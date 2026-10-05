@@ -17,4 +17,5 @@ const html = fs.readFileSync('src/index.html', 'utf8');
 const out = html.replace('<!--APP-->', () => `<script>\n/* three.js (MIT) dahil */\n${js}\n</script>`);
 fs.mkdirSync('dist', { recursive: true });
 fs.writeFileSync('dist/bilgisayarin-icine-yolculuk.html', out);
-console.log('dist/bilgisayarin-icine-yolculuk.html', (out.length / 1024).toFixed(0) + ' KB');
+fs.writeFileSync('dist/index.html', out);
+console.log('dist/index.html', (out.length / 1024).toFixed(0) + ' KB');
