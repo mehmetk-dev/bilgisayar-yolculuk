@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilgisayarın İçine Yolculuk</title>
+<style>
+:root {
+  --fs: 19px;
+  --bg: rgba(12, 16, 22, 0.9);
+  --bg2: rgba(28, 34, 44, 0.96);
+  --line: #3a4554;
+  --fg: #f4f6f9;
+  --mut: #b9c3cf;
+  --acc: #ffd166;
+  --acc2: #36d6ff;
+  --pw: #ff9a2e;
+  --ok: #3ddc84;
+  --bad: #ff5a5a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #1a2029; color: var(--fg); font: var(--fs)/1.4 "Segoe UI", "DejaVu Sans", "Noto Sans", Arial, sans-serif; }
+#c { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; touch-action: none; }
+button, select { font: inherit; color: var(--fg); background: #253041; border: 2px solid var(--line); border-radius: 10px; padding: 0.38em 0.7em; cursor: pointer; }
+button:hover { border-color: var(--acc); }
+button.on { background: #3b4a20; border-color: var(--acc); color: #fff; }
+button:focus-visible { outline: 3px solid var(--acc2); }
+h2, h3, h4 { margin: 0; }
+.small { font-size: 0.78em; color: var(--mut); }
+
+/* üst çubuk */
+#top { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 0.6em; padding: 0.4em 0.8em; background: linear-gradient(#0c1016f2, #0c101600); z-index: 10; pointer-events: none; flex-wrap: wrap; }
+#top > * { pointer-events: auto; }
+.brand { font-weight: 800; font-size: 1.25em; letter-spacing: 0.01em; white-space: nowrap; text-shadow: 0 2px 6px #000; }
+.brand span { color: var(--acc); }
+#eraBadge { background: var(--bg); border: 2px solid var(--acc); padding: 0.2em 0.7em; border-radius: 999px; white-space: nowrap; }
+#variantBox { display: flex; gap: 0.4em; }
+.spacer { flex: 1; }
+.topbtns { display: flex; gap: 0.4em; flex-wrap: wrap; justify-content: flex-end; }
+.topbtns button { font-size: 0.85em; }
+
+/* sol araçlar */
+#tools { gap: 0.25em; position: fixed; left: 0.6em; top: 4.6em; bottom: 8.2em; width: 12.6em; overflow-y: auto; display: flex; flex-direction: column; gap: 0.32em; z-index: 9; padding: 0.5em; background: var(--bg); border: 2px solid var(--line); border-radius: 14px; scrollbar-width: thin; }
+#tools .grp { font-size: 0.68em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--acc); margin: 0.35em 0 0 0.2em; font-weight: 700; }
+#tools button { text-align: left; font-size: 0.86em; padding: 0.26em 0.55em; }
+#tools .row { display: flex; gap: 0.3em; }
+#tools .row button { flex: 1; text-align: center; }
+.tool[data-kind="power"].on { background: #4a2a10; border-color: var(--pw); }
+.tool[data-kind="data"].on { background: #0f3a48; border-color: var(--acc2); }
+
+/* alt çubuk */
+#bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; align-items: center; gap: 1.2em; padding: 0.6em 1em 0.8em; background: linear-gradient(#0c101600, #0c1016f5 35%); flex-wrap: wrap; justify-content: center; }
+#timeline { display: flex; align-items: center; position: relative; gap: 0; background: var(--bg); border: 2px solid var(--line); border-radius: 999px; padding: 0.3em; }
+#timeline .era { border: 0; background: transparent; border-radius: 999px; padding: 0.45em 1.1em; font-weight: 800; font-size: 1.05em; position: relative; }
+#timeline .era small { display: block; font-weight: 400; font-size: 0.62em; color: var(--mut); }
+#timeline .era.on { background: var(--acc); color: #111; }
+#timeline .era.on small { color: #333; }
+#timeline .era + .era::before { content: ""; position: absolute; left: -0.1em; top: 50%; width: 0.2em; height: 0.2em; border-radius: 50%; background: var(--mut); }
+.slider { display: flex; align-items: center; gap: 0.6em; background: var(--bg); border: 2px solid var(--line); border-radius: 999px; padding: 0.35em 1em; }
+.slider input { width: 13em; accent-color: var(--acc); height: 1.6em; }
+#tourBtns { display: flex; gap: 0.4em; }
+#tourBtns button { font-weight: 700; }
+
+/* bilgi paneli */
+#info { position: fixed; right: 0.6em; top: 4.2em; width: min(30em, 42vw); max-height: calc(100vh - 13.5em); overflow-y: auto; z-index: 11; background: var(--bg2); border: 2px solid var(--acc); border-radius: 16px; padding: 0.9em 1.1em; display: none; box-shadow: 0 10px 40px #0009; }
+#info.open { display: block; }
+.ihead { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6em; margin-bottom: 0.4em; }
+.ikind { font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--acc); font-weight: 700; }
+#info h2 { font-size: 1.45em; line-height: 1.15; }
+#info h3 { font-size: 0.95em; color: var(--acc); margin: 0.7em 0 0.2em; }
+.x { background: transparent; border: 2px solid var(--line); border-radius: 50%; width: 2em; height: 2em; padding: 0; flex: none; }
+.spec { background: #0f141b; border-left: 4px solid var(--acc2); padding: 0.35em 0.6em; border-radius: 6px; font-size: 0.86em; color: #dff6ff; margin: 0.2em 0 0.6em; }
+.tabs { display: flex; gap: 0.3em; flex-wrap: wrap; margin-bottom: 0.5em; }
+.tabs button { font-size: 0.82em; padding: 0.3em 0.55em; }
+.ibody { font-size: 1em; line-height: 1.5; }
+.ibody p { margin: 0.3em 0; }
+.ibtns { display: flex; flex-wrap: wrap; gap: 0.35em; margin-top: 0.8em; }
+.ibtns button { font-size: 0.85em; }
+.warn { margin-top: 0.6em; background: #4a1b1b; border: 2px solid var(--bad); border-radius: 8px; padding: 0.4em 0.6em; }
+b.pw { color: var(--pw); } b.dt { color: var(--acc2); } b.g { color: var(--ok); } b.p { color: #c792ff; }
+
+/* etiketler */
+#labels { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+.lbl { position: absolute; left: 0; top: 0; display: none; pointer-events: auto; cursor: pointer; will-change: transform; }
+.lbl span { display: block; background: rgba(10, 14, 20, 0.88); border: 2px solid var(--acc); color: #fff; font-weight: 700; padding: 0.12em 0.55em; border-radius: 8px; white-space: nowrap; font-size: 0.92em; box-shadow: 0 3px 10px #0008; }
+.lbl::after { content: ""; position: absolute; left: calc(50% + var(--sx, 0px)); top: 100%; width: 2px; height: var(--stem, 20px); background: var(--acc); transform: translateX(-1px); }
+.lbl::before { content: ""; position: absolute; left: calc(50% + var(--sx, 0px)); top: calc(100% + var(--stem, 20px) - 4px); width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 2px #000a; }
+.lbl.sel span { background: var(--acc); color: #111; }
+.lbl.below::after { top: auto; bottom: 100%; }
+.lbl.below::before { top: auto; bottom: calc(100% + var(--stem, 20px) - 4px); }
+.lbl.cable.power span { border-color: var(--pw); } .lbl.cable.power::after, .lbl.cable.power::before { background: var(--pw); }
+.lbl.cable.data span { border-color: var(--acc2); } .lbl.cable.data::after, .lbl.cable.data::before { background: var(--acc2); }
+.lbl.feature span { background: var(--acc); color: #111; font-size: 1.05em; }
+.lbl.region span { background: #0e2a38; border-color: var(--acc2); font-size: 1em; }
+.lbl.region::after, .lbl.region::before { background: var(--acc2); }
+
+/* paneller */
+.panel { position: fixed; z-index: 12; background: var(--bg2); border: 2px solid var(--line); border-radius: 16px; padding: 0.8em 1em; display: none; box-shadow: 0 10px 40px #0009; }
+.panel.open { display: block; }
+.panel h3 { font-size: 1.1em; }
+#legend { left: 14.8em; top: 6.4em; width: 24em; max-height: 60vh; overflow-y: auto; }
+#legend ul { list-style: none; padding: 0; margin: 0.4em 0 0; }
+#legend li { padding: 0.25em 0.3em; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.5em; }
+#legend li:hover { background: #2a3546; }
+#legend li i { width: 1.4em; height: 0.5em; border-radius: 4px; flex: none; }
+#legend li i.power { background: var(--pw); } #legend li i.data { background: var(--acc2); }
+#legend p { margin: 0.3em 0; font-size: 0.9em; }
+#featureMenu { left: 14.8em; top: 6.4em; width: 18em; display: none; }
+#featureMenu.open { display: flex; flex-direction: column; gap: 0.35em; }
+#featureMenu button { text-align: left; }
+#powerPanel { left: 50%; transform: translateX(-50%); top: 4.4em; width: min(46em, 94vw); }
+.states, .variant { display: flex; gap: 0.4em; margin: 0.5em 0; flex-wrap: wrap; }
+.variant button { font-weight: 700; }
+.pbar-l { margin-top: 0.6em; font-size: 0.95em; }
+.pbar { position: relative; height: 2.1em; background: #0d1117; border: 2px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; margin-top: 0.25em; }
+.pbar.cap > div { background: repeating-linear-gradient(45deg, #2d3b52, #2d3b52 10px, #34445e 10px, #34445e 20px); }
+.pbar .seg { height: 100%; transition: width 0.6s ease; border-right: 2px solid #0d1117; }
+.pbar span { position: absolute; right: 0.6em; top: 50%; transform: translateY(-50%); font-weight: 800; text-shadow: 0 1px 3px #000; }
+.plegend { display: flex; flex-wrap: wrap; gap: 0.4em 1em; margin-top: 0.5em; font-size: 0.85em; }
+.plegend i { display: inline-block; width: 0.9em; height: 0.9em; border-radius: 3px; margin-right: 0.3em; vertical-align: -0.1em; }
+.pnote { margin-top: 0.6em; font-size: 0.92em; background: #0f141b; padding: 0.4em 0.6em; border-radius: 8px; }
+.pnote.small { font-size: 0.75em; background: none; padding: 0; color: var(--mut); }
+#conceptsPanel, #eraPanel { left: 50%; transform: translateX(-50%); top: 4.4em; width: min(52em, 94vw); max-height: calc(100vh - 14em); overflow-y: auto; }
+.concept { border-top: 2px solid var(--line); padding: 0.6em 0; }
+.concept h4 { color: var(--acc); font-size: 1.05em; }
+.concept p { margin: 0.3em 0; }
+.cbtns { display: flex; gap: 0.4em; flex-wrap: wrap; }
+#eraPanel ul { margin: 0.3em 0; }
+#cpuModal { position: fixed; inset: 0; z-index: 30; background: #000c; display: none; align-items: center; justify-content: center; }
+#cpuModal.open { display: flex; }
+.mbox { background: var(--bg2); border: 2px solid var(--acc); border-radius: 16px; padding: 0.9em 1.1em; width: min(62em, 96vw); max-height: 96vh; overflow-y: auto; }
+.schema svg { width: 100%; height: auto; display: block; border-radius: 10px; }
+.facts { border-collapse: collapse; margin-top: 0.6em; width: 100%; }
+.facts th, .facts td { text-align: left; padding: 0.25em 0.5em; border-bottom: 1px solid var(--line); }
+.facts th { color: var(--acc); width: 40%; }
+#comparePanel { inset: 0; padding: 0; background: transparent; border: 0; box-shadow: none; pointer-events: none; z-index: 20; }
+#comparePanel.open { display: block; }
+#comparePanel > * { pointer-events: auto; }
+.ctop { position: absolute; top: 0.6em; left: 0.6em; right: 0.6em; display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; background: var(--bg2); border: 2px solid var(--acc); border-radius: 14px; padding: 0.5em 0.8em; }
+.closeBtn { font-weight: 700; border-color: var(--acc); }
+.cats { display: flex; gap: 0.35em; flex-wrap: wrap; flex: 1; }
+.cats button { font-size: 0.85em; }
+.cbottom { position: absolute; left: 0.6em; right: 0.6em; bottom: 0.6em; background: var(--bg2); border: 2px solid var(--line); border-radius: 14px; padding: 0.6em 0.9em; max-height: 46vh; overflow-y: auto; }
+.lesson { font-weight: 700; margin-bottom: 0.4em; }
+.badge { display: inline-block; margin-left: 0.5em; padding: 0.1em 0.6em; border-radius: 999px; font-size: 0.85em; }
+.badge.up { background: #6a2a12; border: 2px solid var(--pw); }
+.badge.down { background: #12452a; border: 2px solid var(--ok); }
+.badge.same { background: #2a3546; border: 2px solid var(--mut); }
+.ctable { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.ctable th, .ctable td { border-bottom: 1px solid var(--line); padding: 0.25em 0.5em; text-align: left; vertical-align: top; }
+.ctable tr > th:first-child { color: var(--acc); width: 14%; }
+.ctable select { width: 100%; font-weight: 700; }
+body.comparing #labels, body.comparing #tools, body.comparing #bottom, body.comparing #info, body.comparing #legend, body.comparing #top { display: none !important; }
+#quizBar { left: 50%; transform: translateX(-50%); bottom: 7.4em; top: auto; width: min(54em, 94vw); border-color: var(--acc); text-align: center; }
+#quizBar.open { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: center; justify-content: center; }
+.qq { font-size: 1.35em; font-weight: 800; width: 100%; }
+.qmsg { width: 100%; }
+.qmsg.ok { color: var(--ok); font-weight: 700; } .qmsg.bad { color: var(--bad); font-weight: 700; }
+.qscore { font-weight: 700; color: var(--acc); }
+#toast { position: fixed; left: 50%; top: 5em; transform: translateX(-50%); background: var(--bg2); border: 2px solid var(--acc); padding: 0.5em 1em; border-radius: 10px; z-index: 40; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+#toast.on { opacity: 1; }
+#fade { position: fixed; inset: 0; background: #1a2029; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 8; }
+#fade.on { opacity: 1; }
+#loading { position: fixed; inset: 0; z-index: 50; background: #11161d; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6em; transition: opacity 0.5s; }
+#loading.done { opacity: 0; pointer-events: none; }
+#loading h1 { margin: 0; font-size: 2.2em; }
+#loading h1 span { color: var(--acc); }
+#help { position: fixed; inset: 0; z-index: 45; background: #000c; display: none; align-items: center; justify-content: center; }
+#help.open { display: flex; }
+#help .mbox ul { line-height: 1.7; }
+kbd { background: #2a3546; border: 1px solid var(--line); border-radius: 5px; padding: 0 0.35em; font-family: inherit; }
+@media (max-width: 1100px) {
+  :root { --fs: 16px; }
+  #tools { width: 11.5em; }
+}
+</style>
+</head>
+<body>
+<canvas id="c" tabindex="0" aria-label="3B bilgisayar modeli"></canvas>
+<div id="labels"></div>
+
+<header id="top">
+  <div class="brand">Bilgisayarın <span>İçine</span> Yolculuk</div>
+  <div id="eraBadge"></div>
+  <div id="variantBox"></div>
+  <div class="spacer"></div>
+  <div class="topbtns">
+    <button id="levelBtn" title="Anlatım düzeyi">👦 Çocuklar</button>
+    <button id="labelBtn" class="on" title="Etiketler (L)">🏷 Etiketler</button>
+    <button id="pauseBtn" class="on" title="Animasyonları durdur (Boşluk)">⏸ Animasyon</button>
+    <button id="fontDown" title="Yazıyı küçült">A−</button>
+    <button id="fontUp" title="Yazıyı büyüt">A+</button>
+    <button id="qualBtn" title="Yavaş bilgisayarlarda düşük seçin">Grafik: yüksek</button>
+    <button id="fsBtn" title="Tam ekran (F)">⛶ Tam ekran</button>
+    <button id="helpBtn" title="Yardım">?</button>
+  </div>
+</header>
+
+<nav id="tools" aria-label="Araçlar">
+  <div class="grp">Görünüş</div>
+  <div class="row"><button class="tool" data-act="view" data-v="front">Ön</button><button class="tool" data-act="view" data-v="rear">Arka</button></div>
+  <div class="row"><button class="tool" data-act="view" data-v="inside">İç</button><button class="tool" data-act="view" data-v="io">Arka panel</button></div>
+  <div class="grp">Kasa</div>
+  <button id="openBtn">Kasayı aç</button>
+  <button id="trayBtn">⏏ CD/DVD tepsisi</button>
+  <button id="diskBtn">⏏ Disket</button>
+  <div class="grp">Bağlantılar</div>
+  <button class="tool" data-act="cables" data-kind="power">🟧 Güç kabloları</button>
+  <button class="tool" data-act="cables" data-kind="data">🟦 Veri bağlantıları</button>
+  <button id="featBtn">Anakart soketleri</button>
+  <div class="grp">Ders</div>
+  <button id="eraBtn">📅 Dönem bilgisi</button>
+  <button id="powerBtn">⚡ Güç tüketimi</button>
+  <button id="cmpBtn">⇄ Karşılaştır</button>
+  <button id="conceptBtn">💡 Kavramlar</button>
+  <button id="quizBtn">❓ Buldurma oyunu</button>
+</nav>
+
+<aside id="info" aria-live="polite"></aside>
+<div id="legend" class="panel"></div>
+<div id="featureMenu" class="panel"></div>
+<div id="powerPanel" class="panel"></div>
+<div id="conceptsPanel" class="panel"></div>
+<div id="eraPanel" class="panel"></div>
+<div id="quizBar" class="panel"></div>
+<div id="comparePanel" class="panel"></div>
+<div id="cpuModal"></div>
+
+<footer id="bottom">
+  <div id="timeline" role="tablist" aria-label="Dönemler">
+    <button class="era" data-era="1990">1990'lar<small>disket · CD</small></button>
+    <button class="era" data-era="2000">2000'ler<small>AGP · DVD</small></button>
+    <button class="era" data-era="2010">2010'lar<small>SSD · USB 3</small></button>
+    <button class="era" data-era="2025">2025<small>M.2 · cam kasa</small></button>
+  </div>
+  <label class="slider">Parçaları ayır <input id="explode" type="range" min="0" max="100" value="0"></label>
+  <div id="tourBtns"><button id="prevBtn">◀ Önceki parça</button><button id="nextBtn">Sonraki parça ▶</button></div>
+</footer>
+
+<div id="help"><div class="mbox"><h3>Nasıl kullanılır?</h3><ul>
+  <li><b>Döndürme:</b> sol fare tuşuyla sürükleyin · <b>Yakınlaştırma:</b> tekerlek · <b>Kaydırma:</b> sağ tuş</li>
+  <li>Bir parçaya ya da porta <b>tıklayın</b>: büyür, açıklaması çıkar. Boş yere tıklamak seçimi kaldırır.</li>
+  <li><kbd>←</kbd> <kbd>→</kbd> önceki/sonraki parça · <kbd>Boşluk</kbd> animasyon · <kbd>L</kbd> etiketler · <kbd>O</kbd> kasayı aç · <kbd>F</kbd> tam ekran · <kbd>1</kbd>–<kbd>4</kbd> dönemler · <kbd>Esc</kbd> kapat</li>
+  <li>Sistemler <b>temsilîdir</b>; marka adları uydurmadır. Güç değerleri tahminidir.</li>
+</ul><p class="small">Kapatmak için tıklayın.</p></div></div>
+<div id="toast"></div>
+<div id="fade"></div>
+<div id="loading"><h1>Bilgisayarın <span>İçine</span> Yolculuk</h1><div>Model hazırlanıyor…</div></div>
+<!--APP-->
+</body>
+</html>
