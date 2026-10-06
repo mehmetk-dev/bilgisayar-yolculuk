@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilgisayar Dersleri</title>
+<style>
+<!--CSS-->
+</style>
+</head>
+<body data-view="home">
+<header id="top">
+  <a class="brand" href="#">💻 Bilgisayar <span>Dersleri</span></a>
+  <span id="crumb"></span>
+  <span class="sp"></span>
+  <button id="fontDown" type="button" title="Yazıyı küçült">A−</button>
+  <button id="fontUp" type="button" title="Yazıyı büyüt">A+</button>
+  <button id="soundBtn" type="button" title="Başarı sesini aç/kapat"></button>
+  <a class="btn" href="bilgisayar.html" title="Bilgisayarın içini üç boyutlu görün">🖥 Bilgisayarı canlı gör</a>
+</header>
+
+<main id="home">
+  <div class="hero">
+    <h1>Bilgisayarı adım adım öğrenelim</h1>
+    <p>Bir ders seçin. Her adımda ne yapacağınız yazar; doğru yaptığınızda ekran size haber verir. Acele etmeyin, yanlış yapmaktan korkmayın: burada hiçbir şey bozulmaz. Yandaki bilgisayar bir <b>alıştırma bilgisayarıdır</b>; gerçek dosyalarınıza dokunmaz.</p>
+  </div>
+  <a class="live" href="bilgisayar.html">
+    <span class="live-ic">🖥</span>
+    <span class="live-txt"><b>Bilgisayarı canlı görün</b><small>Kasayı açın, parçaları tek tek inceleyin: 1990'lardan bugüne üç boyutlu bilgisayar.</small></span>
+    <span class="live-go">Aç ▶</span>
+  </a>
+  <div id="cards"></div>
+</main>
+
+<main id="lesson">
+  <section id="guide" aria-live="polite">
+    <div class="prog"><span id="stepNo"></span><div id="bar"><i></i></div></div>
+    <div id="dots" aria-label="Adımlar"></div>
+    <h2 id="stepTitle"></h2>
+    <div id="stepBody"></div>
+    <div id="combo"></div>
+    <div id="msg" hidden></div>
+    <div id="hint" hidden></div>
+    <button id="manual" type="button" class="primary" hidden></button>
+    <button id="next" type="button" class="primary" hidden>Devam ▶</button>
+    <div class="gnav">
+      <button id="prev" type="button">◀ Önceki adım</button>
+      <button id="hintBtn" type="button">💡 İpucu</button>
+      <button id="skip" type="button" title="Algılanmadıysa bir sonraki adıma geçer">Adımı geç ▶</button>
+    </div>
+  </section>
+  <section id="work">
+    <div id="np"></div>
+    <div id="desk"></div>
+    <div id="scene"></div>
+    <div class="under">
+      <div id="pano" class="empty"><h3>📋 Pano <span class="pflash"></span></h3><div class="ptext"></div></div>
+      <div class="kbwrap"><div id="kb" class="kb" aria-hidden="true"></div></div>
+    </div>
+  </section>
+</main>
+<div id="printCard"></div>
+<!--APP-->
+</body>
+</html>

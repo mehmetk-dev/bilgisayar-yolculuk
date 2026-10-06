@@ -4,7 +4,7 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 
 ## Hızlı başlangıç
 
-`dist/bilgisayarin-icine-yolculuk.html` dosyasını Chrome, Edge, Firefox ya da Brave ile açın. İnternet bağlantısı gerekmez: Three.js ve bütün dokular dosyanın içine gömülüdür. Kurulum da gerekmez.
+`dist/index.html` (dersler, ana sayfa) ya da `dist/bilgisayar.html` (3B bilgisayar) dosyasını Chrome, Edge, Firefox ya da Brave ile açın. İnternet bağlantısı gerekmez: Three.js ve bütün dokular dosyanın içine gömülüdür. Kurulum da gerekmez.
 
 ## Dersteki kullanım
 
@@ -28,6 +28,35 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 | Anlatım düzeyini değiştirmek | Üstte "Çocuklar" / "Gençler (teknik)" |
 | Sunum için ayar yapmak | Tam ekran (<kbd>F</kbd>), A−/A+ ile yazı boyutu, animasyonu durdurma (<kbd>Boşluk</kbd>), sonraki/önceki parça (<kbd>←</kbd> <kbd>→</kbd>) |
 | Yavaş bilgisayarda çalıştırmak | "Grafik: düşük" seçeneği gölgeleri kapatır ve çözünürlüğü düşürür. Açılışta kare hızı düşükse uygulama bunu kendiliğinden yapar |
+
+## Dersler (ana sayfa: `index.html`)
+
+Bilgisayarı yeni öğrenen yetişkinler için adım adım alıştırmalar. Sitenin ana sayfasıdır; buradaki **🖥 Bilgisayarı canlı gör** bağlantısı 3B bilgisayarı açar, oradaki **📝 Derslere dön** düğmesi geri getirir. Her adımda ne yapılacağı yazar; sayfa öğrencinin yaptığını algılar ve doğru yapınca bir sonraki adıma geçirir.
+
+Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
+
+| Hafta | Dersler |
+|---|---|
+| 1 | Açma-kapama (güç düğmesi, şifre, Uyku/Kapat/Yeniden başlat) · Fareyi tutma ve tek tık (hedef oyunu) · Çift tık, sağ tık, tekerlek (balon oyunu, Mayın Tarlası) · Sürükle-bırak (kart dizme) · Pencereler · Fare parkuru |
+| 2 | Klavye: Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, İ/I, ! ? @, ok tuşları, Home/End |
+| 3 | Not Defteri: seçme, Ctrl+A/C/V/X/Z/Y, sağ tık, Ctrl+S ile kaydetme, Ctrl+O ile açma |
+| 4 | 3B uygulama + "Donanım mı, yazılım mı?" ve "Giriş mi, çıkış mı?" ayırma oyunları |
+| 5 | Masaüstü, Başlat'tan ve aramayla açma, görev çubuğu, masaüstünü göster, Alt+Tab, ses |
+| 6 | Dosya Gezgini: yeni klasör, F2, taşıma, kopyalama, silme, Geri Dönüşüm Kutusu, arama, USB bellek |
+| 7 | Paint · Ekran Alıntısı · Ayarlar (arka plan, ses, Wi-Fi, saat, yazı boyutu) |
+| 8 | İnternette gezinme ve indirme (reklam tuzakları) · Program kurma/kaldırma (izin penceresi, ek yazılım kutucukları) · Yazıcı ve sürücüler (Aygıt Yöneticisi) · İşletim sistemi kurulumu (gösterim) |
+| Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre |
+
+Eğitmen için:
+- Ekrandaki klavye basılan tuşu ve adımın istediği tuşları yakar. **Pano** kutusu kopyalanan yazıyı gösterir.
+- Sık yapılan hatalarda (Ctrl'yi basılı tutmayı unutmak, yazıyı yanlışlıkla silmek, reklama tıklamak…) uyarı çıkar. 40 saniye ilerlenmezse ipucu açılır. Algılanamayan bir durumda "Adımı geç" kullanılabilir.
+- Her adımın süresi tutulur. Fare parkurunun sonunda her görevin süresi listelenir, en uzun süren kırmızı görünür. Diğer derslerde en uzun süren üç adım gösterilir.
+- İlerleme tarayıcıda saklanır; sayfa yenilense de kaldığı yerden devam eder. Ders sonunda özet kartı yazdırılabilir.
+
+Kaynak: `src/dersler/`
+- `app.js`: ders akışı. `lessons/`: ders metinleri ve adımlar. Her adımın hangi olayla tamamlanacağı burada yazılıdır; alanlar `lessons/common.js` başında anlatılır.
+- `desktop.js`: alıştırma masaüstü. `apps/`: programlar. `vfs.js`: bellekteki dosya sistemi. `dialog.js`: kaydet/aç/yazdır pencereleri.
+- `notepad.js`, `keyboard.js`: Not Defteri ve ekran klavyesi. `css/`: stiller (derlemede sayfaya gömülür).
 
 ## Temsilî sistemler
 
@@ -54,7 +83,7 @@ Bu sistemler kesin geçiş tarihlerini göstermez. Her dönemin farkını anlatm
 
 ```bash
 npm install
-node build.mjs          # dist/bilgisayarin-icine-yolculuk.html (küçültülmüş)
+node build.mjs          # dist/index.html (dersler) ve dist/bilgisayar.html (3B) (küçültülmüş, internetsiz çalışır)
 node build.mjs --dev    # okunabilir çıktı
 node tools/shot.mjs senaryo.json   # ekran görüntüsü (Brave/Chromium + puppeteer-core)
 ```
