@@ -77,10 +77,11 @@ function showHome() {
     }
     const p = store.lessons[l.id];
     const total = l.steps.length;
-    let status = `<span class="tag">⏱ ~${l.minutes} dk · ${total} adım</span>`;
+    const sc = l.test && testScore(l);
+    let status = `<span class="tag">⏱ ~${l.minutes} dk · ${sc ? `${sc.total} soru` : `${total} adım`}</span>`;
     let btn = `<a class="btn primary" href="#ders/${l.id}">Başla ▶</a>`;
     if (p?.done) {
-      status = '<span class="tag ok">✔ Tamamlandı</span>';
+      status = `<span class="tag ok">✔ ${sc ? `Puan: ${sc.right} / ${sc.total}` : 'Tamamlandı'}</span>`;
       btn = `<a class="btn" href="#ders/${l.id}" data-restart="${l.id}">↻ Tekrar yap</a>`;
     } else if (p?.step > 0) {
       status = `<span class="tag">Adım ${p.step + 1} / ${total}</span>`;
@@ -255,6 +256,10 @@ function finalHtml() {
     const total = timed.reduce((a, s) => a + s.t, 0);
     report = `<h3 class="rep-h">⏱ Parkur süresi: ${fmtTime(total)}</h3><table class="sum rep">${timed.sort((a, b) => a.i - b.i).map((s) => `<tr class="${s.t === slow[0].t ? 'slow' : ''}"><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table>
       <p class="mut">Kırmızı satır, en uzun süren görevdir. Öğrencinin takıldığı yeri gösterir.</p>`;
+  } else if (lesson.test) {
+    const sc = testScore(lesson);
+    report = `<div class="score"><b>${sc.right} / ${sc.total}</b><span>soruyu ilk denemede doğru bildiniz</span></div>
+      ${sc.missed.length ? `<details class="rep-d" open><summary>Tekrar bakılacak konular</summary><ul>${sc.missed.map((s) => `<li>${esc(s.title)}</li>`).join('')}</ul></details>` : '<p>Hepsini ilk denemede bildiniz! 🌟</p>'}`;
   } else if (slow.length >= 3) {
     report = `<details class="rep-d"><summary>⏱ En uzun süren adımlar (eğitmen için)</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
   }
@@ -270,6 +275,14 @@ function finalHtml() {
       <a class="btn" href="#">🏠 Ders listesi</a>
     </div>
     ${lesson.stage === 'scene' ? '' : '<p class="mut">Yandaki alanda dilediğiniz kadar serbestçe alıştırma yapabilirsiniz.</p>'}`;
+}
+
+// Testlerde puan: ilk denemede (uyarı almadan) doğru bilinen sorular. Atlanan soru yanlış sayılır.
+function testScore(l) {
+  const stats = store.lessons[l.id]?.stats || {};
+  const qs = l.steps.filter((s) => s.quiz);
+  const right = qs.filter((s) => { const st = stats[l.steps.indexOf(s)]; return st && !st.w; });
+  return { total: qs.length, right: right.length, missed: qs.filter((s) => !right.includes(s)) };
 }
 
 function nextLesson() {

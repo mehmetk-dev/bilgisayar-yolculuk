@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Bilgisayar İşletmenliği – 1. Hafta Alıştırmaları</title>
+<style>
+@page { size: 1280px 720px; margin: 0; }
+:root { --ink:#1d1d1b; --mut:#6b6a64; --line:#d9d5ca; --paper:#fbfaf6; --acc:#b5441c; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); }
+body { font-family: 'Fira Sans', sans-serif; color: var(--ink); counter-reset: n; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.slide { width: 1280px; height: 720px; padding: 64px 80px 0; position: relative; overflow: hidden; page-break-after: always; break-after: page; counter-increment: n; background: var(--paper); }
+.slide::after { content: "Bilgisayar İşletmenliği  ·  1. Hafta"; position: absolute; left: 80px; bottom: 28px; font-size: 14px; color: var(--mut); letter-spacing: .02em; }
+.slide::before { content: counter(n); position: absolute; right: 80px; bottom: 28px; font-size: 14px; color: var(--mut); }
+.kick { font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--acc); font-weight: 500; margin: 0 0 10px; }
+h1 { font-size: 42px; line-height: 1.15; font-weight: 600; margin: 0 0 28px; letter-spacing: -.01em; }
+h2 { font-size: 22px; font-weight: 600; margin: 0 0 8px; }
+p { font-size: 24px; line-height: 1.45; margin: 0 0 14px; }
+.mut { color: var(--mut); }
+ul { margin: 0; padding: 0; list-style: none; }
+li { font-size: 24px; line-height: 1.4; padding-left: 26px; position: relative; margin-bottom: 14px; }
+li::before { content: ""; position: absolute; left: 0; top: .62em; width: 10px; height: 2px; background: var(--acc); }
+b, strong { font-weight: 600; }
+.cols { display: flex; gap: 56px; align-items: flex-start; }
+.col { flex: 1; }
+.fig { margin: 0; }
+.fig img { display: block; width: 100%; border: 1px solid var(--line); }
+.fig figcaption { font-size: 15px; color: var(--mut); margin-top: 8px; line-height: 1.35; }
+.rule { height: 1px; background: var(--line); margin: 0 0 24px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); font-size: 21px; line-height: 1.35; }
+th { font-weight: 600; white-space: nowrap; padding-right: 28px; }
+thead th { font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); font-weight: 500; border-bottom: 1px solid var(--ink); }
+.num { font-weight: 600; color: var(--acc); }
+kbd, .k { font-family: inherit; font-weight: 600; border: 1px solid var(--ink); padding: 0 8px; border-radius: 3px; font-size: .85em; }
+.note { border-left: 3px solid var(--acc); padding: 4px 0 4px 18px; font-size: 21px; line-height: 1.4; margin-top: 18px; }
+.steps4 { display: flex; gap: 0; margin-top: 18px; border-top: 1px solid var(--ink); }
+.steps4 div { flex: 1; padding: 20px 24px 0 0; }
+.steps4 .n { font-size: 56px; font-weight: 300; color: var(--acc); line-height: 1; margin-bottom: 10px; }
+.steps4 span { font-size: 23px; line-height: 1.35; display: block; }
+.cover { padding-top: 0; display: flex; flex-direction: column; justify-content: center; }
+.cover h1 { font-size: 72px; margin-bottom: 18px; font-weight: 600; }
+.cover .sub { font-size: 30px; color: var(--mut); margin: 0; }
+.cover .bar { width: 72px; height: 4px; background: var(--acc); margin-bottom: 36px; }
+.cover .meta { position: absolute; left: 80px; bottom: 56px; font-size: 18px; color: var(--mut); }
+.cover::after, .cover::before { display: none; }
+.win { border: 1px solid var(--ink); width: 100%; background: #fff; }
+.win .bar { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--ink); padding: 8px 12px; font-size: 18px; }
+.win .bar i { font-style: normal; display: inline-block; width: 34px; text-align: center; }
+.win .body { height: 110px; display: flex; align-items: center; justify-content: center; color: var(--mut); font-size: 18px; }
+.task2 { columns: 2; column-gap: 56px; }
+.task2 li { break-inside: avoid; font-size: 22px; margin-bottom: 11px; }
+.big { font-size: 28px; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide cover">
+  <div class="bar"></div>
+  <h1>Bilgisayar İşletmenliği</h1>
+  <p class="sub">1. Hafta: Açma-kapama, fare ve pencereler</p>
+  <p class="sub" style="font-size:22px;margin-top:10px">Alıştırmalar ve oyunlar</p>
+  <div class="meta">Alıştırma bilgisayarında uygulamalı ders</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <p class="kick">Bu hafta</p>
+  <h1>Altı ders, yüz dakika</h1>
+  <table>
+    <thead><tr><th>Ders</th><th>Süre</th><th>Alıştırma ve oyunlar</th></tr></thead>
+    <tr><th><span class="num">1</span>&nbsp; Açma ve kapatma</th><td>15 dk</td><td>Bilgisayarı aç, şifre gir; Uyku, Yeniden başlat, Kapat</td></tr>
+    <tr><th><span class="num">2</span>&nbsp; Fareyi tutma, tek tık</th><td>15 dk</td><td>Dört köşe, Hedef oyunu</td></tr>
+    <tr><th><span class="num">3</span>&nbsp; Çift tık, sağ tık, tekerlek</th><td>20 dk</td><td>Balon oyunu, Karışık hedef, Tarif kaydırma, Mayın Tarlası</td></tr>
+    <tr><th><span class="num">4</span>&nbsp; Sürükle-bırak</th><td>15 dk</td><td>Simge taşıma, Kart dizme, Klasöre ve çöpe atma</td></tr>
+    <tr><th><span class="num">5</span>&nbsp; Pencereler</th><td>20 dk</td><td>Hesap Makinesi ile küçült, büyüt, taşı</td></tr>
+    <tr><th><span class="num">6</span>&nbsp; Fare parkuru</th><td>15 dk</td><td>11 görevlik tekrar, süre tutulur</td></tr>
+  </table>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <p class="kick">Başlamadan önce</p>
+  <h1>Alıştırmalar nasıl işliyor?</h1>
+  <div class="cols">
+    <div class="col" style="flex:.8">
+      <ul>
+        <li>Solda <b>ne yapacağınız</b> yazar, sağda <b>alıştırma bilgisayarı</b> vardır.</li>
+        <li>Doğru yaptığınızda ekran <b>kendiliğinden</b> sonraki adıma geçer.</li>
+        <li>Yanlış yaparsanız bir uyarı çıkar; takılırsanız ipucu açılır.</li>
+        <li>Gerçek dosyalarınıza dokunmaz. <b>Hiçbir şey bozulmaz.</b></li>
+      </ul>
+    </div>
+    <div class="col" style="flex:1.2">
+      <figure class="fig"><img src="img/app_genel.png"><figcaption>Sol: adım ve yönerge. Sağ: alıştırma bilgisayarı (burada Hedef oyunu açık).</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <p class="kick">Ders 1 · Açma ve kapatma</p>
+  <h1>Bilgisayarın dört parçası</h1>
+  <table style="margin-top:6px">
+    <tr><th class="big" style="width:210px">Kasa</th><td class="big">Asıl bilgisayar budur. Bütün işi o yapar.</td></tr>
+    <tr><th class="big">Ekran</th><td class="big">Kasanın yaptığını gösterir (monitör).</td></tr>
+    <tr><th class="big">Klavye</th><td class="big">Yazı yazarız.</td></tr>
+    <tr><th class="big">Fare</th><td class="big">Ekrandaki oku hareket ettirir, tıklarız.</td></tr>
+  </table>
+  <p class="mut" style="margin-top:26px">Dizüstü bilgisayarda (laptop) bunların hepsi tek parçadır.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <p class="kick">Ders 1 · Alıştırma</p>
+  <h1>Bilgisayarı açın</h1>
+  <div class="cols" style="gap:28px">
+    <figure class="fig col"><img src="img/ac_kapali.png"><figcaption><b>1.</b> Kasadaki güç düğmesine <b>bir kez</b> basın. Ekranın düğmesi değil, kasanınki.</figcaption></figure>
+    <figure class="fig col"><img src="img/ac_kilit.png"><figcaption><b>2.</b> Kilit ekranına bir kez tıklayın ya da bir tuşa basın.</figcaption></figure>
+    <figure class="fig col"><img src="img/ac_sifre.png"><figcaption><b>3.</b> Şifreyi (1234) yazın, <b>Enter</b>’a basın. Harfler nokta olarak görünür.</figcaption></figure>
+  </div>
+  <p class="note" style="margin-top:30px">Güç düğmesine basılı tutulmaz. Basılı tutmak, donmuş bir bilgisayarı zorla kapatır.</p>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <p class="kick">Ders 1 · Alıştırma</p>
+  <h1>Kapatmanın üç yolu</h1>
+  <div class="cols">
+    <div class="col" style="flex:1">
+      <figure class="fig"><img src="img/ac_guc.png"><figcaption>Başlat menüsü, sağ alt köşedeki güç simgesi.</figcaption></figure>
+    </div>
+    <div class="col" style="flex:1.1">
+      <table>
+        <tr><th>Uyku</th><td>Her şey yerinde kalır. <b>Kısa aralar</b> için.</td></tr>
+        <tr><th>Yeniden başlat</th><td>Yavaşlayınca, donunca, güncellemeden sonra.</td></tr>
+        <tr><th>Kapat</th><td><b>Gün sonunda.</b> Bilgisayar işini toparlayıp kapanır.</td></tr>
+      </table>
+      <p class="note">Fişten çekmek <b>asla</b>: kaydedilmemiş iş kaybolur, bilgisayar bir daha açılmayabilir.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <p class="kick">Ders 2 · Fareyi tutma ve tek tık</p>
+  <h1>Fareyi nasıl tutarız?</h1>
+  <div class="cols">
+    <div class="col" style="flex:.55">
+      <svg viewBox="0 0 160 220" width="260" style="display:block;margin:0 auto">
+        <path d="M80 10 C35 10 18 45 18 90 L18 150 C18 190 45 212 80 212 C115 212 142 190 142 150 L142 90 C142 45 125 10 80 10 Z" fill="#fff" stroke="#1d1d1b" stroke-width="3"/>
+        <path d="M80 10 L80 95 M18 95 L142 95" stroke="#1d1d1b" stroke-width="2.5" fill="none"/>
+        <rect x="73" y="34" width="14" height="34" rx="7" fill="#b5441c"/>
+        <text x="48" y="72" font-size="14" text-anchor="middle" font-family="Fira Sans" font-weight="600">SOL</text>
+        <text x="112" y="72" font-size="14" text-anchor="middle" font-family="Fira Sans" font-weight="600">SAĞ</text>
+      </svg>
+    </div>
+    <div class="col" style="flex:1">
+      <ul>
+        <li>Avucunuzu farenin üstüne <b>rahatça</b> koyun.</li>
+        <li><b>İşaret parmağı</b> sol tuşta, <b>orta parmak</b> sağ tuşta.</li>
+        <li>Bileğiniz masaya dayalı olsun, fare masada kayar.</li>
+        <li>Masanın kenarına geldiyseniz fareyi <b>kaldırıp ortaya koyun</b>. Ekrandaki ok yerinde kalır.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <p class="kick">Ders 2 · Alıştırma 1</p>
+  <h1>Dört köşe</h1>
+  <div class="cols">
+    <div class="col" style="flex:.85">
+      <ul>
+        <li>Ekrandaki ok, yani <b>imleç</b>, fareyle birlikte hareket eder.</li>
+        <li>İmleci ekranın <b>dört köşesine</b> sırayla götürün.</li>
+        <li>Değdiğiniz köşenin işareti <b>yeşile</b> döner.</li>
+      </ul>
+      <p class="note">Amaç: imleci istediğimiz yere götürebilmek.</p>
+    </div>
+    <div class="col" style="flex:1.15">
+      <figure class="fig"><img src="img/f1_kose.png"><figcaption>İki köşe tamamlandı, iki köşe kaldı.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <p class="kick">Ders 2 · Oyun</p>
+  <h1>Hedef oyunu: tek tık</h1>
+  <div class="cols">
+    <div class="col" style="flex:.85">
+      <ul>
+        <li>Yeşil daireye <b>sol tuşla bir kez</b> tıklayın.</li>
+        <li>10 hedef var; daireler gittikçe <b>küçülür</b>.</li>
+        <li>Üstte <b>vurulan</b> ve <b>ıska</b> sayısı görünür.</li>
+        <li>İmlecin <b>ucu</b> dairenin içinde olsun, fareyi oynatmadan tıklayın.</li>
+      </ul>
+    </div>
+    <div class="col" style="flex:1.15">
+      <figure class="fig"><img src="img/f1_hedef.png"><figcaption>Oyunun üstündeki sekmelerle tek tık, çift tık, sağ tık ve karışık kipleri arasında geçilir.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <p class="kick">Ders 2 · Alıştırma</p>
+  <h1>Simge seçme ve düğmeye basma</h1>
+  <div class="cols">
+    <div class="col" style="flex:1">
+      <table>
+        <tr><th class="num">1</th><td>Geri Dönüşüm Kutusu’na <b>bir kez</b> tıklayın. Simge <b>seçili</b> olur.</td></tr>
+        <tr><th class="num">2</th><td>Hesap Makinesi’ne tıklayın. Öncekinin seçimi kalkar.</td></tr>
+        <tr><th class="num">3</th><td>Boş bir yere tıklayın. Seçim kalkar.</td></tr>
+        <tr><th class="num">4</th><td>Başlat’a tıklayın, menü açılır. Bir daha tıklayın, kapanır.</td></tr>
+      </table>
+    </div>
+    <div class="col" style="flex:.9">
+      <figure class="fig"><img src="img/ac_baslat.png"><figcaption>Başlat menüsü: bütün programlar burada.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <p class="kick">Ders 3 · Oyun</p>
+  <h1>Balon oyunu: çift tık</h1>
+  <div class="cols">
+    <div class="col" style="flex:.85">
+      <ul>
+        <li>Balona hızlıca <b>iki kez</b> tıklayın: <b>tık-tık</b>. 6 balon var.</li>
+        <li>Tek tık balonu patlatmaz; oyun <b>uyarır</b>.</li>
+        <li>Püf noktası: fareyi <b>oynatmayın</b>, yalnızca parmağınız hareket etsin.</li>
+      </ul>
+      <p class="note">Sonra Not Defteri simgesine çift tıklayıp açın, sağ üstteki ✕ ile kapatın.</p>
+    </div>
+    <div class="col" style="flex:1.15">
+      <figure class="fig"><img src="img/f2_balon.png"><figcaption>Çift tık herkesi başta zorlar. Acele etmeyin.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <p class="kick">Ders 3 · Oyun</p>
+  <h1>Karışık hedef: sol tık, sağ tık</h1>
+  <div class="cols" style="gap:28px">
+    <figure class="fig" style="flex:0 0 400px"><img src="img/f2_karisik.png"><figcaption><b style="color:#2e7d32">Yeşil</b> daire: farenin <b>sol</b> tuşu</figcaption></figure>
+    <figure class="fig" style="flex:0 0 400px"><img src="img/f2_sag.png"><figcaption><b style="color:#c25a00">Turuncu</b> daire: farenin <b>sağ</b> tuşu</figcaption></figure>
+  </div>
+  <p style="margin-top:18px;font-size:21px;line-height:1.4"><b>Sağ tık</b> “bununla neler yapabilirim?” diye sorar ve bir menü açar. Önce Paint simgesine, sonra masaüstüne sağ tıklayıp menüleri karşılaştırırız.</p>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <p class="kick">Ders 3 · Alıştırma</p>
+  <h1>Tekerlek: tarifi sonuna kadar kaydırın</h1>
+  <div class="cols">
+    <div class="col" style="flex:.85">
+      <ul>
+        <li>Tekerleği <b>kendinize doğru</b> çevirin: sayfa <b>aşağı</b> iner.</li>
+        <li>Tekerleği <b>ileri</b> çevirin: sayfa yukarı çıkar.</li>
+        <li>Tarifin en altında <b>gizli bir kelime</b> var. Bulana kadar kaydırın.</li>
+      </ul>
+    </div>
+    <div class="col" style="flex:1.15">
+      <figure class="fig"><img src="img/f2_tarif.png"><figcaption>Uydurma bir tarif sitesi. Gerçek bir siteye bağlanmaz.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <p class="kick">Ders 3 · Bonus oyun</p>
+  <h1>Mayın Tarlası</h1>
+  <div class="cols">
+    <div class="col" style="flex:1">
+      <ul>
+        <li><b>Sol tık</b> kareyi açar. Sayı, çevresindeki mayın sayısını söyler.</li>
+        <li><b>Sağ tık</b> mayın olduğunu düşündüğünüz kareye bayrak koyar.</li>
+        <li>Hem kare açın hem bayrak koyun.</li>
+        <li>Mayına basarsanız gülen yüze tıklayıp yeniden başlayın.</li>
+      </ul>
+      <p class="note">Sol ve sağ tuş aynı oyunda kullanılır. İlk tıklama her zaman güvenlidir.</p>
+    </div>
+    <div class="col" style="flex:.9">
+      <figure class="fig"><img src="img/f2_mayin.png"><figcaption>7 × 7 alan, 6 mayın. Sol üstte bir bayrak var.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <p class="kick">Ders 4 · Sürükle-bırak</p>
+  <h1>Tut, taşı, bırak</h1>
+  <div class="steps4">
+    <div><div class="n">1</div><span>Fareyi nesnenin <b>üzerine getirin</b>.</span></div>
+    <div><div class="n">2</div><span>Sol tuşa <b>basın ve basılı tutun</b>.</span></div>
+    <div><div class="n">3</div><span>Parmağınızı kaldırmadan fareyi <b>kaydırın</b>.</span></div>
+    <div><div class="n">4</div><span>Gideceği yere gelince tuşu <b>bırakın</b>.</span></div>
+  </div>
+  <p style="margin-top:44px">İlk alıştırma: <b>Hesap Makinesi</b> simgesini tutup masaüstünün sağ tarafına taşıyın.</p>
+</section>
+
+<!-- 16 -->
+<section class="slide">
+  <p class="kick">Ders 4 · Oyun</p>
+  <h1>Kart dizme</h1>
+  <div class="cols">
+    <div class="col" style="flex:.85">
+      <ul>
+        <li>Kartları tutup aşağıdaki yerlerine sürükleyin: <b>A, 2, 3, 4, 5</b>.</li>
+        <li>Kartlar karışık gelir. Her oyunda sıra değişir.</li>
+        <li>Yanlış yere bırakırsanız kart <b>geri döner</b> ve oyun bir ipucu verir.</li>
+      </ul>
+      <p class="note">Gerçek bilgisayarda aynı alıştırma: Başlat’a <b>Solitaire</b> yazın.</p>
+    </div>
+    <div class="col" style="flex:1.15">
+      <figure class="fig"><img src="img/s_kart.png"><figcaption>As yerine oturdu, 2 – 5 sırada.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 17 -->
+<section class="slide">
+  <p class="kick">Ders 4 · Alıştırma</p>
+  <h1>Dosyayı klasöre, çöpe atın</h1>
+  <div class="cols">
+    <div class="col" style="flex:1">
+      <table>
+        <tr><th class="num">1</th><td><b>deniz.jpg</b> resmini <b>Fotoğraflarım</b> klasörünün üzerine sürükleyin. Klasör <b>maviye boyanınca</b> bırakın.</td></tr>
+        <tr><th class="num">2</th><td>Klasöre çift tıklayıp resmin içeride olduğunu görün.</td></tr>
+        <tr><th class="num">3</th><td><b>eski not</b> dosyasını Geri Dönüşüm Kutusu’na bırakın.</td></tr>
+      </table>
+      <p class="note">Silinen dosya hemen yok olmaz; kutuya gider ve geri alınabilir.</p>
+    </div>
+    <div class="col" style="flex:.9">
+      <figure class="fig"><img src="img/s_klasor.png"><figcaption>Masaüstünde klasör, resim ve gereksiz not dosyası.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 18 -->
+<section class="slide">
+  <p class="kick">Ders 5 · Pencereler</p>
+  <h1>Pencerenin parçaları</h1>
+  <div class="cols">
+    <div class="col" style="flex:1">
+      <div class="win" style="margin-bottom:22px"><div class="bar"><span>Hesap Makinesi</span><span><i>—</i><i>☐</i><i style="color:var(--acc);font-weight:600">✕</i></span></div><div class="body">Pencerenin içi</div></div>
+      <table>
+        <tr><th>—</th><td>Küçült: pencere görev çubuğuna iner</td></tr>
+        <tr><th>☐ / ❐</th><td>Ekranı kapla / önceki boyut</td></tr>
+        <tr><th>✕</th><td>Kapat</td></tr>
+        <tr><th>Başlık çubuğu</th><td>Tutup sürükleyince pencere taşınır</td></tr>
+      </table>
+    </div>
+    <div class="col" style="flex:.9">
+      <figure class="fig"><img src="img/p_pencere.png"><figcaption>Alıştırma: Hesap Makinesi ile 12 + 7 hesaplayın, sonra pencereyi küçültüp görev çubuğundan geri getirin, kaplayın, taşıyın, boyutunu değiştirin.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide">
+  <p class="kick">Ders 6 · Tekrar</p>
+  <h1>Fare parkuru: 11 görev</h1>
+  <ul class="task2">
+    <li>Hesap Makinesi’ni çift tıklayıp açın</li>
+    <li>25 + 17 hesaplayın</li>
+    <li>Küçültün</li>
+    <li>Görev çubuğundan geri getirin</li>
+    <li>✕ ile kapatın</li>
+    <li>Başlat’tan Not Defteri’ni açın</li>
+    <li>Adınızı yazıp <b>Enter</b>’a basın</li>
+    <li>Pencereyi taşıyın</li>
+    <li>Kaydetmeden kapatın</li>
+    <li>çöp.txt’yi Geri Dönüşüm Kutusu’na atın</li>
+    <li>Bilgisayarı yeniden başlatın</li>
+  </ul>
+  <p class="note" style="margin-top:28px">Her görevin süresi tutulur. Sonda tablo çıkar, <b>en uzun süren görev kırmızı</b> görünür: kimin nerede takıldığı hemen anlaşılır.</p>
+</section>
+
+<!-- 20 -->
+<section class="slide">
+  <p class="kick">Özet</p>
+  <h1>Bu hafta öğrendiklerimiz</h1>
+  <table>
+    <tr><th>Tek tık</th><td>Seçer, düğmelere basar</td></tr>
+    <tr><th>Çift tık</th><td>Simgeyi, dosyayı, programı açar</td></tr>
+    <tr><th>Sağ tık</th><td>“Bununla neler yapabilirim?” menüsü</td></tr>
+    <tr><th>Tekerlek</th><td>Sayfayı aşağı yukarı kaydırır</td></tr>
+    <tr><th>Sürükle-bırak</th><td>Bas, tut, kaydır, bırak: taşır</td></tr>
+    <tr><th>— ☐ ✕</th><td>Pencereyi küçültür, kaplar, kapatır</td></tr>
+    <tr><th>Uyku / Yeniden başlat / Kapat</th><td>Kısa ara / bir şey ters gidince / gün sonu</td></tr>
+  </table>
+</section>
+
+<!-- 21 -->
+<section class="slide">
+  <p class="kick">Evde tekrar</p>
+  <h1>Kendi bilgisayarınızda deneyin</h1>
+  <ul>
+    <li>Bilgisayarı açın, şifrenizle girin, <b>Kapat</b> ile kapatın. 2–3 kez tekrarlayın.</li>
+    <li>Bir kez de <b>Yeniden başlat</b> deneyin.</li>
+    <li>Başlat’a <b>Solitaire</b> ve <b>Minesweeper</b> yazın: sürükle-bırak ve sol/sağ tık için birebir alıştırma.</li>
+    <li>Her gün birkaç dakika fareyle oynayın. Hız zamanla gelir.</li>
+  </ul>
+</section>
+
+</body>
+</html>

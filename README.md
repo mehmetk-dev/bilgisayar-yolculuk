@@ -35,26 +35,28 @@ Bilgisayarı yeni öğrenen yetişkinler için adım adım alıştırmalar. Site
 
 Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
 
-| Hafta | Dersler |
+| Hafta | Dersler (her hafta 8) |
 |---|---|
-| 1 | Açma-kapama (güç düğmesi, şifre, Uyku/Kapat/Yeniden başlat) · Fareyi tutma ve tek tık (hedef oyunu) · Çift tık, sağ tık, tekerlek (balon oyunu, Mayın Tarlası) · Sürükle-bırak (kart dizme) · Pencereler · Fare parkuru |
-| 2 | Klavye: Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, İ/I, ! ? @, ok tuşları, Home/End |
-| 3 | Not Defteri: seçme, Ctrl+A/C/V/X/Z/Y, sağ tık, Ctrl+S ile kaydetme, Ctrl+O ile açma |
-| 4 | 3B uygulama + "Donanım mı, yazılım mı?" ve "Giriş mi, çıkış mı?" ayırma oyunları |
-| 5 | Masaüstü, Başlat'tan ve aramayla açma, görev çubuğu, masaüstünü göster, Alt+Tab, ses |
-| 6 | Dosya Gezgini: yeni klasör, F2, taşıma, kopyalama, silme, Geri Dönüşüm Kutusu, arama, USB bellek |
-| 7 | Paint · Ekran Alıntısı · Ayarlar (arka plan, ses, Wi-Fi, saat, yazı boyutu) |
-| 8 | İnternette gezinme ve indirme (reklam tuzakları) · Program kurma/kaldırma (izin penceresi, ek yazılım kutucukları) · Yazıcı ve sürücüler (Aygıt Yöneticisi) · İşletim sistemi kurulumu (gösterim) |
+| 1 | Açma-kapama · Fareyi tutma ve tek tık · Çift tık, sağ tık, tekerlek · Sürükle-bırak · Pencereler · Fare parkuru · Eşleştirme oyunları · Test |
+| 2 | Klavyeyi tanıyalım · On parmak: temel sıra · Rakamlar ve sayılar (tarih, saat, para, Num Lock) · İşaretler ( ) / = " # € · Tuş avı (ipucusuz) · Bayram kartı ve hata avı · Klavye eşleştirme oyunu · Test |
+| 3 | Not Defteri ve kısayollar · Seçmenin incelikleri (Shift + ok/End, üç tık, Ctrl + ok) · Kaydetme, farklı kaydetme ve açma · Alışveriş listesi · Tarifi düzene sokun · Kısayol yarışı (süreli) · Kısayol eşleştirme · Test |
+| 4 | 3B uygulama · Donanım mı, yazılım mı? · Kasanın içi: parçalar · Portlar ve kablolar · Bilgisayar ilanı okuma · Bakım ve sağlıklı kullanım · Sorun giderme: ilk kontroller · Test |
+| 5 | Masaüstü, Başlat ve görev çubuğu · Başlat menüsünü keşif · Masaüstünü düzenleme · Hesap Makinesi ile günlük hesaplar · Oyunlarla pratik (Mayın Tarlası, Kart Dizme) · Masaüstü parkuru (süreli) · Masaüstü haritası · Test |
+| 6 | Dosya Gezgini ve USB bellek · Dosya türleri ve uzantılar · Klasör içinde klasör · Fotoğraflarla çalışmak · Geri Dönüşüm Kutusu · Dağınık klasörü toparlama (süreli) · Ne yapardınız? Dosya durumları · Test |
+| 7 | Paint · Paint ile ev çizimi · Paint ile tebrik kartı · Ekran Alıntısı · Ekran alıntısıyla yardım istemek · Ayarlar · Ayarlar parkuru (süreli) · Test |
+| 8 | İnternette gezinme ve indirme · İnternette bilgi bulmak (okuyup soru cevaplama) · İnternetteki tuzaklar · Program kurma/kaldırma · Yazıcı ve sürücüler · İşletim sistemi kurulumu (gösterim) · İnternet parkuru (süreli) · Test |
 | Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre |
 
 Eğitmen için:
 - Ekrandaki klavye basılan tuşu ve adımın istediği tuşları yakar. **Pano** kutusu kopyalanan yazıyı gösterir.
 - Sık yapılan hatalarda (Ctrl'yi basılı tutmayı unutmak, yazıyı yanlışlıkla silmek, reklama tıklamak…) uyarı çıkar. 40 saniye ilerlenmezse ipucu açılır. Algılanamayan bir durumda "Adımı geç" kullanılabilir.
+- Her haftanın sonunda **orta seviye alıştırmalar** vardır: klavyede sarı ipucu yanmaz, nasıl yapılacağı yazmaz; takılan öğrenci 💡 İpucu'na bakar. Parkurlarda her görevin süresi listelenir.
+- **Haftalık testler** 10 sorudur, seçenekler her açılışta karışık sıradadır. Yanlış cevapta açıklama çıkar ve doğrusu bulununca geçilir. Sonunda ilk denemede doğru bilinen soru sayısı ve tekrar bakılacak konular görünür; puan ana sayfadaki kartta da yazar.
 - Her adımın süresi tutulur. Fare parkurunun sonunda her görevin süresi listelenir, en uzun süren kırmızı görünür. Diğer derslerde en uzun süren üç adım gösterilir.
 - İlerleme tarayıcıda saklanır; sayfa yenilense de kaldığı yerden devam eder. Ders sonunda özet kartı yazdırılabilir.
 
 Kaynak: `src/dersler/`
-- `app.js`: ders akışı. `lessons/`: ders metinleri ve adımlar. Her adımın hangi olayla tamamlanacağı burada yazılıdır; alanlar `lessons/common.js` başında anlatılır.
+- `app.js`: ders akışı. `lessons/`: ders metinleri ve adımlar (`hafta2_ek.js` … `hafta8_ek.js` ve `alistirmalar.js`: ek dersler ve orta seviye alıştırmalar, `testler.js`: haftalık testler, `kalip.js`: soru ve ayırma adımı kalıpları). Her adımın hangi olayla tamamlanacağı burada yazılıdır; alanlar `lessons/common.js` başında anlatılır.
 - `desktop.js`: alıştırma masaüstü. `apps/`: programlar. `vfs.js`: bellekteki dosya sistemi. `dialog.js`: kaydet/aç/yazdır pencereleri.
 - `notepad.js`, `keyboard.js`: Not Defteri ve ekran klavyesi. `css/`: stiller (derlemede sayfaya gömülür).
 

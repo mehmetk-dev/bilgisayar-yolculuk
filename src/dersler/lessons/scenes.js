@@ -9,7 +9,7 @@ export function sorter(opts) {
     const items = [...opts.items].sort(() => Math.random() - 0.5);
     let left = items.length;
     el.innerHTML = `<div class="so-pool">${items.map((it, i) => `<div class="so-item" data-i="${i}"><span>${it.icon}</span>${esc(it.label)}</div>`).join('')}</div>
-      <div class="so-bins">${opts.bins.map((b) => `<div class="so-bin" data-bin="${b.id}"><h3>${b.icon} ${esc(b.label)}</h3><div class="so-in"></div></div>`).join('')}</div>`;
+      <div class="so-bins" style="--cols:${opts.bins.length === 3 ? 3 : 2}">${opts.bins.map((b) => `<div class="so-bin" data-bin="${b.id}"><h3>${b.icon} ${esc(b.label)}</h3><div class="so-in"></div></div>`).join('')}</div>`;
     el.addEventListener('pointerdown', (e) => {
       const card = e.target.closest('.so-item');
       if (!card || card.classList.contains('ok') || e.button !== 0) return;
@@ -58,10 +58,13 @@ export function sorter(opts) {
   };
 }
 
-// Mesaj kartı + seçenekler. opts: { kind: 'sms'|'mail'|'call'|'web'|'plain', from, text, options: [[id, etiket]], correct, explain }
+// Mesaj kartı + seçenekler. opts: { kind: 'sms'|'mail'|'call'|'web'|'plain', from, text, options: [[id, etiket]], correct, explain, column }
+// column: true → uzun seçenekler alt alta dizilir; shuffle: true → seçenekler her açılışta karışık sırada
 export function quiz(opts) {
   return (el, c) => {
     el.className = 'sc sc-quiz';
+    const options = [...(opts.options || [['safe', '✅ Güvenli'], ['scam', '🚩 Dolandırıcılık']])];
+    if (opts.shuffle) options.sort(() => Math.random() - 0.5);
     const frame = {
       sms: `<div class="ph"><div class="ph-top">💬 Mesajlar</div><div class="ph-from">${esc(opts.from)}</div><div class="ph-bubble">${opts.text}</div></div>`,
       mail: `<div class="ml"><div class="ml-head"><b>Kimden:</b> ${esc(opts.from)}<br><b>Konu:</b> ${esc(opts.subject || '')}</div><div class="ml-body">${opts.text}</div></div>`,
@@ -70,7 +73,7 @@ export function quiz(opts) {
       plain: `<div class="pl">${opts.text}</div>`,
     }[opts.kind || 'plain'];
     el.innerHTML = `<div class="qz-card">${frame}</div><p class="qz-q">${opts.question || 'Sizce bu mesaj güvenli mi?'}</p>
-      <div class="qz-opts">${(opts.options || [['safe', '✅ Güvenli'], ['scam', '🚩 Dolandırıcılık']]).map(([id, l]) => `<button type="button" class="btn" data-a="${id}">${l}</button>`).join('')}</div>
+      <div class="qz-opts${opts.column ? ' col' : ''}">${options.map(([id, l]) => `<button type="button" class="btn" data-a="${id}">${l}</button>`).join('')}</div>
       <div class="qz-exp" hidden></div>`;
     el.querySelector('.qz-opts').addEventListener('click', (e) => {
       const b = e.target.closest('[data-a]');

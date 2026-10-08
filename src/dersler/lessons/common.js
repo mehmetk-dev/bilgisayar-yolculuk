@@ -7,6 +7,7 @@
 //   setup(c)                      → ders açılınca bir kez (ör. masaüstüne dosya koymak)
 //   summary: [[kısayol/yol, açıklama], …] → son adımdaki özet ve yazdırılabilir kart
 //   parkur: true                  → son adımda her görevin süresi listelenir
+//   test: true                    → son adımda puan (ilk denemede doğru bilinen `quiz: true` adımlar)
 //
 // Bir adımın alanları:
 //   title, html (metin ya da c => metin), combo, keys, mouse, target, hint
