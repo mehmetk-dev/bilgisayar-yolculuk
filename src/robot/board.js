@@ -1,6 +1,6 @@
 // Izgara görevi: harita, komut düğmeleri, program alanı ve Robo'nun adım adım oynatılması
 import { parseMap, parseProg, simulate, countBlocks, newId, DIR } from './sim.js';
-import { robotHTML, play, confetti, sleep, prefs } from './robo.js';
+import { robotHTML, play, confetti, sleep, prefs, toast, hideToast } from './robo.js';
 
 export const CMDS = {
   F: { label: 'İleri git', icon: '⬆', cls: 'c-f' },
@@ -46,13 +46,17 @@ export function renderGrid(el, step, done) {
   ];
 
   el.innerHTML = `<div class="gridact">
-  <div class="ginfo"><h3>${step.title}</h3>${step.text}<div class="gmsg" hidden></div></div>
-  <div class="gboard"><div class="board" style="--w:${m.w};--h:${m.h}">${tiles.join('')}${items.join('')}<div class="path"></div>${robotHTML(dir0, m.start.x, m.start.y)}</div></div>
+  <div class="gleft">
+    <div class="ginfo"><h3>${step.title}</h3>${step.text}</div>
+    <div class="gboard"><div class="board" style="--w:${m.w};--h:${m.h}">${tiles.join('')}${items.join('')}<div class="path"></div>${robotHTML(dir0, m.start.x, m.start.y)}</div></div>
+    <div class="hint" hidden></div>
+  </div>
   <div class="gcode">
     <h4>Komutlar</h4>
     <div class="tools">${step.tools.map((c) => `<button type="button" class="tool ${CMDS[c].cls}" data-c="${c}"><span class="bi">${CMDS[c].icon}</span>${CMDS[c].label}</button>`).join('')}</div>
     <h4>Programım <span class="cnt"></span></h4>
     <div class="prog" tabindex="-1"></div>
+    <p class="ptip">✋ Blokları <b>sürükleyerek</b> yerini değiştirebilir${step.tools.includes('loop') ? ', döngünün içine ya da dışına taşıyabilirsin' : ''}.</p>
     <div class="ctrl">
       <button type="button" class="primary run">▶ Çalıştır</button>
       <button type="button" class="reset">↺ Başa al</button>
@@ -67,7 +71,7 @@ export function renderGrid(el, step, done) {
   const arrow = q('.rarrow');
   const progEl = q('.prog');
   const cnt = q('.cnt');
-  const msg = q('.gmsg');
+  const hintEl = q('.hint');
   const runBtn = q('.run');
   const trail = q('.path');
 
@@ -81,14 +85,8 @@ export function renderGrid(el, step, done) {
   ro.observe(q('.gboard'));
   fit();
 
-  function say(kind, html) {
-    msg.hidden = !html;
-    msg.className = 'gmsg ' + kind;
-    msg.innerHTML = html || '';
-    msg.classList.remove('pop');
-    void msg.offsetWidth;
-    msg.classList.add('pop');
-  }
+  // Sonuçlar ekranın üstünde bildirim olarak çıkar; tahta ve sayfa yerinden oynamaz
+  const say = (kind, html) => toast(kind, html);
 
   function place(e, instant) {
     if (instant) rb.classList.add('noanim');
@@ -102,12 +100,13 @@ export function renderGrid(el, step, done) {
   function resetRobot() {
     tok++;
     running = false;
-    rb.classList.remove('bump', 'fall', 'happy', 'sad', 'walk');
+    rb.classList.remove('bump', 'fall', 'happy', 'sad', 'walk', 'halt');
     place({ x: m.start.x, y: m.start.y, d: dir0, rot: dir0 * 90 }, true);
     el.querySelectorAll('.star').forEach((s) => s.classList.remove('got'));
     q('.goal').classList.remove('win');
     trail.innerHTML = '';
     highlight(null);
+    el.querySelectorAll('.blk.extra').forEach((b) => b.classList.remove('extra'));
     setRunning(false);
   }
 
@@ -143,7 +142,7 @@ export function renderGrid(el, step, done) {
       if (caret.list === list && caret.i === i) h += '<span class="caret" aria-hidden="true"></span>';
       if (i < list.length) h += blockHTML(list[i]);
     }
-    if (!list.length) h += list === prog ? '<span class="pempty">Komutlara tıkla, buraya eklensin 👆</span>' : '<span class="pempty">içine komut ekle</span>';
+    if (!list.length) h += list === prog ? '<span class="pempty">Komutlara tıkla, buraya eklensin 👆</span>' : '<span class="pempty">içine komut ekle ya da bir bloğu buraya sürükle</span>';
     return h;
   }
 
@@ -153,12 +152,19 @@ export function renderGrid(el, step, done) {
     cnt.textContent = max ? `${n} / ${max} blok` : `${n} blok`;
     cnt.classList.toggle('full', !!max && n >= max);
     if (newId) progEl.querySelector(`[data-id="${newId}"]`)?.classList.add('new');
-    progEl.querySelector('.caret')?.scrollIntoView({ block: 'nearest' });
+    // İmleç görünür kalsın ama yalnızca program kutusu kaysın, sayfa değil
+    const c = progEl.querySelector('.caret');
+    if (c) {
+      const pr = progEl.getBoundingClientRect();
+      const cr = c.getBoundingClientRect();
+      if (cr.bottom > pr.bottom) progEl.scrollTop += cr.bottom - pr.bottom + 10;
+      else if (cr.top < pr.top) progEl.scrollTop -= pr.top - cr.top + 10;
+    }
   }
 
   function changed() {
     resetRobot();
-    msg.hidden = true;
+    hideToast();
   }
 
   function add(c) {
@@ -214,6 +220,70 @@ export function renderGrid(el, step, done) {
     draw();
   });
 
+  // --- sürükle bırak: blokların yerini değiştirme, döngünün içine/dışına taşıma (fare ve dokunmatik) ---
+  let drag = null;
+  let dragged = false;
+  progEl.addEventListener('pointerdown', (e) => {
+    if (running || e.button > 0 || e.target.closest('.del, select')) return;
+    const blk = e.target.closest('.blk');
+    if (blk) drag = { el: blk, f: find(+blk.dataset.id), x0: e.clientX, y0: e.clientY, on: false };
+  });
+  const onMove = (e) => {
+    if (!drag) return;
+    if (!drag.on) {
+      if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 8) return;
+      const r = drag.el.getBoundingClientRect();
+      drag.on = true;
+      drag.ox = drag.x0 - r.left;
+      drag.oy = drag.y0 - r.top;
+      drag.ghost = drag.el.cloneNode(true);
+      drag.ghost.classList.add('ghost');
+      drag.ghost.style.width = r.width + 'px';
+      document.body.appendChild(drag.ghost);
+      drag.mark = document.createElement('span');
+      drag.mark.className = 'drop';
+      drag.el.classList.add('dragging');
+      progEl.classList.add('dnd');
+    }
+    e.preventDefault();
+    drag.ghost.style.transform = `translate(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px) rotate(2deg)`;
+    // Bırakılacak yer: parmağın altındaki döngü gövdesi ya da programın kendisi
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    drag.to = null;
+    if (!under || !progEl.contains(under)) { drag.mark.remove(); return; }
+    const body = under.closest('.lbody');
+    const cont = body && drag.f.b.c !== 'loop' && !drag.el.contains(body) ? body : progEl;
+    const kids = [...cont.children].filter((k) => k.classList.contains('blk') && k !== drag.el);
+    let i = kids.findIndex((k) => { const r = k.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; });
+    if (i < 0) i = kids.length;
+    cont.insertBefore(drag.mark, kids[i] || cont.querySelector(':scope > .pempty'));
+    drag.to = { list: cont === progEl ? prog : find(+cont.dataset.in).b.body, i };
+  };
+  const onUp = () => {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    if (!d.on) return;
+    dragged = true;
+    d.ghost.remove();
+    d.mark.remove();
+    progEl.classList.remove('dnd');
+    d.el.classList.remove('dragging');
+    if (!d.to) return;
+    const f = find(d.f.b.id);
+    f.list.splice(f.i, 1);
+    d.to.list.splice(d.to.i, 0, f.b);
+    caret = { list: d.to.list, i: d.to.i + 1 };
+    play('add');
+    changed();
+    draw(f.b.id);
+  };
+  addEventListener('pointermove', onMove, { passive: false });
+  addEventListener('pointerup', onUp);
+  addEventListener('pointercancel', onUp);
+  // Sürüklemenin sonundaki tıklama imleci oynatmasın
+  progEl.addEventListener('click', (e) => { if (dragged) { dragged = false; e.stopImmediatePropagation(); } }, true);
+
   progEl.addEventListener('change', (e) => {
     if (e.target.tagName !== 'SELECT') return;
     find(+e.target.closest('.loop').dataset.id).b.n = +e.target.value;
@@ -244,8 +314,8 @@ export function renderGrid(el, step, done) {
   async function run() {
     if (running) { resetRobot(); return; }
     resetRobot();
-    msg.hidden = true;
-    const { ev, result } = simulate(m, dir0, prog);
+    hideToast();
+    const { ev, result, extra, extraId } = simulate(m, dir0, prog);
     const my = ++tok;
     setRunning(true);
     const ms = prefs.fast ? 280 : 560;
@@ -273,7 +343,7 @@ export function renderGrid(el, step, done) {
         setTimeout(() => { rb.classList.add('fall'); play('splash'); }, ms * 0.6);
         await sleep(ms * 0.6);
       }
-      await sleep(e.t === 'win' ? 0 : ms);
+      await sleep(e.t === 'win' || e.t === 'stop' ? 0 : ms);
     }
     if (my !== tok) return;
     highlight(null);
@@ -284,18 +354,33 @@ export function renderGrid(el, step, done) {
       play('win');
       confetti();
       const n = countBlocks(prog);
-      say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b><br>${n} blokla çözdün. Aşağıdaki <b>Devam ▶</b> düğmesine basabilirsin.`);
+      say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b><br>${n} blokla çözdün. Şimdi <b>Devam ▶</b> düğmesine basabilirsin.`);
+      hintEl.hidden = true;
       done();
+    } else if (result === 'extra') {
+      // Robo pilde durduruldu: kalan yürüme komutları fazla
+      rb.classList.add('halt');
+      el.querySelector(`.blk[data-id="${extraId}"]`)?.classList.add('extra');
+      play('wrong');
+      say('warn', `<b>Dur! Pile ulaştım ama programında ${extra} fazla adım var.</b><br>Devam etseydim pili geçip giderdim! Kırmızı çerçeveli blok ve ondan sonrakiler fazla; onları ✖ ile sil ve tekrar dene.`);
     } else {
       fails++;
       rb.classList.add('sad');
       if (result === 'empty' || result === 'nogoal' || result === 'nostars') play('wrong');
-      const hint = step.hint && fails >= 2 ? `<div class="hint">💡 <b>İpucu:</b> ${step.hint}</div>` : '';
-      say('bad', `${FAIL[result]}<br><small>Programını düzelt ve tekrar ▶ Çalıştır'a bas. ↺ Başa al ile Robo başlangıca döner.</small>${hint}`);
+      say('bad', `<b>${FAIL[result]}</b><br><small>Programını düzelt ve tekrar ▶ Çalıştır'a bas.</small>`);
+      if (step.hint && fails >= 2) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
     }
   }
   runBtn.onclick = run;
 
   draw();
-  return () => { tok++; ro.disconnect(); };
+  return () => {
+    tok++;
+    ro.disconnect();
+    hideToast();
+    removeEventListener('pointermove', onMove);
+    removeEventListener('pointerup', onUp);
+    removeEventListener('pointercancel', onUp);
+    document.querySelector('.ghost')?.remove();
+  };
 }

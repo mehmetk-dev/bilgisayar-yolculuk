@@ -1,15 +1,14 @@
 /* ızgara görevi yerleşimi */
-.gridact { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(17em, 1fr); grid-template-areas: "info code" "board code"; gap: 1em 1.4em; align-items: start; }
-.ginfo { grid-area: info; }
+.gridact { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(17em, 1fr); gap: 1em 1.4em; align-items: start; }
+.gleft { display: flex; flex-direction: column; gap: 0.6em; min-width: 0; }
 .ginfo h3 { font-size: 1.35em; font-weight: 900; color: color-mix(in srgb, var(--c), #000 25%); }
-.gboard { grid-area: board; padding: 0.6em 4px 1em; min-width: 0; }
-.gcode { grid-area: code; background: #faf7ff; border: 2px solid #e6dcff; border-radius: 20px; padding: 0.9em; display: flex; flex-direction: column; gap: 0.5em; position: sticky; top: 0; }
+.gboard { padding: 0.8em 4px 1em; min-width: 0; overflow: hidden; }
+.gcode { background: #faf7ff; border: 2px solid #e6dcff; border-radius: 20px; padding: 0.9em; display: flex; flex-direction: column; gap: 0.5em; }
 .gcode h4 { font-size: 0.95em; color: var(--mut); display: flex; align-items: center; gap: 0.5em; }
 .cnt { margin-left: auto; font-size: 0.85em; background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 0 0.6em; }
 .cnt.full { background: var(--warn-bg); border-color: #e0a100; color: #5a3600; }
 @media (max-width: 52em) {
-  .gridact { grid-template-columns: minmax(0, 1fr); grid-template-areas: "info" "board" "code"; }
-  .gcode { position: static; }
+  .gridact { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* komut renkleri */
@@ -29,10 +28,11 @@
 /* program alanı */
 .prog { min-height: 9em; max-height: 24em; overflow-y: auto; background: #fff; border: 3px dashed #d4c6ff; border-radius: 16px; padding: 0.5em; display: flex; flex-direction: column; gap: 0.3em; cursor: text; }
 .pempty { color: var(--mut); font-size: 0.85em; font-weight: 700; padding: 0.3em; }
-.blk { display: flex; align-items: center; gap: 0.45em; color: #fff; font-weight: 800; border-radius: 12px; padding: 0.3em 0.4em 0.3em 0.6em; cursor: pointer; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 30%); transition: transform 0.15s, outline-color 0.15s; outline: 4px solid transparent; }
+.blk { touch-action: none; user-select: none; -webkit-user-select: none; display: flex; align-items: center; gap: 0.45em; color: #fff; font-weight: 800; border-radius: 12px; padding: 0.3em 0.4em 0.3em 0.6em; cursor: pointer; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 30%); transition: transform 0.15s, outline-color 0.15s; outline: 4px solid transparent; }
 .blk:not(.loop):hover { filter: brightness(1.08); }
 .blk.new { animation: pop 0.3s; }
 .blk.now { outline-color: #ffd23f; transform: translateX(6px) scale(1.03); }
+.blk.extra { outline-color: #ff3d3d; animation: shake 0.4s 2; }
 .del { margin-left: auto; background: #ffffff33; border: 0; box-shadow: none; color: #fff; font-size: 0.75em; padding: 0.15em 0.5em; border-radius: 8px; }
 .del:hover { background: #00000033; }
 .loop { flex-direction: column; align-items: stretch; padding: 0; gap: 0; }
@@ -40,7 +40,8 @@
 .lhead select { font: inherit; font-weight: 900; border: 0; border-radius: 8px; padding: 0 0.2em; color: var(--fg); cursor: pointer; }
 .iter { font-size: 0.85em; background: #ffd23f; color: #5a3600; border-radius: 999px; padding: 0 0.5em; }
 .iter:empty { display: none; }
-.lbody { margin-left: 1.4em; background: #fff3f7; border-radius: 10px 0 0 10px; padding: 0.35em; min-height: 2.4em; display: flex; flex-direction: column; gap: 0.3em; color: var(--fg); }
+.lbody { margin: 0 0.45em 0 1.5em; background: #fde8f0; border: 2px dashed #f2a7c3; border-radius: 10px; padding: 0.4em; min-height: 3em; display: flex; flex-direction: column; gap: 0.3em; color: var(--fg); }
+.lbody > .pempty { font-size: 0.8em; color: #b04a72; text-align: center; padding: 0.4em; }
 .lfoot { padding: 0.1em 0.7em 0.25em; font-size: 0.75em; font-weight: 700; opacity: 0.9; }
 .lfoot:hover { text-decoration: underline; }
 .caret { display: block; height: 5px; flex: none; border-radius: 3px; background: #ff3d7f; animation: caret 1s steps(2) infinite; }
@@ -89,6 +90,9 @@
 .rb.fall .rbi { animation: sink 0.9s ease-in forwards; }
 .rb.happy .rbi { animation: jump 0.5s ease-in-out 3; }
 .rb.happy .arm-l, .rb.happy .arm-r { animation: wave 0.3s ease-in-out infinite; }
+.rb.halt .rbi { animation: halt 0.5s ease-in-out 2; }
+.rb.halt .arm-r { animation: wave 0.25s ease-in-out 6; }
+@keyframes halt { 30% { transform: translateY(-8%) scale(1.06); } 60% { transform: translateY(0) rotate(-6deg); } }
 .rb.sad .smile { display: none; }
 .rb.sad .frown { display: block; }
 .rb.sad .bulb { fill: #8a8a8a; animation: none; }
@@ -98,3 +102,21 @@
 @keyframes jump { 50% { transform: translateY(-30%) scale(1.08); } }
 .mini .board { border-radius: 16px; overflow: visible; }
 .mini .tile { border-radius: 16px; }
+
+/* bildirim */
+.toast { position: fixed; z-index: 60; left: 50%; top: 4.2em; width: min(34em, calc(100vw - 32px)); transform: translate(-50%, -160%); opacity: 0; display: flex; align-items: center; gap: 0.7em; padding: 0.8em 0.9em 0.8em 1em; border-radius: 20px; border: 3px solid; background: #fff; box-shadow: 0 12px 30px #0003; transition: transform 0.35s cubic-bezier(0.2, 1.4, 0.4, 1), opacity 0.25s; cursor: pointer; pointer-events: none; }
+.toast.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.toast.ok { background: var(--ok-bg); border-color: var(--ok); color: #0d4a25; }
+.toast.bad { background: var(--bad-bg); border-color: #f0a199; color: #6e1d1d; }
+.toast.warn { background: var(--warn-bg); border-color: #e0a100; color: #5a3600; }
+.tic { font-size: 2.2em; line-height: 1; }
+.toast.show .tic { animation: pop 0.5s 0.15s; }
+.tbody { flex: 1; }
+.tclose { background: none; border: 0; box-shadow: none; font-size: 0.8em; padding: 0.2em 0.4em; color: inherit; opacity: 0.6; }
+
+/* sürükle bırak */
+.blk.dragging { opacity: 0.3; }
+.ghost { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; opacity: 0.95; box-shadow: 0 12px 24px #0004; margin: 0; }
+.drop { display: block; flex: none; height: 6px; border-radius: 3px; background: #2f8cff; box-shadow: 0 0 0 3px #2f8cff44; }
+.dnd .caret { display: none; }
+.ptip { margin: 0; font-size: 0.78em; color: var(--mut); }

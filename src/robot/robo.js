@@ -93,3 +93,28 @@ export function confetti(n = 70) {
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+// Ekranın üstünde kısa süreli bildirim (sayfanın düzenini kaydırmaz)
+const TOAST_IC = { ok: '🎉', bad: '😵', warn: '✋' };
+let toastTimer = 0;
+export function toast(kind, html, ms = 6000) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.setAttribute('role', 'status');
+    t.setAttribute('aria-live', 'polite');
+    t.addEventListener('click', hideToast);
+    document.body.appendChild(t);
+  }
+  t.className = 'toast ' + kind;
+  t.innerHTML = `<span class="tic">${TOAST_IC[kind] || '🤖'}</span><div class="tbody">${html}</div><button type="button" class="tclose" aria-label="Bildirimi kapat">✖</button>`;
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, ms);
+}
+export function hideToast() {
+  clearTimeout(toastTimer);
+  document.getElementById('toast')?.classList.remove('show');
+}

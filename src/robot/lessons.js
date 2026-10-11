@@ -142,7 +142,7 @@ const b5 = {
       text: '<p>“İleri git, ileri git, ileri git, ileri git, ileri git, ileri git…” demek çok yorucu değil mi?</p><p>Bunun yerine <span class="chipb c-loop">🔁 6 kez tekrarla: ⬆ İleri git</span> diyebiliriz. Buna <b>DÖNGÜ</b> denir!</p>',
       pics: ['⬆', '⬆', '⬆', '⬆', '⬆', '⬆', '=', '🔁'] },
     { type: 'story', anim: 'dance', title: 'Tekrarla bloğu nasıl kullanılır?',
-      text: '<ol class="tips"><li><b>🔁 Tekrarla</b> düğmesine bas. Programına bir döngü eklenir.</li><li>Kırmızı çizgi döngünün <b>içine</b> geçer. Tekrar edilecek komutlara tıkla.</li><li>Sayıyı değiştirerek kaç kez tekrarlanacağını seç.</li><li>Döngüden sonra komut eklemek için <b>“döngü sonu”</b> yazısına tıkla.</li></ol>' },
+      text: '<ol class="tips"><li><b>🔁 Tekrarla</b> düğmesine bas. Programına bir döngü eklenir.</li><li>Kırmızı çizgi döngünün <b>içine</b> geçer. Tekrar edilecek komutlara tıkla.</li><li>Sayıyı değiştirerek kaç kez tekrarlanacağını seç.</li><li>Döngüden sonra komut eklemek için <b>“döngü sonu”</b> yazısına tıkla.</li><li>Bir blok döngünün dışında mı kaldı? Onu <b>sürükleyip</b> döngünün içine bırak. ✋</li></ol>' },
     { type: 'quiz', title: 'Kaç kare gider?',
       q: '<span class="chipb c-loop">🔁 3 kez tekrarla: ⬆ İleri git</span> programı Robo\'yu kaç kare ilerletir?',
       opts: ['1 kare', '3 kare', '4 kare'], a: 1,

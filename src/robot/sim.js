@@ -72,7 +72,8 @@ export function simulate(m, dir, prog) {
   const atGoal = () => x === m.goal.x && y === m.goal.y;
   const acts = flatten(prog);
   if (!acts.length) return { ev, result: 'empty' };
-  for (const a of acts) {
+  for (let ai = 0; ai < acts.length; ai++) {
+    const a = acts[ai];
     const base = { id: a.id, loop: a.loop, iter: a.iter, n: a.n };
     if (a.c === 'L' || a.c === 'R') {
       const s = a.c === 'R' ? 1 : -1;
@@ -100,6 +101,12 @@ export function simulate(m, dir, prog) {
     if (star) got.add(k);
     ev.push({ ...base, t: 'move', x, y, d, rot, star: star ? k : null });
     if (atGoal() && got.size === m.stars.length) {
+      // Pilden sonra hâlâ yürüme komutu varsa Robo durdurulur: program fazla uzun
+      const extra = acts.slice(ai + 1).filter((r) => r.c === 'F' || r.c === 'B');
+      if (extra.length) {
+        ev.push({ t: 'stop', x, y, d, rot });
+        return { ev, result: 'extra', extra: extra.length, extraId: extra[0].id };
+      }
       ev.push({ t: 'win', x, y, d, rot });
       return { ev, result: 'win' };
     }
