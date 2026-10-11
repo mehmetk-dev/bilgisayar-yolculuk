@@ -97,8 +97,7 @@ button.link { background: none; border: 0; box-shadow: none; color: var(--acc); 
 .trail { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.1em; position: relative; }
 .trail::before { content: ""; position: absolute; left: 1.75em; top: 1em; bottom: 1em; border-left: 6px dashed #e2cfa8; }
 .node a, .node.soon { display: flex; align-items: center; gap: 1em; text-decoration: none; color: inherit; position: relative; }
-.node:nth-child(even) { padding-left: 2.2em; }
-.node:nth-child(even) .nnum { margin-left: -2.2em; }
+
 .nnum { width: 3.5em; height: 3.5em; flex: none; border-radius: 50%; background: var(--c); color: #fff; font-weight: 900; font-size: 1.1em; display: grid; place-items: center; border: 5px solid #fff; box-shadow: 0 4px 0 color-mix(in srgb, var(--c), #000 25%), 0 6px 16px #0002; }
 .node.done .nnum { background: var(--ok); }
 .ncard { flex: 1; display: flex; gap: 0.9em; align-items: center; background: #fff; border: 3px solid color-mix(in srgb, var(--c), #fff 60%); border-radius: 20px; padding: 0.8em 1em; transition: transform 0.15s; }
@@ -113,6 +112,10 @@ button.link { background: none; border: 0; box-shadow: none; color: var(--acc); 
 .nprog i { display: block; height: 100%; background: var(--c); border-radius: 999px; }
 .ncount { font-size: 0.75em; color: var(--mut); font-weight: 700; }
 .node.soon { --c: #b9b0c9; opacity: 0.75; }
+.whead { position: relative; z-index: 1; display: flex; align-items: baseline; gap: 0.6em; flex-wrap: wrap; font-size: 1.25em; font-weight: 900; margin: 0.8em 0 -0.2em; padding: 0.3em 0.9em; background: var(--bg); border-radius: 14px; align-self: flex-start; }
+.whead span { background: var(--fg); color: #fff; border-radius: 999px; padding: 0.1em 0.7em; font-size: 0.8em; }
+.whead small { font-size: 0.6em; color: var(--mut); font-weight: 700; }
+.trail .whead:first-child { margin-top: 0; }
 .node.soon .ncard { border-style: dashed; }
 .tnote { background: #fffdf6; border: 2px dashed #e0c98f; border-radius: 18px; padding: 0.9em 1.1em; margin-top: 1.8em; font-size: 0.92em; }
 .tnote h3, .tnote h4 { margin-bottom: 0.3em; }
@@ -197,8 +200,6 @@ button.link { background: none; border: 0; box-shadow: none; color: var(--acc); 
   .story .sbot { width: 8em; }
   .bubble::before { left: 50%; top: -22px; margin: 0 0 0 -14px; border: 14px solid transparent; border-bottom: 22px solid #d8ccff; border-top: 0; }
   .stage { padding: 0.9em; }
-  .node:nth-child(even) { padding-left: 0; }
-  .node:nth-child(even) .nnum { margin-left: 0; }
   .nnum { width: 2.8em; height: 2.8em; }
   .trail::before { left: 1.4em; }
   .ncard { flex-direction: column; align-items: flex-start; }

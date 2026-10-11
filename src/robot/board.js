@@ -1,5 +1,5 @@
 // Izgara görevi: harita, komut düğmeleri, program alanı ve Robo'nun adım adım oynatılması
-import { parseMap, parseProg, simulate, countBlocks, newId, DIR } from './sim.js';
+import { parseMap, parseProg, simulate, countBlocks, newId, DIR, SLOTS, isBox } from './sim.js';
 import { robotHTML, play, confetti, sleep, prefs, toast, hideToast } from './robo.js';
 
 export const CMDS = {
@@ -7,7 +7,22 @@ export const CMDS = {
   B: { label: 'Geri git', icon: '⬇', cls: 'c-b' },
   L: { label: 'Sola dön', icon: '↰', cls: 'c-l' },
   R: { label: 'Sağa dön', icon: '↱', cls: 'c-r' },
+  P: { label: 'Yıldızı al', icon: '✋', cls: 'c-p' },
+  fn: { label: 'Fonksiyon', icon: '🧩', cls: 'c-fn' },
   loop: { label: 'Tekrarla', icon: '🔁', cls: 'c-loop' },
+  if: { label: 'Eğer … ise', icon: '❓', cls: 'c-if' },
+  ife: { label: 'Eğer … değilse', icon: '❓', cls: 'c-if' },
+  until: { label: '… olana kadar tekrarla', icon: '🔁', cls: 'c-until' },
+};
+
+export const CONDS = {
+  open: 'önüm açık',
+  blocked: 'önümde engel var',
+  left: 'solum açık',
+  right: 'sağım açık',
+  star: 'yıldızın üstündeyim',
+  nostar: 'burada yıldız yok',
+  goal: 'pile ulaştım',
 };
 
 const BATTERY = `<svg viewBox="0 0 40 48" aria-hidden="true"><rect x="14" y="2" width="12" height="6" rx="2" fill="#2d6a3e"/><rect x="5" y="7" width="30" height="39" rx="7" fill="#2fbf71" stroke="#1d7a47" stroke-width="3"/><path d="M23 13 L13 29 H20 L17 41 L28 24 H21 Z" fill="#ffe14d" stroke="#c99a00" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
@@ -17,76 +32,159 @@ const FAIL = {
   tree: 'Aaa! Önümde ağaç var 🌳 Oradan geçemem.',
   edge: 'Dur! Orada yol yok, haritanın dışına çıkamam.',
   water: 'Şıpırtı! Suya düştüm 💦 Robotlar yüzemez!',
+  door: 'Kapı kilitli! 🚪 Önce anahtarı 🔑 almalıyım.',
+  nopick: 'Burada alınacak yıldız yok! ✋ Yıldızın tam üstündeyken “Yıldızı al” demelisin.',
   nostars: 'Pile geldim ama bütün yıldızları toplamadım ⭐',
   nogoal: 'Komutlar bitti ama pile ulaşamadım 🔋',
+  limit: 'Ufff, çok yoruldum! 😵 Program hiç bitmiyor gibi. Döngü bir gün sona eriyor mu?',
 };
 const WIN = ['Harika! Robo pile ulaştı! 🎉', 'Süpersin! Algoritman çalıştı! 🌟', 'Bravo! Tam bir programcı gibi! 🤖', 'Mükemmel! Robo\'nun pili doldu! 🔋'];
 
-export function renderGrid(el, step, done) {
-  const m = parseMap(step.map);
-  const dir0 = DIR[step.dir || 'E'];
-  const max = step.max || 0;
-  let prog = step.preset ? parseProg(step.preset) : [];
-  let caret = { list: prog, i: prog.length };
-  let tok = 0;
-  let running = false;
-  let fails = 0;
-
+// --- tahta çizimi (görevde ve sorulardaki küçük resimlerde ortak) ---
+function boardInner(m, dir) {
   const tiles = [];
   for (let y = 0; y < m.h; y++) {
     for (let x = 0; x < m.w; x++) {
       const c = m.cell[y][x];
-      tiles.push(`<div class="tile t-${c}${(x + y) % 2 ? ' alt' : ''}"></div>`);
+      tiles.push(`<div class="tile t-${c}${(x + y) % 2 ? ' alt' : ''}"${c === 'door' ? ` data-door` : ''}></div>`);
     }
   }
-  const items = [
-    `<div class="it start" style="--x:${m.start.x};--y:${m.start.y}"></div>`,
-    `<div class="it goal" style="--x:${m.goal.x};--y:${m.goal.y}">${BATTERY}</div>`,
-    ...m.stars.map((s) => `<div class="it star" data-k="${s.x},${s.y}" style="--x:${s.x};--y:${s.y}">⭐</div>`),
-  ];
+  return tiles.join('')
+    + `<div class="it start" style="--x:${m.start.x};--y:${m.start.y}"></div>`
+    + (m.goal ? `<div class="it goal" style="--x:${m.goal.x};--y:${m.goal.y}">${BATTERY}</div>` : '')
+    + m.stars.map((s) => `<div class="it star" data-k="${s.x},${s.y}" style="--x:${s.x};--y:${s.y}">⭐</div>`).join('')
+    + m.keys.map((s) => `<div class="it key" data-k="${s.x},${s.y}" style="--x:${s.x};--y:${s.y}">🔑</div>`).join('')
+    + `<div class="path"></div>${robotHTML(dir, m.start.x, m.start.y)}`;
+}
 
+// Sorular için küçük, hareketsiz harita resmi
+export function boardPic(rows, dir = 'E', t = 46) {
+  const m = parseMap(rows);
+  return `<div class="board pic" style="--w:${m.w};--h:${m.h};--t:${t}px">${boardInner(m, DIR[dir])}</div>`;
+}
+
+// --- blok çizimi ---
+function condSelect(b, conds, ro) {
+  if (ro) return `<span class="cv">${CONDS[b.cond]}</span>`;
+  const list = conds.includes(b.cond) ? conds : [b.cond, ...conds];
+  return `<select class="cond" aria-label="Koşul">${list.map((k) => `<option value="${k}"${k === b.cond ? ' selected' : ''}>${CONDS[k]}</option>`).join('')}</select>`;
+}
+
+function blockHTML(b, ctx) {
+  const k = CMDS[b.c];
+  const del = ctx.ro ? '' : '<button type="button" class="del" title="Sil" aria-label="Bloğu sil">✖</button>';
+  if (!isBox(b)) {
+    const label = b.c === 'fn' ? ctx.fnName : k.label;
+    return `<div class="blk ${k.cls}" data-id="${b.id}"><span class="bi">${k.icon}</span><span class="bl">${label}</span>${del}</div>`;
+  }
+  let head;
+  if (b.c === 'loop') {
+    head = ctx.ro ? `<span class="cv">${b.n}</span> kez tekrarla`
+      : `<select class="n" aria-label="Kaç kez">${[2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<option${n === b.n ? ' selected' : ''}>${n}</option>`).join('')}</select> kez tekrarla`;
+  } else if (b.c === 'until') head = `${condSelect(b, ctx.conds, ctx.ro)} olana kadar tekrarla`;
+  else head = `eğer ${condSelect(b, ctx.conds, ctx.ro)} ise`;
+  const body = (s) => `<div class="lbody" data-in="${b.id}:${s}">${listHTML(b[s], ctx)}</div>`;
+  const foot = b.c === 'loop' || b.c === 'until' ? 'döngü sonu ⤶' : 'eğer sonu ⤶';
+  return `<div class="blk box ${k.cls}" data-id="${b.id}"><div class="lhead"><span class="bi">${k.icon}</span>${head}<span class="iter"></span><span class="chk"></span>${del}</div>${body('body')}${b.c === 'ife' ? `<div class="lmid" data-in="${b.id}:body2">değilse</div>${body('body2')}` : ''}<div class="lfoot" data-after="${b.id}">${foot}</div></div>`;
+}
+
+function listHTML(list, ctx) {
+  let h = '';
+  for (let i = 0; i <= list.length; i++) {
+    if (!ctx.ro && ctx.caret.list === list && ctx.caret.i === i) h += '<span class="caret" aria-hidden="true"></span>';
+    if (i < list.length) h += blockHTML(list[i], ctx);
+  }
+  if (!list.length && !ctx.ro) h += ctx.root === list ? `<span class="pempty">${ctx.emptyText}</span>` : '<span class="pempty">içine komut ekle ya da bir bloğu buraya sürükle</span>';
+  return h;
+}
+
+// Sorular için hareketsiz program resmi
+export function codePic(str, fnStr, fnName = 'Fonksiyon') {
+  const ctx = { ro: true, conds: Object.keys(CONDS), fnName };
+  const main = `<div class="prog ro">${listHTML(parseProg(str), ctx)}</div>`;
+  if (!fnStr) return `<div class="codepic">${main}</div>`;
+  return `<div class="codepic two">${main}<div><div class="fnhead">🧩 ${fnName} =</div><div class="prog ro fnprog">${listHTML(parseProg(fnStr), ctx)}</div></div></div>`;
+}
+
+const within = (root, list) => root === list || root.some((b) => (SLOTS[b.c] || []).some((s) => within(b[s], list)));
+
+export function renderGrid(el, step, done, prev) {
+  const rows = step.maps || [step.map];
+  const M = rows.map(parseMap);
+  const dirs = rows.map((_, k) => DIR[(step.dirs && step.dirs[k]) || step.dir || 'E']);
+  const max = step.max || 0;
+  // ⭐⭐⭐ hedefi: örnek çözümün blok sayısı
+  const best = step.best ?? (step.sol ? countBlocks(parseProg(step.sol)) + countBlocks(parseProg(step.fnSol || step.fnPreset || '')) : 0);
+  const hasFn = step.tools.includes('fn');
+  const fnName = step.fnName || 'Fonksiyon';
+  const conds = step.conds || ['open', 'blocked', 'star', 'goal'];
+  const fresh = () => ({ prog: step.preset ? parseProg(step.preset) : [], fn: step.fnPreset ? parseProg(step.fnPreset) : [] });
+  let { prog, fn } = fresh();
+  let caret = { list: prog, i: prog.length };
+  let mi = 0;
+  let tok = 0;
+  let running = false;
+  let fails = 0;
+  const total = () => countBlocks(prog) + countBlocks(fn);
+  const stars = (n) => '⭐'.repeat(n) + '<span class="dim">⭐</span>'.repeat(3 - n);
+
+  const tabs = M.length > 1 ? `<div class="mtabs">${M.map((_, k) => `<button type="button" class="mtab${k ? '' : ' cur'}" data-k="${k}">🗺 Harita ${k + 1}</button>`).join('')}</div>` : '';
   el.innerHTML = `<div class="gridact">
   <div class="gleft">
-    <div class="ginfo"><h3>${step.title}</h3>${step.text}</div>
-    <div class="gboard"><div class="board" style="--w:${m.w};--h:${m.h}">${tiles.join('')}${items.join('')}<div class="path"></div>${robotHTML(dir0, m.start.x, m.start.y)}</div></div>
+    <div class="ginfo"><h3>${step.title}${best ? ` <span class="bestline" title="En az ${best} blokla çözersen 3 yıldız">${prev ? stars(prev) : ''} <small>⭐⭐⭐ hedefi: ${best} blok</small></span>` : ''}</h3>${step.text}</div>
+    ${tabs}
+    <div class="gboard"><div class="board"></div></div>
     <div class="hint" hidden></div>
   </div>
   <div class="gcode">
     <h4>Komutlar</h4>
-    <div class="tools">${step.tools.map((c) => `<button type="button" class="tool ${CMDS[c].cls}" data-c="${c}"><span class="bi">${CMDS[c].icon}</span>${CMDS[c].label}</button>`).join('')}</div>
+    <div class="tools">${step.tools.map((c) => `<button type="button" class="tool ${CMDS[c].cls}" data-c="${c}"><span class="bi">${CMDS[c].icon}</span>${c === 'fn' ? fnName : CMDS[c].label}</button>`).join('')}</div>
     <h4>Programım <span class="cnt"></span></h4>
-    <div class="prog" tabindex="-1"></div>
-    <p class="ptip">✋ Blokları <b>sürükleyerek</b> yerini değiştirebilir${step.tools.includes('loop') ? ', döngünün içine ya da dışına taşıyabilirsin' : ''}.</p>
+    <div class="prog" data-root="main" tabindex="-1"></div>
+    ${hasFn ? `<h4 class="fnhead">🧩 ${fnName} fonksiyonum</h4><div class="prog fnprog" data-root="fn" tabindex="-1"></div>` : ''}
+    <p class="ptip">✋ Blokları <b>sürükleyerek</b> yerini değiştirebilir, içine ya da dışına taşıyabilirsin.</p>
     <div class="ctrl">
       <button type="button" class="primary run">▶ Çalıştır</button>
       <button type="button" class="reset">↺ Başa al</button>
-      <button type="button" class="clear">${step.preset ? '↺ İlk program' : '🗑 Temizle'}</button>
+      <button type="button" class="clear">${step.preset || step.fnPreset ? '↺ İlk program' : '🗑 Temizle'}</button>
     </div>
   </div>
 </div>`;
 
   const q = (s) => el.querySelector(s);
   const board = q('.board');
-  const rb = q('.rb');
-  const arrow = q('.rarrow');
-  const progEl = q('.prog');
+  const progEl = q('.prog[data-root="main"]');
+  const fnEl = q('.fnprog');
   const cnt = q('.cnt');
   const hintEl = q('.hint');
   const runBtn = q('.run');
-  const trail = q('.path');
+  let rb;
+  let arrow;
+  let trail;
+
+  function showMap(k) {
+    mi = k;
+    const m = M[k];
+    board.style.setProperty('--w', m.w);
+    board.style.setProperty('--h', m.h);
+    board.innerHTML = boardInner(m, dirs[k]);
+    rb = q('.rb');
+    arrow = q('.rarrow');
+    trail = q('.path');
+    el.querySelectorAll('.mtab').forEach((t) => t.classList.toggle('cur', +t.dataset.k === k));
+    fit();
+  }
 
   // Kare boyutu alana göre ayarlanır
-  const fit = () => {
+  function fit() {
     const w = q('.gboard').clientWidth - 8;
-    const t = Math.max(38, Math.min(84, Math.floor(w / m.w)));
+    const t = Math.max(34, Math.min(80, Math.floor(w / M[mi].w)));
     board.style.setProperty('--t', t + 'px');
-  };
+  }
   const ro = new ResizeObserver(fit);
   ro.observe(q('.gboard'));
-  fit();
 
-  // Sonuçlar ekranın üstünde bildirim olarak çıkar; tahta ve sayfa yerinden oynamaz
-  const say = (kind, html) => toast(kind, html);
+  const say = (kind, html, ms) => toast(kind, html, ms);
 
   function place(e, instant) {
     if (instant) rb.classList.add('noanim');
@@ -99,12 +197,7 @@ export function renderGrid(el, step, done) {
 
   function resetRobot() {
     tok++;
-    running = false;
-    rb.classList.remove('bump', 'fall', 'happy', 'sad', 'walk', 'halt');
-    place({ x: m.start.x, y: m.start.y, d: dir0, rot: dir0 * 90 }, true);
-    el.querySelectorAll('.star').forEach((s) => s.classList.remove('got'));
-    q('.goal').classList.remove('win');
-    trail.innerHTML = '';
+    showMap(mi);
     highlight(null);
     el.querySelectorAll('.blk.extra').forEach((b) => b.classList.remove('extra'));
     setRunning(false);
@@ -117,48 +210,34 @@ export function renderGrid(el, step, done) {
   }
 
   // --- program alanı ---
-  function find(id, list = prog) {
-    for (let i = 0; i < list.length; i++) {
-      const b = list[i];
-      if (b.id === id) return { list, i, b };
-      if (b.body) { const r = find(id, b.body); if (r) return r; }
+  function find(id, lists = [prog, fn]) {
+    for (const L of lists) {
+      for (let i = 0; i < L.length; i++) {
+        const b = L[i];
+        if (b.id === id) return { list: L, i, b };
+        for (const s of SLOTS[b.c] || []) { const r = find(id, [b[s]]); if (r) return r; }
+      }
     }
     return null;
   }
-
-  function blockHTML(b) {
-    const k = CMDS[b.c];
-    const del = '<button type="button" class="del" title="Sil" aria-label="Bloğu sil">✖</button>';
-    if (b.c === 'loop') {
-      const opts = [2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<option${n === b.n ? ' selected' : ''}>${n}</option>`).join('');
-      return `<div class="blk loop c-loop" data-id="${b.id}"><div class="lhead"><span class="bi">${k.icon}</span><select aria-label="Kaç kez">${opts}</select> kez tekrarla <span class="iter"></span>${del}</div><div class="lbody" data-in="${b.id}">${listHTML(b.body)}</div><div class="lfoot" data-after="${b.id}">döngü sonu ⤶</div></div>`;
-    }
-    return `<div class="blk ${k.cls}" data-id="${b.id}"><span class="bi">${k.icon}</span><span class="bl">${k.label}</span>${del}</div>`;
-  }
-
-  function listHTML(list) {
-    let h = '';
-    for (let i = 0; i <= list.length; i++) {
-      if (caret.list === list && caret.i === i) h += '<span class="caret" aria-hidden="true"></span>';
-      if (i < list.length) h += blockHTML(list[i]);
-    }
-    if (!list.length) h += list === prog ? '<span class="pempty">Komutlara tıkla, buraya eklensin 👆</span>' : '<span class="pempty">içine komut ekle ya da bir bloğu buraya sürükle</span>';
-    return h;
-  }
+  const slotList = (ref) => { const [id, s] = ref.split(':'); return find(+id).b[s]; };
 
   function draw(newId) {
-    progEl.innerHTML = listHTML(prog);
-    const n = countBlocks(prog);
+    const ctx = { caret, conds, fnName, root: prog, emptyText: 'Komutlara tıkla, buraya eklensin 👆' };
+    progEl.innerHTML = listHTML(prog, ctx);
+    if (fnEl) fnEl.innerHTML = listHTML(fn, { ...ctx, root: fn, emptyText: `${fnName} fonksiyonunun adımlarını buraya yaz` });
+    const n = total();
     cnt.textContent = max ? `${n} / ${max} blok` : `${n} blok`;
     cnt.classList.toggle('full', !!max && n >= max);
-    if (newId) progEl.querySelector(`[data-id="${newId}"]`)?.classList.add('new');
+    if (newId) el.querySelector(`.blk[data-id="${newId}"]`)?.classList.add('new');
     // İmleç görünür kalsın ama yalnızca program kutusu kaysın, sayfa değil
-    const c = progEl.querySelector('.caret');
-    if (c) {
-      const pr = progEl.getBoundingClientRect();
+    const c = el.querySelector('.caret');
+    const box = c?.closest('.prog');
+    if (c && box) {
+      const pr = box.getBoundingClientRect();
       const cr = c.getBoundingClientRect();
-      if (cr.bottom > pr.bottom) progEl.scrollTop += cr.bottom - pr.bottom + 10;
-      else if (cr.top < pr.top) progEl.scrollTop -= pr.top - cr.top + 10;
+      if (cr.bottom > pr.bottom) box.scrollTop += cr.bottom - pr.bottom + 10;
+      else if (cr.top < pr.top) box.scrollTop -= pr.top - cr.top + 10;
     }
   }
 
@@ -169,20 +248,26 @@ export function renderGrid(el, step, done) {
 
   function add(c) {
     if (running) return;
-    if (max && countBlocks(prog) >= max) {
+    if (max && total() >= max) {
       play('wrong');
       say('warn', `Bu görevde en fazla <b>${max} blok</b> kullanabilirsin. ${step.tools.includes('loop') ? '🔁 Tekrarla bloğu ile kısaltmayı dene!' : ''}`);
       cnt.classList.remove('shake'); void cnt.offsetWidth; cnt.classList.add('shake');
       return;
     }
-    if (c === 'loop' && caret.list !== prog) {
+    if (c === 'fn' && within(fn, caret.list)) {
       play('wrong');
-      say('warn', 'Döngünün içine bir döngü daha koymayalım. Önce “döngü sonu” yazısına tıkla.');
+      say('warn', 'Fonksiyonun içinde kendisini çağırmayalım. Önce yukarıdaki <b>Programım</b> alanına tıkla.');
       return;
     }
-    const b = c === 'loop' ? { id: newId(), c, n: step.loopN || 3, body: [] } : { id: newId(), c };
+    const b = { id: newId(), c };
+    if (c === 'loop') Object.assign(b, { n: step.loopN || 3, body: [] });
+    if (c === 'if' || c === 'until' || c === 'ife') {
+      b.cond = c === 'until' ? (conds.includes('goal') ? 'goal' : conds[0]) : (step.ifCond || conds[0]);
+      b.body = [];
+      if (c === 'ife') b.body2 = [];
+    }
     caret.list.splice(caret.i, 0, b);
-    caret = c === 'loop' ? { list: b.body, i: 0 } : { list: caret.list, i: caret.i + 1 };
+    caret = isBox(b) ? { list: b.body, i: 0 } : { list: caret.list, i: caret.i + 1 };
     play('add');
     changed();
     draw(b.id);
@@ -203,31 +288,47 @@ export function renderGrid(el, step, done) {
     if (b) add(b.dataset.c);
   });
 
-  progEl.addEventListener('click', (e) => {
-    if (running) return;
-    const t = e.target;
-    const del = t.closest('.del');
-    if (del) return remove(+del.closest('.blk').dataset.id);
-    if (t.closest('select')) return;
-    const foot = t.closest('.lfoot');
-    const blk = t.closest('.blk:not(.loop)');
-    const inLoop = t.closest('.lhead') ? t.closest('.loop').dataset.id : t.closest('.lbody')?.dataset.in;
-    if (foot) { const f = find(+foot.dataset.after); caret = { list: f.list, i: f.i + 1 }; }
-    else if (blk) { const f = find(+blk.dataset.id); caret = { list: f.list, i: f.i + 1 }; }
-    else if (inLoop) { const f = find(+inLoop); caret = { list: f.b.body, i: f.b.body.length }; }
-    else caret = { list: prog, i: prog.length };
-    play('click');
-    draw();
-  });
+  const roots = [progEl, fnEl].filter(Boolean);
+  const rootList = (box) => (box.dataset.root === 'fn' ? fn : prog);
 
-  // --- sürükle bırak: blokların yerini değiştirme, döngünün içine/dışına taşıma (fare ve dokunmatik) ---
+  for (const box of roots) {
+    box.addEventListener('click', (e) => {
+      if (running) return;
+      const t = e.target;
+      const del = t.closest('.del');
+      if (del) return remove(+del.closest('.blk').dataset.id);
+      if (t.closest('select')) return;
+      const foot = t.closest('.lfoot');
+      const blk = t.closest('.blk:not(.box)');
+      const head = t.closest('.lhead');
+      const slot = t.closest('.lbody, .lmid');
+      if (foot) { const f = find(+foot.dataset.after); caret = { list: f.list, i: f.i + 1 }; }
+      else if (blk) { const f = find(+blk.dataset.id); caret = { list: f.list, i: f.i + 1 }; }
+      else if (head) { const b = find(+head.parentNode.dataset.id).b; caret = { list: b.body, i: b.body.length }; }
+      else if (slot) { const l = slotList(slot.dataset.in); caret = { list: l, i: l.length }; }
+      else { const l = rootList(box); caret = { list: l, i: l.length }; }
+      play('click');
+      draw();
+    });
+    box.addEventListener('change', (e) => {
+      const s = e.target;
+      const b = find(+s.closest('.blk').dataset.id).b;
+      if (s.classList.contains('n')) b.n = +s.value;
+      else if (s.classList.contains('cond')) b.cond = s.value;
+      changed();
+    });
+  }
+
+  // --- sürükle bırak: blokların yerini değiştirme, içine/dışına taşıma (fare ve dokunmatik) ---
   let drag = null;
   let dragged = false;
-  progEl.addEventListener('pointerdown', (e) => {
-    if (running || e.button > 0 || e.target.closest('.del, select')) return;
-    const blk = e.target.closest('.blk');
-    if (blk) drag = { el: blk, f: find(+blk.dataset.id), x0: e.clientX, y0: e.clientY, on: false };
-  });
+  for (const box of roots) {
+    box.addEventListener('pointerdown', (e) => {
+      if (running || e.button > 0 || e.target.closest('.del, select')) return;
+      const blk = e.target.closest('.blk');
+      if (blk) drag = { el: blk, id: +blk.dataset.id, x0: e.clientX, y0: e.clientY, on: false };
+    });
+  }
   const onMove = (e) => {
     if (!drag) return;
     if (!drag.on) {
@@ -243,21 +344,25 @@ export function renderGrid(el, step, done) {
       drag.mark = document.createElement('span');
       drag.mark.className = 'drop';
       drag.el.classList.add('dragging');
-      progEl.classList.add('dnd');
+      el.classList.add('dnd');
     }
     e.preventDefault();
     drag.ghost.style.transform = `translate(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px) rotate(2deg)`;
-    // Bırakılacak yer: parmağın altındaki döngü gövdesi ya da programın kendisi
+    // Bırakılacak yer: parmağın altındaki gövde ya da programın kendisi
     const under = document.elementFromPoint(e.clientX, e.clientY);
+    const rootBox = under?.closest('.prog[data-root]');
     drag.to = null;
-    if (!under || !progEl.contains(under)) { drag.mark.remove(); return; }
-    const body = under.closest('.lbody');
-    const cont = body && drag.f.b.c !== 'loop' && !drag.el.contains(body) ? body : progEl;
+    if (!rootBox || !el.contains(rootBox)) { drag.mark.remove(); return; }
+    let body = under.closest('.lbody');
+    if (body && drag.el.contains(body)) body = null;
+    const cont = body || rootBox;
+    const list = body ? slotList(body.dataset.in) : rootList(rootBox);
+    if (find(drag.id).b.c === 'fn' && within(fn, list)) { drag.mark.remove(); return; }
     const kids = [...cont.children].filter((k) => k.classList.contains('blk') && k !== drag.el);
     let i = kids.findIndex((k) => { const r = k.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; });
     if (i < 0) i = kids.length;
     cont.insertBefore(drag.mark, kids[i] || cont.querySelector(':scope > .pempty'));
-    drag.to = { list: cont === progEl ? prog : find(+cont.dataset.in).b.body, i };
+    drag.to = { list, i };
   };
   const onUp = () => {
     if (!drag) return;
@@ -267,10 +372,10 @@ export function renderGrid(el, step, done) {
     dragged = true;
     d.ghost.remove();
     d.mark.remove();
-    progEl.classList.remove('dnd');
+    el.classList.remove('dnd');
     d.el.classList.remove('dragging');
     if (!d.to) return;
-    const f = find(d.f.b.id);
+    const f = find(d.id);
     f.list.splice(f.i, 1);
     d.to.list.splice(d.to.i, 0, f.b);
     caret = { list: d.to.list, i: d.to.i + 1 };
@@ -282,17 +387,19 @@ export function renderGrid(el, step, done) {
   addEventListener('pointerup', onUp);
   addEventListener('pointercancel', onUp);
   // Sürüklemenin sonundaki tıklama imleci oynatmasın
-  progEl.addEventListener('click', (e) => { if (dragged) { dragged = false; e.stopImmediatePropagation(); } }, true);
+  for (const box of roots) box.addEventListener('click', (e) => { if (dragged) { dragged = false; e.stopImmediatePropagation(); } }, true);
 
-  progEl.addEventListener('change', (e) => {
-    if (e.target.tagName !== 'SELECT') return;
-    find(+e.target.closest('.loop').dataset.id).b.n = +e.target.value;
+  el.querySelector('.mtabs')?.addEventListener('click', (e) => {
+    const t = e.target.closest('.mtab');
+    if (!t || running) return;
+    play('click');
+    mi = +t.dataset.k;
     changed();
   });
 
   q('.reset').onclick = () => { changed(); play('click'); };
   q('.clear').onclick = () => {
-    prog = step.preset ? parseProg(step.preset) : [];
+    ({ prog, fn } = fresh());
     caret = { list: prog, i: prog.length };
     play('del');
     changed();
@@ -302,29 +409,27 @@ export function renderGrid(el, step, done) {
   // --- çalıştırma ---
   function highlight(e) {
     el.querySelectorAll('.blk.now').forEach((b) => b.classList.remove('now'));
-    el.querySelectorAll('.iter').forEach((s) => { s.textContent = ''; });
+    el.querySelectorAll('.iter, .chk').forEach((s) => { s.textContent = ''; s.className = s.classList[0]; });
     if (!e) return;
     if (e.id) el.querySelector(`.blk[data-id="${e.id}"]`)?.classList.add('now');
-    if (e.loop) {
-      const l = el.querySelector(`.loop[data-id="${e.loop}"]`);
-      if (l) l.querySelector('.iter').textContent = `(${e.iter}. tur)`;
+    for (const [id, k] of Object.entries(e.loops || {})) {
+      const it = el.querySelector(`.blk[data-id="${id}"] > .lhead > .iter`);
+      if (it) it.textContent = `(${k}. tur)`;
+    }
+    if (e.t === 'check') {
+      const c = el.querySelector(`.blk[data-id="${e.id}"] > .lhead > .chk`);
+      if (c) { c.textContent = e.ok ? '✔ evet' : '✖ hayır'; c.classList.add(e.ok ? 'yes' : 'no'); }
     }
   }
 
-  async function run() {
-    if (running) { resetRobot(); return; }
-    resetRobot();
-    hideToast();
-    const { ev, result, extra, extraId } = simulate(m, dir0, prog);
-    const my = ++tok;
-    setRunning(true);
-    const ms = prefs.fast ? 280 : 560;
-    board.style.setProperty('--dur', ms * 0.8 + 'ms');
-    await sleep(150);
+  async function playEvents(ev, my, ms) {
     for (const e of ev) {
-      if (my !== tok) return;
+      if (my !== tok) return false;
       highlight(e);
+      let wait = ms;
       if (e.t === 'turn') { place(e); play('turn'); }
+      else if (e.t === 'check') { play('click'); wait = ms * 0.6; }
+      else if (e.t === 'call') { play('add'); wait = ms * 0.45; }
       else if (e.t === 'move') {
         const dot = document.createElement('i');
         dot.style.cssText = `--x:${rb.style.getPropertyValue('--x')};--y:${rb.style.getPropertyValue('--y')}`;
@@ -333,6 +438,19 @@ export function renderGrid(el, step, done) {
         rb.classList.remove('walk'); void rb.offsetWidth; rb.classList.add('walk');
         play('step');
         if (e.star) setTimeout(() => { el.querySelector(`.star[data-k="${e.star}"]`)?.classList.add('got'); play('star'); }, ms * 0.6);
+        if (e.key) {
+          setTimeout(() => {
+            el.querySelector(`.key[data-k="${e.key}"]`)?.classList.add('got');
+            el.querySelectorAll('[data-door]').forEach((d) => d.classList.add('open'));
+            play('ok');
+          }, ms * 0.6);
+        }
+      } else if (e.t === 'pick') {
+        rb.classList.remove('picking'); void rb.offsetWidth; rb.classList.add('picking');
+        el.querySelector(`.star[data-k="${e.star}"]`)?.classList.add('got');
+        play('star');
+      } else if (e.t === 'nopick') {
+        rb.classList.add('sad');
       } else if (e.t === 'bump') {
         rb.style.setProperty('--bx', e.bx);
         rb.style.setProperty('--by', e.by);
@@ -341,38 +459,70 @@ export function renderGrid(el, step, done) {
       } else if (e.t === 'fall') {
         place(e);
         setTimeout(() => { rb.classList.add('fall'); play('splash'); }, ms * 0.6);
-        await sleep(ms * 0.6);
-      }
-      await sleep(e.t === 'win' || e.t === 'stop' ? 0 : ms);
+        wait = ms * 1.6;
+      } else wait = 0;
+      await sleep(wait);
     }
-    if (my !== tok) return;
-    highlight(null);
-    setRunning(false);
-    if (result === 'win') {
+    return my === tok;
+  }
+
+  async function run() {
+    if (running) { resetRobot(); return; }
+    hideToast();
+    const my = ++tok;
+    const ms = prefs.fast ? 260 : 540;
+    for (let k = 0; k < M.length; k++) {
+      mi = k;
+      showMap(k);
+      highlight(null);
+      tok = my;
+      setRunning(true);
+      board.style.setProperty('--dur', ms * 0.8 + 'ms');
+      const r = simulate(M[k], dirs[k], prog, { fn, pick: step.pick });
+      await sleep(180);
+      if (!(await playEvents(r.ev, my, ms))) return;
+      highlight(null);
+      const where = M.length > 1 ? `<b>${k + 1}. haritada:</b> ` : '';
+      if (r.result === 'extra') {
+        setRunning(false);
+        rb.classList.add('halt');
+        el.querySelector(`.blk[data-id="${r.extraId}"]`)?.classList.add('extra');
+        play('wrong');
+        say('warn', `${where}<b>Dur! Pile ulaştım ama programında ${r.extra} fazla adım var.</b><br>Devam etseydim pili geçip giderdim! Kırmızı çerçeveli blok ve ondan sonraki yürüme komutları fazla; onları ✖ ile sil.`);
+        return;
+      }
+      if (r.result !== 'win') {
+        setRunning(false);
+        fails++;
+        rb.classList.add('sad');
+        if (!['tree', 'edge', 'water', 'door'].includes(r.result)) play('wrong');
+        const multi = M.length > 1 && k > 0 ? '<br><small>Unutma: aynı program <b>bütün haritalarda</b> çalışmalı.</small>' : '<br><small>Programını düzelt ve tekrar ▶ Çalıştır\'a bas.</small>';
+        say('bad', `${where}<b>${FAIL[r.result]}</b>${multi}`);
+        if (step.hint && fails >= 2) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
+        return;
+      }
       rb.classList.add('happy');
       q('.goal').classList.add('win');
-      play('win');
-      confetti();
-      const n = countBlocks(prog);
-      say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b><br>${n} blokla çözdün. Şimdi <b>Devam ▶</b> düğmesine basabilirsin.`);
-      hintEl.hidden = true;
-      done();
-    } else if (result === 'extra') {
-      // Robo pilde durduruldu: kalan yürüme komutları fazla
-      rb.classList.add('halt');
-      el.querySelector(`.blk[data-id="${extraId}"]`)?.classList.add('extra');
-      play('wrong');
-      say('warn', `<b>Dur! Pile ulaştım ama programında ${extra} fazla adım var.</b><br>Devam etseydim pili geçip giderdim! Kırmızı çerçeveli blok ve ondan sonrakiler fazla; onları ✖ ile sil ve tekrar dene.`);
-    } else {
-      fails++;
-      rb.classList.add('sad');
-      if (result === 'empty' || result === 'nogoal' || result === 'nostars') play('wrong');
-      say('bad', `<b>${FAIL[result]}</b><br><small>Programını düzelt ve tekrar ▶ Çalıştır'a bas.</small>`);
-      if (step.hint && fails >= 2) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
+      if (k < M.length - 1) {
+        play('ok');
+        say('ok', `<b>${k + 1}. harita tamam!</b> Şimdi aynı program ${k + 2}. haritada deneniyor…`, 1800);
+        await sleep(1500);
+        if (my !== tok) return;
+      }
     }
+    setRunning(false);
+    play('win');
+    confetti();
+    const n = total();
+    const s = best ? (n <= best ? 3 : n <= best + 2 ? 2 : 1) : 0;
+    const rate = s ? `<div class="rate">${stars(s)}</div>${s < 3 ? `<small>${best} blokla çözebilir misin? Denemek zorunda değilsin.</small><br>` : ''}` : '';
+    say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b>${rate}<br>${n} blokla çözdün. <b>Devam ▶</b> düğmesine basabilirsin.`, 7000);
+    hintEl.hidden = true;
+    done(s);
   }
   runBtn.onclick = run;
 
+  showMap(0);
   draw();
   return () => {
     tok++;
@@ -383,4 +533,9 @@ export function renderGrid(el, step, done) {
     removeEventListener('pointercancel', onUp);
     document.querySelector('.ghost')?.remove();
   };
+}
+
+// Soru şıklarında küçük komut dizisi: chips('FFR') → ⬆ ⬆ ↱
+export function chips(str) {
+  return [...str].map((c) => `<span class="chipb ${CMDS[c].cls}">${CMDS[c].icon}</span>`).join(' ');
 }

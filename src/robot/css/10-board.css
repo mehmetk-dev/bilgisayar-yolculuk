@@ -17,6 +17,10 @@
 .c-l { --k: #2f8cff; }
 .c-r { --k: #7a5cff; }
 .c-loop { --k: #e0457b; }
+.c-p { --k: #d99500; }
+.c-fn { --k: #ff6680; }
+.c-if { --k: #f08c00; }
+.c-until { --k: #c2410c; }
 .chipb, .tool, .blk { background: var(--k); }
 .tools { display: flex; flex-wrap: wrap; gap: 0.45em; }
 .tool { color: #fff; border: 0; font-size: 0.95em; padding: 0.5em 0.85em; box-shadow: 0 4px 0 color-mix(in srgb, var(--k), #000 30%); }
@@ -26,24 +30,32 @@
 .running .tools, .running .prog, .running .clear { opacity: 0.55; pointer-events: none; }
 
 /* program alanı */
-.prog { min-height: 9em; max-height: 24em; overflow-y: auto; background: #fff; border: 3px dashed #d4c6ff; border-radius: 16px; padding: 0.5em; display: flex; flex-direction: column; gap: 0.3em; cursor: text; }
+.prog { min-height: 9em; max-height: 34em; overflow-y: auto; background: #fff; border: 3px dashed #d4c6ff; border-radius: 16px; padding: 0.5em; display: flex; flex-direction: column; gap: 0.3em; cursor: text; }
 .pempty { color: var(--mut); font-size: 0.85em; font-weight: 700; padding: 0.3em; }
 .blk { touch-action: none; user-select: none; -webkit-user-select: none; display: flex; align-items: center; gap: 0.45em; color: #fff; font-weight: 800; border-radius: 12px; padding: 0.3em 0.4em 0.3em 0.6em; cursor: pointer; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 30%); transition: transform 0.15s, outline-color 0.15s; outline: 4px solid transparent; }
-.blk:not(.loop):hover { filter: brightness(1.08); }
+.blk:not(.box):hover { filter: brightness(1.08); }
 .blk.new { animation: pop 0.3s; }
 .blk.now { outline-color: #ffd23f; transform: translateX(6px) scale(1.03); }
 .blk.extra { outline-color: #ff3d3d; animation: shake 0.4s 2; }
 .del { margin-left: auto; background: #ffffff33; border: 0; box-shadow: none; color: #fff; font-size: 0.75em; padding: 0.15em 0.5em; border-radius: 8px; }
 .del:hover { background: #00000033; }
-.loop { flex-direction: column; align-items: stretch; padding: 0; gap: 0; }
+.box { flex-direction: column; align-items: stretch; padding: 0; gap: 0; }
 .lhead { display: flex; align-items: center; gap: 0.4em; padding: 0.3em 0.4em 0.3em 0.6em; flex-wrap: wrap; }
-.lhead select { font: inherit; font-weight: 900; border: 0; border-radius: 8px; padding: 0 0.2em; color: var(--fg); cursor: pointer; }
+.lhead select { max-width: 100%; font: inherit; font-weight: 900; border: 0; border-radius: 8px; padding: 0 0.2em; color: var(--fg); cursor: pointer; }
 .iter { font-size: 0.85em; background: #ffd23f; color: #5a3600; border-radius: 999px; padding: 0 0.5em; }
 .iter:empty { display: none; }
-.lbody { margin: 0 0.45em 0 1.5em; background: #fde8f0; border: 2px dashed #f2a7c3; border-radius: 10px; padding: 0.4em; min-height: 3em; display: flex; flex-direction: column; gap: 0.3em; color: var(--fg); }
-.lbody > .pempty { font-size: 0.8em; color: #b04a72; text-align: center; padding: 0.4em; }
+.lbody { margin: 0 0.45em 0 1.5em; background: color-mix(in srgb, var(--k), #fff 88%); border: 2px dashed color-mix(in srgb, var(--k), #fff 50%); border-radius: 10px; padding: 0.4em; min-height: 3em; display: flex; flex-direction: column; gap: 0.3em; color: var(--fg); }
+.lbody > .pempty { font-size: 0.8em; color: color-mix(in srgb, var(--k), #000 30%); text-align: center; padding: 0.4em; }
 .lfoot { padding: 0.1em 0.7em 0.25em; font-size: 0.75em; font-weight: 700; opacity: 0.9; }
-.lfoot:hover { text-decoration: underline; }
+.lfoot:hover, .lmid:hover { text-decoration: underline; }
+.lmid { padding: 0.2em 0.7em; font-weight: 800; cursor: pointer; }
+.chk { font-size: 0.8em; border-radius: 999px; padding: 0 0.5em; background: #fff; }
+.chk:empty { display: none; }
+.chk.yes { color: var(--ok); }
+.chk.no { color: var(--bad); }
+.cv { background: #ffffff; color: var(--fg); border-radius: 8px; padding: 0 0.35em; font-weight: 900; }
+.fnhead { color: #c2185b !important; }
+.fnprog { border-color: #ffb3c4; background: #fff7f9; min-height: 5em; }
 .caret { display: block; height: 5px; flex: none; border-radius: 3px; background: #ff3d7f; animation: caret 1s steps(2) infinite; }
 @keyframes caret { 50% { opacity: 0.2; } }
 .running .caret { visibility: hidden; }
@@ -120,3 +132,23 @@
 .drop { display: block; flex: none; height: 6px; border-radius: 3px; background: #2f8cff; box-shadow: 0 0 0 3px #2f8cff44; }
 .dnd .caret { display: none; }
 .ptip { margin: 0; font-size: 0.78em; color: var(--mut); }
+
+/* harita sekmeleri, anahtar, kapı, yıldız puanı */
+.mtabs { display: flex; gap: 0.4em; flex-wrap: wrap; }
+.mtab { font-size: 0.85em; padding: 0.25em 0.8em; }
+.mtab.cur { background: var(--c); border-color: var(--c); color: #fff; }
+.t-door { background: #98da77; }
+.t-door::after { content: "🚪"; position: absolute; inset: 0; display: grid; place-items: center; font-size: calc(var(--t) * 0.68); transition: transform 0.5s, opacity 0.5s; }
+.t-door.open::after { transform: scale(0.6) translateY(-30%); opacity: 0.25; }
+.key { font-size: calc(var(--t) * 0.5); animation: twinkle 1.4s ease-in-out infinite; z-index: 2; }
+.key.got { animation: grab 0.5s forwards; }
+.rb.picking .rbi { animation: pickup 0.45s ease-in-out; }
+@keyframes pickup { 50% { transform: translateY(10%) scale(0.92); } }
+.bestline { font-size: 0.6em; font-weight: 700; color: var(--mut); white-space: nowrap; }
+.rate { font-size: 1.6em; letter-spacing: 0.1em; }
+.dim { filter: grayscale(1); opacity: 0.3; }
+.board.pic { margin: 0; pointer-events: none; }
+.codepic { display: inline-flex; gap: 1em; text-align: left; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+.codepic .prog { min-height: 0; max-height: none; cursor: default; border-style: solid; font-size: 0.85em; min-width: 12em; }
+.codepic .fnhead { font-weight: 800; font-size: 0.85em; margin-bottom: 0.2em; }
+.qpic { flex-wrap: wrap; gap: 1em; align-items: center; }

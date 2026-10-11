@@ -1,5 +1,5 @@
 // Robo ile Kodlama: macera haritası ve bölüm ekranı
-import { LESSONS } from './lessons.js';
+import { LESSONS, WEEKS } from './lessons/index.js';
 import { renderStory, renderOrder, renderQuiz } from './acts.js';
 import { renderGrid } from './board.js';
 import { roboSVG, play, confetti, prefs, load, save } from './robo.js';
@@ -8,9 +8,13 @@ const $ = (s) => document.querySelector(s);
 const mapEl = $('#map');
 const lesEl = $('#lesson');
 const crumb = $('#crumb');
-const KEY = 'robo-ilerleme';
+const KEY = 'robo-ilerleme-v2';
 const progress = load(KEY, {});
-const rec = (no) => (progress[no] ||= { steps: {}, done: false });
+const rec = (no) => {
+  const r = (progress[no] ||= { steps: {}, done: false });
+  r.score ||= {};
+  return r;
+};
 const RENDER = { story: renderStory, order: renderOrder, quiz: renderQuiz, grid: renderGrid };
 let cleanup = null;
 
@@ -38,15 +42,17 @@ function showMap() {
   lesEl.innerHTML = '';
   const next = LESSONS.find((l) => !rec(l.no).done) || LESSONS[0];
   const started = LESSONS.some((l) => Object.keys(rec(l.no).steps).length);
-  const nodes = LESSONS.map((l) => {
+  const node = (l) => {
     const r = rec(l.no);
     const n = Object.keys(r.steps).length;
+    const st = Object.values(r.score).reduce((a, b) => a + b, 0);
     return `<li class="node${r.done ? ' done' : ''}" style="--c:${l.color}"><a href="#b${l.no}">
   <span class="nnum">${r.done ? '✓' : l.no}</span>
   <span class="ncard"><span class="nicon">${l.icon}</span><span class="ntxt"><b>${l.no}. ${l.title}</b><small>${l.desc}</small>
-  <span class="nfoot"><span class="chip">Kavram: ${l.concept}</span><span class="nprog"><i style="width:${(n / l.steps.length) * 100}%"></i></span><span class="ncount">${n}/${l.steps.length}</span></span></span></span>
+  <span class="nfoot"><span class="chip">Kavram: ${l.concept}</span><span class="nprog"><i style="width:${(n / l.steps.length) * 100}%"></i></span><span class="ncount">${n}/${l.steps.length}${st ? ` · ⭐${st}` : ''}</span></span></span></span>
 </a></li>`;
-  }).join('');
+  };
+  const nodes = WEEKS.map((w, wi) => `<li class="whead"><span>${wi + 1}. Hafta</span>${w.title}<small>4 ders × 40 dk</small></li>${w.lessons.map(node).join('')}`).join('');
   mapEl.innerHTML = `<div class="mwrap">
 <section class="hero">
   <div class="sbot wave">${roboSVG()}</div>
@@ -57,7 +63,6 @@ function showMap() {
   </div>
 </section>
 <ol class="trail">${nodes}
-  <li class="node soon"><span class="nnum">🔒</span><span class="ncard"><span class="nicon">🚧</span><span class="ntxt"><b>6. Bölüm yakında</b><small>Sırada: “Eğer… ise” koşulları ve daha büyük maceralar!</small></span></span></li>
 </ol>
 <section class="tnote">
   <h3>👩‍🏫 Öğretmen için</h3>
@@ -80,7 +85,7 @@ function lessonHead(L, i) {
 
 function showStep(L, i) {
   show('lesson');
-  crumb.textContent = `${L.no}. Bölüm`;
+  crumb.textContent = `${L.week}. Hafta · ${L.no}. Bölüm`;
   const r = rec(L.no);
   const s = L.steps[i];
   lesEl.innerHTML = `<div class="lwrap" style="--c:${L.color}">${lessonHead(L, i)}
@@ -89,7 +94,8 @@ function showStep(L, i) {
   const go = lesEl.querySelector('.go');
   const hint = lesEl.querySelector('.nhint');
   let ok = false;
-  const done = () => {
+  const done = (score) => {
+    if (score && score > (r.score[i] || 0)) { r.score[i] = score; save(KEY, progress); }
     if (ok) return;
     ok = true;
     if (!r.steps[i]) { r.steps[i] = true; save(KEY, progress); }
@@ -109,7 +115,7 @@ function showStep(L, i) {
     location.hash = i + 1 < L.steps.length ? `#b${L.no}/${i + 1}` : `#b${L.no}/son`;
   };
   if (r.steps[i]) done();
-  cleanup = RENDER[s.type](lesEl.querySelector('.stage'), s, done) || null;
+  cleanup = RENDER[s.type](lesEl.querySelector('.stage'), s, done, r.score[i]) || null;
 }
 
 function showFinish(L) {
@@ -126,7 +132,7 @@ function showFinish(L) {
     <h3>Tebrikler, harika bir programcısın! 🎉</h3>
     <div class="learned"><h4>Bu bölümde öğrendiklerin</h4><ul>${L.learned.map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="tnote"><h4>👩‍🏫 Sınıfta oynayın</h4><p>${L.teacher}</p></div>
-    <div class="fbtns">${next ? `<a class="btn primary big" href="#b${next.no}">${next.icon} ${next.no}. Bölüm: ${next.title} ▶</a>` : '<span class="soon-txt">🚧 6. bölüm çok yakında!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
+    <div class="fbtns">${next ? `<a class="btn primary big" href="#b${next.no}">${next.icon} ${next.no}. Bölüm: ${next.title} ▶</a>` : '<span class="soon-txt">🏆 Bütün bölümleri bitirdin!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
   </div></div>`;
   play('win');
   confetti(110);
