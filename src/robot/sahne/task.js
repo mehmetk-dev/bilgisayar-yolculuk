@@ -36,6 +36,7 @@ export function makeApi(w, progs) {
     flagged: () => w.log.flags > 0,
     touching: (a, b) => w.touching(w.sprite(a), b),
     mem: w.mem,
+    count: (op) => { let c = 0; const walk = (l) => l.forEach((b) => { if (b.op === op) c++; ['body', 'body2'].forEach((k) => b[k] && walk(b[k])); }); Object.values(progs).forEach((ss) => ss.forEach(walk)); return c; },
     hats: (op, n) => Object.entries(progs).filter(([k]) => !n || k === n).reduce((c, [, ss]) => c + ss.filter((s) => s[0]?.op === op && s.length > 1).length, 0),
   };
 }
@@ -61,6 +62,7 @@ export function renderScratch(el, step, done, prev, ctx) {
   let w = null;
   let raf = 0;
   let last = 0;
+  let acc = 0;
   let won = false;
   let flagged = false;
 
@@ -146,10 +148,13 @@ export function renderScratch(el, step, done, prev, ctx) {
   }
 
   function loop(now) {
-    const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
+    // Scratch gibi saniyede 30 kare: ekran hızı ne olursa olsun kuklalar aynı hızda gider
+    acc += last ? Math.min(0.1, (now - last) / 1000) : 0;
     last = now;
     if (w) {
-      w.step(dt);
+      let n = 0;
+      while (acc >= 1 / 30 && n < 3) { w.step(1 / 30); acc -= 1 / 30; n++; }
+      if (n === 3) acc = 0;
       stage.render();
       editor.glow(w.threads);
       check();

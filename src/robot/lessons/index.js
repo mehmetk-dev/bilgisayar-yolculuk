@@ -3,12 +3,14 @@ import { b1, b2, b3, b4 } from './h1.js';
 import { b5, b6, b7, b8 } from './h2.js';
 import { b9, b10, b11, b12 } from './h3.js';
 import { b13, b14, b15, b16 } from './h4.js';
+import { b17, b18, b19, b20 } from './h5.js';
 
 export const WEEKS = [
   { title: 'Algoritma ve yönler', lessons: [b1, b2, b3, b4] },
   { title: 'Hata ayıklama ve döngüler', lessons: [b5, b6, b7, b8] },
   { title: 'Fonksiyonlar ve koşullar', lessons: [b9, b10, b11, b12] },
   { title: 'Scratch\'e merhaba', lessons: [b13, b14, b15, b16] },
+  { title: 'Döngü, ses, algılama ve kalem', lessons: [b17, b18, b19, b20] },
 ];
 
 // Bölümlere sıra numarası ve hafta bilgisi verilir
