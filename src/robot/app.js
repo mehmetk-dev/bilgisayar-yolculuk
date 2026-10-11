@@ -2,6 +2,7 @@
 import { LESSONS, WEEKS } from './lessons/index.js';
 import { renderStory, renderOrder, renderQuiz } from './acts.js';
 import { renderGrid } from './board.js';
+import { renderScratch } from './sahne/task.js';
 import { roboSVG, play, confetti, prefs, load, save } from './robo.js';
 
 const $ = (s) => document.querySelector(s);
@@ -15,7 +16,7 @@ const rec = (no) => {
   r.score ||= {};
   return r;
 };
-const RENDER = { story: renderStory, order: renderOrder, quiz: renderQuiz, grid: renderGrid };
+const RENDER = { story: renderStory, order: renderOrder, quiz: renderQuiz, grid: renderGrid, scratch: renderScratch };
 let cleanup = null;
 
 function show(view) {
@@ -107,7 +108,7 @@ function showStep(L, i) {
   go.onclick = () => {
     if (!ok) {
       play('wrong');
-      hint.textContent = s.type === 'grid' ? 'Önce Robo\'yu pile ulaştır 🔋' : 'Önce bu görevi tamamla 🙂';
+      hint.textContent = s.type === 'grid' ? 'Önce Robo\'yu pile ulaştır 🔋' : s.type === 'scratch' ? (s.free ? 'Bitirince ✔ Bitirdim düğmesine bas 🙂' : 'Önce hedeflerin hepsini ✅ yap, sonra 🏁 ile dene') : 'Önce bu görevi tamamla 🙂';
       go.classList.remove('shake'); void go.offsetWidth; go.classList.add('shake');
       return;
     }
@@ -115,7 +116,7 @@ function showStep(L, i) {
     location.hash = i + 1 < L.steps.length ? `#b${L.no}/${i + 1}` : `#b${L.no}/son`;
   };
   if (r.steps[i]) done();
-  cleanup = RENDER[s.type](lesEl.querySelector('.stage'), s, done, r.score[i]) || null;
+  cleanup = RENDER[s.type](lesEl.querySelector('.stage'), s, done, r.score[i], { L, i }) || null;
 }
 
 function showFinish(L) {
