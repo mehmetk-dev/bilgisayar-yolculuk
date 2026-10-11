@@ -221,8 +221,58 @@ button.link { background: none; border: 0; box-shadow: none; color: var(--acc); 
 .cert-name { font-size: 2em; font-weight: 900; color: var(--acc); border-bottom: 3px dashed #d9a400; margin: 0.3em auto 0.5em; padding-bottom: 0.1em; max-width: 90%; }
 .cert-s { color: var(--mut); font-size: 0.9em; }
 @media print {
-  body * { visibility: hidden; }
-  .cert, .cert * { visibility: visible; }
-  .cert { position: fixed; left: 50%; top: 2cm; transform: translateX(-50%); width: 17cm; box-shadow: none; }
+  body.pcert * { visibility: hidden; }
+  body.pcert .cert, body.pcert .cert * { visibility: visible; }
+  body.pcert .cert { position: fixed; left: 50%; top: 2cm; transform: translateX(-50%); width: 17cm; box-shadow: none; }
   .robo * { animation: none !important; }
+}
+
+/* öğrenci seçimi */
+#pick { position: fixed; inset: 0; z-index: 80; background: #2b234099; display: grid; place-items: center; padding: 16px; }
+.pickbox { background: #fff; border-radius: 26px; padding: 1.4em 1.6em; width: min(34em, 100%); max-height: 100%; overflow: auto; text-align: center; display: flex; flex-direction: column; gap: 0.8em; align-items: center; box-shadow: 0 20px 50px #0004; animation: pop 0.35s; }
+.pickbox .sbot { width: 6em; }
+.pickbox h2 { font-size: 1.6em; font-weight: 900; }
+.plist { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
+.pone { display: inline-flex; }
+.pname { font-size: 1.1em; padding: 0.5em 1em; border-radius: 16px 0 0 16px; border-color: #d8ccff; }
+.pname.cur { background: var(--acc); color: #fff; border-color: var(--acc); }
+.pdel { border-radius: 0 16px 16px 0; border-left: 0; padding: 0.3em 0.55em; font-size: 0.8em; }
+.padd { display: flex; gap: 0.5em; flex-wrap: wrap; justify-content: center; }
+.padd input { font: inherit; border: 3px solid var(--line); border-radius: 14px; padding: 0.35em 0.7em; min-width: 12em; }
+.pfoot { display: flex; gap: 1em; justify-content: center; }
+#who { max-width: 12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+
+/* öğretmen kılavuzu */
+.tnote h3 { display: flex; flex-wrap: wrap; gap: 0.6em; align-items: center; }
+.gbtn { font-size: 0.75em; }
+.guide { max-width: 64em; margin: 0 auto; display: flex; flex-direction: column; gap: 1.2em; }
+.ghead { background: #fff; border-radius: 20px; padding: 1em 1.3em; border: 3px solid #e6dcff; }
+.ghead h1 { font-size: 1.8em; font-weight: 900; }
+.gbtns { display: flex; gap: 0.5em; flex-wrap: wrap; margin-top: 0.5em; }
+.gplan { background: #fffdf6; border: 2px dashed #e0c98f; border-radius: 18px; padding: 1em 1.3em; }
+.gtable { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 0.6em; }
+.gtable th, .gtable td { text-align: left; padding: 0.35em 0.5em; border-bottom: 1px solid var(--line); vertical-align: top; }
+.gweek > h2 { font-size: 1.4em; font-weight: 900; margin: 0.4em 0 0.6em; display: flex; gap: 0.5em; align-items: center; }
+.gweek > h2 span { background: var(--fg); color: #fff; border-radius: 999px; padding: 0.1em 0.7em; font-size: 0.75em; }
+.glesson { background: #fff; border: 3px solid color-mix(in srgb, var(--c), #fff 60%); border-radius: 18px; padding: 1em 1.2em; margin-bottom: 1em; break-inside: avoid-page; }
+.glesson h3 { font-size: 1.25em; font-weight: 900; color: color-mix(in srgb, var(--c), #000 30%); }
+.glesson h3 small { font-size: 0.6em; color: var(--mut); font-weight: 700; margin-left: 0.4em; }
+.glesson h4 { margin: 0.6em 0 0.2em; font-size: 0.95em; }
+.gcols { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; font-size: 0.9em; }
+.gcols ul { margin: 0; padding-left: 1.2em; }
+@media (max-width: 40em) { .gcols { grid-template-columns: 1fr; } }
+.gsteps { margin: 0; padding-left: 1.5em; font-size: 0.92em; display: flex; flex-direction: column; gap: 0.25em; }
+.gtype { display: inline-block; width: 1.4em; }
+.gsteps details { margin: 0.2em 0 0.4em; }
+.gsteps summary { cursor: pointer; color: var(--acc); font-weight: 700; font-size: 0.85em; }
+.gans { padding: 0.5em; background: #faf8ff; border-radius: 10px; margin-top: 0.3em; }
+.gans .codepic { font-size: 0.85em; }
+.gsp { margin-bottom: 0.5em; }
+.gscript { margin: 0.3em 0 0.5em; display: flex; flex-direction: column; gap: 2px; }
+.gl { margin-left: calc(var(--d) * 1.4em); border-left: 6px solid var(--k); background: color-mix(in srgb, var(--k), #fff 85%); padding: 0.1em 0.5em; border-radius: 4px; font-size: 0.85em; font-weight: 700; width: max-content; max-width: 100%; }
+@media print {
+  #top, .gbtns, .lnav { display: none !important; }
+  body:not(.pcert) .gsteps details { display: block; }
+  body:not(.pcert) .gsteps details > * { display: block; }
+  #lesson { overflow: visible; }
 }

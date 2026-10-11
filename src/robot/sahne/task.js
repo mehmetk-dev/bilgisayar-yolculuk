@@ -2,10 +2,10 @@
 import { createWorld, programUses } from './runtime.js';
 import { createStage, thumb } from './stage.js';
 import { createEditor, bid } from './editor.js';
-import { mk } from './blocks.js';
+import { mk, SOUNDS, NOTES } from './blocks.js';
 import { COSTUMES, BACKDROPS } from './costumes.js';
 import { playSound, playNote } from './sound.js';
-import { play, confetti, toast, hideToast, load, save, esc } from '../robo.js';
+import { play, confetti, toast, hideToast, pload as load, psave as save, pdel, esc } from '../robo.js';
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 const draftKey = (ctx, i) => `robo-taslak-${ctx.L.no}-${i}`;
@@ -115,8 +115,8 @@ export function renderScratch(el, step, done, prev, ctx) {
   function reset() {
     w?.stopAll();
     w = createWorld(setup, progs);
-    w.onSound = playSound;
-    w.onNote = playNote;
+    w.onSound = (snd, sp) => { playSound(snd); stage.fx(sp, '🔊 ' + (SOUNDS[snd] || snd)); };
+    w.onNote = (n, d, sp) => { playNote(n, d); stage.fx(sp, '♪ ' + (NOTES[n] || n)); };
     stage.attach(w);
     latch = goals.map(() => false);
     paintGoals();
@@ -176,7 +176,7 @@ export function renderScratch(el, step, done, prev, ctx) {
   q('.resetb').onclick = () => { reset(); play('click'); };
   q('.restart').onclick = () => {
     if (!confirm('Bu adımdaki kodun silinip baştan başlansın mı?')) return;
-    localStorage.removeItem(draftKey(ctx, ctx.i));
+    pdel(draftKey(ctx, ctx.i));
     setup = clone(step.setup);
     const p = presetProgs(setup);
     for (const k of Object.keys(progs)) delete progs[k];

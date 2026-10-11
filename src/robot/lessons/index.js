@@ -6,6 +6,7 @@ import { b13, b14, b15, b16 } from './h4.js';
 import { b17, b18, b19, b20 } from './h5.js';
 import { b21, b22, b23, b24 } from './h6.js';
 import { b25, b26, b27, b28 } from './h7.js';
+import { b29, b30, b31, b32 } from './h8.js';
 
 export const WEEKS = [
   { title: 'Algoritma ve yönler', lessons: [b1, b2, b3, b4] },
@@ -14,7 +15,8 @@ export const WEEKS = [
   { title: 'Scratch\'e merhaba', lessons: [b13, b14, b15, b16] },
   { title: 'Döngü, ses, algılama ve kalem', lessons: [b17, b18, b19, b20] },
   { title: 'Değişkenler, rastgelelik ve hikâye', lessons: [b21, b22, b23, b24] },
-  { title: 'Oyun projeleri ve bitirme', lessons: [b25, b26, b27, b28] },
+  { title: 'Oyun projeleri ve kendi projen', lessons: [b25, b26, b27, b28] },
+  { title: 'Scratch ustalığı: soru, matematik, klonlar', lessons: [b29, b30, b31, b32] },
 ];
 
 // Bölümlere sıra numarası ve hafta bilgisi verilir

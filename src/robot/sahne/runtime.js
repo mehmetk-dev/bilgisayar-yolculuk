@@ -21,9 +21,12 @@ export function createWorld(setup, progs, opt = {}) {
     threads: [],
     keys: new Set(),
     mouse: { x: 0, y: 0, down: false },
+    answer: '',
+    asking: null,
+    timer0: 0,
     penLines: [],
     penOps: [],
-    log: { touch: new Set(), said: [], sounds: [], notes: [], bcasts: [], backdrops: [], keys: [], clicks: [], flags: 0 },
+    log: { touch: new Set(), answers: [], clones: 0, said: [], sounds: [], notes: [], bcasts: [], backdrops: [], keys: [], clicks: [], flags: 0 },
     onSound: null,
     mem: {},
     onNote: null,
@@ -35,10 +38,10 @@ export function createWorld(setup, progs, opt = {}) {
       name: d.name, costume: d.costume, frame: (d.frame || 1) - 1,
       x: d.x ?? 0, y: d.y ?? 0, dir: d.dir ?? 90, size: d.size ?? 100, visible: d.visible !== false,
       rot: d.rot || 'lr', effect: 0, say: null, turned: 0, frames: 0, pen: { down: false, color: '#4c97ff', size: 3 },
-      w: c.w, h: c.h, scripts: progs[d.name] || [],
+      w: c.w, h: c.h, scripts: progs[d.name] || [], uid: w.sprites.length + 1,
     });
   }
-  const sprite = (name) => w.sprites.find((s) => s.name === name);
+  const sprite = (name) => w.sprites.find((s) => s.name === name && !s.isClone) || w.sprites.find((s) => s.name === name);
   w.sprite = sprite;
 
   // --- kukla işlemleri ---
@@ -70,8 +73,9 @@ export function createWorld(setup, progs, opt = {}) {
     if (o === 'kenar') { const b = bbox(sp); return b.l <= -W || b.r >= W || b.b <= -H || b.t >= H; }
     if (o === 'duvar') { const b = bbox(sp, 0.8); return (BACKDROPS[w.backdrop].walls || []).some(([x1, y1, x2, y2]) => overlap(b, { l: x1, b: y1, r: x2, t: y2 })); }
     if (o === 'fare') { const b = bbox(sp); return w.mouse.x >= b.l && w.mouse.x <= b.r && w.mouse.y >= b.b && w.mouse.y <= b.t; }
-    const other = sprite(o);
-    return !!other && other !== sp && other.visible && overlap(bbox(sp, 0.75), bbox(other, 0.75));
+    // Aynı adlı bütün kuklalar (klonlar dahil) denenir
+    const b = bbox(sp, 0.75);
+    return w.sprites.some((other) => other.name === o && other !== sp && other.visible && overlap(b, bbox(other, 0.75)));
   }
   w.touching = touching;
 
@@ -102,10 +106,29 @@ export function createWorld(setup, progs, opt = {}) {
       case 'mx': return Math.round(w.mouse.x);
       case 'my': return Math.round(w.mouse.y);
       case 'var': return num(sp, w.vars[v.v]);
+      case 'answer': return num(sp, String(w.answer));
+      case 'join': return num(sp, String(val(sp, v.a)) + String(val(sp, v.b)));
+      case 'timer': return Math.round((w.t - w.timer0) * 10) / 10;
+      case 'op': {
+        const a = num(sp, v.a);
+        const b = num(sp, v.b);
+        const r = v.o === '+' ? a + b : v.o === '-' ? a - b : v.o === '*' ? a * b : b ? a / b : 0;
+        return Math.round(r * 1e6) / 1e6;
+      }
       default: return 0;
     }
   }
-  const text = (sp, v) => (v && typeof v === 'object' ? String(num(sp, v)) : String(v ?? ''));
+  // Ham değer: cevap ve değişkenler yazı da olabilir
+  const val = (sp, v) => {
+    if (v && typeof v === 'object') {
+      if (v.r === 'answer') return w.answer;
+      if (v.r === 'var') return w.vars[v.v] ?? 0;
+      if (v.r === 'join') return String(val(sp, v.a)) + String(val(sp, v.b));
+      return num(sp, v);
+    }
+    return v ?? '';
+  };
+  const text = (sp, v) => String(val(sp, v));
   w.num = num;
 
   function cond(sp, c) {
@@ -115,8 +138,17 @@ export function createWorld(setup, progs, opt = {}) {
       case 'key': return w.keys.has(c.key);
       case 'mouse': return w.mouse.down;
       case 'cmp': {
-        const a = num(sp, c.a);
-        const b = num(sp, c.b);
+        const ra = val(sp, c.a);
+        const rb = val(sp, c.b);
+        const isN = (x) => typeof x === 'number' || (String(x).trim() !== '' && Number.isFinite(+String(x).replace(',', '.')));
+        if (isN(ra) && isN(rb)) {
+          const a = num(sp, typeof ra === 'number' ? ra : String(ra));
+          const b = num(sp, typeof rb === 'number' ? rb : String(rb));
+          return c.op === '<' ? a < b : c.op === '>' ? a > b : Math.abs(a - b) < 1e-9;
+        }
+        // Yazılar büyük-küçük harf farkı gözetmeden karşılaştırılır (Scratch gibi)
+        const a = String(ra).trim().toLocaleLowerCase('tr');
+        const b = String(rb).trim().toLocaleLowerCase('tr');
         return c.op === '<' ? a < b : c.op === '>' ? a > b : a === b;
       }
       default: return false;
@@ -174,6 +206,16 @@ export function createWorld(setup, progs, opt = {}) {
       case 'chy': setPos(sp, sp.x, sp.y + N('n')); break;
       case 'sety': setPos(sp, sp.x, N('n')); break;
       case 'bounce': bounce(sp); break;
+      case 'gotoT': {
+        const o = a.o === 'fare' ? w.mouse : sprite(a.o);
+        if (o) setPos(sp, o.x, o.y);
+        break;
+      }
+      case 'pointTo': {
+        const o = a.o === 'fare' ? w.mouse : sprite(a.o);
+        if (o) sp.dir = normDir(Math.round(Math.atan2(o.x - sp.x, o.y - sp.y) * 180 / Math.PI));
+        break;
+      }
 
       case 'say': case 'sayFor': case 'thinkFor': {
         const say = { text: text(sp, a.t), think: b.op === 'thinkFor' };
@@ -198,13 +240,13 @@ export function createWorld(setup, progs, opt = {}) {
 
       case 'sound': case 'soundW':
         w.log.sounds.push({ sp: sp.name, snd: a.snd, t: w.t });
-        w.onSound?.(a.snd);
+        w.onSound?.(a.snd, sp);
         if (b.op === 'soundW') yield* waitFor(SOUND_LEN[a.snd] || 0.4);
         break;
       case 'note': {
         const beats = Math.max(0, N('b'));
         w.log.notes.push(+a.note);
-        w.onNote?.(+a.note, beats * BEAT);
+        w.onNote?.(+a.note, beats * BEAT, sp);
         yield* waitFor(beats * BEAT);
         break;
       }
@@ -218,6 +260,19 @@ export function createWorld(setup, progs, opt = {}) {
       case 'waitUntil': while (!cond(sp, a.c)) yield; break;
       case 'until': while (!th.dead && !cond(sp, a.c)) yield* loopBody(sp, b, th); break;
       case 'stop': w.stopAll(); th.dead = true; break;
+      case 'clone': makeClone(a.o === 'kendim' || !a.o ? sp : sprite(a.o)); break;
+      case 'delClone':
+        if (sp.isClone) { deleteClone(sp); th.dead = true; }
+        break;
+      case 'ask': {
+        const q = text(sp, a.t);
+        sp.say = sp.visible && q ? { text: q, think: false } : null;
+        w.asking = { sp, text: q };
+        while (w.asking) yield;
+        if (sp.say?.text === q) sp.say = null;
+        break;
+      }
+      case 'resetTimer': w.timer0 = w.t; break;
 
       case 'clear': w.penLines = []; w.penOps.push({ clear: true }); break;
       case 'down':
@@ -243,8 +298,27 @@ export function createWorld(setup, progs, opt = {}) {
   }
 
   // --- iş parçacıkları ---
+  // --- klonlar ---
+  let cloneUid = 1000;
+  function makeClone(src) {
+    if (!src || w.sprites.filter((s) => s.isClone).length >= 100) return;
+    const c = { ...src, isClone: true, uid: ++cloneUid, say: null, pen: { ...src.pen }, turned: 0, frames: 0 };
+    w.sprites.splice(w.sprites.indexOf(src) + 1, 0, c);
+    w.log.clones++;
+    for (const s of c.scripts) if (s[0] && s[0].op === 'cloneStart') start(c, s);
+  }
+  function deleteClone(c) {
+    w.sprites = w.sprites.filter((s) => s !== c);
+    for (const t of w.threads) if (t.sp === c) { t.dead = true; t.done = true; }
+  }
+  w.answerQ = (v) => {
+    w.answer = String(v);
+    w.log.answers.push(w.answer);
+    w.asking = null;
+  };
+
   function start(sp, script) {
-    for (const t of w.threads) if (t.script === script) { t.dead = true; t.done = true; }
+    for (const t of w.threads) if (t.script === script && t.sp === sp) { t.dead = true; t.done = true; }
     const th = { sp, script, done: false, dead: false, cur: script[0].id };
     th.gen = runList(sp, script.slice(1), th);
     w.threads.push(th);
@@ -252,7 +326,11 @@ export function createWorld(setup, progs, opt = {}) {
   }
   const hats = (op, test = () => true) => {
     const out = [];
-    for (const sp of w.sprites) for (const s of sp.scripts) if (s[0] && s[0].op === op && test(s[0])) out.push(start(sp, s));
+    // 🏁 sadece asıl kuklaları başlatır; tuş ve haber olayları klonlarda da çalışır
+    for (const sp of w.sprites.slice()) {
+      if (sp.isClone && op === 'flag') continue;
+      for (const s of sp.scripts) if (s[0] && s[0].op === op && test(s[0])) out.push(start(sp, s));
+    }
     return out;
   };
   function broadcast(msg) {
@@ -260,15 +338,15 @@ export function createWorld(setup, progs, opt = {}) {
     return hats('recv', (h) => h.args.msg === msg);
   }
 
-  w.flag = () => { w.log.flags++; return hats('flag'); };
+  w.flag = () => { w.log.flags++; w.timer0 = w.t; return hats('flag'); };
   w.keyDown = (k) => {
     if (!w.keys.has(k)) w.log.keys.push(k);
     w.keys.add(k);
     hats('key', (h) => h.args.key === k);
   };
   w.keyUp = (k) => w.keys.delete(k);
-  w.clickSprite = (name) => {
-    const sp = sprite(name);
+  w.clickSprite = (name, obj) => {
+    const sp = obj || sprite(name);
     if (!sp) return;
     w.log.clicks.push(name);
     for (const s of sp.scripts) if (s[0] && s[0].op === 'click') start(sp, s);
@@ -276,6 +354,8 @@ export function createWorld(setup, progs, opt = {}) {
   w.stopAll = () => {
     for (const t of w.threads) { t.dead = true; t.done = true; }
     w.threads = [];
+    w.sprites = w.sprites.filter((s) => !s.isClone);
+    w.asking = null;
   };
   w.running = () => w.threads.some((t) => !t.done);
 

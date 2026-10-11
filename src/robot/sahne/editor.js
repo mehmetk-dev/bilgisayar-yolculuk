@@ -19,11 +19,61 @@ export function createEditor(host, cfg) {
 
   host.innerHTML = `<div class="sed">
   <div class="spal"><div class="scats">${cats.map((c) => `<button type="button" class="scat" data-c="${c}" style="--k:${CATS[c].color}"><i></i>${CATS[c].name}</button>`).join('')}</div><div class="sblocks"></div></div>
-  <div class="sscripts"><div class="stabs"></div><div class="scode" tabindex="-1"></div><p class="ptip">👆 Bir bloğa tıklayınca kırmızı çizginin olduğu yere eklenir. ✋ Blokları sürükleyerek taşıyabilirsin.</p></div>
+  <div class="sscripts"><div class="stabs"></div><div class="stools"><button type="button" class="undo" disabled title="Son değişikliği geri al">↶ Geri al</button><select class="copyto" title="İmlecin olduğu betiği başka kuklaya kopyala"></select></div><div class="scode" tabindex="-1"></div><p class="ptip">👆 Bir bloğa tıklayınca kırmızı çizginin olduğu yere eklenir. ✋ Blokları sürükleyerek taşıyabilirsin.</p></div>
 </div>`;
   const pal = host.querySelector('.sblocks');
   const tabs = host.querySelector('.stabs');
   const code = host.querySelector('.scode');
+  const undoBtn = host.querySelector('.undo');
+  const copySel = host.querySelector('.copyto');
+
+  // --- geri alma: her değişiklikten önce programın kopyası saklanır ---
+  const hist = [];
+  function snap() {
+    const s = JSON.stringify(progs);
+    if (hist[hist.length - 1] === s) return;
+    hist.push(s);
+    if (hist.length > 50) hist.shift();
+    undoBtn.disabled = false;
+  }
+  function undo() {
+    const s = hist.pop();
+    if (!s) return;
+    const data = JSON.parse(s);
+    for (const k of Object.keys(data)) {
+      if (!progs[k]) { progs[k] = data[k]; continue; }
+      progs[k].length = 0;
+      progs[k].push(...data[k]);
+    }
+    const ss = scripts();
+    caret = ss.length ? { list: ss[ss.length - 1], i: ss[ss.length - 1].length } : null;
+    undoBtn.disabled = !hist.length;
+    play('del');
+    changed();
+    draw();
+  }
+  undoBtn.onclick = undo;
+
+  // --- betiği başka kuklaya kopyalama ---
+  const holds = (list, target) => list === target || list.some((b) => slotsOf(b).some((s) => holds(b[s], target)));
+  function fillCopy() {
+    const others = sprites().filter((s) => s.name !== cur && !s.locked);
+    copySel.hidden = !others.length || locked();
+    copySel.innerHTML = '<option value="">⧉ Betiği kopyala…</option>' + others.map((s) => `<option value="${esc(s.name)}">→ ${esc(s.name)}</option>`).join('');
+  }
+  copySel.onchange = () => {
+    const to = copySel.value;
+    copySel.value = '';
+    if (!to) return;
+    const src = caretValid() && scripts().find((s) => holds(s, caret.list));
+    if (!src) { toast('warn', 'Önce kopyalamak istediğin betikteki bir bloğa tıkla.'); return; }
+    snap();
+    const fresh = (list) => list.map((b) => { const c = { ...b, id: bid(), args: JSON.parse(JSON.stringify(b.args)) }; slotsOf(b).forEach((k) => { c[k] = fresh(b[k]); }); return c; });
+    (progs[to] ||= []).push(fresh(src));
+    play('add');
+    changed();
+    toast('ok', `Betik <b>${esc(to)}</b> kuklasına kopyalandı. Görmek için üstten ${esc(to)} sekmesine tıkla.`, 3500);
+  };
 
   const sprites = () => cfg.sprites();
   const spDef = () => sprites().find((s) => s.name === cur) || sprites()[0];
@@ -32,28 +82,32 @@ export function createEditor(host, cfg) {
 
   // --- girdilerin çizimi ---
   const opt = (v, label, sel) => `<option value="${esc(v)}"${String(sel) === String(v) ? ' selected' : ''}>${esc(label)}</option>`;
-  const sel = (arg, part, options, val, cls = '') => `<select class="in ${cls}" data-arg="${arg}"${part ? ` data-part="${part}"` : ''}>${options.map(([v, l]) => opt(v, l, val)).join('')}</select>`;
+  // Her girdinin data-path değeri, bloğun args nesnesindeki yeridir: "n", "n.a", "c.b.a" gibi
+  const sel = (path, options, val, cls = '') => `<select class="in ${cls}" data-path="${path}">${options.map(([v, l]) => opt(v, l, val)).join('')}</select>`;
+  const OPN = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 
-  function repMenu(arg) {
-    if (!cfg.reporters?.length) return '';
+  function repMenu(path, depth) {
+    if (!cfg.reporters?.length || depth > 1) return '';
     const o = [['', '▾']];
-    for (const r of cfg.reporters) {
-      if (r === 'var') for (const v of cfg.vars || []) o.push(['var:' + v, v]);
-      else o.push([r, REPORTERS[r].label]);
+    for (const k of cfg.reporters) {
+      if (k === 'var') for (const v of cfg.vars || []) o.push(['var:' + v, v]);
+      else o.push([k, REPORTERS[k].label]);
     }
-    return sel(arg, 'rep', o, '', 'rep');
+    return sel(path, o, '', 'rep');
   }
 
-  function numSlot(arg, v, kind) {
+  function numSlot(path, v, kind, depth = 0) {
     if (v && typeof v === 'object') {
       const R = REPORTERS[v.r];
       const k = (CATS[R.cat] || { color: '#59c059' }).color;
       let inner = esc(R.label);
-      if (v.r === 'rand') inner = `rastgele <input class="in num" data-arg="${arg}" data-part="a" value="${esc(v.a)}" size="3"> ile <input class="in num" data-arg="${arg}" data-part="b" value="${esc(v.b)}" size="3"> arası`;
-      if (v.r === 'var') inner = esc(v.v);
-      return `<span class="rp" style="--k:${k}">${inner}<button type="button" class="rpx" data-arg="${arg}" title="Sayıya çevir">×</button></span>`;
+      if (v.r === 'rand') inner = `rastgele ${numSlot(path + '.a', v.a, 'num', depth + 1)} ile ${numSlot(path + '.b', v.b, 'num', depth + 1)} arası`;
+      if (v.r === 'join') inner = `birleştir ${numSlot(path + '.a', v.a, 'txt', depth + 1)} ${numSlot(path + '.b', v.b, 'txt', depth + 1)}`;
+      if (v.r === 'op') inner = `${numSlot(path + '.a', v.a, 'num', depth + 1)} ${sel(path + '.o', Object.entries(OPN), v.o, 'opsel')} ${numSlot(path + '.b', v.b, 'num', depth + 1)}`;
+      if (v.r === 'var') inner = (cfg.vars || []).length > 1 ? sel(path + '.v', cfg.vars.map((x) => [x, x]), v.v) : esc(v.v);
+      return `<span class="rp" style="--k:${k}">${inner}<button type="button" class="rpx" data-path="${path}" title="Sayıya çevir">×</button></span>`;
     }
-    return `<input class="in ${kind}" data-arg="${arg}" value="${esc(v)}" size="${Math.max(kind === 'txt' ? 4 : 2, String(v).length)}" inputmode="${kind === 'num' ? 'decimal' : 'text'}">${repMenu(arg)}`;
+    return `<input class="in ${kind}" data-path="${path}" value="${esc(v)}" size="${Math.max(kind === 'txt' ? 4 : 2, String(v).length)}" inputmode="${kind === 'num' ? 'decimal' : 'text'}">${repMenu(path, depth)}`;
   }
 
   function touchTargets() {
@@ -63,18 +117,19 @@ export function createEditor(host, cfg) {
     return t;
   }
 
-  function condSlot(arg, c) {
+  const cmpLeft = () => [...(cfg.vars || []).map((v) => ['var:' + v, v]), ['x', 'x konumu'], ['y', 'y konumu'], ...['answer', 'timer', 'mx', 'my'].filter((k) => cfg.reporters?.includes(k)).map((k) => [k, REPORTERS[k].label])];
+
+  function condSlot(path, c) {
     const kinds = cfg.conds || Object.keys(COND_KINDS);
-    const ksel = sel(arg, 'kind', [...(c ? [] : [['', 'koşul seç ▾']]), ...kinds.map((k) => [k, k === 'cmp' ? 'karşılaştır' : k === 'touch' ? 'dokunma' : k === 'key' ? 'tuş' : 'fare']) ], c ? c.k : '', 'kind');
+    const ksel = sel(path, [...(c ? [] : [['', 'koşul seç ▾']]), ...kinds.map((k) => [k, k === 'cmp' ? 'karşılaştır' : k === 'touch' ? 'dokunma' : k === 'key' ? 'tuş' : 'fare']) ], c ? c.k : '', 'kind');
     if (!c) return `<span class="cnd empty">${ksel}</span>`;
     let body = '';
-    if (c.k === 'touch') body = `${sel(arg, 'o', touchTargets(), c.o)} ’a dokunuyor mu?`;
-    if (c.k === 'key') body = `${sel(arg, 'key', Object.entries(KEYS), c.key)} tuşuna basılı mı?`;
+    if (c.k === 'touch') body = `${sel(path + '.o', touchTargets(), c.o)} ’a dokunuyor mu?`;
+    if (c.k === 'key') body = `${sel(path + '.key', Object.entries(KEYS), c.key)} tuşuna basılı mı?`;
     if (c.k === 'mouse') body = 'fare tıklandı mı?';
     if (c.k === 'cmp') {
-      const left = [...(cfg.vars || []).map((v) => ['var:' + v, v]), ['x', 'x konumu'], ['y', 'y konumu']];
       const lv = c.a.r === 'var' ? 'var:' + c.a.v : c.a.r;
-      body = `${sel(arg, 'a', left, lv)} ${sel(arg, 'op', Object.entries(OPS), c.op)} <input class="in num" data-arg="${arg}" data-part="b" value="${esc(c.b)}" size="3">`;
+      body = `${sel(path + '.a', cmpLeft(), lv, 'cmpa')} ${sel(path + '.op', Object.entries(OPS), c.op)} ${numSlot(path + '.b', c.b, 'num', 0)}`;
     }
     return `<span class="cnd">${cfg.conds?.length === 1 ? '' : ksel}${body}</span>`;
   }
@@ -86,14 +141,16 @@ export function createEditor(host, cfg) {
       case 'num': return numSlot(k, v, 'num');
       case 'text': return numSlot(k, v, 'txt');
       case 'cond': return condSlot(k, v);
-      case 'key': return sel(k, '', Object.entries(KEYS), v);
-      case 'msg': return sel(k, '', (cfg.msgs || ['mesaj1']).map((m) => [m, m]), v);
-      case 'costume': { const sp = spDef(); return sel(k, '', COSTUMES[sp.costume].frames.map((_, i) => [i + 1, `${COSTUMES[sp.costume].name} ${i + 1}`]), v); }
-      case 'backdrop': return sel(k, '', (cfg.backdrops || Object.keys(BACKDROPS)).map((x) => [x, BACKDROPS[x].name]), v);
-      case 'sound': return sel(k, '', Object.entries(SOUNDS), v);
-      case 'note': return sel(k, '', Object.entries(NOTES).map(([n, l]) => [n, `${l} (${n})`]), v);
-      case 'color': return `<span class="sw" style="background:${v}"></span>${sel(k, '', Object.entries(COLORS), v)}`;
-      case 'var': return sel(k, '', (cfg.vars || []).map((x) => [x, x]), v);
+      case 'key': return sel(k, Object.entries(KEYS), v);
+      case 'msg': return sel(k, (cfg.msgs || ['mesaj1']).map((m) => [m, m]), v);
+      case 'costume': { const sp = spDef(); return sel(k, COSTUMES[sp.costume].frames.map((_, i) => [i + 1, `${COSTUMES[sp.costume].name} ${i + 1}`]), v); }
+      case 'backdrop': return sel(k, (cfg.backdrops || Object.keys(BACKDROPS)).map((x) => [x, BACKDROPS[x].name]), v);
+      case 'sound': return sel(k, Object.entries(SOUNDS), v);
+      case 'note': return sel(k, Object.entries(NOTES).map(([n, l]) => [n, `${l} (${n})`]), v);
+      case 'color': return `<span class="sw" style="background:${v}"></span>${sel(k, Object.entries(COLORS), v)}`;
+      case 'var': return sel(k, (cfg.vars || []).map((x) => [x, x]), v);
+      case 'target': return sel(k, [['fare', 'fare imleci'], ...sprites().filter((s) => s.name !== cur).map((s) => [s.name, s.name])], v);
+      case 'clonesrc': return sel(k, [['kendim', 'kendim'], ...sprites().filter((s) => s.name !== cur).map((s) => [s.name, s.name])], v);
       default: return '';
     }
   }
@@ -143,6 +200,7 @@ export function createEditor(host, cfg) {
 
   function draw(newId) {
     drawTabs();
+    fillCopy();
     const ss = scripts();
     const ro = locked();
     code.classList.toggle('ro', ro);
@@ -176,6 +234,7 @@ export function createEditor(host, cfg) {
 
   function add(op) {
     if (locked()) { toast('warn', 'Bu kuklanın kodu kilitli. Üstteki sekmelerden başka bir kukla seç.'); return; }
+    snap();
     const b = mk([op], bid);
     const def = BLOCKS[op];
     if (def.args?.c) b.args.c = cfg.condDefault ? JSON.parse(JSON.stringify(cfg.condDefault)) : null;
@@ -217,10 +276,12 @@ export function createEditor(host, cfg) {
   function remove(id) {
     const f = find(id);
     if (!f) return;
+    snap();
     if (isTop(f.list) && f.i === 0 && isHat(f.b)) {
       // Olay bloğu silinince bütün betik silinir
       scripts().splice(scripts().indexOf(f.list), 1);
       caret = null;
+      if (f.list.length > 1) toast('warn', 'Betiğin tamamı silindi. Yanlışlıkla mı oldu? <b>↶ Geri al</b> düğmesine bas.', 4000);
     } else {
       f.list.splice(f.i, 1);
       if (isTop(f.list) && !f.list.length) scripts().splice(scripts().indexOf(f.list), 1);
@@ -262,8 +323,11 @@ export function createEditor(host, cfg) {
     if (del) return remove(+del.closest('.sb').dataset.id);
     const rpx = t.closest('.rpx');
     if (rpx) {
+      snap();
       const b = find(+rpx.closest('.sb').dataset.id).b;
-      b.args[rpx.dataset.arg] = 0;
+      const keys = rpx.dataset.path.split('.');
+      const last = keys.pop();
+      keys.reduce((o, k) => o[k], b.args)[last] = 0;
       changed();
       return draw();
     }
@@ -285,43 +349,42 @@ export function createEditor(host, cfg) {
   });
 
   // Girdi değişiklikleri
+  const newRep = (v) => (v === 'rand' ? { r: 'rand', a: 1, b: 10 } : v === 'op' ? { r: 'op', o: '+', a: 1, b: 1 } : v === 'join' ? { r: 'join', a: 'Merhaba ', b: 'dünya' } : v.startsWith('var:') ? { r: 'var', v: v.slice(4) } : { r: v });
+  function newCond(kind) {
+    if (kind === 'touch') return { k: 'touch', o: touchTargets()[0][0] };
+    if (kind === 'key') return { k: 'key', key: 'space' };
+    if (kind === 'mouse') return { k: 'mouse' };
+    if (kind === 'cmp') return { k: 'cmp', a: (cfg.vars || []).length ? { r: 'var', v: cfg.vars[0] } : { r: 'x' }, op: '>', b: 0 };
+    return null;
+  }
+
   function onInput(e) {
     const t = e.target;
-    if (!t.dataset.arg) return;
+    const path = t.dataset.path;
+    if (!path) return;
     const b = find(+t.closest('.sb').dataset.id)?.b;
     if (!b) return;
-    const k = t.dataset.arg;
-    const part = t.dataset.part;
-    const type = BLOCKS[b.op].args[k][0];
+    const keys = path.split('.');
+    const last = keys.pop();
+    const parent = keys.reduce((o, k) => o[k], b.args);
+    const type = BLOCKS[b.op].args[keys[0] ?? last][0];
     const asNum = (v) => (v.trim() !== '' && Number.isFinite(+v.replace(',', '.')) ? +v.replace(',', '.') : v);
     let redraw = false;
-    if (type === 'cond') {
-      if (part === 'kind') {
-        const kind = t.value;
-        b.args[k] = kind === 'touch' ? { k: 'touch', o: touchTargets()[0][0] } : kind === 'key' ? { k: 'key', key: 'space' } : kind === 'mouse' ? { k: 'mouse' }
-          : kind === 'cmp' ? { k: 'cmp', a: (cfg.vars || []).length ? { r: 'var', v: cfg.vars[0] } : { r: 'x' }, op: '>', b: 0 } : null;
-        redraw = true;
-      } else if (part === 'a') b.args[k].a = t.value.startsWith('var:') ? { r: 'var', v: t.value.slice(4) } : { r: t.value };
-      else if (part === 'b') b.args[k].b = asNum(t.value);
-      else b.args[k][part] = t.value;
-    } else if (part === 'rep') {
-      const v = t.value;
-      if (!v) return;
-      b.args[k] = v === 'rand' ? { r: 'rand', a: 1, b: 10 } : v.startsWith('var:') ? { r: 'var', v: v.slice(4) } : { r: v };
-      redraw = true;
-    } else if (part === 'a' || part === 'b') b.args[k][part] = asNum(t.value);
-    else if (type === 'num') b.args[k] = asNum(t.value);
-    else if (type === 'costume') b.args[k] = +t.value;
-    else if (type === 'note') b.args[k] = +t.value;
-    else b.args[k] = t.value;
+    if (t.classList.contains('kind')) { parent[last] = newCond(t.value); redraw = true; }
+    else if (t.classList.contains('rep')) { if (!t.value) return; parent[last] = newRep(t.value); redraw = true; }
+    else if (t.classList.contains('cmpa')) parent[last] = newRep(t.value);
+    else if (t.tagName === 'INPUT') parent[last] = (type === 'text' && !keys.length) || t.classList.contains('txt') ? t.value : asNum(t.value);
+    else if ((type === 'costume' || type === 'note') && !keys.length) parent[last] = +t.value;
+    else parent[last] = t.value;
     if (type === 'color') t.previousElementSibling.style.background = t.value;
     if (t.tagName === 'INPUT') t.size = Math.max(t.classList.contains('txt') ? 4 : 2, t.value.length);
     changed();
     if (redraw) draw();
   }
-  code.addEventListener('input', onInput);
+  code.addEventListener('input', (e) => { if (e.target.tagName === 'INPUT') onInput(e); });
   // Kutuya tıklayınca içindeki değer seçilsin: yeni sayı yazınca eskisi silinir
   code.addEventListener('focusin', (e) => {
+    if (e.target.dataset.path) snap();
     if (e.target.tagName !== 'INPUT') return;
     e.target.select();
     e.target.dataset.fresh = '1';
@@ -385,6 +448,7 @@ export function createEditor(host, cfg) {
     host.classList.remove('dnd');
     d.el.classList.remove('dragging');
     if (!d.to) return;
+    snap();
     const f = find(d.id);
     let i = d.to.i;
     f.list.splice(f.i, 1);

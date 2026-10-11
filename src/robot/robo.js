@@ -14,6 +14,26 @@ export function save(key, val) {
   } catch { /* gizli pencere vb. */ }
 }
 
+// Öğrenci profilleri: aynı bilgisayarı kullanan çocukların ilerlemesi ve kodları ayrı saklanır
+export const profile = { name: load('robo-profil', '') };
+const pkey = (k) => (profile.name ? `robo@${profile.name}:${k}` : k);
+export const pload = (k, d) => load(pkey(k), d);
+export const psave = (k, v) => save(pkey(k), v);
+export const pdel = (k) => { try { localStorage.removeItem(pkey(k)); } catch { /* yok say */ } };
+export const profiles = () => load('robo-profiller', []);
+export function setProfile(name) {
+  profile.name = name;
+  save('robo-profil', name);
+  if (name && !profiles().includes(name)) save('robo-profiller', [...profiles(), name].sort((a, b) => a.localeCompare(b, 'tr')));
+}
+export function removeProfile(name) {
+  save('robo-profiller', profiles().filter((n) => n !== name));
+  try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith(`robo@${name}:`)) localStorage.removeItem(k);
+  } catch { /* yok say */ }
+  if (profile.name === name) setProfile('');
+}
+
 export const prefs = { fast: load('robo-hizli', false), sound: load('robo-ses', true) };
 
 export function roboSVG() {

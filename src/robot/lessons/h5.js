@@ -74,7 +74,7 @@ export const b18 = {
   teacher: '<b>Beden perküsyonu:</b> Sınıfla “alkış, alkış, dizlere vur” ritmini 4 kez tekrarlayın (döngü!). Sonra notaları öğrencilerin boyuna göre dizin (Do en kısa, İnce Do en uzun); her öğrenci kendi notasını söylesin ve “Küçük Yıldız”ı insan piyanosuyla çalın.',
   steps: [
     { type: 'story', anim: 'dance', title: 'Müzik zamanı! 🎶',
-      text: `<p>Pembe ${blk('sound', 'Ses')} blokları kuklalara ses çıkarttırır: miyav, hav, davul, zil…</p><p>${blk('sound', '♪ Do notasını 0.5 vuruş çal')} bloğu ile şarkı bile çalabilirsin! Notalar: <b>Do, Re, Mi, Fa, Sol, La, Si, İnce Do</b>.</p><p>Vuruş, notanın ne kadar uzun çalacağıdır: 1 vuruş, 0.5 vuruştan iki kat uzundur.</p>`,
+      text: `<p>Pembe ${blk('sound', 'Ses')} blokları kuklalara ses çıkarttırır: miyav, hav, davul, zil…</p><p>${blk('sound', '♪ Do notasını 0.5 vuruş çal')} bloğu ile şarkı bile çalabilirsin! Notalar: <b>Do, Re, Mi, Fa, Sol, La, Si, İnce Do</b>.</p><p>Vuruş, notanın ne kadar uzun çalacağıdır: 1 vuruş, 0.5 vuruştan iki kat uzundur.</p><p class="mut">Hoparlör yoksa da sorun değil: çalınan her ses ve nota kuklanın üstünde 🔊 ♪ işaretiyle görünür.</p>`,
       pics: ['🥁', '🎹', '🎺', '🎸'] },
     { type: 'scratch', title: 'Davulcu',
       text: `<p>🏁 tıklanınca davul 4 kez çalsın. ${blk('sound', 'davul sesini bitene kadar çal')} bloğunu bir döngüye koy. Her vuruşta kostüm değişirse daha eğlenceli olur!</p>`,

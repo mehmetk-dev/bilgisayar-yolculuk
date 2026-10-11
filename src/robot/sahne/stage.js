@@ -18,6 +18,7 @@ export function createStage(host, opt = {}) {
     <div class="stg-stamps"></div>
     <div class="stg-sprites"></div>
     <div class="stg-vars"></div>
+    <form class="stg-ask" hidden><input type="text" maxlength="40" aria-label="Cevabın"><button type="submit">✔</button></form>
   </div></div>`;
   const box = host.querySelector('.stg');
   const world = host.querySelector('.stg-world');
@@ -26,6 +27,9 @@ export function createStage(host, opt = {}) {
   const stamps = host.querySelector('.stg-stamps');
   const layer = host.querySelector('.stg-sprites');
   const varsEl = host.querySelector('.stg-vars');
+  const askEl = host.querySelector('.stg-ask');
+  const askIn = askEl.querySelector('input');
+  askEl.onsubmit = (e) => { e.preventDefault(); if (w?.asking) { w.answerQ(askIn.value); askIn.value = ''; } };
   let w = null;
   let els = new Map();
   let bdNow = null;
@@ -46,18 +50,32 @@ export function createStage(host, opt = {}) {
     pen.clearRect(0, 0, 960, 720);
     els = new Map();
     bdNow = null;
-    for (const sp of w.sprites) {
-      const d = document.createElement('div');
-      d.className = 'spr';
-      d.dataset.name = sp.name;
-      d.innerHTML = '<div class="spr-img"></div>';
-      const bub = document.createElement('div');
-      bub.className = 'bub';
-      layer.appendChild(d);
-      layer.appendChild(bub);
-      els.set(sp, { d, img: d.firstChild, bub, frame: -1, costume: null, say: undefined });
-    }
     render();
+  }
+
+  // Kuklaların ekrandaki karşılıkları: klonlar eklenip silindikçe güncellenir
+  function sync() {
+    const live = new Set(w.sprites);
+    for (const [sp, e] of els) if (!live.has(sp)) { e.d.remove(); e.bub.remove(); els.delete(sp); }
+    let prev = null;
+    for (const sp of w.sprites) {
+      let e = els.get(sp);
+      if (!e) {
+        const d = document.createElement('div');
+        d.className = 'spr';
+        d.dataset.name = sp.name;
+        d.innerHTML = '<div class="spr-img"></div>';
+        const bub = document.createElement('div');
+        bub.className = 'bub';
+        e = { d, img: d.firstChild, bub, frame: -1, costume: null, say: undefined, sp };
+        els.set(sp, e);
+        d.spr = sp;
+        // Çizim sırası: kukla listesindeki sırayla (klon, kopyalandığı kuklanın hemen üstünde)
+        if (prev) prev.d.after(d); else layer.prepend(d);
+        layer.appendChild(bub);
+      }
+      prev = e;
+    }
   }
 
   function drawPen() {
@@ -87,6 +105,8 @@ export function createStage(host, opt = {}) {
     if (!w) return;
     if (bdNow !== w.backdrop) { bdNow = w.backdrop; bdEl.innerHTML = BACKDROPS[w.backdrop]?.svg || ''; }
     if (w.penOps.length) drawPen();
+    if (els.size !== w.sprites.length || w.sprites.some((sp) => !els.has(sp))) sync();
+    if (!!w.asking === askEl.hidden) { askEl.hidden = !w.asking; if (w.asking) setTimeout(() => askIn.focus(), 0); }
     const active = new Set(w.threads.filter((t) => !t.done).map((t) => t.sp));
     for (const [sp, e] of els) {
       const c = COSTUMES[sp.costume];
@@ -132,14 +152,14 @@ export function createStage(host, opt = {}) {
     opt.onMouse?.(w.mouse);
   });
   world.addEventListener('pointerdown', (e) => {
-    if (!w) return;
+    if (!w || e.target.closest('.stg-ask')) return;
     const p = toStage(e);
     w.mouse.x = p.x;
     w.mouse.y = p.y;
     w.mouse.down = true;
     // En üstteki (son çizilen) görünür kukla tıklanır
-    const hit = [...layer.querySelectorAll('.spr')].reverse().find((d) => d.style.display !== 'none' && d.contains(e.target));
-    if (hit) w.clickSprite(hit.dataset.name);
+    const hit = [...layer.querySelectorAll('.spr')].reverse().find((d) => d.spr && d.style.display !== 'none' && d.contains(e.target));
+    if (hit) w.clickSprite(hit.spr.name, hit.spr);
   });
   const up = () => { if (w) w.mouse.down = false; };
   addEventListener('pointerup', up);
@@ -157,9 +177,22 @@ export function createStage(host, opt = {}) {
   addEventListener('keyup', ku);
 
   fit();
+  // Ses çalınca kuklanın üstünde beliren işaret (hoparlör olmasa da görülsün)
+  function fx(sp, label) {
+    if (!sp?.visible) return;
+    const d = document.createElement('div');
+    d.className = 'sfx';
+    d.textContent = label;
+    d.style.left = W + sp.x + 'px';
+    d.style.top = H - sp.y - sp.h * sp.size / 200 + 'px';
+    layer.appendChild(d);
+    setTimeout(() => d.remove(), 1100);
+  }
+
   return {
     attach,
     render,
+    fx,
     destroy() {
       ro.disconnect();
       removeEventListener('pointerup', up);

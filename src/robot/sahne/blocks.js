@@ -28,6 +28,7 @@ export const BLOCKS = {
   goto: { cat: 'motion', text: 'x: {x} y: {y} konumuna git', args: { x: ['num', 0], y: ['num', 0] } },
   gotoRand: { cat: 'motion', text: 'rastgele konuma git' },
   gotoMouse: { cat: 'motion', text: 'fare imlecine git' },
+  gotoT: { cat: 'motion', text: '{o} konumuna git', args: { o: ['target', 'fare'] } },
   glide: { cat: 'motion', text: '{s} saniyede x: {x} y: {y} konumuna süzül', args: { s: ['num', 1], x: ['num', 0], y: ['num', 0] } },
   point: { cat: 'motion', text: '{d} yönüne dön', args: { d: ['num', 90] } },
   chx: { cat: 'motion', text: 'x\'i {n} değiştir', args: { n: ['num', 10] } },
@@ -35,6 +36,7 @@ export const BLOCKS = {
   chy: { cat: 'motion', text: 'y\'yi {n} değiştir', args: { n: ['num', 10] } },
   sety: { cat: 'motion', text: 'y\'yi {n} yap', args: { n: ['num', 0] } },
   bounce: { cat: 'motion', text: 'kenara geldiyse sek' },
+  pointTo: { cat: 'motion', text: '{o} doğru dön', args: { o: ['target', 'fare'] } },
 
   sayFor: { cat: 'looks', text: '{t} de {s} saniye', args: { t: ['text', 'Merhaba!'], s: ['num', 2] } },
   say: { cat: 'looks', text: '{t} de', args: { t: ['text', 'Merhaba!'] } },
@@ -63,6 +65,12 @@ export const BLOCKS = {
   waitUntil: { cat: 'control', text: '{c} olana kadar bekle', args: { c: ['cond', null] } },
   until: { cat: 'control', kind: 'c', text: '{c} olana kadar tekrarla', args: { c: ['cond', null] } },
   stop: { cat: 'control', cap: true, text: 'tümünü durdur' },
+  cloneStart: { cat: 'control', kind: 'hat', text: 'klon olarak başladığımda' },
+  clone: { cat: 'control', text: '{o} klonunu oluştur', args: { o: ['clonesrc', 'kendim'] } },
+  delClone: { cat: 'control', cap: true, text: 'bu klonu sil' },
+
+  ask: { cat: 'sensing', text: '{t} diye sor ve bekle', args: { t: ['text', 'Adın ne?'] } },
+  resetTimer: { cat: 'sensing', text: 'zamanlayıcıyı sıfırla' },
 
   clear: { cat: 'pen', text: 'tümünü sil' },
   down: { cat: 'pen', text: 'kalemi bastır' },
@@ -86,6 +94,10 @@ export const COLORS = { '#4c97ff': 'mavi', '#ff4d4d': 'kırmızı', '#2fbf71': '
 // Sayı yerine konabilen değer blokları (yeşil/mavi/turuncu yuvarlak bloklar)
 export const REPORTERS = {
   rand: { cat: 'operators', label: 'rastgele' },
+  op: { cat: 'operators', label: 'işlem (+ − × ÷)' },
+  join: { cat: 'operators', label: 'birleştir' },
+  answer: { cat: 'sensing', label: 'cevap' },
+  timer: { cat: 'sensing', label: 'zamanlayıcı' },
   x: { cat: 'motion', label: 'x konumu' },
   y: { cat: 'motion', label: 'y konumu' },
   dir: { cat: 'motion', label: 'yön' },

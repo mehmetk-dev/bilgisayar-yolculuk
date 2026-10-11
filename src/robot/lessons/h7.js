@@ -166,7 +166,7 @@ export const b27 = {
 };
 
 export const b28 = {
-  icon: '🏆', color: '#d97706', title: 'Bitirme Projesi', concept: 'Kendi projen',
+  icon: '🏆', color: '#d97706', title: 'Kendi Projen', concept: 'Kendi projen',
   desc: 'Öğrendiğin her şeyi kullanarak kendi oyununu, hikâyeni ya da sanat eserini yap. Sonra gerçek Scratch\'e geç!',
   learned: ['Bir fikri plana, planı koda dönüştürebilirsin.', 'Olay, döngü, koşul, değişken ve haber salma her projede işe yarar.', 'Aynı blokları scratch.mit.edu adresinde gerçek Scratch\'te de kullanabilirsin.'],
   teacher: '<b>Proje fuarı:</b> Ders sonunda sınıfı bir “bilim fuarına” çevirin: her öğrenci projesini açık bırakır, diğerleri gezip dener ve yapışkan nota bir övgü yazar. İsteyen öğrenciler aile izniyle scratch.mit.edu üzerinde hesap açıp projelerini yeniden yapabilir.',
@@ -194,7 +194,7 @@ export const b28 = {
     { type: 'story', anim: 'wave', title: 'Gerçek Scratch\'e geçiş 🐱',
       text: '<p>Burada öğrendiğin bloklar gerçek <b>Scratch</b>\'te birebir aynı! Scratch ücretsizdir:</p><ol class="tips"><li>Tarayıcıda <b>scratch.mit.edu</b> adresine git ve <b>“Oluştur”</b>a tıkla (hesap açmadan da deneyebilirsin).</li><li>Projelerini kaydetmek için ailen ya da öğretmeninle birlikte hesap aç.</li><li>İnternetsiz çalışmak için “Scratch Uygulaması”nı indirebilirsin.</li></ol><p><b>Küçük bir fark:</b> Gerçek Scratch\'te 🏁\'e basınca kuklalar kendiliğinden başa dönmez. O yüzden her betiğin başına <b>“x: y: konumuna git”</b> gibi başlangıç blokları koymayı unutma!</p>' },
     { type: 'story', anim: 'dance', title: 'Tebrikler, programcı! 🎓',
-      text: '<p>Robo\'ya ilk adımını attırdığın günden bugüne çok yol aldın: algoritma, döngü, fonksiyon, koşul, değişken, haber salma… ve kendi oyunların!</p><p>Bitirince <b>sertifikanı</b> alabilirsin. Adını yaz ve yazdır! 🏅</p>',
+      text: '<p>Robo\'ya ilk adımını attırdığın günden bugüne çok yol aldın: algoritma, döngü, fonksiyon, koşul, değişken, haber salma… ve kendi oyunların!</p><p>Son bir hafta daha var: <b>Scratch ustalığı</b>! Soru soran kuklalar, matematik oyunları ve klonlarla dolu bir uzay savaşı seni bekliyor. 🚀</p>',
       pics: ['🤖', '🐱', '🎮', '🏆', '🎓'] },
   ],
 };
