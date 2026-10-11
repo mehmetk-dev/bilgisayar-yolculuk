@@ -1,6 +1,7 @@
 // Tek dosyalık, internetsiz çalışan HTML sayfaları üretir:
 //   dist/index.html (+ dersler.html): ana sayfa, adım adım bilgisayar dersleri
 //   dist/bilgisayar.html (+ bilgisayarin-icine-yolculuk.html): 3B bilgisayar
+//   dist/robot.html: çocuklar için Robo ile Kodlama (algoritma) bölümleri
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
 
@@ -33,3 +34,4 @@ fs.mkdirSync('dist', { recursive: true });
 // Eski adresler (dersler.html, bilgisayarin-icine-yolculuk.html) de çalışmaya devam etsin diye kopyaları yazılır
 await page('src/main.js', 'src/index.html', ['dist/bilgisayar.html', 'dist/bilgisayarin-icine-yolculuk.html']);
 await page('src/dersler/app.js', 'src/dersler/index.html', ['dist/index.html', 'dist/dersler.html'], 'src/dersler/css');
+await page('src/robot/app.js', 'src/robot/index.html', ['dist/robot.html'], 'src/robot/css');

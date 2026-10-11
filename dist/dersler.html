@@ -52,6 +52,8 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 .hero h1 { font-size: 1.9em; }
 .hero p { color: var(--mut); font-size: 1.05em; }
 .live { max-width: 64em; margin: 0 auto 1.6em; display: flex; align-items: center; gap: 1em; padding: 1em 1.3em; border-radius: 18px; text-decoration: none; color: #fff; background: linear-gradient(120deg, #0a3d7a, #0a5dc2 55%, #3aa0ff); box-shadow: 0 8px 24px #0a5dc244; }
+.live.robo { margin-top: -0.8em; background: linear-gradient(120deg, #6a3df0, #a35cff 55%, #ff8a3d); box-shadow: 0 8px 24px #7a5cff44; }
+.live.robo .live-go { color: #6a3df0; }
 .live:hover { filter: brightness(1.08); }
 .live:focus-visible { outline: 3px solid var(--want); outline-offset: 3px; }
 .live-ic { font-size: 2.6em; line-height: 1; }
@@ -915,6 +917,7 @@ ol.steps.big li { margin: 0.4em 0; }
   <button id="fontDown" type="button" title="Yazıyı küçült">A−</button>
   <button id="fontUp" type="button" title="Yazıyı büyüt">A+</button>
   <button id="soundBtn" type="button" title="Başarı sesini aç/kapat"></button>
+  <a class="btn" href="robot.html" title="Çocuklar için robotik kodlama dersleri">🤖 Robo ile Kodlama</a>
   <a class="btn" href="bilgisayar.html" title="Bilgisayarın içini üç boyutlu görün">🖥 Bilgisayarı canlı gör</a>
 </header>
 
@@ -927,6 +930,11 @@ ol.steps.big li { margin: 0.4em 0; }
     <span class="live-ic">🖥</span>
     <span class="live-txt"><b>Bilgisayarı canlı görün</b><small>Kasayı açın, parçaları tek tek inceleyin: 1990'lardan bugüne üç boyutlu bilgisayar.</small></span>
     <span class="live-go">Aç ▶</span>
+  </a>
+  <a class="live robo" href="robot.html">
+    <span class="live-ic">🤖</span>
+    <span class="live-txt"><b>Robo ile Kodlama (8–12 yaş)</b><small>Çocuklar için robotik kodlamaya giriş: algoritma, ileri-geri, dönüşler, hata ayıklama ve döngüler.</small></span>
+    <span class="live-go">Başla ▶</span>
   </a>
   <div id="cards"></div>
 </main>

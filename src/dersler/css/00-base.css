@@ -45,6 +45,8 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 .hero h1 { font-size: 1.9em; }
 .hero p { color: var(--mut); font-size: 1.05em; }
 .live { max-width: 64em; margin: 0 auto 1.6em; display: flex; align-items: center; gap: 1em; padding: 1em 1.3em; border-radius: 18px; text-decoration: none; color: #fff; background: linear-gradient(120deg, #0a3d7a, #0a5dc2 55%, #3aa0ff); box-shadow: 0 8px 24px #0a5dc244; }
+.live.robo { margin-top: -0.8em; background: linear-gradient(120deg, #6a3df0, #a35cff 55%, #ff8a3d); box-shadow: 0 8px 24px #7a5cff44; }
+.live.robo .live-go { color: #6a3df0; }
 .live:hover { filter: brightness(1.08); }
 .live:focus-visible { outline: 3px solid var(--want); outline-offset: 3px; }
 .live-ic { font-size: 2.6em; line-height: 1; }

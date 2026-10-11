@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robo ile Kodlama</title>
+<style>
+:root {
+  --bg: #fff6e6;
+  --card: #ffffff;
+  --fg: #2b2340;
+  --mut: #6b6380;
+  --line: #eadcc2;
+  --acc: #7a5cff;
+  --ok: #1f9d55;
+  --ok-bg: #e3f8ea;
+  --bad: #c93a3a;
+  --bad-bg: #ffe9e6;
+  --warn-bg: #fff1cc;
+  --c: var(--acc);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg) radial-gradient(#f3e3c4 1.5px, transparent 1.6px) 0 0 / 26px 26px;
+  color: var(--fg);
+  font: 18px/1.5 "Nunito", "Segoe UI", "Noto Sans", "DejaVu Sans", Arial, sans-serif;
+  display: flex; flex-direction: column;
+}
+[hidden] { display: none !important; }
+h1, h2, h3, h4 { margin: 0; line-height: 1.2; }
+p { margin: 0.4em 0; }
+.mut { color: var(--mut); font-size: 0.9em; }
+button, .btn {
+  font: inherit; font-weight: 700; color: var(--fg); background: #fff; border: 2px solid var(--line); border-radius: 14px;
+  padding: 0.4em 0.9em; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.35em;
+  box-shadow: 0 3px 0 var(--line); transition: transform 0.08s;
+}
+button:hover, .btn:hover { border-color: var(--c); }
+button:active, .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
+button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+button:disabled { cursor: default; }
+.primary { background: var(--c); border-color: var(--c); color: #fff; box-shadow: 0 4px 0 color-mix(in srgb, var(--c), #000 30%); }
+.primary:hover { filter: brightness(1.08); }
+.big { font-size: 1.15em; padding: 0.55em 1.2em; border-radius: 16px; }
+button.link { background: none; border: 0; box-shadow: none; color: var(--acc); text-decoration: underline; padding: 0.1em; font-weight: 600; }
+.shake { animation: shake 0.4s; }
+.pop { animation: pop 0.35s; }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@keyframes pop { 0% { transform: scale(0.85); opacity: 0.4; } 60% { transform: scale(1.04); } }
+
+/* üst çubuk */
+#top { display: flex; align-items: center; gap: 0.6em; padding: 0.45em 1em; background: #fff; border-bottom: 3px solid #f0e2c6; flex-wrap: wrap; flex: none; }
+#top .btn, #top button { font-size: 0.8em; padding: 0.3em 0.7em; }
+.brand { font-weight: 900; font-size: 1.2em; color: var(--fg); text-decoration: none; white-space: nowrap; }
+.brand span { color: var(--acc); }
+#crumb { color: var(--mut); font-weight: 700; }
+#crumb:not(:empty)::before { content: "›"; margin-right: 0.5em; }
+.sp { flex: 1; }
+#map, #lesson { flex: 1; overflow-y: auto; padding: 1.2em 16px 3em; }
+
+/* Robo karakteri */
+.robo { overflow: visible; }
+.robo .ant line { stroke: #35506b; stroke-width: 3; stroke-linecap: round; }
+.robo .bulb { fill: #ff5d8f; animation: glow 1.6s ease-in-out infinite; }
+.robo .arm rect, .robo .arm circle { fill: #ffb547; stroke: #c9802a; stroke-width: 2; }
+.robo .arm { transform-box: fill-box; }
+.robo .arm-l { transform-origin: 100% 50%; }
+.robo .arm-r { transform-origin: 0% 50%; }
+.robo .wheel { fill: #35506b; }
+.robo .body { fill: #ffb547; stroke: #c9802a; stroke-width: 3; }
+.robo .heart { fill: #ff5d8f; animation: glow 1.2s ease-in-out infinite; }
+.robo .head { fill: #6cc9ff; stroke: #2a86c4; stroke-width: 3; }
+.robo .face { fill: #1d3557; }
+.robo .eye circle:first-child { fill: #fff; }
+.robo .eye { transform-box: fill-box; transform-origin: center; animation: blink 4s infinite; }
+.robo .pup { fill: #1d3557; transition: transform 0.3s; }
+.robo .mouth { fill: none; stroke: #7ff0ff; stroke-width: 3; stroke-linecap: round; }
+.robo .frown { display: none; }
+.robo .cheek { fill: #ff8fb1; opacity: 0.8; }
+@keyframes glow { 50% { opacity: 0.45; } }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+
+.sbot { width: 9em; flex: none; }
+.sbot .robo { width: 100%; display: block; }
+.sbot.wave .arm-r { animation: wave 0.9s ease-in-out infinite; }
+.sbot.wave .robo, .sbot.think .robo { animation: float 3s ease-in-out infinite; }
+.sbot.think .robo { transform-origin: 50% 90%; animation: tilt 2.4s ease-in-out infinite; }
+.sbot.think .bulb { animation: glow 0.5s infinite; }
+.sbot.dance .robo { transform-origin: 50% 95%; animation: dance 0.8s ease-in-out infinite; }
+.sbot.dance .arm-l { animation: wave 0.4s ease-in-out infinite alternate-reverse; }
+.sbot.dance .arm-r { animation: wave 0.4s ease-in-out infinite alternate; }
+@keyframes wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-40deg); } }
+@keyframes float { 50% { transform: translateY(-8px); } }
+@keyframes tilt { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes dance { 0%, 100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(8deg) translateY(-10px); } }
+
+/* harita (ana ekran) */
+.mwrap { max-width: 56em; margin: 0 auto; }
+.hero { display: flex; align-items: center; gap: 1.5em; background: linear-gradient(135deg, #7a5cff, #a35cff 55%, #ff8a3d); color: #fff; border-radius: 28px; padding: 1.4em 1.8em; box-shadow: 0 10px 30px #7a5cff44; margin-bottom: 1.8em; }
+.hero h1 { font-size: 2em; font-weight: 900; }
+.hero p { font-size: 1.05em; opacity: 0.95; max-width: 34em; }
+.hero .btn { --c: #fff; color: #6a3df0; margin-top: 0.4em; box-shadow: 0 4px 0 #0003; }
+.trail { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.1em; position: relative; }
+.trail::before { content: ""; position: absolute; left: 1.75em; top: 1em; bottom: 1em; border-left: 6px dashed #e2cfa8; }
+.node a, .node.soon { display: flex; align-items: center; gap: 1em; text-decoration: none; color: inherit; position: relative; }
+.node:nth-child(even) { padding-left: 2.2em; }
+.node:nth-child(even) .nnum { margin-left: -2.2em; }
+.nnum { width: 3.5em; height: 3.5em; flex: none; border-radius: 50%; background: var(--c); color: #fff; font-weight: 900; font-size: 1.1em; display: grid; place-items: center; border: 5px solid #fff; box-shadow: 0 4px 0 color-mix(in srgb, var(--c), #000 25%), 0 6px 16px #0002; }
+.node.done .nnum { background: var(--ok); }
+.ncard { flex: 1; display: flex; gap: 0.9em; align-items: center; background: #fff; border: 3px solid color-mix(in srgb, var(--c), #fff 60%); border-radius: 20px; padding: 0.8em 1em; transition: transform 0.15s; }
+.node a:hover .ncard { transform: translateX(6px) rotate(-0.5deg); border-color: var(--c); }
+.nicon { font-size: 2.3em; line-height: 1; }
+.ntxt { display: flex; flex-direction: column; gap: 0.15em; flex: 1; min-width: 0; }
+.ntxt b { font-size: 1.2em; color: color-mix(in srgb, var(--c), #000 25%); }
+.ntxt small { color: var(--mut); font-size: 0.88em; }
+.nfoot { display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; margin-top: 0.3em; }
+.chip { font-size: 0.75em; font-weight: 800; background: color-mix(in srgb, var(--c), #fff 85%); color: color-mix(in srgb, var(--c), #000 35%); border-radius: 999px; padding: 0.15em 0.7em; }
+.nprog { flex: 1; min-width: 4em; max-width: 10em; height: 0.55em; background: #f1e9da; border-radius: 999px; overflow: hidden; }
+.nprog i { display: block; height: 100%; background: var(--c); border-radius: 999px; }
+.ncount { font-size: 0.75em; color: var(--mut); font-weight: 700; }
+.node.soon { --c: #b9b0c9; opacity: 0.75; }
+.node.soon .ncard { border-style: dashed; }
+.tnote { background: #fffdf6; border: 2px dashed #e0c98f; border-radius: 18px; padding: 0.9em 1.1em; margin-top: 1.8em; font-size: 0.92em; }
+.tnote h3, .tnote h4 { margin-bottom: 0.3em; }
+
+/* bölüm ekranı */
+.lwrap { max-width: 74em; margin: 0 auto; display: flex; flex-direction: column; gap: 0.9em; }
+.lbar { display: flex; align-items: center; gap: 0.7em; flex-wrap: wrap; }
+.ltag { background: var(--c); color: #fff; font-weight: 900; border-radius: 999px; padding: 0.2em 0.9em; white-space: nowrap; }
+.lbar h2 { font-size: 1.45em; font-weight: 900; color: color-mix(in srgb, var(--c), #000 30%); }
+.dots { display: flex; flex-wrap: wrap; gap: 0.3em; margin-left: auto; }
+.dot { width: 2em; height: 2em; border-radius: 50%; display: grid; place-items: center; font-size: 0.8em; font-weight: 800; text-decoration: none; color: var(--mut); background: #fff; border: 2px solid var(--line); }
+.dot.ok { background: color-mix(in srgb, var(--c), #fff 70%); border-color: var(--c); color: color-mix(in srgb, var(--c), #000 40%); }
+.dot.cur { background: var(--c); border-color: var(--c); color: #fff; transform: scale(1.15); }
+.stage { background: var(--card); border: 3px solid color-mix(in srgb, var(--c), #fff 65%); border-radius: 26px; padding: 1.3em; min-height: 22em; box-shadow: 0 8px 0 color-mix(in srgb, var(--c), #fff 80%); }
+.lnav { display: flex; align-items: center; gap: 0.8em; }
+.nhint { flex: 1; text-align: right; font-weight: 700; color: var(--bad); }
+.go[aria-disabled="true"] { filter: grayscale(0.7); opacity: 0.55; }
+.go.ready { animation: ready 1.4s ease-in-out infinite; }
+@keyframes ready { 50% { transform: scale(1.06); box-shadow: 0 4px 0 color-mix(in srgb, var(--c), #000 30%), 0 0 0 8px color-mix(in srgb, var(--c), transparent 70%); } }
+.chipb { display: inline-block; color: #fff; font-weight: 800; border-radius: 10px; padding: 0.05em 0.6em; white-space: nowrap; box-shadow: 0 2px 0 #0002; }
+
+/* hikâye */
+.story { display: flex; align-items: center; gap: 1.6em; min-height: 19em; padding: 0.5em 1em; }
+.story .sbot { width: 12em; }
+.bubble { flex: 1; position: relative; background: #f6f2ff; border: 3px solid #d8ccff; border-radius: 28px; padding: 1.2em 1.4em; font-size: 1.12em; animation: pop 0.4s; }
+.bubble::before { content: ""; position: absolute; left: -22px; top: 50%; margin-top: -14px; border: 14px solid transparent; border-right: 22px solid #d8ccff; border-left: 0; }
+.bubble h3 { font-size: 1.4em; font-weight: 900; margin-bottom: 0.4em; color: color-mix(in srgb, var(--c), #000 25%); }
+.pics { display: flex; flex-wrap: wrap; gap: 0.3em; font-size: 2.2em; margin-top: 0.5em; }
+.pics span { animation: hop 1.6s ease-in-out infinite; animation-delay: calc(var(--i) * 0.15s); display: inline-block; }
+@keyframes hop { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+.tips { padding-left: 1.3em; margin: 0.3em 0; }
+.tips li { margin: 0.35em 0; }
+
+/* sıralama ve soru */
+.act h3 { font-size: 1.4em; font-weight: 900; color: color-mix(in srgb, var(--c), #000 25%); }
+.ahead { display: flex; gap: 1em; align-items: center; margin-bottom: 0.8em; }
+.ahead .sbot { width: 6em; }
+.slots { list-style: none; padding: 0; margin: 0 0 1em; display: grid; gap: 0.5em; }
+.slots li { display: flex; align-items: center; gap: 0.7em; }
+.num { width: 2.2em; height: 2.2em; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 900; background: color-mix(in srgb, var(--c), #fff 80%); color: color-mix(in srgb, var(--c), #000 30%); }
+.sc { flex: 1; min-height: 2.6em; border: 3px dashed var(--line); border-radius: 14px; display: flex; align-items: center; gap: 0.5em; padding: 0.25em 0.8em; color: #cbbfa6; font-weight: 800; }
+.fill .sc { border: 3px solid var(--ok); background: var(--ok-bg); color: var(--fg); animation: pop 0.35s; }
+.fill .num { background: var(--ok); color: #fff; }
+.pool { display: flex; flex-wrap: wrap; gap: 0.6em; padding: 0.9em; background: #fbf6ec; border-radius: 18px; min-height: 4em; }
+.card { font-size: 1em; padding: 0.5em 0.9em; border-color: color-mix(in srgb, var(--c), #fff 50%); }
+.ic { font-size: 1.4em; line-height: 1; }
+.amsg, .gmsg { border-radius: 16px; padding: 0.7em 1em; border: 3px solid; margin-top: 0.9em; }
+.amsg.ok, .gmsg.ok { background: var(--ok-bg); border-color: var(--ok); color: #0d4a25; }
+.amsg.bad, .gmsg.bad { background: var(--bad-bg); border-color: #f0a199; color: #6e1d1d; }
+.gmsg.warn { background: var(--warn-bg); border-color: #e0a100; color: #5a3600; }
+.hint { margin-top: 0.5em; background: #fffbea; border: 2px dashed #e0b400; border-radius: 12px; padding: 0.4em 0.7em; color: #5a3600; }
+.quiz { max-width: 44em; margin: 0 auto; text-align: center; }
+.qpic { display: flex; justify-content: center; margin: 1em 0 0.4em; }
+.qq { font-size: 1.25em; margin: 0.8em 0; }
+.opts { display: flex; flex-direction: column; gap: 0.6em; max-width: 30em; margin: 0 auto; }
+.opt { font-size: 1.1em; padding: 0.6em 1em; border-width: 3px; }
+.opt.right { background: var(--ok-bg); border-color: var(--ok); color: #0d4a25; animation: pop 0.35s; }
+.opt.wrongopt { background: var(--bad-bg); border-color: #f0a199; opacity: 0.7; animation: shake 0.4s; }
+.opt:disabled:not(.right):not(.wrongopt) { opacity: 0.5; }
+
+/* bitiş */
+.finish { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.8em; }
+.finish .sbot { width: 9em; }
+.badge { display: flex; align-items: center; gap: 0.5em; background: linear-gradient(135deg, #ffd23f, #ffb547); border: 4px solid #fff; box-shadow: 0 6px 0 #c9802a, 0 10px 20px #0002; border-radius: 999px; padding: 0.4em 1.4em; font-size: 1.3em; animation: pop 0.6s; }
+.badge span { font-size: 1.5em; }
+.finish h3 { font-size: 1.5em; font-weight: 900; }
+.learned { background: #f6f2ff; border-radius: 18px; padding: 0.8em 1.2em; text-align: left; max-width: 36em; }
+.learned ul { margin: 0.3em 0 0; padding-left: 1.2em; }
+.finish .tnote { margin-top: 0; text-align: left; max-width: 36em; }
+.fbtns { display: flex; flex-wrap: wrap; gap: 0.7em; justify-content: center; margin-top: 0.4em; }
+.soon-txt { font-weight: 800; color: var(--mut); align-self: center; }
+
+/* konfeti */
+#fx { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+#fx i { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 3px; animation: fall-c 2.5s ease-in forwards; }
+@keyframes fall-c { to { transform: translate(var(--dx), 110vh) rotate(var(--rz)); } }
+
+@media (max-width: 40em) {
+  body { font-size: 16px; }
+  .hero { flex-direction: column; text-align: center; padding: 1.2em; }
+  .hero .sbot { width: 7em; }
+  .story { flex-direction: column; padding: 0; }
+  .story .sbot { width: 8em; }
+  .bubble::before { left: 50%; top: -22px; margin: 0 0 0 -14px; border: 14px solid transparent; border-bottom: 22px solid #d8ccff; border-top: 0; }
+  .stage { padding: 0.9em; }
+  .node:nth-child(even) { padding-left: 0; }
+  .node:nth-child(even) .nnum { margin-left: 0; }
+  .nnum { width: 2.8em; height: 2.8em; }
+  .trail::before { left: 1.4em; }
+  .ncard { flex-direction: column; align-items: flex-start; }
+  .dots { margin-left: 0; }
+  #top .brand { font-size: 1em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* ızgara görevi yerleşimi */
+.gridact { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(17em, 1fr); grid-template-areas: "info code" "board code"; gap: 1em 1.4em; align-items: start; }
+.ginfo { grid-area: info; }
+.ginfo h3 { font-size: 1.35em; font-weight: 900; color: color-mix(in srgb, var(--c), #000 25%); }
+.gboard { grid-area: board; padding: 0.6em 4px 1em; min-width: 0; }
+.gcode { grid-area: code; background: #faf7ff; border: 2px solid #e6dcff; border-radius: 20px; padding: 0.9em; display: flex; flex-direction: column; gap: 0.5em; position: sticky; top: 0; }
+.gcode h4 { font-size: 0.95em; color: var(--mut); display: flex; align-items: center; gap: 0.5em; }
+.cnt { margin-left: auto; font-size: 0.85em; background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 0 0.6em; }
+.cnt.full { background: var(--warn-bg); border-color: #e0a100; color: #5a3600; }
+@media (max-width: 52em) {
+  .gridact { grid-template-columns: minmax(0, 1fr); grid-template-areas: "info" "board" "code"; }
+  .gcode { position: static; }
+}
+
+/* komut renkleri */
+.c-f { --k: #2fbf71; }
+.c-b { --k: #ff8a3d; }
+.c-l { --k: #2f8cff; }
+.c-r { --k: #7a5cff; }
+.c-loop { --k: #e0457b; }
+.chipb, .tool, .blk { background: var(--k); }
+.tools { display: flex; flex-wrap: wrap; gap: 0.45em; }
+.tool { color: #fff; border: 0; font-size: 0.95em; padding: 0.5em 0.85em; box-shadow: 0 4px 0 color-mix(in srgb, var(--k), #000 30%); }
+.tool:hover { filter: brightness(1.1); }
+.tool:active { box-shadow: 0 1px 0 color-mix(in srgb, var(--k), #000 30%); }
+.bi { font-size: 1.25em; line-height: 1; min-width: 1em; text-align: center; }
+.running .tools, .running .prog, .running .clear { opacity: 0.55; pointer-events: none; }
+
+/* program alanı */
+.prog { min-height: 9em; max-height: 24em; overflow-y: auto; background: #fff; border: 3px dashed #d4c6ff; border-radius: 16px; padding: 0.5em; display: flex; flex-direction: column; gap: 0.3em; cursor: text; }
+.pempty { color: var(--mut); font-size: 0.85em; font-weight: 700; padding: 0.3em; }
+.blk { display: flex; align-items: center; gap: 0.45em; color: #fff; font-weight: 800; border-radius: 12px; padding: 0.3em 0.4em 0.3em 0.6em; cursor: pointer; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 30%); transition: transform 0.15s, outline-color 0.15s; outline: 4px solid transparent; }
+.blk:not(.loop):hover { filter: brightness(1.08); }
+.blk.new { animation: pop 0.3s; }
+.blk.now { outline-color: #ffd23f; transform: translateX(6px) scale(1.03); }
+.del { margin-left: auto; background: #ffffff33; border: 0; box-shadow: none; color: #fff; font-size: 0.75em; padding: 0.15em 0.5em; border-radius: 8px; }
+.del:hover { background: #00000033; }
+.loop { flex-direction: column; align-items: stretch; padding: 0; gap: 0; }
+.lhead { display: flex; align-items: center; gap: 0.4em; padding: 0.3em 0.4em 0.3em 0.6em; flex-wrap: wrap; }
+.lhead select { font: inherit; font-weight: 900; border: 0; border-radius: 8px; padding: 0 0.2em; color: var(--fg); cursor: pointer; }
+.iter { font-size: 0.85em; background: #ffd23f; color: #5a3600; border-radius: 999px; padding: 0 0.5em; }
+.iter:empty { display: none; }
+.lbody { margin-left: 1.4em; background: #fff3f7; border-radius: 10px 0 0 10px; padding: 0.35em; min-height: 2.4em; display: flex; flex-direction: column; gap: 0.3em; color: var(--fg); }
+.lfoot { padding: 0.1em 0.7em 0.25em; font-size: 0.75em; font-weight: 700; opacity: 0.9; }
+.lfoot:hover { text-decoration: underline; }
+.caret { display: block; height: 5px; flex: none; border-radius: 3px; background: #ff3d7f; animation: caret 1s steps(2) infinite; }
+@keyframes caret { 50% { opacity: 0.2; } }
+.running .caret { visibility: hidden; }
+.ctrl { display: flex; flex-wrap: wrap; gap: 0.45em; margin-top: 0.3em; }
+.ctrl .run { --c: #2fbf71; font-size: 1.1em; flex: 1 1 100%; }
+.ctrl button:not(.run) { flex: 1; font-size: 0.85em; }
+
+/* tahta */
+.board { --t: 64px; --dur: 450ms; position: relative; display: grid; grid-template-columns: repeat(var(--w), var(--t)); grid-auto-rows: var(--t); width: max-content; margin: 0 auto; border-radius: 16px; }
+.tile { position: relative; }
+.t-floor { background: #a6e388; box-shadow: inset 0 0 0 1px #8fd06f; }
+.t-floor.alt { background: #98da77; }
+.t-tree { background: #98da77; }
+.t-tree::after { content: "🌳"; position: absolute; inset: 0; display: grid; place-items: center; font-size: calc(var(--t) * 0.7); }
+.t-water { background: #4fb6ff repeating-linear-gradient(160deg, #ffffff00 0 10px, #ffffff40 10px 13px); background-size: 40px 40px; animation: water 3s linear infinite; }
+.t-void { background: transparent; }
+@keyframes water { to { background-position: 40px 0; } }
+.board > .tile:first-child { border-top-left-radius: 14px; }
+.it { position: absolute; left: calc(var(--x) * var(--t)); top: calc(var(--y) * var(--t)); width: var(--t); height: var(--t); display: grid; place-items: center; pointer-events: none; }
+.it.start::before { content: ""; width: 70%; height: 70%; border-radius: 50%; border: 3px dashed #ffffffcc; }
+.goal svg { width: 62%; animation: beat 1.2s ease-in-out infinite; filter: drop-shadow(0 3px 0 #0002); }
+.goal.win svg { animation: pop 0.5s 3; }
+@keyframes beat { 50% { transform: scale(1.1); } }
+.star { font-size: calc(var(--t) * 0.52); animation: twinkle 1.8s ease-in-out infinite; z-index: 2; }
+.star.got { animation: grab 0.5s forwards; }
+@keyframes twinkle { 50% { transform: rotate(12deg) scale(1.12); } }
+@keyframes grab { 50% { transform: scale(1.8) translateY(-30%); opacity: 1; } 100% { transform: scale(0.2) translateY(-120%); opacity: 0; } }
+.path i { position: absolute; left: calc(var(--x) * var(--t)); top: calc(var(--y) * var(--t)); width: var(--t); height: var(--t); display: grid; place-items: center; }
+.path i::after { content: ""; width: 22%; height: 22%; border-radius: 50%; background: #ffffffb0; }
+
+/* tahtadaki Robo */
+.rb { position: absolute; left: 0; top: 0; width: var(--t); height: var(--t); z-index: 3; transform: translate(calc(var(--x) * var(--t)), calc(var(--y) * var(--t))); transition: transform var(--dur) ease-in-out; }
+.rb.noanim, .rb.noanim * { transition: none !important; }
+.rbi { position: absolute; inset: 8%; }
+.rbi .robo { width: 100%; height: 100%; display: block; position: relative; }
+.rarrow { position: absolute; inset: -12%; transform: rotate(var(--r)); transition: transform var(--dur) ease-in-out; }
+.rarrow i { position: absolute; left: 50%; top: -4%; transform: translateX(-50%); border-left: calc(var(--t) * 0.13) solid transparent; border-right: calc(var(--t) * 0.13) solid transparent; border-bottom: calc(var(--t) * 0.17) solid #ff3d7f; filter: drop-shadow(0 2px 0 #0003); }
+.rb.d0 .pup { transform: translateY(-2.5px); }
+.rb.d1 .pup { transform: translateX(3px); }
+.rb.d2 .pup { transform: translateY(2.5px); }
+.rb.d3 .pup { transform: translateX(-3px); }
+.rb.walk .rbi { animation: bob var(--dur) ease-in-out; }
+.rb.bump .rbi { animation: bump 0.55s ease-in-out; }
+.rb.fall .rbi { animation: sink 0.9s ease-in forwards; }
+.rb.happy .rbi { animation: jump 0.5s ease-in-out 3; }
+.rb.happy .arm-l, .rb.happy .arm-r { animation: wave 0.3s ease-in-out infinite; }
+.rb.sad .smile { display: none; }
+.rb.sad .frown { display: block; }
+.rb.sad .bulb { fill: #8a8a8a; animation: none; }
+@keyframes bob { 50% { transform: translateY(-12%) rotate(-4deg); } }
+@keyframes bump { 35% { transform: translate(calc(var(--bx) * 22%), calc(var(--by) * 22%)); } 55% { transform: rotate(-10deg); } 75% { transform: rotate(8deg); } }
+@keyframes sink { 40% { transform: scale(1.1) rotate(20deg); } 100% { transform: scale(0.15) rotate(360deg); opacity: 0.25; } }
+@keyframes jump { 50% { transform: translateY(-30%) scale(1.08); } }
+.mini .board { border-radius: 16px; overflow: visible; }
+.mini .tile { border-radius: 16px; }
+
+</style>
+</head>
+<body data-view="map">
+<header id="top">
+  <a class="btn home" href="index.html" title="Bilgisayar Dersleri ana sayfasına dön">🏠 Ana sayfa</a>
+  <a class="brand" href="#">🤖 Robo ile <span>Kodlama</span></a>
+  <span id="crumb"></span>
+  <span class="sp"></span>
+  <button id="speedBtn" type="button" title="Robo'nun hızı"></button>
+  <button id="soundBtn" type="button" title="Sesleri aç/kapat"></button>
+</header>
+<main id="map"></main>
+<main id="lesson" hidden></main>
+<div id="fx" aria-hidden="true"></div>
+<script>
+(()=>{var O=(e,a,i)=>()=>{if(i)throw i[0];try{return e&&(a=e(e=0)),a}catch(t){throw i=[t],t}};var Pa=(e,a)=>()=>{try{return a||e((a={exports:{}}).exports,a),a.exports}catch(i){throw a=0,i}};function U(e,a){try{let i=localStorage.getItem(e);return i==null?a:JSON.parse(i)}catch{return a}}function H(e,a){try{localStorage.setItem(e,JSON.stringify(a))}catch{}}function B(){return`<svg class="robo" viewBox="0 0 100 106" aria-hidden="true">
+  <g class="ant"><line x1="50" y1="7" x2="50" y2="20"/><circle class="bulb" cx="50" cy="7" r="5.5"/></g>
+  <g class="arm arm-l"><rect x="9" y="62" width="17" height="8" rx="4"/><circle cx="10" cy="66" r="5.5"/></g>
+  <g class="arm arm-r"><rect x="74" y="62" width="17" height="8" rx="4"/><circle cx="90" cy="66" r="5.5"/></g>
+  <rect class="wheel" x="27" y="88" width="17" height="13" rx="5"/><rect class="wheel" x="56" y="88" width="17" height="13" rx="5"/>
+  <rect class="body" x="25" y="57" width="50" height="34" rx="11"/>
+  <circle class="heart" cx="50" cy="74" r="6.5"/>
+  <rect class="head" x="16" y="18" width="68" height="45" rx="17"/>
+  <rect class="face" x="24" y="25" width="52" height="31" rx="12"/>
+  <g class="eye"><circle cx="39" cy="38" r="7.5"/><circle class="pup" cx="39" cy="38" r="3.8"/></g>
+  <g class="eye"><circle cx="61" cy="38" r="7.5"/><circle class="pup" cx="61" cy="38" r="3.8"/></g>
+  <path class="mouth smile" d="M42 47 Q50 54 58 47"/>
+  <path class="mouth frown" d="M42 51 Q50 45 58 51"/>
+  <circle class="cheek" cx="29" cy="49" r="3.5"/><circle class="cheek" cx="71" cy="49" r="3.5"/>
+</svg>`}function Q(e){return`<div class="mini"><div class="board" style="--w:1;--h:1;--t:5em"><div class="tile t-floor"></div>${ta(e)}</div></div>`}function ta(e,a=0,i=0){return`<div class="rb d${e}" style="--x:${a};--y:${i}"><div class="rbi"><div class="rarrow" style="--r:${e*90}deg"><i></i></div>${B()}</div></div>`}function f(e,a,i,t="sine",s=.12,l=e){let o=v.createOscillator(),d=v.createGain();o.type=t,o.frequency.setValueAtTime(e,v.currentTime+a),o.frequency.exponentialRampToValueAtTime(l,v.currentTime+a+i),d.gain.setValueAtTime(s,v.currentTime+a),d.gain.exponentialRampToValueAtTime(.001,v.currentTime+a+i),o.connect(d).connect(v.destination),o.start(v.currentTime+a),o.stop(v.currentTime+a+i+.02)}function p(e){if($.sound)try{v||(v=new(window.AudioContext||window.webkitAudioContext)),v.state==="suspended"&&v.resume(),Na[e]?.()}catch{}}function T(e=70){let a=document.getElementById("fx");if(!a||matchMedia("(prefers-reduced-motion: reduce)").matches)return;let i=["#ff8a3d","#2fbf71","#2f8cff","#e0457b","#8a5cff","#ffd23f"];for(let t=0;t<e;t++){let s=document.createElement("i");s.style.cssText=`left:${Math.random()*100}vw;background:${i[t%i.length]};--dx:${(Math.random()-.5)*30}vw;--rz:${Math.random()*900-450}deg;animation-delay:${Math.random()*.4}s;animation-duration:${1.8+Math.random()*1.2}s`,a.appendChild(s),setTimeout(()=>s.remove(),3500)}}var $,v,Na,Z,j=O(()=>{$={fast:U("robo-hizli",!1),sound:U("robo-ses",!0)};v=null;Na={click:()=>f(700,0,.05,"triangle",.08),add:()=>f(520,0,.08,"triangle",.1,780),del:()=>f(400,0,.1,"triangle",.1,200),step:()=>f(330,0,.09,"square",.04,440),turn:()=>f(500,0,.12,"sine",.08,650),star:()=>{f(988,0,.1,"triangle"),f(1319,.08,.18,"triangle")},bump:()=>f(180,0,.3,"sawtooth",.1,70),splash:()=>{f(900,0,.35,"sine",.1,120),f(300,.1,.3,"triangle",.06,90)},ok:()=>{f(660,0,.1,"triangle"),f(880,.09,.16,"triangle")},wrong:()=>f(220,0,.22,"square",.06,160),win:()=>[523,659,784,1047].forEach((e,a)=>f(e,a*.11,a===3?.4:.14,"triangle",.12))};Z=e=>new Promise(a=>setTimeout(a,e))});var Ya,Ka,Oa,ja,Ca,L,ma=O(()=>{j();Ya={no:1,icon:"📋",color:"#ff8a3d",title:"Algoritma Nedir?",concept:"Sıralı adımlar",desc:"Robo ile tanış, günlük hayattaki algoritmaları sırala ve ilk komutunu ver.",learned:["Algoritma, bir işi yapmak için sırayla izlenen adımlardır.","Komut, robota verilen tek bir emirdir.","Adımların sırası önemlidir."],teacher:"<b>Robot oyunu (bilgisayarsız, 5 dk):</b> Bir öğrenci “robot” olsun, gözlerini kapatsın. Sınıf ona yalnızca “bir adım ileri” komutu vererek onu kapıya götürsün. Sonra sorun: “Kaç komut gerekti? Bir adım fazla deseydik ne olurdu?”",steps:[{type:"story",anim:"wave",title:"Merhaba, ben Robo! 👋",text:"<p>Ben çok çalışkan bir robotum ama kendi kendime düşünemem. Ne yapacağımı bana <b>adım adım</b> söylemen gerekiyor.</p><p>Bir işi yapmak için sırayla izlenen adımlara <b>ALGORİTMA</b> denir. Haydi birlikte öğrenelim!</p>",pics:["🤖","➡️","📋","➡️","🎉"]},{type:"story",anim:"think",title:"Sen de her gün algoritma kullanıyorsun!",text:"<p>Sabah dişlerini fırçalarken, kahvaltı hazırlarken, ayakkabını bağlarken… Hepsi <b>sıralı adımlardan</b> oluşur.</p><p>Sıra karışırsa ne olur? Ayakkabıyı çorabın üstüne değil, altına giymeye çalışırsın! 😄</p>",pics:["🪥","🥪","👟","🌱"]},{type:"order",title:"Diş fırçalama algoritması",text:"<p>Kartlara <b>doğru sırayla</b> tıkla. İlk ne yapılır?</p>",items:[["🪥","Diş fırçasını al"],["🧴","Fırçaya macun sür"],["😁","Dişlerini fırçala"],["💧","Ağzını çalkala"],["🧼","Fırçayı yıka, yerine koy"]]},{type:"order",title:"Fidan dikme algoritması",text:"<p>Bir fidan dikmek istiyoruz. Adımları sıraya koy!</p>",items:[["⛏️","Toprağı kaz, çukur aç"],["🌱","Fidanı çukura koy"],["🪣","Üstünü toprakla ört"],["💦","Fidanı sula"]],ok:"Süper! Fidanı sulamadan önce dikmen gerektiğini biliyordun. 🌳"},{type:"story",anim:"dance",title:"Şimdi bana komut ver!",text:'<p><b>Komut</b>, robota verilen tek bir emirdir. Komutları arka arkaya dizince bir <b>program</b> olur.</p><p><span class="chipb c-f">⬆ İleri git</span> komutu beni baktığım yöne doğru <b>bir kare</b> ilerletir.</p><p>Hedefim her zaman <b>pil</b> 🔋, çünkü şarjım bitmek üzere!</p>'},{type:"grid",title:"İlk programın",text:"<p>Robo'yu pile 🔋 götür. <b>⬆ İleri git</b> düğmesine her bastığında programına bir adım eklenir.</p><p>Kaç kare var? Say, sonra <b>▶ Çalıştır</b>'a bas.</p>",map:["S...G"],dir:"E",tools:["F"],sol:"FFFF",hint:"Robo ile pil arasındaki kareleri say: 4 kare. Yani 4 kez İleri git."},{type:"grid",title:"Yukarı doğru",text:"<p>Bu sefer Robo <b>yukarı</b> bakıyor. “İleri” her zaman Robo'nun <b>baktığı yöndür</b>.</p><p>Yoldaki yıldızı ⭐ da topla!</p>",map:["G",".","*",".","S"],dir:"N",tools:["F"],sol:"FFFF"},{type:"grid",title:"Uzun yol",text:"<p>Bütün yıldızları topla ve pile ulaş. Kareleri tek tek saymayı unutma!</p>",map:["S.*.*..G"],dir:"E",tools:["F"],sol:"FFFFFFF",hint:"Robo ile pil arasında 7 adım var. Programında kaç blok olduğunu “Programım” başlığının yanında görebilirsin."}]},Ka={no:2,icon:"↕️",color:"#2fbf71",title:"İleri ve Geri",concept:"Yön ve hareket",desc:"Robo hem ileri hem geri gidebilir. Yıldızlar iki yanda olunca hangisini kullanacaksın?",learned:["İleri git: Robo baktığı yöne bir kare gider.","Geri git: Robo yüzünü çevirmeden bir kare geri gider.","Bir problemi çözmenin birden fazla yolu olabilir."],teacher:"<b>İleri–geri oyunu:</b> Öğrenciler sıraların yanında ayağa kalkar. Öğretmen “ileri”, “geri”, “ileri, ileri, geri” gibi komut dizileri söyler; herkes aynı anda uygular. Sonra bir öğrenci öğretmen olur. Dizinin sonunda herkes aynı yerde mi?",steps:[{type:"story",anim:"wave",title:"Geri vites! 🚗",text:'<p>Yeni bir komut öğrendim: <span class="chipb c-b">⬇ Geri git</span></p><p>Geri giderken <b>yüzüm aynı yöne bakar</b>, sadece geri geri yürürüm. Tıpkı park eden bir arabanın geri vitesi gibi!</p>',pics:["🤖","⬅️","🚗","⬅️"]},{type:"quiz",title:"Düşün bakalım",pic:Q(1),q:"Robo <b>sağa</b> bakıyor ve <b>⬇ Geri git</b> komutunu alıyor. Ne olur?",opts:["Bir kare <b>sola</b> gider, yüzü hâlâ sağa bakar","Bir kare <b>sağa</b> gider","Arkasını döner ve sola bakar"],a:0,ok:"Geri gidince Robo baktığı yönün tersine bir kare kayar ama arkasını dönmez."},{type:"grid",title:"Pil arkamda!",text:"<p>Robo sağa bakıyor ama pil <b>arkasında</b>. <b>⬇ Geri git</b> komutunu kullan.</p>",map:["G..S."],dir:"E",tools:["F","B"],sol:"BBB"},{type:"grid",title:"Önce yıldız, sonra pil",text:"<p>Yıldız ⭐ önünde, pil 🔋 arkanda. Önce yıldızı al, sonra geri geri pile git.</p>",map:["G...S.*"],dir:"E",tools:["F","B"],sol:"FFBBBBBB",hint:"Önce 2 kez İleri git ile yıldızı al. Sonra 6 kez Geri git."},{type:"grid",title:"İki yanda yıldız",text:"<p>Yıldızlar iki yanda! Hangisini önce alırsan al, en sonda pile ulaşmalısın.</p>",map:["*..S...*G"],dir:"E",tools:["F","B"],sol:"BBBFFFFFFFF",hint:"Önce 3 kez Geri git ile soldaki yıldızı al. Sonra İleri git ile sağa doğru ilerle."}]},Oa={no:3,icon:"🔄",color:"#2f8cff",title:"Sağa ve Sola Dön",concept:"Dönüşler",desc:"Robo yerinde dönmeyi öğreniyor. Ağaçların ve gölün etrafından dolaşalım.",learned:["Dönüş komutu Robo'yu ilerletmez, sadece baktığı yönü değiştirir.","Sağ ve sol, Robo'nun baktığı yöne göre belirlenir.","Uzun yolları küçük parçalara bölerek planlayabiliriz."],teacher:"<b>Sınıf haritası:</b> Yere tebeşir ya da bantla 4×4 kare çizin. Bir öğrenci robot olur; diğeri kâğıda ok işaretleri (⬆ ↰ ↱) çizerek program yazar, robot sırayla uygular. “Sağa dön” derken robotun sağı mı, bizim sağımız mı? Tartışın!",steps:[{type:"story",anim:"dance",title:"Dönmeyi öğrendim!",text:'<p>İki yeni komutum var: <span class="chipb c-l">↰ Sola dön</span> ve <span class="chipb c-r">↱ Sağa dön</span></p><p>Dönerken <b>bir kare bile ilerlemem</b>, sadece yerimde çeyrek tur dönerim ve baktığım yön değişir.</p><p>Önümdeki <b>kırmızı ok</b> nereye baktığımı gösterir. 👀</p>'},{type:"quiz",title:"Robo nereye bakar?",pic:Q(0),q:"Robo <b>yukarı</b> bakıyor. <b>↱ Sağa dön</b> dersek nereye bakar?",opts:["➡️ Sağa","⬅️ Sola","⬇️ Aşağı"],a:0,ok:"Yukarı bakarken sağa dönen Robo, sağ tarafa bakar."},{type:"quiz",title:"İki kez dönersek?",pic:Q(1),q:"Robo <b>sağa</b> bakıyor. Arka arkaya iki kez <b>↰ Sola dön</b> dersek nereye bakar?",opts:["⬆️ Yukarı","⬅️ Sola (tam ters yöne)","➡️ Yine sağa"],a:1,ok:"İki çeyrek tur = yarım tur. Robo tam arkasına döner!",no:"İpucu: Birinci dönüşte yukarı bakar. İkinci dönüşte?"},{type:"grid",title:"Köşeyi dön",text:"<p>Yol köşede dönüyor. Köşeye gelince <b>↱ Sağa dön</b>, sonra yine ilerle.</p>",map:["S..","##.","##G"],dir:"E",tools:["F","L","R"],sol:"FFRFF",hint:"2 kez İleri git, sonra Sağa dön, sonra 2 kez İleri git."},{type:"grid",title:"Yukarı tırman",text:"<p>Önce yıldızı al, sonra yukarı çık ve pile git. Hangi yöne döneceğini Robo'nun gözünden düşün!</p>",map:["#...G","#.###","S*..."],dir:"E",tools:["F","L","R"],sol:"FLFFRFFF",hint:"Yıldızı alınca Robo sağa bakıyor. Yukarı çıkmak için onun soluna dönmesi gerek: ↰ Sola dön."},{type:"grid",title:"Merdiven",text:"<p>Zikzak bir yol! Dikkat et, düz gidersen suya düşersin 💦</p>",map:["S.~~","#.*#","##.G"],dir:"E",tools:["F","L","R"],sol:"FRFLFRFLF",hint:"Yolu parçalara böl: bir kare ilerle, dön, bir kare ilerle, öbür yöne dön…"},{type:"grid",title:"Gölün etrafından",text:"<p>Robo yüzme bilmez! Gölün etrafından dolaşıp pile ulaş. Yolda yıldızı da topla.</p>",map:["..*..",".~~~.","S~~~G"],dir:"N",tools:["F","L","R"],sol:"FFRFFFFRFF",hint:"Önce yukarı çık (2 kare), sağa dön, üst sıradan 4 kare git, sonra aşağı in."}]},ja={no:4,icon:"🐞",color:"#e0457b",title:"Bug Avı: Hata Ayıklama",concept:"Hata ayıklama",desc:"Programlarda hata var! Robo'yu izle, hatalı komutu bul ve düzelt.",learned:["Programdaki hataya “bug” (böcek) denir.","Hatayı bulup düzeltmeye “hata ayıklama” (debug) denir.","Programı çalıştırıp izlemek hatayı bulmanın en iyi yoludur."],teacher:"<b>Bozuk tarif oyunu:</b> Tahtaya kasıtlı hatalı bir algoritma yazın (ör. “Çorabı giy, ayakkabıyı giy, ayakkabıyı bağla, çorabı çıkar”). Öğrenciler hatayı bulsun ve düzeltilmiş halini söylesin. Hata yapmanın programcılığın doğal bir parçası olduğunu vurgulayın.",steps:[{type:"story",anim:"think",title:"Programda böcek var! 🐞",text:"<p>Bazen yazdığımız program istediğimiz gibi çalışmaz. Programdaki hataya <b>bug</b> yani <b>böcek</b> denir.</p><p>Çok eskiden bir bilgisayarın içine gerçek bir güve girmiş ve bilgisayarı bozmuş. O günden beri hatalara “bug” deniyor!</p>",pics:["🖥️","🦋","🐞","🔍"]},{type:"story",anim:"wave",title:"Bug avcısı ipuçları 🔍",text:`<ol class="tips"><li><b>▶ Çalıştır</b> ve Robo'yu dikkatle izle. Hangi blok çalışırken parlıyor?</li><li>Robo <b>nerede</b> yanlış yere gitti?</li><li>O bloğun <b>✖</b> düğmesine basıp sil. Kırmızı çizgi silinen yerde kalır.</li><li>Doğru komuta tıkla, tam o yere eklenir.</li></ol><p class="mut">Bir bloğa tıklarsan kırmızı çizgi onun altına geçer; yeni komut oraya eklenir.</p>`},{type:"grid",title:"Eksik adım",text:"<p>Robo pile ulaşamıyor! Önce <b>▶ Çalıştır</b>'a basıp izle. Programda bir şey <b>eksik</b>.</p>",map:["S....G"],dir:"E",tools:["F"],preset:"FFF",sol:"FFFFF",hint:"Pile kadar 5 kare var ama programda sadece 3 İleri git var."},{type:"grid",title:"Yanlış dönüş",text:"<p>Bu programda <b>bir komut yanlış</b>. Robo köşede yanlış yöne dönüyor! Yanlış bloğu ✖ ile sil, yerine doğrusunu koy.</p>",map:["S..","##.","##G"],dir:"E",tools:["F","L","R"],preset:"FFLFF",sol:"FFRFF",hint:"↰ Sola dön bloğunu sil ve aynı yere ↱ Sağa dön ekle."},{type:"grid",title:"Neden suya düştü?",text:"<p>Robo suya düşüyor! 💦 Hangi adım eksik? Robo'nun nerede döndüğüne dikkat et.</p>",map:["..*..",".~~~.","S~~~G"],dir:"N",tools:["F","L","R"],preset:"FFRFFFRFF",sol:"FFRFFFFRFF",hint:"Üst sırada 4 kare gitmesi lazım ama 3 kare gidip dönüyor. İkinci ↱ Sağa dön bloğunun önüne bir İleri git ekle."},{type:"grid",title:"Fazladan bir blok",text:"<p>Bu sefer programda <b>fazladan</b> bir komut var. Robo yolun dışına çıkıyor. Hangisini silmeliyiz?</p>",map:["#...G","#.###","S*..."],dir:"E",tools:["F","L","R"],preset:"FLFFFRFFF",sol:"FLFFRFFF",hint:"Robo yukarı çıkarken 2 kare gitmeli, programda 3 tane var."}]},Ca={no:5,icon:"🔁",color:"#8a5cff",title:"Tekrar Tekrar: Döngüler",concept:"Döngü (tekrar)",desc:"Aynı komutları tekrar tekrar yazmak yerine “Tekrarla” bloğu ile kısa programlar yaz.",learned:["Döngü, bazı komutları belli sayıda tekrar ettirir.","Döngüler programı kısaltır ve okumayı kolaylaştırır.","Tekrar eden bir deseni (kalıbı) bulmak, döngü kurmanın ilk adımıdır."],teacher:"<b>Dans döngüsü:</b> Sınıfla bir dans hareketi kurun: “alkışla, zıpla, dön”. Tahtaya “3 kez tekrarla: alkışla, zıpla, dön” yazın ve hep birlikte yapın. Sonra öğrenciler kendi dans döngülerini yazsın. Scratch'teki “tekrarla” bloğu tam olarak budur.",steps:[{type:"story",anim:"think",title:"Ufff, çok yoruldum! 😮‍💨",text:'<p>“İleri git, ileri git, ileri git, ileri git, ileri git, ileri git…” demek çok yorucu değil mi?</p><p>Bunun yerine <span class="chipb c-loop">🔁 6 kez tekrarla: ⬆ İleri git</span> diyebiliriz. Buna <b>DÖNGÜ</b> denir!</p>',pics:["⬆","⬆","⬆","⬆","⬆","⬆","=","🔁"]},{type:"story",anim:"dance",title:"Tekrarla bloğu nasıl kullanılır?",text:'<ol class="tips"><li><b>🔁 Tekrarla</b> düğmesine bas. Programına bir döngü eklenir.</li><li>Kırmızı çizgi döngünün <b>içine</b> geçer. Tekrar edilecek komutlara tıkla.</li><li>Sayıyı değiştirerek kaç kez tekrarlanacağını seç.</li><li>Döngüden sonra komut eklemek için <b>“döngü sonu”</b> yazısına tıkla.</li></ol>'},{type:"quiz",title:"Kaç kare gider?",q:`<span class="chipb c-loop">🔁 3 kez tekrarla: ⬆ İleri git</span> programı Robo'yu kaç kare ilerletir?`,opts:["1 kare","3 kare","4 kare"],a:1,ok:"İçindeki İleri git komutu 3 kez çalışır, Robo 3 kare gider."},{type:"quiz",title:"Robo ne çizer?",q:'<span class="chipb c-loop">🔁 4 kez tekrarla: ⬆ İleri git, ↱ Sağa dön</span> programında Robo nasıl bir yol çizer?',opts:["Düz bir çizgi","Bir kare ⬜ çizip başladığı yere döner","Zikzak"],a:1,ok:"Her turda bir kenar çizip sağa döner. 4 kenar = bir kare!"},{type:"grid",title:"Uzun koridor",text:"<p>Pil çok uzakta! Ama bu görevde en fazla <b>2 blok</b> kullanabilirsin. Döngü ile çöz!</p>",map:["S.......G"],dir:"E",tools:["F","loop"],max:2,loopN:2,sol:"8(F)",hint:"🔁 Tekrarla ekle, içine bir ⬆ İleri git koy. Sonra sayıyı 8 yap."},{type:"grid",title:"Merdiven döngüsü",text:"<p>Merdivenin her basamağı aynı! Tekrar eden <b>deseni</b> bul, döngünün içine koy. En fazla <b>5 blok</b>.</p>",map:["###G","##.*","#.*#","S.##"],dir:"E",tools:["F","L","R","loop"],max:5,sol:"3(FLFR)",hint:"Bir basamak: İleri git, Sola dön, İleri git, Sağa dön. Bu 4 komutu 3 kez tekrarla."},{type:"grid",title:"Bahçeyi dolaş",text:"<p>Bahçenin köşelerindeki yıldızları topla ve pile git. Döngüden sonra bir blok daha gerekebilir. En fazla <b>5 blok</b>.</p>",map:["S.*","G#.","*.*"],dir:"E",tools:["F","L","R","loop"],max:5,sol:"3(FFR)F",hint:"Her kenarda: 2 kez İleri git, Sağa dön. Bunu 3 kez tekrarla, sonra döngü sonuna tıklayıp bir İleri git daha ekle."}]},L=[Ya,Ka,Oa,ja,Ca]});function ka(e,a,i){let t=a.pics?`<div class="pics">${a.pics.map((s,l)=>`<span style="--i:${l}">${s}</span>`).join("")}</div>`:"";e.innerHTML=`<div class="story ${a.anim||"wave"}"><div class="sbot">${B()}</div><div class="bubble"><h3>${a.title}</h3>${a.text}${t}</div></div>`,i()}function Va(e){let a=e.slice();do for(let i=a.length-1;i>0;i--){let t=Math.floor(Math.random()*(i+1));[a[i],a[t]]=[a[t],a[i]]}while(a.every((i,t)=>i.i===t));return a}function ya(e,a,i){let t=a.items.map(([d,c],k)=>({i:k,ic:d,tx:c}));e.innerHTML=`<div class="act order">
+  <div class="ahead"><div class="sbot think">${B()}</div><div><h3>${a.title}</h3>${a.text}</div></div>
+  <ol class="slots">${t.map((d,c)=>`<li><span class="num">${c+1}</span><span class="sc">?</span></li>`).join("")}</ol>
+  <div class="pool">${Va(t).map(d=>`<button type="button" class="card" data-i="${d.i}"><span class="ic">${d.ic}</span>${d.tx}</button>`).join("")}</div>
+  <div class="amsg" hidden></div>
+</div>`;let s=e.querySelectorAll(".slots li"),l=e.querySelector(".amsg"),o=0;e.querySelector(".pool").addEventListener("click",d=>{let c=d.target.closest(".card");if(c)if(+c.dataset.i===o){let k=t[o];s[o].querySelector(".sc").innerHTML=`<span class="ic">${k.ic}</span>${k.tx}`,s[o].classList.add("fill"),c.remove(),o++,l.hidden=!0,o===t.length?(p("win"),T(40),e.querySelector(".sbot").className="sbot dance",l.hidden=!1,l.className="amsg ok pop",l.innerHTML=a.ok||"Harika! Adımları doğru sıraya koydun. İşte bu bir <b>algoritma</b>! 🎉",i()):p("ok")}else p("wrong"),c.classList.remove("shake"),c.offsetWidth,c.classList.add("shake"),l.hidden=!1,l.className="amsg bad",l.innerHTML=`Hmm, bu adım biraz daha sonra gelmeli. <b>${o+1}.</b> adımda ne yapmalıyız? 🤔`})}function ga(e,a,i){e.innerHTML=`<div class="act quiz">
+  <h3>${a.title}</h3>
+  ${a.pic?`<div class="qpic">${a.pic}</div>`:""}
+  <p class="qq">${a.q}</p>
+  <div class="opts">${a.opts.map((s,l)=>`<button type="button" class="opt" data-i="${l}">${s}</button>`).join("")}</div>
+  <div class="amsg" hidden></div>
+</div>`;let t=e.querySelector(".amsg");e.querySelector(".opts").addEventListener("click",s=>{let l=s.target.closest(".opt");!l||l.disabled||(t.hidden=!1,+l.dataset.i===a.a?(l.classList.add("right"),e.querySelectorAll(".opt").forEach(o=>{o.disabled=!0}),p("ok"),T(25),t.className="amsg ok pop",t.innerHTML=`<b>Doğru!</b> ${a.ok||""}`,i()):(l.classList.add("wrongopt"),l.disabled=!0,p("wrong"),t.className="amsg bad",t.innerHTML=a.no||"Bir daha düşün. Robo'nun yerinde olsan ne yapardın? 🤔"))})}var ha=O(()=>{j()});function xa(e){let a=e.length,i=Math.max(...e.map(d=>d.length)),t=[],s=[],l=null,o=null;for(let d=0;d<a;d++){t.push([]);for(let c=0;c<i;c++){let k=e[d][c]??" ";k==="S"&&(l={x:c,y:d}),k==="G"&&(o={x:c,y:d}),k==="*"&&s.push({x:c,y:d}),t[d].push(k==="#"?"tree":k==="~"?"water":k===" "?"void":"floor")}}return{w:i,h:a,cell:t,start:l,goal:o,stars:s}}function ra(e){let a=0,i=()=>{let t=[];for(;a<e.length&&e[a]!==")";){let s=e[a];if(/\d/.test(s)){a+=2;let l=i();a++,t.push({id:C(),c:"loop",n:+s,body:l})}else t.push({id:C(),c:s}),a++}return t};return i()}function za(e){let a=[];for(let i of e)if(i.c==="loop")for(let t=0;t<i.n;t++)for(let s of za(i.body))a.push({...s,loop:i.id,iter:t+1,n:i.n});else a.push({c:i.c,id:i.id});return a}function Fa(e,a,i){let{x:t,y:s}=e.start,l=a,o=a*90,d=new Set,c=[],k=()=>t===e.goal.x&&s===e.goal.y,D=za(i);if(!D.length)return{ev:c,result:"empty"};for(let x of D){let M={id:x.id,loop:x.loop,iter:x.iter,n:x.n};if(x.c==="L"||x.c==="R"){let h=x.c==="R"?1:-1;l=(l+h+4)%4,o+=h*90,c.push({...M,t:"turn",x:t,y:s,d:l,rot:o});continue}let y=x.c==="B"?-1:1,P=t+fa[l]*y,u=s+va[l]*y,q=e.cell[u]?.[P]??"void";if(q==="tree"||q==="void")return c.push({...M,t:"bump",x:t,y:s,d:l,rot:o,bx:fa[l]*y,by:va[l]*y}),{ev:c,result:q==="tree"?"tree":"edge"};if(t=P,s=u,q==="water")return c.push({...M,t:"fall",x:t,y:s,d:l,rot:o}),{ev:c,result:"water"};let z=t+","+s,S=e.stars.some(h=>h.x===t&&h.y===s)&&!d.has(z);if(S&&d.add(z),c.push({...M,t:"move",x:t,y:s,d:l,rot:o,star:S?z:null}),k()&&d.size===e.stars.length)return c.push({t:"win",x:t,y:s,d:l,rot:o}),{ev:c,result:"win"}}return{ev:c,result:k()?"nostars":"nogoal"}}var fa,va,$a,Ia,C,V,Sa=O(()=>{fa=[0,1,0,-1],va=[-1,0,1,0],$a={N:0,E:1,S:2,W:3};Ia=0,C=()=>++Ia;V=e=>e.reduce((a,i)=>a+1+(i.body?V(i.body):0),0)});function Ra(e,a,i){let t=xa(a.map),s=$a[a.dir||"E"],l=a.max||0,o=a.preset?ra(a.preset):[],d={list:o,i:o.length},c=0,k=!1,D=0,x=[];for(let r=0;r<t.h;r++)for(let n=0;n<t.w;n++){let m=t.cell[r][n];x.push(`<div class="tile t-${m}${(n+r)%2?" alt":""}"></div>`)}let M=[`<div class="it start" style="--x:${t.start.x};--y:${t.start.y}"></div>`,`<div class="it goal" style="--x:${t.goal.x};--y:${t.goal.y}">${Wa}</div>`,...t.stars.map(r=>`<div class="it star" data-k="${r.x},${r.y}" style="--x:${r.x};--y:${r.y}">⭐</div>`)];e.innerHTML=`<div class="gridact">
+  <div class="ginfo"><h3>${a.title}</h3>${a.text}<div class="gmsg" hidden></div></div>
+  <div class="gboard"><div class="board" style="--w:${t.w};--h:${t.h}">${x.join("")}${M.join("")}<div class="path"></div>${ta(s,t.start.x,t.start.y)}</div></div>
+  <div class="gcode">
+    <h4>Komutlar</h4>
+    <div class="tools">${a.tools.map(r=>`<button type="button" class="tool ${J[r].cls}" data-c="${r}"><span class="bi">${J[r].icon}</span>${J[r].label}</button>`).join("")}</div>
+    <h4>Programım <span class="cnt"></span></h4>
+    <div class="prog" tabindex="-1"></div>
+    <div class="ctrl">
+      <button type="button" class="primary run">▶ Çalıştır</button>
+      <button type="button" class="reset">↺ Başa al</button>
+      <button type="button" class="clear">${a.preset?"↺ İlk program":"🗑 Temizle"}</button>
+    </div>
+  </div>
+</div>`;let y=r=>e.querySelector(r),P=y(".board"),u=y(".rb"),q=y(".rarrow"),z=y(".prog"),S=y(".cnt"),h=y(".gmsg"),da=y(".run"),ca=y(".path"),pa=()=>{let r=y(".gboard").clientWidth-8,n=Math.max(38,Math.min(84,Math.floor(r/t.w)));P.style.setProperty("--t",n+"px")},ba=new ResizeObserver(pa);ba.observe(y(".gboard")),pa();function I(r,n){h.hidden=!n,h.className="gmsg "+r,h.innerHTML=n||"",h.classList.remove("pop"),h.offsetWidth,h.classList.add("pop")}function W(r,n){n&&u.classList.add("noanim"),u.style.setProperty("--x",r.x),u.style.setProperty("--y",r.y),u.className=u.className.replace(/\bd\d\b/,"d"+r.d),q.style.setProperty("--r",r.rot+"deg"),n&&(u.offsetWidth,u.classList.remove("noanim"))}function _(){c++,k=!1,u.classList.remove("bump","fall","happy","sad","walk"),W({x:t.start.x,y:t.start.y,d:s,rot:s*90},!0),e.querySelectorAll(".star").forEach(r=>r.classList.remove("got")),y(".goal").classList.remove("win"),ca.innerHTML="",ea(null),aa(!1)}function aa(r){k=r,e.classList.toggle("running",r),da.textContent=r?"⏹ Durdur":"▶ Çalıştır"}function E(r,n=o){for(let m=0;m<n.length;m++){let g=n[m];if(g.id===r)return{list:n,i:m,b:g};if(g.body){let b=E(r,g.body);if(b)return b}}return null}function Ha(r){let n=J[r.c],m='<button type="button" class="del" title="Sil" aria-label="Bloğu sil">✖</button>';if(r.c==="loop"){let g=[2,3,4,5,6,7,8,9].map(b=>`<option${b===r.n?" selected":""}>${b}</option>`).join("");return`<div class="blk loop c-loop" data-id="${r.id}"><div class="lhead"><span class="bi">${n.icon}</span><select aria-label="Kaç kez">${g}</select> kez tekrarla <span class="iter"></span>${m}</div><div class="lbody" data-in="${r.id}">${ua(r.body)}</div><div class="lfoot" data-after="${r.id}">döngü sonu ⤶</div></div>`}return`<div class="blk ${n.cls}" data-id="${r.id}"><span class="bi">${n.icon}</span><span class="bl">${n.label}</span>${m}</div>`}function ua(r){let n="";for(let m=0;m<=r.length;m++)d.list===r&&d.i===m&&(n+='<span class="caret" aria-hidden="true"></span>'),m<r.length&&(n+=Ha(r[m]));return r.length||(n+=r===o?'<span class="pempty">Komutlara tıkla, buraya eklensin 👆</span>':'<span class="pempty">içine komut ekle</span>'),n}function N(r){z.innerHTML=ua(o);let n=V(o);S.textContent=l?`${n} / ${l} blok`:`${n} blok`,S.classList.toggle("full",!!l&&n>=l),r&&z.querySelector(`[data-id="${r}"]`)?.classList.add("new"),z.querySelector(".caret")?.scrollIntoView({block:"nearest"})}function Y(){_(),h.hidden=!0}function Ga(r){if(k)return;if(l&&V(o)>=l){p("wrong"),I("warn",`Bu görevde en fazla <b>${l} blok</b> kullanabilirsin. ${a.tools.includes("loop")?"🔁 Tekrarla bloğu ile kısaltmayı dene!":""}`),S.classList.remove("shake"),S.offsetWidth,S.classList.add("shake");return}if(r==="loop"&&d.list!==o){p("wrong"),I("warn","Döngünün içine bir döngü daha koymayalım. Önce “döngü sonu” yazısına tıkla.");return}let n=r==="loop"?{id:C(),c:r,n:a.loopN||3,body:[]}:{id:C(),c:r};d.list.splice(d.i,0,n),d=r==="loop"?{list:n.body,i:0}:{list:d.list,i:d.i+1},p("add"),Y(),N(n.id)}function Aa(r){let n=E(r);n.list.splice(n.i,1),d={list:n.list,i:n.i},p("del"),Y(),N()}e.querySelector(".tools").addEventListener("click",r=>{let n=r.target.closest(".tool");n&&Ga(n.dataset.c)}),z.addEventListener("click",r=>{if(k)return;let n=r.target,m=n.closest(".del");if(m)return Aa(+m.closest(".blk").dataset.id);if(n.closest("select"))return;let g=n.closest(".lfoot"),b=n.closest(".blk:not(.loop)"),K=n.closest(".lhead")?n.closest(".loop").dataset.id:n.closest(".lbody")?.dataset.in;if(g){let w=E(+g.dataset.after);d={list:w.list,i:w.i+1}}else if(b){let w=E(+b.dataset.id);d={list:w.list,i:w.i+1}}else if(K){let w=E(+K);d={list:w.b.body,i:w.b.body.length}}else d={list:o,i:o.length};p("click"),N()}),z.addEventListener("change",r=>{r.target.tagName==="SELECT"&&(E(+r.target.closest(".loop").dataset.id).b.n=+r.target.value,Y())}),y(".reset").onclick=()=>{Y(),p("click")},y(".clear").onclick=()=>{o=a.preset?ra(a.preset):[],d={list:o,i:o.length},p("del"),Y(),N()};function ea(r){if(e.querySelectorAll(".blk.now").forEach(n=>n.classList.remove("now")),e.querySelectorAll(".iter").forEach(n=>{n.textContent=""}),!!r&&(r.id&&e.querySelector(`.blk[data-id="${r.id}"]`)?.classList.add("now"),r.loop)){let n=e.querySelector(`.loop[data-id="${r.loop}"]`);n&&(n.querySelector(".iter").textContent=`(${r.iter}. tur)`)}}async function Da(){if(k){_();return}_(),h.hidden=!0;let{ev:r,result:n}=Fa(t,s,o),m=++c;aa(!0);let g=$.fast?280:560;P.style.setProperty("--dur",g*.8+"ms"),await Z(150);for(let b of r){if(m!==c)return;if(ea(b),b.t==="turn")W(b),p("turn");else if(b.t==="move"){let K=document.createElement("i");K.style.cssText=`--x:${u.style.getPropertyValue("--x")};--y:${u.style.getPropertyValue("--y")}`,ca.appendChild(K),W(b),u.classList.remove("walk"),u.offsetWidth,u.classList.add("walk"),p("step"),b.star&&setTimeout(()=>{e.querySelector(`.star[data-k="${b.star}"]`)?.classList.add("got"),p("star")},g*.6)}else b.t==="bump"?(u.style.setProperty("--bx",b.bx),u.style.setProperty("--by",b.by),u.classList.add("bump"),p("bump")):b.t==="fall"&&(W(b),setTimeout(()=>{u.classList.add("fall"),p("splash")},g*.6),await Z(g*.6));await Z(b.t==="win"?0:g)}if(m===c)if(ea(null),aa(!1),n==="win"){u.classList.add("happy"),y(".goal").classList.add("win"),p("win"),T();let b=V(o);I("ok",`<b>${a.win||wa[Math.floor(Math.random()*wa.length)]}</b><br>${b} blokla çözdün. Aşağıdaki <b>Devam ▶</b> düğmesine basabilirsin.`),i()}else{D++,u.classList.add("sad"),(n==="empty"||n==="nogoal"||n==="nostars")&&p("wrong");let b=a.hint&&D>=2?`<div class="hint">💡 <b>İpucu:</b> ${a.hint}</div>`:"";I("bad",`${Ua[n]}<br><small>Programını düzelt ve tekrar ▶ Çalıştır'a bas. ↺ Başa al ile Robo başlangıca döner.</small>${b}`)}}return da.onclick=Da,N(),()=>{c++,ba.disconnect()}}var J,Wa,Ua,wa,Ba=O(()=>{Sa();j();J={F:{label:"İleri git",icon:"⬆",cls:"c-f"},B:{label:"Geri git",icon:"⬇",cls:"c-b"},L:{label:"Sola dön",icon:"↰",cls:"c-l"},R:{label:"Sağa dön",icon:"↱",cls:"c-r"},loop:{label:"Tekrarla",icon:"🔁",cls:"c-loop"}},Wa='<svg viewBox="0 0 40 48" aria-hidden="true"><rect x="14" y="2" width="12" height="6" rx="2" fill="#2d6a3e"/><rect x="5" y="7" width="30" height="39" rx="7" fill="#2fbf71" stroke="#1d7a47" stroke-width="3"/><path d="M23 13 L13 29 H20 L17 41 L28 24 H21 Z" fill="#ffe14d" stroke="#c99a00" stroke-width="1.5" stroke-linejoin="round"/></svg>',Ua={empty:"Programın boş! Önce komutlara tıklayarak bir program yaz. 👈",tree:"Aaa! Önümde ağaç var 🌳 Oradan geçemem.",edge:"Dur! Orada yol yok, haritanın dışına çıkamam.",water:"Şıpırtı! Suya düştüm 💦 Robotlar yüzemez!",nostars:"Pile geldim ama bütün yıldızları toplamadım ⭐",nogoal:"Komutlar bitti ama pile ulaşamadım 🔋"},wa=["Harika! Robo pile ulaştı! 🎉","Süpersin! Algoritman çalıştı! 🌟","Bravo! Tam bir programcı gibi! 🤖","Mükemmel! Robo'nun pili doldu! 🔋"]});var Xa=Pa(()=>{ma();ha();Ba();j();var A=e=>document.querySelector(e),na=A("#map"),F=A("#lesson"),la=A("#crumb"),X="robo-ilerleme",R=U(X,{}),G=e=>R[e]||(R[e]={steps:{},done:!1}),Qa={story:ka,order:ya,quiz:ga,grid:Ra},ia=null;function sa(e){document.body.dataset.view=e,na.hidden=e!=="map",F.hidden=e==="map"}function Ta(){ia?.(),ia=null;let e=/^#b(\d+)(?:\/(\d+|son))?$/.exec(location.hash),a=e&&L.find(i=>i.no===+e[1]);a?e[2]==="son"?Ja(a):Za(a,Math.min(+(e[2]||0),a.steps.length-1)):La(),window.scrollTo(0,0),na.scrollTop=F.scrollTop=0}function La(){sa("map"),la.textContent="",F.innerHTML="";let e=L.find(t=>!G(t.no).done)||L[0],a=L.some(t=>Object.keys(G(t.no).steps).length),i=L.map(t=>{let s=G(t.no),l=Object.keys(s.steps).length;return`<li class="node${s.done?" done":""}" style="--c:${t.color}"><a href="#b${t.no}">
+  <span class="nnum">${s.done?"✓":t.no}</span>
+  <span class="ncard"><span class="nicon">${t.icon}</span><span class="ntxt"><b>${t.no}. ${t.title}</b><small>${t.desc}</small>
+  <span class="nfoot"><span class="chip">Kavram: ${t.concept}</span><span class="nprog"><i style="width:${l/t.steps.length*100}%"></i></span><span class="ncount">${l}/${t.steps.length}</span></span></span></span>
+</a></li>`}).join("");na.innerHTML=`<div class="mwrap">
+<section class="hero">
+  <div class="sbot wave">${B()}</div>
+  <div class="htxt">
+    <h1>Robo ile Kodlama Macerası</h1>
+    <p>Robo bir robot ama kendi kendine düşünemiyor! Ona <b>adım adım komut</b> vererek pile ulaşmasına yardım et. Bilgisayarda kodlamaya (Scratch'e) başlamadan önce algoritmanın sırlarını öğren.</p>
+    <a class="btn primary big" href="#b${e.no}">${a?"Kaldığın yerden devam et":"Maceraya başla"} ▶</a>
+  </div>
+</section>
+<ol class="trail">${i}
+  <li class="node soon"><span class="nnum">🔒</span><span class="ncard"><span class="nicon">🚧</span><span class="ntxt"><b>6. Bölüm yakında</b><small>Sırada: “Eğer… ise” koşulları ve daha büyük maceralar!</small></span></span></li>
+</ol>
+<section class="tnote">
+  <h3>👩‍🏫 Öğretmen için</h3>
+  <p>Bölümler 8–12 yaş için sırayla tasarlandı: <b>sıralama → yön → dönüş → hata ayıklama → döngü</b>. Her bölüm yaklaşık bir ders saati sürer. Önerilen akış: 5–10 dk bilgisayarsız sınıf oyunu (her bölümün sonunda öneri var), 25 dk ekranda görevler, 5 dk paylaşım.</p>
+  <p>Adımlar arasında üstteki numaralı düğmelerle serbestçe geçebilirsiniz. İlerleme yalnızca bu tarayıcıda saklanır. <button type="button" class="link" id="resetAll">İlerlemeyi sıfırla</button></p>
+</section></div>`,A("#resetAll").onclick=()=>{if(confirm("Tüm bölümlerdeki ilerleme silinsin mi?")){for(let t of Object.keys(R))delete R[t];H(X,R),La()}}}function Ma(e,a){let i=G(e.no),t=e.steps.map((s,l)=>`<a class="dot${l===a?" cur":""}${i.steps[l]?" ok":""}" href="#b${e.no}/${l}" title="${l+1}. adım">${l+1}</a>`).join("");return`<div class="lbar"><span class="ltag">${e.icon} ${e.no}. Bölüm</span><h2>${e.title}</h2><nav class="dots" aria-label="Adımlar">${t}<a class="dot fin${a==="son"?" cur":""}${i.done?" ok":""}" href="#b${e.no}/son" title="Bitiş">🏁</a></nav></div>`}function Za(e,a){sa("lesson"),la.textContent=`${e.no}. Bölüm`;let i=G(e.no),t=e.steps[a];F.innerHTML=`<div class="lwrap" style="--c:${e.color}">${Ma(e,a)}
+  <div class="stage s-${t.type}"></div>
+  <nav class="lnav"><a class="btn" href="${a>0?`#b${e.no}/${a-1}`:"#"}">◀ ${a>0?"Geri":"Harita"}</a><span class="nhint"></span><button type="button" class="primary big go" aria-disabled="true">${a+1<e.steps.length?"Devam ▶":"Bitir 🏁"}</button></nav></div>`;let s=F.querySelector(".go"),l=F.querySelector(".nhint"),o=!1,d=()=>{o||(o=!0,i.steps[a]||(i.steps[a]=!0,H(X,R)),s.setAttribute("aria-disabled","false"),s.classList.add("ready"),l.textContent="",F.querySelector(".dot.cur")?.classList.add("ok"))};s.onclick=()=>{if(!o){p("wrong"),l.textContent=t.type==="grid"?"Önce Robo'yu pile ulaştır 🔋":"Önce bu görevi tamamla 🙂",s.classList.remove("shake"),s.offsetWidth,s.classList.add("shake");return}p("click"),location.hash=a+1<e.steps.length?`#b${e.no}/${a+1}`:`#b${e.no}/son`},i.steps[a]&&d(),ia=Qa[t.type](F.querySelector(".stage"),t,d)||null}function Ja(e){sa("lesson"),la.textContent=`${e.no}. Bölüm`;let a=G(e.no);a.done=!0,H(X,R);let i=L.find(t=>t.no===e.no+1);F.innerHTML=`<div class="lwrap" style="--c:${e.color}">${Ma(e,"son")}
+  <div class="stage finish">
+    <div class="sbot dance">${B()}</div>
+    <div class="badge"><span>${e.icon}</span><b>${e.no}. Bölüm tamam!</b></div>
+    <h3>Tebrikler, harika bir programcısın! 🎉</h3>
+    <div class="learned"><h4>Bu bölümde öğrendiklerin</h4><ul>${e.learned.map(t=>`<li>${t}</li>`).join("")}</ul></div>
+    <div class="tnote"><h4>👩‍🏫 Sınıfta oynayın</h4><p>${e.teacher}</p></div>
+    <div class="fbtns">${i?`<a class="btn primary big" href="#b${i.no}">${i.icon} ${i.no}. Bölüm: ${i.title} ▶</a>`:'<span class="soon-txt">🚧 6. bölüm çok yakında!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
+  </div></div>`,p("win"),T(110)}var qa=A("#soundBtn"),Ea=A("#speedBtn"),oa=()=>{qa.textContent=$.sound?"🔊 Ses açık":"🔇 Ses kapalı",Ea.textContent=$.fast?"🐇 Hızlı":"🐢 Yavaş"};qa.onclick=()=>{$.sound=!$.sound,H("robo-ses",$.sound),oa(),p("click")};Ea.onclick=()=>{$.fast=!$.fast,H("robo-hizli",$.fast),oa(),p("click")};oa();addEventListener("hashchange",Ta);Ta()});Xa();})();
+
+</script>
+</body>
+</html>
