@@ -115,8 +115,9 @@ const bd = (body) => `<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/s
 // Labirent duvarları: sahne koordinatında [x1, y1, x2, y2] (sol-alt, sağ-üst)
 const MAZE1 = [[-240, 170, 240, 180], [-240, -180, 240, -170], [-240, -180, -230, 180], [230, -180, 240, 180],
   [-160, -80, -150, 170], [-80, -170, -70, 90], [0, -80, 10, 170], [80, -170, 90, 90], [160, -80, 170, 170]];
+// Zikzak labirent: alttan başlar, sağdan-soldan sırayla yukarı çıkılır
 const MAZE2 = [[-240, 170, 240, 180], [-240, -180, 240, -170], [-240, -180, -230, 180], [230, -180, 240, 180],
-  [-170, 90, 120, 100], [-240, 20, -60, 30], [20, -60, 240, 30], [-130, -100, -120, 30], [-170, -100, 60, -90], [110, 30, 120, 100]];
+  [-240, -100, 160, -90], [-160, -10, 240, 0], [-240, 80, 160, 90]];
 const wallSVG = (walls, fill, stroke) => walls.map(([x1, y1, x2, y2]) => `<rect x="${x1 + 240}" y="${180 - y2}" width="${x2 - x1}" height="${y2 - y1}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`).join('');
 
 export const BACKDROPS = {

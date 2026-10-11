@@ -35,6 +35,7 @@ export function makeApi(w, progs) {
     uses: (op) => programUses(progs, op),
     flagged: () => w.log.flags > 0,
     touching: (a, b) => w.touching(w.sprite(a), b),
+    touched: (a, b) => w.log.touch.has(a + '>' + b) || w.touching(w.sprite(a), b),
     mem: w.mem,
     count: (op) => { let c = 0; const walk = (l) => l.forEach((b) => { if (b.op === op) c++; ['body', 'body2'].forEach((k) => b[k] && walk(b[k])); }); Object.values(progs).forEach((ss) => ss.forEach(walk)); return c; },
     hats: (op, n) => Object.entries(progs).filter(([k]) => !n || k === n).reduce((c, [, ss]) => c + ss.filter((s) => s[0]?.op === op && s.length > 1).length, 0),

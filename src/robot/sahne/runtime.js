@@ -23,7 +23,7 @@ export function createWorld(setup, progs, opt = {}) {
     mouse: { x: 0, y: 0, down: false },
     penLines: [],
     penOps: [],
-    log: { said: [], sounds: [], notes: [], bcasts: [], backdrops: [], keys: [], clicks: [], flags: 0 },
+    log: { touch: new Set(), said: [], sounds: [], notes: [], bcasts: [], backdrops: [], keys: [], clicks: [], flags: 0 },
     onSound: null,
     mem: {},
     onNote: null,
@@ -59,7 +59,13 @@ export function createWorld(setup, progs, opt = {}) {
   }
   w.setPos = setPos;
 
+  // Kod içinde sorulan her “dokunuyor mu?” cevabı evet ise kaydedilir (görev denetimi için)
   function touching(sp, o) {
+    const r = touching0(sp, o);
+    if (r) w.log.touch.add(sp.name + '>' + o);
+    return r;
+  }
+  function touching0(sp, o) {
     if (!sp.visible) return false;
     if (o === 'kenar') { const b = bbox(sp); return b.l <= -W || b.r >= W || b.b <= -H || b.t >= H; }
     if (o === 'duvar') { const b = bbox(sp, 0.8); return (BACKDROPS[w.backdrop].walls || []).some(([x1, y1, x2, y2]) => overlap(b, { l: x1, b: y1, r: x2, t: y2 })); }

@@ -151,7 +151,7 @@ export const b19 = {
       text: '<p>Fare ok tuşlarıyla hareket ediyor (hazır). Senin görevin: <b>eğer fare duvara dokunuyorsa</b> başlangıca (x: -200, y: -140) dönsün. Sonra fareyi labirentten geçirip peynire ulaştır!</p>',
       setup: { backdrop: 'labirent1', sprites: [sp('Peynir', 'peynir', 205, -140), sp('Fare', 'fare', -200, -140, { scripts: ARROWS })] },
       blocks: ['flag', 'forever', 'if', 'goto', 'sayFor', 'sound', 'key', 'chx', 'chy'], conds: ['touch'], condDefault: { k: 'touch', o: 'duvar' }, backdrops: ['labirent1'], edit: 'Fare',
-      goals: [{ t: 'Duvara değince başa dönsün', f: (a) => { if (a.touching('Fare', 'duvar')) a.mem.hit = 1; return a.mem.hit && near(a.sp('Fare'), -200, -140, 30); } }, { t: 'Peynire ulaş 🧀', f: (a) => a.touching('Fare', 'Peynir') }],
+      goals: [{ t: 'Duvara değince başa dönsün', f: (a) => { if (a.touched('Fare', 'duvar')) a.mem.hit = 1; return a.mem.hit && near(a.sp('Fare'), -200, -140, 30); } }, { t: 'Peynire ulaş 🧀', f: (a) => a.touching('Fare', 'Peynir') }],
       sol: { Fare: [...ARROWS, [['flag'], ['goto', -200, -140], ['forever', [['if', { k: 'touch', o: 'duvar' }, [['goto', -200, -140]]]]]]] },
       testTime: 30,
       play: [['hold', 'right', 0.2, 1.0], ['hold', 'up', 1.1, 3.9], ['hold', 'right', 4.0, 4.9], ['hold', 'down', 5.0, 7.8], ['hold', 'right', 7.9, 8.7], ['hold', 'up', 8.8, 11.6], ['hold', 'right', 11.7, 12.5], ['hold', 'down', 12.6, 15.4], ['hold', 'right', 15.5, 16.3], ['hold', 'up', 16.5, 20]] },

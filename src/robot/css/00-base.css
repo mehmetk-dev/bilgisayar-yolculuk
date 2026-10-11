@@ -209,3 +209,20 @@ button.link { background: none; border: 0; box-shadow: none; color: var(--acc); 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* sertifika */
+.certwrap { display: flex; flex-direction: column; align-items: center; gap: 0.7em; width: 100%; }
+.cnamebox { font-weight: 800; display: flex; gap: 0.5em; align-items: center; flex-wrap: wrap; justify-content: center; }
+.cname { font: inherit; font-weight: 700; border: 3px solid var(--line); border-radius: 12px; padding: 0.3em 0.7em; min-width: 14em; }
+.cert { position: relative; width: min(40em, 100%); background: #fffdf3; border: 10px double #d9a400; border-radius: 18px; padding: 1.4em 1.6em; text-align: center; box-shadow: 0 8px 24px #0002; }
+.cert-robo { width: 6em; margin: 0 auto; }
+.cert-robo .robo { width: 100%; }
+.cert-t { font-size: 1.7em; font-weight: 900; color: #a16207; }
+.cert-name { font-size: 2em; font-weight: 900; color: var(--acc); border-bottom: 3px dashed #d9a400; margin: 0.3em auto 0.5em; padding-bottom: 0.1em; max-width: 90%; }
+.cert-s { color: var(--mut); font-size: 0.9em; }
+@media print {
+  body * { visibility: hidden; }
+  .cert, .cert * { visibility: visible; }
+  .cert { position: fixed; left: 50%; top: 2cm; transform: translateX(-50%); width: 17cm; box-shadow: none; }
+  .robo * { animation: none !important; }
+}

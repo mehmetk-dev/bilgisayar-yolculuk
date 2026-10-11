@@ -59,7 +59,7 @@ function showMap() {
   <div class="sbot wave">${roboSVG()}</div>
   <div class="htxt">
     <h1>Robo ile Kodlama Macerası</h1>
-    <p>Robo bir robot ama kendi kendine düşünemiyor! Ona <b>adım adım komut</b> vererek pile ulaşmasına yardım et. Bilgisayarda kodlamaya (Scratch'e) başlamadan önce algoritmanın sırlarını öğren.</p>
+    <p>Önce Robo'ya <b>adım adım komut</b> vererek algoritmanın sırlarını öğren; sonra Scratch gibi renkli bloklarla kendi animasyonlarını ve oyunlarını yap! <b>7 hafta, 28 bölüm.</b></p>
     <a class="btn primary big" href="#b${next.no}">${started ? 'Kaldığın yerden devam et' : 'Maceraya başla'} ▶</a>
   </div>
 </section>
@@ -121,22 +121,48 @@ function showStep(L, i) {
 
 function showFinish(L) {
   show('lesson');
-  crumb.textContent = `${L.no}. Bölüm`;
+  crumb.textContent = `${L.week}. Hafta · ${L.no}. Bölüm`;
   const r = rec(L.no);
-  r.done = true;
-  save(KEY, progress);
+  // Bölüm ancak bütün adımları yapılınca “bitti” sayılır (öğretmen üstteki düğmelerle atlayabilir)
+  if (L.steps.every((_, k) => r.steps[k])) { r.done = true; save(KEY, progress); }
   const next = LESSONS.find((l) => l.no === L.no + 1);
   lesEl.innerHTML = `<div class="lwrap" style="--c:${L.color}">${lessonHead(L, 'son')}
   <div class="stage finish">
     <div class="sbot dance">${roboSVG()}</div>
     <div class="badge"><span>${L.icon}</span><b>${L.no}. Bölüm tamam!</b></div>
     <h3>Tebrikler, harika bir programcısın! 🎉</h3>
+    ${next ? '' : certHTML()}
     <div class="learned"><h4>Bu bölümde öğrendiklerin</h4><ul>${L.learned.map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="tnote"><h4>👩‍🏫 Sınıfta oynayın</h4><p>${L.teacher}</p></div>
     <div class="fbtns">${next ? `<a class="btn primary big" href="#b${next.no}">${next.icon} ${next.no}. Bölüm: ${next.title} ▶</a>` : '<span class="soon-txt">🏆 Bütün bölümleri bitirdin!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
   </div></div>`;
   play('win');
   confetti(110);
+  const nameIn = lesEl.querySelector('.cname');
+  if (nameIn) {
+    const paintName = () => { lesEl.querySelector('.cert-name').textContent = nameIn.value.trim() || '……………………'; save('robo-ad', nameIn.value); };
+    nameIn.oninput = paintName;
+    paintName();
+    lesEl.querySelector('.cprint').onclick = () => print();
+  }
+}
+
+// Son bölümün sonunda yazdırılabilir sertifika
+function certHTML() {
+  const total = LESSONS.reduce((n, l) => n + Object.values(rec(l.no).score).reduce((a, b) => a + b, 0), 0);
+  const done = LESSONS.filter((l) => rec(l.no).done).length;
+  const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+  return `<div class="certwrap">
+  <label class="cnamebox">Adın soyadın: <input class="cname" type="text" maxlength="40" value="${(load('robo-ad', '') || '').replace(/"/g, '&quot;')}" placeholder="Adını yaz"></label>
+  <div class="cert">
+    <div class="cert-robo">${roboSVG()}</div>
+    <div class="cert-t">🏅 Başarı Sertifikası</div>
+    <div class="cert-name"></div>
+    <p><b>Robo ile Kodlama</b> eğitiminin <b>${done}/${LESSONS.length}</b> bölümünü tamamlayarak algoritma, döngü, fonksiyon, koşul, değişken ve oyun tasarımını öğrenmiştir.</p>
+    <p class="cert-s">${total ? `Toplam ⭐ ${total} yıldız · ` : ''}${date}</p>
+  </div>
+  <button type="button" class="primary cprint">🖨 Sertifikayı yazdır</button>
+</div>`;
 }
 
 // Üst çubuk: ses ve hız
