@@ -9,6 +9,7 @@ import { setup } from './setup.js';
 import { photos, viewer, pdf, music } from './media.js';
 import { devmgr } from './devmgr.js';
 import { snip } from './snip.js';
+import { mail } from './mail.js';
 import { hedef, mayin, kartlar } from './games.js';
 import { esc } from './util.js';
 
@@ -37,6 +38,7 @@ export const APPS = {
   explorer: { name: 'Dosya Gezgini', icon: '📁', w: 0.8, h: 0.8, keywords: ['dosya', 'klasör', 'gezgin', 'belgeler'], create: explorer },
   paint: { name: 'Paint', icon: '🎨', w: 0.9, h: 0.9, keywords: ['resim', 'çizim', 'boya'], create: paint },
   settings: { name: 'Ayarlar', icon: '⚙', w: 0.86, h: 0.88, single: true, keywords: ['ayar', 'arka plan', 'wifi', 'wi-fi', 'ses', 'yazıcı', 'saat', 'ekran'], create: settings },
+  mail: { name: 'E-posta', icon: '✉', w: 0.86, h: 0.86, single: true, keywords: ['posta', 'e-posta', 'eposta', 'mail', 'mektup'], create: mail },
   browser: { name: 'İnternet', icon: '🌐', w: 0.9, h: 0.9, keywords: ['tarayıcı', 'internet', 'edge', 'chrome', 'web'], create: browser },
   photos: { name: 'Fotoğraflar', icon: '🖼', w: 0.66, h: 0.78, keywords: ['fotoğraf', 'resim'], create: photos },
   viewer: { name: 'Resim Gösterici', icon: '🌄', w: 0.66, h: 0.78, installable: true, keywords: ['resim', 'gösterici'], create: viewer },
@@ -50,4 +52,4 @@ export const APPS = {
   kartlar: { name: 'Kart Dizme', icon: '🃏', w: 0.8, h: 0.8, keywords: ['oyun', 'kart', 'solitaire'], create: kartlar },
 };
 
-export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer'];
+export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer'];

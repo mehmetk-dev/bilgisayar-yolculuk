@@ -34,7 +34,7 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 #top { display: flex; align-items: center; gap: 0.6em; padding: 0.45em 1em; background: #fff; border-bottom: 1px solid var(--line); flex-wrap: wrap; flex: none; }
 .brand { font-weight: 800; font-size: 1.15em; color: var(--fg); text-decoration: none; white-space: nowrap; }
 .brand span { color: var(--acc); }
-#crumb { color: var(--mut); font-weight: 600; }
+#crumb { color: var(--mut); font-weight: 600; flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #crumb:not(:empty)::before { content: "›"; margin-right: 0.5em; }
 .sp { flex: 1; }
 #top button, #top .btn { font-size: 0.8em; padding: 0.25em 0.6em; }
@@ -220,3 +220,9 @@ body:not(.with-kb) .under { display: none; }
 .oz-t td.part { background: var(--warn-bg); color: var(--warn); }
 .oz-t small { display: block; font-size: 0.85em; opacity: 0.85; }
 .oz-btns { display: flex; gap: 0.6em; flex-wrap: wrap; }
+
+/* dar ekranda üst çubuk kısa kalsın: Robo ve 3B bağlantıları ana sayfada büyük kart olarak da var */
+@media (max-width: 640px) {
+  #top a[href="robot.html"], #top a[href="bilgisayar.html"] { display: none; }
+  #crumb { flex-basis: 100%; order: 9; }
+}

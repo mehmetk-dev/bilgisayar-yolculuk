@@ -101,6 +101,7 @@ export class Desktop {
     this.dialogs.closeAll();
     for (const w of [...this.wins]) this.destroy(w);
     this.fs.reset();
+    this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;

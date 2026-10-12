@@ -33,7 +33,7 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 
 Bilgisayarı yeni öğrenen yetişkinler için adım adım alıştırmalar. Sitenin ana sayfasıdır; buradaki **🖥 Bilgisayarı canlı gör** bağlantısı 3B bilgisayarı açar, oradaki **📝 Derslere dön** düğmesi geri getirir. Her adımda ne yapılacağı yazar; sayfa öğrencinin yaptığını algılar ve doğru yapınca bir sonraki adıma geçirir.
 
-Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
+Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, E-posta, Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
 
 | Hafta | Dersler (her hafta 8) |
 |---|---|
@@ -45,6 +45,7 @@ Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vard
 | 6 | Dosya Gezgini ve USB bellek · Dosya türleri ve uzantılar · Klasör içinde klasör · Fotoğraflarla çalışmak · Geri Dönüşüm Kutusu · Dağınık klasörü toparlama (süreli) · Ne yapardınız? Dosya durumları · Test |
 | 7 | Paint · Paint ile ev çizimi · Paint ile tebrik kartı · Ekran Alıntısı · Ekran alıntısıyla yardım istemek · Ayarlar · Ayarlar parkuru (süreli) · Test |
 | 8 | İnternette gezinme ve indirme · İnternette bilgi bulmak (okuyup soru cevaplama) · İnternetteki tuzaklar · Program kurma/kaldırma · Yazıcı ve sürücüler · İşletim sistemi kurulumu (gösterim) · İnternet parkuru (süreli) · Test |
+| 9 | E-posta: posta okuma, ek indirme, yanıtlama, fotoğraf ekleyip gönderme, adres yazımı, sahte (dolandırıcılık) postası |
 | Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre · Yazma hızı ölçümü: dakikada kelime ve hata; her ölçüm öğrencinin profilinde saklanır, haftadan haftaya karşılaştırılır |
 
 Eğitmen için:
