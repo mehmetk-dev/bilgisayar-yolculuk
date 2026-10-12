@@ -34,7 +34,7 @@ export const onparmak = {
     yaz({ title: 'G ve H', html: '<p>İşaret parmakları bir yana da uzanır: sol işaret parmağı <b>G</b>\'ye, sağ işaret parmağı <b>H</b>\'ye. Yazın:</p>', target: 'hala dağ sakal kafa', keys: [...HOME, 'KeyG', 'KeyH', 'BracketLeft'], hint: 'Ğ, P\'nin sağındaki tuştur; sağ serçe parmakla basılır.', done: 'Güzel.' }),
     yaz({ title: 'Üst sıraya uzanmak', html: '<p>Parmaklar yukarı da uzanır, sonra yine temel sıraya döner. Sol orta parmak <b>E</b>\'ye, sağ işaret parmağı <b>U</b>\'ya, sağ orta parmak <b>I</b>\'ya gider. Yazın:</p>', target: 'ders eski kule sulu', keys: [...HOME, 'KeyE', 'KeyR', 'KeyU', 'KeyI'], done: 'Her uzanıştan sonra parmaklar temel sıraya döner.' }),
     yaz({ title: 'Bir cümle', html: '<p>Son olarak büyük harfle başlayan ve noktayla biten bir cümle yazın:</p>', target: 'Ali dalda elma aldı.', must: ['Ali', 'dalda', 'elma', 'aldı', '.'], hint: 'Büyük A için sağ elinizle Shift\'i tutun, sol serçe parmakla A\'ya basın. Noktasız ı, O\'nun solundaki tuştur.', done: 'Harika! Her gün birkaç dakika bu satırları yazmak parmaklarınızı hızlandırır.' }),
-    { final: true, title: 'Tebrikler! 🎉', html: '<p>Parmaklarınızın yerini öğrendiniz:</p>' },
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Parmaklarınızın yerini öğrendiniz. Hızınızı görmek isterseniz: <a href="#ders/hiz">⏱ Yazma hızı ölçümü</a> (her hafta tekrar edebilirsiniz).</p>' },
   ],
 };
 

@@ -89,7 +89,11 @@ function showHome() {
     const sc = l.test && testScore(l);
     let status = `<span class="tag">⏱ ~${l.minutes} dk · ${sc ? `${sc.total} soru` : `${total} adım`}</span>`;
     let btn = `<a class="btn primary" href="#ders/${l.id}">Başla ▶</a>`;
-    if (p?.done) {
+    const last = store.logs?.[l.id]?.at(-1);
+    if (last?.wpm != null) {
+      status = `<span class="tag ok">⌨ Son ölçüm: ${last.wpm} kelime/dk</span>`;
+      btn = `<a class="btn" href="#ders/${l.id}" data-restart="${l.id}">↻ Yeniden ölç</a>`;
+    } else if (p?.done) {
       status = `<span class="tag ok">✔ ${sc ? `Puan: ${sc.right} / ${sc.total}` : 'Tamamlandı'}</span>`;
       btn = `<a class="btn" href="#ders/${l.id}" data-restart="${l.id}">↻ Tekrar yap</a>`;
     } else if (p?.step > 0) {
@@ -152,7 +156,13 @@ function startAt(p) {
 // Adımların kullandığı ortak bağlam: ders boyunca aynı kalır (L: derse özel veriler)
 let base = null;
 function ctxBase() {
-  if (!base || base.lesson !== lesson) base = { lesson, L: {}, np, kb, get d() { return desk; } };
+  if (!base || base.lesson !== lesson) {
+    const id = lesson.id;
+    // log: ders tekrarlansa da silinmeyen ölçüm geçmişi (ör. yazma hızı), öğrencinin profilinde saklanır
+    base = { lesson, L: {}, np, kb, get d() { return desk; },
+      get logs() { return store.logs?.[id] || []; },
+      log: (entry) => { ((store.logs ||= {})[id] ||= []).push({ at: Date.now(), ...entry }); persist(); } };
+  }
   return base;
 }
 

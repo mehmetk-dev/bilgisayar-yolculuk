@@ -7,6 +7,7 @@ import { masaustu, dosyalar } from './hafta5_6.js';
 import { paint, alinti, ayarlar } from './hafta7.js';
 import { internet, kurulum, yazici, oskurulum } from './hafta8.js';
 import { guvenlik } from './guvenlik.js';
+import { hiz } from './hiz.js';
 import { eslestir, tusavi, kart, liste, ilanOku, masaustuParkur, dosyaParkur } from './alistirmalar.js';
 import { test1, test2, test3, test4, test5, test6, test7, test8 } from './testler.js';
 import { onparmak, rakamlar, isaretler, klavyeOyun } from './hafta2_ek.js';
@@ -32,7 +33,7 @@ export const WEEKS = [
   { no: 6, title: 'Dosyalar ve klasörler', lessons: [dosyalar, dosyaTurleri, klasorAgaci, fotograflar, copKutusu, dosyaParkur, dosyaSenaryo, test6] },
   { no: 7, title: 'Paint, Ekran Alıntısı ve Ayarlar', lessons: [paint, evCiz, tebrikKarti, alinti, alintiPratik, ayarlar, ayarlarParkur, test7] },
   { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, aramaPratik, tuzaklar, kurulum, yazici, oskurulum, internetParkur, test8] },
-  { no: 0, title: 'İnternette güvenlik', lessons: [guvenlik] },
+  { no: 0, title: 'İnternette güvenlik ve yazma hızı', lessons: [guvenlik, hiz] },
 ];
 
 export const LESSONS = WEEKS.flatMap((w) => w.lessons);

@@ -45,7 +45,7 @@ Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vard
 | 6 | Dosya Gezgini ve USB bellek · Dosya türleri ve uzantılar · Klasör içinde klasör · Fotoğraflarla çalışmak · Geri Dönüşüm Kutusu · Dağınık klasörü toparlama (süreli) · Ne yapardınız? Dosya durumları · Test |
 | 7 | Paint · Paint ile ev çizimi · Paint ile tebrik kartı · Ekran Alıntısı · Ekran alıntısıyla yardım istemek · Ayarlar · Ayarlar parkuru (süreli) · Test |
 | 8 | İnternette gezinme ve indirme · İnternette bilgi bulmak (okuyup soru cevaplama) · İnternetteki tuzaklar · Program kurma/kaldırma · Yazıcı ve sürücüler · İşletim sistemi kurulumu (gösterim) · İnternet parkuru (süreli) · Test |
-| Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre |
+| Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre · Yazma hızı ölçümü: dakikada kelime ve hata; her ölçüm öğrencinin profilinde saklanır, haftadan haftaya karşılaştırılır |
 
 Eğitmen için:
 - Ekrandaki klavye basılan tuşu ve adımın istediği tuşları yakar. **Pano** kutusu kopyalanan yazıyı gösterir.
