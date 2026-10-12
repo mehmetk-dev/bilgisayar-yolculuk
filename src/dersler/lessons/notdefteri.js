@@ -38,7 +38,8 @@ export const notdefteri = {
         <div class="box"><b>Gerçek bilgisayarda nasıl açılır?</b><ol>
           <li>Klavyedeki ${K('⊞ Windows')} tuşuna basın.</li>
           <li><b>not defteri</b> yazın.</li>
-          <li>${K('Enter')} tuşuna basın.</li></ol></div>`,
+          <li>${K('Enter')} tuşuna basın.</li></ol></div>
+        <p class="mut">Bu sayfadayken ⊞ Windows tuşuna basarsanız bilgisayarın gerçek Başlat menüsü açılır; ${K('Esc')} ile kapatıp derse dönebilirsiniz.</p>`,
       keys: ['Meta'],
     },
     {

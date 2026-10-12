@@ -46,7 +46,7 @@ export const secme = {
       title: 'Shift + End',
       html: `<p>İmleci 3. satırın başına (<b>Akşam</b>'ın önüne) koyun ve ${K('Shift', 'End')} tuşlarına basın. Satırın sonuna kadar seçilir.</p>`,
       combo: ['Shift', 'End'],
-      hint: `Satırın başına gitmek için ${K('Home')} tuşu da kullanılabilir.`,
+      hint: `Satırın başına gitmek için ${K('Home')} tuşu da kullanılabilir. Dizüstü bilgisayarda End yoksa ${K('Shift', 'Fn', '→')} deneyin.`,
       on: (ev) => ev.type === 'select' && ev.text.trim() === 'Akşam torunlar geldi.',
       done: `Tersi de olur: satırın sonundayken ${K('Shift', 'Home')} başına kadar seçer.`,
     },

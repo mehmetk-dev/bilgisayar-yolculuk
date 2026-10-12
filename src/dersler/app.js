@@ -223,7 +223,9 @@ function showStep(i, resumed = false) {
   if (!info && lesson.stage === 'notepad') np.focus();
   if (lesson.stage === 'desktop' && desk) setTimeout(() => desk.refocus(), 80);
   // Koşul zaten sağlanmışsa (ör. pencere zaten açık) adım hemen tamamlansın
-  if (step.check) setTimeout(() => { if (!done && step === lesson?.steps[idx] && step.check(ctx)) complete(); }, 60);
+  // Bu arada başka adıma geçildiyse (ör. hızlı çift tıklama) eski adımın koşuluna bakılmaz
+  const s = step;
+  if (s.check) setTimeout(() => { if (!done && s === step && s === lesson?.steps[idx] && s.check(ctx)) complete(); }, 60);
 }
 
 function complete() {
