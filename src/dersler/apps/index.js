@@ -11,6 +11,7 @@ import { devmgr } from './devmgr.js';
 import { snip } from './snip.js';
 import { mail } from './mail.js';
 import { word } from './word.js';
+import { sheet } from './sheet.js';
 import { hedef, mayin, kartlar } from './games.js';
 import { esc } from './util.js';
 
@@ -40,6 +41,7 @@ export const APPS = {
   paint: { name: 'Paint', icon: '🎨', w: 0.9, h: 0.9, keywords: ['resim', 'çizim', 'boya'], create: paint },
   settings: { name: 'Ayarlar', icon: '⚙', w: 0.86, h: 0.88, single: true, keywords: ['ayar', 'arka plan', 'wifi', 'wi-fi', 'ses', 'yazıcı', 'saat', 'ekran'], create: settings },
   word: { name: 'Kelime İşlemci', icon: '📘', w: 0.9, h: 0.92, keywords: ['word', 'kelime', 'belge', 'yazı', 'dilekçe', 'mektup'], create: word },
+  sheet: { name: 'Hesap Tablosu', icon: '📗', w: 0.9, h: 0.92, keywords: ['excel', 'hesap', 'tablo', 'bütçe', 'çizelge'], create: sheet },
   mail: { name: 'E-posta', icon: '✉', w: 0.86, h: 0.86, single: true, keywords: ['posta', 'e-posta', 'eposta', 'mail', 'mektup'], create: mail },
   browser: { name: 'İnternet', icon: '🌐', w: 0.9, h: 0.9, keywords: ['tarayıcı', 'internet', 'edge', 'chrome', 'web'], create: browser },
   photos: { name: 'Fotoğraflar', icon: '🖼', w: 0.66, h: 0.78, keywords: ['fotoğraf', 'resim'], create: photos },
@@ -54,4 +56,4 @@ export const APPS = {
   kartlar: { name: 'Kart Dizme', icon: '🃏', w: 0.8, h: 0.8, keywords: ['oyun', 'kart', 'solitaire'], create: kartlar },
 };
 
-export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer'];
+export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer'];

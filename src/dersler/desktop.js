@@ -453,6 +453,7 @@ export class Desktop {
     const name = n.name.toLowerCase();
     if (name.endsWith('.txt')) return this.open('notepad', { node: n.id });
     if (name.endsWith('.docx')) return this.open('word', { node: n.id });
+    if (name.endsWith('.xlsx')) return this.open('sheet', { node: n.id });
     if (/\.(jpe?g|png|bmp)$/.test(name)) return this.open(this.settings.installed.includes('viewer') ? 'viewer' : 'photos', { node: n.id });
     if (name.endsWith('.exe')) return this.runSetup(n);
     if (name.endsWith('.pdf')) return this.open('pdf', { node: n.id });

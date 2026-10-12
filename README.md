@@ -33,12 +33,12 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 
 Bilgisayarı yeni öğrenen yetişkinler için adım adım alıştırmalar. Sitenin ana sayfasıdır; buradaki **🖥 Bilgisayarı canlı gör** bağlantısı 3B bilgisayarı açar, oradaki **📝 Derslere dön** düğmesi geri getirir. Her adımda ne yapılacağı yazar; sayfa öğrencinin yaptığını algılar ve doğru yapınca bir sonraki adıma geçirir.
 
-Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, E-posta, Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
+Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, E-posta, Kelime İşlemci (.docx), Hesap Tablosu (.xlsx), Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
 
-| Hafta | Dersler (her hafta 8) |
+| Hafta | Dersler |
 |---|---|
 | 1 | Açma-kapama · Fareyi tutma ve tek tık · Çift tık, sağ tık, tekerlek · Sürükle-bırak · Pencereler · Fare parkuru · Eşleştirme oyunları · Test |
-| 2 | Klavyeyi tanıyalım · On parmak: temel sıra · Rakamlar ve sayılar (tarih, saat, para, Num Lock) · İşaretler ( ) / = " # € · Tuş avı (ipucusuz) · Bayram kartı ve hata avı · Klavye eşleştirme oyunu · Test |
+| 2 | Klavyeyi tanıyalım · Harf bulma alıştırması (tuşların yerini yeni öğrenenler için; zorlanılan harfler tekrar sorulur) · On parmak: temel sıra · Rakamlar ve sayılar (tarih, saat, para, Num Lock) · İşaretler ( ) / = " # € · Tuş avı (ipucusuz) · Bayram kartı ve hata avı · Klavye eşleştirme oyunu · Test |
 | 3 | Not Defteri ve kısayollar · Seçmenin incelikleri (Shift + ok/End, üç tık, Ctrl + ok) · Kaydetme, farklı kaydetme ve açma · Alışveriş listesi · Tarifi düzene sokun · Kısayol yarışı (süreli) · Kısayol eşleştirme · Test |
 | 4 | 3B uygulama · Donanım mı, yazılım mı? · Kasanın içi: parçalar · Portlar ve kablolar · Bilgisayar ilanı okuma · Bakım ve sağlıklı kullanım · Sorun giderme: ilk kontroller · Test |
 | 5 | Masaüstü, Başlat ve görev çubuğu · Başlat menüsünü keşif · Masaüstünü düzenleme · Hesap Makinesi ile günlük hesaplar · Oyunlarla pratik (Mayın Tarlası, Kart Dizme) · Masaüstü parkuru (süreli) · Masaüstü haritası · Test |
@@ -46,6 +46,8 @@ Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vard
 | 7 | Paint · Paint ile ev çizimi · Paint ile tebrik kartı · Ekran Alıntısı · Ekran alıntısıyla yardım istemek · Ayarlar · Ayarlar parkuru (süreli) · Test |
 | 8 | İnternette gezinme ve indirme · İnternette bilgi bulmak (okuyup soru cevaplama) · İnternetteki tuzaklar · Program kurma/kaldırma · Yazıcı ve sürücüler · İşletim sistemi kurulumu (gösterim) · İnternet parkuru (süreli) · Test |
 | 9 | E-posta: posta okuma, ek indirme, yanıtlama, fotoğraf ekleyip gönderme, adres yazımı, sahte (dolandırıcılık) postası |
+| 10 | Kelime işlemci (Word benzeri): dilekçe yazma, kalın, ortalama, yazı boyutu, iki yana yaslama, tarih, kaydetme, yazdırma · Liste, tablo (Tab ile hücreler), yazı rengi, resim, PDF olarak kaydetme |
+| 11 | Hesap tablosu (Excel benzeri): hücre adresi, veri girişi, ∑ Otomatik Toplam, TOPLA, ORTALAMA, dört işlem · Kalın ve ₺ biçimi, durum çubuğu, sıralama, sütun grafiği, yazdırma |
 | Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre · Yazma hızı ölçümü: dakikada kelime ve hata; her ölçüm öğrencinin profilinde saklanır, haftadan haftaya karşılaştırılır |
 
 Eğitmen için:

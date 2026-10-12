@@ -422,3 +422,42 @@
 .wd-t { border-collapse: collapse; width: 100%; margin: 0.3em 0; }
 .wd-t td { border: 1px solid #888; padding: 0.25em 0.5em; min-width: 2em; height: 1.6em; }
 .wd-status { display: flex; justify-content: space-between; padding: 0.2em 0.7em; background: #1f5fbf; color: #fff; font-size: 0.8em; }
+
+/* Hesap Tablosu */
+.xl { background: #fff; }
+.xl-tabs { display: flex; gap: 0.2em; align-items: flex-end; background: #1e7145; padding: 0.3em 0.5em 0; }
+.xl-tabs button, .xl-tabs span { border: 0 !important; border-radius: 6px 6px 0 0 !important; padding: 0.3em 0.9em !important; font-size: 0.9em; }
+.xl-tabs .xl-file { background: #165a37; color: #fff; font-weight: 700; }
+.xl-tabs span { background: #f3f3f3; color: #1e5b3a; font-weight: 700; }
+.xl-rib { display: flex; flex-wrap: wrap; gap: 0.25em; align-items: center; padding: 0.35em 0.5em; background: #f3f3f3; border-bottom: 1px solid #d6d6d6; }
+.xl-rib button { height: 1.9em; padding: 0 0.55em !important; border: 1px solid transparent !important; background: none; border-radius: 4px !important; font-size: 0.88em; }
+.xl-rib button:hover { background: #dcefe3; border-color: #a9d3b7 !important; }
+.xl-sep { width: 1px; height: 1.5em; background: #d0d0d0; margin: 0 0.2em; }
+.xl-menu { position: absolute; top: 2.1em; left: 0.5em; z-index: 6; background: #fff; border: 1px solid #c8c8c8; border-radius: 8px; box-shadow: 0 8px 20px #0003; padding: 0.3em; display: flex; flex-direction: column; min-width: 14em; }
+.xl-menu button { border: 0 !important; background: none; justify-content: flex-start; padding: 0.4em 0.7em !important; }
+.xl-menu button:hover { background: #e6f2ea; }
+.xl-menu small { margin-left: auto; color: #777; }
+.xl-bar { display: flex; align-items: center; gap: 0.4em; padding: 0.25em 0.5em; border-bottom: 1px solid #d6d6d6; }
+.xl-name { width: 4.5em; font: inherit; font-size: 0.9em; text-align: center; border: 1px solid #c8c8c8; padding: 0.15em; }
+.xl-fx { font-style: italic; color: #666; font-family: Georgia, serif; }
+.xl-formula { flex: 1; font: inherit; font-size: 0.9em; border: 1px solid #c8c8c8; padding: 0.15em 0.4em; outline: none; min-width: 0; }
+.xl-formula:focus { border-color: #1e7145; }
+.xl-wrap { flex: 1; overflow: auto; position: relative; outline: none; min-height: 0; }
+.xl-grid { border-collapse: collapse; font-size: 0.85em; user-select: none; table-layout: fixed; }
+.xl-grid th { background: #f0f0f0; color: #444; font-weight: 400; border: 1px solid #d4d4d4; position: sticky; top: 0; z-index: 2; }
+.xl-grid thead th { height: 1.6em; }
+.xl-grid tbody th { left: 0; width: 2.6em; z-index: 1; }
+.xl-grid th.hl { background: #d3e8da; color: #1e5b3a; font-weight: 700; }
+.xl-corner { left: 0; z-index: 3 !important; width: 2.6em; }
+.xl-grid td { border: 1px solid #e1e1e1; width: 7.5em; max-width: 7.5em; height: 1.75em; padding: 0 0.3em; white-space: nowrap; overflow: hidden; text-overflow: clip; position: relative; }
+.xl-grid td.num { text-align: right; }
+.xl-grid td.err { color: #b00020; }
+.xl-grid td.b { font-weight: 700; }
+.xl-grid td.sel { background: #e3f1e8; }
+.xl-grid td.act { outline: 2px solid #1e7145; outline-offset: -2px; background: #fff; z-index: 1; }
+.xl-in { position: absolute; inset: 0; width: 100%; border: 0; outline: 2px solid #1e7145; outline-offset: -2px; font: inherit; padding: 0 0.3em; background: #fff; }
+.xl-chart { position: absolute; top: 2.5em; left: 32em; width: 24em; background: #fff; border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 4px 14px #0002; padding: 0.4em 0.6em; z-index: 4; }
+.xl-ch-h { display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
+.xl-ch-x { border: 0 !important; background: none; padding: 0 0.3em !important; }
+.xl-chart svg { width: 100%; display: block; }
+.xl-status { display: flex; justify-content: space-between; padding: 0.2em 0.7em; background: #1e7145; color: #fff; font-size: 0.8em; white-space: pre; }

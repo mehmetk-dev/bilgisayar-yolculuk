@@ -11,6 +11,7 @@ import { hiz } from './hiz.js';
 import { eposta } from './eposta.js';
 import { harfbul } from './harfbul.js';
 import { dilekce, belgeEkle } from './kelime.js';
+import { hesap1, hesap2 } from './hesap.js';
 import { eslestir, tusavi, kart, liste, ilanOku, masaustuParkur, dosyaParkur } from './alistirmalar.js';
 import { test1, test2, test3, test4, test5, test6, test7, test8 } from './testler.js';
 import { onparmak, rakamlar, isaretler, klavyeOyun } from './hafta2_ek.js';
@@ -38,6 +39,7 @@ export const WEEKS = [
   { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, aramaPratik, tuzaklar, kurulum, yazici, oskurulum, internetParkur, test8] },
   { no: 9, title: 'E-posta', lessons: [eposta] },
   { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, belgeEkle] },
+  { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2] },
   { no: 0, title: 'İnternette güvenlik ve yazma hızı', lessons: [guvenlik, hiz] },
 ];
 
