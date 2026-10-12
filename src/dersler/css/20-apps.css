@@ -378,3 +378,47 @@
 .ml-err { color: #b00020; font-weight: 700; min-height: 1.2em; font-size: 0.9em; }
 .ml-body { flex: 1; min-height: 8em; font: inherit; border: 1px solid #ddd; border-radius: 8px; padding: 0.5em; resize: none; outline: none; }
 .ml-body:focus { border-color: #c62828; }
+.pdf-doc { font-family: Calibri, Carlito, "Noto Sans", sans-serif; font-size: 11pt; line-height: 1.4; }
+.pdf-doc img { max-width: 100%; }
+.pdf-doc table { border-collapse: collapse; } .pdf-doc td { border: 1px solid #999; padding: 0.2em 0.5em; min-width: 3em; }
+
+/* Kelime İşlemci */
+.wd { background: #f3f3f3; }
+.wd-tabs { display: flex; gap: 0.2em; background: #1f5fbf; padding: 0.3em 0.5em 0; }
+.wd-tabs button { border: 0 !important; border-radius: 6px 6px 0 0 !important; background: none; color: #fff; padding: 0.3em 0.9em !important; font-size: 0.9em; }
+.wd-tabs button.on { background: #f3f3f3; color: #1f3d6b; font-weight: 700; }
+.wd-tabs .wd-file { background: #174a96; font-weight: 700; }
+.wd-rib { display: flex; flex-wrap: wrap; gap: 0.3em; padding: 0.35em 0.5em; border-bottom: 1px solid #d6d6d6; align-items: center; }
+.wd-grp { display: flex; gap: 0.15em; align-items: center; padding-right: 0.4em; border-right: 1px solid #d6d6d6; position: relative; }
+.wd-grp:last-child { border-right: 0; }
+.wd-rib button { min-width: 2em; height: 1.9em; padding: 0 0.45em !important; border: 1px solid transparent !important; background: none; border-radius: 4px !important; justify-content: center; font-size: 0.9em; }
+.wd-rib button:hover { background: #e2e8f2; border-color: #c5d1e3 !important; }
+.wd-rib button.on { background: #cddcf3; border-color: #8fb0e0 !important; }
+.wd-rib select { font: inherit; font-size: 0.85em; height: 1.9em; border: 1px solid #c8c8c8; border-radius: 4px; background: #fff; }
+.wd-font { width: 9em; }
+.wd-al { flex-direction: column; gap: 2px; }
+.wd-al span { display: block; height: 2px; background: #333; width: 1em; }
+.wd-justifyLeft span:nth-child(2) { width: 0.6em; align-self: flex-start; }
+.wd-justifyLeft span { align-self: flex-start; }
+.wd-justifyCenter span:nth-child(2) { width: 0.6em; }
+.wd-justifyRight span { align-self: flex-end; }
+.wd-justifyRight span:nth-child(2) { width: 0.6em; }
+.wd-color { flex-direction: column; gap: 0 !important; line-height: 1; }
+.wd-color span { font-weight: 700; }
+.wd-color i { display: block; width: 1.1em; height: 0.25em; }
+.wd-colorwrap { position: relative; }
+.wd-pal, .wd-tpop { position: absolute; top: 2.1em; left: 0; z-index: 5; background: #fff; border: 1px solid #c8c8c8; border-radius: 6px; padding: 0.35em; display: flex; gap: 0.3em; box-shadow: 0 4px 12px #0002; }
+.wd-pal button { width: 1.6em; min-width: 0; height: 1.6em; border: 1px solid #0003 !important; }
+.wd-tpop { flex-direction: column; font-size: 0.85em; white-space: nowrap; }
+.wd-tpop input { width: 3.5em; font: inherit; margin-left: 0.3em; }
+.wd-menu { position: absolute; top: 2.1em; left: 0.5em; z-index: 6; background: #fff; border: 1px solid #c8c8c8; border-radius: 8px; box-shadow: 0 8px 20px #0003; padding: 0.3em; display: flex; flex-direction: column; min-width: 15em; }
+.wd-menu button { border: 0 !important; background: none; justify-content: flex-start; padding: 0.4em 0.7em !important; }
+.wd-menu button:hover { background: #e6eef9; }
+.wd-menu small { margin-left: auto; color: #777; }
+.wd-scroll { flex: 1; overflow: auto; padding: 1.2em; min-height: 0; }
+.wd-page { background: #fff; width: min(42em, 100%); min-height: 100%; margin: 0 auto; padding: 2.5em 3em; box-shadow: 0 1px 6px #0003; outline: none; font-family: Calibri, Carlito, "Noto Sans", sans-serif; font-size: 11pt; line-height: 1.4; color: #000; }
+.wd-page p { margin: 0 0 0.5em; }
+.wd-page img { max-width: 100%; }
+.wd-t { border-collapse: collapse; width: 100%; margin: 0.3em 0; }
+.wd-t td { border: 1px solid #888; padding: 0.25em 0.5em; min-width: 2em; height: 1.6em; }
+.wd-status { display: flex; justify-content: space-between; padding: 0.2em 0.7em; background: #1f5fbf; color: #fff; font-size: 0.8em; }

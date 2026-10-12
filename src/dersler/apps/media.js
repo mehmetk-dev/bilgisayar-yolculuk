@@ -45,7 +45,7 @@ export function pdf({ desk, body, args, setTitle }) {
   const n = desk.fs.get(args.node);
   setTitle(`${n?.name || 'Belge'} - PDF Okuyucu`);
   body.classList.add('pdf');
-  body.innerHTML = `<div class="pdf-page"><h2>📕 ${esc((n?.name || '').replace(/\.pdf$/i, ''))}</h2><p>Bu bir örnek PDF belgesidir. PDF dosyaları çoğunlukla fatura, broşür ve resmî yazılar için kullanılır; içindeki yazı değiştirilemez, sadece okunur ve yazdırılır.</p><div class="pdf-lines">${'<i></i>'.repeat(12)}</div></div>`;
+  body.innerHTML = `<div class="pdf-page"><h2>📕 ${esc((n?.name || '').replace(/\.pdf$/i, ''))}</h2>${n?.content?.html ? `<div class="pdf-doc">${n.content.html}</div>` : `<p>Bu bir örnek PDF belgesidir. PDF dosyaları çoğunlukla fatura, broşür ve resmî yazılar için kullanılır; içindeki yazı değiştirilemez, sadece okunur ve yazdırılır.</p><div class="pdf-lines">${'<i></i>'.repeat(12)}</div>`}</div>`;
   return {};
 }
 

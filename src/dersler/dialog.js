@@ -148,6 +148,7 @@ export class Dialogs {
 export function fileIcon(name) {
   if (/\.txt$/i.test(name)) return '📝';
   if (/\.(png|jpe?g|bmp)$/i.test(name)) return '🖼';
+  if (/\.docx?$/i.test(name)) return '📘';
   if (/\.pdf$/i.test(name)) return '📕';
   if (/\.exe$/i.test(name)) return '💿';
   if (/\.(mp3|wav)$/i.test(name)) return '🎵';
