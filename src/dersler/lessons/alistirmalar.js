@@ -144,7 +144,7 @@ export const tusavi = {
       title: 'İşaretler',
       html: '<p>Yeni bir satıra şu cümleyi yazın. Soru işaretini ve ünlemi unutmayın:</p>',
       target: 'Geliyor musun? Evet, geliyorum!',
-      hint: `? için ${K('Shift', '*')}, ! için ${K('Shift', '1')}. Virgül, M harfinin sağındaki iki tuştan sağdakidir.`,
+      hint: `? için ${K('Shift', '*')}, ! için ${K('Shift', '1')}. Virgül, İ\'nin sağındaki tuştur (Enter\'ın hemen solunda).`,
       on: (ev, c) => ev.type === 'input' && lines(c.np.value).some((l) => closeEnough(l, 'Geliyor musun? Evet, geliyorum!') && /\?/.test(l) && /!/.test(l) && l.includes(',')),
       done: 'İşaretleri doğru yazdınız.',
     },
@@ -211,10 +211,10 @@ export const kart = {
         <ul class="big-list"><li>Cümleler <b>büyük harfle</b> başlar.</li><li>Sonunda <b>nokta, soru ya da ünlem</b> olur.</li><li>Türkçe harfleri (ç, ğ, ı, ö, ş, ü) doğru kullanın.</li></ul>
         <p>Her satırdan sonra ${K('Enter')}'a basın.</p>`,
     },
-    satir({ title: 'Hitap', target: 'Sevgili Ayşe Teyze,', must: ['Sevgili', 'Ayşe', 'Teyze', ','], html: '<p>Not Defteri\'ne tıklayın ve ilk satıra yazın:</p>', hint: 'Virgül, M harfinin sağındaki iki tuştan sağdakidir (Ö\'nün yanında değil). Ş, L\'nin sağındaki ikinci tuştur.', done: 'Hitap tamam.' }),
+    satir({ title: 'Hitap', target: 'Sevgili Ayşe Teyze,', must: ['Sevgili', 'Ayşe', 'Teyze', ','], html: '<p>Not Defteri\'ne tıklayın ve ilk satıra yazın:</p>', hint: 'Virgül, İ\'nin sağındaki tuştur (Enter\'ın hemen solunda). Ş, L\'nin hemen sağındaki tuştur.', done: 'Hitap tamam.' }),
     satir({ title: 'Kutlama', target: 'Bayramınız kutlu olsun!', must: ['Bayramınız', 'kutlu', 'olsun', '!'], hint: `Ünlem: ${K('Shift', '1')}. Noktasız ı, O\'nun solundaki I tuşudur.`, done: 'Güzel.' }),
     satir({ title: 'Soru', target: 'İzmir\'e ne zaman geliyorsunuz?', must: ['İzmir\'e', 'geliyorsunuz', '?'], hint: `Büyük İ: ${K('Shift', 'İ')}. Kesme işareti (\'): ${K('Shift', '2')}. Soru işareti: ${K('Shift', '*')}.`, done: 'Kesme işaretini de doğru koydunuz.' }),
-    satir({ title: 'Kapanış', target: 'Ellerinizden öperim.', must: ['Ellerinizden', 'öperim', '.'], hint: 'Ö, Ğ\'nin altındaki tuştur. Nokta sağ alttaki <kbd>.</kbd> tuşudur.', done: 'Neredeyse bitti.' }),
+    satir({ title: 'Kapanış', target: 'Ellerinizden öperim.', must: ['Ellerinizden', 'öperim', '.'], hint: 'Ö, M\'nin hemen sağındaki tuştur. Nokta sağ alttaki <kbd>.</kbd> tuşudur.', done: 'Neredeyse bitti.' }),
     {
       title: 'İmza',
       html: '<p>En alta kendi adınızı yazın. Adınız büyük harfle başlasın.</p>',

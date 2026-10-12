@@ -53,7 +53,8 @@ Eğitmen için:
 - Her haftanın sonunda **orta seviye alıştırmalar** vardır: klavyede sarı ipucu yanmaz, nasıl yapılacağı yazmaz; takılan öğrenci 💡 İpucu'na bakar. Parkurlarda her görevin süresi listelenir.
 - **Haftalık testler** 10 sorudur, seçenekler her açılışta karışık sıradadır. Yanlış cevapta açıklama çıkar ve doğrusu bulununca geçilir. Sonunda ilk denemede doğru bilinen soru sayısı ve tekrar bakılacak konular görünür; puan ana sayfadaki kartta da yazar.
 - Her adımın süresi tutulur. Fare parkurunun sonunda her görevin süresi listelenir, en uzun süren kırmızı görünür. Diğer derslerde en uzun süren üç adım gösterilir.
-- İlerleme tarayıcıda saklanır; sayfa yenilense de kaldığı yerden devam eder. Ders sonunda özet kartı yazdırılabilir.
+- İlerleme tarayıcıda saklanır ve **her öğrenci için ayrıdır**: açılışta (ya da üstteki 👤 düğmesiyle) öğrenci seçilir; "Misafir" eski ortak kaydı kullanır. Sayfa yenilense de kaldığı yerden devam eder; ders sırasında sekme kapatılmak istenirse (Ctrl + W) tarayıcı önce sorar. sayfa yenilense de kaldığı yerden devam eder. Ders sonunda özet kartı yazdırılabilir.
+- Klavye dili yanlışsa (ENG ya da Türkçe F) ve Caps Lock açık kalmışsa rehberin üstünde uyarı çıkar.
 
 Kaynak: `src/dersler/`
 - `app.js`: ders akışı. `lessons/`: ders metinleri ve adımlar (`hafta2_ek.js` … `hafta8_ek.js` ve `alistirmalar.js`: ek dersler ve orta seviye alıştırmalar, `testler.js`: haftalık testler, `kalip.js`: soru ve ayırma adımı kalıpları). Her adımın hangi olayla tamamlanacağı burada yazılıdır; alanlar `lessons/common.js` başında anlatılır.

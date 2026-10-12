@@ -59,7 +59,7 @@ export const klavye = {
       title: 'Delete: sağdaki harfi sil',
       html: `<p>Şimdi imleci <b>kira</b> kelimesinin <b>en başına</b>, k harfinin önüne getirin (fareyle tıklayarak ya da ${K('←')} okuyla).</p><p>Sonra ${K('Delete')} tuşuna bir kez basın: sağdaki <b>k</b> silinir, <b>ira</b> kalır.</p>`,
       combo: ['Delete'],
-      hint: 'Delete tuşu genellikle Backspace\'in sağında ya da aşağısındadır. Üzerinde “Del” de yazabilir.',
+      hint: 'Delete tuşu genellikle Backspace\'in sağında ya da aşağısındadır. Üzerinde “Del” de yazabilir. Dizüstü bilgisayarlarda klavyenin sağ üst köşesinde olur.',
       on: (ev, c) => ev.type === 'input' && ev.inputType === 'deleteContentForward',
       done: 'Delete, imlecin <b>sağındaki</b> harfi siler. Kısaca: Backspace geriye, Delete ileriye siler.',
     },
@@ -138,8 +138,11 @@ export const klavye = {
     },
     {
       title: 'Home ve End',
-      html: `<p>${K('Home')}: imleç satırın <b>başına</b> gider. ${K('End')}: satırın <b>sonuna</b> gider. İkisine de basın.</p>`,
+      html: `<p>${K('Home')}: imleç satırın <b>başına</b> gider. ${K('End')}: satırın <b>sonuna</b> gider. İkisine de basın.</p>
+        <p class="mut">Dizüstü bilgisayarlarda Home ve End çoğu zaman ok tuşlarının üzerinde küçük yazar; ${K('Fn')} tuşunu basılı tutup basılır (ör. ${K('Fn', '←')}). Hiç bulamazsanız alttaki düğmeye basın.</p>`,
       keys: ['Home', 'End'],
+      manual: '✔ Klavyemde Home/End yok',
+      hint: 'Fn tuşu genellikle en alt sırada, Ctrl\'nin yanındadır. Fn\'yi basılı tutup ← (Home) ya da → (End) okuna basmayı deneyin.',
       on: (ev, c) => {
         if (ev.type !== 'key') return false;
         if (ev.e.key === 'Home') c.s.h = true;

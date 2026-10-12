@@ -13,6 +13,7 @@
   <a class="brand" href="#">💻 Bilgisayar <span>Dersleri</span></a>
   <span id="crumb"></span>
   <span class="sp"></span>
+  <button id="who" type="button" title="Bu bilgisayarı kimin kullandığını seçin; her öğrencinin ilerlemesi ayrı saklanır"></button>
   <button id="fontDown" type="button" title="Yazıyı küçült">A−</button>
   <button id="fontUp" type="button" title="Yazıyı büyüt">A+</button>
   <button id="soundBtn" type="button" title="Başarı sesini aç/kapat"></button>
@@ -40,6 +41,7 @@
 
 <main id="lesson">
   <section id="guide" aria-live="polite">
+    <div id="kbAlerts"><div id="layoutAlert" hidden></div><div id="capsAlert" hidden>🔠 <b>Caps Lock açık:</b> harfler büyük yazılıyor. Kapatmak için <kbd>Caps Lock</kbd> tuşuna bir kez basın.</div></div>
     <div class="prog"><span id="stepNo"></span><div id="bar"><i></i></div></div>
     <div id="dots" aria-label="Adımlar"></div>
     <h2 id="stepTitle"></h2>
@@ -65,6 +67,7 @@
     </div>
   </section>
 </main>
+<div id="pick" hidden></div>
 <div id="printCard"></div>
 <!--APP-->
 </body>

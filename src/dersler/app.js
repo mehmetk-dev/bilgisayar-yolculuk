@@ -10,8 +10,17 @@ const $ = (s) => document.querySelector(s);
 const K = (...names) => names.map((n) => `<kbd>${n}</kbd>`).join(' + ');
 const HINT_DELAY = 40000;
 
+// ---- Öğrenci profilleri: aynı bilgisayarı kullananların ilerlemesi ayrı saklanır ----
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* yoksay */ } };
+const PROF_KEY = 'bilgisayar-dersleri.ogrenci', LIST_KEY = 'bilgisayar-dersleri.ogrenciler', ASKED_KEY = 'bilgisayar-dersleri.secildi';
+const who = lsGet(PROF_KEY, '');
+const profiles = () => lsGet(LIST_KEY, []);
+// Misafir eski anahtarı kullanır; profiller öncesinden kalan ilerleme kaybolmaz
+const storeKey = (name) => 'bilgisayar-dersleri.v2' + (name ? '@' + name : '');
+
 // ---- Kalıcı ayarlar ve ilerleme (yalnızca bu tarayıcıda) ----
-const STORE_KEY = 'bilgisayar-dersleri.v2';
+const STORE_KEY = storeKey(who);
 let store = { fs: 20, sound: true, lessons: {} };
 try { store = { ...store, ...JSON.parse(localStorage.getItem(STORE_KEY) || '{}') }; } catch { /* gizli pencere vb. */ }
 const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch { /* yoksay */ } };
@@ -436,10 +445,95 @@ document.addEventListener('keydown', (e) => {
   if (lesson?.stage === 'desktop' && (e.ctrlKey || e.metaKey) && ['KeyS', 'KeyO', 'KeyP', 'KeyF'].includes(e.code)) e.preventDefault();
 });
 
+// ---- Klavye uyarıları: yanlış klavye dili ve açık kalan Caps Lock ----
+// Türkçe Q'da bu fiziksel tuşlar Türkçe harf yazar; İngilizce düzende işaret yazarlar
+const TR_KEYS = { Semicolon: 'ş', Quote: 'i', BracketLeft: 'ğ', BracketRight: 'ü', Comma: 'ö', Period: 'ç' };
+const LAYOUT_MSG = {
+  eng: `⌨ <b>Klavye dili İngilizce olmuş:</b> Türkçe harfler (ş, ğ, ü, ö, ç, ı) yazılmıyor. Ekranın sağ altındaki <b>ENG</b> yazısına tıklayıp <b>TUR</b> seçin. Kısayolu: ${K('⊞ Windows', 'Boşluk')}.`,
+  f: '⌨ <b>Bilgisayarda Türkçe F klavye seçili:</b> Q tuşu “f” yazıyor. Dersler Türkçe Q klavyeye göre hazırlandı. Sağ alttaki dil yazısına (TUR) tıklayıp <b>Türkçe Q</b>\'yu seçin.',
+};
+let layout = '';
+function setLayout(kind) {
+  layout = kind;
+  const el = $('#layoutAlert');
+  if (kind) el.innerHTML = LAYOUT_MSG[kind];
+  el.hidden = !kind;
+}
+const setCaps = (on) => { $('#capsAlert').hidden = !on; };
+addEventListener('keydown', (e) => {
+  if (!lesson) return;
+  if (e.getModifierState) setCaps(e.getModifierState('CapsLock'));
+  if (e.ctrlKey || e.altKey || e.metaKey || e.key.length !== 1) return;
+  const k = e.key.toLocaleLowerCase('tr');
+  // Q tuşu İngilizce düzende de q yazar; yalnızca F klavye uyarısını kaldırır
+  if (e.code === 'KeyQ') { if (k === 'f') setLayout('f'); else if (layout === 'f') setLayout(''); }
+  else if (TR_KEYS[e.code]) setLayout(k === TR_KEYS[e.code] ? '' : /\p{L}/u.test(k) ? 'f' : 'eng');
+}, true);
+// Caps Lock tuşu bırakıldığında ve fareyle tıklayınca da durum güncellensin (sayfa açılmadan önce açık kalmış olabilir)
+addEventListener('keyup', (e) => { if (lesson && e.code === 'CapsLock' && e.getModifierState) setCaps(e.getModifierState('CapsLock')); }, true);
+addEventListener('mousedown', (e) => { if (lesson && e.getModifierState) setCaps(e.getModifierState('CapsLock')); }, true);
+
+// ---- Sekme yanlışlıkla kapanmasın (Ctrl + W, Alt + F4): tarayıcı önce sorar ----
+let leaving = false;
+addEventListener('beforeunload', (e) => {
+  if (!lesson || leaving) return;
+  saveProgress();
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+// ---- Öğrenci seçimi ----
+const pick = $('#pick');
+$('#who').textContent = who ? `👤 ${who}` : '👤 Öğrenci seç';
+$('#who').onclick = () => openPicker();
+if (who) $('.hero h1').textContent = `Hoş geldiniz, ${who}!`;
+
+function choose(name) {
+  saveProgress();
+  lsSet(PROF_KEY, name);
+  if (name && !profiles().includes(name)) lsSet(LIST_KEY, [...profiles(), name].sort((a, b) => a.localeCompare(b, 'tr')));
+  try { sessionStorage.setItem(ASKED_KEY, '1'); } catch { /* yoksay */ }
+  leaving = true;
+  location.hash = '';
+  location.reload();
+}
+
+function openPicker(first = false) {
+  pick.hidden = false;
+  pick.innerHTML = `<div class="pickbox" role="dialog" aria-label="Öğrenci seçimi">
+  <h2>👤 Bu bilgisayarı kim kullanıyor?</h2>
+  <div class="plist">${profiles().map((n) => `<span class="pone"><button type="button" class="pname${n === who ? ' cur' : ''}" data-n="${esc(n)}">${esc(n)}</button><button type="button" class="pdel" data-n="${esc(n)}" title="${esc(n)} kaydını sil">🗑</button></span>`).join('') || '<p class="mut">Henüz kayıtlı kimse yok. Adınızı yazıp ekleyin.</p>'}</div>
+  <form class="padd"><input type="text" maxlength="30" placeholder="Adınız soyadınız" aria-label="Adınız"><button type="submit" class="primary">➕ Ekle ve başla</button></form>
+  <div class="pfoot"><button type="button" class="link pguest">Misafir olarak devam et</button>${first ? '' : '<button type="button" class="link pclose">Kapat</button>'}</div>
+  <p class="mut">Her öğrencinin ilerlemesi ve test puanları bu bilgisayarda ayrı saklanır. Listede adınız varsa üzerine tıklayın.</p>
+</div>`;
+  pick.onclick = (e) => {
+    const t = e.target;
+    if ((t === pick && !first) || t.classList.contains('pclose')) { pick.hidden = true; return; }
+    if (t.classList.contains('pname')) choose(t.dataset.n);
+    if (t.classList.contains('pguest')) choose('');
+    if (t.classList.contains('pdel') && confirm(`“${t.dataset.n}” adlı öğrencinin bütün ilerlemesi ve puanları silinsin mi?`)) {
+      lsSet(LIST_KEY, profiles().filter((n) => n !== t.dataset.n));
+      try { localStorage.removeItem(storeKey(t.dataset.n)); } catch { /* yoksay */ }
+      if (t.dataset.n === who) choose(''); else openPicker(first);
+    }
+  };
+  pick.querySelector('.padd').onsubmit = (e) => {
+    e.preventDefault();
+    const n = e.target.querySelector('input').value.trim().replace(/\s+/g, ' ');
+    if (n) choose(n);
+  };
+  pick.querySelector('input').focus();
+}
+
 addEventListener('hashchange', route);
 addEventListener('pagehide', saveProgress);
 applyFont();
 route();
+// Bu oturumda henüz kimse seçilmediyse sorulur
+let asked = false;
+try { asked = !!sessionStorage.getItem(ASKED_KEY); } catch { asked = true; }
+if (!asked) openPicker(true);
 
 // Testler ve eğitmen için: konsoldan erişim
 window.DERS = { get desk() { return desk; }, np, get lesson() { return lesson; }, get idx() { return idx; }, get done() { return done; }, showStep: (i) => showStep(i) };

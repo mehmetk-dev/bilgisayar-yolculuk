@@ -184,3 +184,24 @@ body:not(.with-kb) .under { display: none; }
   #printCard th { width: 35%; white-space: nowrap; }
   .pfoot { margin-top: 1em; }
 }
+
+/* klavye uyarıları (dil, Caps Lock): rehberin üstünde yapışık durur */
+#kbAlerts { position: sticky; top: -1em; z-index: 5; display: flex; flex-direction: column; gap: 0.4em; margin: -1em -1.1em 0; padding: 1em 1.1em 0; background: var(--card); }
+#kbAlerts:not(:has(> :not([hidden]))) { display: none; }
+#layoutAlert, #capsAlert { border-radius: 12px; padding: 0.5em 0.8em; border: 2px solid; font-size: 0.9em; animation: pop 0.35s; }
+#layoutAlert { background: #ffe3e0; border-color: #d23b2a; color: #6d140b; }
+#capsAlert { background: var(--warn-bg); border-color: #e0a100; color: #5a3600; }
+
+/* öğrenci seçimi */
+#pick { position: fixed; inset: 0; z-index: 80; background: #1c243099; display: grid; place-items: center; padding: 16px; }
+.pickbox { background: var(--card); border-radius: 20px; padding: 1.3em 1.5em; width: min(32em, 100%); max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 0.8em; text-align: center; box-shadow: 0 20px 50px #0004; }
+.pickbox h2 { font-size: 1.4em; }
+.plist { display: flex; flex-wrap: wrap; gap: 0.5em; justify-content: center; }
+.pone { display: inline-flex; }
+.pname { border-radius: 10px 0 0 10px; }
+.pname.cur { background: var(--acc); border-color: var(--acc); color: #fff; font-weight: 700; }
+.pdel { border-radius: 0 10px 10px 0; border-left: 0; padding: 0.3em 0.5em; font-size: 0.8em; }
+.padd { display: flex; gap: 0.5em; flex-wrap: wrap; justify-content: center; }
+.padd input { font: inherit; padding: 0.35em 0.6em; border: 2px solid var(--line); border-radius: 10px; flex: 1 1 10em; min-width: 0; }
+.padd input:focus { outline: none; border-color: var(--acc); }
+.pfoot { display: flex; gap: 1em; justify-content: center; flex-wrap: wrap; }
