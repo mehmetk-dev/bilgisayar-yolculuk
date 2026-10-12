@@ -1,6 +1,6 @@
 // İnternet tarayıcısı: sekmeler, adres çubuğu (adres mi, arama mı?), geri/ileri, indirmeler, reklamlar.
-import { SITES, SEARCH_HOST, resolve } from './sites.js';
-import { esc } from './util.js';
+import { SITES, SEARCH_HOST, resolve, PHOTOS, photoContent } from './sites.js';
+import { esc, pictureURL } from './util.js';
 
 let tabSeq = 1;
 
@@ -10,15 +10,18 @@ export function browser({ desk, body, args, emit, setTitle }) {
     <div class="br-tabs"><div class="br-tablist"></div><button type="button" class="br-newtab" title="Yeni sekme">＋</button></div>
     <div class="br-bar">
       <button type="button" class="br-back" title="Geri">←</button><button type="button" class="br-fwd" title="İleri">→</button><button type="button" class="br-reload" title="Yenile">⟳</button><button type="button" class="br-home" title="Ana sayfa">⌂</button>
-      <div class="br-addr"><span class="br-lock"></span><input class="br-url" spellcheck="false" autocomplete="off" aria-label="Adres çubuğu" placeholder="Arama yapın ya da adres yazın"></div>
-      <button type="button" class="br-dl" title="İndirmeler">⬇</button>
+      <div class="br-addr"><span class="br-lock"></span><input class="br-url" spellcheck="false" autocomplete="off" aria-label="Adres çubuğu" placeholder="Arama yapın ya da adres yazın"><button type="button" class="br-zoomlbl" hidden title="Yakınlaştırmayı sıfırla (Ctrl + 0)"></button><button type="button" class="br-star" title="Bu sayfayı sık kullanılanlara ekle (Ctrl + D)">☆</button></div>
+      <button type="button" class="br-cap" title="Web yakalama: sayfanın resmini al (Ctrl + Shift + S)">✂</button><button type="button" class="br-dl" title="İndirmeler">⬇</button>
     </div>
+    <div class="br-bm" hidden></div>
     <div class="br-toolbar" hidden>🔎 Hızlı Arama Araç Çubuğu <input placeholder="Süper Arama" disabled> <span>📢 Reklam: Bugün %90 indirim!</span><span>📢 Kazandınız!</span></div>
     <div class="br-page"></div>
     <div class="br-dlpanel" hidden></div>
-    <div class="br-pop" hidden></div>`;
+    <div class="br-pop" hidden></div>
+    <div class="br-ctx" hidden></div>`;
   const $ = (s) => body.querySelector(s);
   const pageEl = $('.br-page'), url = $('.br-url');
+  pageEl.tabIndex = -1; // sayfaya tıklanınca odak tarayıcıya gelsin; kısayollar (Ctrl + D, Ctrl + +) çalışsın
   const tabs = [];
   let cur = null;
   const downloads = [];
@@ -78,6 +81,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     $('.br-pop').hidden = true;
     if (site?.popup) setTimeout(() => popup(), 600);
     renderTabs();
+    renderBm();
+    applyZoom();
     setTitle(`${title} - İnternet`);
   }
 
@@ -106,8 +111,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     p.querySelector('.pop-fakeok').onclick = () => emit('web-popup-click', { what: 'ok' });
   }
 
-  function download(name) {
-    const content = /resim/i.test(name) ? { setup: 'viewer' } : /surucu/i.test(name) ? { setup: 'driver' } : '';
+  function download(name, photo) {
+    const content = photo ? photoContent(photo) : /resim/i.test(name) ? { setup: 'viewer' } : /surucu/i.test(name) ? { setup: 'driver' } : '';
     const node = desk.fs.write('downloads', name, content);
     downloads.unshift({ name, id: node.id });
     renderDl(true);
@@ -116,7 +121,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
 
   function renderDl(open) {
     const p = $('.br-dlpanel');
-    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x">✕</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>💿</span><div><b>${esc(d.name)}</b><small>Tamamlandı</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="1">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
+    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x">✕</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>${/\.(jpe?g|png)$/i.test(d.name) ? '🖼' : '💿'}</span><div><b>${esc(d.name)}</b><small>Tamamlandı</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="1">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
     if (open) p.hidden = false;
   }
 
@@ -138,7 +143,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       return;
     }
     const dl = e.target.closest('[data-download]');
-    if (dl) { download(dl.dataset.download); return; }
+    if (dl) { download(dl.dataset.download, dl.dataset.photo); return; }
     const tab = e.target.closest('[data-tab]');
     const x = e.target.closest('[data-close]');
     if (x) { closeTab(+x.dataset.close); return; }
@@ -172,6 +177,112 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (atBottom !== cur.atBottom || !atBottom) emit('web-scroll', { atBottom, host: loc?.host, path: loc?.path, top: pageEl.scrollTop });
     cur.atBottom = atBottom;
   });
+
+  // ---- Sık kullanılanlar (yer imleri) ----
+  const bms = (desk.bookmarks ||= []);
+  function renderBm() {
+    const u = cur?.hist[cur.idx] ? fmtUrl(cur.hist[cur.idx]) : '';
+    const on = bms.some((b) => b.url === u);
+    $('.br-star').textContent = on ? '★' : '☆';
+    $('.br-star').classList.toggle('on', on);
+    $('.br-bm').hidden = !bms.length;
+    $('.br-bm').innerHTML = bms.map((b, i) => `<button type="button" data-bm="${i}" title="${esc(b.url)}">⭐ ${esc(b.title.slice(0, 24))}</button>`).join('');
+  }
+  function bookmark() {
+    const loc = cur.hist[cur.idx];
+    if (!loc) return;
+    const u = fmtUrl(loc), i = bms.findIndex((b) => b.url === u);
+    if (i >= 0) { bms.splice(i, 1); emit('web-bookmark', { url: u, removed: true }); }
+    else { bms.push({ url: u, title: cur.title }); emit('web-bookmark', { url: u, title: cur.title }); desk.toast('Sık kullanılanlara eklendi', esc(cur.title), '⭐', 3000); }
+    renderBm();
+  }
+  $('.br-star').onclick = bookmark;
+  $('.br-bm').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-bm]');
+    if (!b) return;
+    go(bms[+b.dataset.bm].url, 'bookmark');
+    emit('web-bookmark-open', { url: bms[+b.dataset.bm].url });
+  });
+
+  // ---- Yakınlaştırma (Ctrl + / Ctrl − / Ctrl 0, Ctrl + tekerlek) ----
+  let zoom = 100;
+  function applyZoom() {
+    pageEl.style.zoom = zoom / 100;
+    const l = $('.br-zoomlbl');
+    l.hidden = zoom === 100;
+    l.textContent = `🔍 %${zoom}`;
+  }
+  function setZoom(z) {
+    zoom = Math.max(50, Math.min(200, z));
+    applyZoom();
+    emit('web-zoom', { zoom });
+  }
+  $('.br-zoomlbl').onclick = () => setZoom(100);
+  pageEl.addEventListener('wheel', (e) => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); setZoom(zoom + (e.deltaY < 0 ? 10 : -10)); }, { passive: false });
+
+  // ---- Web yakalama: tarayıcının kendi ekran görüntüsü aracı (yalnızca sayfayı alır) ----
+  function capture() {
+    const s = desk.screen.getBoundingClientRect(), r = pageEl.getBoundingClientRect();
+    desk.imageClip = desk.renderScreen({ x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height });
+    desk.toast('Web yakalama: sayfanın resmi panoya kopyalandı', `<img class="to-img" src="${desk.imageClip.toDataURL()}" alt="">Paint'te ya da e-postada <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, '✂', 8000);
+    emit('web-capture');
+  }
+  $('.br-cap').onclick = capture;
+
+  body.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    if (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd') { e.preventDefault(); setZoom(zoom + 10); }
+    else if (e.key === '-' || e.code === 'NumpadSubtract') { e.preventDefault(); setZoom(zoom - 10); }
+    else if (e.key === '0' || e.code === 'Numpad0') { e.preventDefault(); setZoom(100); }
+    else if (e.code === 'KeyD') { e.preventDefault(); bookmark(); }
+    else if (e.code === 'KeyS' && e.shiftKey) { e.preventDefault(); capture(); }
+  });
+
+  // ---- Sayfada sağ tık: resmi kaydet/kopyala, seçili yazıyı kopyala ----
+  const ctx = $('.br-ctx');
+  const hideCtx = () => { ctx.hidden = true; };
+  pageEl.addEventListener('contextmenu', (e) => {
+    const img = e.target.closest('img[data-photo]');
+    const text = getSelection().toString().trim();
+    if (!img && !text) return;
+    e.preventDefault();
+    const items = img
+      ? [['save', '💾 Resmi farklı kaydet…'], ['copyimg', '⧉ Resmi kopyala'], ['newtab', '↗ Resmi yeni sekmede aç']]
+      : [['copy', '⧉ Kopyala <small>Ctrl+C</small>'], ['search', `🔍 Bulalım'da ara: “${esc(text.slice(0, 18))}”`]];
+    ctx.innerHTML = items.map(([k, l]) => `<button type="button" data-ctx="${k}">${l}</button>`).join('');
+    ctx.dataset.photo = img?.dataset.photo || '';
+    ctx.dataset.text = text;
+    const b = body.getBoundingClientRect();
+    ctx.style.left = Math.min(e.clientX - b.left, b.width - 230) + 'px';
+    ctx.style.top = Math.min(e.clientY - b.top, b.height - 120) + 'px';
+    ctx.hidden = false;
+    emit('web-context', { what: img ? 'image' : 'text' });
+  });
+  body.addEventListener('mousedown', (e) => { if (!e.target.closest('.br-ctx')) hideCtx(); });
+  ctx.addEventListener('mousedown', (e) => e.preventDefault()); // seçili yazı kaybolmasın
+  ctx.addEventListener('click', async (e) => {
+    const k = e.target.closest('[data-ctx]')?.dataset.ctx;
+    if (!k) return;
+    hideCtx();
+    const id = ctx.dataset.photo, p = PHOTOS[id];
+    if (k === 'copy') { document.execCommand('copy'); return; }
+    if (k === 'search') { newTab({ host: SEARCH_HOST, path: '/ara', q: ctx.dataset.text, search: true }); return; }
+    if (k === 'newtab') { newTab(null); pageEl.innerHTML = `<div class="wp uf-one"><img src="${pictureURL(photoContent(id))}" alt=""></div>`; cur.title = p.name; renderTabs(); return; }
+    if (k === 'copyimg') {
+      const im = new Image();
+      im.onload = () => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').drawImage(im, 0, 0); desk.imageClip = c; desk.toast('Resim kopyalandı', 'Paint\'te ya da e-postada Ctrl + V ile yapıştırabilirsiniz.', '⧉', 4000); emit('web-img-copy', { name: p.name }); };
+      im.src = pictureURL(photoContent(id));
+      return;
+    }
+    if (k === 'save') {
+      const r = await desk.dialogs.file({ mode: 'save', fs: desk.fs.dialogApi(), folder: 'downloads', name: p.name, ext: '.jpg', typeLabel: 'JPEG resmi (*.jpg)' });
+      if (!r) return;
+      desk.fs.write(r.folder, r.name, photoContent(id));
+      desk.toast('Resim kaydedildi', `${esc(r.name)} → ${esc(desk.fs.label(r.folder))}`, '💾', 4000);
+      emit('web-img-save', { name: r.name, folder: r.folder });
+    }
+  });
+  pageEl.addEventListener('copy', () => emit('web-copy', { text: getSelection().toString() }));
 
   const api = {
     onSettings: () => { $('.br-toolbar').hidden = !desk.settings.toolbar; },

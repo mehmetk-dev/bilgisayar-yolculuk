@@ -517,3 +517,26 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 @keyframes ppFade { from { opacity: 0; } }
 @keyframes ppPush { from { transform: translateX(100%); } }
 @keyframes ppZoom { from { transform: scale(0.3); opacity: 0; } }
+
+/* Tarayıcı: sık kullanılanlar, yakınlaştırma, web yakalama, sağ tık menüsü */
+.br-addr .br-star, .br-addr .br-zoomlbl { border: 0 !important; background: none; padding: 0 0.35em !important; font-size: 1em; color: #555; flex: none; }
+.br-addr .br-zoomlbl { font-size: 0.8em; background: #e8eef7; border-radius: 999px !important; }
+.br-star.on { color: #e6a700; }
+.br-bm { display: flex; gap: 0.3em; padding: 0.2em 0.5em; background: #f7f9fc; border-bottom: 1px solid #e0e5ec; overflow-x: auto; }
+.br-bm button { border: 0 !important; background: none; font-size: 0.82em; padding: 0.15em 0.5em !important; border-radius: 6px !important; white-space: nowrap; }
+.br-bm button:hover { background: #e6eef9; }
+.br-ctx { position: absolute; z-index: 30; background: #fff; border: 1px solid #c8c8c8; border-radius: 8px; box-shadow: 0 8px 20px #0003; padding: 0.3em; display: flex; flex-direction: column; min-width: 13em; }
+.br-ctx button { border: 0 !important; background: none; justify-content: flex-start; padding: 0.4em 0.7em !important; font-size: 0.9em; }
+.br-ctx button:hover { background: #e6eef9; }
+.br-ctx small { margin-left: auto; color: #777; padding-left: 1em; }
+.uf-head { background: #263238; color: #fff; padding: 0.7em 1em; font-weight: 800; font-size: 1.2em; display: flex; flex-direction: column; }
+.uf-head small { font-weight: 400; font-size: 0.65em; opacity: 0.8; }
+.uf-tip { margin: 0.6em 1em; color: #555; font-size: 0.9em; }
+.uf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11em, 1fr)); gap: 0.8em; padding: 0 1em 1em; }
+.uf-grid figure { margin: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+.uf-grid img { width: 100%; display: block; aspect-ratio: 3 / 2; object-fit: cover; }
+.uf-grid figcaption { display: flex; justify-content: space-between; align-items: center; gap: 0.4em; padding: 0.3em 0.5em; font-size: 0.85em; }
+.uf-grid figcaption button { font-size: 0.85em; padding: 0.1em 0.5em !important; }
+.uf-one { display: grid; place-items: center; padding: 1em; background: #222; min-height: 100%; }
+.uf-one img { max-width: 100%; }
+.br-page:focus { outline: none; }

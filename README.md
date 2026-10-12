@@ -49,6 +49,7 @@ Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vard
 | 10 | Kelime işlemci (Word benzeri): dilekçe yazma, kalın, ortalama, yazı boyutu, iki yana yaslama, tarih, kaydetme, yazdırma · Liste, tablo (Tab ile hücreler), yazı rengi, resim, PDF olarak kaydetme |
 | 11 | Hesap tablosu (Excel benzeri): hücre adresi, veri girişi, ∑ Otomatik Toplam, TOPLA, ORTALAMA, dört işlem · Kalın ve ₺ biçimi, durum çubuğu, sıralama, sütun grafiği, yazdırma |
 | 12 | Sunu (PowerPoint benzeri): başlık slaytı, yeni slayt ve maddeler, tasarım teması, resim, slayt geçişi, slayt sırası, slayt gösterisi (F5), kaydetme |
+| 13 | Günlük işler, iki ayrı ders: **bilgisayarda** (PrtSc ile ekran görüntüsü → Paint, fotoğrafı arka plan yapma, USB'ye kopyalama, kopyalama/taşıma farkı) · **tarayıcıda** (resme sağ tık → Resmi farklı kaydet, İndir düğmesi ve İndirilenler, indirileni arka plan yapma, sayfadan yazı kopyalama, ✂ web yakalama, Ctrl + / Ctrl − yakınlaştırma, ☆ sık kullanılanlar) |
 | Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre · Yazma hızı ölçümü: dakikada kelime ve hata; her ölçüm öğrencinin profilinde saklanır, haftadan haftaya karşılaştırılır |
 
 Eğitmen için:

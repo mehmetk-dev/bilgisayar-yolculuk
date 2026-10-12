@@ -1,7 +1,20 @@
 // Tarayıcıda açılan örnek web siteleri. Hepsi uydurmadır; gerçek bir siteye bağlanılmaz.
 // Bağlantılar data-href, düğmeler data-act ile çalışır; indirmeler data-download ile yapılır.
 
+import { pictureURL } from './util.js';
+
 export const SEARCH_HOST = 'www.bulalim.com';
+
+// Ücretsiz fotoğraf sitesindeki resimler: indirilince dosyanın içeriği bu olur
+export const PHOTOS = {
+  'deniz-manzarasi': { name: 'deniz manzarası.jpg', emoji: '🌅', bg: ['#ff9a5a', '#2a6fdb'], title: 'Deniz manzarası' },
+  'kapadokya': { name: 'kapadokya.jpg', emoji: '🎈', bg: ['#ffd8a8', '#7ab8f5'], title: 'Kapadokya balonları' },
+  'orman': { name: 'orman.jpg', emoji: '🌲', bg: ['#a5d6a7', '#1b5e20'], title: 'Orman yolu' },
+  'lale': { name: 'lale bahçesi.jpg', emoji: '🌷', bg: ['#f8bbd0', '#81c784'], title: 'Lale bahçesi' },
+  'kis': { name: 'karlı dağ.jpg', emoji: '🏔', bg: ['#e3f2fd', '#90a4ae'], title: 'Karlı dağ' },
+  'kedi': { name: 'kedi.jpg', emoji: '🐱', bg: ['#fff3e0', '#ffcc80'], title: 'Uykucu kedi' },
+};
+export const photoContent = (id) => { const p = PHOTOS[id]; return p && { emoji: p.emoji, bg: p.bg }; };
 
 const RESULTS = [
   { keys: ['börek', 'borek', 'tarif', 'yemek', 'ıspanak'], title: 'Ispanaklı Börek Tarifi (Adım Adım)', url: 'www.lezzetli-tarifler.com.tr/borek', snip: 'Çıtır çıtır ıspanaklı börek nasıl yapılır? Malzemeler, püf noktaları ve resimli anlatım…' },
@@ -10,6 +23,7 @@ const RESULTS = [
   { keys: ['haber', 'gündem', 'son dakika', 'haberler'], title: 'Günün Haberleri', url: 'www.gunun-haberleri.com.tr', snip: 'Gündemden, spordan, ekonomiden son haberler.' },
   { keys: ['resim', 'gösterici', 'gosterici', 'program', 'indir', 'fotoğraf'], title: 'Resim Gösterici: Ücretsiz İndir', url: 'www.program-indir.com.tr/resim-gosterici', snip: 'Fotoğraflarınızı kolayca açın, büyütün, döndürün. Ücretsiz ve güvenli indirme.' },
   { keys: ['yazıcı', 'yazici', 'sürücü', 'surucu', 'r-200', 'r200', 'driver'], title: 'Renkli Yazıcı R-200 Sürücüleri', url: 'www.yazici-destek.com.tr/r-200', snip: 'Yazıcınızın resmî sürücü ve yazılım indirme sayfası.' },
+  { keys: ['fotoğraf', 'fotograf', 'manzara', 'duvar', 'kağıdı', 'arka', 'plan', 'resim', 'resimler', 'ücretsiz'], title: 'Ücretsiz Fotoğraflar: Manzara, Doğa, Hayvanlar', url: 'www.ucretsiz-fotograflar.com.tr', snip: 'Telif ücreti olmayan, indirip kullanabileceğiniz binlerce fotoğraf ve duvar kâğıdı.' },
   { keys: ['banka', 'bankam'], title: 'Bankam: İnternet Şubesi', url: 'www.bankam.com.tr', snip: 'İnternet şubesine güvenli giriş.' },
 ];
 const AD = { title: 'Bilgisayarınız YAVAŞ mı? 10 KAT Hızlandırın!', url: 'www.super-hizlandirici.xyz', snip: 'Hemen indirin, ücretsiz tarama yapın!!!' };
@@ -63,6 +77,14 @@ export const SITES = {
       }
       if (path === '/mercimek') return page('Mercimek Çorbası', `${head}<article class="lt"><h1>Mercimek Çorbası</h1><div class="lt-img">🍲</div><p>1 su bardağı kırmızı mercimek, 1 soğan, 1 havuç, 1 kaşık un, tereyağı, tuz ve 6 su bardağı su. Hepsini 25 dakika pişirip blenderdan geçirin.</p></article>`);
       return page('Lezzetli Tarifler', `${head}<div class="lt-grid"><a data-href="www.lezzetli-tarifler.com.tr/borek">🥧<b>Ispanaklı Börek</b></a><a data-href="www.lezzetli-tarifler.com.tr/mercimek">🍲<b>Mercimek Çorbası</b></a></div>`);
+    },
+  },
+  'www.ucretsiz-fotograflar.com.tr': {
+    name: 'Ücretsiz Fotoğraflar', secure: true,
+    render() {
+      return page('Ücretsiz Fotoğraflar', `<header class="uf-head">📷 Ücretsiz Fotoğraflar<small>İndirip dilediğiniz gibi kullanabilirsiniz</small></header>
+        <p class="uf-tip">Bir fotoğrafı kaydetmek için üzerine <b>sağ tıklayın</b> ve “Resmi farklı kaydet”i seçin ya da altındaki <b>İndir</b> düğmesini kullanın.</p>
+        <div class="uf-grid">${Object.entries(PHOTOS).map(([id, p]) => `<figure><img src="${pictureURL({ emoji: p.emoji, bg: p.bg })}" alt="${p.title}" data-photo="${id}"><figcaption>${p.title}<button type="button" data-download="${p.name}" data-photo="${id}">⬇ İndir</button></figcaption></figure>`).join('')}</div>`);
     },
   },
   'www.hava-durumu.com.tr': {

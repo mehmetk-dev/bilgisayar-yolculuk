@@ -102,6 +102,7 @@ export class Desktop {
     for (const w of [...this.wins]) this.destroy(w);
     this.fs.reset();
     this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
+    this.bookmarks = []; // tarayıcının sık kullanılanları
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;
@@ -948,6 +949,11 @@ export class Desktop {
 
   // ------------------------------------------------------------------ Klavye
   bindKeys() {
+    // Print Screen: bütün ekranın resmi panoya. Tarayıcılar bu tuşta yalnızca keyup gönderir.
+    addEventListener('keyup', (e) => {
+      if (e.key !== 'PrintScreen' || !this.root.isConnected || !this.root.offsetParent || this.power !== 'desktop') return;
+      this.printScreen();
+    });
     this.screen.addEventListener('keydown', (e) => {
       if (this.power === 'lock') { e.preventDefault(); this.setPower('login'); return; }
       if (this.power === 'sleep' && Date.now() - this.sleepAt > 900) { this.emit('wake'); this.setPower('lock'); return; }
@@ -1089,6 +1095,13 @@ export class Desktop {
 
   // Ekranın bir bölümünün resmini çizer. Tarayıcı ekran görüntüsü alamadığı için masaüstündeki
   // öğeleri (arka plan renkleri, yazılar, resimler, Paint tuvali) kendimiz bir tuvale çizeriz.
+  printScreen() {
+    const s = this.screen.getBoundingClientRect();
+    this.imageClip = this.renderScreen({ x: 0, y: 0, w: s.width, h: s.height });
+    this.toast('Ekran görüntüsü panoya kopyalandı', `<img class="to-img" src="${this.imageClip.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, '📸', 8000);
+    this.emit('printscreen');
+  }
+
   renderScreen(r) {
     const scr = this.screen.getBoundingClientRect();
     const c = document.createElement('canvas');
