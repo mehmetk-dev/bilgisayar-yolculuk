@@ -9,6 +9,7 @@ import { internet, kurulum, yazici, oskurulum } from './hafta8.js';
 import { guvenlik } from './guvenlik.js';
 import { hiz } from './hiz.js';
 import { eposta } from './eposta.js';
+import { harfbul } from './harfbul.js';
 import { eslestir, tusavi, kart, liste, ilanOku, masaustuParkur, dosyaParkur } from './alistirmalar.js';
 import { test1, test2, test3, test4, test5, test6, test7, test8 } from './testler.js';
 import { onparmak, rakamlar, isaretler, klavyeOyun } from './hafta2_ek.js';
@@ -27,7 +28,7 @@ const yolculuk = {
 // Her hafta 8 ders: konu anlatımları, ek dersler, orta seviye alıştırmalar (yönlendirmesiz) ve tekrar testi
 export const WEEKS = [
   { no: 1, title: 'Açma-kapama ve fare', lessons: [ackapa, fare1, fare2, surukle, pencereler, parkur, eslestir, test1] },
-  { no: 2, title: 'Klavye', lessons: [klavye, onparmak, rakamlar, isaretler, tusavi, kart, klavyeOyun, test2] },
+  { no: 2, title: 'Klavye', lessons: [klavye, harfbul, onparmak, rakamlar, isaretler, tusavi, kart, klavyeOyun, test2] },
   { no: 3, title: 'Metin seçme ve kısayollar', lessons: [notdefteri, secme, kaydetPratik, liste, tarif, kisayolYarisi, kopyaOyun, test3] },
   { no: 4, title: 'Donanım ve yazılım', lessons: [yolculuk, donanim, parcalar, portlar, ilanOku, bakim, sorunGiderme, test4] },
   { no: 5, title: 'Masaüstü, Başlat menüsü ve pencereler', lessons: [masaustu, baslatKesif, masaustuDuzen, hesapMakinesi, oyunlar, masaustuParkur, masaustuHarita, test5] },
