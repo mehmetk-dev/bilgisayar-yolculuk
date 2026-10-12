@@ -23,7 +23,7 @@ const storeKey = (name) => 'bilgisayar-dersleri.v2' + (name ? '@' + name : '');
 const STORE_KEY = storeKey(who);
 let store = { fs: 20, sound: true, lessons: {} };
 try { store = { ...store, ...JSON.parse(localStorage.getItem(STORE_KEY) || '{}') }; } catch { /* gizli pencere vb. */ }
-const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch { /* yoksay */ } };
+const persist = () => { store.seen = Date.now(); try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch { /* yoksay */ } };
 let saveTimer = 0;
 const saveSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(saveProgress, 400); };
 
@@ -69,7 +69,52 @@ function route() {
   const m = location.hash.match(/^#ders\/(.+)$/);
   const l = m && LESSONS.find((x) => x.id === m[1]);
   if (l) openLesson(l);
+  else if (location.hash === '#ozet') showOzet();
   else showHome();
+}
+
+// ---- Eğitmen özeti: bu bilgisayardaki bütün öğrencilerin ilerlemesi ----
+function ozetTable() {
+  const rows = [...profiles().map((n) => [n, n === who ? store : lsGet(storeKey(n), {})])];
+  const guest = who ? lsGet(storeKey(''), {}) : store;
+  if (Object.keys(guest.lessons || {}).length || guest.logs) rows.push(['Misafir', guest]);
+  const weeks = WEEKS.filter((w) => w.no);
+  const cell = (w, st) => {
+    const ls = w.lessons.filter((l) => !l.link);
+    const n = ls.filter((l) => st.lessons?.[l.id]?.done).length;
+    const t = ls.find((l) => l.test);
+    const sc = t && st.lessons?.[t.id]?.done ? testScore(t, st) : null;
+    const cls = n === ls.length ? 'full' : n ? 'part' : '';
+    return `<td class="${cls}">${n ? `${n} / ${ls.length}` : '–'}${sc ? `<small>Test ${sc.right}/${sc.total}</small>` : ''}</td>`;
+  };
+  const hizCell = (st) => {
+    const L = st.logs?.hiz;
+    if (!L?.length) return '<td>–</td>';
+    const f = L.at(-1).wpm - L[0].wpm;
+    return `<td>${L.at(-1).wpm} kelime/dk${L.length > 1 ? `<small>ilk: ${L[0].wpm} (${f >= 0 ? '+' : ''}${f})</small>` : ''}</td>`;
+  };
+  const seen = (st) => (st.seen ? new Date(st.seen).toLocaleDateString('tr-TR') : '–');
+  if (!rows.length) return '';
+  return `<table class="oz-t"><thead><tr><th>Öğrenci</th>${weeks.map((w) => `<th title="${esc(w.title)}">${w.no}. hafta</th>`).join('')}<th>Yazma hızı</th><th>Son çalışma</th></tr></thead>
+    <tbody>${rows.map(([n, st]) => `<tr><td><b>${esc(n)}</b></td>${weeks.map((w) => cell(w, st)).join('')}${hizCell(st)}<td>${seen(st)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function showOzet() {
+  if (lesson) saveProgress();
+  lesson = null;
+  np.active = false;
+  document.body.dataset.view = 'ozet';
+  $('#crumb').textContent = 'Eğitmen özeti';
+  clearTimeout(hintTimer);
+  const t = ozetTable();
+  $('#ozet').innerHTML = `<div class="oz"><h1>📊 Eğitmen özeti</h1>
+    <p class="mut">Bu bilgisayarda kayıtlı öğrencilerin her haftada bitirdiği ders sayısı ve test puanı (ilk denemede doğru bilinen sorular). Yeşil: hafta tamam, sarı: yarım. Kayıtlar yalnızca bu bilgisayarın tarayıcısındadır; her bilgisayarın özeti ayrıdır.</p>
+    ${t ? `<div class="oz-wrap">${t}</div><div class="oz-btns"><button type="button" class="btn" id="ozPrint">🖨 Yazdır</button><a class="btn" href="#">🏠 Ders listesi</a></div>` : '<p>Henüz kayıtlı öğrenci yok. Öğrenciler üstteki 👤 düğmesinden adlarını ekleyince burada görünür.</p><a class="btn" href="#">🏠 Ders listesi</a>'}</div>`;
+  const pr = $('#ozPrint');
+  if (pr) pr.onclick = () => {
+    $('#printCard').innerHTML = `<h1>📊 Eğitmen özeti</h1><p>${new Date().toLocaleDateString('tr-TR')}</p>${t}`;
+    print();
+  };
 }
 
 function showHome() {
@@ -299,8 +344,8 @@ function finalHtml() {
 }
 
 // Testlerde puan: ilk denemede (uyarı almadan) doğru bilinen sorular. Atlanan soru yanlış sayılır.
-function testScore(l) {
-  const stats = store.lessons[l.id]?.stats || {};
+function testScore(l, st = store) {
+  const stats = st.lessons?.[l.id]?.stats || {};
   const qs = l.steps.filter((s) => s.quiz);
   const right = qs.filter((s) => { const st = stats[l.steps.indexOf(s)]; return st && !st.w; });
   return { total: qs.length, right: right.length, missed: qs.filter((s) => !right.includes(s)) };

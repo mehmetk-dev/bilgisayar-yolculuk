@@ -54,6 +54,7 @@ Eğitmen için:
 - **Haftalık testler** 10 sorudur, seçenekler her açılışta karışık sıradadır. Yanlış cevapta açıklama çıkar ve doğrusu bulununca geçilir. Sonunda ilk denemede doğru bilinen soru sayısı ve tekrar bakılacak konular görünür; puan ana sayfadaki kartta da yazar.
 - Her adımın süresi tutulur. Fare parkurunun sonunda her görevin süresi listelenir, en uzun süren kırmızı görünür. Diğer derslerde en uzun süren üç adım gösterilir.
 - İlerleme tarayıcıda saklanır ve **her öğrenci için ayrıdır**: açılışta (ya da üstteki 👤 düğmesiyle) öğrenci seçilir; "Misafir" eski ortak kaydı kullanır. Sayfa yenilense de kaldığı yerden devam eder; ders sırasında sekme kapatılmak istenirse (Ctrl + W) tarayıcı önce sorar. sayfa yenilense de kaldığı yerden devam eder. Ders sonunda özet kartı yazdırılabilir.
+- **📊 Özet** (üst çubuk): bu bilgisayardaki her öğrencinin hafta hafta bitirdiği ders sayısı, test puanı, yazma hızı ve son çalıştığı gün. Yazdırılabilir.
 - Klavye dili yanlışsa (ENG ya da Türkçe F) ve Caps Lock açık kalmışsa rehberin üstünde uyarı çıkar.
 
 Kaynak: `src/dersler/`

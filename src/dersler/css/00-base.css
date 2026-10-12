@@ -72,7 +72,7 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 
 /* ders ekranı */
 #lesson { flex: 1; display: grid; grid-template-columns: minmax(18em, 24em) 1fr; gap: 1em; padding: 1em; min-height: 0; }
-body[data-view="home"] #lesson, body[data-view="lesson"] #home { display: none; }
+body:not([data-view="home"]) #home, body:not([data-view="lesson"]) #lesson, body:not([data-view="ozet"]) #ozet { display: none; }
 #guide { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 1em 1.1em; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6em; min-height: 0; }
 .prog { display: flex; align-items: center; gap: 0.6em; font-size: 0.8em; color: var(--mut); font-weight: 700; }
 #bar { flex: 1; height: 0.5em; background: #e4e9f0; border-radius: 999px; overflow: hidden; }
@@ -182,6 +182,7 @@ body:not(.with-kb) .under { display: none; }
   #printCard table { border-collapse: collapse; width: 100%; margin-top: 0.6em; }
   #printCard th, #printCard td { border: 1px solid #888; padding: 0.4em 0.6em; text-align: left; font-size: 15pt; }
   #printCard th { width: 35%; white-space: nowrap; }
+  #printCard .oz-t th, #printCard .oz-t td { width: auto; font-size: 10pt; padding: 0.25em 0.35em; text-align: center; }
   .pfoot { margin-top: 1em; }
 }
 
@@ -205,3 +206,17 @@ body:not(.with-kb) .under { display: none; }
 .padd input { font: inherit; padding: 0.35em 0.6em; border: 2px solid var(--line); border-radius: 10px; flex: 1 1 10em; min-width: 0; }
 .padd input:focus { outline: none; border-color: var(--acc); }
 .pfoot { display: flex; gap: 1em; justify-content: center; flex-wrap: wrap; }
+
+/* eğitmen özeti */
+#ozet { flex: 1; overflow-y: auto; padding: 1.5em 1em 3em; }
+.oz { max-width: 72em; margin: 0 auto; display: flex; flex-direction: column; gap: 0.8em; }
+.oz h1 { font-size: 1.6em; }
+.oz-wrap { overflow-x: auto; background: var(--card); border: 2px solid var(--line); border-radius: 14px; }
+.oz-t { border-collapse: collapse; width: 100%; font-size: 0.85em; }
+.oz-t th, .oz-t td { padding: 0.45em 0.6em; border-bottom: 1px solid var(--line); text-align: center; white-space: nowrap; }
+.oz-t th:first-child, .oz-t td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); }
+.oz-t thead th, .oz-t thead th:first-child { background: #f4f7fb; font-size: 0.9em; }
+.oz-t td.full { background: var(--ok-bg); color: var(--ok); font-weight: 700; }
+.oz-t td.part { background: var(--warn-bg); color: var(--warn); }
+.oz-t small { display: block; font-size: 0.85em; opacity: 0.85; }
+.oz-btns { display: flex; gap: 0.6em; flex-wrap: wrap; }
