@@ -50,7 +50,7 @@ export function addrProblem(a) {
 
 export function mail({ desk, body, emit, setTitle }) {
   const mb = box(desk);
-  body.classList.add('ml');
+  body.classList.add('pm');
   let folder = 'inbox', view = null; // view: { kind: 'read', id } | { kind: 'compose', ... }
   const $ = (s) => body.querySelector(s);
   const get = (id) => mb.mails.find((m) => m.id === id);
@@ -59,52 +59,52 @@ export function mail({ desk, body, emit, setTitle }) {
   function render() {
     const n = unread();
     setTitle(`E-posta${n ? ` (${n})` : ''}`);
-    body.innerHTML = `<div class="ml-top"><span class="ml-logo">✉ Postam</span><span class="ml-me">${ME}</span></div>
-      <div class="ml-main"><nav class="ml-side"><button type="button" class="ml-new">✏ Yeni posta</button>
+    body.innerHTML = `<div class="pm-top"><span class="pm-logo">✉ Postam</span><span class="pm-me">${ME}</span></div>
+      <div class="pm-main"><nav class="pm-side"><button type="button" class="pm-new">✏ Yeni posta</button>
         ${FOLDERS.map(([id, ic, label]) => `<button type="button" data-folder="${id}" class="${id === folder && !view ? 'on' : ''}">${ic} ${label}${id === 'inbox' && n ? ` <b>${n}</b>` : ''}</button>`).join('')}</nav>
-      <section class="ml-pane">${view?.kind === 'read' ? readHtml(get(view.id)) : view?.kind === 'compose' ? composeHtml() : listHtml()}</section></div>`;
+      <section class="pm-pane">${view?.kind === 'read' ? readHtml(get(view.id)) : view?.kind === 'compose' ? composeHtml() : listHtml()}</section></div>`;
     if (view?.kind === 'compose') {
-      $('.ml-to').value = view.to; $('.ml-subj').value = view.subject; $('.ml-body').value = view.text;
+      $('.pm-to').value = view.to; $('.pm-subj').value = view.subject; $('.pm-body').value = view.text;
     }
   }
 
   function listHtml() {
     const list = mb.mails.filter((m) => m.folder === folder);
     const label = FOLDERS.find((f) => f[0] === folder)[2];
-    return `<h2 class="ml-h">${label}</h2>${list.length ? `<ul class="ml-list">${list.map((m) => `<li><button type="button" data-open="${m.id}" class="${m.read ? '' : 'unread'}">
-      <span class="ml-from">${esc(folder === 'sent' ? 'Kime: ' + m.to : m.fromName)}</span><span class="ml-subj">${esc(m.subject || '(Konu yok)')}${m.attachments.length ? ' 📎' : ''}</span><span class="ml-time">${esc(m.time)}</span></button></li>`).join('')}</ul>` : '<p class="ml-empty">Bu klasörde posta yok.</p>'}`;
+    return `<h2 class="pm-h">${label}</h2>${list.length ? `<ul class="pm-list">${list.map((m) => `<li><button type="button" data-open="${m.id}" class="${m.read ? '' : 'unread'}">
+      <span class="pm-from">${esc(folder === 'sent' ? 'Kime: ' + m.to : m.fromName)}</span><span class="pm-subj">${esc(m.subject || '(Konu yok)')}${m.attachments.length ? ' 📎' : ''}</span><span class="pm-time">${esc(m.time)}</span></button></li>`).join('')}</ul>` : '<p class="pm-empty">Bu klasörde posta yok.</p>'}`;
   }
 
   function readHtml(m) {
-    const att = m.attachments.length ? `<div class="ml-atts">${m.attachments.map((a, i) => `<div class="ml-att">${isImage(a.name) ? `<img src="${pictureURL(a.content)}" alt="">` : `<span>${fileIcon(a.name)}</span>`}<b>${esc(a.name)}</b>${m.folder === 'sent' ? '' : `<button type="button" data-dl="${i}">⬇ İndir</button>`}</div>`).join('')}</div>` : '';
-    return `<div class="ml-tools"><button type="button" class="ml-back">← Geri</button>
-        ${m.folder === 'sent' ? '' : '<button type="button" class="ml-reply">↩ Yanıtla</button>'}<button type="button" class="ml-fwd">↪ İlet</button>
-        ${m.folder === 'inbox' ? '<button type="button" class="ml-spam">⚠ İstenmeyen</button>' : ''}${m.folder === 'trash' ? '' : '<button type="button" class="ml-del">🗑 Sil</button>'}</div>
-      <h2 class="ml-h">${esc(m.subject || '(Konu yok)')}</h2>
-      <div class="ml-meta"><b>${esc(m.fromName || 'Ben')}</b> &lt;${esc(m.from)}&gt;<br><span>Kime: ${esc(m.to)} · ${esc(m.date)} ${esc(m.time)}</span></div>
-      <div class="ml-text">${esc(m.body).replace(/\n/g, '<br>')}</div>
-      ${m.link ? `<p><a href="#" class="ml-link" data-danger="1">👉 ${esc(m.link)}</a></p>` : ''}${att}`;
+    const att = m.attachments.length ? `<div class="pm-atts">${m.attachments.map((a, i) => `<div class="pm-att">${isImage(a.name) ? `<img src="${pictureURL(a.content)}" alt="">` : `<span>${fileIcon(a.name)}</span>`}<b>${esc(a.name)}</b>${m.folder === 'sent' ? '' : `<button type="button" data-dl="${i}">⬇ İndir</button>`}</div>`).join('')}</div>` : '';
+    return `<div class="pm-tools"><button type="button" class="pm-back">← Geri</button>
+        ${m.folder === 'sent' ? '' : '<button type="button" class="pm-reply">↩ Yanıtla</button>'}<button type="button" class="pm-fwd">↪ İlet</button>
+        ${m.folder === 'inbox' ? '<button type="button" class="pm-spam">⚠ İstenmeyen</button>' : ''}${m.folder === 'trash' ? '' : '<button type="button" class="pm-del">🗑 Sil</button>'}</div>
+      <h2 class="pm-h">${esc(m.subject || '(Konu yok)')}</h2>
+      <div class="pm-meta"><b>${esc(m.fromName || 'Ben')}</b> &lt;${esc(m.from)}&gt;<br><span>Kime: ${esc(m.to)} · ${esc(m.date)} ${esc(m.time)}</span></div>
+      <div class="pm-text">${esc(m.body).replace(/\n/g, '<br>')}</div>
+      ${m.link ? `<p><a href="#" class="pm-link" data-danger="1">👉 ${esc(m.link)}</a></p>` : ''}${att}`;
   }
 
   function composeHtml() {
-    return `<div class="ml-tools"><button type="button" class="ml-send primary">➤ Gönder</button><button type="button" class="ml-attach">📎 Dosya ekle</button><button type="button" class="ml-discard">✕ Vazgeç</button></div>
-      <h2 class="ml-h">${view.title}</h2>
-      <label class="ml-field"><span>Kime:</span><input class="ml-to" type="text" spellcheck="false" autocomplete="off" placeholder="ornek@ornek.com"></label>
-      <label class="ml-field"><span>Konu:</span><input class="ml-subj" type="text" autocomplete="off"></label>
-      ${view.attachments.length ? `<div class="ml-atts">${view.attachments.map((a, i) => `<div class="ml-att">${isImage(a.name) ? `<img src="${pictureURL(a.content)}" alt="">` : `<span>${fileIcon(a.name)}</span>`}<b>${esc(a.name)}</b><button type="button" data-unatt="${i}" title="Eki çıkar">✕</button></div>`).join('')}</div>` : ''}
-      <div class="ml-err" aria-live="polite"></div>
-      <textarea class="ml-body" spellcheck="false" placeholder="Mesajınızı buraya yazın"></textarea>`;
+    return `<div class="pm-tools"><button type="button" class="pm-send primary">➤ Gönder</button><button type="button" class="pm-attach">📎 Dosya ekle</button><button type="button" class="pm-discard">✕ Vazgeç</button></div>
+      <h2 class="pm-h">${view.title}</h2>
+      <label class="pm-field"><span>Kime:</span><input class="pm-to" type="text" spellcheck="false" autocomplete="off" placeholder="ornek@ornek.com"></label>
+      <label class="pm-field"><span>Konu:</span><input class="pm-subj" type="text" autocomplete="off"></label>
+      ${view.attachments.length ? `<div class="pm-atts">${view.attachments.map((a, i) => `<div class="pm-att">${isImage(a.name) ? `<img src="${pictureURL(a.content)}" alt="">` : `<span>${fileIcon(a.name)}</span>`}<b>${esc(a.name)}</b><button type="button" data-unatt="${i}" title="Eki çıkar">✕</button></div>`).join('')}</div>` : ''}
+      <div class="pm-err" aria-live="polite"></div>
+      <textarea class="pm-body" spellcheck="false" placeholder="Mesajınızı buraya yazın"></textarea>`;
   }
 
   // Yazma ekranındaki kutuların içeriği yeniden çizimde kaybolmasın
-  const keep = () => { if (view?.kind === 'compose' && $('.ml-to')) { view.to = $('.ml-to').value; view.subject = $('.ml-subj').value; view.text = $('.ml-body').value; } };
+  const keep = () => { if (view?.kind === 'compose' && $('.pm-to')) { view.to = $('.pm-to').value; view.subject = $('.pm-subj').value; view.text = $('.pm-body').value; } };
 
   function compose(o = {}) {
     keep();
     view = { kind: 'compose', title: 'Yeni posta', to: '', subject: '', text: '', attachments: [], ...o };
     render();
     emit('mail-compose', { reply: !!o.replyTo, forward: !!o.forwardOf });
-    setTimeout(() => (view.to ? $('.ml-body') : $('.ml-to'))?.focus(), 0);
+    setTimeout(() => (view.to ? $('.pm-body') : $('.pm-to'))?.focus(), 0);
   }
 
   function openMail(id) {
@@ -117,9 +117,9 @@ export function mail({ desk, body, emit, setTitle }) {
 
   function send() {
     keep();
-    const to = view.to.trim(), err = (t) => { $('.ml-err').textContent = t; emit('mail-error', { what: t }); };
+    const to = view.to.trim(), err = (t) => { $('.pm-err').textContent = t; emit('mail-error', { what: t }); };
     const p = addrProblem(to);
-    if (p) { err(p); $('.ml-to').focus(); return; }
+    if (p) { err(p); $('.pm-to').focus(); return; }
     const go = () => {
       const m = { id: 'm' + seq++, folder: 'sent', read: true, from: ME, fromName: 'Ben', to, subject: view.subject.trim(), body: view.text, attachments: view.attachments, date: today(), time: new Date().toTimeString().slice(0, 5), replyTo: view.replyTo, forwardOf: view.forwardOf };
       mb.mails.unshift(m);
@@ -141,7 +141,7 @@ export function mail({ desk, body, emit, setTitle }) {
     };
     if (!view.subject.trim()) {
       desk.dialogs.ask({ title: 'Konu yok', icon: '✉', text: 'Bu postanın konusu boş. Yine de gönderilsin mi?', buttons: [['send', 'Gönder'], ['back', 'Geri dön, konu yazayım', true]] })
-        .then((a) => { if (a === 'send') go(); else { $('.ml-subj').focus(); emit('mail-error', { what: 'konu' }); } });
+        .then((a) => { if (a === 'send') go(); else { $('.pm-subj').focus(); emit('mail-error', { what: 'konu' }); } });
       return;
     }
     go();
@@ -161,21 +161,21 @@ export function mail({ desk, body, emit, setTitle }) {
   body.addEventListener('click', (e) => {
     const t = e.target.closest('button, a');
     if (!t) return;
-    if (t.classList.contains('ml-link')) {
+    if (t.classList.contains('pm-link')) {
       e.preventDefault();
       emit('mail-link', { danger: !!t.dataset.danger });
       desk.dialogs.ask({ title: 'Dikkat!', icon: '⚠', text: 'Bu bağlantı bankanızın sitesine değil, <b>bankaniz-dogrulama.xyz</b> adlı yabancı bir siteye gidiyor. Bankalar e-postayla şifre ya da kart numarası istemez.', buttons: [['ok', 'Anladım', true]] });
       return;
     }
-    if (t.classList.contains('ml-new')) return compose();
+    if (t.classList.contains('pm-new')) return compose();
     if (t.dataset.folder) { keep(); folder = t.dataset.folder; view = null; render(); emit('mail-folder', { folder }); return; }
     if (t.dataset.open) return openMail(t.dataset.open);
-    if (t.classList.contains('ml-back')) { view = null; render(); return; }
+    if (t.classList.contains('pm-back')) { view = null; render(); return; }
     const m = view?.kind === 'read' && get(view.id);
-    if (m && t.classList.contains('ml-reply')) return compose({ title: 'Yanıtla', to: m.from, subject: m.subject.startsWith('Ynt:') ? m.subject : 'Ynt: ' + m.subject, text: `\n\n--- ${m.fromName} yazdı ---\n${m.body}`, replyTo: m.id });
-    if (m && t.classList.contains('ml-fwd')) return compose({ title: 'İlet', subject: 'İlt: ' + m.subject, text: `\n\n--- İletilen posta ---\nKimden: ${m.fromName} <${m.from}>\nKonu: ${m.subject}\n\n${m.body}`, attachments: [...m.attachments], forwardOf: m.id });
-    if (m && (t.classList.contains('ml-del') || t.classList.contains('ml-spam'))) {
-      const spam = t.classList.contains('ml-spam');
+    if (m && t.classList.contains('pm-reply')) return compose({ title: 'Yanıtla', to: m.from, subject: m.subject.startsWith('Ynt:') ? m.subject : 'Ynt: ' + m.subject, text: `\n\n--- ${m.fromName} yazdı ---\n${m.body}`, replyTo: m.id });
+    if (m && t.classList.contains('pm-fwd')) return compose({ title: 'İlet', subject: 'İlt: ' + m.subject, text: `\n\n--- İletilen posta ---\nKimden: ${m.fromName} <${m.from}>\nKonu: ${m.subject}\n\n${m.body}`, attachments: [...m.attachments], forwardOf: m.id });
+    if (m && (t.classList.contains('pm-del') || t.classList.contains('pm-spam'))) {
+      const spam = t.classList.contains('pm-spam');
       m.folder = spam ? 'spam' : 'trash';
       view = null;
       render();
@@ -191,10 +191,10 @@ export function mail({ desk, body, emit, setTitle }) {
       return;
     }
     if (view?.kind === 'compose') {
-      if (t.classList.contains('ml-send')) return send();
-      if (t.classList.contains('ml-attach')) return attach();
+      if (t.classList.contains('pm-send')) return send();
+      if (t.classList.contains('pm-attach')) return attach();
       if (t.dataset.unatt) { keep(); view.attachments.splice(+t.dataset.unatt, 1); render(); return; }
-      if (t.classList.contains('ml-discard')) { view = null; render(); emit('mail-discard'); }
+      if (t.classList.contains('pm-discard')) { view = null; render(); emit('mail-discard'); }
     }
   });
   render();

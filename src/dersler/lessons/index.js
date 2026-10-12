@@ -14,6 +14,7 @@ import { dilekce, belgeEkle } from './kelime.js';
 import { hesap1, hesap2 } from './hesap.js';
 import { sunu } from './sunu.js';
 import { gunlukPc, gunlukWeb } from './gunluk.js';
+import { isg } from './isg.js';
 import { eslestir, tusavi, kart, liste, ilanOku, masaustuParkur, dosyaParkur } from './alistirmalar.js';
 import { test1, test2, test3, test4, test5, test6, test7, test8 } from './testler.js';
 import { onparmak, rakamlar, isaretler, klavyeOyun } from './hafta2_ek.js';
@@ -34,7 +35,7 @@ export const WEEKS = [
   { no: 1, title: 'Açma-kapama ve fare', lessons: [ackapa, fare1, fare2, surukle, pencereler, parkur, eslestir, test1] },
   { no: 2, title: 'Klavye', lessons: [klavye, harfbul, onparmak, rakamlar, isaretler, tusavi, kart, klavyeOyun, test2] },
   { no: 3, title: 'Metin seçme ve kısayollar', lessons: [notdefteri, secme, kaydetPratik, liste, tarif, kisayolYarisi, kopyaOyun, test3] },
-  { no: 4, title: 'Donanım ve yazılım', lessons: [yolculuk, donanim, parcalar, portlar, ilanOku, bakim, sorunGiderme, test4] },
+  { no: 4, title: 'Donanım ve yazılım', lessons: [yolculuk, donanim, parcalar, portlar, ilanOku, bakim, isg, sorunGiderme, test4] },
   { no: 5, title: 'Masaüstü, Başlat menüsü ve pencereler', lessons: [masaustu, baslatKesif, masaustuDuzen, hesapMakinesi, oyunlar, masaustuParkur, masaustuHarita, test5] },
   { no: 6, title: 'Dosyalar ve klasörler', lessons: [dosyalar, dosyaTurleri, klasorAgaci, fotograflar, copKutusu, dosyaParkur, dosyaSenaryo, test6] },
   { no: 7, title: 'Paint, Ekran Alıntısı ve Ayarlar', lessons: [paint, evCiz, tebrikKarti, alinti, alintiPratik, ayarlar, ayarlarParkur, test7] },
