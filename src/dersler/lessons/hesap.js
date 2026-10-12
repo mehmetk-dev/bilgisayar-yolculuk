@@ -4,7 +4,7 @@ import { K, desktopReady, maxed, norm } from './common.js';
 
 const X = (c) => c.d.find('sheet')?.api;
 const cell = (c, a) => X(c)?.cell(a) || { raw: '', value: '', text: '' };
-const sheetOpen = (c, data) => { if (!c.d.find('sheet')) maxed(c, 'sheet', data ? { data } : {}); };
+const sheetOpen = (c, data) => maxed(c, 'sheet', data ? { data } : {});
 const near = (v, n) => typeof v === 'number' && Math.abs(v - n) < 0.01;
 const editEvents = ['xl-edit', 'xl-autosum', 'xl-format', 'xl-sort', 'xl-chart', 'xl-select'];
 const when = (test) => (ev, c) => editEvents.includes(ev.type) && !!test(c);

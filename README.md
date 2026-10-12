@@ -33,7 +33,7 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 
 Bilgisayarı yeni öğrenen yetişkinler için adım adım alıştırmalar. Sitenin ana sayfasıdır; buradaki **🖥 Bilgisayarı canlı gör** bağlantısı 3B bilgisayarı açar, oradaki **📝 Derslere dön** düğmesi geri getirir. Her adımda ne yapılacağı yazar; sayfa öğrencinin yaptığını algılar ve doğru yapınca bir sonraki adıma geçirir.
 
-Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, E-posta, Kelime İşlemci (.docx), Hesap Tablosu (.xlsx), Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
+Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vardır. Masaüstü, görev çubuğu, Başlat menüsü, pencereler, Not Defteri, Hesap Makinesi, E-posta, Kelime İşlemci (.docx), Hesap Tablosu (.xlsx), Sunu (.pptx), Dosya Gezgini, Paint, Ayarlar, internet tarayıcısı, kurulum sihirbazı ve Aygıt Yöneticisi içerir. Hepsi bellekte çalışır, öğrencinin gerçek dosyalarına dokunmaz. Site, adres ve marka adları uydurmadır.
 
 | Hafta | Dersler |
 |---|---|
@@ -48,6 +48,7 @@ Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vard
 | 9 | E-posta: posta okuma, ek indirme, yanıtlama, fotoğraf ekleyip gönderme, adres yazımı, sahte (dolandırıcılık) postası |
 | 10 | Kelime işlemci (Word benzeri): dilekçe yazma, kalın, ortalama, yazı boyutu, iki yana yaslama, tarih, kaydetme, yazdırma · Liste, tablo (Tab ile hücreler), yazı rengi, resim, PDF olarak kaydetme |
 | 11 | Hesap tablosu (Excel benzeri): hücre adresi, veri girişi, ∑ Otomatik Toplam, TOPLA, ORTALAMA, dört işlem · Kalın ve ₺ biçimi, durum çubuğu, sıralama, sütun grafiği, yazdırma |
+| 12 | Sunu (PowerPoint benzeri): başlık slaytı, yeni slayt ve maddeler, tasarım teması, resim, slayt geçişi, slayt sırası, slayt gösterisi (F5), kaydetme |
 | Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre · Yazma hızı ölçümü: dakikada kelime ve hata; her ölçüm öğrencinin profilinde saklanır, haftadan haftaya karşılaştırılır |
 
 Eğitmen için:

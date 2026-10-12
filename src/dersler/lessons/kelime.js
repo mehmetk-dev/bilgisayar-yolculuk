@@ -5,7 +5,7 @@ import { K, desktopReady, maxed, norm } from './common.js';
 const W = (c) => c.d.find('word')?.api;
 const info = (c) => W(c)?.info() || { blocks: [], text: '', tables: 0, images: 0 };
 const block = (c, word) => info(c).blocks.find((b) => norm(b.text).includes(norm(word)));
-const wordOpen = (c) => { if (!c.d.find('word')) maxed(c, 'word'); };
+const wordOpen = (c) => maxed(c, 'word');
 // Biçim adımları: belge her değiştiğinde koşula bakılır
 const formatEvents = ['doc-format', 'doc-input', 'doc-shortcut', 'doc-insert', 'doc-cell'];
 const when = (test) => (ev, c) => formatEvents.includes(ev.type) && !!test(c);

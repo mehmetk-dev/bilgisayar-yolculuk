@@ -500,6 +500,8 @@ document.addEventListener('keydown', (e) => {
 // Masaüstü derslerinde Ctrl+S/O/P gibi kısayollar tarayıcının kendi pencerelerini açmasın
 document.addEventListener('keydown', (e) => {
   if (lesson?.stage === 'desktop' && (e.ctrlKey || e.metaKey) && ['KeyS', 'KeyO', 'KeyP', 'KeyF'].includes(e.code)) e.preventDefault();
+  // F5 sayfayı yenilemesin; sunu açıksa slayt gösterisini başlatsın (odak sunudaysa sunu bunu zaten yapmıştır)
+  if (lesson?.stage === 'desktop' && e.key === 'F5' && !e.ctrlKey) { if (!e.defaultPrevented) desk?.find('slides')?.api.show?.(); e.preventDefault(); }
 });
 
 // ---- Klavye uyarıları: yanlış klavye dili ve açık kalan Caps Lock ----

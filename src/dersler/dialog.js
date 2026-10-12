@@ -150,6 +150,7 @@ export function fileIcon(name) {
   if (/\.(png|jpe?g|bmp)$/i.test(name)) return '🖼';
   if (/\.docx?$/i.test(name)) return '📘';
   if (/\.xlsx?$/i.test(name)) return '📗';
+  if (/\.pptx?$/i.test(name)) return '📙';
   if (/\.pdf$/i.test(name)) return '📕';
   if (/\.exe$/i.test(name)) return '💿';
   if (/\.(mp3|wav)$/i.test(name)) return '🎵';
