@@ -540,3 +540,20 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .uf-one { display: grid; place-items: center; padding: 1em; background: #222; min-height: 100%; }
 .uf-one img { max-width: 100%; }
 .br-page:focus { outline: none; }
+.xl-grid td[data-cond="kirmizi"] { background: #ffc7ce; color: #9c0006; }
+.xl-grid td[data-cond="yesil"] { background: #c6efce; color: #006100; }
+.xl-grid td[data-cond="sari"] { background: #ffeb9c; color: #9c5700; }
+.xl-grid td.clip { outline: 2px dashed #1e7145; outline-offset: -3px; }
+.xl-grid td.fillsel { outline: 1px dashed #555; outline-offset: -2px; background: #f4f4f4; }
+.xl-grid tr[hidden] { display: none; }
+.xl-fh { position: absolute; width: 8px; height: 8px; background: #1e7145; border: 1px solid #fff; cursor: crosshair; z-index: 3; }
+.xl-fb { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); width: 1.2em; height: 1.2em; display: grid; place-items: center; background: #fff; border: 1px solid #aaa; border-radius: 3px; font-size: 0.8em; cursor: pointer; font-weight: 400; color: #333; }
+.xl-fb.on { background: #1e7145; color: #fff; border-color: #1e7145; }
+.xl-pop { position: absolute; z-index: 25; background: #fff; border: 1px solid #c8c8c8; border-radius: 8px; box-shadow: 0 8px 20px #0003; padding: 0.6em 0.8em; display: flex; flex-direction: column; gap: 0.45em; font-size: 0.88em; min-width: 15em; max-width: 22em; }
+.xl-pop p { margin: 0; }
+.xl-row { display: flex; gap: 0.4em; align-items: center; flex-wrap: wrap; }
+.xl-pop select, .xl-pop input[type="text"], .xl-pop input:not([type]) { font: inherit; padding: 0.15em 0.3em; }
+.xl-pop button { padding: 0.15em 0.7em !important; font-size: 0.95em; }
+.xl-pop .primary { background: #1e7145 !important; border-color: #1e7145 !important; color: #fff; }
+.xl-flist { max-height: 10em; overflow-y: auto; display: flex; flex-direction: column; gap: 0.15em; border: 1px solid #e0e0e0; border-radius: 4px; padding: 0.3em; }
+.xl-fall { font-weight: 700; }

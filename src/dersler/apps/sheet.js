@@ -1,5 +1,6 @@
-// Hesap Tablosu: Excel benzeri çalışma sayfası. Hücre seçme ve yazma, formüller (+ − * / ^, TOPLA, ORTALAMA, MAK, MİN,
-// SAY), otomatik toplam, kalın ve para biçimi, sıralama, sütun grafiği; .xlsx olarak kaydetme, açma, yazdırma.
+// Hesap Tablosu: Excel benzeri çalışma sayfası. Hücre seçme ve yazma; formüller (+ − * / ^ & ve karşılaştırma,
+// TOPLA, ORTALAMA, MAK, MİN, SAY, EĞER, EĞERSAY, ETOPLA, YUVARLA); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
+// doldurma tutamacı; otomatik toplam; kalın, para ve yüzde biçimi; koşullu biçimlendirme; sıralama; filtre; sütun grafiği.
 // Türkçe Excel gibi: ondalık ayırıcı virgül, işlev bağımsız değişkenleri noktalı virgülle ayrılır.
 import { esc } from './util.js';
 
@@ -7,48 +8,88 @@ const COLS = 'ABCDEFGH';
 const ROWS = 20;
 export const addr = (r, c) => COLS[c] + (r + 1);
 export function parseAddr(a) {
-  const m = /^([A-H])(\d{1,2})$/.exec(String(a).toUpperCase());
+  const m = /^\$?([A-H])\$?(\d{1,2})$/.exec(String(a).toUpperCase());
   if (!m || +m[2] < 1 || +m[2] > ROWS) return null;
   return { r: +m[2] - 1, c: COLS.indexOf(m[1]) };
 }
 
-// "1.250,50", "12,5", "750", "300 TL" → sayı; değilse null
+// "1.250,50", "12,5", "750", "300 TL", "%18" → sayı; değilse null
 export function parseNumber(s) {
   let t = String(s).trim().replace(/\s*(₺|TL)$/i, '');
+  let pct = false;
+  if (/^%|%$/.test(t)) { pct = true; t = t.replace('%', '').trim(); }
   if (!t) return null;
   if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '').replace(',', '.');
   else if (/^-?\d+(,\d+)?$/.test(t)) t = t.replace(',', '.');
   else if (!/^-?\d+(\.\d+)?$/.test(t)) return null;
   const n = parseFloat(t);
-  return isFinite(n) ? n : null;
+  return isFinite(n) ? (pct ? n / 100 : n) : null;
+}
+
+// Formülü (dr, dc) kadar kaydırılmış bir hücreye kopyalarken başvuruları kaydırır; $ olan kısım sabit kalır
+export function shiftFormula(f, dr, dc) {
+  if (!f.startsWith('=')) return f;
+  return f.split(/("[^"]*")/).map((part, i) => (i % 2 ? part : part.replace(/(?<![A-Za-zÇĞİÖŞÜçğıöşü$])(\$?)([A-Ha-h])(\$?)(\d{1,2})(?![\d(A-Za-zÇĞİÖŞÜçğıöşü])/g, (all, d1, col, d2, row) => {
+    const c = d1 ? COLS.indexOf(col.toUpperCase()) : COLS.indexOf(col.toUpperCase()) + dc;
+    const r = d2 ? +row : +row + dr;
+    if (c < 0 || c >= COLS.length || r < 1 || r > ROWS) return '#BAŞV!';
+    return `${d1}${COLS[c]}${d2}${r}`;
+  }))).join('');
 }
 
 class FErr extends Error {}
+const isRange = (x) => x && x.range;
+// Toplama/ortalama gibi işlevler: aralıktaki sayılar alınır (yazı ve boşluk atlanır), tek değerler sayıya çevrilir
+const numsOf = (args, num) => args.flatMap((a) => (isRange(a) ? a.vals.filter((v) => typeof v === 'number') : [num(a)]));
+const low = (s) => String(s).toLocaleLowerCase('tr');
+// EĞERSAY/ETOPLA ölçütü: ">=50", "<>Kira", "Geçti", 10
+function criterion(cr) {
+  const m = /^(<=|>=|<>|<|>|=)?(.*)$/.exec(String(cr));
+  const op = m[1] || '=', rhs = m[2], n = parseNumber(rhs);
+  return (v) => {
+    if (v === '' || v == null) return op === '<>' ? rhs !== '' : rhs === '';
+    if (n !== null && typeof v === 'number') return { '=': v === n, '<>': v !== n, '<': v < n, '>': v > n, '<=': v <= n, '>=': v >= n }[op];
+    const a = low(v), b = low(rhs);
+    return { '=': a === b, '<>': a !== b, '<': a < b, '>': a > b, '<=': a <= b, '>=': a >= b }[op];
+  };
+}
 const FUNCS = {
-  TOPLA: (v) => v.reduce((a, b) => a + b, 0),
-  ORTALAMA: (v) => { if (!v.length) throw new FErr('#BÖL/0!'); return v.reduce((a, b) => a + b, 0) / v.length; },
-  MAK: (v) => (v.length ? Math.max(...v) : 0),
-  'MİN': (v) => (v.length ? Math.min(...v) : 0),
-  SAY: (v) => v.length,
+  TOPLA: (a, num) => numsOf(a, num).reduce((x, y) => x + y, 0),
+  ORTALAMA: (a, num) => { const v = numsOf(a, num); if (!v.length) throw new FErr('#BÖL/0!'); return v.reduce((x, y) => x + y, 0) / v.length; },
+  MAK: (a, num) => { const v = numsOf(a, num); return v.length ? Math.max(...v) : 0; },
+  'MİN': (a, num) => { const v = numsOf(a, num); return v.length ? Math.min(...v) : 0; },
+  SAY: (a) => a.flatMap((x) => (isRange(x) ? x.vals : [x])).filter((v) => typeof v === 'number').length,
+  'EĞER': (a) => { if (a.length < 2) throw new FErr('#DEĞER!'); const c = a[0]; return (typeof c === 'string' ? c !== '' : !!c) ? a[1] : (a.length > 2 ? a[2] : false); },
+  YUVARLA: (a, num) => { const k = 10 ** Math.round(num(a[1] ?? 0)); return Math.round(num(a[0]) * k) / k; },
+  'EĞERSAY': (a) => { if (!isRange(a[0])) throw new FErr('#DEĞER!'); const t = criterion(a[1] ?? ''); return a[0].vals.filter(t).length; },
+  ETOPLA: (a, num) => {
+    if (!isRange(a[0])) throw new FErr('#DEĞER!');
+    const t = criterion(a[1] ?? ''), sum = isRange(a[2]) ? a[2].vals : a[0].vals;
+    return a[0].vals.reduce((s, v, i) => (t(v) && typeof sum[i] === 'number' ? s + sum[i] : s), 0);
+  },
 };
-const ALIAS = { SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', COUNT: 'SAY', MIN_TR: 'MİN' };
+const ALIAS = { SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', COUNT: 'SAY', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA' };
 
 // Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır)
 function evaluate(src, get) {
-  const re = /\s*(?:(\d+(?:,\d+)?)|([A-Za-zÇĞİÖŞÜçğıöşü]+\d*)|(.))/y;
+  const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+\$?\d*)|(<=|>=|<>|.))/y;
   const toks = [];
   let m;
   re.lastIndex = 0;
   while (re.lastIndex < src.length && (m = re.exec(src))) {
     if (m[1]) toks.push({ t: 'num', v: parseFloat(m[1].replace(',', '.')) });
-    else if (m[2]) toks.push({ t: 'id', v: m[2].toLocaleUpperCase('tr') });
-    else if (m[3].trim()) toks.push({ t: 'op', v: m[3] });
+    else if (m[2] !== undefined) toks.push({ t: 'str', v: m[2] });
+    else if (m[3]) toks.push({ t: 'id', v: m[3].toLocaleUpperCase('tr') });
+    else if (m[4].trim()) toks.push({ t: 'op', v: m[4] });
   }
+  if (src.split('"').length % 2 === 0) throw new FErr('#DEĞER!'); // kapanmamış tırnak
   let i = 0;
-  const peek = () => toks[i], eat = (v) => { if (toks[i]?.v === v) { i++; return true; } return false; };
+  const peek = () => toks[i], eat = (v) => { if (toks[i]?.t === 'op' && toks[i].v === v) { i++; return true; } return false; };
   const num = (x) => {
     if (typeof x === 'number') return x;
+    if (typeof x === 'boolean') return x ? 1 : 0;
     if (x === '' || x == null) return 0;
+    if (isRange(x)) throw new FErr('#DEĞER!');
     const n = parseNumber(x);
     if (n === null) throw new FErr('#DEĞER!');
     return n;
@@ -56,33 +97,35 @@ function evaluate(src, get) {
   function range(a, b) {
     const p = parseAddr(a), q = parseAddr(b);
     if (!p || !q) throw new FErr('#BAŞV!');
-    const out = [];
-    for (let r = Math.min(p.r, q.r); r <= Math.max(p.r, q.r); r++) for (let c = Math.min(p.c, q.c); c <= Math.max(p.c, q.c); c++) out.push(get(addr(r, c)));
-    return out;
+    const vals = [];
+    for (let r = Math.min(p.r, q.r); r <= Math.max(p.r, q.r); r++) for (let c = Math.min(p.c, q.c); c <= Math.max(p.c, q.c); c++) vals.push(get(addr(r, c)));
+    return { range: true, vals };
   }
   function primary() {
     const t = toks[i++];
     if (!t) throw new FErr('#DEĞER!');
-    if (t.t === 'num') return t.v;
-    if (t.t === 'op' && t.v === '(') { const v = expr(); if (!eat(')')) throw new FErr('#DEĞER!'); return v; }
+    if (t.t === 'num' || t.t === 'str') return t.v;
+    if (t.t === 'op' && t.v === '(') { const v = compare(); if (!eat(')')) throw new FErr('#DEĞER!'); return v; }
     if (t.t === 'id') {
       if (peek()?.v === '(') {
         i++;
-        const name = ALIAS[t.v] || t.v;
+        const name = ALIAS[t.v.replace(/İ/g, 'I')] || ALIAS[t.v] || t.v;
         const fn = FUNCS[name];
         if (!fn) throw new FErr('#AD?');
-        const vals = [];
+        const args = [];
         if (!eat(')')) {
           do {
-            if (toks[i]?.t === 'id' && toks[i + 1]?.v === ':') { const a = toks[i].v; i += 2; const b = toks[i++]?.v; vals.push(...range(a, b).filter((x) => typeof x === 'number')); }
-            else { const v = expr(); vals.push(typeof v === 'number' ? v : num(v)); }
+            if (toks[i]?.t === 'id' && toks[i + 1]?.v === ':') { const a = toks[i].v; i += 2; const b = toks[i++]?.v; args.push(range(a, b)); }
+            else args.push(compare());
           } while (eat(';') || eat(','));
           if (!eat(')')) throw new FErr('#DEĞER!');
         }
-        return fn(vals);
+        return fn(args, num);
       }
+      if (t.v === 'DOĞRU' || t.v === 'TRUE') return true;
+      if (t.v === 'YANLIŞ' || t.v === 'FALSE') return false;
       if (!parseAddr(t.v)) throw new FErr('#AD?');
-      return get(t.v);
+      return get(t.v.replace(/\$/g, ''));
     }
     throw new FErr('#DEĞER!');
   }
@@ -107,12 +150,25 @@ function evaluate(src, get) {
     for (;;) {
       if (eat('+')) v = num(v) + num(term());
       else if (eat('-')) v = num(v) - num(term());
-      else if (eat('&')) v = String(v) + String(term());
+      else if (eat('&')) { const w = term(); v = String(v === true ? 'DOĞRU' : v === false ? 'YANLIŞ' : v) + String(w); }
       else return v;
     }
   }
-  const v = expr();
+  function compare() {
+    let v = expr();
+    for (const op of ['<=', '>=', '<>', '<', '>', '=']) {
+      if (eat(op)) {
+        const w = expr();
+        const both = typeof v === 'number' && typeof w === 'number';
+        const a = both ? v : low(v), b = both ? w : low(w);
+        return { '=': a === b, '<>': a !== b, '<': a < b, '>': a > b, '<=': a <= b, '>=': a >= b }[op];
+      }
+    }
+    return v;
+  }
+  const v = compare();
   if (i < toks.length) throw new FErr('#DEĞER!');
+  if (isRange(v)) throw new FErr('#DEĞER!');
   return v;
 }
 
@@ -132,12 +188,14 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="asc" title="Küçükten büyüğe sırala">↑ A→Z</button><button type="button" data-act="desc" title="Büyükten küçüğe sırala">↓ Z→A</button>
       <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Grafik</button>
+      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button>
     </div>
+    <div class="xl-pop" hidden></div>
     <div class="xl-menu" hidden><button type="button" data-file="new">📄 Yeni</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
     <div class="xl-bar"><input class="xl-name" readonly aria-label="Ad kutusu"><span class="xl-fx">fx</span><input class="xl-formula" spellcheck="false" autocomplete="off" aria-label="Formül çubuğu"></div>
     <div class="xl-wrap" tabindex="0"><table class="xl-grid"><thead><tr><th class="xl-corner"></th>${[...COLS].map((c) => `<th>${c}</th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length: ROWS }, (_, r) => `<tr><th>${r + 1}</th>${[...COLS].map((_, c) => `<td data-a="${addr(r, c)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
-      <div class="xl-chart" hidden></div></div>
+      <div class="xl-chart" hidden></div><div class="xl-fh" title="Doldurma tutamacı: aşağı ya da sağa sürükleyin"></div></div>
     <div class="xl-status"><span class="xl-stat"></span><span>Sayfa1</span></div>`;
   const $ = (s) => body.querySelector(s);
   const wrap = $('.xl-wrap'), fbar = $('.xl-formula');
@@ -145,6 +203,10 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   let act = { r: 0, c: 0 }, anchor = { r: 0, c: 0 }; // seçim: anchor'dan act'e dikdörtgen
   let editing = null; // { input, enterMode }
   let chart = null; // { range }
+  let rules = []; // koşullu biçim: { r1, c1, r2, c2, crit: '>50', color }
+  let filt = null; // filtre: { hr: başlık satırı, r2, c2, allow: { sütun: Set(gösterilecek yazılar) } }
+  let clip = null; // kopyalanan hücreler: { r1, c1, r2, c2, data, cut }
+  let fill = null; // doldurma tutamacıyla sürükleme
 
   const sel = () => ({ r1: Math.min(anchor.r, act.r), c1: Math.min(anchor.c, act.c), r2: Math.max(anchor.r, act.r), c2: Math.max(anchor.c, act.c) });
   const selAddr = () => { const s = sel(); return s.r1 === s.r2 && s.c1 === s.c2 ? addr(s.r1, s.c1) : `${addr(s.r1, s.c1)}:${addr(s.r2, s.c2)}`; };
@@ -160,8 +222,38 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     try { return evaluate(raw.slice(1), (b) => value(b, seen)); } finally { seen.delete(a); }
   }
   function show(a) {
-    try { const v = value(a); return { v, text: typeof v === 'number' ? fmtNum(v, fmt[a]?.f) : String(v) }; }
+    try { const v = value(a); return { v, text: typeof v === 'number' ? fmtNum(v, fmt[a]?.f) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v) }; }
     catch (e) { return { v: null, err: true, text: e instanceof FErr ? e.message : '#DEĞER!' }; }
+  }
+
+  // Toplam satırı: içinde birden çok satırı kapsayan bir aralık (ör. =TOPLA(B2:B5)) olan satır. Sıralama ve filtre buna dokunmaz.
+  const totalRow = (r) => [...COLS].some((_, c) => [...(cells[addr(r, c)] || '').matchAll(/\$?[A-H]\$?(\d{1,2}):\$?[A-H]\$?(\d{1,2})/gi)].some((m) => m[1] !== m[2]) && (cells[addr(r, c)] || '').startsWith('='));
+  const COND = { kirmizi: 'Kırmızı', yesil: 'Yeşil', sari: 'Sarı' };
+  function condColor(a, r, c, v) {
+    let col = null;
+    for (const R of rules) if (r >= R.r1 && r <= R.r2 && c >= R.c1 && c <= R.c2 && v !== '' && v != null && criterion(R.crit)(v)) col = R.color;
+    return col;
+  }
+  const rowsEl = () => body.querySelectorAll('tbody tr');
+  function hiddenRow(r) {
+    if (!filt || r <= filt.hr || r > filt.r2) return false;
+    return Object.entries(filt.allow).some(([c, set]) => !set.has(show(addr(r, +c)).text));
+  }
+  function renderFilter() {
+    body.querySelectorAll('.xl-fb').forEach((b) => b.remove());
+    rowsEl().forEach((tr, r) => { tr.hidden = hiddenRow(r); });
+    if (!filt) { $('.xl-stat').dataset.filter = ''; return; }
+    for (let c = 0; c <= filt.c2; c++) {
+      const b = document.createElement('span');
+      b.className = 'xl-fb' + (filt.allow[c] ? ' on' : '');
+      b.dataset.col = c;
+      b.textContent = filt.allow[c] ? '⏷' : '▾';
+      b.title = 'Filtre: hangi satırlar görünsün?';
+      td(addr(filt.hr, c)).append(b);
+    }
+    let shown = 0;
+    for (let r = filt.hr + 1; r <= filt.r2; r++) if (!hiddenRow(r)) shown++;
+    $('.xl-stat').dataset.filter = Object.keys(filt.allow).length ? `${filt.r2 - filt.hr} kayıttan ${shown} tanesi gösteriliyor` : '';
   }
 
   function render() {
@@ -171,7 +263,10 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       el.classList.toggle('num', typeof s.v === 'number' || !!s.err);
       el.classList.toggle('err', !!s.err);
       el.classList.toggle('b', !!fmt[a]?.b);
+      const col = condColor(a, r, c, s.v);
+      el.dataset.cond = col || '';
     }
+    renderFilter();
     paintSel();
     setTitle(`${dirty ? '*' : ''}${fileName || 'Kitap1'} - Hesap Tablosu`);
   }
@@ -187,7 +282,14 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     // Seçili sayılar için durum çubuğunda toplam ve ortalama (Excel'deki gibi)
     const nums = [];
     for (let r = s.r1; r <= s.r2; r++) for (let c = s.c1; c <= s.c2; c++) { const v = show(addr(r, c)).v; if (typeof v === 'number') nums.push(v); }
-    $('.xl-stat').textContent = nums.length > 1 ? `Ortalama: ${fmtNum(nums.reduce((a, b) => a + b, 0) / nums.length)}   Sayı: ${nums.length}   Toplam: ${fmtNum(nums.reduce((a, b) => a + b, 0))}` : 'Hazır';
+    $('.xl-stat').textContent = (nums.length > 1 ? `Ortalama: ${fmtNum(nums.reduce((a, b) => a + b, 0) / nums.length)}   Sayı: ${nums.length}   Toplam: ${fmtNum(nums.reduce((a, b) => a + b, 0))}` : 'Hazır') + ($('.xl-stat').dataset.filter ? '   ·   ' + $('.xl-stat').dataset.filter : '');
+    body.querySelectorAll('td.clip').forEach((x) => x.classList.remove('clip'));
+    if (clip) for (let r = clip.r1; r <= clip.r2; r++) for (let c = clip.c1; c <= clip.c2; c++) td(addr(r, c)).classList.add('clip');
+    // Doldurma tutamacı: seçimin sağ alt köşesindeki küçük kare
+    const br = td(addr(s.r2, s.c2)), fh = $('.xl-fh');
+    fh.hidden = !!editing || br.closest('tr').hidden;
+    fh.style.left = (br.offsetLeft + br.offsetWidth - 4) + 'px';
+    fh.style.top = (br.offsetTop + br.offsetHeight - 4) + 'px';
     td(addr(act.r, act.c)).scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
@@ -201,6 +303,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   function setCell(a, raw) {
     raw = raw.trim();
     if (raw) cells[a] = raw; else delete cells[a];
+    if (/%/.test(raw) && !raw.startsWith('=') && parseNumber(raw) !== null) (fmt[a] ||= {}).f = 'pct';
     dirty = true;
     render();
     const s = show(a);
@@ -236,6 +339,124 @@ export function sheet({ desk, body, args, emit, setTitle }) {
 
   // ---- Komutlar ----
   function eachSel(fn) { const s = sel(); for (let r = s.r1; r <= s.r2; r++) for (let c = s.c1; c <= s.c2; c++) fn(addr(r, c), r, c); }
+  // ---- Kopyala, kes, yapıştır; Ctrl + D ve doldurma tutamacı ----
+  function copy(cut = false) {
+    const t = sel();
+    const data = [];
+    for (let r = t.r1; r <= t.r2; r++) { const row = []; for (let c = t.c1; c <= t.c2; c++) row.push([cells[addr(r, c)], fmt[addr(r, c)]]); data.push(row); }
+    clip = { ...t, data, cut };
+    paintSel();
+    emit('xl-copy', { range: selAddr(), cut });
+  }
+  function put(r, c, src, sr, sc, move) {
+    const a = addr(r, c), [raw, f] = src;
+    const v = raw && !move ? shiftFormula(raw, r - sr, c - sc) : raw;
+    if (v) cells[a] = v; else delete cells[a];
+    if (f) fmt[a] = structuredClone(f); else delete fmt[a];
+  }
+  function paste() {
+    if (!clip) { desk.toast('Pano boş', 'Önce hücreleri seçip Ctrl + C ile kopyalayın.', '📋'); return; }
+    const t = sel(), h = clip.r2 - clip.r1 + 1, w = clip.c2 - clip.c1 + 1;
+    // Tek hücre kopyalanıp birden fazla hücre seçildiyse hepsine yapıştırılır (formül her satıra uyarlanır)
+    const tr2 = h === 1 && w === 1 ? t.r2 : t.r1 + h - 1, tc2 = h === 1 && w === 1 ? t.c2 : t.c1 + w - 1;
+    if (tr2 >= ROWS || tc2 >= COLS.length) { desk.toast('Yapıştırılamadı', 'Yapıştırılacak alan sayfanın dışına taşıyor.', '⚠'); return; }
+    const moved = clip.cut;
+    if (moved) for (let r = clip.r1; r <= clip.r2; r++) for (let c = clip.c1; c <= clip.c2; c++) { delete cells[addr(r, c)]; delete fmt[addr(r, c)]; }
+    for (let r = t.r1; r <= tr2; r++) for (let c = t.c1; c <= tc2; c++) {
+      const i = (r - t.r1) % h, j = (c - t.c1) % w;
+      put(r, c, clip.data[i][j], clip.r1 + i, clip.c1 + j, moved);
+    }
+    anchor = { r: t.r1, c: t.c1 }; act = { r: tr2, c: tc2 };
+    const from = clip.r1 === clip.r2 && clip.c1 === clip.c2 ? addr(clip.r1, clip.c1) : `${addr(clip.r1, clip.c1)}:${addr(clip.r2, clip.c2)}`;
+    if (moved) clip = null;
+    dirty = true;
+    render();
+    emit('xl-paste', { from, to: selAddr(), cut: moved });
+  }
+  // Seçimi (s) hedefe (to) kadar doldurur: formüller kaydırılır, iki ya da daha çok sayı varsa seri devam eder (1, 2 → 3, 4…)
+  function fillTo(s, to, dir) {
+    const series = (vals) => {
+      const n = vals.map((x) => (x && !x.startsWith('=') ? parseNumber(x) : null));
+      if (n.length < 2 || n.some((x) => x === null)) return null;
+      const d = n[1] - n[0];
+      return n.every((x, k) => k === 0 || Math.abs(x - n[k - 1] - d) < 1e-9) ? { last: n.at(-1), d } : null;
+    };
+    if (dir === 'down') {
+      for (let c = s.c1; c <= s.c2; c++) {
+        const src = []; for (let r = s.r1; r <= s.r2; r++) src.push([cells[addr(r, c)], fmt[addr(r, c)], r]);
+        const ser = series(src.map((x) => x[0]));
+        for (let r = s.r2 + 1; r <= to; r++) {
+          const k = (r - s.r2 - 1) % src.length;
+          if (ser) { cells[addr(r, c)] = fmtSeries(ser.last + ser.d * (r - s.r2)); if (src[k][1]) fmt[addr(r, c)] = structuredClone(src[k][1]); }
+          else put(r, c, src[k], src[k][2], c, false);
+        }
+      }
+      anchor = { r: s.r1, c: s.c1 }; act = { r: to, c: s.c2 };
+    } else {
+      for (let r = s.r1; r <= s.r2; r++) {
+        const src = []; for (let c = s.c1; c <= s.c2; c++) src.push([cells[addr(r, c)], fmt[addr(r, c)], c]);
+        const ser = series(src.map((x) => x[0]));
+        for (let c = s.c2 + 1; c <= to; c++) {
+          const k = (c - s.c2 - 1) % src.length;
+          if (ser) cells[addr(r, c)] = fmtSeries(ser.last + ser.d * (c - s.c2));
+          else put(r, c, src[k], r, src[k][2], false);
+        }
+      }
+      anchor = { r: s.r1, c: s.c1 }; act = { r: s.r2, c: to };
+    }
+    dirty = true;
+    render();
+    emit('xl-fill', { from: s.r1 === s.r2 && s.c1 === s.c2 ? addr(s.r1, s.c1) : `${addr(s.r1, s.c1)}:${addr(s.r2, s.c2)}`, to: selAddr(), dir });
+  }
+  const fmtSeries = (n) => String(Math.round(n * 1e9) / 1e9).replace('.', ',');
+  function fillDown() {
+    const t = sel();
+    if (t.r1 === t.r2) { desk.toast('Aşağı doldur', 'Önce kopyalanacak hücreyi ve altındaki boş hücreleri birlikte seçin.', 'ℹ'); return; }
+    fillTo({ ...t, r2: t.r1 }, t.r2, 'down');
+  }
+
+  // ---- Koşullu biçim ve filtre pencereleri ----
+  const pop = $('.xl-pop');
+  // Açılır kutu, verilen öğenin hemen altında açılır
+  function openPop(html, under) {
+    pop.innerHTML = html;
+    pop.hidden = false;
+    const b = body.getBoundingClientRect(), r = under.getBoundingClientRect();
+    pop.style.left = Math.max(4, Math.min(r.left - b.left, body.clientWidth - pop.offsetWidth - 8)) + 'px';
+    pop.style.top = Math.min(r.bottom - b.top + 3, body.clientHeight - pop.offsetHeight - 6) + 'px';
+  }
+  function condDialog() {
+    const t = sel();
+    if (t.r1 === t.r2 && t.c1 === t.c2) { desk.toast('Koşullu Biçim', 'Önce renklendirilecek hücreleri fareyle sürükleyerek seçin.', '🎨'); return; }
+    const b = $('[data-act="cond"]');
+    openPop(`<b>🎨 Koşullu Biçim</b><p>Seçili hücrelerden (${selAddr()}) değeri</p>
+      <div class="xl-row"><select class="xl-cop"><option value=">">büyük olanları</option><option value="<">küçük olanları</option><option value=">=">en az şu kadar olanları</option><option value="=">eşit olanları</option></select>
+      <input class="xl-cval" placeholder="50 ya da Kaldı" size="9"></div>
+      <div class="xl-row">renk: <select class="xl-ccol">${Object.entries(COND).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select></div>
+      <div class="xl-row"><button type="button" class="xl-cok primary">Uygula</button><button type="button" class="xl-cclr">Kuralları temizle</button><button type="button" class="xl-px">İptal</button></div>`, b);
+    pop.querySelector('.xl-cval').focus();
+  }
+  function filterToggle() {
+    if (filt) { filt = null; render(); emit('xl-filter-off'); return; }
+    // Etkin hücrenin bulunduğu tablonun başlık satırı: yukarı doğru boş olmayan son satır
+    const used = (r) => [...COLS].some((_, c) => cells[addr(r, c)]);
+    if (!used(act.r)) { desk.toast('Filtre', 'Önce tablonun içinde bir hücreye tıklayın.', '🔽'); return; }
+    let hr = act.r; while (hr > 0 && used(hr - 1)) hr--;
+    let r2 = hr; while (r2 + 1 < ROWS && used(r2 + 1) && !totalRow(r2 + 1)) r2++;
+    let c2 = COLS.length - 1; while (c2 > 0 && !cells[addr(hr, c2)]) c2--;
+    filt = { hr, r2, c2, allow: {} };
+    render();
+    emit('xl-filter-on', { header: hr + 1 });
+  }
+  function filterDialog(c) {
+    const vals = [...new Set(Array.from({ length: filt.r2 - filt.hr }, (_, k) => show(addr(filt.hr + 1 + k, c)).text))].sort((x, y) => x.localeCompare(y, 'tr'));
+    const allow = filt.allow[c];
+    const cell = td(addr(filt.hr, c));
+    openPop(`<b>🔽 ${esc(show(addr(filt.hr, c)).text)}</b><label class="xl-fall"><input type="checkbox" class="xl-fa" ${allow ? '' : 'checked'}> (Tümünü seç)</label>
+      <div class="xl-flist">${vals.map((v) => `<label><input type="checkbox" value="${esc(v)}" ${!allow || allow.has(v) ? 'checked' : ''}> ${esc(v || '(Boş)')}</label>`).join('')}</div>
+      <div class="xl-row"><button type="button" class="xl-fok primary" data-col="${c}">Tamam</button><button type="button" class="xl-px">İptal</button></div>`, cell);
+  }
+
   function format(kind) {
     if (kind === 'bold') { let all = true; eachSel((a) => { if (!fmt[a]?.b) all = false; }); eachSel((a) => { (fmt[a] ||= {}).b = !all; }); }
     else eachSel((a) => { (fmt[a] ||= {}).f = kind === 'plain' ? undefined : kind; });
@@ -261,22 +482,26 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     emit('xl-autosum', { addr: a, formula: f });
   }
   function sort(desc) {
-    // Etkin sütuna göre, başlık satırının altındaki veri satırlarını sıralar. Formül içeren satırda (ör. Toplam) durur.
+    // Etkin sütuna göre, başlık satırının altındaki veri satırlarını sıralar. Toplam satırında durur.
     const s = sel();
     const lastCol = (r) => { let c = COLS.length - 1; while (c >= 0 && !cells[addr(r, c)]) c--; return c; };
     let r1 = s.r1 === s.r2 ? 1 : s.r1, r2 = s.r1 === s.r2 ? r1 : s.r2;
     if (s.r1 === s.r2) {
       const row = (r) => [...COLS].some((_, c) => cells[addr(r, c)]);
-      const formulaRow = (r) => [...COLS].some((_, c) => (cells[addr(r, c)] || '').startsWith('='));
-      while (r2 + 1 < ROWS && row(r2 + 1) && !formulaRow(r2 + 1)) r2++;
+      while (r2 + 1 < ROWS && row(r2 + 1) && !totalRow(r2 + 1)) r2++;
     }
     const c2 = s.c1 === s.c2 ? Math.max(...Array.from({ length: r2 - r1 + 1 }, (_, k) => lastCol(r1 + k))) : s.c2;
     const c1 = s.c1 === s.c2 ? 0 : s.c1;
-    const rows = Array.from({ length: r2 - r1 + 1 }, (_, k) => Array.from({ length: c2 - c1 + 1 }, (__, j) => [cells[addr(r1 + k, c1 + j)], fmt[addr(r1 + k, c1 + j)]]));
-    const key = act.c - c1;
-    const val = (row) => { const v = row[key]?.[0]; const n = parseNumber(v ?? ''); return n ?? (v || ''); };
-    rows.sort((a, b) => { const x = val(a), y = val(b); const o = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'tr'); return desc ? -o : o; });
-    rows.forEach((row, k) => row.forEach(([raw, f], j) => { const a = addr(r1 + k, c1 + j); if (raw) cells[a] = raw; else delete cells[a]; if (f) fmt[a] = f; else delete fmt[a]; }));
+    // Sıralama anahtarı hesaplanmış değerdir (formül sütununa göre de sıralanabilir)
+    const rows = Array.from({ length: r2 - r1 + 1 }, (_, k) => ({
+      src: r1 + k,
+      key: show(addr(r1 + k, act.c)).v,
+      data: Array.from({ length: c2 - c1 + 1 }, (__, j) => [cells[addr(r1 + k, c1 + j)], fmt[addr(r1 + k, c1 + j)]]),
+    }));
+    const kv = (x) => (x === '' || x == null ? '' : x);
+    rows.sort((a, b) => { const x = kv(a.key), y = kv(b.key); const o = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'tr'); return desc ? -o : o; });
+    // Satırla birlikte taşınan formüller yeni satırına göre kaydırılır (=ORTALAMA(B2:C2) → B5:C5 gibi)
+    rows.forEach((row, k) => row.data.forEach(([raw, f], j) => { const a = addr(r1 + k, c1 + j); if (raw) cells[a] = shiftFormula(raw, r1 + k - row.src, 0); else delete cells[a]; if (f) fmt[a] = f; else delete fmt[a]; }));
     dirty = true;
     render();
     emit('xl-sort', { desc, col: COLS[act.c], from: addr(r1, c1), to: addr(r2, c2) });
@@ -306,7 +531,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   // ---- Dosya ----
   const fsApi = desk.fs.dialogApi();
   function load(data, name = null, fld = folder) {
-    cells = { ...(data?.cells || {}) }; fmt = structuredClone(data?.fmt || {});
+    cells = { ...(data?.cells || {}) }; fmt = structuredClone(data?.fmt || {}); rules = structuredClone(data?.rules || []); filt = null; clip = null;
     fileName = name; folder = fld; dirty = false; chart = null;
     $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
@@ -317,7 +542,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     let r = fileName && !asNew ? { folder, name: fileName } : await desk.dialogs.file({ mode: 'save', fs: fsApi, folder, name: fileName || 'Kitap1.xlsx', ext: '.xlsx', typeLabel: 'Excel Çalışma Kitabı (*.xlsx)' });
     wrap.focus({ preventScroll: true });
     if (!r) return false;
-    desk.fs.write(r.folder, r.name, { cells: { ...cells }, fmt: structuredClone(fmt) });
+    desk.fs.write(r.folder, r.name, { cells: { ...cells }, fmt: structuredClone(fmt), rules: structuredClone(rules) });
     const quick = !!fileName && !asNew;
     fileName = r.name; folder = r.folder; dirty = false;
     render();
@@ -351,6 +576,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   // ---- Olaylar ----
   let dragging = false;
   wrap.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.xl-fb')) { e.preventDefault(); filterDialog(+e.target.closest('.xl-fb').dataset.col); return; }
+    if (e.target.closest('.xl-fh')) { e.preventDefault(); if (editing) commit(0, 0); fill = { s: sel(), dir: null, to: null }; return; }
     const cell = e.target.closest('td[data-a]');
     if (!cell || e.target.classList.contains('xl-in')) return;
     e.preventDefault();
@@ -361,12 +588,30 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     wrap.focus({ preventScroll: true });
   });
   wrap.addEventListener('mouseover', (e) => {
+    if (fill) {
+      const cell = e.target.closest('td[data-a]');
+      if (!cell) return;
+      const p = parseAddr(cell.dataset.a), s0 = fill.s;
+      fill.dir = p.r > s0.r2 ? 'down' : p.c > s0.c2 ? 'right' : null;
+      fill.to = fill.dir === 'down' ? p.r : fill.dir === 'right' ? p.c : null;
+      body.querySelectorAll('td.fillsel').forEach((x) => x.classList.remove('fillsel'));
+      if (fill.dir === 'down') for (let r = s0.r2 + 1; r <= fill.to; r++) for (let c = s0.c1; c <= s0.c2; c++) td(addr(r, c)).classList.add('fillsel');
+      if (fill.dir === 'right') for (let r = s0.r1; r <= s0.r2; r++) for (let c = s0.c2 + 1; c <= fill.to; c++) td(addr(r, c)).classList.add('fillsel');
+      return;
+    }
     if (!dragging || !(e.buttons & 1)) { dragging = false; return; }
     const cell = e.target.closest('td[data-a]');
     if (cell) { const p = parseAddr(cell.dataset.a); act = p; paintSel(); }
   });
   addEventListener('mouseup', function up() {
     if (!body.isConnected) { removeEventListener('mouseup', up); return; }
+    if (fill) {
+      const f = fill;
+      fill = null;
+      body.querySelectorAll('td.fillsel').forEach((x) => x.classList.remove('fillsel'));
+      if (f.dir) fillTo(f.s, f.to, f.dir);
+      return;
+    }
     if (dragging) { dragging = false; emit('xl-select', { addr: addr(act.r, act.c), range: selAddr() }); }
   });
   wrap.addEventListener('dblclick', (e) => { if (e.target.closest('td[data-a]')) startEdit(null, false); });
@@ -380,6 +625,10 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (e.ctrlKey || e.metaKey) {
+      if (e.code === 'KeyC') { e.preventDefault(); copy(false); }
+      if (e.code === 'KeyX') { e.preventDefault(); copy(true); }
+      if (e.code === 'KeyV') { e.preventDefault(); paste(); }
+      if (e.code === 'KeyD') { e.preventDefault(); fillDown(); }
       if (e.code === 'KeyB') { e.preventDefault(); format('bold'); }
       if (e.code === 'KeyS') { e.preventDefault(); save(e.shiftKey); }
       if (e.code === 'KeyP') { e.preventDefault(); fileCmd('print'); }
@@ -397,6 +646,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (k === 'F2') { e.preventDefault(); startEdit(null, false); return; }
+    if (k === 'Escape') { if (clip) { clip = null; paintSel(); } pop.hidden = true; return; }
     if (k.length === 1 && !e.altKey) { e.preventDefault(); startEdit(k); }
   });
   // Formül çubuğu: tıklayıp oradan da yazılabilir
@@ -406,16 +656,47 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (e.key === 'Enter') { e.preventDefault(); if (editing) editing.input.value = fbar.value; commit(1, 0); }
     if (e.key === 'Escape') { e.preventDefault(); cancel(); }
   });
-  body.addEventListener('mousedown', (e) => { if (!e.target.closest('.xl-menu, .xl-file')) $('.xl-menu').hidden = true; if (e.target.closest('.xl-rib button')) e.preventDefault(); });
+  body.addEventListener('mousedown', (e) => {
+    if (!e.target.closest('.xl-menu, .xl-file')) $('.xl-menu').hidden = true;
+    if (!e.target.closest('.xl-pop, [data-act="cond"], .xl-fb')) pop.hidden = true;
+    if (e.target.closest('.xl-rib button')) e.preventDefault();
+  });
+  pop.addEventListener('change', (e) => {
+    if (e.target.classList.contains('xl-fa')) pop.querySelectorAll('.xl-flist input').forEach((b) => { b.checked = e.target.checked; });
+    else if (e.target.closest('.xl-flist')) pop.querySelector('.xl-fa').checked = [...pop.querySelectorAll('.xl-flist input')].every((b) => b.checked);
+  });
+  pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); pop.querySelector('.xl-cok, .xl-fok')?.click(); } e.stopPropagation(); });
   body.addEventListener('click', (e) => {
     const t = e.target.closest('button');
     if (!t) return;
     if (t.classList.contains('xl-file')) { $('.xl-menu').hidden = !$('.xl-menu').hidden; return; }
     if (t.dataset.file) return fileCmd(t.dataset.file);
+    if (t.classList.contains('xl-px')) { pop.hidden = true; return; }
+    if (t.classList.contains('xl-cok')) {
+      const op = pop.querySelector('.xl-cop').value, val = pop.querySelector('.xl-cval').value.trim();
+      if (!val) { pop.querySelector('.xl-cval').focus(); return; }
+      const R = { ...sel(), crit: op + val, color: pop.querySelector('.xl-ccol').value };
+      rules.push(R);
+      pop.hidden = true; dirty = true; render();
+      emit('xl-cond', { range: selAddr(), crit: R.crit, color: R.color });
+      return;
+    }
+    if (t.classList.contains('xl-cclr')) { rules = []; pop.hidden = true; dirty = true; render(); emit('xl-cond-clear'); return; }
+    if (t.classList.contains('xl-fok')) {
+      const c = +t.dataset.col, boxes = [...pop.querySelectorAll('.xl-flist input')];
+      if (boxes.every((b) => b.checked)) delete filt.allow[c];
+      else filt.allow[c] = new Set(boxes.filter((b) => b.checked).map((b) => b.value));
+      pop.hidden = true; render();
+      emit('xl-filter', { col: COLS[c], values: filt.allow[c] ? [...filt.allow[c]] : null, shown: [...Array(filt.r2 - filt.hr)].filter((_, k) => !hiddenRow(filt.hr + 1 + k)).length });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
     if (t.classList.contains('xl-ch-x')) { chart = null; $('.xl-chart').hidden = true; emit('xl-chart-remove'); return; }
     const a = t.dataset.act;
     if (!a) return;
     if (editing) commit(0, 0);
+    if (a === 'cond') return condDialog();
+    if (a === 'filter') { filterToggle(); wrap.focus({ preventScroll: true }); return; }
     if (a === 'sum') autosum();
     else if (a === 'asc' || a === 'desc') sort(a === 'desc');
     else if (a === 'chart') {
@@ -434,7 +715,9 @@ export function sheet({ desk, body, args, emit, setTitle }) {
 
   return {
     // Derslerin kontrolü için
-    cell: (a) => { const s = show(a); return { raw: cells[a] || '', value: s.v, text: s.text, bold: !!fmt[a]?.b, f: fmt[a]?.f || null }; },
+    cell: (a) => { const s = show(a), p = parseAddr(a); return { raw: cells[a] || '', value: s.v, text: s.text, bold: !!fmt[a]?.b, f: fmt[a]?.f || null, color: condColor(a, p.r, p.c, s.v), hidden: hiddenRow(p.r) }; },
+    get filter() { return filt && { header: filt.hr + 1, cols: Object.keys(filt.allow).map((c) => COLS[c]) }; },
+    get rules() { return rules.length; },
     get chart() { return chart; },
     confirmClose: confirmDiscard,
     focus: () => { if (!desk.dialogs.busy && !editing) wrap.focus({ preventScroll: true }); },
