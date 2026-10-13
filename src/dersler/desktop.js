@@ -14,7 +14,27 @@ export const WALLPAPERS = {
   gece: ['Gece', 'radial-gradient(circle at 20% 30%, #fff8 0 1px, transparent 2px) 0 0/90px 90px, radial-gradient(circle at 70% 60%, #fff6 0 1px, transparent 2px) 0 0/130px 130px, linear-gradient(180deg, #0f1c3d, #1f2f5c 60%, #2d1f4d)', ['#1f2f5c', '#2d1f4d']],
   lavanta: ['Lavanta', 'linear-gradient(135deg, #e0c3fc 0%, #b28dff 50%, #6a4bbf 100%)', ['#b28dff', '#6a4bbf']],
   deniz: ['Deniz', 'linear-gradient(180deg, #a1ffce 0%, #2bc0e4 45%, #1d6fa3 100%)', ['#2bc0e4', '#1d6fa3']],
+  // Mağazadan indirilen temalarla gelir (4. alan: tema yüklenmeden arka plan listesinde görünmez)
+  kapadokya: ['Kapadokya', 'radial-gradient(circle at 22% 30%, #e85d3a 0 2.2%, transparent 2.4%), radial-gradient(circle at 70% 22%, #f4b400 0 1.8%, transparent 2%), radial-gradient(circle at 48% 45%, #3c8dde 0 1.4%, transparent 1.6%), linear-gradient(180deg, #ffd8a8 0%, #f7a96b 55%, #b5651d 56%, #8a4a17 100%)', ['#f7a96b', '#8a4a17'], 'store'],
+  kis: ['Karlı Dağlar', 'linear-gradient(160deg, transparent 55%, #fff 55.3%, #dfe9f3 70%), linear-gradient(200deg, transparent 50%, #f5f9fc 50.3%, #c9d6e3 80%), linear-gradient(180deg, #8fb3d9 0%, #c7dcef 60%, #eef4fa 100%)', ['#c7dcef', '#8fa3b8'], 'store'],
+  uzay: ['Uzay', 'radial-gradient(circle at 75% 30%, #f6c177 0 4%, #c27c2c 6%, transparent 6.4%), radial-gradient(circle at 10% 20%, #fff9 0 1px, transparent 2px) 0 0/70px 70px, radial-gradient(circle at 60% 80%, #fff6 0 1px, transparent 2px) 0 0/110px 110px, radial-gradient(ellipse at 30% 80%, #5b2a86 0%, transparent 60%), linear-gradient(180deg, #05051a, #12123a)', ['#12123a', '#05051a'], 'store'],
+  yayla: ['Karadeniz Yaylası', 'radial-gradient(ellipse at 30% 100%, #2e7d32 0 30%, transparent 30.5%), radial-gradient(ellipse at 80% 105%, #1b5e20 0 35%, transparent 35.5%), linear-gradient(180deg, #cfe8ef 0%, #a9d3c9 45%, #6fae7a 70%, #3f7f46 100%)', ['#a9d3c9', '#3f7f46'], 'store'],
 };
+
+// Temalar: arka plan + vurgu rengi + açık/koyu mod birlikte. store: Mağazadan indirilir.
+export const THEMES = {
+  windows: { name: 'Windows (açık)', wall: 'mavi', accent: '#0a5dc2', dark: false },
+  koyu: { name: 'Windows (koyu)', wall: 'gece', accent: '#4c9be8', dark: true },
+  gunbatimi: { name: 'Gün batımı', wall: 'gunbatimi', accent: '#c2410c', dark: false },
+  orman: { name: 'Orman', wall: 'orman', accent: '#2e7d32', dark: false },
+  lavanta: { name: 'Lavanta', wall: 'lavanta', accent: '#7030a0', dark: false },
+  deniz: { name: 'Deniz', wall: 'deniz', accent: '#0e7490', dark: false },
+  kapadokya: { name: 'Kapadokya', wall: 'kapadokya', accent: '#b45309', dark: false, store: true, size: '18 MB', pics: 6 },
+  kis: { name: 'Karlı Dağlar', wall: 'kis', accent: '#475569', dark: false, store: true, size: '22 MB', pics: 8 },
+  uzay: { name: 'Uzay', wall: 'uzay', accent: '#8b5cf6', dark: true, store: true, size: '30 MB', pics: 10 },
+  yayla: { name: 'Karadeniz Yaylası', wall: 'yayla', accent: '#15803d', dark: false, store: true, size: '16 MB', pics: 5 },
+};
+export const ACCENTS = [['Mavi', '#0a5dc2'], ['Lacivert', '#1e3a8a'], ['Mor', '#7030a0'], ['Pembe', '#c2185b'], ['Kırmızı', '#c62828'], ['Turuncu', '#c2410c'], ['Yeşil', '#2e7d32'], ['Camgöbeği', '#0e7490'], ['Gri', '#475569']];
 
 const CELL_W = 6.2, CELL_H = 5.7; // em
 const PINNED = ['explorer', 'browser'];
@@ -23,6 +43,11 @@ const DEFAULT_SETTINGS = () => ({
   wallpaper: 'mavi', customWall: null, volume: 50, muted: false, brightness: 100, wifi: true, network: 'EvAğı',
   knownNetworks: ['EvAğı'], autoTime: true, timeOffset: 0, tz: 'İstanbul (UTC+3)', textScale: 100, dark: false,
   user: 'Öğrenci', password: '1234', printers: ['PDF olarak kaydet'], installed: [], unknownDevice: true,
+  theme: 'windows', themes: [], accent: '#0a5dc2', accentBars: false, accentTitle: false, transparency: true, taskbarAlign: 'center',
+  // Bilgisayar açılırken kendiliğinden başlayan programlar (Görev Yöneticisi → Başlangıç uygulamaları)
+  startup: { cloud: true, chat: true, music: true, printer: true, defender: true },
+  // Tarayıcı: kurulu uzantılar { id: { on, pin } }, arama motoru, açılış sayfası
+  extensions: {}, searchEngine: 'bulalim', startPage: 'home', askDownload: false,
 });
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -103,6 +128,8 @@ export class Desktop {
     this.fs.reset();
     this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
     this.bookmarks = []; // tarayıcının sık kullanılanları
+    this.webHistory = []; this.webDownloads = []; this.webNotes = {}; // tarayıcının geçmişi, indirilenleri, uzantı notları
+    this.tmKilled = new Set(); // Görev Yöneticisi'nde sonlandırılan arka plan işlemleri
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;
@@ -209,11 +236,27 @@ export class Desktop {
     this.root.querySelector('.tb-wifi').textContent = s.wifi && s.network ? '📶' : '🚫';
     this.root.querySelector('.tb-vol').textContent = s.muted || !s.volume ? '🔇' : s.volume < 40 ? '🔈' : '🔊';
     this.root.classList.toggle('dk-dark', !!s.dark);
+    this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
+    this.root.classList.toggle('dk-accbars', !!s.accentBars);
+    this.root.classList.toggle('dk-acctitle', !!s.accentTitle);
+    this.root.classList.toggle('dk-notrans', !s.transparency);
+    this.root.classList.toggle('dk-tbleft', s.taskbarAlign === 'left');
     this.tick();
+  }
+
+  // Temayı uygular: arka plan, vurgu rengi ve açık/koyu mod birlikte değişir
+  applyTheme(key) {
+    const t = THEMES[key];
+    if (!t) return;
+    Object.assign(this.settings, { theme: key, wallpaper: t.wall, customWall: null, accent: t.accent, dark: t.dark });
+    this.applySettings();
+    this.emit('theme', { key, name: t.name, dark: t.dark });
+    this.wins.forEach((w) => w.api?.onSettings?.());
   }
 
   setSetting(key, value) {
     this.settings[key] = value;
+    if (key === 'wallpaper' || key === 'dark' || key === 'accent') this.settings.theme = 'ozel'; // temadan ayrıldı
     this.applySettings();
     this.emit('setting', { key, value });
     this.wins.forEach((w) => w.api?.onSettings?.());
@@ -609,6 +652,13 @@ export class Desktop {
         [{ cmd: 'eject', label: '⏏ USB Belleği çıkar' }], () => this.ejectUsb(), 'usb');
     };
     $('.tb-clock').onclick = () => this.open('settings', { page: 'time' });
+    // Görev çubuğunun boş yerine sağ tık: Görev Yöneticisi ve görev çubuğu ayarları
+    $('.dk-taskbar').addEventListener('contextmenu', (e) => {
+      if (e.target.closest('button')) return;
+      e.preventDefault();
+      this.menu(e.clientX, e.clientY - 70, [{ cmd: 'taskmgr', label: '📊 Görev Yöneticisi' }, { cmd: 'tbset', label: '⚙ Görev çubuğu ayarları' }],
+        (c) => (c === 'taskmgr' ? this.open('taskmgr') : this.open('settings', { page: 'personal' })), 'taskbar');
+    });
     $('.tb-apps').addEventListener('click', (e) => {
       const b = e.target.closest('[data-app]');
       if (!b) return;
@@ -719,15 +769,16 @@ export class Desktop {
 
   winxMenu() {
     const items = [
-      { cmd: 'apps', label: 'Yüklü uygulamalar' }, { cmd: 'devmgr', label: 'Aygıt Yöneticisi' }, { cmd: 'settings', label: 'Ayarlar' },
+      { cmd: 'apps', label: 'Yüklü uygulamalar' }, { cmd: 'devmgr', label: 'Aygıt Yöneticisi' }, { cmd: 'taskmgr', label: 'Görev Yöneticisi' }, { cmd: 'settings', label: 'Ayarlar' },
       { cmd: 'explorer', label: 'Dosya Gezgini' }, { cmd: 'search', label: 'Ara' }, '-',
       { cmd: 'power', label: 'Kapat veya oturumu kapat', sub: [{ cmd: 'sleep', label: 'Uyku' }, { cmd: 'shutdown', label: 'Kapat' }, { cmd: 'restart', label: 'Yeniden başlat' }] },
       { cmd: 'desktop', label: 'Masaüstü' },
     ];
     const b = this.root.querySelector('.tb-start').getBoundingClientRect();
-    this.menu(b.left, b.top - 320, items, (cmd) => {
+    this.menu(b.left, b.top - 345, items, (cmd) => {
       if (cmd === 'apps') this.open('settings', { page: 'apps' });
       else if (cmd === 'devmgr') this.open('devmgr');
+      else if (cmd === 'taskmgr') this.open('taskmgr');
       else if (cmd === 'settings') this.open('settings');
       else if (cmd === 'explorer') this.open('explorer');
       else if (cmd === 'search') this.toggleStart(true, true);
@@ -787,7 +838,7 @@ export class Desktop {
     win.api = def.create({
       desk: this, win, body, args, fs: this.fs, dialogs: this.dialogs,
       emit: (type, data = {}) => this.emit(type, { app, win: win.id, ...data }),
-      setTitle: (t) => { win.title = t; el.querySelector('.win-title').textContent = t; this.renderTaskbar(); },
+      setTitle: (t) => { win.title = t; el.querySelector('.win-title').textContent = t + (win.hung ? ' (Yanıt Vermiyor)' : ''); this.renderTaskbar(); },
       close: () => this.destroy(win),
     }) || {};
     if (!el.querySelector('.win-title').textContent) el.querySelector('.win-title').textContent = win.title;
@@ -911,7 +962,34 @@ export class Desktop {
     this.emit('win-unmax', { app: win.app, win: win.id });
   }
 
+  // Program donar: pencere soluklaşır, tıklamalara yanıt vermez, başlığa "(Yanıt Vermiyor)" eklenir
+  hang(win, on = true) {
+    if (!win || !this.wins.includes(win)) return;
+    win.hung = on;
+    win.el.classList.toggle('hung', on);
+    win.el.querySelector('.win-hang')?.remove();
+    const t = win.el.querySelector('.win-title');
+    t.textContent = win.title + (on ? ' (Yanıt Vermiyor)' : '');
+    if (on) {
+      const h = document.createElement('div');
+      h.className = 'win-hang';
+      h.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); if (++win.hangClicks >= 2) this.hangDialog(win); });
+      win.hangClicks = 0;
+      win.el.querySelector('.win-body').append(h);
+    }
+    this.emit(on ? 'app-hang' : 'app-unhang', { app: win.app, win: win.id });
+  }
+
+  async hangDialog(win) {
+    if (this.dialogs.busy) return;
+    win.hangClicks = 0;
+    const a = await this.dialogs.ask({ title: win.title, icon: '⏳', text: `<b>${esc(win.title)}</b> yanıt vermiyor.<br><small>Programı kapatırsanız kaydedilmemiş bilgiler kaybolabilir.</small>`, buttons: [['kill', 'Programı kapat', true], ['wait', 'Programın yanıt vermesini bekle']] });
+    if (a === 'kill' && this.wins.includes(win)) { this.destroy(win); this.emit('end-task', { app: win.app, hung: true, via: 'dialog' }); }
+    else this.emit('hang-wait', { app: win.app });
+  }
+
   async close(win) {
+    if (win.hung) { this.hangDialog(win); return; }
     if (win.api?.confirmClose && !(await win.api.confirmClose())) { this.emit('win-close-cancel', { app: win.app }); return; }
     this.destroy(win);
     this.emit('win-close', { app: win.app, win: win.id });
@@ -959,6 +1037,7 @@ export class Desktop {
       if (this.power === 'sleep' && Date.now() - this.sleepAt > 900) { this.emit('wake'); this.setPower('lock'); return; }
       if (e.altKey && e.key === 'Tab') { e.preventDefault(); this.altTab(); return; }
       if (e.altKey && e.key === 'F4' && this.active) { e.preventDefault(); this.close(this.active); return; }
+      if ((e.ctrlKey && e.shiftKey && e.key === 'Escape') || (e.ctrlKey && e.altKey && e.key === 'Delete')) { e.preventDefault(); this.emit('taskmgr-key'); this.open('taskmgr'); return; }
       if (e.target === this.iconsEl && this.selected) {
         const it = this.item(this.selected);
         if (e.key === 'Delete' && !it.sys) { e.preventDefault(); this.deleteNode(this.selected); }

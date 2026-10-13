@@ -8,6 +8,7 @@ import { browser } from './browser.js';
 import { setup } from './setup.js';
 import { photos, viewer, pdf, music } from './media.js';
 import { devmgr } from './devmgr.js';
+import { taskmgr } from './taskmgr.js';
 import { snip } from './snip.js';
 import { mail } from './mail.js';
 import { word } from './word.js';
@@ -51,6 +52,7 @@ export const APPS = {
   pdf: { name: 'PDF Okuyucu', icon: '📕', w: 0.55, h: 0.8, hidden: true, create: pdf },
   music: { name: 'Müzik Çalar', icon: '🎵', w: 0.4, h: 0.55, keywords: ['müzik', 'şarkı'], create: music },
   setup: { name: 'Kurulum', icon: '💿', w: 0.64, h: 0.7, hidden: true, create: setup },
+  taskmgr: { name: 'Görev Yöneticisi', icon: '📊', w: 0.78, h: 0.82, single: true, keywords: ['görev', 'yönetici', 'işlem', 'donma', 'yanıt vermiyor', 'performans', 'başlangıç', 'task'], create: taskmgr },
   devmgr: { name: 'Aygıt Yöneticisi', icon: '🖥', w: 0.6, h: 0.8, keywords: ['aygıt', 'sürücü', 'donanım'], create: devmgr },
   snip: { name: 'Ekran Alıntısı', icon: '✂', w: 0.48, h: 0.55, single: true, keywords: ['ekran', 'alıntı', 'görüntü', 'snip'], create: snip },
   hedef: { name: 'Hedef Oyunu', icon: '🎯', w: 0.84, h: 0.88, keywords: ['oyun', 'fare'], create: hedef },

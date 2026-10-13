@@ -1,13 +1,13 @@
 // Ayarlar: ses ve parlaklık, yazıcılar, Wi-Fi, arka plan, yüklü uygulamalar, saat, yazı boyutu, güncelleştirmeler
 import { esc, pictureURL, progress, wait, playTune } from './util.js';
-import { WALLPAPERS } from '../desktop.js';
+import { WALLPAPERS, THEMES, ACCENTS } from '../desktop.js';
 import { APPS } from './index.js';
 
 const PAGES = [
   ['system', '🖥', 'Sistem', 'Ekran, ses'],
   ['devices', '🖨', 'Bluetooth ve cihazlar', 'Yazıcılar, fare'],
   ['network', '📶', 'Ağ ve İnternet', 'Wi-Fi'],
-  ['personal', '🎨', 'Kişiselleştirme', 'Arka plan, renkler'],
+  ['personal', '🎨', 'Kişiselleştirme', 'Temalar, arka plan, renkler'],
   ['apps', '🧩', 'Uygulamalar', 'Yüklü uygulamalar'],
   ['time', '🕒', 'Saat ve dil', 'Tarih, saat dilimi'],
   ['access', '♿', 'Erişilebilirlik', 'Metin boyutu'],
@@ -59,10 +59,23 @@ export function settings({ desk, body, args, emit, dialogs }) {
       }
       h += '</section>';
     } else if (page === 'personal') {
-      h += `<section><h3>Arka plan</h3><div class="st-preview" style="background:${desk.wallCss()}"></div>
-        <p>Bir resim seçin:</p><div class="st-walls">${Object.entries(WALLPAPERS).map(([k, [n, css]]) => `<button type="button" data-wall="${k}" title="${n}" class="${s.wallpaper === k ? 'on' : ''}" style="background:${css}"><span>${n}</span></button>`).join('')}</div>
+      // Tema önizlemesi: küçük bir masaüstü (arka plan, pencere, görev çubuğu) temanın renkleriyle
+      const owned = Object.entries(THEMES).filter(([k, t]) => !t.store || s.themes.includes(k));
+      const custom = s.theme === 'ozel';
+      h += `<section><h3>🖌 Temalar</h3><p class="st-note">Tema; arka planı, vurgu rengini ve açık/koyu modu <b>birlikte</b> değiştirir. Uygulamak için birine tıklayın.</p>
+        <div class="st-themes">${owned.map(([k, t]) => `<button type="button" data-theme="${k}" class="${s.theme === k ? 'on' : ''}">${mini(t)}<span>${t.name}</span></button>`).join('')}
+          ${custom ? `<button type="button" class="on st-custom" disabled>${mini({ wall: s.wallpaper, accent: s.accent, dark: s.dark })}<span>Özel</span></button>` : ''}</div>
+        ${flow.store || '<button type="button" class="st-btn" data-act="store">🛍 Mağaza\'dan daha fazla tema alın</button>'}</section>
+        <section><h3>🖼 Arka plan</h3><div class="st-preview" style="background:${desk.wallCss()}"></div>
+        <p>Bir resim seçin:</p><div class="st-walls">${Object.entries(WALLPAPERS).filter(([k, w]) => !w[3] || s.themes.includes(k)).map(([k, [n, css]]) => `<button type="button" data-wall="${k}" title="${n}" class="${s.wallpaper === k ? 'on' : ''}" style="background:${css}"><span>${n}</span></button>`).join('')}</div>
         <button type="button" class="st-btn" data-act="browseWall">🖼 Fotoğraflara göz atın…</button></section>
-        <section><h3>Renkler</h3>${toggle('dark', s.dark, 'Koyu mod')}</section>`;
+        <section><h3>🎨 Renkler</h3>${toggle('dark', s.dark, 'Koyu mod')}
+        ${toggle('transparency', s.transparency, 'Saydamlık efektleri (Başlat menüsü ve görev çubuğu yarı saydam)')}
+        <p>Vurgu rengi <small class="st-note">(düğmeler, seçili öğeler, görev çubuğundaki çizgi)</small></p>
+        <div class="st-accents">${ACCENTS.map(([n, c]) => `<button type="button" data-accent="${c}" title="${n}" class="${s.accent === c ? 'on' : ''}" style="background:${c}"></button>`).join('')}</div>
+        ${toggle('accentBars', s.accentBars, 'Vurgu rengini Başlat menüsünde ve görev çubuğunda göster')}
+        ${toggle('accentTitle', s.accentTitle, 'Vurgu rengini başlık çubuklarında göster')}</section>
+        <section><h3>▭ Görev çubuğu</h3><label class="st-row">Görev çubuğu hizalaması <select data-act="tbAlign"><option value="center" ${s.taskbarAlign !== 'left' ? 'selected' : ''}>Ortala</option><option value="left" ${s.taskbarAlign === 'left' ? 'selected' : ''}>Sol</option></select></label></section>`;
     } else if (page === 'apps') {
       const list = [...BUILTIN, ...s.installed];
       h += `<section><h3>Yüklü uygulamalar</h3><div class="st-list">${list.map((a) => `<div class="st-item"><span>${APPS[a].icon}</span><b>${APPS[a].name}</b><small>${s.installed.includes(a) ? 'Örnek Yazılım A.Ş. · 48 MB' : 'Windows ile gelir'}</small>
@@ -88,14 +101,48 @@ export function settings({ desk, body, args, emit, dialogs }) {
 
   const go = (p) => { page = p; render(); emit('settings-page', { page }); };
 
+  // Tema önizlemesi: küçük bir masaüstü (arka plan, pencere, görev çubuğu) temanın renkleriyle
+  function mini(t) {
+    const wall = t.wall === 'custom' ? desk.wallCss() : (WALLPAPERS[t.wall] || WALLPAPERS.mavi)[1];
+    return `<span class="st-mini ${t.dark ? 'dark' : ''}" style="--mc:${t.accent};background:${wall}"><i class="mw"><b></b></i><i class="mt"></i></span>`;
+  }
+  function renderStore() {
+    const list = Object.entries(THEMES).filter(([, t]) => t.store);
+    flow.store = `<div class="st-store"><div class="st-store-h">🛍 Mağaza · Temalar <button type="button" class="st-btn" data-act="storeClose">✕ Kapat</button></div>
+      <p class="st-note">Temalar ücretsizdir. Yalnızca <b>Mağaza</b>'dan indirin; internette “ücretsiz tema” diye program indirmeyin, istenmeyen yazılım bulaşabilir.</p>
+      <div class="st-sgrid">${list.map(([k, t]) => {
+        const have = s.themes.includes(k);
+        return `<div class="st-sitem">${mini(t)}<div><b>${t.name}</b><small>${t.pics} resim · ${t.size} · Ücretsiz</small></div>
+          ${flow.getting === k ? '<div class="st-sprog"></div>' : have ? `<button type="button" class="st-btn" data-theme="${k}">Uygula</button>` : `<button type="button" class="st-btn primary" data-get-theme="${k}">Al</button>`}</div>`;
+      }).join('')}</div></div>`;
+    render();
+  }
+
   body.addEventListener('click', async (e) => {
     const b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.page) return go(b.dataset.page);
     if (b.dataset.wall) { s.customWall = null; desk.setSetting('wallpaper', b.dataset.wall); render(); emit('wallpaper', { name: WALLPAPERS[b.dataset.wall][0], key: b.dataset.wall }); return; }
+    if (b.dataset.theme) { desk.applyTheme(b.dataset.theme); render(); return; }
+    if (b.dataset.accent) { desk.setSetting('accent', b.dataset.accent); render(); emit('accent', { color: b.dataset.accent, name: ACCENTS.find((x) => x[1] === b.dataset.accent)?.[0] }); return; }
+    if (b.dataset.getTheme) {
+      // Mağazadan tema indirme: ilerleme çubuğu, sonra temalar listesine eklenir
+      const k = b.dataset.getTheme;
+      flow.getting = k;
+      renderStore();
+      await progress(pg.querySelector('.st-sprog'), 2000, `${THEMES[k].name} indiriliyor… (${THEMES[k].size})`);
+      flow.getting = null;
+      if (!s.themes.includes(k)) s.themes = [...s.themes, k];
+      renderStore();
+      desk.toast('Tema yüklendi', `<b>${THEMES[k].name}</b> artık Ayarlar → Kişiselleştirme → Temalar'da.`, '🖌', 5000);
+      emit('theme-get', { key: k, name: THEMES[k].name });
+      return;
+    }
     const act = b.dataset.act;
     const netEl = b.closest('[data-net]');
     switch (act) {
+      case 'store': renderStore(); emit('theme-store'); return;
+      case 'storeClose': flow.store = null; render(); return;
       case 'soundTest': {
         const t = playTune(desk, [523, 659, 784]);
         emit('sound-test', { audible: t > 0, volume: s.volume, muted: s.muted });
@@ -241,6 +288,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
       render();
       emit('toggle', { key: k, on: e.target.checked });
     }
+    if (e.target.dataset.act === 'tbAlign') { desk.setSetting('taskbarAlign', e.target.value); emit('taskbar-align', { value: e.target.value }); return; }
     if (e.target.dataset.act === 'tz') {
       const old = ZONES.find(([z]) => z === s.tz)[1], nu = ZONES.find(([z]) => z === e.target.value)[1];
       s.tz = e.target.value;
