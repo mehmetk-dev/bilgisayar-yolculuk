@@ -129,6 +129,26 @@ export class Dialogs {
     return p;
   }
 
+  // Metin kutulu pencere. fields: [{ name, label, value }]. Tamam'da { name: değer } döner; check(değerler) hata metni dönerse kapanmaz.
+  form({ title, text = '', fields, ok = 'Tamam', icon = '', check }) {
+    const inner = `${text ? `<div class="dlg-msg">${icon ? `<span class="dlg-icon">${icon}</span>` : ''}<div>${text}</div></div>` : ''}
+      <div class="dlg-pr">${fields.map((f, i) => `<label class="dlg-row"><span>${esc(f.label)}</span><input class="dlg-name" data-f="${f.name}" value="${esc(f.value || '')}" autocomplete="off" spellcheck="false" ${i ? '' : 'autofocus'}></label>`).join('')}</div>
+      <div class="dlg-err"></div>
+      <div class="dlg-btns"><button type="button" class="dlg-ok">${esc(ok)}</button><button type="button" class="dlg-cancel">İptal</button></div>`;
+    const p = this.shell('dlg-form', title, inner, 'form');
+    const back = this._last;
+    const go = () => {
+      const v = Object.fromEntries([...back.querySelectorAll('[data-f]')].map((x) => [x.dataset.f, x.value]));
+      const err = check?.(v);
+      if (err) { back.querySelector('.dlg-err').textContent = err; return; }
+      back.close(v);
+    };
+    back.querySelector('.dlg-ok').onclick = go;
+    back.querySelector('.dlg-cancel').onclick = () => back.close(null);
+    back.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('[data-f]')) { e.preventDefault(); go(); } });
+    return p;
+  }
+
   print({ printers, doc }) {
     const inner = `<div class="dlg-pr">
         <label class="dlg-row"><span>Yazıcı:</span><select class="dlg-printer">${printers.map((p) => `<option>${esc(p)}</option>`).join('')}</select></label>
@@ -153,6 +173,7 @@ export function fileIcon(name) {
   if (/\.pptx?$/i.test(name)) return '📙';
   if (/\.pdf$/i.test(name)) return '📕';
   if (/\.exe$/i.test(name)) return '💿';
+  if (/\.zip$/i.test(name)) return '🗜';
   if (/\.(mp3|wav)$/i.test(name)) return '🎵';
   if (/\.zip$/i.test(name)) return '🗜';
   if (/\.(mp4|avi|mov)$/i.test(name)) return '🎬';
