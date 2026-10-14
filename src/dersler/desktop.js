@@ -1,7 +1,7 @@
 // Benzetim Windows masaüstü: açılış/kapanış, oturum açma, simgeler, sürükle-bırak, pencereler,
 // görev çubuğu, Başlat menüsü, sağ tık menüleri, bildirimler, izin (UAC) penceresi, ekran alıntısı.
 // Olan her şey emit() ile derse bildirilir; dersin adımları bu olaylara bakarak ilerler.
-import { VFS, RECYCLE, USB } from './vfs.js';
+import { VFS, RECYCLE, USB, PHONE } from './vfs.js';
 import { Dialogs, esc, fileIcon } from './dialog.js';
 import { APPS, START_APPS } from './apps/index.js';
 import { pictureURL } from './apps/util.js';
@@ -14,7 +14,38 @@ export const WALLPAPERS = {
   gece: ['Gece', 'radial-gradient(circle at 20% 30%, #fff8 0 1px, transparent 2px) 0 0/90px 90px, radial-gradient(circle at 70% 60%, #fff6 0 1px, transparent 2px) 0 0/130px 130px, linear-gradient(180deg, #0f1c3d, #1f2f5c 60%, #2d1f4d)', ['#1f2f5c', '#2d1f4d']],
   lavanta: ['Lavanta', 'linear-gradient(135deg, #e0c3fc 0%, #b28dff 50%, #6a4bbf 100%)', ['#b28dff', '#6a4bbf']],
   deniz: ['Deniz', 'linear-gradient(180deg, #a1ffce 0%, #2bc0e4 45%, #1d6fa3 100%)', ['#2bc0e4', '#1d6fa3']],
+  // Mağaza'dan indirilen temaların resimleri (indirilmeden Ayarlar'da görünmez)
+  kapadokya: ['Kapadokya', svgWall(`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd7a8"/><stop offset=".6" stop-color="#ffb37a"/><stop offset="1" stop-color="#e98d5a"/></linearGradient></defs><rect width="160" height="90" fill="url(#g)"/>
+    <g fill="#e2533b"><circle cx="40" cy="22" r="7"/><circle cx="104" cy="14" r="5"/><circle cx="128" cy="34" r="4"/><circle cx="70" cy="40" r="3"/></g><g fill="#ffe08a"><path d="M40 15v14M37 16q3 6 0 12M43 16q-3 6 0 12" stroke="#ffe08a" stroke-width="1" fill="none"/><rect x="38" y="31" width="4" height="3"/><rect x="102.5" y="20" width="3" height="2"/><rect x="127" y="39" width="2.4" height="1.6"/><rect x="69" y="44" width="2" height="1.4"/></g>
+    <g fill="#c98b5e"><path d="M0 90V70q10-6 18 0 4-14 10 0 8-10 16 2 6-16 12 0 10-8 20 2 4-12 10 0 12-6 22 4 6-14 12-2 10-6 18 4 6-8 22-2V90z"/></g><g fill="#a86a43"><path d="M22 90l6-26 6 26zM54 90l5-22 5 22zM96 90l6-28 6 28zM132 90l5-20 5 20z"/><circle cx="28" cy="64" r="2.4"/><circle cx="59" cy="68" r="2"/><circle cx="102" cy="62" r="2.6"/><circle cx="137" cy="70" r="2"/></g>`), ['#ffb37a', '#a86a43'], true],
+  lale: ['Lale Bahçesi', svgWall(`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6ff"/><stop offset=".55" stop-color="#e9f7ff"/><stop offset=".56" stop-color="#7cc36b"/><stop offset="1" stop-color="#3f8f3a"/></linearGradient></defs><rect width="160" height="90" fill="url(#g)"/>
+    ${Array.from({ length: 22 }, (_, i) => { const x = 6 + i * 7 + (i % 3), y = 58 + (i % 4) * 7, c = ['#e53950', '#ffcf3f', '#e05bb1', '#ff7a2f'][i % 4]; return `<path d="M${x} ${y + 12}V${y + 3}" stroke="#2f7a2e" stroke-width="1"/><path d="M${x - 2.4} ${y}q0 4 2.4 4 2.4 0 2.4-4l-1.2 1.4-1.2-1.8-1.2 1.8z" fill="${c}"/>`; }).join('')}`), ['#e53950', '#3f8f3a'], true],
+  bogaz: ['Boğaz', svgWall(`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26315e"/><stop offset=".45" stop-color="#d9686a"/><stop offset=".58" stop-color="#f7b267"/><stop offset=".6" stop-color="#2a3f6e"/><stop offset="1" stop-color="#16234a"/></linearGradient></defs><rect width="160" height="90" fill="url(#g)"/>
+    <circle cx="118" cy="50" r="6" fill="#ffd79a"/><g fill="#1b2240"><path d="M0 54h38v-6h4v-3a4 4 0 0 1 8 0v3h4v-8h1v8h3v6h20v-4a5 5 0 0 1 10 0v4h6V40h1v14h2v6H0z"/></g>
+    <path d="M60 50Q95 30 130 50M60 50v-14M130 50v-14M60 36Q95 52 130 36" stroke="#e8e8f0" stroke-width=".7" fill="none"/><path d="M50 50h90" stroke="#e8e8f0" stroke-width="1"/><g stroke="#ffd79a55" stroke-width=".5"><path d="M106 64h24M110 70h16M113 76h10"/></g>`), ['#d9686a', '#16234a'], true],
+  kis: ['Karlı Dağlar', svgWall(`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fb8de"/><stop offset="1" stop-color="#e9f2fa"/></linearGradient></defs><rect width="160" height="90" fill="url(#g)"/>
+    <path d="M0 70L30 34l14 16 22-30 26 34 18-18 50 34v20H0z" fill="#5b7fa6"/><path d="M30 34l-6 7 6-2 4 3 5-1zM66 20l-8 11 5-2 4 4 5-3 6 2zM110 36l-5 5 5-1 3 2 4-1z" fill="#fff"/><path d="M0 78q40-10 80 0t80-4v16H0z" fill="#fff"/>
+    <g fill="#fff">${Array.from({ length: 40 }, (_, i) => `<circle cx="${(i * 37) % 160}" cy="${(i * 23) % 70}" r="${0.4 + (i % 3) * 0.3}"/>`).join('')}</g>`), ['#5b7fa6', '#e9f2fa'], true],
 };
+
+function svgWall(inner) {
+  // Tek tırnak: bu değer HTML'de style="…" içine de yazılıyor
+  return `center/cover no-repeat url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">${inner}</svg>`).replace(/'/g, '%27')}')`;
+}
+
+// Temalar: arka plan + vurgu rengi + açık/koyu mod birlikte. store: Mağaza'dan indirilir.
+export const THEMES = {
+  windows: { name: 'Windows (açık)', wall: 'mavi', accent: '#0a5dc2', dark: false },
+  koyu: { name: 'Windows (koyu)', wall: 'gece', accent: '#4c9be8', dark: true },
+  gunbatimi: { name: 'Gün batımı', wall: 'gunbatimi', accent: '#c4314b', dark: false },
+  orman: { name: 'Orman', wall: 'orman', accent: '#2e7d32', dark: false },
+  lavanta: { name: 'Lavanta', wall: 'lavanta', accent: '#7a3fc4', dark: false },
+  kapadokya: { name: 'Kapadokya', wall: 'kapadokya', accent: '#c25a0a', dark: false, store: true, size: '14 MB', desc: 'Peribacaları ve gün doğumunda sıcak hava balonları.' },
+  lale: { name: 'Lale Bahçesi', wall: 'lale', accent: '#c2185b', dark: false, store: true, size: '9 MB', desc: 'İlkbaharda rengârenk lale bahçesi.' },
+  bogaz: { name: 'Boğaz', wall: 'bogaz', accent: '#3a7bd5', dark: true, store: true, size: '12 MB', desc: 'Gün batımında köprü ve kıyı. Koyu modla gelir.' },
+  kis: { name: 'Karlı Dağlar', wall: 'kis', accent: '#3a6ea5', dark: false, store: true, size: '11 MB', desc: 'Kar yağarken sessiz dağlar.' },
+};
+export const ACCENTS = [['Mavi', '#0a5dc2'], ['Lacivert', '#1f3d8a'], ['Turkuaz', '#00838f'], ['Yeşil', '#2e7d32'], ['Turuncu', '#c25a0a'], ['Kırmızı', '#c4314b'], ['Pembe', '#c2185b'], ['Mor', '#7a3fc4'], ['Gri', '#5f6b7a']];
 
 const CELL_W = 6.2, CELL_H = 5.7; // em
 const PINNED = ['explorer', 'browser'];
@@ -23,6 +54,7 @@ const DEFAULT_SETTINGS = () => ({
   wallpaper: 'mavi', customWall: null, volume: 50, muted: false, brightness: 100, wifi: true, network: 'EvAğı',
   knownNetworks: ['EvAğı'], autoTime: true, timeOffset: 0, tz: 'İstanbul (UTC+3)', textScale: 100, dark: false,
   user: 'Öğrenci', password: '1234', printers: ['PDF olarak kaydet'], installed: [], unknownDevice: true,
+  theme: 'windows', accent: '#0a5dc2', themes: [], startupOff: [], ext: {}, popupBlock: false,
 });
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -96,13 +128,16 @@ export class Desktop {
   reset({ power = 'desktop', settings = {} } = {}) {
     this.closeMenus();
     this.root.querySelector('.dk-toasts').innerHTML = '';
-    this.screen.querySelectorAll('.dk-uac, .dk-snip, .dk-switch').forEach((x) => x.remove());
+    this.screen.querySelectorAll('.dk-uac, .dk-snip, .dk-switch, .dk-secure, .dk-phone').forEach((x) => x.remove());
+    this.phoneEl = null;
     this.snipping = false;
     this.dialogs.closeAll();
     for (const w of [...this.wins]) this.destroy(w);
     this.fs.reset();
     this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
     this.bookmarks = []; // tarayıcının sık kullanılanları
+    this.history = []; // tarayıcı geçmişi
+    this.stopped = null; // Görev Yöneticisinden sonlandırılan arka plan işlemleri
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;
@@ -209,10 +244,23 @@ export class Desktop {
     this.root.querySelector('.tb-wifi').textContent = s.wifi && s.network ? '📶' : '🚫';
     this.root.querySelector('.tb-vol').textContent = s.muted || !s.volume ? '🔇' : s.volume < 40 ? '🔈' : '🔊';
     this.root.classList.toggle('dk-dark', !!s.dark);
+    this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
+    this.root.classList.toggle('tb-left', !!s.taskbarLeft);
     this.tick();
   }
 
+  applyTheme(key) {
+    const th = THEMES[key];
+    if (!th) return;
+    Object.assign(this.settings, { theme: key, wallpaper: th.wall, customWall: null, accent: th.accent, dark: th.dark });
+    this.applySettings();
+    this.emit('theme', { key, name: th.name });
+    this.wins.forEach((w) => w.api?.onSettings?.());
+  }
+
   setSetting(key, value) {
+    // Temanın bir parçası tek başına değişince tema “Özel” olur (Windows'taki gibi)
+    if (['wallpaper', 'accent', 'dark'].includes(key)) this.settings.theme = 'custom';
     this.settings[key] = value;
     this.applySettings();
     this.emit('setting', { key, value });
@@ -457,11 +505,25 @@ export class Desktop {
     if (name.endsWith('.xlsx')) return this.open('sheet', { node: n.id });
     if (name.endsWith('.pptx')) return this.open('slides', { node: n.id });
     if (/\.(jpe?g|png|bmp)$/.test(name)) return this.open(this.settings.installed.includes('viewer') ? 'viewer' : 'photos', { node: n.id });
+    if (name.endsWith('.mp4')) return this.open('photos', { node: n.id });
+    if (name.endsWith('.zip')) return this.extractZip(n, true);
     if (name.endsWith('.exe')) return this.runSetup(n);
     if (name.endsWith('.pdf')) return this.open('pdf', { node: n.id });
     if (name.endsWith('.mp3')) return this.open('music', { node: n.id });
     this.toast('Açılamadı', 'Bu dosyayı açacak bir program yok.', '⚠');
     return null;
+  }
+
+  // Sıkıştırılmış klasörü ayıklama: içindekiler aynı yerde, zip'in adını taşıyan yeni bir klasöre çıkar
+  async extractZip(n, opened) {
+    const list = n.content?.zip || [];
+    const into = n.name.replace(/\.zip$/i, '');
+    const a = await this.dialogs.ask({ title: 'Sıkıştırılmış (zip) Klasörleri Ayıkla', icon: '🗜', text: `${opened ? `<b>${esc(n.name)}</b> sıkıştırılmış bir klasördür. İçindekileri rahatça kullanmak için önce ayıklayın.<br><br>` : ''}İçindekiler (${list.length}): ${list.map((x) => esc(x.name)).join(', ')}<br><br>Dosyalar şu klasöre çıkarılacak:<br><b>${esc(this.fs.path(n.parent).map((x) => x.name).join(' › '))} › ${esc(into)}</b>`, buttons: [['yes', 'Ayıkla', true], ['no', 'İptal']] });
+    this.emit('zip-ask', { name: n.name, answer: a });
+    if (a !== 'yes') return null;
+    const f = this.fs.extract(n.id, n.parent, this.fs.uniqueName(n.parent, into));
+    this.emit('zip-extract', { name: n.name, folder: f.id, count: list.length });
+    return this.open('explorer', { folder: f.id });
   }
 
   async runSetup(n) {
@@ -609,6 +671,21 @@ export class Desktop {
         [{ cmd: 'eject', label: '⏏ USB Belleği çıkar' }], () => this.ejectUsb(), 'usb');
     };
     $('.tb-clock').onclick = () => this.open('settings', { page: 'time' });
+    // Görev çubuğuna sağ tık: boş yerde Görev Yöneticisi, uygulama düğmesinde pencereyi kapat
+    $('.dk-taskbar').addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (e.target.closest('.tb-start')) return;
+      const b = e.target.closest('.tb-apps [data-app]');
+      if (b) {
+        const app = b.dataset.app, list = this.wins.filter((w) => w.app === app);
+        this.menu(e.clientX, e.clientY - (list.length ? 110 : 75), [{ cmd: 'open', label: `${APPS[app].icon} ${APPS[app].name}` }, '-',
+          ...(list.length ? [{ cmd: 'close', label: list.length > 1 ? 'Tüm pencereleri kapat' : 'Pencereyi kapat' }] : []), { cmd: 'taskmgr', label: '📊 Görev Yöneticisi' }],
+        (c) => (c === 'open' ? this.open(app) : c === 'taskmgr' ? this.open('taskmgr') : list.forEach((w) => this.close(w))), 'taskbar-app', { app });
+        return;
+      }
+      this.menu(e.clientX, e.clientY - 75, [{ cmd: 'taskmgr', label: '📊 Görev Yöneticisi' }, { cmd: 'settings', label: '⚙ Görev çubuğu ayarları' }],
+        (c) => (c === 'taskmgr' ? this.open('taskmgr') : this.open('settings', { page: 'personal' })), 'taskbar');
+    });
     $('.tb-apps').addEventListener('click', (e) => {
       const b = e.target.closest('[data-app]');
       if (!b) return;
@@ -719,15 +796,16 @@ export class Desktop {
 
   winxMenu() {
     const items = [
-      { cmd: 'apps', label: 'Yüklü uygulamalar' }, { cmd: 'devmgr', label: 'Aygıt Yöneticisi' }, { cmd: 'settings', label: 'Ayarlar' },
+      { cmd: 'apps', label: 'Yüklü uygulamalar' }, { cmd: 'devmgr', label: 'Aygıt Yöneticisi' }, { cmd: 'taskmgr', label: 'Görev Yöneticisi' }, { cmd: 'settings', label: 'Ayarlar' },
       { cmd: 'explorer', label: 'Dosya Gezgini' }, { cmd: 'search', label: 'Ara' }, '-',
       { cmd: 'power', label: 'Kapat veya oturumu kapat', sub: [{ cmd: 'sleep', label: 'Uyku' }, { cmd: 'shutdown', label: 'Kapat' }, { cmd: 'restart', label: 'Yeniden başlat' }] },
       { cmd: 'desktop', label: 'Masaüstü' },
     ];
     const b = this.root.querySelector('.tb-start').getBoundingClientRect();
-    this.menu(b.left, b.top - 320, items, (cmd) => {
+    this.menu(b.left, b.top - 345, items, (cmd) => {
       if (cmd === 'apps') this.open('settings', { page: 'apps' });
       else if (cmd === 'devmgr') this.open('devmgr');
+      else if (cmd === 'taskmgr') this.open('taskmgr');
       else if (cmd === 'settings') this.open('settings');
       else if (cmd === 'explorer') this.open('explorer');
       else if (cmd === 'search') this.toggleStart(true, true);
@@ -912,6 +990,13 @@ export class Desktop {
   }
 
   async close(win) {
+    if (win.hung) {
+      // Yanıt vermeyen program kapatılmak istenince Windows sorar
+      const a = await this.dialogs.ask({ title: win.title, icon: '⏳', text: `<b>${esc(APPS[win.app].name)} yanıt vermiyor</b><br>Programı kapatırsanız kaydedilmemiş bilgiler kaybolabilir.`, buttons: [['close', 'Programı kapat'], ['wait', 'Programın yanıt vermesini bekle', true]] });
+      this.emit('hung-answer', { app: win.app, answer: a });
+      if (a === 'close') { this.destroy(win); this.emit('win-close', { app: win.app, win: win.id, hung: true }); }
+      return;
+    }
     if (win.api?.confirmClose && !(await win.api.confirmClose())) { this.emit('win-close-cancel', { app: win.app }); return; }
     this.destroy(win);
     this.emit('win-close', { app: win.app, win: win.id });
@@ -939,6 +1024,44 @@ export class Desktop {
     else this.iconsEl.focus({ preventScroll: true });
   }
 
+  // Programı “yanıt vermiyor” durumuna sokar (ya da düzeltir): pencere beyazlaşır, tıklamalara cevap vermez
+  hang(win, on = true) {
+    if (!win) return;
+    win.hung = on;
+    win.el.classList.toggle('hung', on);
+    const t = win.el.querySelector('.win-title');
+    t.textContent = on ? `${win.title} (Yanıt vermiyor)` : win.title;
+    let fog = win.el.querySelector('.win-fog');
+    if (on && !fog) {
+      fog = document.createElement('div');
+      fog.className = 'win-fog';
+      fog.innerHTML = '<span class="spin"></span>';
+      fog.addEventListener('pointerdown', (e) => { e.stopPropagation(); fog.classList.add('more'); this.emit('hung-click', { app: win.app }); });
+      win.el.querySelector('.win-body').append(fog);
+    } else if (!on) fog?.remove();
+    this.emit('hang', { app: win.app, win: win.id, on });
+  }
+
+  // Ctrl + Alt + Delete ekranı
+  secureScreen() {
+    const o = document.createElement('div');
+    o.className = 'dk-secure';
+    o.innerHTML = `<div>${[['lock', 'Kilitle'], ['user', 'Kullanıcı değiştir'], ['signout', 'Oturumu kapat'], ['taskmgr', 'Görev Yöneticisi']].map(([k, l]) => `<button type="button" data-k="${k}">${l}</button>`).join('')}</div><button type="button" data-k="cancel" class="sec-cancel">İptal</button>`;
+    this.screen.append(o);
+    this.emit('secure-screen', { open: true });
+    o.querySelector('button').focus();
+    const done = (k) => {
+      o.remove();
+      this.emit('secure-screen', { open: false, choice: k });
+      if (k === 'taskmgr') this.ensure('taskmgr');
+      else if (k === 'lock' || k === 'user') this.setPower('lock');
+      else if (k === 'signout') { this.closeAll(); this.setPower('login'); }
+      this.refocus();
+    };
+    o.addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) done(b.dataset.k); });
+    o.addEventListener('keydown', (e) => { if (e.key === 'Escape') done('cancel'); });
+  }
+
   find(app) { return this.wins.filter((w) => w.app === app).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0] || null; }
   ensure(app, args) {
     const w = this.find(app);
@@ -959,6 +1082,9 @@ export class Desktop {
       if (this.power === 'sleep' && Date.now() - this.sleepAt > 900) { this.emit('wake'); this.setPower('lock'); return; }
       if (e.altKey && e.key === 'Tab') { e.preventDefault(); this.altTab(); return; }
       if (e.altKey && e.key === 'F4' && this.active) { e.preventDefault(); this.close(this.active); return; }
+      // Ctrl + Shift + Esc: Görev Yöneticisi. Ctrl + Alt + Delete: güvenlik ekranı. (Windows bu tuşları kendisi yakalayabilir.)
+      if (e.ctrlKey && e.shiftKey && e.key === 'Escape') { e.preventDefault(); this.emit('taskmgr-key'); this.ensure('taskmgr'); return; }
+      if (e.ctrlKey && e.altKey && e.key === 'Delete') { e.preventDefault(); this.secureScreen(); return; }
       if (e.target === this.iconsEl && this.selected) {
         const it = this.item(this.selected);
         if (e.key === 'Delete' && !it.sys) { e.preventDefault(); this.deleteNode(this.selected); }
@@ -1039,6 +1165,74 @@ export class Desktop {
     t.style.cursor = 'pointer';
     t.addEventListener('click', (e) => { if (!e.target.closest('.to-x')) { t.remove(); this.open('explorer', { folder: USB }); } });
     this.emit('usb', { on: true });
+  }
+
+  // Telefonu kabloyla bağlamak: telefon önce “yalnızca şarj” modundadır; telefondan “Dosya aktarımı” seçilince
+  // bilgisayarda “Telefonum” sürücüsü görünür. Telefonun ekranı masaüstünün sağ alt köşesinde çizilir.
+  plugPhone() {
+    if (this.phoneEl) return;
+    const el = this.phoneEl = document.createElement('div');
+    el.className = 'dk-phone';
+    this.screen.append(el);
+    let mode = 'charge', open = false;
+    const draw = () => {
+      el.innerHTML = `<div class="ph-cable"></div><div class="ph-body"><div class="ph-notch"></div><div class="ph-screen">
+        <div class="ph-time">${pad(this.now().getHours())}:${pad(this.now().getMinutes())} 🔋⚡</div>
+        ${open ? `<div class="ph-sheet"><b>USB tercihleri</b><small>USB ile bağlanan cihaz: bu bilgisayar</small>
+          ${[['charge', 'Yalnızca şarj'], ['files', 'Dosya aktarımı'], ['ptp', 'Fotoğraf aktarımı (PTP)']].map(([k, l]) => `<label class="ph-opt"><input type="radio" name="phm" value="${k}" ${mode === k ? 'checked' : ''}> ${l}</label>`).join('')}
+          <button type="button" class="ph-done">Tamam</button></div>`
+        : `<div class="ph-note" role="button" tabindex="0"><b>⚡ Bu cihaz USB ile şarj ediliyor</b><small>${mode === 'charge' ? 'Diğer seçenekler için dokunun.' : 'Dosya aktarımı açık. Değiştirmek için dokunun.'}</small></div>`}
+        </div></div><button type="button" class="ph-unplug" title="Kabloyu çıkar">🔌 Kabloyu çıkar</button>`;
+    };
+    draw();
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.ph-note')) { open = true; draw(); this.emit('phone-sheet'); return; }
+      if (e.target.closest('.ph-done')) { open = false; draw(); return; }
+      if (e.target.closest('.ph-unplug')) { this.unplugPhone(); return; }
+      const r = e.target.closest('input[name="phm"]');
+      if (!r) return;
+      mode = r.value;
+      this.emit('phone-mode', { mode });
+      if (mode === 'charge') { if (this.fs.phone) { this.leavePhone(); this.fs.plugPhone(false); } return; }
+      if (!this.fs.phone) {
+        this.fs.plugPhone(true);
+        const t = this.toast('Telefonum', 'Bu cihazla ne yapmak istediğinizi seçin.<div class="to-acts"><button type="button" data-ph="import">🖼 Fotoğrafları içeri aktar</button><button type="button" data-ph="open">📂 Dosyaları görmek için cihazı aç</button></div>', '📱', 20000);
+        t.addEventListener('click', (ev) => {
+          const k = ev.target.closest('[data-ph]')?.dataset.ph;
+          if (!k) return;
+          t.remove();
+          this.emit('phone-choice', { choice: k });
+          if (k === 'open') this.open('explorer', { folder: PHONE });
+          else this.importPhotos();
+        });
+      }
+    });
+    this.emit('phone', { on: true });
+  }
+
+  leavePhone() { for (const w of this.wins.filter((x) => x.app === 'explorer')) w.api?.leavePhone?.(); }
+
+  unplugPhone() {
+    if (!this.phoneEl) return;
+    this.phoneEl.remove();
+    this.phoneEl = null;
+    if (this.fs.phone) { this.fs.plugPhone(false); this.leavePhone(); }
+    this.emit('phone', { on: false });
+  }
+
+  // Telefondaki bütün fotoğrafları Resimler içinde tarihli bir klasöre kopyalar
+  async importPhotos() {
+    const photos = Object.values(this.fs.nodes).filter((n) => n.type === 'file' && this.fs.isInside(n.id, PHONE) && /\.jpe?g$/i.test(n.name));
+    const t = this.toast('İçeri aktarılıyor', `<div class="prg"><i></i></div><small>${photos.length} fotoğraf kopyalanıyor…</small>`, '🖼', 60000);
+    const bar = t.querySelector('.prg i');
+    for (let i = 0; i <= 20; i++) { bar.style.width = i * 5 + '%'; await new Promise((r) => setTimeout(r, 70)); }
+    t.remove();
+    const folder = this.fs.create('pictures', { type: 'folder', name: `Telefondan ${this.now().toLocaleDateString('tr-TR')}` });
+    for (const p of photos) this.fs.copy(p.id, folder.id);
+    const d = this.toast('İçeri aktarma tamamlandı', `${photos.length} fotoğraf <b>Resimler › ${esc(folder.name)}</b> klasörüne kopyalandı. Telefondakiler yerinde duruyor.`, '✅', 8000);
+    d.style.cursor = 'pointer';
+    d.addEventListener('click', () => this.open('explorer', { folder: folder.id }));
+    this.emit('phone-import', { count: photos.length, folder: folder.id });
   }
 
   ejectUsb() {

@@ -577,3 +577,26 @@ export const test8 = test({
     },
   ],
 });
+
+// 3B "Donanım dersi"nin (bilgisayar.html#ders) tekrar testi
+export const testDonanim = test({
+  id: 'testDonanim', no: 4, title: 'Donanım testi: kasanın içi',
+  desc: '3B donanım dersinin tekrarı: anakart, işlemci, RAM, disk, SSD, ekran kartı, güç kaynağı, fan ve kablolar üzerine 15 soru.',
+  qs: [
+    { t: 'Anakart', pic: '🟩', q: 'Bütün parçaların takıldığı, onları birbirine bağlayan büyük kart hangisi?', opts: ['Ekran kartı', 'Anakart', 'Güç kaynağı'], ok: 1, why: 'Anakart şehrin yolları gibidir: işlemci, RAM, disk ve kartlar onun üzerinden haberleşir.' },
+    { t: 'İşlemci', pic: '🧠', q: 'Bilgisayarın “beyni”, bütün hesapları yapan parça hangisi?', opts: ['İşlemci (CPU)', 'RAM', 'Fan'], ok: 0, why: 'İşlemci lokantadaki aşçı gibidir: tıkladığımız, yazdığımız her şey onun hesabından geçer.' },
+    { t: 'İşlemcinin adı', pic: 'i5-4590', q: 'İlanda “Intel Core i5-4590” yazıyor. Tireden sonraki ilk sayı (4) ne demek?', opts: ['4. nesil: hangi yılın işlemcisi olduğu', '4 GB RAM', '4 tane fan'], ok: 0, why: 'Tireden sonraki ilk sayı nesildir, yani işlemcinin yılı: 4. nesil 2014 civarı, 12. nesil 2022 civarı. i3, i5, i7 ise sınıfıdır.' },
+    { t: 'Yeni mi, güçlü mü?', pic: '🚗 2014 · 2022', q: 'Hangisi büyük ihtimalle daha hızlıdır?', opts: ['i7, 4. nesil', 'i5, 12. nesil', 'İkisi aynı'], ok: 1, why: 'Arabanın model yılı gibi: yeni nesil, eski nesilden çoğu zaman hızlıdır. Önce nesle, sonra sınıfa bakılır.' },
+    { t: 'Soğutucu', pic: '🌡 🌀', q: 'İşlemcinin üstündeki metal kanatlar ve fan ne işe yarar?', opts: ['İşlemciyi hızlandırır', 'İşlemcinin ısısını alıp uzaklaştırır', 'Elektrik verir'], ok: 1, why: 'İşlemci çalışırken çok ısınır. Soğutucu arabanın radyatörü gibidir; olmasa işlemci kendini korumak için kapanır.' },
+    { t: 'RAM: geçici hafıza', pic: '🗒', q: 'RAM için hangisi doğrudur?', opts: ['Fotoğraflar yıllarca burada saklanır', 'Açık işleri tutar; elektrik gidince içi silinir', 'Görüntüyü ekrana gönderir'], ok: 1, why: 'RAM çalışma masasıdır: üzerinde çalıştığınız işler oradadır, akşam masa temizlenir. Kalıcı saklama diskin işidir.' },
+    { t: 'Elektrik kesildi', pic: '⚡ 📝 ❌', q: 'Kaydetmediğiniz yazı elektrik kesilince kayboldu. Yazı neredeydi?', opts: ['Diskte', 'RAM’de', 'Ekran kartında'], ok: 1, why: 'Yazı masanın üstündeydi (RAM), dolaba (diske) konmamıştı. Ctrl + S ile kaydetmek, masadakini dolaba koymaktır.' },
+    { t: 'Disk dolu', pic: '🗄 100%', q: 'Bilgisayar “Disk dolu” uyarısı veriyor. Ne gerekir?', opts: ['Daha çok RAM', 'Daha büyük disk ya da gereksiz dosyaları silmek', 'Daha güçlü fan'], ok: 1, why: 'Dolap dolmuştur. RAM ise masadır; aynı anda çok program açınca yavaşlama oluyorsa artırılır.' },
+    { t: 'İlan okumak', pic: '🏷', q: 'İlanda “16 GB RAM, 512 GB SSD” yazıyor. Fotoğraflarınız hangisine kaydedilir?', opts: ['16 GB RAM’e', '512 GB SSD’ye', 'İkisine de sığmaz'], ok: 1, why: 'SSD diskidir: dosyalar orada kalıcı durur. 16 GB RAM, o an açık işler için masadır.' },
+    { t: 'SSD', pic: '⚡💽', q: 'Eski bilgisayar çok geç açılıyor. Hangi değişiklik en çok hızlandırır?', opts: ['Daha büyük ekran', 'HDD yerine SSD takmak', 'Yeni klavye'], ok: 1, why: 'SSD’de dönen parça yoktur; bilgiyi yongalarda saklar ve HDD’den kat kat hızlıdır.' },
+    { t: 'Ekran kartı', pic: '🎨 ➜ 🖥', q: 'Ekrandaki görüntüyü çizip monitöre gönderen parça hangisi?', opts: ['Ekran kartı', 'Güç kaynağı', 'Disk'], ok: 0, why: 'Ekran kartı ressam gibidir; saniyede onlarca resim çizer. Monitör kablosu onun çıkışına takılır.' },
+    { t: 'Güç kaynağı', pic: '🔌', q: 'Güç kaynağı (PSU) ne yapar?', opts: ['Dosyaları saklar', 'Prizdeki elektriği parçalara uygun hale getirip dağıtır', 'İnternete bağlar'], ok: 1, why: 'Telefonun şarj aleti gibidir: prizdeki güçlü elektriği parçalara uygun zayıf elektriğe çevirir ve kablolarla dağıtır.' },
+    { t: 'Kablolar', pic: '🟧 🟦', q: 'Bir diske hangi kablolar takılır?', opts: ['Yalnızca güç kablosu', 'Yalnızca veri kablosu', 'Bir güç, bir veri kablosu'], ok: 2, why: 'Güç kablosu elektrik getirir, veri kablosu bilgiyi anakarta taşır. Biri eksikse bilgisayar diski kullanamaz.' },
+    { t: 'Fotoğrafın yolculuğu', pic: '🖼', q: 'Bir fotoğrafı açınca parçalar hangi sırayla çalışır?', opts: ['Ekran kartı → işlemci → disk → RAM', 'Disk → RAM → işlemci → ekran kartı', 'RAM → disk → ekran kartı → işlemci'], ok: 1, why: 'Dolaptan alınır (disk), masaya konur (RAM), işlenir (işlemci), çizilip gösterilir (ekran kartı → ekran).' },
+    { t: 'Güvenlik', pic: '🔧 ⚠', q: 'Kasanın kapağını açmadan önce ilk ne yapılır?', opts: ['Bilgisayar kapatılır ve fişi çekilir', 'Fanlar elle durdurulur', 'Hiçbir şey; açıkken daha kolay'], ok: 0, why: 'Önce kapatıp fişi çekin, sonra bir metale dokunup statik elektriği boşaltın. Güç kaynağının içini ise hiç açmayın.' },
+  ],
+});

@@ -10,6 +10,7 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 
 | Ne yapmak istiyorsunuz? | Nasıl? |
 |---|---|
+| Donanımı sınıfta adım adım anlatmak | Üstte **🎓 Donanım dersi** (ya da adresin sonuna `#ders`): 22 adım. Kamera parçaya gider, parça vurgulanır; panelde yalın anlatım, günlük hayattan örnek ve “Sınıfa sorun” (cevabı düğmeyle açılır). <kbd>←</kbd> <kbd>→</kbd> adımlar arasında geçer. Metinler `src/ders.js` içindedir |
 | Dönem değiştirmek | Alttaki zaman çizgisi ya da <kbd>1</kbd>–<kbd>4</kbd> tuşları |
 | Döndürmek / yakınlaştırmak | Sol tuşla sürükleyin, tekerlek ile yakınlaştırın, sağ tuşla kaydırın |
 | Kasayı açmak | "Kasayı aç" ya da <kbd>O</kbd> |
@@ -25,7 +26,7 @@ Bilgisayar bileşenlerini 1990'lardan 2025'e kadar anlatan, tarayıcıda çalı�
 | Güç tüketimini anlatmak | "Güç tüketimi": PSU kapasitesi ile anlık tüketim ayrı gösterilir. Boşta, ofis ve oyun durumları vardır; 2025 için ofis ve oyun bilgisayarı seçilebilir |
 | Eski ve yeni parçaları karşılaştırmak | "Karşılaştır": iki parça cetvel üzerinde gerçek ölçekte yan yana durur, altında tablo vardır |
 | Öğrencilere parça buldurmak | "Buldurma oyunu": etiketler gizlenir, soru sorulur, puan tutulur |
-| Anlatım düzeyini değiştirmek | Üstte "Çocuklar" / "Gençler (teknik)" |
+| Anlatım düzeyini değiştirmek | Üstte "Basit anlatım" / "Teknik anlatım" |
 | Sunum için ayar yapmak | Tam ekran (<kbd>F</kbd>), A−/A+ ile yazı boyutu, animasyonu durdurma (<kbd>Boşluk</kbd>), sonraki/önceki parça (<kbd>←</kbd> <kbd>→</kbd>) |
 | Yavaş bilgisayarda çalıştırmak | "Grafik: düşük" seçeneği gölgeleri kapatır ve çözünürlüğü düşürür. Açılışta kare hızı düşükse uygulama bunu kendiliğinden yapar |
 
@@ -40,16 +41,16 @@ Sağ tarafta gerçek bilgisayara benzeyen bir **alıştırma bilgisayarı** vard
 | 1 | Açma-kapama · Fareyi tutma ve tek tık · Çift tık, sağ tık, tekerlek · Sürükle-bırak · Pencereler · Fare parkuru · Eşleştirme oyunları · Test |
 | 2 | Klavyeyi tanıyalım · Harf bulma alıştırması (tuşların yerini yeni öğrenenler için; zorlanılan harfler tekrar sorulur) · On parmak: temel sıra · Rakamlar ve sayılar (tarih, saat, para, Num Lock) · İşaretler ( ) / = " # € · Tuş avı (ipucusuz) · Bayram kartı ve hata avı · Klavye eşleştirme oyunu · Test |
 | 3 | Not Defteri ve kısayollar · Seçmenin incelikleri (Shift + ok/End, üç tık, Ctrl + ok) · Kaydetme, farklı kaydetme ve açma · Alışveriş listesi · Tarifi düzene sokun · Kısayol yarışı (süreli) · Kısayol eşleştirme · Test |
-| 4 | 3B uygulama · Donanım mı, yazılım mı? · Kasanın içi: parçalar · Portlar ve kablolar · Bilgisayar ilanı okuma · Bakım ve sağlıklı kullanım · Sağlıklı ve güvenli çalışma (ekran mesafesi, oturuş, mola, kablolar, statik elektrik, elektrik yangını, acil durum) · Sorun giderme: ilk kontroller · Test |
-| 5 | Masaüstü, Başlat ve görev çubuğu · Başlat menüsünü keşif · Masaüstünü düzenleme · Hesap Makinesi ile günlük hesaplar · Oyunlarla pratik (Mayın Tarlası, Kart Dizme) · Masaüstü parkuru (süreli) · Masaüstü haritası · Test |
+| 4 | 3B uygulama · 🎓 Donanım dersi (3B, adım adım) · Donanım mı, yazılım mı? · Kasanın içi: parçalar · Portlar ve kablolar · Bilgisayar ilanı okuma · Bakım ve sağlıklı kullanım · Sağlıklı ve güvenli çalışma (ekran mesafesi, oturuş, mola, kablolar, statik elektrik, elektrik yangını, acil durum) · Sorun giderme: ilk kontroller · Test · Donanım testi: kasanın içi (15 soru) |
+| 5 | Masaüstü, Başlat ve görev çubuğu · Başlat menüsünü keşif · Masaüstünü düzenleme · Hesap Makinesi ile günlük hesaplar · Oyunlarla pratik (Mayın Tarlası, Kart Dizme) · Program dondu! Görev Yöneticisi (yanıt vermeyen programı kapatma, Ctrl + Shift + Esc, performans grafikleri, başlangıç uygulamaları) · Masaüstü parkuru (süreli) · Masaüstü haritası · Test |
 | 6 | Dosya Gezgini ve USB bellek · Dosya türleri ve uzantılar · Klasör içinde klasör · Fotoğraflarla çalışmak · Geri Dönüşüm Kutusu · Dağınık klasörü toparlama (süreli) · Ne yapardınız? Dosya durumları · Test |
-| 7 | Paint · Paint ile ev çizimi · Paint ile tebrik kartı · Ekran Alıntısı · Ekran alıntısıyla yardım istemek · Ayarlar · Ayarlar parkuru (süreli) · Test |
-| 8 | İnternette gezinme ve indirme · İnternette bilgi bulmak (okuyup soru cevaplama) · İnternetteki tuzaklar · Program kurma/kaldırma · Yazıcı ve sürücüler · İşletim sistemi kurulumu (gösterim) · İnternet parkuru (süreli) · Test |
+| 7 | Paint · Paint ile ev çizimi · Paint ile tebrik kartı · Ekran Alıntısı · Ekran alıntısıyla yardım istemek · Ayarlar · Temalar ve Mağaza (tema, koyu mod, vurgu rengi, Mağaza'dan tema ve uygulama indirme, taklit uygulamayı tanıma) · Ayarlar parkuru (süreli) · Test |
+| 8 | İnternette gezinme ve indirme · İnternet adresini (URL) okumak (adresin parçaları, alan adı, .gov.tr / .com.tr / .xyz, kilit ve site bilgileri, yazım hatası, sahte reklam, kilitli sahte site, alt alan adı tuzağı, “Güvenli değil”, adres önerileri, bildirim izni, adresi kopyalama) · İnternette bilgi bulmak (okuyup soru cevaplama) · İnternetteki tuzaklar · Program kurma/kaldırma · Yazıcı ve sürücüler · İşletim sistemi kurulumu (gösterim) · İnternet parkuru (süreli) · Test |
 | 9 | E-posta: posta okuma, ek indirme, yanıtlama, fotoğraf ekleyip gönderme, adres yazımı, sahte (dolandırıcılık) postası |
-| 10 | Kelime işlemci (Word benzeri): dilekçe yazma, kalın, ortalama, yazı boyutu, iki yana yaslama, tarih, kaydetme, yazdırma · Liste, tablo (Tab ile hücreler), yazı rengi, resim, PDF olarak kaydetme |
+| 10 | Kelime işlemci (Word benzeri): dilekçe yazma, kalın, ortalama, yazı boyutu, iki yana yaslama, tarih, kaydetme, yazdırma · Liste, tablo (Tab ile hücreler), yazı rengi, resim, PDF olarak kaydetme · Hazır bülteni düzenleme: Konu Başlığı / Başlık 1 stilleri, Bul ve Değiştir (Ctrl + H), yazım denetimi (F7), vurgu rengi, kenar boşlukları, sözcük sayısı |
 | 11 | Hesap tablosu (Excel benzeri): hücre adresi, veri girişi, ∑ Otomatik Toplam, TOPLA, ORTALAMA, dört işlem · Kalın ve ₺ biçimi, durum çubuğu, sıralama, sütun grafiği, yazdırma · Not çizelgesi: formülü kopyalama (Ctrl + C / V, doldurma tutamacı), göreli başvuru, EĞER, koşullu biçimlendirme, MAK, EĞERSAY, formüllü tabloyu sıralama · Alışveriş ve faturalar: yüzde, $ ile sabit başvuru, ETOPLA, filtre |
 | 12 | Sunu (PowerPoint benzeri): başlık slaytı, yeni slayt ve maddeler, tasarım teması, resim, slayt geçişi, slayt sırası, slayt gösterisi (F5), kaydetme |
-| 13 | Günlük işler, iki ayrı ders: **bilgisayarda** (PrtSc ile ekran görüntüsü → Paint, fotoğrafı arka plan yapma, USB'ye kopyalama, kopyalama/taşıma farkı) · **tarayıcıda** (resme sağ tık → Resmi farklı kaydet, İndir düğmesi ve İndirilenler, indirileni arka plan yapma, sayfadan yazı kopyalama, ✂ web yakalama, Ctrl + / Ctrl − yakınlaştırma, ☆ sık kullanılanlar) |
+| 13 | Günlük işler, iki ayrı ders: **bilgisayarda** (PrtSc ile ekran görüntüsü → Paint, fotoğrafı arka plan yapma, USB'ye kopyalama, kopyalama/taşıma farkı) · **tarayıcıda** (resme sağ tık → Resmi farklı kaydet, İndir düğmesi ve İndirilenler, indirileni arka plan yapma, sayfadan yazı kopyalama, ✂ web yakalama, Ctrl + / Ctrl − yakınlaştırma, ☆ sık kullanılanlar) · Tarayıcı: uzantı mağazası ve izinler, reklam engelleyici, zararlı uzantıyı kaldırma, geçmiş (Ctrl + H), göz atma verilerini temizleme, gizli pencere, sayfada bul (Ctrl + F) |
 | Ek | İnternette güvenlik: sahte SMS, arama ve siteler; doğrulama kodu; sahte virüs uyarısı; güçlü şifre · Yazma hızı ölçümü: dakikada kelime ve hata; her ölçüm öğrencinin profilinde saklanır, haftadan haftaya karşılaştırılır |
 
 Eğitmen için:
@@ -64,7 +65,7 @@ Eğitmen için:
 
 Kaynak: `src/dersler/`
 - `app.js`: ders akışı. `lessons/`: ders metinleri ve adımlar (`hafta2_ek.js` … `hafta8_ek.js` ve `alistirmalar.js`: ek dersler ve orta seviye alıştırmalar, `testler.js`: haftalık testler, `kalip.js`: soru ve ayırma adımı kalıpları). Her adımın hangi olayla tamamlanacağı burada yazılıdır; alanlar `lessons/common.js` başında anlatılır.
-- `desktop.js`: alıştırma masaüstü. `apps/`: programlar. `vfs.js`: bellekteki dosya sistemi. `dialog.js`: kaydet/aç/yazdır pencereleri.
+- `desktop.js`: alıştırma masaüstü (temalar ve vurgu rengi, yanıt vermeyen pencere, Ctrl + Alt + Delete ekranı da burada). `apps/`: programlar (Görev Yöneticisi `taskmgr.js`; Mağaza, Takvim ve Hava Durumu `store.js`; tarayıcı uzantıları `browser.js`). `vfs.js`: bellekteki dosya sistemi. `dialog.js`: kaydet/aç/yazdır pencereleri.
 - `notepad.js`, `keyboard.js`: Not Defteri ve ekran klavyesi. `css/`: stiller (derlemede sayfaya gömülür).
 
 ## Temsilî sistemler
@@ -95,6 +96,7 @@ npm install
 node build.mjs          # dist/index.html (dersler) ve dist/bilgisayar.html (3B) (küçültülmüş, internetsiz çalışır)
 node build.mjs --dev    # okunabilir çıktı
 node tools/shot.mjs senaryo.json   # ekran görüntüsü (Brave/Chromium + puppeteer-core)
+python3 sunum/uret.py && node sunum/pdf.mjs donanim   # slaytlar (donanım sunusu: sunum/Bilgisayar-Isletmenligi-donanim.pdf, görseller sunum/img2/dh_*.jpg)
 ```
 
 ### Klasör yapısı

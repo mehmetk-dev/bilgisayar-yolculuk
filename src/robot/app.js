@@ -5,6 +5,7 @@ import { renderGrid } from './board.js';
 import { renderScratch } from './sahne/task.js';
 import { renderGuide } from './guide.js';
 import { roboSVG, play, confetti, prefs, save, pload as load, psave, profile, profiles, setProfile, removeProfile, esc } from './robo.js';
+import { startIcons } from '../icons.js';
 
 const $ = (s) => document.querySelector(s);
 const mapEl = $('#map');
@@ -228,3 +229,5 @@ route();
 let asked = false;
 try { asked = !!sessionStorage.getItem('robo-secildi'); } catch { /* yok say */ }
 if (!asked) { pick.dataset.first = '1'; openPicker(); }
+
+startIcons();

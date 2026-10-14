@@ -59,3 +59,13 @@ th.sm, td.sm { font-size: 18px; }
 .col .kv th { width: 150px; }
 .tight th, .tight td { padding: 7px 16px 7px 0; font-size: 19px; }
 .fig img { max-height: 470px; width: auto; max-width: 100%; }
+
+/* donanım sunusu: örnek ve soru kutuları */
+.ornek { background: #f4ecd8; border-left: 4px solid var(--acc); padding: 12px 18px; margin-top: 16px; font-size: 20px; line-height: 1.4; }
+.ornek b.t { display: block; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); margin-bottom: 4px; }
+.soru { border-left: 4px solid #2e5f7a; padding: 6px 18px; margin-top: 14px; font-size: 19px; line-height: 1.35; color: #2e5f7a; }
+.soru b.t { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin-right: 8px; }
+.fig.dark img { border: 0; border-radius: 4px; }
+.flow { display: flex; gap: 10px; margin-top: 8px; }
+.flow div { flex: 1; border-top: 3px solid var(--acc); padding-top: 10px; font-size: 19px; line-height: 1.3; }
+.flow .n { font-size: 40px; font-weight: 300; color: var(--acc); line-height: 1; }

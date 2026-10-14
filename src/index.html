@@ -19,7 +19,7 @@
   --bad: #ff5a5a;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: #1a2029; color: var(--fg); font: var(--fs)/1.4 "Segoe UI", "DejaVu Sans", "Noto Sans", Arial, sans-serif; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #1a2029; color: var(--fg); font: var(--fs)/1.4 UISymC, UISymM, UISymD, "Segoe UI", "DejaVu Sans", "Noto Sans", Arial, sans-serif; }
 #c { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; touch-action: none; }
 button, select { font: inherit; color: var(--fg); background: #253041; border: 2px solid var(--line); border-radius: 10px; padding: 0.38em 0.7em; cursor: pointer; }
 button:hover { border-color: var(--acc); }
@@ -169,6 +169,38 @@ body.comparing #labels, body.comparing #tools, body.comparing #bottom, body.comp
 #help.open { display: flex; }
 #help .mbox ul { line-height: 1.7; }
 kbd { background: #2a3546; border: 1px solid var(--line); border-radius: 5px; padding: 0 0.35em; font-family: inherit; }
+/* adım adım ders paneli */
+#lessonPanel { position: fixed; left: 0.6em; top: 4.6em; bottom: 8.2em; width: min(28em, 38vw); overflow-y: auto; z-index: 11; background: var(--bg2); border: 2px solid var(--acc); border-radius: 14px; padding: 0.8em 1em 0; display: none; box-shadow: 0 10px 40px #0009; scrollbar-width: thin; }
+#lessonPanel.open { display: flex; flex-direction: column; }
+#lessonPanel h2 { font-size: 1.4em; line-height: 1.15; margin: 0.45em 0 0.35em; }
+.ljump { width: 100%; font-size: 0.8em; padding: 0.25em 0.4em; }
+.lprog { height: 0.4em; background: #0d1117; border-radius: 99px; margin-top: 0.5em; overflow: hidden; }
+.lprog i { display: block; height: 100%; background: var(--acc); transition: width 0.4s; }
+.ltext { line-height: 1.5; }
+.lornek { margin-top: 0.7em; background: #2c2a14; border-left: 4px solid var(--acc); border-radius: 8px; padding: 0.45em 0.7em; }
+.lornek p, .lsoru p { margin: 0.25em 0; line-height: 1.45; }
+.lsoru { margin-top: 0.7em; background: #12303c; border-left: 4px solid var(--acc2); border-radius: 8px; padding: 0.45em 0.7em; }
+.lsoru button { font-size: 0.82em; margin: 0.2em 0; }
+.lcevap { color: #c9f7d8; }
+.ltab { border-collapse: collapse; width: 100%; margin-top: 0.6em; font-size: 0.92em; }
+.ltab th, .ltab td { text-align: left; padding: 0.28em 0.4em; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ltab th { color: var(--acc); white-space: nowrap; }
+.lflow { margin: 0.5em 0 0; padding-left: 0; list-style: none; }
+.lflow li { padding: 0.35em 0.6em; border-radius: 8px; margin-bottom: 0.25em; border: 2px solid transparent; color: var(--mut); transition: all 0.3s; }
+.lflow li.on { border-color: var(--ok); color: #fff; background: #12452a; font-weight: 700; }
+.lnav { position: sticky; bottom: 0; margin-top: auto; display: flex; gap: 0.4em; padding: 0.7em 0 0.8em; background: var(--bg2); }
+.lnav button { flex: 1; font-weight: 700; }
+.lnav button[data-a="again"] { flex: 0 0 2.6em; }
+.lnav button:disabled { opacity: 0.35; cursor: default; }
+#labels .lbl.mark span { background: var(--acc); color: #111; font-size: 1em; }
+body.lessoning #tools, body.lessoning #tourBtns { display: none; }
+body.lessoning #lessonPanel { bottom: 0.6em; }
+body.lessoning #bottom { left: calc(min(28em, 38vw) + 1.2em); }
+.ltab th { white-space: normal; width: 38%; }
+@media (max-height: 820px) { #lessonPanel { font-size: 0.9em; } #lessonPanel h2 { font-size: 1.25em; } }
+body.lessoning #legend, body.lessoning #featureMenu { left: auto; right: 0.6em; }
+body.comparing #lessonPanel { display: none !important; }
+#lessonTop { border-color: var(--acc); font-weight: 700; }
 @media (max-width: 1100px) {
   :root { --fs: 16px; }
   #tools { width: 11.5em; }
@@ -186,7 +218,8 @@ kbd { background: #2a3546; border: 1px solid var(--line); border-radius: 5px; pa
   <div class="spacer"></div>
   <div class="topbtns">
     <button id="lessonsBtn" title="Adım adım bilgisayar dersleri" onclick="location.href='index.html'">📝 Derslere dön</button>
-    <button id="levelBtn" title="Anlatım düzeyi">👦 Çocuklar</button>
+    <button id="lessonTop" data-lesson title="Adım adım donanım dersi (sınıfta anlatmak için)">🎓 Donanım dersi</button>
+    <button id="levelBtn" title="Parça bilgilerinin anlatım düzeyi">💬 Basit anlatım</button>
     <button id="labelBtn" class="on" title="Etiketler (L)">🏷 Etiketler</button>
     <button id="pauseBtn" class="on" title="Animasyonları durdur (Boşluk)">⏸ Animasyon</button>
     <button id="fontDown" title="Yazıyı küçült">A−</button>
@@ -210,6 +243,7 @@ kbd { background: #2a3546; border: 1px solid var(--line); border-radius: 5px; pa
   <button class="tool" data-act="cables" data-kind="data">🟦 Veri bağlantıları</button>
   <button id="featBtn">Anakart soketleri</button>
   <div class="grp">Ders</div>
+  <button data-lesson>🎓 Adım adım ders</button>
   <button id="eraBtn">📅 Dönem bilgisi</button>
   <button id="powerBtn">⚡ Güç tüketimi</button>
   <button id="cmpBtn">⇄ Karşılaştır</button>
@@ -218,6 +252,7 @@ kbd { background: #2a3546; border: 1px solid var(--line); border-radius: 5px; pa
 </nav>
 
 <aside id="info" aria-live="polite"></aside>
+<aside id="lessonPanel" aria-live="polite"></aside>
 <div id="legend" class="panel"></div>
 <div id="featureMenu" class="panel"></div>
 <div id="powerPanel" class="panel"></div>

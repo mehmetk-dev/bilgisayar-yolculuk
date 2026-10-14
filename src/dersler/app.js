@@ -5,6 +5,7 @@ import { Keyboard, keyLabel } from './keyboard.js';
 import { Notepad } from './notepad.js';
 import { Dialogs, esc } from './dialog.js';
 import { Desktop } from './desktop.js';
+import { startIcons } from '../icons.js';
 
 const $ = (s) => document.querySelector(s);
 const K = (...names) => names.map((n) => `<kbd>${n}</kbd>`).join(' + ');
@@ -499,7 +500,8 @@ document.addEventListener('keydown', (e) => {
 });
 // Masaüstü derslerinde Ctrl+S/O/P gibi kısayollar tarayıcının kendi pencerelerini açmasın
 document.addEventListener('keydown', (e) => {
-  if (lesson?.stage === 'desktop' && (e.ctrlKey || e.metaKey) && ['KeyS', 'KeyO', 'KeyP', 'KeyF', 'KeyD'].includes(e.code)) e.preventDefault();
+  if (lesson?.stage === 'desktop' && (e.ctrlKey || e.metaKey) && ['KeyS', 'KeyO', 'KeyP', 'KeyF', 'KeyD', 'KeyH', 'KeyJ', 'KeyK'].includes(e.code)) e.preventDefault();
+  if (lesson?.stage === 'desktop' && e.key === 'F7') e.preventDefault(); // tarayıcının “imleçle gezinme” sorusu çıkmasın
   // F5 sayfayı yenilemesin; sunu açıksa slayt gösterisini başlatsın (odak sunudaysa sunu bunu zaten yapmıştır)
   if (lesson?.stage === 'desktop' && e.key === 'F5' && !e.ctrlKey) { if (!e.defaultPrevented) desk?.find('slides')?.api.show?.(); e.preventDefault(); }
 });
@@ -553,11 +555,14 @@ function choose(name) {
   if (name && !profiles().includes(name)) lsSet(LIST_KEY, [...profiles(), name].sort((a, b) => a.localeCompare(b, 'tr')));
   try { sessionStorage.setItem(ASKED_KEY, '1'); } catch { /* yoksay */ }
   leaving = true;
-  location.hash = '';
+  // Açılışta sorulduysa (ör. 3B dersten gelen test bağlantısı) istenen ders açık kalsın
+  if (!pickFirst) location.hash = '';
   location.reload();
 }
 
+let pickFirst = false;
 function openPicker(first = false) {
+  pickFirst = first;
   pick.hidden = false;
   pick.innerHTML = `<div class="pickbox" role="dialog" aria-label="Öğrenci seçimi">
   <h2>👤 Bu bilgisayarı kim kullanıyor?</h2>
@@ -596,3 +601,5 @@ if (!asked) openPicker(true);
 
 // Testler ve eğitmen için: konsoldan erişim
 window.DERS = { get desk() { return desk; }, np, get lesson() { return lesson; }, get idx() { return idx; }, get done() { return done; }, showStep: (i) => showStep(i) };
+
+startIcons();

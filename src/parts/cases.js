@@ -408,7 +408,7 @@ export function case2010({ rearHoles = [], slotOpenings = [], fan, grommets = tr
   add(bz, G.box(W - 3, 0.08, 0.3), mat('#5a5f66', 0.3, 0.8), [0, 37.4, z0 + 3.05]);
   labelPlane(bz, 'NOVATRON', 5.4, 0.8, [0, 2.4, z0 + 3.17], null, { fg: '#9aa0a8' });
   // üst ön I/O (eğimli yüz)
-  const io = group(bz, [0, H + 0.15, z0 - 2.0], [-0.35, 0, 0]);
+  const io = group(bz, [0, H + 0.15, z0 - 2.0], [-0.35, 0, 0], 'onIO');
   io.userData.mergeRoot = false;
   add(io, G.rbox(13, 0.3, 3.4, 0.1), mat('#101113', 0.4), [0, 0, 0]);
   const up = (spec, x) => { const p = makePort(spec); p.rotation.set(PI / 2, 0, 0); p.position.set(x, 0.2, 0.2); p.userData.front = true; io.add(p); };

@@ -17,7 +17,7 @@ export function pictureURL(content) {
   grad.addColorStop(0, c.bg[0]); grad.addColorStop(1, c.bg[1]);
   g.fillStyle = grad;
   g.fillRect(0, 0, 480, 320);
-  g.font = '170px "Noto Color Emoji", "Segoe UI Emoji", sans-serif';
+  g.font = '170px UISymC, UISymM, UISymD, "Noto Color Emoji", "Segoe UI Emoji", sans-serif';
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.fillText(c.emoji, 240, 170);

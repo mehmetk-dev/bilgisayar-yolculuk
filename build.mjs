@@ -7,6 +7,13 @@ import fs from 'node:fs';
 
 const dev = process.argv.includes('--dev');
 
+// Simge yazı tipleri (src/fonts): emoji ve semboller her bilgisayarda aynı görünsün diye
+// sayfaya gömülür. Sistem yazı tipi bu simgeleri kimi zaman hiç göstermez (kare çıkar).
+const SYMBOL_FONTS = [['UISymC', 'ui-color.woff2'], ['UISymM', 'ui-mono.woff2'], ['UISymD', 'ui-dv.woff2']];
+const symbolFontCss = SYMBOL_FONTS.map(([family, file]) =>
+  `@font-face { font-family: ${family}; src: url(data:font/woff2;base64,${fs.readFileSync(`src/fonts/${file}`).toString('base64')}) format("woff2"); }`
+).join('\n');
+
 async function page(entry, htmlFile, outFiles, cssDir) {
   const res = await esbuild.build({
     entryPoints: [entry],
@@ -25,6 +32,7 @@ async function page(entry, htmlFile, outFiles, cssDir) {
     const css = fs.readdirSync(cssDir).filter((f) => f.endsWith('.css')).sort().map((f) => fs.readFileSync(`${cssDir}/${f}`, 'utf8')).join('\n');
     html = html.replace('<!--CSS-->', () => css);
   }
+  html = html.replace('<style>', () => `<style>\n${symbolFontCss}`);
   const out = html.replace('<!--APP-->', () => `<script>\n${js}\n</script>`);
   for (const f of outFiles) fs.writeFileSync(f, out);
   console.log(outFiles.join(', '), (out.length / 1024).toFixed(0) + ' KB');

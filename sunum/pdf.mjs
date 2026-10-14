@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const puppeteer = createRequire(path.join(dir, '..', 'package.json'))('puppeteer-core');
-const names = process.argv.slice(2).length ? process.argv.slice(2) : ['hafta2', 'hafta3', 'hafta4', 'hafta5', 'hafta6', 'hafta7', 'hafta8', 'ek-guvenlik'];
+const names = process.argv.slice(2).length ? process.argv.slice(2) : ['hafta2', 'hafta3', 'hafta4', 'hafta5', 'hafta6', 'hafta7', 'hafta8', 'ek-guvenlik', 'donanim', 'donanim-notlar'];
 
 const browser = await puppeteer.launch({ executablePath: '/usr/bin/brave', headless: 'new', args: ['--no-sandbox'] });
 for (const n of names) {

@@ -116,7 +116,7 @@ export function paint({ desk, body, args, emit, setTitle, dialogs }) {
       inp.remove();
       if (!t) return;
       snap();
-      g.fillStyle = color; g.font = `${px}px "Segoe UI", sans-serif`; g.textBaseline = 'top';
+      g.fillStyle = color; g.font = `${px}px UISymC, UISymM, UISymD, "Segoe UI", sans-serif`; g.textBaseline = 'top';
       g.fillText(t, p.x, p.y);
       changed();
       emit('paint-text', { text: t, color });

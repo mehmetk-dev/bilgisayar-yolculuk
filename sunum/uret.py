@@ -420,3 +420,217 @@ S.append(slide('Özet', 'Altın kurallar', table([
     ['Sahte virüs uyarısı', 'Numarayı aramayın; sekmeyi ya da tarayıcıyı kapatın'],
     ['Emin değilseniz', 'Bir yakınınıza danışın']], 'kv')))
 write('ek-guvenlik', 'Ek ders: İnternette güvenlik', 'Bilgisayar İşletmenliği – Ek Ders: İnternette Güvenlik', S)
+
+
+# ================================================================ DONANIM
+# Öğrencilere gösterilen slaytlar (cevapsız) + öğretmen için ayrı not dosyası (cevaplar, anlatım, 3B adımı).
+# Görseller 3B "Donanım dersi"nin adımlarından alınır: img2/dh_<adım>.jpg (adım 0'dan başlar).
+def orn(t):
+    return f'<div class="ornek"><b class="t">Örnek</b>{t}</div>'
+
+
+def dus(t):
+    return f'<p class="soru"><b class="t">Düşünelim</b>{t}</p>'
+
+
+def resim(img, cap='', style=''):
+    c = f'<figcaption>{cap}</figcaption>' if cap else ''
+    return f'<figure class="fig dark"><img src="{IMG}{img}" style="{style}">{c}</figure>'
+
+
+# Her parça: slayt + öğretmen notu aynı kayıttan üretilir
+# adim: 3B dersteki adım numarası (ekranda görünen), anlat: öğretmenin ek anlatımı, dikkat: sık karışan nokta
+DN = [
+    dict(kick='Giriş', title='Bilgisayar neden oluşur?', adim=1, img='dh_00.jpg',
+         items=['<b>Kasa:</b> asıl bilgisayar.', '<b>Ekran, klavye, fare:</b> kasaya takılır.', 'Dizüstüde hepsi tek parçadır.'],
+         ornek='Araba gibi: direksiyon ve pedallar klavye ile fare, gösterge ekran. Arabayı yürüten kaputun altındaki motordur; bilgisayarın motoru da kasanın içindedir.',
+         soru='Ekran bozulursa fotoğraflar da gider mi?', cevap='Hayır. Ekran sadece gösterir; fotoğraflar kasanın içinde saklıdır.',
+         anlat='Masadaki gerçek bilgisayarı gösterin: “Bu kutu kasa, asıl bilgisayar bu.” Öğrenciler çoğu zaman ekranı bilgisayar sanar.',
+         dikkat='“Bilgisayar” denince ekran değil kasa kastedilir.'),
+    dict(kick='Kasa', title='Düğmeler ve girişler', adim=2, img='dh_01.jpg',
+         items=['<b>⏻ Açma düğmesi:</b> yuvarlak, ışıklı olan.', '<b>USB girişleri:</b> USB bellek buraya.', '<b>Yeşil:</b> kulaklık, <b>pembe:</b> mikrofon.', 'Bazı kasalarda bunlar üstte, bazılarında önde.'],
+         ornek='Evin kapısı ve zili gibi. Açma düğmesi de evin anahtarıdır.',
+         soru='Bilgisayar dondu, fare de klavye de çalışmıyor. Ne yaparsınız?',
+         cevap='Önce 1–2 dakika beklenir. Düzelmezse açma düğmesine 5–10 saniye basılı tutulur; bilgisayar kapanır. Kaydedilmemiş işler gider, bu yüzden son çaredir. Normalde Başlat → Güç → Kapat kullanılır.',
+         anlat='Sınıftaki kasalarda açma düğmesinin yerini öğrencilere buldurun; her kasada farklı yerdedir.',
+         dikkat='Kısa basmak açar; uzun basılı tutmak zorla kapatır.'),
+    dict(kick='Kasa', title='Kasayı açalım', adim=3, img='dh_02.jpg',
+         items=['İçeride birkaç parça ve kablolar var.', 'Şimdi bunları <b>birer birer</b> tanıyacağız.', 'Gerçekte açmadan önce: <b>kapat ve fişi çek</b>.'],
+         ornek='Buzdolabının arkasını açmadan önce fişini çekeriz. Bilgisayar da öyle.',
+         soru='Kasayı açmadan önce ilk ne yapılır?', cevap='Bilgisayar kapatılır, fişi çekilir. Parçalara kenarlarından tutularak dokunulur.',
+         anlat='Statik elektrik: halıda yürüyüp kapı koluna dokununca çarpan elektrik, parçaları bozabilir. Önce bir metale dokunulur.',
+         dikkat=''),
+    dict(kick='Parça 1', title='Anakart: her şeyin takıldığı kart', adim=4, img='dh_03.jpg',
+         items=['Kasanın içindeki <b>en büyük kart</b>.', 'Diğer bütün parçalar ona takılır.', 'Parçalar onun üzerinden haberleşir.'],
+         ornek='Şehrin <b>yolları</b> gibi: diğer parçalar binalar, anakart aradaki yollar. Yol kapanırsa kimse kimseye ulaşamaz.',
+         soru='Anakart bozulursa ne olur?', cevap='Bilgisayar çoğu zaman hiç açılmaz. İçindeki dosyalar genelde kurtarılabilir.',
+         anlat='Anakart değişince çoğu zaman işlemci ve RAM de değişmek zorunda kalır; bu yüzden eski bilgisayarda anakart arızası “yeni bilgisayar al” demek olabilir.',
+         dikkat=''),
+    dict(kick='Parça 2', title='İşlemci: bilgisayarın beyni', adim=5, img='dh_04.jpg',
+         items=['Tıkladığınız, yazdığınız her şeyi <b>o hesaplar</b>.', 'Küçük, kare bir parça.', 'Üstünde bir fan durur (resimde kaldırdık).'],
+         ornek='Lokantanın <b>aşçısı</b> gibi: siparişleri o hazırlar. Aşçı iyiyse yemek çabuk gelir.',
+         soru='Bilgisayar her işte çok yavaşsa sebebi işlemci olabilir mi?',
+         cevap='Evet, eski ya da zayıf işlemci yavaşlatır. Ama çoğu zaman sorun disk (eski HDD) ya da az RAM’dir; önce onlara bakılır.',
+         anlat='3B’de işlemcinin üstündeki soğutucu kaldırılmış hâlde görünür.',
+         dikkat='İşlemci = CPU. Kasanın kendisine “işlemci” denmez.'),
+    dict(kick='Parça 2', title='İşlemcinin adı: “i5, 4. nesil” ne demek?', adim=6, img='dh_04.jpg', tablo=True,
+         items=[], ornek='Araba gibi: <b>i3, i5, i7</b> donanım paketleri (temel, orta, dolu), <b>nesil</b> model yılı. Yeni model “orta paket”, eski model “dolu paket”ten çoğu zaman iyidir: <b>yeni bir i5, eski bir i7’den hızlı olabilir.</b>',
+         soru='“i7, 4. nesil” mi, “i5, 12. nesil” mi daha hızlı?',
+         cevap='Büyük ihtimalle i5, 12. nesil. Arada yaklaşık 8 yıl var. Kural: önce nesle, sonra sınıfa bakılır.',
+         anlat='Okuma örneği: Intel Core i5-4590 → i5 sınıf, tireden sonraki ilk sayı 4 → 4. nesil (2014 civarı). i5-12400 → tireden sonra 12 → 12. nesil (2022 civarı). Nesil numarası iki basamaklı olabilir (10, 11, 12, 13, 14). AMD’de Ryzen 5 5600 → Ryzen 5 sınıf (≈ i5), ilk rakam 5 → 5000 serisi. Sondaki harfler: U = dizüstü, tasarruflu; H = dizüstü, güçlü; K = masaüstü, en güçlü sürüm. Derste gösterilen 2010’lar bilgisayarı 2014 dönemi, yani tam bir “4. nesil” dönemi bilgisayardır. 2024’ten sonra Intel yeni adlar kullanıyor (Core Ultra 5, 7, 9); mantık aynı: sayı büyüdükçe daha güçlü.',
+         dikkat='GHz’e tek başına bakmak yanıltır; farklı nesilleri GHz ile karşılaştırmayın.'),
+    dict(kick='Parça 3', title='Fan: işlemciyi serin tutar', adim=7, img='dh_06.jpg',
+         items=['İşlemci çalışırken <b>ısınır</b>.', 'Metal parça ısıyı çeker, <b>fan</b> üfleyip uzaklaştırır.', 'Zorlanınca fan hızlanır, ses artar: normal.'],
+         ornek='Sıcak çorbayı üfleyerek soğutmak gibi.',
+         soru='Dizüstüyü yorganın üstünde kullanırsak ne olur?', cevap='Hava delikleri kapanır, ısınır. Önce yavaşlar, çok ısınırsa kendiliğinden kapanır.',
+         anlat='Bilgisayar kendi kendine kapanıyorsa ilk şüphelilerden biri ısınmadır (toz, kapalı hava delikleri).',
+         dikkat=''),
+    dict(kick='Parça 4', title='RAM: geçici hafıza', adim=8, img='dh_07.jpg',
+         items=['O an <b>açık olan</b> işleri tutar.', 'Kaydedilmemiş yazı da buradadır.', 'Kapanınca ya da elektrik gidince <b>silinir</b>.', 'Büyüklüğü <b>GB</b>: 8 GB, 16 GB…'],
+         ornek='<b>Çalışma masası:</b> dosyayı dolaptan alıp masada çalışırsınız, akşam masa temizlenir. Ya da telefon numarasını <b>çevirene kadar aklınızda tutmak</b>.',
+         soru='Elektrik kesildi, kaydetmediğiniz yazı kayboldu. Neden?', cevap='Yazı RAM’deydi (masada); diske (dolaba) kaydedilmemişti. Elektrik gidince RAM boşaldı. Sık sık Ctrl + S.',
+         anlat='Bugün için öneri: internet ve ofis işi 8 GB ile döner, rahat çalışmak için 16 GB. Tarayıcıda çok sekme açmak RAM’i doldurur.',
+         dikkat='En sık karışan konu: “RAM’i büyük bilgisayara daha çok fotoğraf sığar” yanlış. Fotoğraf diske sığar.'),
+    dict(kick='Parça 5', title='Disk: kalıcı hafıza', adim=9, img='dh_08.jpg',
+         items=['Fotoğraf, belge, program <b>burada saklanır</b>.', 'Kapansa da <b>silinmez</b>.', 'Eski tip diskin (HDD) içinde plak gibi dönen bir disk var.', 'Büyüklüğü GB ya da TB (1 TB = 1000 GB).'],
+         ornek='Disk bir <b>dolap</b>. Eski diskin içi ise <b>pikap</b> gibi: plak döner, iğne okur.',
+         soru='Çalışan kasaya çarparsanız hangi parça zarar görebilir?', cevap='Dönen disk (HDD): okuyan kol plağa çarpıp çizebilir, dosyalar kaybolabilir.',
+         anlat='3B’de diskin kapağı soluklaşır, içindeki plakanın döndüğü ve kolun hareket ettiği görünür. 1 TB yaklaşık 250 bin telefon fotoğrafı eder.',
+         dikkat=''),
+    dict(kick='Parça 6', title='SSD: hızlı disk', adim=10, img='dh_09.jpg',
+         items=['O da disk: dosyaları kalıcı saklar.', 'Dönen parçası yok; küçük yongalar var.', 'Eski diskten <b>çok daha hızlı</b>.'],
+         ornek='Eski disk: kütüphanede raflar arasında kitap aramak. SSD: kitap <b>elinizin altındaki çekmecede</b>.',
+         soru='Eski bilgisayar çok geç açılıyor. Ne en çok işe yarar?', cevap='Eski disk yerine SSD taktırmak.',
+         anlat='Öğrencilerin evdeki eski bilgisayarları için en ucuz ve en etkili yükseltme budur; ilanlarda “SSD” yazıp yazmadığına bakmalarını söyleyin.',
+         dikkat=''),
+    dict(kick='En çok karıştırılan', title='RAM mi, disk mi?', adim=11, img='dh_10.jpg', ramdisk=True,
+         items=[], ornek='<b>Kaydet</b> = masadakini dolaba koymak. İlanda “16 GB RAM, 512 GB SSD” = 16 GB masa, 512 GB dolap.',
+         soru='“Disk dolu” uyarısı: RAM mi gerekir, disk mi?', cevap='Disk (dolap dolmuş): gereksiz dosyalar silinir ya da büyük disk takılır. RAM, çok program açınca yavaşlama varsa artırılır.',
+         anlat='Tahtaya iki sütun çizin: MASA / DOLAP. Öğrencilere “şunu nereye koyarsınız?” diye sorun: açık Word belgesi (masa), tatil fotoğrafları (dolap), çalışan internet tarayıcısı (masa), kurulu program (dolap).',
+         dikkat='Telefonlarda da aynı ayrım vardır: “4 GB RAM, 128 GB depolama”.'),
+    dict(kick='Parça 7', title='Ekran kartı: görüntüyü çizer', adim=12, img='dh_11.jpg',
+         items=['Ekranda gördüğünüz her şeyi <b>çizip ekrana gönderir</b>.', 'Ekran kablosu onun arkasına takılır.', 'Oyun ve video için güçlüsü gerekir.'],
+         ornek='Bir <b>ressam</b>: saniyede onlarca resim çizer; resimler değişince hareket görürüz, çizgi film gibi.',
+         soru='Işık yanıyor, fan dönüyor ama ekranda görüntü yok. Neye bakarsınız?', cevap='Ekranın fişine ve düğmesine; sonra ekran kablosunun iki ucunun da tam takılı olduğuna.',
+         anlat='Çoğu ofis bilgisayarında ayrı ekran kartı yoktur; işlemcinin içindeki küçük grafik birimi bu işi yapar. Ayrı kart varsa ekran kablosu ona takılmalıdır (alttaki girişler).',
+         dikkat=''),
+    dict(kick='Parça 8', title='Güç kaynağı: elektriği hazırlar', adim=13, img='dh_12.jpg',
+         items=['Bilgisayarın <b>fişi buna takılır</b>.', 'Prizdeki güçlü elektriği <b>zayıf elektriğe</b> çevirir.', 'Kablolarla her parçaya dağıtır.'],
+         ornek='Telefonun <b>şarj aleti</b> gibi.',
+         soru='Elektrik sık kesiliyorsa bilgisayar nasıl korunur?', cevap='Kesintisiz güç kaynağı (UPS): elektrik gidince birkaç dakika çalıştırır; iş kaydedilip kapatılır.',
+         anlat='Teknik bilgi (sorulursa): prizdeki 220 voltu 12 ve 5 volta çevirir. Üzerindeki watt değeri verebileceği en fazla güçtür; bilgisayar her an o kadar harcamaz. 3B’deki “Ne kadar elektrik harcıyor?” düğmesi bunu gösterir.',
+         dikkat='Güç kaynağının içi asla açılmaz; fiş çekili olsa da içinde elektrik kalabilir.'),
+    dict(kick='Bağlantılar', title='Kablolar: elektrik ve bilgi', adim=14, img='dh_13.jpg',
+         items=['Diske <b>iki kablo</b> takılır.', '<b>Turuncu:</b> elektrik getirir.', '<b>Mavi:</b> bilgiyi taşır.'],
+         ornek='Eve de iki ayrı kablo gelir: biri elektrik, biri internet.',
+         soru='Yalnızca elektrik kablosu takılıysa disk görünür mü?', cevap='Görünmez. Disk çalışır ama bilgi kablosu olmadan bilgisayar ona ulaşamaz.',
+         anlat='Renkler 3B uygulamanın gösterimidir; gerçek kablolar farklı renkte olabilir.', dikkat=''),
+    dict(kick='Parça 9', title='Kasa fanları: içeriyi havalandırır', adim=15, img='dh_14.jpg',
+         items=['Öndeki fanlar serin havayı <b>içeri alır</b>.', 'Arkadaki fan sıcak havayı <b>dışarı atar</b>.', 'Toz birikince ses artar.'],
+         ornek='Karşılıklı iki pencere açınca olan <b>cereyan</b> gibi.',
+         soru='Fan sesi eskisinden çok daha fazla. Ne olabilir?', cevap='Toz birikmiş olabilir; fiş çekiliyken temizletilir. Kasa duvara dayanmaz.',
+         anlat='Yılda bir toz temizliği yeterlidir. Elektrik süpürgesi kasanın içine sokulmaz (statik elektrik).', dikkat=''),
+    dict(kick='Parça 10', title='CD/DVD sürücüsü', adim=16, img='dh_15.jpg',
+         items=['CD ve DVD’leri okur.', 'Yeni bilgisayarların çoğunda <b>yok</b>.', 'Yerini USB bellek ve internet aldı.'],
+         ornek='Pikap gibi döner, ama okuyan iğne değil, ince bir ışıktır.',
+         soru='DVD yeri olmayan bilgisayarda eski DVD nasıl izlenir?', cevap='USB ile takılan ayrı bir DVD sürücüsü alınır.',
+         anlat='Eski düğün, sünnet DVD’lerini bilgisayara ve USB belleğe kopyalamalarını önerin; diskler yıllar içinde bozulabilir.', dikkat=''),
+    dict(kick='Bağlantılar', title='Arkadaki girişler', adim=17, img='dh_16.jpg',
+         items=['<b>USB:</b> fare, klavye, yazıcı', '<b>HDMI:</b> ekran, televizyon', '<b>İnternet kablosu</b> girişi', '<b>Ses:</b> yeşil hoparlör, pembe mikrofon'],
+         ornek='Her kablonun ucu farklı, yanlış yere girmez. Girmiyorsa <b>zorlamayın</b>, çevirin.',
+         soru='USB bellek girmiyor. Ne yaparsınız?', cevap='Zorlamadan ters çevirip yeniden denenir.',
+         anlat='3B’de herhangi bir girişe tıklanınca adı ve görevi yazar; öğrencilere birkaç tanesini tıklatın.', dikkat=''),
+    dict(kick='Hepsi bir arada', title='Parçaları ayıralım', adim=18, img='dh_17.jpg',
+         items=['Her parça bir iş yapar.', 'Hiçbiri tek başına bilgisayar değil.', 'Birlikte çalışınca bilgisayar olur.'],
+         ornek='Bir lokanta: aşçı (işlemci), tezgâh (RAM), kiler (disk), garson (ekran kartı), elektrik (güç kaynağı).',
+         soru='Hangi parça olmadan bilgisayar hiç açılmaz?', cevap='Anakart, işlemci, RAM ve güç kaynağı. Disk olmadan açılır ama Windows gelmez.',
+         anlat='Alttaki “Parçaları ayır” kaydırıcısıyla parçaları toplayıp ayırın.', dikkat=''),
+    dict(kick='Birlikte çalışma', title='Bir fotoğrafı açınca ne olur?', adim=19, img='dh_18.jpg', akis=True,
+         items=[], ornek='Fotoğrafı kırpıp <b>kaydetmeden</b> kapatırsanız kırpılmış hâli kaybolur.',
+         soru='Kaydetmeden kapattınız. Diskte hangi hâli kalır?', cevap='Eski hâli. Kırpılmış hâli yalnızca RAM’deydi.',
+         anlat='3B’de parçalar sırayla yeşil yanar: disk → RAM → işlemci → ekran kartı. Bir tur izletin, sonra öğrencilere sırayı söyletin.', dikkat=''),
+    dict(kick='Bugün', title='Küçücük disk: M.2 SSD', adim=20, img='dh_19.jpg',
+         items=['<b>Sakız paketi</b> kadar.', 'Kablosu yok; anakarta takılır.', 'Çok hızlı. Dizüstülerde de bu var.'],
+         ornek='Sakız paketi kadar ama içine on binlerce fotoğraf sığar.',
+         soru='Dizüstüde bu parçalar nerede?', cevap='Klavyenin altındaki gövdede, küçültülmüş olarak; bir de pil vardır.',
+         anlat='Parçalar küçüldü ama görevler aynı: beyin, masa, dolap, ressam, elektrik.', dikkat=''),
+    dict(kick='Eskiden', title='Disket', adim=21, img='dh_20.jpg',
+         items=['1990’larda dosyalar disketle taşınırdı.', 'Bir diskete bugünkü <b>tek bir telefon fotoğrafı</b> bile sığmaz.'],
+         ornek='Disket bir kartpostal, bugünkü disk bir kütüphane.',
+         soru='Disketin yerini ne aldı?', cevap='USB bellek ve internet (e-posta, bulut).',
+         anlat='Bir disket 1,44 MB; bugünkü 1 TB’lık diske yaklaşık 700 bin disket sığar. 3B’de “Eski ve yeni diskleri karşılaştır” düğmesi gerçek boyutlarıyla yan yana gösterir.', dikkat=''),
+]
+
+S = []
+S.append(cover('Donanım: bilgisayarın içine yolculuk', 'Bilgisayarın parçaları, ne işe yaradıkları ve günlük hayattan örnekler', ''))
+S.append(slide('Bugün', 'Neler öğreneceğiz?', split(ul([
+    'Bilgisayarın içinde hangi parçalar var?', 'Her parça ne işe yarar?', '“i5, 4. nesil”, “16 GB RAM” ne demek?', 'RAM ile disk arasındaki fark'], ) +
+    note('Her parçayı bir benzetmeyle hatırlayacağız: <b>işlemci aşçı, RAM masa, disk dolap, ekran kartı ressam.</b>'),
+    resim('dh_02.jpg'), 1, 1)))
+for d in DN:
+    if d.get('tablo'):
+        left = table([['i3 · i5 · i7 · i9', '<b>Sınıfı.</b> Sayı büyüdükçe daha güçlü.'],
+                      ['i5-<b>4</b>590', 'Tireden sonraki ilk sayı = <b>nesil</b>: 4. nesil, 2014 civarı'],
+                      ['i5-<b>12</b>400', '12. nesil, 2022 civarı'],
+                      ['AMD Ryzen 5', 'Öteki marka, aynı mantık: Ryzen 5 ≈ i5']], 'kv tight')
+        body = left + orn(d['ornek']) + dus(d['soru'])
+        S.append(slide(d['kick'], d['title'], body))
+    elif d.get('ramdisk'):
+        S.append(slide(d['kick'], d['title'], split(
+            table([['Ne tutar?', 'Şu an açık işler', 'Bütün dosyalar'], ['Kapanınca', '<b>Silinir</b>', '<b>Kalır</b>'], ['Hız', 'Çok hızlı', 'Daha yavaş'],
+                   ['Ne kadar?', '8–32 GB', '256 GB – 2 TB']], 'tight', head=['', 'RAM (masa)', 'Disk (dolap)']) + orn(d['ornek']) + dus(d['soru']),
+            resim(d['img']), 1.1, .9)))
+    elif d.get('akis'):
+        S.append(slide(d['kick'], d['title'], '''
+<div class="flow">
+<div><div class="n">1</div><b>Disk</b> fotoğrafı bulur.<br><span class="mut">Dolaptan çıkarılır</span></div>
+<div><div class="n">2</div><b>RAM</b>’e gelir.<br><span class="mut">Masaya konur</span></div>
+<div><div class="n">3</div><b>İşlemci</b> açar.<br><span class="mut">Aşçı hazırlar</span></div>
+<div><div class="n">4</div><b>Ekran kartı</b> çizer.<br><span class="mut">Ressam gösterir</span></div>
+</div>''' + split(orn(d['ornek']) + dus(d['soru']), resim(d['img'], style='max-height:330px'), 1, 1)))
+    else:
+        S.append(slide(d['kick'], d['title'], split(ul(d['items'], 'small') + orn(d['ornek']) + dus(d['soru']), resim(d['img']), 1, 1)))
+S.append(slide('Özet', 'Kasanın içi: tek cümleyle', table([
+    ['Anakart', 'Şehrin yolları: her şey ona takılır'], ['İşlemci', 'Beyin, aşçı. i3–i9 sınıfı, nesil = yılı'],
+    ['RAM', 'Masa: geçici, kapanınca silinir'], ['Disk (HDD / SSD)', 'Dolap: kalıcı, kapanınca da durur'],
+    ['Ekran kartı', 'Ressam: görüntüyü çizer'], ['Güç kaynağı', 'Şarj aleti: elektriği hazırlar'], ['Fan', 'Serinletir']], 'kv tight')))
+S.append(slide('Sırada', 'Kendinizi deneyin', split(
+    table([['1', '3B bilgisayarda <b>🎓 Donanım dersi</b>: adımları kendiniz gezin.'],
+           ['2', '<b>❓ Buldurma oyunu</b>: “RAM nerede?” sorusuna parçaya tıklayın.'],
+           ['3', 'Dersler sayfası → 4. hafta → <b>Donanım testi</b> (15 soru).'],
+           ['4', 'Evde: kendi bilgisayarınızın RAM’ine ve işlemcisine bakın. <span class="mut">Ayarlar → Sistem → Hakkında</span>']], 'kv'),
+    resim('dh_21.jpg'), 1.1, .9)))
+write('donanim', 'Donanım: bilgisayarın içi', 'Bilgisayar İşletmenliği – Donanım: Bilgisayarın İçine Yolculuk', S)
+
+# ---------------------------------------------------------------- öğretmen notları (A4, yazdırmak için)
+NOT_CSS = '''@page { size: A4; margin: 14mm 14mm 16mm; }
+body { font-family: 'Fira Sans', sans-serif; color: #1d1d1b; font-size: 11pt; line-height: 1.4; margin: 0; }
+h1 { font-size: 20pt; margin: 0 0 2mm; } .sub { color: #6b6a64; margin: 0 0 6mm; }
+.plan { border-collapse: collapse; width: 100%; margin-bottom: 6mm; } .plan td, .plan th { border-bottom: 1px solid #d9d5ca; padding: 1.5mm 2mm; text-align: left; vertical-align: top; }
+.n { break-inside: avoid; border-top: 2px solid #b5441c; padding: 3mm 0 4mm; display: flex; gap: 5mm; }
+.n img { width: 52mm; height: auto; border-radius: 2px; flex: none; }
+.n h2 { font-size: 13pt; margin: 0 0 1mm; } .n .meta { font-size: 9pt; color: #b5441c; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 1.5mm; }
+.n p { margin: 1mm 0; } .q { background: #eef4f7; padding: 1.5mm 3mm; border-left: 3px solid #2e5f7a; } .a { color: #2e6b3a; }
+.d { color: #b5441c; } b { font-weight: 600; }'''
+cards = []
+slide_no = 3
+for d in DN:
+    cards.append(f'''<div class="n"><img src="{IMG}{d['img']}"><div>
+<div class="meta">Slayt {slide_no} · 3B dersinde {d['adim']}. adım</div><h2>{d['title']}</h2>
+<p>{d['anlat']}</p>
+<p class="q"><b>Düşünelim:</b> {d['soru']}<br><span class="a"><b>Cevap:</b> {d['cevap']}</span></p>
+{f'<p class="d"><b>Dikkat:</b> {d["dikkat"]}</p>' if d['dikkat'] else ''}</div></div>''')
+    slide_no += 1
+notlar = f'''<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>Donanım dersi – öğretmen notları</title><style>{NOT_CSS}</style></head><body>
+<h1>Donanım dersi: öğretmen notları</h1>
+<p class="sub">Slaytlar (Bilgisayar-Isletmenligi-donanim.pdf) öğrencilere gösterilir; cevaplar ve ek anlatım yalnızca bu dosyadadır.</p>
+<table class="plan">
+<tr><th>Hazırlık</th><td>Sınıf bilgisayarlarında <b>bilgisayar.html</b> açılır, üstteki <b>🎓 Donanım dersi</b> düğmesine basılır. Öğrenciler kendi ekranlarında aynı adımları izler; ← → tuşlarıyla ilerlenir. Panelde “Düşünelim” sorusu ve “Cevabı göster” düğmesi vardır: önce öğrencilere düşündürün, sonra açtırın.</td></tr>
+<tr><th>Akış (≈ 55 dk)</th><td>1) Anlatım: slayt + 3B adımları birlikte (30 dk) · 2) <b>❓ Buldurma oyunu</b> 3B’de (10 dk) · 3) Dersler sayfası → 4. hafta → <b>Donanım testi: kasanın içi</b>, 15 soru (15 dk)</td></tr>
+<tr><th>Ana fikir</th><td>İşlemci = aşçı (beyin) · RAM = masa (geçici) · Disk = dolap (kalıcı) · Ekran kartı = ressam · Güç kaynağı = şarj aleti · Anakart = şehrin yolları</td></tr>
+</table>
+{''.join(cards)}
+</body></html>'''
+with open(os.path.join(D, 'donanim-notlar.html'), 'w', encoding='utf-8') as f:
+    f.write(notlar)
+print('donanim-notlar', len(DN), 'not')

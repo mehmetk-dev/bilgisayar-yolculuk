@@ -17,7 +17,7 @@ html, body { margin: 0; height: 100%; }
 body {
   background: var(--bg) radial-gradient(#f3e3c4 1.5px, transparent 1.6px) 0 0 / 26px 26px;
   color: var(--fg);
-  font: 18px/1.5 "Nunito", "Segoe UI", "Noto Sans", "DejaVu Sans", Arial, sans-serif;
+  font: 18px/1.5 "Nunito", UISymC, UISymM, UISymD, "Segoe UI", "Noto Sans", "DejaVu Sans", Arial, sans-serif;
   display: flex; flex-direction: column;
 }
 [hidden] { display: none !important; }

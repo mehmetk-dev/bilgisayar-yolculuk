@@ -36,7 +36,7 @@ export function clearTexCache() {
   cache.clear();
 }
 
-const FONT = '"DejaVu Sans", "Segoe UI", Arial, sans-serif';
+const FONT = '"DejaVu Sans", UISymC, UISymM, UISymD, "Segoe UI", Arial, sans-serif';
 const MONO = '"DejaVu Sans Mono", Consolas, monospace';
 
 function txt(g, s, x, y, size, color, { align = 'left', bold = false, mono = false, rot = 0, base = 'middle' } = {}) {

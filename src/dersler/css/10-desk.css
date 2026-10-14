@@ -1,7 +1,7 @@
 /* Benzetim masaüstü: ekran çerçevesi, simgeler, pencereler, görev çubuğu, Başlat, menüler, açılış ekranları */
 .dk { position: relative; flex: 1; display: flex; min-height: 0; border-radius: 14px; overflow: hidden; border: 0.45em solid #1d2430; background: #000; font-size: calc(0.72em * var(--dk-scale, 1)); color: #1c2430; box-shadow: 0 10px 30px #1c243033; line-height: 1.35; }
 .dk button { font: inherit; border-width: 1px; border-radius: 5px; padding: 0.25em 0.6em; color: inherit; }
-.dk button:focus-visible { outline: 2px solid #0a5dc2; outline-offset: 1px; }
+.dk button:focus-visible { outline: 2px solid var(--dk-acc, #0a5dc2); outline-offset: 1px; }
 .dk-screen { position: relative; flex: 1; overflow: hidden; outline: none; user-select: none; }
 .dk-screen input, .dk-screen textarea { user-select: text; }
 .dk-wall { position: absolute; inset: 0; transition: background 0.4s; }
@@ -14,10 +14,10 @@
 .dk-icon.sel { background: #ffffff45; border-color: #ffffffa0; }
 .di-img { font-size: 2.5em; display: block; line-height: 1.15; position: relative; width: fit-content; margin: 0 auto; }
 .dk-icons.big .di-img { font-size: 3.2em; }
-.di-arrow { position: absolute; left: -0.1em; bottom: 0.05em; font-size: 0.32em; background: #fff; color: #0a5dc2; border-radius: 3px; font-style: normal; padding: 0 0.2em; text-shadow: none; font-weight: 800; }
+.di-arrow { position: absolute; left: -0.1em; bottom: 0.05em; font-size: 0.32em; background: #fff; color: var(--dk-acc, #0a5dc2); border-radius: 3px; font-style: normal; padding: 0 0.2em; text-shadow: none; font-weight: 800; }
 .di-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.95em; line-height: 1.2; overflow-wrap: anywhere; }
 .dk-icon.sel .di-name { -webkit-line-clamp: 4; }
-.di-rename { width: 100%; font: inherit; font-size: 0.95em; text-align: center; resize: none; border: 1px solid #0a5dc2; border-radius: 3px; text-shadow: none; color: #111; }
+.di-rename { width: 100%; font: inherit; font-size: 0.95em; text-align: center; resize: none; border: 1px solid var(--dk-acc, #0a5dc2); border-radius: 3px; text-shadow: none; color: #111; }
 .dk-ghost { position: absolute; pointer-events: none; opacity: 0.8; z-index: 9800; color: #fff; text-shadow: 0 1px 3px #000; width: 5.8em; text-align: center; }
 .dk-ghost.ex-item { color: #111; text-shadow: none; background: #cfe0f8; border-radius: 6px; }
 .dragging { opacity: 0.35; }
@@ -48,7 +48,7 @@
 .tb-apps { display: flex; gap: 0.15em; }
 .tb-apps button.run::after { content: ""; position: absolute; bottom: 2px; left: 50%; width: 6px; height: 3px; transform: translateX(-50%); background: #8a94a3; border-radius: 2px; }
 .tb-apps button.act { background: #ffffffc8; }
-.tb-apps button.act::after { width: 16px; background: #0a5dc2; }
+.tb-apps button.act::after { width: 16px; background: var(--dk-acc, #0a5dc2); }
 .tb-search { height: 2.1em; border-radius: 999px !important; background: #fff; border: 1px solid #c9d1dc; padding: 0 1em !important; font-size: 0.9em; width: 9em; justify-content: flex-start; color: #555; display: flex; align-items: center; gap: 0.4em; }
 .tb-tray { display: flex; align-items: center; height: 100%; }
 .tb-tray button { border: 0 !important; background: none; height: 100%; padding: 0 0.5em !important; border-radius: 4px !important; font-size: 0.9em; }
@@ -56,12 +56,12 @@
 .tb-clock { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; line-height: 1.15; font-size: 0.82em !important; }
 .tb-showdesk { width: 0.7em; padding: 0 !important; border-left: 1px solid #b5bfcc !important; border-radius: 0 !important; }
 .logo4 { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 0.95em; height: 0.95em; }
-.logo4 i { background: linear-gradient(135deg, #3aa0ff, #0a5dc2); border-radius: 1px; }
+.logo4 i { background: linear-gradient(135deg, color-mix(in srgb, var(--dk-acc, #0a5dc2) 55%, #fff), var(--dk-acc, #0a5dc2)); border-radius: 1px; }
 
 /* Başlat menüsü */
 .dk-start { position: absolute; left: 50%; bottom: 3.4em; transform: translateX(-50%); width: min(36em, 94%); max-height: calc(100% - 4.5em); background: #f3f5f9f7; backdrop-filter: blur(14px); border: 1px solid #c9d1dc; border-radius: 10px; box-shadow: 0 14px 44px #0006; z-index: 6000; display: flex; flex-direction: column; padding: 1em 1.2em 0; overflow: hidden; animation: rise 0.18s; }
 @keyframes rise { from { transform: translate(-50%, 1em); opacity: 0; } }
-.st-search { font: inherit; padding: 0.5em 1em; border-radius: 999px; border: 1px solid #b9c2cf; border-bottom: 2px solid #0a5dc2; margin-bottom: 0.7em; outline: none; flex: none; }
+.st-search { font: inherit; padding: 0.5em 1em; border-radius: 999px; border: 1px solid #b9c2cf; border-bottom: 2px solid var(--dk-acc, #0a5dc2); margin-bottom: 0.7em; outline: none; flex: none; }
 .st-head { font-weight: 700; font-size: 0.9em; margin: 0.2em 0 0.4em; }
 .st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.4em, 1fr)); gap: 0.2em; overflow-y: auto; padding-bottom: 0.5em; }
 .st-grid button { display: flex; flex-direction: column; align-items: center; gap: 0.15em; border: 0 !important; background: none; padding: 0.5em 0.2em !important; font-size: 0.85em; border-radius: 6px !important; text-align: center; }
@@ -97,9 +97,9 @@
 .qk-row { display: flex; gap: 0.5em; }
 .qk-row button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.2em; padding: 0.6em !important; border-radius: 8px !important; background: #fff; font-size: 0.85em; }
 .qk-row button span { font-size: 0.95em; }
-.qk-wifi.on { background: #0a5dc2 !important; color: #fff; }
+.qk-wifi.on { background: var(--dk-acc, #0a5dc2) !important; color: #fff; }
 .qk-sl { display: flex; align-items: center; gap: 0.6em; }
-.qk-sl input { flex: 1; accent-color: #0a5dc2; }
+.qk-sl input { flex: 1; accent-color: var(--dk-acc, #0a5dc2); }
 .qk-mute { border: 0 !important; background: none; font-size: 1.1em; padding: 0 !important; }
 .qk-all { align-self: flex-start; }
 
@@ -121,7 +121,7 @@
 .uac-box p { padding: 0 1em; font-size: 0.85em; color: #555; }
 .uac-btns { display: flex; gap: 0.5em; padding: 0.9em 1em; background: #f3f3f3; }
 .uac-btns button { flex: 1; padding: 0.5em !important; }
-.uac-btns .primary { background: #0a5dc2; color: #fff; border-color: #0a5dc2; }
+.uac-btns .primary { background: var(--dk-acc, #0a5dc2); color: #fff; border-color: var(--dk-acc, #0a5dc2); }
 
 /* Ekran alıntısı ve Alt+Tab */
 .dk-snip { position: absolute; inset: 0; background: #0007; z-index: 9400; cursor: crosshair; }
@@ -130,7 +130,7 @@
 .dk-switch { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); background: #f3f5f9f2; border-radius: 10px; padding: 1em; display: flex; gap: 0.6em; z-index: 9000; box-shadow: 0 10px 40px #0006; }
 .dk-switch > div { padding: 0.6em; border-radius: 6px; display: flex; flex-direction: column; align-items: center; width: 7em; font-size: 0.85em; text-align: center; }
 .dk-switch span { font-size: 2em; }
-.dk-switch .on { outline: 3px solid #0a5dc2; background: #fff; }
+.dk-switch .on { outline: 3px solid var(--dk-acc, #0a5dc2); background: #fff; }
 
 /* Açılış, kilit, oturum açma, uyku, kapanma */
 .dk-over { position: absolute; inset: 0; z-index: 9500; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; outline: none; }
@@ -211,6 +211,21 @@
 .os-pw { display: flex; flex-wrap: wrap; gap: 0.4em; align-items: center; padding: 0.5em; background: #f4f7fb; border-radius: 6px; }
 .os-steps .prg { margin-top: 0.4em; }
 
+/* Görev çubuğu sola hizalı (Ayarlar > Kişiselleştirme) */
+.tb-left .tb-center { justify-content: flex-start; padding-left: 0.4em; }
+.tb-left .dk-start { left: 0.5em; transform: none; animation: none; }
+
+/* Yanıt vermeyen pencere ve Ctrl + Alt + Delete ekranı */
+.win.hung .win-body > :not(.win-fog) { filter: grayscale(0.4); }
+.win-fog { position: absolute; inset: 0; background: #ffffff70; z-index: 50; cursor: wait; display: flex; align-items: center; justify-content: center; transition: background 0.4s; }
+.win-fog.more { background: #ffffffc8; }
+.win-fog .spin { width: 2em; height: 2em; opacity: 0.6; }
+.dk-secure { position: absolute; inset: 0; z-index: 9550; background: #0a3d7aee; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2em; }
+.dk-secure > div { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4em; }
+.dk-secure button { background: none; border: 2px solid transparent !important; color: #fff; font-size: 1.25em; padding: 0.2em 0.6em !important; }
+.dk-secure button:hover, .dk-secure button:focus-visible { border-color: #fff9 !important; outline: none; }
+.dk-secure .sec-cancel { position: absolute; right: 2em; bottom: 2em; font-size: 1em; background: #ffffff22; border: 1px solid #fff6 !important; }
+
 /* Koyu mod (Ayarlar > Kişiselleştirme) */
 .dk-dark .dk-taskbar { background: #202020ee; color: #fff; border-color: #444; }
 .dk-dark .tb-search { background: #333; color: #ddd; border-color: #555; }
@@ -219,10 +234,39 @@
 .dk-dark .st-search { background: #333; color: #fff; }
 .dk-dark .win-bar { background: #2b2b2b; color: #fff; }
 .dk-dark .win:not(.active) .win-bar { background: #3a3a3a; color: #aaa; }
+.dk-dark .win-bar button:hover { background: #444; }
+.dk-dark .dk-menu, .dk-dark .dk-toast, .dk-dark .dk-switch { background: #2b2b2bf7; color: #eee; border-color: #444; }
+.dk-dark .dk-menu button:hover:not(:disabled) { background: #3d3d3d; }
+.dk-dark .dk-menu hr { border-color: #444; }
+.dk-dark .st-grid button:hover, .dk-dark .st-results button:hover, .dk-dark .dk-switch .on { background: #3a3a3a; }
+.dk-dark .st-results .best { background: #333c48; }
+.dk-dark .st-results small { color: #aaa; }
+.dk-dark .tb-start:hover, .dk-dark .tb-apps button:hover, .dk-dark .tb-tray button:hover, .dk-dark .tb-apps button.act { background: #ffffff1c; }
+.dk-dark .qk-row button { background: #3a3a3a; }
+.dk-dark .win { border-color: #555; }
+/* Windows'un kendi uygulamaları da koyulaşır: Ayarlar, Dosya Gezgini, Görev Yöneticisi, Mağaza, Takvim, Hava Durumu */
+.dk-dark .st, .dk-dark .tm, .dk-dark .ms, .dk-dark .tk, .dk-dark .hv, .dk-dark .dm { background: #202020; color: #eee; }
+.dk-dark .st-page section, .dk-dark .st-nav button.on, .dk-dark .tm-nav button.on, .dk-dark .ms-nav button.on, .dk-dark .ms-card, .dk-dark .ms-page section, .dk-dark .ms-row, .dk-dark .tm-main, .dk-dark .tk-day { background: #2b2b2b; border-color: #3a3a3a; color: #eee; }
+.dk-dark .st-nav button:hover, .dk-dark .tm-nav button:hover, .dk-dark .ms-nav button:hover { background: #333; }
+.dk-dark .st-btn, .dk-dark .ms-btn, .dk-dark .tm-btn, .dk-dark .ms-q, .dk-dark .tk-head button, .dk-dark .tk-note, .dk-dark .hv-city { background: #3a3a3a; color: #eee; border-color: #555 !important; }
+.dk-dark .st-item { border-color: #3a3a3a; }
+.dk-dark .st-note, .dk-dark .st-item small, .dk-dark .st-me small, .dk-dark .ms-card small, .dk-dark .ms-mut, .dk-dark .tm-boot small { color: #aaa; }
+.dk-dark .tm-t th { background: #2b2b2b; color: #ddd; border-color: #3a3a3a; }
+.dk-dark .tm-t td { border-color: #333; color: #eee; }
+.dk-dark .tm-t tr.sel td { background: #2f4a6b !important; }
+.dk-dark .tm-t tr[data-proc]:hover td, .dk-dark .tm-t tr[data-start]:hover td { background: #333; }
+.dk-dark .tm-grp td { color: #8cb8ff; }
+.dk-dark .tm-plist button.on { background: #2f4a6b; }
+.dk-dark .tk-grid button { background: #2b2b2b; color: #eee; }
+.dk-dark .ex, .dk-dark .ex-cmd, .dk-dark .ex-drive, .dk-dark .ex-addr, .dk-dark .ex-search { background: #202020; color: #eee; border-color: #3a3a3a !important; }
+.dk-dark .ex-top, .dk-dark .ex-cmd, .dk-dark .ex-nav, .dk-dark .ex-status { border-color: #3a3a3a; }
+.dk-dark .ex-item:hover, .dk-dark .ex-nav button:hover, .dk-dark .ex-top > button:hover:not(:disabled), .dk-dark .ex-cmd button:hover:not(:disabled) { background: #333; }
+.dk-dark .ex-item.sel, .dk-dark .ex-nav button.on { background: #2f4a6b; border-color: #4a6b94; }
+.dk-dark .ex-status, .dk-dark .ei-loc, .dk-dark .ex-empty { color: #aaa; }
 
 /* Ortak ilerleme çubuğu */
 .prg-l { font-size: 0.9em; margin-bottom: 0.3em; }
 .prg { height: 0.7em; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
-.prg i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #0a5dc2, #3aa0ff); }
-.spin { display: inline-block; width: 1em; height: 1em; border: 2px solid #0a5dc2; border-right-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -0.15em; }
+.prg i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--dk-acc, #0a5dc2), #3aa0ff); }
+.spin { display: inline-block; width: 1em; height: 1em; border: 2px solid var(--dk-acc, #0a5dc2); border-right-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -0.15em; }
 @keyframes spin { to { transform: rotate(360deg); } }

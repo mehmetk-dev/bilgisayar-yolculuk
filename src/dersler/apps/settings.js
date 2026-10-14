@@ -1,13 +1,13 @@
-// Ayarlar: ses ve parlaklık, yazıcılar, Wi-Fi, arka plan, yüklü uygulamalar, saat, yazı boyutu, güncelleştirmeler
+// Ayarlar: ses ve parlaklık, yazıcılar, Wi-Fi, temalar, arka plan, vurgu rengi, yüklü uygulamalar, saat, yazı boyutu, güncelleştirmeler
 import { esc, pictureURL, progress, wait, playTune } from './util.js';
-import { WALLPAPERS } from '../desktop.js';
+import { WALLPAPERS, THEMES, ACCENTS } from '../desktop.js';
 import { APPS } from './index.js';
 
 const PAGES = [
   ['system', '🖥', 'Sistem', 'Ekran, ses'],
   ['devices', '🖨', 'Bluetooth ve cihazlar', 'Yazıcılar, fare'],
   ['network', '📶', 'Ağ ve İnternet', 'Wi-Fi'],
-  ['personal', '🎨', 'Kişiselleştirme', 'Arka plan, renkler'],
+  ['personal', '🎨', 'Kişiselleştirme', 'Temalar, arka plan, renkler'],
   ['apps', '🧩', 'Uygulamalar', 'Yüklü uygulamalar'],
   ['time', '🕒', 'Saat ve dil', 'Tarih, saat dilimi'],
   ['access', '♿', 'Erişilebilirlik', 'Metin boyutu'],
@@ -20,7 +20,7 @@ export const NETWORKS = [
 ];
 const NEW_PRINTER = 'Renkli Yazıcı R-200 (Ağ)';
 const ZONES = [['İstanbul (UTC+3)', 3], ['Londra (UTC+0)', 0], ['Berlin (UTC+1)', 1], ['Bakü (UTC+4)', 4], ['New York (UTC-5)', -5]];
-const BUILTIN = ['notepad', 'calc', 'paint', 'browser', 'photos', 'snip', 'mayin'];
+const BUILTIN = ['notepad', 'calc', 'paint', 'browser', 'store', 'photos', 'snip', 'mayin'];
 
 export function settings({ desk, body, args, emit, dialogs }) {
   body.classList.add('st');
@@ -59,10 +59,22 @@ export function settings({ desk, body, args, emit, dialogs }) {
       }
       h += '</section>';
     } else if (page === 'personal') {
-      h += `<section><h3>Arka plan</h3><div class="st-preview" style="background:${desk.wallCss()}"></div>
-        <p>Bir resim seçin:</p><div class="st-walls">${Object.entries(WALLPAPERS).map(([k, [n, css]]) => `<button type="button" data-wall="${k}" title="${n}" class="${s.wallpaper === k ? 'on' : ''}" style="background:${css}"><span>${n}</span></button>`).join('')}</div>
+      // Mağaza'dan indirilmemiş temalar ve resimleri listede görünmez
+      const themes = Object.entries(THEMES).filter(([k, th]) => !th.store || s.themes.includes(k));
+      const walls = Object.entries(WALLPAPERS).filter(([k, w]) => !w[3] || s.themes.includes(k));
+      const mini = (wall, acc, dark) => `<span class="st-mini" style="background:${wall}"><i style="background:${dark ? '#202020' : '#eef2f7'}"><b style="background:${acc}"></b></i></span>`;
+      h += `<section><h3>Temalar</h3><p class="st-note">Tema; arka planı, vurgu rengini ve açık/koyu modu birlikte değiştirir.</p>
+        <div class="st-preview st-prevdesk" style="background:${desk.wallCss()}"><i class="${s.dark ? 'dark' : ''}"><b style="background:${s.accent}"></b></i></div>
+        <p>Geçerli tema: <b>${s.theme === 'custom' ? 'Özel' : esc(THEMES[s.theme]?.name || '')}</b></p>
+        <div class="st-themes">${themes.map(([k, th]) => `<button type="button" data-theme="${k}" class="${s.theme === k ? 'on' : ''}">${mini(WALLPAPERS[th.wall][1], th.accent, th.dark)}<span>${th.name}</span></button>`).join('')}</div>
+        <button type="button" class="st-btn" data-act="moreThemes">🛍 Mağaza'dan daha fazla tema alın</button></section>
+        <section><h3>Arka plan</h3>
+        <p>Bir resim seçin:</p><div class="st-walls">${walls.map(([k, [n, css]]) => `<button type="button" data-wall="${k}" title="${n}" class="${s.wallpaper === k ? 'on' : ''}" style="background:${css}"><span>${n}</span></button>`).join('')}</div>
         <button type="button" class="st-btn" data-act="browseWall">🖼 Fotoğraflara göz atın…</button></section>
-        <section><h3>Renkler</h3>${toggle('dark', s.dark, 'Koyu mod')}</section>`;
+        <section><h3>Renkler</h3>${toggle('dark', s.dark, 'Koyu mod (pencere başlıkları, görev çubuğu ve Windows uygulamaları koyu renk olur)')}
+        <p>Vurgu rengi <small class="st-note">(Başlat düğmesi, seçili düğmeler, açık programın görev çubuğundaki çizgisi)</small></p>
+        <div class="st-accents">${ACCENTS.map(([n, c]) => `<button type="button" data-accent="${c}" title="${n}" class="${s.accent === c ? 'on' : ''}" style="background:${c}"></button>`).join('')}</div></section>
+        <section><h3>Görev çubuğu</h3>${toggle('taskbarLeft', s.taskbarLeft, 'Görev çubuğu simgelerini sola hizala (eski Windows gibi)')}</section>`;
     } else if (page === 'apps') {
       const list = [...BUILTIN, ...s.installed];
       h += `<section><h3>Yüklü uygulamalar</h3><div class="st-list">${list.map((a) => `<div class="st-item"><span>${APPS[a].icon}</span><b>${APPS[a].name}</b><small>${s.installed.includes(a) ? 'Örnek Yazılım A.Ş. · 48 MB' : 'Windows ile gelir'}</small>
@@ -92,10 +104,13 @@ export function settings({ desk, body, args, emit, dialogs }) {
     const b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.page) return go(b.dataset.page);
+    if (b.dataset.theme) { desk.applyTheme(b.dataset.theme); render(); return; }
+    if (b.dataset.accent) { desk.setSetting('accent', b.dataset.accent); render(); emit('accent', { color: b.dataset.accent, name: ACCENTS.find((a) => a[1] === b.dataset.accent)[0] }); return; }
     if (b.dataset.wall) { s.customWall = null; desk.setSetting('wallpaper', b.dataset.wall); render(); emit('wallpaper', { name: WALLPAPERS[b.dataset.wall][0], key: b.dataset.wall }); return; }
     const act = b.dataset.act;
     const netEl = b.closest('[data-net]');
     switch (act) {
+      case 'moreThemes': desk.open('store', { page: 'themes' }); emit('more-themes'); return;
       case 'soundTest': {
         const t = playTune(desk, [523, 659, 784]);
         emit('sound-test', { audible: t > 0, volume: s.volume, muted: s.muted });

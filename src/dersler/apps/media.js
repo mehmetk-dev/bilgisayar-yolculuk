@@ -17,7 +17,7 @@ function imageViewer(appName) {
       setTitle(`${node.name} - ${appName}`);
       const l = list();
       body.innerHTML = `<div class="pv-bar"><button type="button" data-a="prev" ${l.length > 1 ? '' : 'disabled'}>◀</button><button type="button" data-a="out">－</button><span>%${Math.round(zoom * 100)}</span><button type="button" data-a="in">＋</button><button type="button" data-a="next" ${l.length > 1 ? '' : 'disabled'}>▶</button><button type="button" data-a="wall">🖼 Arka plan yap</button><button type="button" data-a="all">Tüm resimler</button></div>
-        <div class="pv-img"><img src="${pictureURL(node.content)}" alt="${esc(node.name)}" style="transform:scale(${zoom})"></div>`;
+        <div class="pv-img"><img src="${pictureURL(node.content)}" alt="${esc(node.name)}" style="transform:scale(${zoom})">${node.content?.video ? '<span class="pv-play">▶ Video (850 MB)</span>' : ''}</div>`;
     }
     body.addEventListener('click', (e) => {
       const p = e.target.closest('[data-id]');
@@ -41,12 +41,24 @@ function imageViewer(appName) {
 export const photos = imageViewer('Fotoğraflar');
 export const viewer = imageViewer('Resim Gösterici');
 
-export function pdf({ desk, body, args, setTitle }) {
+export function pdf({ desk, body, args, setTitle, emit }) {
   const n = desk.fs.get(args.node);
   setTitle(`${n?.name || 'Belge'} - PDF Okuyucu`);
   body.classList.add('pdf');
-  body.innerHTML = `<div class="pdf-page"><h2>📕 ${esc((n?.name || '').replace(/\.pdf$/i, ''))}</h2>${n?.content?.html ? `<div class="pdf-doc">${n.content.html}</div>` : `<p>Bu bir örnek PDF belgesidir. PDF dosyaları çoğunlukla fatura, broşür ve resmî yazılar için kullanılır; içindeki yazı değiştirilemez, sadece okunur ve yazdırılır.</p><div class="pdf-lines">${'<i></i>'.repeat(12)}</div>`}</div>`;
-  return {};
+  body.innerHTML = `<div class="pdf-bar"><button type="button" class="pdf-print" title="Yazdır (Ctrl + P)">🖨 Yazdır</button><button type="button" class="pdf-zoom" data-z="-10">−</button><b class="pdf-zl">%100</b><button type="button" class="pdf-zoom" data-z="10">+</button></div><div class="pdf-page"><h2>📕 ${esc((n?.name || '').replace(/\.pdf$/i, ''))}</h2>${n?.content?.html ? `<div class="pdf-doc">${n.content.html}</div>` : `<p>Bu bir örnek PDF belgesidir. PDF dosyaları çoğunlukla fatura, broşür ve resmî yazılar için kullanılır; içindeki yazı değiştirilemez, sadece okunur ve yazdırılır.</p><div class="pdf-lines">${'<i></i>'.repeat(12)}</div>`}</div>`;
+  let zoom = 100;
+  const print = async () => {
+    const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: n?.name || 'Belge' });
+    if (r) { desk.toast('Yazdırılıyor', `“${esc(n?.name || 'Belge')}” → ${esc(r.printer)}`, '🖨'); emit('pdf-print', { ...r, name: n?.name }); }
+  };
+  body.addEventListener('click', (e) => {
+    if (e.target.closest('.pdf-print')) return print();
+    const z = e.target.closest('[data-z]');
+    if (z) { zoom = Math.max(50, Math.min(200, zoom + +z.dataset.z)); body.querySelector('.pdf-page').style.zoom = zoom / 100; body.querySelector('.pdf-zl').textContent = `%${zoom}`; }
+  });
+  body.tabIndex = -1;
+  body.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.code === 'KeyP') { e.preventDefault(); print(); } });
+  return { focus: () => body.focus({ preventScroll: true }) };
 }
 
 export function music({ desk, body, args, emit, setTitle }) {

@@ -2,6 +2,8 @@
 // Bağlantılar data-href, düğmeler data-act ile çalışır; indirmeler data-download ile yapılır.
 
 import { pictureURL } from './util.js';
+import { GUNLUK_SITES } from './siteler-gunluk.js';
+import { BULUT_SITE } from './bulut.js';
 
 export const SEARCH_HOST = 'www.bulalim.com';
 
@@ -24,9 +26,24 @@ const RESULTS = [
   { keys: ['resim', 'gösterici', 'gosterici', 'program', 'indir', 'fotoğraf'], title: 'Resim Gösterici: Ücretsiz İndir', url: 'www.program-indir.com.tr/resim-gosterici', snip: 'Fotoğraflarınızı kolayca açın, büyütün, döndürün. Ücretsiz ve güvenli indirme.' },
   { keys: ['yazıcı', 'yazici', 'sürücü', 'surucu', 'r-200', 'r200', 'driver'], title: 'Renkli Yazıcı R-200 Sürücüleri', url: 'www.yazici-destek.com.tr/r-200', snip: 'Yazıcınızın resmî sürücü ve yazılım indirme sayfası.' },
   { keys: ['fotoğraf', 'fotograf', 'manzara', 'duvar', 'kağıdı', 'arka', 'plan', 'resim', 'resimler', 'ücretsiz'], title: 'Ücretsiz Fotoğraflar: Manzara, Doğa, Hayvanlar', url: 'www.ucretsiz-fotograflar.com.tr', snip: 'Telif ücreti olmayan, indirip kullanabileceğiniz binlerce fotoğraf ve duvar kâğıdı.' },
+  { keys: ['uzantı', 'uzanti', 'eklenti', 'reklam', 'engelle', 'engelleyici', 'sesli', 'okuma', 'karanlık', 'gece'], title: 'Uzantı Mağazası: tarayıcınıza yeni özellikler ekleyin', url: 'uzantilar.bulalim.com', snip: 'Reklam engelleyici, gece okuma modu, sesli okuyucu ve daha fazlası.' },
   { keys: ['banka', 'bankam'], title: 'Bankam: İnternet Şubesi', url: 'www.bankam.com.tr', snip: 'İnternet şubesine güvenli giriş.' },
+  { keys: ['e-devlet', 'edevlet', 'devlet', 'türkiye', 'turkiye', 'barkodlu', 'belge'], title: 'e-Devlet Kapısı', url: 'www.turkiye.gov.tr', snip: 'Kamu hizmetlerine tek noktadan, güvenli erişim.' },
+  { keys: ['meb', 'milli', 'eğitim', 'egitim', 'okul', 'kurs'], title: 'Millî Eğitim Bakanlığı', url: 'www.meb.gov.tr', snip: 'Bakanlığın resmî sitesi: duyurular, haberler, hayat boyu öğrenme kursları.' },
+  { keys: ['randevu', 'hastane', 'mhrs', 'doktor', 'muayene', 'hekim'], title: 'MHRS: Hastane ve Aile Hekimi Randevusu', url: 'www.mhrs.gov.tr', snip: 'Merkezi Hekim Randevu Sistemi. Randevu alın, randevularınızı görün ve iptal edin.' },
+  { keys: ['indirim', 'alışveriş', 'alisveris', 'fırsat', 'firsat', 'kampanya'], title: 'Fırsat Pazarı: günün indirimleri', url: 'www.firsat-pazari.com.tr', snip: 'Mutfak, ev ve elektronikte günün fırsatları.' },
 ];
 const AD = { title: 'Bilgisayarınız YAVAŞ mı? 10 KAT Hızlandırın!', url: 'www.super-hizlandirici.xyz', snip: 'Hemen indirin, ücretsiz tarama yapın!!!' };
+// Arama sonuçlarının en üstüne konan sahte e-Devlet reklamı (dolandırıcılar reklam satın alabilir)
+const AD_DEVLET = { title: 'e-Devlet Giriş - Hızlı Giriş Yap', url: 'www.turkiye-gov-giris.com', snip: 'e-Devlet şifrenizle hemen giriş yapın. Belgelerinizi anında indirin.' };
+
+// Adresteki asıl site adı (alan adı): sondaki iki parça; .com.tr, .gov.tr gibi ülke uzantılarında üç parça.
+// Ör. bankam.com.tr.hesap-dogrulama.xyz → hesap-dogrulama.xyz
+export function siteName(host) {
+  const p = host.replace(/^www\./, '').split('.');
+  const two = p.slice(-2).join('.');
+  return /^(com|gov|edu|org|net|bel|k12|gen|av|tsk|pol)\.tr$/.test(two) ? p.slice(-3).join('.') : two;
+}
 
 const page = (title, html, cls = '') => ({ title, html: `<div class="wp ${cls}">${html}</div>` });
 
@@ -52,10 +69,12 @@ export const SITES = {
       if (path.startsWith('/ara')) {
         const words = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
         const hits = RESULTS.map((r) => ({ r, score: words.filter((w) => r.keys.some((k) => k.includes(w) || w.includes(k))).length })).filter((x) => x.score).sort((a, b) => b.score - a.score).map((x) => x.r);
-        const showAd = words.some((w) => ['indir', 'program', 'yavaş', 'hızlandır', 'resim'].some((k) => w.includes(k)));
+        const devlet = words.some((w) => w.includes('devlet'));
+        const ad = devlet ? AD_DEVLET : AD;
+        const showAd = devlet || words.some((w) => ['indir', 'program', 'yavaş', 'hızlandır', 'resim'].some((k) => w.includes(k)));
         return page(`${q} - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>
           <p class="se-count">Yaklaşık ${hits.length ? hits.length * 1240 : 0} sonuç bulundu</p>
-          ${showAd ? `<div class="se-res ad"><small class="ad-tag">Reklam</small><a data-href="${AD.url}" data-ad="1">${AD.title}</a><cite>${AD.url}</cite><p>${AD.snip}</p></div>` : ''}
+          ${showAd ? `<div class="se-res ad"><small class="ad-tag">Reklam</small><a data-href="${ad.url}" data-ad="1">${ad.title}</a><cite>${ad.url}</cite><p>${ad.snip}</p></div>` : ''}
           ${hits.map((r) => `<div class="se-res"><cite>${r.url.split('/')[0]}</cite><a data-href="${r.url}">${r.title}</a><p>${r.snip}</p></div>`).join('') || '<p>Aramanızla eşleşen sonuç bulunamadı. Farklı kelimelerle deneyin.</p>'}`, 'se');
       }
       return page('Bulalım', `<div class="se-home"><div class="se-logo">Bulalım</div><form class="se-form big" data-search><input name="q" placeholder="Ne aramak istersiniz?" autocomplete="off"><button>🔍 Ara</button></form>
@@ -149,6 +168,36 @@ export const SITES = {
       return page('Bankam İnternet Şubesi', `<header class="bk-head">🏦 Bankam</header><div class="bk"><h1>İnternet Şubesi</h1><div class="bk-form"><input placeholder="T.C. Kimlik No" disabled><input placeholder="Şifre" disabled><button type="button" disabled>Giriş</button></div><p class="bk-note">🔒 Adres çubuğunda kilit işareti ve <b>bankam.com.tr</b> adresi var.<br>Bankanız sizden asla telefonla ya da SMS ile şifre istemez.</p></div>`);
     },
   },
+  'www.turkiye-gov-giris.com': {
+    name: 'e-Devlet (sahte)', secure: true,
+    render() {
+      return page('e-Devlet Kapısı: Giriş', `<header class="ed-head">🇹🇷 e-Devlet Kapısı</header><div class="bk"><h1>Hesabınızın süresi doldu! 24 saat içinde doğrulayın</h1><div class="bk-form"><input placeholder="T.C. Kimlik No" disabled><input placeholder="e-Devlet şifresi" disabled><input placeholder="Kart numarası" disabled><input placeholder="Son kullanma tarihi / CVV" disabled><button type="button" disabled>Doğrula</button></div>
+        <p class="scam-note">(Alıştırma: bu sayfa SAHTEDİR. Görünüşü aynı, kilidi de var; ama adresi <b>turkiye-gov-giris.com</b>. Gerçek adres <b>turkiye.gov.tr</b>.)</p></div>`);
+    },
+  },
+  'bankam.com.tr.hesap-dogrulama.xyz': {
+    name: 'Bankam (sahte)', secure: true,
+    render() {
+      return page('Bankam İnternet Şubesi', `<header class="bk-head">🏦 Bankam</header><div class="bk"><h1>Güvenlik doğrulaması</h1><div class="bk-form"><input placeholder="Müşteri numarası" disabled><input placeholder="Şifre" disabled><input placeholder="SMS ile gelen kod" disabled><button type="button" disabled>Onayla</button></div>
+        <p class="scam-note">(Alıştırma: bu sayfa SAHTEDİR. Adresin başında “bankam.com.tr” yazsa da site <b>hesap-dogrulama.xyz</b>\'nindir.)</p></div>`);
+    },
+  },
+  'www.eski-forum.com': {
+    name: 'Eski Forum', secure: false,
+    render() {
+      return page('Hobi Forumu', `<header class="pi-head" style="background:#5d4037">💬 Hobi Forumu</header><div class="pi"><h1>Bahçecilik sohbetleri</h1>
+        <p>🌱 <b>Domates fidesi ne zaman dikilir?</b> · 42 cevap</p><p>🌷 <b>Lale soğanları için en iyi toprak</b> · 17 cevap</p>
+        <div class="bk-form"><input placeholder="Kullanıcı adı" disabled><input placeholder="Şifre" disabled><button type="button" disabled>Üye girişi</button></div>
+        <p class="scam-note">Bu site <b>şifreli bağlantı (https)</b> kullanmıyor: adres çubuğunda “⚠ Güvenli değil” yazar. Okumak sorun değil, ama buraya şifre ya da kart bilgisi girmeyin.</p></div>`);
+    },
+  },
+  'www.meb.gov.tr': {
+    name: 'Millî Eğitim Bakanlığı', secure: true,
+    render() {
+      return page('T.C. Millî Eğitim Bakanlığı', `<header class="ed-head" style="background:#0d47a1">🎓 T.C. Millî Eğitim Bakanlığı</header><div class="ed"><h1>Duyurular</h1>
+        <p>📢 Halk eğitim merkezlerinde yeni dönem kurs kayıtları başladı: bilgisayar işletmenliği, el sanatları, yabancı dil.</p><p>📢 Hayat boyu öğrenme kurslarına e-Devlet üzerinden başvurulabilir.</p></div>`);
+    },
+  },
   'www.bankam-guvenlik-giris.xyz': {
     name: 'Bankam (sahte)', secure: false,
     render() {
@@ -157,18 +206,24 @@ export const SITES = {
   },
 };
 
+Object.assign(SITES, GUNLUK_SITES, BULUT_SITE);
+
 function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 
 // Adres çubuğuna yazılanı çözümler: site adresi mi, arama mı?
 export function resolve(input) {
   let t = input.trim();
   if (!t) return null;
-  const looksUrl = !/\s/.test(t) && /\.[a-zçğıöşü]{2,}/i.test(t);
+  const looksUrl = !/\s/.test(t) && (/\.[a-zçğıöşü]{2,}/i.test(t) || /^tarayici:\/\//i.test(t));
   if (!looksUrl) return { host: SEARCH_HOST, path: '/ara', q: t, search: true };
+  if (/^tarayici:\/\//i.test(t)) return { host: 'tarayici', path: '/' + t.slice(11).replace(/^\/+/, ''), q: '' };
   t = t.replace(/^https?:\/\//i, '');
   const slash = t.indexOf('/');
   let host = (slash < 0 ? t : t.slice(0, slash)).toLocaleLowerCase('tr');
   const path = slash < 0 ? '/' : t.slice(slash) || '/';
   if (!SITES[host] && SITES['www.' + host]) host = 'www.' + host;
+  // Geçmişten ya da sık kullanılanlardan gelen arama adresleri: www.bulalim.com/ara?q=börek
+  const m = path.match(/^(.*)\?q=(.*)$/);
+  if (m) return { host, path: m[1] || '/', q: m[2], search: host === SEARCH_HOST && m[1] === '/ara' };
   return { host, path, q: '' };
 }

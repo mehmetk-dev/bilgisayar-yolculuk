@@ -8,6 +8,8 @@ import { setAniso } from './textures.js';
 import { buildModel, ruler, registerIO } from './compare.js';
 import { cpuSchemaSVG, cpuSchemaFacts } from './cpuSchema.js';
 import { ERA_BUILDERS, ERA_IO } from './eras/index.js';
+import { startIcons } from './icons.js';
+import { DERS, DERS_TITLE } from './ders.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -286,6 +288,7 @@ function updateLabels() {
         (S.era === '2025' && ['ekranKarti', 'sogutucu', 'ram', 'psuBolmesi', 'anakart'].includes(p.type) && left);
       const insideVisible = S.open > 0.5 || S.explode > 0.1 || p.removed > 0.5;
       show = (S.labels && !S.quiz && !S.compare && !S.cableMode && !S.cablePart && !S.feature && (!S.selected || isSel) && (!S.focusSet || S.focusSet.includes(p.id)) && (outside || insideVisible || isSel)) || (S.focusSet && S.focusSet.includes(p.id) && !S.quiz);
+      if (lessonOn() && !lessonLabel(p.id)) show = false;
       if (p.obj.visible === false) show = false;
       if (!isSel && S.asm.regions && camera.position.z - S.asm.center.z < -22 && S.explode < 0.05) show = false;
       if (show) world = p.obj.localToWorld(_v.copy(p.labelLocal));
@@ -309,7 +312,7 @@ function updateLabels() {
     items.push({ L, x: (q.x * 0.5 + 0.5) * W, y: (-q.y * 0.5 + 0.5) * H, d });
   }
   items.sort((a, b) => a.d - b.d);
-  const tb = $('#tools').getBoundingClientRect(), top = $('#top').getBoundingClientRect(), bot = $('#bottom').getBoundingClientRect();
+  const tb = (L.on ? lessonPanel : $('#tools')).getBoundingClientRect(), top = $('#top').getBoundingClientRect(), bot = $('#bottom').getBoundingClientRect();
   const ir = info.classList.contains('open') ? info.getBoundingClientRect() : null;
   const safe = { l: S.compare ? 8 : tb.right + 8, t: S.compare ? 70 : top.bottom + 2, r: ir ? ir.left - 8 : W - 8, b: S.compare ? H * 0.5 : bot.top - 4 };
   for (const it of items) {
@@ -871,7 +874,7 @@ function bindUI() {
   $('#eraBtn').onclick = () => togglePanel('eraPanel', renderEraPanel);
   $('#levelBtn').onclick = () => {
     S.level = S.level === 'k' ? 't' : 'k';
-    $('#levelBtn').innerHTML = S.level === 'k' ? '👦 Çocuklar' : '🎓 Gençler (teknik)';
+    $('#levelBtn').innerHTML = S.level === 'k' ? '💬 Basit anlatım' : '🔧 Teknik anlatım';
     const p = partById(S.selected); if (p) showPartInfo(p);
     if ($('#conceptsPanel').classList.contains('open')) renderConcepts();
     if ($('#eraPanel').classList.contains('open')) renderEraPanel();
@@ -883,6 +886,7 @@ function bindUI() {
   $('#fsBtn').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); };
   $('#fontUp').onclick = () => setFont(1);
   $('#fontDown').onclick = () => setFont(-1);
+  $$('[data-lesson]').forEach((b) => b.onclick = () => (L.on ? lessonClose() : lessonOpen()));
   $('#helpBtn').onclick = () => $('#help').classList.toggle('open');
   $('#help').onclick = () => $('#help').classList.remove('open');
 
@@ -896,7 +900,9 @@ function bindUI() {
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
     const k = e.key.toLowerCase();
-    if (k === 'arrowright' || k === 'pagedown') tourStep(1);
+    if (L.on && (k === 'arrowright' || k === 'pagedown')) lessonGo(L.i + 1);
+    else if (L.on && (k === 'arrowleft' || k === 'pageup')) lessonGo(L.i - 1);
+    else if (k === 'arrowright' || k === 'pagedown') tourStep(1);
     else if (k === 'arrowleft' || k === 'pageup') tourStep(-1);
     else if (k === ' ') { e.preventDefault(); $('#pauseBtn').click(); }
     else if (k === 'l') $('#labelBtn').click();
@@ -943,6 +949,166 @@ function pick(x, y) {
   }
 }
 
+// ================================================================ Adım adım donanım dersi (ders.js)
+const L = { on: false, i: 0, timer: null, token: 0, labels: [] };
+// (updateLabels içinde L adı döngü değişkeniyle çakışır; bu ikisi oradan çağrılır)
+function lessonOn() { return L.on; }
+function lessonLabel(id) { return L.labels.includes(id); }
+const lessonPanel = $('#lessonPanel');
+
+function lessonOpen(i = L.i) {
+  L.on = true;
+  document.body.classList.add('lessoning');
+  deselect();
+  $('#quizBar').classList.remove('open'); S.quiz = null;
+  lessonGo(i);
+}
+function lessonClose() {
+  L.on = false; L.token++;
+  clearInterval(L.timer);
+  lessonMarks(null);
+  document.body.classList.remove('lessoning');
+  lessonPanel.classList.remove('open');
+  S.focusSet = null; clearHighlights(); applyVisual();
+  if (location.hash === '#ders') history.replaceState(null, '', location.pathname);
+}
+function lessonGo(i) {
+  L.i = Math.max(0, Math.min(DERS.length - 1, i));
+  clearInterval(L.timer);
+  const tok = ++L.token, st = DERS[L.i];
+  renderLesson();
+  const run = () => { if (tok === L.token) lessonApply(st); };
+  if (st.era && st.era !== S.era) {
+    S.ready = false;
+    setEra(st.era);
+    const wait = () => (S.ready ? run() : requestAnimationFrame(wait));
+    requestAnimationFrame(wait);
+  } else run();
+}
+function lessonApply(st) {
+  resetModes();
+  L.labels = st.labels || st.show || [];
+  lessonMarks(st);
+  for (const id of ['legend', 'powerPanel', 'conceptsPanel', 'eraPanel', 'featureMenu', 'cpuModal']) $('#' + id).classList.remove('open');
+  if (S.compare) closeCompare();
+  for (const p of S.asm.parts) p.removedTarget = 0;
+  S.trayTarget = st.tray ? 1 : 0; S.diskTarget = 0;
+  S.openTarget = st.open ? 1 : 0;
+  S.explodeTarget = st.explode || 0; $('#explode').value = S.explodeTarget * 100;
+  for (const id of st.remove || []) { const p = partById(id); if (p) p.removedTarget = 1; }
+  if (st.inside) { const p = partById(st.inside); if (p) { S.inside.add(p.id); if (p.type !== 'm2') p.removedTarget = 1; } }
+  updateEraUI();
+  if (st.cables) {
+    if (st.cables === 'power' || st.cables === 'data') showCables(st.cables);
+    else { const p = partById(st.cables); if (p) partAction(p, 'cables'); }
+  } else if (st.show) lessonFocus(st.show, st);
+  else if (st.view) setView(st.view);
+  if (st.flow) {
+    if (!st.show) setView(st.view || 'inside');
+    let k = 0;
+    const next = () => {
+      const [ids] = st.flow[k % st.flow.length];
+      clearHighlights();
+      S.focusSet = ids.filter((id) => partById(id));
+      L.labels = S.focusSet.filter((id) => id !== 'sogutucu' && id !== 'ram2');
+      for (const id of S.focusSet) addHighlight(finalBox(partById(id)), '#3ddc84', 0.4);
+      applyVisual();
+      lessonPanel.querySelectorAll('.lflow li').forEach((li, j) => li.classList.toggle('on', j === k % st.flow.length));
+      k++;
+    };
+    next();
+    L.timer = setInterval(next, 2400);
+  }
+  applyVisual();
+}
+// Parçaları vurgular, diğerlerini soluklaştırır, kamerayı hepsini görecek şekilde götürür
+function lessonFocus(ids, st) {
+  S.focusSet = [...ids, ...(st.keep || [])].filter((id) => partById(id));
+  const all = new THREE.Box3();
+  for (const id of ids.filter((x) => partById(x))) {
+    const b = finalBox(partById(id));
+    if (id !== st.inside) addHighlight(b, '#ffd166', 0.3);
+    all.union(b);
+  }
+  if (all.isEmpty()) return;
+  let ctr = all.getCenter(new THREE.Vector3());
+  let size = all.getSize(new THREE.Vector3()).length();
+  const spotObj = st.spot && S.asm.root.getObjectByName(st.spot[0]);
+  if (spotObj) {
+    clearHighlights();
+    ctr = spotObj.localToWorld(new THREE.Vector3(...st.spot[1]));
+    size = st.spot[2];
+  }
+  const cam = S.asm.cameras[st.view || 'inside'] || S.asm.cameras.inside;
+  const dir = st.dir ? new THREE.Vector3(...st.dir) : st.inside ? new THREE.Vector3(-0.45, 1.0, 0.65) : new THREE.Vector3(...cam.pos).sub(new THREE.Vector3(...cam.target));
+  dir.normalize();
+  $$('.tool[data-act="view"]').forEach((b) => b.classList.toggle('on', b.dataset.v === st.view));
+  flyTo(ctr.clone().addScaledVector(dir, Math.max(14, size * 1.35 * (st.zoom || 1) + 6)).toArray(), ctr.toArray(), 1.1);
+}
+// Adıma özel ek etiketler (st.marks)
+let markEls = [];
+function lessonMarks(st) {
+  for (const m of markEls) m.el.remove();
+  markEls = [];
+  for (const [name, local, text] of st?.marks || []) {
+    const obj = S.asm.root.getObjectByName(name);
+    if (!obj) continue;
+    const el = document.createElement('div');
+    el.className = 'lbl mark';
+    el.innerHTML = `<span>${text}</span>`;
+    labelLayer.appendChild(el);
+    markEls.push({ el, obj, local: new THREE.Vector3(...local) });
+  }
+}
+function updateMarks() {
+  const W = window.innerWidth, H = window.innerHeight;
+  markEls.forEach((m, i) => {
+    const q = m.obj.localToWorld(m.local.clone()).project(camera);
+    if (q.z > 1 || S.compare) { m.el.style.display = 'none'; return; }
+    m.el.style.display = 'block';
+    const x = (q.x * 0.5 + 0.5) * W, y = (-q.y * 0.5 + 0.5) * H;
+    const stem = [34, 90, 34, 130][i % 4], w = m.el.offsetWidth, h = m.el.offsetHeight;
+    m.el.style.transform = `translate(${(x - w / 2).toFixed(0)}px, ${(y - h - stem).toFixed(0)}px)`;
+    m.el.style.setProperty('--stem', `${stem}px`);
+    m.el.style.setProperty('--sx', '0px');
+  });
+}
+function lessonAction(a) {
+  if (a === 'schema') openSchema();
+  else if (a === 'power') togglePanel('powerPanel', renderPower);
+  else if (a.startsWith('compare:')) openCompare(a.slice(8));
+  else if (a.startsWith('cables:')) showCables(a.slice(7));
+  else if (a === 'quiz') { lessonClose(); startQuiz(); }
+  else if (a === 'test') location.href = 'index.html#ders/testDonanim';
+}
+function renderLesson() {
+  const st = DERS[L.i], n = DERS.length;
+  const tablo = st.tablo ? `<table class="ltab">${st.tablo.map((r) => `<tr>${r.map((c, j) => (j ? `<td>${c}</td>` : `<th>${c}</th>`)).join('')}</tr>`).join('')}</table>` : '';
+  const flow = st.flow ? `<ol class="lflow">${st.flow.map(([, t]) => `<li>${t}</li>`).join('')}</ol>` : '';
+  lessonPanel.innerHTML = `
+    <div class="ihead"><div class="ikind">🎓 Donanım dersi · ${L.i + 1} / ${n}</div><button class="x" data-a="close" title="Dersi kapat">✕</button></div>
+    <select class="ljump" aria-label="Adıma git">${DERS.map((d, j) => `<option value="${j}"${j === L.i ? ' selected' : ''}>${j + 1}. ${d.title}</option>`).join('')}</select>
+    <div class="lprog"><i style="width:${((L.i + 1) / n) * 100}%"></i></div>
+    <h2>${st.title}</h2>
+    <div class="ltext">${st.text}</div>${flow}${tablo}
+    ${st.ornek ? `<div class="lornek"><b>💡 Örnek</b><p>${st.ornek}</p></div>` : ''}
+    ${st.soru ? `<div class="lsoru"><b>🤔 Düşünelim</b><p>${st.soru}</p><button data-a="cevap">Cevabı göster</button><p class="lcevap" hidden>✔ ${st.cevap}</p></div>` : ''}
+    ${st.btns ? `<div class="ibtns">${st.btns.map(([t, a]) => `<button data-a="${a}">${t}</button>`).join('')}</div>` : ''}
+    <div class="lnav"><button data-a="prev" ${L.i ? '' : 'disabled'}>◀ Geri</button><button data-a="again" title="Bu adımı yeniden göster">↻</button><button data-a="next" class="on" ${L.i < n - 1 ? '' : 'disabled'}>İleri ▶</button></div>`;
+  lessonPanel.classList.add('open');
+  lessonPanel.scrollTop = 0;
+  lessonPanel.querySelector('.ljump').onchange = (e) => lessonGo(+e.target.value);
+  lessonPanel.querySelectorAll('[data-a]').forEach((b) => b.onclick = () => {
+    const a = b.dataset.a;
+    if (a === 'close') lessonClose();
+    else if (a === 'prev') lessonGo(L.i - 1);
+    else if (a === 'next') lessonGo(L.i + 1);
+    else if (a === 'again') lessonGo(L.i);
+    else if (a === 'cevap') { const c = lessonPanel.querySelector('.lcevap'); c.hidden = !c.hidden; b.textContent = c.hidden ? 'Cevabı göster' : 'Cevabı gizle'; }
+    else lessonAction(a);
+  });
+}
+
 // ================================================================ Döngü
 const clock = new THREE.Timer();
 const _tmp = new THREE.Vector3();
@@ -968,6 +1134,7 @@ function frame() {
   } else {
     renderer.render(scene, camera);
     updateLabels();
+    if (markEls.length) updateMarks();
   }
 }
 
@@ -1051,6 +1218,7 @@ bindUI();
 setEra('2000');
 requestAnimationFrame(frame);
 setTimeout(() => $('#loading').classList.add('done'), 600);
+if (location.hash === '#ders') { const w = () => (S.ready ? lessonOpen(0) : requestAnimationFrame(w)); requestAnimationFrame(w); }
 
 let fpsN = 0, fpsT = 0;
 Object.assign(window.APP, {
@@ -1068,5 +1236,8 @@ Object.assign(window.APP, {
   openCase: (v = true) => { S.openTarget = v ? 1 : 0; updateEraUI(); },
   power: () => togglePanel('powerPanel', renderPower), concepts: () => togglePanel('conceptsPanel', renderConcepts), eraPanel: () => togglePanel('eraPanel', renderEraPanel),
   camera, controls, scene, renderer, flyTo, partById, showPortInfo, showStorageTypes, partAction: (id, a) => partAction(partById(id), a, 'ne'),
+  lesson: { open: lessonOpen, close: lessonClose, go: lessonGo, steps: DERS, title: DERS_TITLE, stopFlow: () => clearInterval(L.timer) },
   setLevel: (l) => { if (S.level !== l) $('#levelBtn').click(); },
 });
+
+startIcons();

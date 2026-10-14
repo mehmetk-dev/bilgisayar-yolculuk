@@ -124,3 +124,10 @@ ol.steps.big li { margin: 0.4em 0; }
 .dr-bar { width: min(22em, 90%); height: 0.6em; background: #e3e8ef; border-radius: 999px; overflow: hidden; }
 .dr-bar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width 0.3s; }
 .dr-count { color: var(--mut); font-size: 0.9em; }
+
+/* Adres (URL) dersi: adresin renkli parçaları */
+.url-anat { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 1.15em; background: #f1f4f8; border-radius: 999px; padding: 0.4em 0.9em; margin: 0.5em 0; overflow-wrap: anywhere; }
+.url-anat span, .url-legend span { padding: 0.05em 0.15em; border-radius: 3px; }
+.url-legend { list-style: none; padding: 0; margin: 0.3em 0 0.6em; display: flex; flex-direction: column; gap: 0.25em; }
+.url-legend span { font-family: Consolas, "DejaVu Sans Mono", monospace; }
+.kurs-kart { background: #fff8e1; border: 2px dashed #e0a800; border-radius: 10px; padding: 0.6em 0.9em; margin: 0.6em 0; line-height: 1.6; font-family: Consolas, "DejaVu Sans Mono", monospace; }

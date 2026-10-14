@@ -178,6 +178,19 @@ const fmtNum = (n, f) => {
   return n.toLocaleString('tr-TR', { maximumFractionDigits: 6, useGrouping: Math.abs(n) >= 10000 });
 };
 
+// Hazır şablon (Dosya → Yeni): aylık ev bütçesi. Rakamlar değiştirilince toplamlar ve kalan kendiliğinden hesaplanır.
+const BUTCE = (() => {
+  const cells = { A1: 'AYLIK EV BÜTÇESİ', A3: 'GELİRLER', B3: 'Tutar', A4: 'Emekli maaşı', B4: '18500', A5: 'Diğer gelir', B5: '0', A6: 'Toplam gelir', B6: '=TOPLA(B4:B5)', A8: 'GİDERLER', B8: 'Tutar' };
+  [['Kira', 6000], ['Market', 5200], ['Elektrik', 850], ['Su', 320], ['Doğalgaz', 1400], ['İnternet/telefon', 650], ['İlaç', 400]].forEach(([n, v], i) => { cells['A' + (9 + i)] = n; cells['B' + (9 + i)] = String(v); });
+  Object.assign(cells, { A16: 'Toplam gider', B16: '=TOPLA(B9:B15)', A18: 'KALAN (gelir − gider)', B18: '=B6-B16' });
+  const fmt = {};
+  for (const a of ['A1', 'A3', 'B3', 'A8', 'B8', 'A6', 'B6', 'A16', 'B16', 'A18', 'B18']) fmt[a] = { b: true };
+  for (let r = 4; r <= 18; r++) (fmt['B' + r] ||= {}).f = 'tl';
+  delete fmt.B8.f; delete fmt.B3.f;
+  return { cells, fmt };
+})();
+const PIE = ['#2e7d32', '#1565c0', '#e46c0a', '#7030a0', '#c62828', '#00838f', '#9e9d24', '#6d4c41', '#ad1457', '#455a64'];
+
 export function sheet({ desk, body, args, emit, setTitle }) {
   body.classList.add('xl');
   body.innerHTML = `
@@ -187,11 +200,11 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       <button type="button" data-act="tl" title="Para birimi biçimi">₺</button><button type="button" data-act="pct" title="Yüzde biçimi">%</button><button type="button" data-act="plain" title="Genel biçim (biçimi kaldır)">123</button>
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="asc" title="Küçükten büyüğe sırala">↑ A→Z</button><button type="button" data-act="desc" title="Büyükten küçüğe sırala">↓ Z→A</button>
-      <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Grafik</button>
+      <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Sütun grafiği</button><button type="button" data-act="pie" title="Seçili alandan pasta grafiği: her parçanın bütünün ne kadarı olduğunu gösterir">🥧 Pasta grafiği</button>
       <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button>
     </div>
     <div class="xl-pop" hidden></div>
-    <div class="xl-menu" hidden><button type="button" data-file="new">📄 Yeni</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
+    <div class="xl-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
     <div class="xl-bar"><input class="xl-name" readonly aria-label="Ad kutusu"><span class="xl-fx">fx</span><input class="xl-formula" spellcheck="false" autocomplete="off" aria-label="Formül çubuğu"></div>
     <div class="xl-wrap" tabindex="0"><table class="xl-grid"><thead><tr><th class="xl-corner"></th>${[...COLS].map((c) => `<th>${c}</th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length: ROWS }, (_, r) => `<tr><th>${r + 1}</th>${[...COLS].map((_, c) => `<td data-a="${addr(r, c)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
@@ -516,8 +529,24 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     }
     const el = $('.xl-chart');
     if (!vals.length) { el.hidden = true; return false; }
-    const max = Math.max(...vals, 0) || 1, W = 360, H = 200, bw = W / vals.length;
     el.hidden = false;
+    if (s.type === 'pie') {
+      const sum = vals.reduce((a, b) => a + Math.max(0, b), 0) || 1;
+      let ang = -Math.PI / 2;
+      const R = 90, cx = 100, cy = 100;
+      const arcs = vals.map((v, k) => {
+        const a = Math.max(0, v) / sum * Math.PI * 2, x1 = cx + R * Math.cos(ang), y1 = cy + R * Math.sin(ang);
+        ang += a;
+        const x2 = cx + R * Math.cos(ang), y2 = cy + R * Math.sin(ang);
+        const d = a >= Math.PI * 2 - 1e-6 ? `M${cx - R},${cy}a${R},${R} 0 1,0 ${2 * R},0a${R},${R} 0 1,0 ${-2 * R},0` : `M${cx},${cy}L${x1},${y1}A${R},${R} 0 ${a > Math.PI ? 1 : 0},1 ${x2},${y2}Z`;
+        return `<path d="${d}" fill="${PIE[k % PIE.length]}" stroke="#fff" stroke-width="1.5"><title>${esc(labels[k])}: ${fmtNum(v)} (%${Math.round(v / sum * 100)})</title></path>`;
+      });
+      el.innerHTML = `<div class="xl-ch-h"><b>Pasta grafiği</b><button type="button" class="xl-ch-x" title="Grafiği kaldır">✕</button></div>
+        <div class="xl-pie"><svg viewBox="0 0 200 200" role="img" aria-label="Pasta grafiği">${arcs.join('')}</svg>
+        <ul>${vals.map((v, k) => `<li><i style="background:${PIE[k % PIE.length]}"></i>${esc(labels[k].slice(0, 18))} <b>%${Math.round(Math.max(0, v) / sum * 100)}</b></li>`).join('')}</ul></div>`;
+      return true;
+    }
+    const max = Math.max(...vals, 0) || 1, W = 360, H = 200, bw = W / vals.length;
     el.innerHTML = `<div class="xl-ch-h"><b>Grafik</b><button type="button" class="xl-ch-x" title="Grafiği kaldır">✕</button></div>
       <svg viewBox="0 0 ${W} ${H + 40}" role="img" aria-label="Sütun grafiği">${vals.map((v, k) => {
         const h = Math.max(0, v / max * H), x = k * bw + bw * 0.15, w = bw * 0.7;
@@ -560,7 +589,14 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     $('.xl-menu').hidden = true;
     if (c === 'save') return save();
     if (c === 'saveas') return save(true);
-    if (c === 'new') { if (await confirmDiscard()) load(); return; }
+    if (c === 'new') {
+      if (!(await confirmDiscard())) return;
+      const a = await desk.dialogs.ask({ title: 'Yeni çalışma kitabı', icon: '📗', text: '<b>Boş bir çalışma kitabı mı, hazır şablon mu?</b><br>Şablonda formüller hazırdır; yalnızca kendi rakamlarınızı yazarsınız.', buttons: [['blank', '📄 Boş çalışma kitabı', true], ['butce', '💰 Aylık ev bütçesi'], ['cancel', 'İptal']] });
+      if (!a || a === 'cancel') return;
+      load(a === 'butce' ? structuredClone(BUTCE) : null);
+      emit('xl-new', { template: a === 'blank' ? null : a });
+      return;
+    }
     if (c === 'open') {
       if (!(await confirmDiscard())) return;
       const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder, ext: '.xlsx', typeLabel: 'Excel dosyaları (*.xlsx)' });
@@ -699,11 +735,11 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (a === 'filter') { filterToggle(); wrap.focus({ preventScroll: true }); return; }
     if (a === 'sum') autosum();
     else if (a === 'asc' || a === 'desc') sort(a === 'desc');
-    else if (a === 'chart') {
+    else if (a === 'chart' || a === 'pie') {
       const s = sel();
       if (s.r1 === s.r2 && s.c1 === s.c2) { desk.toast('Grafik', 'Önce grafiği çizilecek hücreleri fareyle sürükleyerek seçin (adlar ve sayılar).', '📊'); return; }
-      chart = s;
-      if (drawChart()) emit('xl-chart', { range: selAddr() });
+      chart = { ...s, type: a === 'pie' ? 'pie' : 'bar' };
+      if (drawChart()) emit('xl-chart', { range: selAddr(), kind: chart.type });
       else { chart = null; desk.toast('Grafik', 'Seçili alanda sayı yok.', '📊'); }
     } else format(a);
     wrap.focus({ preventScroll: true });

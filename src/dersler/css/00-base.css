@@ -16,7 +16,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
-body { background: var(--bg); color: var(--fg); font: var(--fs)/1.5 "Segoe UI", "Noto Sans", "DejaVu Sans", Arial, sans-serif; display: flex; flex-direction: column; }
+body { background: var(--bg); color: var(--fg); font: var(--fs)/1.5 UISymC, UISymM, UISymD, "Segoe UI", "Noto Sans", "DejaVu Sans", Arial, sans-serif; display: flex; flex-direction: column; }
 [hidden] { display: none !important; }
 h1, h2, h3 { margin: 0; line-height: 1.2; }
 p { margin: 0.4em 0; }
@@ -149,7 +149,7 @@ body:not(.with-kb) .under { display: none; }
 @keyframes glow { 0% { border-color: var(--ok); box-shadow: 0 0 0 5px #157a3c33; } }
 @keyframes fadeout { 0%, 70% { opacity: 1; } }
 .ptext { flex: 1; margin-top: 0.3em; white-space: pre-wrap; overflow-wrap: anywhere; overflow-y: auto; max-height: 7.5em; font-family: Consolas, "DejaVu Sans Mono", monospace; background: #f4f7fb; border-radius: 8px; padding: 0.3em 0.5em; }
-#pano.empty .ptext::before { content: "Henüz boş. Bir şey kopyaladığınızda burada görünecek."; color: var(--mut); font-family: "Segoe UI", "Noto Sans", sans-serif; }
+#pano.empty .ptext::before { content: "Henüz boş. Bir şey kopyaladığınızda burada görünecek."; color: var(--mut); font-family: UISymC, UISymM, UISymD, "Segoe UI", "Noto Sans", sans-serif; }
 .kbwrap { flex: 3 1 24em; background: #d9dfe7; border-radius: 14px; padding: 0.5em; }
 .kb { display: flex; gap: 0.8em; font-size: 0.62em; }
 .kb-main { flex: 15; display: flex; flex-direction: column; gap: 0.25em; min-width: 0; }

@@ -154,5 +154,7 @@ export function fileIcon(name) {
   if (/\.pdf$/i.test(name)) return '📕';
   if (/\.exe$/i.test(name)) return '💿';
   if (/\.(mp3|wav)$/i.test(name)) return '🎵';
+  if (/\.zip$/i.test(name)) return '🗜';
+  if (/\.(mp4|avi|mov)$/i.test(name)) return '🎬';
   return '📄';
 }

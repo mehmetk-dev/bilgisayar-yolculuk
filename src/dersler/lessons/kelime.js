@@ -1,5 +1,6 @@
 // 10. hafta: kelime işlemci (Word benzeri). MEB Bilgisayar İşletmeni programının “Microsoft Word” ünitesine göre:
-// belge açma, metin girişi, biçimlendirme, hizalama, tarih ekleme, kaydetme, yazdırma; liste, tablo, resim, renk, PDF.
+// belge açma, metin girişi, biçimlendirme, hizalama, tarih ekleme, kaydetme, yazdırma; liste, tablo, resim, renk, PDF;
+// stiller (başlıklar), bul ve değiştir, yazım denetimi, vurgu rengi, kenar boşlukları, sözcük sayısı.
 import { K, desktopReady, maxed, norm } from './common.js';
 
 const W = (c) => c.d.find('word')?.api;
@@ -204,5 +205,107 @@ export const belgeEkle = {
       done: 'PDF dosyası her bilgisayarda ve telefonda aynı görünür, kolayca değiştirilemez. E-postayla göndermek için en uygun biçimdir.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Kelime işlemcinin Ekle sekmesini öğrendiniz:</p>' },
+  ],
+};
+
+// Hazır bülten: başlıksız, yazım hatalı; ders boyunca düzenlenir
+const BULTEN = `<p>Mahalle Bülteni</p><p>Yeni Parkımız</p><p>Herkez cumartesi sabahı parkın açılışına davetlidir. Açılışta çocuklar için oyunlar, büyükler için çay ikramı olacak.</p>
+<p>Bahçe Günü</p><p>Malesef geçen hafta yağmur yüzünden yapılamayan bahçe günü bu pazar yapılacak. Bahçe günü saat 10.00'da başlayacak; eldiven ve şapka getirmeyi unutmayın.</p>
+<p>Duyurular</p><p>Muhtarlık şuan yeni adresinde, caminin karşısında hizmet veriyor.</p>`;
+const HEADS = ['yeni parkımız', 'günü', 'duyurular'];
+const docEvents = [...formatEvents, 'doc-style', 'doc-replace', 'doc-spell-fix', 'doc-layout'];
+const whenDoc = (test) => (ev, c) => docEvents.includes(ev.type) && !!test(c);
+
+export const belgeDuzen = {
+  id: 'belge-duzen', icon: '📰', title: 'Kelime işlemci: başlıklar, bul-değiştir, yazım denetimi', minutes: 40, stage: 'desktop',
+  desc: 'Hazır bir mahalle bültenini düzenlemek: Konu Başlığı ve Başlık 1 stilleri, Bul ve Değiştir (Ctrl + H), yazım denetimi (F7), vurgu rengi, kenar boşlukları, sözcük sayısı.',
+  summary: [
+    ['Giriş → Stiller', 'Normal, Başlık 1, Başlık 2, Konu Başlığı: tek tıkla hazır başlık biçimi'],
+    ['Ctrl + F', 'Bul: belgede bir kelimeyi bulur'],
+    ['Ctrl + H', 'Değiştir: bir kelimeyi başka kelimeyle değiştirir (Tümünü değiştir)'],
+    ['F7 / Gözden Geçir → Yazım denetimi', 'Kırmızı dalgalı çizgili kelimeleri düzeltir'],
+    ['Sağ tık (kırmızı çizgili kelime)', 'Doğru yazılışını önerir'],
+    ['🖍 Vurgu rengi', 'Fosforlu kalem gibi yazının arkasını boyar'],
+    ['Düzen → Kenar boşlukları', 'Sayfanın kenarındaki boşluk (Dar: sayfaya daha çok yazı sığar)'],
+    ['Gözden Geçir → Sözcük sayısı', 'Sayfa, sözcük ve karakter sayısı'],
+  ],
+  steps: [
+    {
+      title: 'Hazır bir belgeyi düzenleyelim',
+      html: `<p>Bu derste yazmak yerine <b>düzenleyeceğiz</b>. Yandaki mahalle bülteni yazılmış ama düz yazı gibi: başlıklar belli değil, yazım hataları var.</p>
+        <p>Kelime işlemcinin <b>stilleri</b>, <b>bul-değiştir</b> ve <b>yazım denetimi</b> araçlarıyla dakikalar içinde düzelteceğiz.</p>`,
+      setup: (c) => {
+        desktopReady(c);
+        c.d.closeAll();
+        const n = c.d.fs.write('docs', 'Bülten.docx', { html: BULTEN });
+        maxed(c, 'word', { node: n.id });
+      },
+    },
+    {
+      title: 'Konu başlığı',
+      html: '<p>İlk satıra (<b>Mahalle Bülteni</b>) tıklayın. <b>Giriş</b> sekmesindeki <b>Stiller</b> kutularından <b>Konu Başlığı</b>\'na tıklayın.</p>',
+      mouse: '🖱 İlk satır → Konu Başlığı',
+      hint: 'Stil bütün paragrafa uygulanır; satırı seçmeniz gerekmez, içine tıklamak yeter.',
+      check: (c) => info(c).styles?.[0] === 'title',
+      on: whenDoc((c) => info(c).styles?.[0] === 'title'),
+      done: 'Tek tıkla büyük, ince, altı çizgili bir başlık oldu. Yazı tipini, boyutunu ve rengini tek tek ayarlamak gerekmedi.',
+    },
+    {
+      title: 'Ara başlıklar',
+      html: '<p>Aynı şekilde <b>Yeni Parkımız</b>, <b>Bahçe Günü</b> ve <b>Duyurular</b> satırlarının her birine tıklayıp <b>Başlık 1</b> stilini verin.</p>',
+      mouse: '🖱 Satıra tık → Başlık 1 (üç kez)',
+      on: whenDoc((c) => HEADS.every((h) => { const b = info(c).blocks.find((x) => norm(x.text).endsWith(h) && x.text.length < 25); return b?.tag === 'H1'; })),
+      done: 'Belgenin iskeleti belli oldu: okuyan kişi başlıklara bakarak istediği bölümü hemen bulur. Uzun belgelerde içindekiler tablosu da bu başlıklardan yapılır.',
+    },
+    {
+      title: 'Bul ve değiştir',
+      html: `<p>Bahçe günü artık <b>fidan şenliği</b> olacak. Belgedeki bütün “bahçe günü” yazılarını tek tek düzeltmek yerine:</p>
+        <ol class="steps"><li>${K('Ctrl', 'H')}\'ye basın (ya da Giriş → <b>⇄ Değiştir</b>).</li><li><b>Aranan</b>: bahçe günü &nbsp; <b>Yeni</b>: fidan şenliği</li><li><b>Tümünü değiştir</b>\'e tıklayın.</li></ol>`,
+      combo: ['Ctrl', 'KeyH'],
+      on: (ev, c) => {
+        if (ev.type !== 'doc-replace') return false;
+        if (!ev.all) { c.note('Tek tek değiştirmek de olur; ama <b>Tümünü değiştir</b> hepsini birden yapar.'); return !/bahçe günü/i.test(info(c).text); }
+        return /bahçe/i.test(ev.from) && ev.count >= 3;
+      },
+      done: 'Kelime işlemci hepsini bir anda değiştirdi; cümle başındaki büyük harf de korundu. Kaç değişiklik yapıldığını sağ alttaki bildirim söyledi.',
+    },
+    {
+      title: 'Yazım denetimi',
+      html: `<p>Üstteki <b>Gözden Geçir</b> sekmesine geçin ve <b>ABC✓ Yazım denetimi</b>\'ne tıklayın (ya da ${K('F7')}). Hatalı kelimelerin altı kırmızı dalgalı çizilir.</p>
+        <p>Açılan kutuda her hatanın yanındaki <b>Değiştir</b>\'e ya da <b>Tümünü değiştir</b>\'e tıklayın.</p>`,
+      mouse: '🖱 Gözden Geçir → Yazım denetimi → Değiştir',
+      hint: 'Kırmızı çizgili kelimeye sağ tıklayınca da doğrusu önerilir.',
+      on: whenDoc((c) => { const t = norm(info(c).text); return !/herkez|malesef|şuan/.test(t) && t.includes('herkes') && t.includes('maalesef'); }),
+      done: 'Bu üç hata (herkez, malesef, şuan) en sık yapılan yazım yanlışlarındandır. Doğruları: <b>herkes</b>, <b>maalesef</b>, <b>şu an</b>.',
+    },
+    {
+      title: 'Önemli yeri boyayın',
+      html: `<ol class="steps"><li><b>Giriş</b> sekmesine dönün.</li><li><b>bu pazar</b> kelimelerini fareyle sürükleyerek seçin.</li><li>Şeritteki <b>🖍</b> (metin vurgu rengi) düğmesinden <b>sarı</b>\'yı seçin.</li></ol>`,
+      mouse: '🖱 “bu pazar”ı seçin → 🖍 → Sarı',
+      on: whenDoc((c) => [...(W(c)?.page.querySelectorAll('[style*="background"]') || [])].some((s) => /pazar/i.test(s.textContent) && !/transparent|rgba\(0, 0, 0, 0\)/.test(s.style.backgroundColor))),
+      done: 'Fosforlu kalem gibi: okuyanın gözü önce oraya gider. Az kullanın; her yer boyalıysa hiçbir yer önemli görünmez.',
+    },
+    {
+      title: 'Kenar boşlukları',
+      html: '<p><b>Düzen</b> sekmesine geçin ve <b>Kenar boşlukları: Dar</b>\'a tıklayın. Sayfanın kenarlarına bakın.</p>',
+      mouse: '🖱 Düzen → Dar',
+      on: (ev) => ev.type === 'doc-layout' && ev.margin === 'dar',
+      done: 'Kenarlar daraldı, satırlar uzadı: sayfaya daha çok yazı sığar. İlan ve bültenlerde Dar, resmî yazılarda Normal kullanılır. Aynı yerden sayfayı <b>Yatay</b> da çevirebilirsiniz.',
+    },
+    {
+      title: 'Sözcük sayısı',
+      html: '<p><b>Gözden Geçir → 123 Sözcük sayısı</b>\'na tıklayın. Belgede kaç sözcük var?</p>',
+      mouse: '🖱 Gözden Geçir → Sözcük sayısı',
+      on: (ev) => ev.type === 'doc-count',
+      done: 'Sözcük sayısı ödev, dilekçe ya da ilan yazarken “en fazla 200 kelime” gibi sınırlar için kullanılır. Sayfanın en altındaki mavi çubukta da yazar.',
+    },
+    {
+      title: 'Kaydedin',
+      html: `<p>${K('Ctrl', 'S')} ile kaydedin. Belge zaten <b>Bülten.docx</b> adıyla kayıtlı olduğu için bu sefer soru sorulmaz.</p>`,
+      combo: ['Ctrl', 'KeyS'],
+      on: (ev) => ev.type === 'doc-save',
+      done: 'Kaydedildi. Başlığın başındaki * işareti kayboldu: “kaydedilmemiş değişiklik yok” demektir.',
+    },
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Belgeyi düzenlemeyi öğrendiniz:</p>' },
   ],
 };
