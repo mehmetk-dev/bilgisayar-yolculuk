@@ -173,6 +173,7 @@ export function fileIcon(name) {
   if (/\.pptx?$/i.test(name)) return '📙';
   if (/\.pdf$/i.test(name)) return '📕';
   if (/\.exe$/i.test(name)) return '💿';
+  if (/\.zip$/i.test(name)) return '🗜';
   if (/\.(mp3|wav)$/i.test(name)) return '🎵';
   return '📄';
 }

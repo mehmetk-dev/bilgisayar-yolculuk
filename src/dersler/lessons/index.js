@@ -16,6 +16,7 @@ import { sunu } from './sunu.js';
 import { gunlukPc, gunlukWeb } from './gunluk.js';
 import { isg } from './isg.js';
 import { gorevYoneticisi, temalar, uzantilar, kelimeIleri } from './ileri.js';
+import { zip, takvimDers, erisilebilirlik, mektup, sanalMasaustu } from './ileri2.js';
 import { eslestir, tusavi, kart, liste, ilanOku, masaustuParkur, dosyaParkur } from './alistirmalar.js';
 import { test1, test2, test3, test4, test5, test6, test7, test8 } from './testler.js';
 import { onparmak, rakamlar, isaretler, klavyeOyun } from './hafta2_ek.js';
@@ -47,6 +48,7 @@ export const WEEKS = [
   { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukPc, gunlukWeb] },
   { no: 14, title: 'Daha ileri: Görev Yöneticisi, temalar, tarayıcı uzantıları, Word', lessons: [gorevYoneticisi, temalar, uzantilar, kelimeIleri] },
+  { no: 15, title: 'Daha da ileri: ZIP, takvim, erişilebilirlik, mektup birleştirme, sanal masaüstleri', lessons: [zip, takvimDers, erisilebilirlik, mektup, sanalMasaustu] },
   { no: 0, title: 'İnternette güvenlik ve yazma hızı', lessons: [guvenlik, hiz] },
 ];
 

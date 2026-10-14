@@ -174,6 +174,8 @@ export function explorer({ desk, body, args, emit, setTitle }) {
       case 'eject': desk.ejectUsb(); return;
       case 'wallpaper': if (n) { desk.settings.customWall = pictureURL(n.content); desk.setSetting('wallpaper', 'custom'); emit('wallpaper', { name: n.name, custom: true }); } return;
       case 'open': return open(id);
+      case 'zip': if (n && !isSpecial(cur)) { const z = desk.zipNodes([id], cur); sel = z.id; render(); desk.toast('Sıkıştırıldı', `“${esc(z.name)}” oluşturuldu. Tek dosya ve daha küçük: e-postayla göndermek kolay.`, '🗜', 4500); } return;
+      case 'unzip': if (n) { const f = desk.unzip(n, cur); sel = f.id; render(); desk.toast('Ayıklandı', `Dosyalar “${esc(f.name)}” klasörüne çıkarıldı.`, '📂', 4000); } return;
       case 'props': return desk.dialogs.ask({ title: `${n.name} Özellikleri`, icon: nodeIcon(n), text: `<b>${esc(n.name)}</b><br>Tür: ${n.type === 'folder' ? 'Dosya klasörü' : 'Dosya'}<br>Konum: ${esc(fs.path(n.parent).map((x) => x.name).join(' › '))}`, buttons: [['ok', 'Tamam', true]] });
     }
   }
@@ -220,6 +222,7 @@ export function explorer({ desk, body, args, emit, setTitle }) {
         ? [{ cmd: 'restore', label: '♻ Geri yükle', bold: true }, '-', { cmd: 'delete', label: 'Kalıcı olarak sil' }, { cmd: 'props', label: 'Özellikler' }]
         : [{ cmd: 'open', label: 'Aç', bold: true }, '-', { cmd: 'cut', label: 'Kes', key: 'Ctrl+X' }, { cmd: 'copy', label: 'Kopyala', key: 'Ctrl+C' }, '-',
           { cmd: 'rename', label: 'Yeniden adlandır', key: 'F2' }, { cmd: 'delete', label: 'Sil', key: 'Del' }, '-',
+          /\.zip$/i.test(fs.get(it.dataset.id)?.name || '') ? { cmd: 'unzip', label: '📂 Tümünü ayıkla…' } : { cmd: 'zip', label: '🗜 ZIP dosyasına sıkıştır' },
           ...(/\.(png|jpe?g)$/i.test(fs.get(it.dataset.id)?.name || '') ? [{ cmd: 'wallpaper', label: 'Masaüstü arka planı olarak ayarla' }] : []),
           { cmd: 'props', label: 'Özellikler' }];
       desk.menu(e.clientX, e.clientY, items, (c) => cmd(c, it.dataset.id), 'explorer-item', { id: it.dataset.id, name: fs.get(it.dataset.id)?.name });

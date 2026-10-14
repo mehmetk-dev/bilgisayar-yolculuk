@@ -9,6 +9,7 @@ import { setup } from './setup.js';
 import { photos, viewer, pdf, music } from './media.js';
 import { devmgr } from './devmgr.js';
 import { taskmgr } from './taskmgr.js';
+import { takvim, osk, magnifier } from './araclar.js';
 import { snip } from './snip.js';
 import { mail } from './mail.js';
 import { word } from './word.js';
@@ -52,6 +53,9 @@ export const APPS = {
   pdf: { name: 'PDF Okuyucu', icon: '📕', w: 0.55, h: 0.8, hidden: true, create: pdf },
   music: { name: 'Müzik Çalar', icon: '🎵', w: 0.4, h: 0.55, keywords: ['müzik', 'şarkı'], create: music },
   setup: { name: 'Kurulum', icon: '💿', w: 0.64, h: 0.7, hidden: true, create: setup },
+  takvim: { name: 'Takvim ve Alarmlar', icon: '📅', w: 0.74, h: 0.82, single: true, keywords: ['takvim', 'alarm', 'saat', 'zamanlayıcı', 'hatırlatıcı', 'randevu', 'ajanda'], create: takvim },
+  osk: { name: 'Ekran Klavyesi', icon: '⌨', w: 0.7, h: 0.42, single: true, top: true, noFocus: true, keywords: ['klavye', 'ekran klavyesi', 'erişilebilirlik'], create: osk },
+  magnifier: { name: 'Büyüteç', icon: '🔍', keywords: ['büyüteç', 'büyüt', 'yakınlaştır', 'erişilebilirlik', 'görme'], launch: magnifier },
   taskmgr: { name: 'Görev Yöneticisi', icon: '📊', w: 0.78, h: 0.82, single: true, keywords: ['görev', 'yönetici', 'işlem', 'donma', 'yanıt vermiyor', 'performans', 'başlangıç', 'task'], create: taskmgr },
   devmgr: { name: 'Aygıt Yöneticisi', icon: '🖥', w: 0.6, h: 0.8, keywords: ['aygıt', 'sürücü', 'donanım'], create: devmgr },
   snip: { name: 'Ekran Alıntısı', icon: '✂', w: 0.48, h: 0.55, single: true, keywords: ['ekran', 'alıntı', 'görüntü', 'snip'], create: snip },
@@ -60,4 +64,4 @@ export const APPS = {
   kartlar: { name: 'Kart Dizme', icon: '🃏', w: 0.8, h: 0.8, keywords: ['oyun', 'kart', 'solitaire'], create: kartlar },
 };
 
-export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'slides', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer'];
+export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'slides', 'takvim', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer'];

@@ -4,7 +4,7 @@
 import { VFS, RECYCLE, USB } from './vfs.js';
 import { Dialogs, esc, fileIcon } from './dialog.js';
 import { APPS, START_APPS } from './apps/index.js';
-import { pictureURL } from './apps/util.js';
+import { pictureURL, playTune } from './apps/util.js';
 import { osInstall } from './apps/osinstall.js';
 
 export const WALLPAPERS = {
@@ -79,6 +79,7 @@ export class Desktop {
           <div class="tb-center">
             <button type="button" class="tb-start" title="Başlat">${startLogo()}</button>
             <button type="button" class="tb-search"><span>🔍</span> Ara</button>
+            <button type="button" class="tb-tv" title="Görev Görünümü: açık pencereler ve sanal masaüstleri (⊞ + Tab)"><i></i><i></i></button>
             <div class="tb-apps"></div>
           </div>
           <div class="tb-tray">
@@ -90,7 +91,8 @@ export class Desktop {
         </div>
         <div class="dk-dim"></div>
         <div class="dk-over" tabindex="-1" hidden></div>
-      </div>`;
+      </div>
+      <div class="dk-mag" hidden><b>🔍 Büyüteç</b><button type="button" data-mag="-1" title="Uzaklaştır (⊞ + −)">−</button><span class="dk-magz"></span><button type="button" data-mag="1" title="Yakınlaştır (⊞ + +)">＋</button><button type="button" data-mag="0" title="Büyüteci kapat (⊞ + Esc)">✕</button></div>`;
     const $ = (s) => root.querySelector(s);
     this.screen = $('.dk-screen');
     this.iconsEl = $('.dk-icons');
@@ -109,6 +111,18 @@ export class Desktop {
     this.bindKeys();
     this.tick();
     setInterval(() => this.tick(), 10000);
+    setInterval(() => this.clockTick(), 1000);
+    this.vdesks = ['Masaüstü 1']; // sanal masaüstleri
+    this.vd = 0;
+    this.clock = { alarms: [], events: [], timer: null }; // Takvim ve Alarmlar
+    this.mag = 1;
+    this.bindMagnifier();
+    // Ekran klavyesi: son yazı yazılan yer (odak klavye penceresine geçmez)
+    root.addEventListener('focusin', (e) => {
+      const t = e.target;
+      if (t.closest('.win[data-app="osk"]')) return;
+      if (t.matches('textarea, input:not([type]), input[type="text"], input[type="search"], input[type="password"], [contenteditable="true"]')) this.lastInput = t;
+    });
     this.applySettings();
     this.renderIcons();
     this.renderTaskbar();
@@ -130,6 +144,11 @@ export class Desktop {
     this.bookmarks = []; // tarayıcının sık kullanılanları
     this.webHistory = []; this.webDownloads = []; this.webNotes = {}; // tarayıcının geçmişi, indirilenleri, uzantı notları
     this.tmKilled = new Set(); // Görev Yöneticisi'nde sonlandırılan arka plan işlemleri
+    this.vdesks = ['Masaüstü 1']; this.vd = 0;
+    this.clock = { alarms: [], events: [], timer: null };
+    this.lastInput = null;
+    this.setMag(1, true);
+    this.screen.querySelector('.dk-tv')?.remove();
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;
@@ -503,6 +522,7 @@ export class Desktop {
     if (name.endsWith('.exe')) return this.runSetup(n);
     if (name.endsWith('.pdf')) return this.open('pdf', { node: n.id });
     if (name.endsWith('.mp3')) return this.open('music', { node: n.id });
+    if (name.endsWith('.zip')) return this.openZip(n);
     this.toast('Açılamadı', 'Bu dosyayı açacak bir program yok.', '⚠');
     return null;
   }
@@ -640,8 +660,9 @@ export class Desktop {
     $('.tb-start').onclick = () => this.toggleStart();
     $('.tb-start').oncontextmenu = (e) => { e.preventDefault(); this.winxMenu(); };
     $('.tb-search').onclick = () => this.toggleStart(true, true);
+    $('.tb-tv').onclick = () => this.taskView();
     $('.tb-showdesk').onclick = () => {
-      const vis = this.wins.filter((w) => !w.min);
+      const vis = this.wins.filter((w) => !w.min && w.vd === this.vd);
       if (vis.length) { this.hiddenByShow = vis; vis.forEach((w) => this.minimize(w, true)); }
       else (this.hiddenByShow || []).forEach((w) => this.wins.includes(w) && this.restore(w, true));
       this.emit('show-desktop', { hidden: vis.length });
@@ -663,7 +684,7 @@ export class Desktop {
       const b = e.target.closest('[data-app]');
       if (!b) return;
       const app = b.dataset.app;
-      const list = this.wins.filter((w) => w.app === app);
+      const list = this.wins.filter((w) => w.app === app && w.vd === this.vd);
       this.emit('taskbar-click', { app });
       if (!list.length) { this.open(app); return; }
       const w = list.find((x) => x === this.active) || list.at(-1);
@@ -674,9 +695,10 @@ export class Desktop {
   }
 
   renderTaskbar() {
-    const apps = [...PINNED, ...this.wins.map((w) => w.app).filter((a, i, arr) => !PINNED.includes(a) && arr.indexOf(a) === i)];
+    const here = this.wins.filter((w) => w.vd === this.vd); // görev çubuğu yalnızca bu masaüstündeki pencereleri gösterir
+    const apps = [...PINNED, ...here.map((w) => w.app).filter((a, i, arr) => !PINNED.includes(a) && arr.indexOf(a) === i)];
     this.root.querySelector('.tb-apps').innerHTML = apps.map((a) => {
-      const ws = this.wins.filter((w) => w.app === a);
+      const ws = here.filter((w) => w.app === a);
       const cls = [ws.length ? 'run' : '', ws.some((w) => w === this.active && !w.min) ? 'act' : ''].join(' ');
       return `<button type="button" data-app="${a}" class="${cls}" title="${esc(ws[0]?.title || APPS[a].name)}">${APPS[a].icon}</button>`;
     }).join('');
@@ -810,6 +832,7 @@ export class Desktop {
   open(app, args = {}) {
     const def = APPS[app];
     if (!def) return null;
+    if (def.launch) { def.launch(this, args); this.emit('app-open', { app, args }); return null; } // pencere açmayan araçlar (Büyüteç)
     if (def.single) {
       const ex = this.wins.find((w) => w.app === app);
       if (ex) { if (ex.min) this.restore(ex); else this.focus(ex); ex.api?.onArgs?.(args); return ex; }
@@ -820,7 +843,7 @@ export class Desktop {
     const h = Math.min(H - 20, Math.round(H * (def.h || 0.65)));
     const n = this.wins.length;
     const win = {
-      id: 'w' + this.seq++, app, title: def.name, icon: def.icon,
+      id: 'w' + this.seq++, app, title: def.name, icon: def.icon, vd: this.vd,
       x: Math.round((W - w) / 2 + (n % 5) * 24 - 40), y: Math.max(6, Math.round((H - h) / 2 + (n % 5) * 22 - 30)), w, h, min: false, max: !!def.max,
     };
     win.x = Math.max(4, Math.min(win.x, W - w - 4));
@@ -843,14 +866,16 @@ export class Desktop {
     }) || {};
     if (!el.querySelector('.win-title').textContent) el.querySelector('.win-title').textContent = win.title;
     this.layout(win);
-    this.focus(win, true);
+    if (def.noFocus) { win.el.style.zIndex = ++this.z + 1000; this.renderTaskbar(); } else this.focus(win, true);
     this.emit('app-open', { app, win: win.id, args });
     return win;
   }
 
   bindWin(win) {
     const el = win.el;
-    el.addEventListener('pointerdown', () => { if (this.active !== win) this.focus(win); }, true);
+    // Ekran klavyesi gibi pencereler tıklanınca odağı almaz: yazı, yazılan yerde kalır
+    if (APPS[win.app].noFocus) el.addEventListener('pointerdown', (e) => { if (!e.target.closest('input, select')) e.preventDefault(); });
+    else el.addEventListener('pointerdown', () => { if (this.active !== win) this.focus(win); }, true);
     el.querySelector('.wb-min').onclick = () => this.minimize(win);
     el.querySelector('.wb-max').onclick = () => (win.max ? this.restoreSize(win) : this.maximize(win));
     el.querySelector('.wb-close').onclick = () => this.close(win);
@@ -923,8 +948,10 @@ export class Desktop {
 
   focus(win, quiet) {
     if (!win || win.min) return;
+    if (win.vd !== this.vd) this.switchDesk(win.vd, true);
     this.active = win;
     win.el.style.zIndex = ++this.z;
+    for (const w of this.wins) if (APPS[w.app].top && w !== win) w.el.style.zIndex = ++this.z + 1000; // her zaman üstte
     this.wins.forEach((w) => w.el.classList.toggle('active', w === win));
     this.renderTaskbar();
     win.api?.focus?.();
@@ -936,7 +963,7 @@ export class Desktop {
     win.el.classList.add('min');
     if (this.active === win) {
       this.active = null;
-      const next = [...this.wins].filter((w) => !w.min).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
+      const next = [...this.wins].filter((w) => !w.min && w.vd === this.vd && !APPS[w.app].noFocus).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
       if (next) this.focus(next, true);
     }
     this.renderTaskbar();
@@ -1001,7 +1028,7 @@ export class Desktop {
     this.wins = this.wins.filter((w) => w !== win);
     if (this.active === win) {
       this.active = null;
-      const next = [...this.wins].filter((w) => !w.min).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
+      const next = [...this.wins].filter((w) => !w.min && w.vd === this.vd && !APPS[w.app].noFocus).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
       if (next) this.focus(next, true);
     }
     this.renderTaskbar();
@@ -1038,6 +1065,14 @@ export class Desktop {
       if (e.altKey && e.key === 'Tab') { e.preventDefault(); this.altTab(); return; }
       if (e.altKey && e.key === 'F4' && this.active) { e.preventDefault(); this.close(this.active); return; }
       if ((e.ctrlKey && e.shiftKey && e.key === 'Escape') || (e.ctrlKey && e.altKey && e.key === 'Delete')) { e.preventDefault(); this.emit('taskmgr-key'); this.open('taskmgr'); return; }
+      // ⊞ + Tab: Görev Görünümü; ⊞ + Ctrl + D / ← / →: sanal masaüstü; ⊞ + + / − / Esc: Büyüteç
+      if (e.metaKey && e.key === 'Tab') { e.preventDefault(); this.taskView(); return; }
+      if (e.metaKey && e.ctrlKey && e.code === 'KeyD') { e.preventDefault(); this.newDesk(); return; }
+      if (e.metaKey && e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); this.switchDesk(this.vd + (e.key === 'ArrowLeft' ? -1 : 1)); return; }
+      if (e.metaKey && (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd')) { e.preventDefault(); this.setMag(this.mag + 1); return; }
+      if (e.metaKey && (e.key === '-' || e.code === 'NumpadSubtract')) { e.preventDefault(); this.setMag(this.mag - 1); return; }
+      if (e.metaKey && e.key === 'Escape') { e.preventDefault(); this.setMag(1); return; }
+      if (e.key === 'Escape' && this.screen.querySelector('.dk-tv')) { e.preventDefault(); this.closeTaskView(); return; }
       if (e.target === this.iconsEl && this.selected) {
         const it = this.item(this.selected);
         if (e.key === 'Delete' && !it.sys) { e.preventDefault(); this.deleteNode(this.selected); }
@@ -1054,7 +1089,7 @@ export class Desktop {
   }
 
   altTab() {
-    const list = [...this.wins].sort((a, b) => b.el.style.zIndex - a.el.style.zIndex);
+    const list = [...this.wins].filter((w) => w.vd === this.vd).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex);
     if (!list.length) return;
     if (!this.switcher) {
       this.switcher = document.createElement('div');
@@ -1075,6 +1110,191 @@ export class Desktop {
   }
 
   osInstall() { osInstall(this); }
+
+  // ------------------------------------------------------------------ ZIP: sıkıştırılmış klasör
+  // İçerik: { zip: [{ name, type, content, children }] } — sıkıştırılan öğelerin kopyası
+  zipNodes(ids, parent) {
+    const pack = (id) => { const n = this.fs.get(id); return { name: n.name, type: n.type, content: structuredClone(n.content), children: this.fs.children(id).map((c) => pack(c.id)) }; };
+    const items = ids.map(pack);
+    const first = this.fs.get(ids[0]);
+    const base = ids.length === 1 ? first.name.replace(/\.[^.]+$/, '') : 'Sıkıştırılmış';
+    const size = Math.max(1, Math.round(items.reduce((a, x) => a + sizeOf(x), 0)));
+    const z = this.fs.create(parent, { type: 'file', name: base + '.zip', content: { zip: items, size, packed: Math.max(1, Math.round(size * 0.45)) } });
+    this.emit('zip', { id: z.id, name: z.name, count: countZip(items) });
+    return z;
+  }
+  unzip(n, parent = n.parent) {
+    // İçinde tek klasör varsa iç içe klasör olmasın diye doğrudan o klasör çıkarılır
+    const items = n.content?.zip || [];
+    const single = items.length === 1 && items[0].type === 'folder';
+    const folder = this.fs.create(parent, { type: 'folder', name: single ? items[0].name : n.name.replace(/\.zip$/i, '') }, true);
+    const put = (x, p) => { const c = this.fs.create(p, { type: x.type, name: x.name, content: structuredClone(x.content) }, true); for (const k of x.children || []) put(k, c.id); };
+    for (const x of single ? items[0].children : items) put(x, folder.id);
+    this.fs.changed('create', folder);
+    this.emit('unzip', { id: folder.id, name: folder.name, from: n.name, count: countZip(n.content?.zip || []) });
+    return folder;
+  }
+  async openZip(n) {
+    const items = n.content?.zip || [];
+    const list = (xs, d = 0) => xs.map((x) => `<div style="padding-left:${d * 1.2}em">${x.type === 'folder' ? '📁' : fileIcon(x.name)} ${esc(x.name)}</div>${list(x.children || [], d + 1)}`).join('');
+    this.emit('zip-open', { name: n.name });
+    const a = await this.dialogs.ask({ title: `${n.name} (Sıkıştırılmış klasör)`, icon: '🗜', text: `<div class="zip-list">${list(items) || '<i>Boş</i>'}</div><small>Boyut: ${n.content?.size || 1} KB → sıkıştırılmış <b>${n.content?.packed || 1} KB</b>. Dosyaları kullanmak ve değiştirmek için önce <b>ayıklayın</b>.</small>`, buttons: [['x', 'Tümünü ayıkla', true], ['no', 'Kapat']] });
+    if (a === 'x') { const f = this.unzip(n); this.open('explorer', { folder: f.id }); }
+  }
+
+  // ------------------------------------------------------------------ Sanal masaüstleri ve Görev Görünümü
+  newDesk(quiet) {
+    if (this.vdesks.length >= 4) { this.toast('Sanal masaüstü', 'Bu alıştırmada en çok 4 masaüstü açılabilir.', '🖥', 3000); return; }
+    this.vdesks.push(`Masaüstü ${this.vdesks.length + 1}`);
+    this.switchDesk(this.vdesks.length - 1, true);
+    if (!quiet) this.emit('vd-new', { count: this.vdesks.length });
+    if (this.screen.querySelector('.dk-tv')) this.taskView(true);
+  }
+
+  switchDesk(i, quiet) {
+    if (i < 0 || i >= this.vdesks.length || (i === this.vd && !quiet)) return;
+    this.vd = i;
+    for (const w of this.wins) w.el.classList.toggle('vd-off', w.vd !== i && !APPS[w.app].top);
+    if (this.active && this.active.vd !== i) this.active = null;
+    if (!this.active) {
+      const next = this.wins.filter((w) => w.vd === i && !w.min && !APPS[w.app].noFocus).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
+      if (next) { this.active = next; this.wins.forEach((w) => w.el.classList.toggle('active', w === next)); }
+    }
+    this.renderTaskbar();
+    if (!quiet) {
+      const f = document.createElement('div');
+      f.className = 'dk-vdflash';
+      f.textContent = this.vdesks[i];
+      this.screen.append(f);
+      setTimeout(() => f.remove(), 900);
+      this.emit('vd-switch', { index: i, name: this.vdesks[i] });
+    }
+  }
+
+  removeDesk(i) {
+    if (this.vdesks.length < 2) return;
+    const to = i === 0 ? 1 : i - 1;
+    for (const w of this.wins) if (w.vd === i) w.vd = to;
+    for (const w of this.wins) if (w.vd > i) w.vd--;
+    this.vdesks.splice(i, 1);
+    this.vdesks = this.vdesks.map((n, k) => (/^Masaüstü \d+$/.test(n) ? `Masaüstü ${k + 1}` : n));
+    const cur = this.vd === i ? (to > i ? to - 1 : to) : this.vd > i ? this.vd - 1 : this.vd;
+    this.vd = -1;
+    this.switchDesk(cur, true);
+    this.emit('vd-close', { count: this.vdesks.length });
+  }
+
+  moveToDesk(win, i) {
+    win.vd = i;
+    if (this.active === win && i !== this.vd) this.active = null;
+    this.switchDesk(this.vd, true);
+    this.emit('vd-move', { app: win.app, win: win.id, to: i, name: this.vdesks[i] });
+  }
+
+  taskView(refresh) {
+    let tv = this.screen.querySelector('.dk-tv');
+    if (tv && !refresh) { this.closeTaskView(); return; }
+    this.closeMenus();
+    if (!tv) { tv = document.createElement('div'); tv.className = 'dk-tv'; this.screen.append(tv); }
+    const here = this.wins.filter((w) => w.vd === this.vd && !APPS[w.app].top);
+    tv.innerHTML = `<div class="tv-wins">${here.length ? here.map((w) => `<button type="button" class="tv-win" data-tvwin="${w.id}"><span class="tv-ttl">${w.icon} ${esc(w.title)}</span><span class="tv-big">${w.icon}</span><i data-tvclose="${w.id}" title="Kapat">✕</i></button>`).join('') : '<p class="tv-empty">Bu masaüstünde açık pencere yok.</p>'}</div>
+      <p class="tv-tip">Bir pencereyi başka masaüstüne taşımak için üzerine <b>sağ tıklayın</b>.</p>
+      <div class="tv-desks">${this.vdesks.map((n, i) => `<button type="button" class="tv-desk ${i === this.vd ? 'on' : ''}" data-tvdesk="${i}"><span class="tv-thumb" style="background:${this.wallCss()}">${this.wins.filter((w) => w.vd === i).slice(0, 4).map((w) => `<i>${w.icon}</i>`).join('')}</span><span>${esc(n)}</span>${this.vdesks.length > 1 ? `<i data-tvdel="${i}" title="Masaüstünü kapat">✕</i>` : ''}</button>`).join('')}
+        <button type="button" class="tv-desk tv-new" data-tvnew="1"><span class="tv-thumb">＋</span><span>Yeni masaüstü</span></button></div>`;
+    if (!refresh) {
+      this.emit('taskview', { open: true });
+      tv.addEventListener('click', (e) => {
+        const g = (s) => e.target.closest(s);
+        let b;
+        if ((b = g('[data-tvclose]'))) { const w = this.wins.find((x) => x.id === b.dataset.tvclose); if (w) this.close(w); setTimeout(() => this.taskView(true), 50); return; }
+        if ((b = g('[data-tvdel]'))) { this.removeDesk(+b.dataset.tvdel); this.taskView(true); return; }
+        if (g('[data-tvnew]')) { this.newDesk(); return; }
+        if ((b = g('[data-tvdesk]'))) { this.switchDesk(+b.dataset.tvdesk); this.closeTaskView(); return; }
+        if ((b = g('[data-tvwin]'))) { const w = this.wins.find((x) => x.id === b.dataset.tvwin); this.closeTaskView(); if (w) { if (w.min) this.restore(w); else this.focus(w); } return; }
+        this.closeTaskView();
+      });
+      tv.addEventListener('contextmenu', (e) => {
+        const b = e.target.closest('[data-tvwin]');
+        e.preventDefault();
+        if (!b) return;
+        const w = this.wins.find((x) => x.id === b.dataset.tvwin);
+        const sub = this.vdesks.map((n, i) => ({ cmd: 'vd' + i, label: n, disabled: i === this.vd })).concat([{ cmd: 'vdnew', label: '＋ Yeni masaüstü' }]);
+        this.menu(e.clientX, e.clientY, [{ cmd: 'move', label: 'Şuraya taşı', sub }, { cmd: 'close', label: 'Kapat' }], (c) => {
+          if (c === 'close') { this.close(w); setTimeout(() => this.taskView(true), 50); return; }
+          if (c === 'vdnew') { const cur = this.vd; this.newDesk(true); this.moveToDesk(w, this.vdesks.length - 1); this.switchDesk(cur, true); }
+          else this.moveToDesk(w, +c.slice(2));
+          this.taskView(true);
+        }, 'taskview-win', { app: w.app });
+      });
+    }
+  }
+  closeTaskView() {
+    const tv = this.screen.querySelector('.dk-tv');
+    if (!tv) return;
+    tv.remove();
+    this.emit('taskview', { open: false });
+  }
+
+  // ------------------------------------------------------------------ Büyüteç (tam ekran): fare nereye giderse oraya yakınlaşır
+  bindMagnifier() {
+    this.root.addEventListener('pointermove', (e) => {
+      if (this.mag === 1) return;
+      const r = this.root.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * 100, y = ((e.clientY - r.top) / r.height) * 100;
+      this.screen.style.transformOrigin = `${x}% ${y}%`;
+    });
+    this.root.querySelector('.dk-mag').addEventListener('click', (e) => {
+      const d = e.target.closest('[data-mag]')?.dataset.mag;
+      if (d !== undefined) this.setMag(d === '0' ? 1 : this.mag + +d);
+    });
+  }
+  setMag(z, quiet) {
+    z = Math.max(1, Math.min(4, z));
+    const was = this.mag;
+    this.mag = z;
+    this.screen.style.transform = z === 1 ? '' : `scale(${z})`;
+    this.root.classList.toggle('dk-magon', z > 1);
+    this.root.querySelector('.dk-mag').hidden = z === 1;
+    this.root.querySelector('.dk-magz').textContent = `%${z * 100}`;
+    if (!quiet && z !== was) this.emit('magnifier', { zoom: z * 100, on: z > 1 });
+  }
+
+  // ------------------------------------------------------------------ Saat: alarmlar, zamanlayıcı, takvim hatırlatmaları
+  clockTick() {
+    if (!this.clock || !this.root.isConnected) return;
+    const d = this.now();
+    const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const day = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    for (const a of this.clock.alarms) {
+      if (!a.on || a.time !== hm || a.firedAt === day + hm) continue;
+      a.firedAt = day + hm;
+      this.ring('⏰ ' + (a.label || 'Alarm'), `${a.time} · Alarm çalıyor`, a);
+    }
+    for (const ev of this.clock.events) {
+      if (ev.date !== day || ev.fired || !ev.time) continue;
+      const [h, m] = ev.time.split(':').map(Number);
+      const mins = h * 60 + m - (d.getHours() * 60 + d.getMinutes());
+      if (mins <= (ev.remind ?? 15) && mins >= 0) { ev.fired = true; this.ring('📅 ' + ev.title, `Bugün ${ev.time}${mins ? ` · ${mins} dakika sonra` : ' · şimdi'}`, null, true); }
+    }
+    const t = this.clock.timer;
+    if (t?.end && Date.now() >= t.end) { this.clock.timer = { ...t, end: null, left: 0, done: true }; this.ring('⏱ Süre doldu', t.label && t.label !== 'Zamanlayıcı' ? esc(t.label) : 'Zamanlayıcının süresi bitti.', null); }
+    this.wins.filter((w) => w.app === 'takvim').forEach((w) => w.api?.tick?.());
+  }
+  ring(title, text, alarm, soft) {
+    const t = this.toast(title, `${text}${alarm ? '<div class="to-btns"><button type="button" data-snooze="1">💤 Ertele (5 dk)</button><button type="button" data-dismiss="1">Kapat</button></div>' : ''}`, soft ? '🔔' : '⏰', alarm ? 60000 : 9000);
+    t.classList.add('dk-ring');
+    playTune(this, soft ? [660, 880] : [880, 0, 880, 0, 880], 0.18);
+    t.addEventListener('click', (e) => {
+      if (e.target.closest('[data-snooze]')) {
+        const d = new Date(this.now().getTime() + 5 * 60e3);
+        this.clock.alarms.push({ id: 'a' + Date.now(), time: `${pad(d.getHours())}:${pad(d.getMinutes())}`, label: (alarm.label || 'Alarm') + ' (ertelendi)', on: true, once: true });
+        t.remove();
+        this.emit('alarm-snooze');
+      }
+      if (e.target.closest('[data-dismiss]')) { t.remove(); this.emit('alarm-dismiss'); }
+    });
+    this.emit('ring', { title, alarm: !!alarm });
+  }
 
   // ------------------------------------------------------------------ Bildirim, izin, USB, ekran alıntısı
   toast(title, text, icon = 'ℹ', ms = 5000) {
@@ -1262,6 +1482,9 @@ function paintText(g, node, cs) {
     if (wr.width) g.fillText(m[0], wr.left, wr.top + wr.height / 2);
   }
 }
+
+const sizeOf = (x) => (typeof x.content === 'string' ? x.content.length / 50 + 1 : x.content ? 40 : 12) + (x.children || []).reduce((a, c) => a + sizeOf(c), 0);
+const countZip = (xs) => xs.reduce((a, x) => a + (x.type === 'folder' ? countZip(x.children || []) : 1), 0);
 
 export function nodeIcon(n) {
   if (n.type === 'folder') return '📁';
