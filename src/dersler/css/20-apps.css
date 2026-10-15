@@ -259,6 +259,19 @@
 .tk-grid button i { position: absolute; right: 0.3em; top: 0.3em; width: 0.4em; height: 0.4em; border-radius: 50%; background: #e46c0a; }
 .tk-day { background: #f4f6fa; border-radius: 8px; padding: 0.6em 0.8em; display: flex; flex-direction: column; gap: 0.3em; }
 .tk-hol { color: #c4314b; margin: 0; }
+.tk-evs { display: flex; flex-direction: column; gap: 0.3em; }
+.tk-ev { display: flex; align-items: center; gap: 0.6em; background: #fff; border: 1px solid #dde3ec; border-radius: 6px; padding: 0.3em 0.5em; }
+.tk-ev b { min-width: 3.6em; color: var(--dk-acc, #0a5dc2); }
+.tk-ev span { flex: 1; display: flex; flex-direction: column; }
+.tk-ev small { color: #157a3c; }
+.tk-ev button { background: none; border: 0 !important; color: #888; padding: 0 0.3em; }
+.tk-ev button:hover { color: #c4314b; }
+.tk-evform { display: flex; flex-direction: column; gap: 0.35em; border-top: 1px solid #dde3ec; padding-top: 0.5em; }
+.tk-evform input, .tk-evform select { font: inherit; padding: 0.25em 0.4em; border: 1px solid #c4cad3; border-radius: 4px; }
+.tk-evrow { display: flex; gap: 0.4em; }
+.tk-evrow select { flex: 1; min-width: 0; }
+.tk-evadd { background: var(--dk-acc, #0a5dc2); color: #fff; border: 0 !important; border-radius: 5px; padding: 0.25em 0.9em; font-weight: 700; }
+.tk-everr { margin: 0; color: #c4314b; font-size: 0.9em; min-height: 1.1em; }
 .tk-day label { display: flex; gap: 0.5em; align-items: center; }
 .tk-note { flex: 1; font: inherit; padding: 0.3em 0.5em; border: 1px solid #c9d1dc; border-radius: 4px; }
 

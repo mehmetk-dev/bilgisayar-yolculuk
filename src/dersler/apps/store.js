@@ -126,22 +126,31 @@ export function takvim({ desk, body, emit }) {
   const now = desk.now();
   let y = now.getFullYear(), m = now.getMonth(), pick = now.getDate();
   const notes = (desk.calNotes ||= {});
+  const events = () => (desk.calEvents ||= []); // randevular: { id, date: 'Y-A-G', time, title, remind (dakika önce; null: hatırlatma yok) }
   function render() {
     const first = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
     const isToday = (d) => d === now.getDate() && m === now.getMonth() && y === now.getFullYear();
     const key = (d) => `${y}-${m + 1}-${d}`;
+    const dayEvs = (d) => events().filter((e) => e.date === key(d)).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
     let cells = '<span></span>'.repeat(first);
-    for (let d = 1; d <= days; d++) cells += `<button type="button" data-day="${d}" class="${isToday(d) ? 'today' : ''} ${d === pick ? 'pick' : ''} ${HOLIDAYS[`${d}-${m + 1}`] ? 'hol' : ''}">${d}${notes[key(d)] ? '<i></i>' : ''}</button>`;
+    for (let d = 1; d <= days; d++) cells += `<button type="button" data-day="${d}" class="${isToday(d) ? 'today' : ''} ${d === pick ? 'pick' : ''} ${HOLIDAYS[`${d}-${m + 1}`] ? 'hol' : ''}">${d}${notes[key(d)] || dayEvs(d).length ? '<i></i>' : ''}</button>`;
     const hol = HOLIDAYS[`${pick}-${m + 1}`];
     body.innerHTML = `<div class="tk-head"><button type="button" data-mv="-1" title="Önceki ay">‹</button><b>${MONTHS[m]} ${y}</b><button type="button" data-mv="1" title="Sonraki ay">›</button><button type="button" data-mv="0">Bugün</button></div>
       <div class="tk-grid">${['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((d) => `<em>${d}</em>`).join('')}${cells}</div>
       <div class="tk-day"><b>${pick} ${MONTHS[m]} ${y}</b>${hol ? `<p class="tk-hol">🇹🇷 ${hol}</p>` : ''}
-        <label>Not: <input class="tk-note" value="${esc(notes[key(pick)] || '')}" placeholder="ör. Saat 14.00 doktor randevusu"></label></div>`;
+        <label>Not: <input class="tk-note" value="${esc(notes[key(pick)] || '')}" placeholder="ör. Bugün çiçekleri sula"></label>
+        <div class="tk-evs">${dayEvs(pick).map((e) => `<div class="tk-ev"><b>${e.time || 'Gün boyu'}</b><span>${esc(e.title)}${e.time && e.remind != null ? `<small>🔔 ${e.remind ? `${e.remind} dk önce` : 'tam vaktinde'} hatırlatır</small>` : ''}</span><button type="button" data-evdel="${e.id}" title="Randevuyu sil">✕</button></div>`).join('') || '<p class="mut">Bu güne randevu eklenmedi.</p>'}</div>
+        <div class="tk-evform"><b>＋ Randevu ekle</b><input class="tk-evt" maxlength="40" placeholder="Ne var? (ör. Doktor randevusu)">
+          <div class="tk-evrow"><input type="time" class="tk-evtime" title="Saat"><select class="tk-evrem" title="Hatırlatıcı"><option value="">Hatırlatma yok</option><option value="0">Tam vaktinde</option><option value="5">5 dk önce</option><option value="15">15 dk önce</option><option value="30">30 dk önce</option><option value="60">1 saat önce</option></select><button type="button" class="tk-evadd">Ekle</button></div>
+          <p class="tk-everr"></p></div></div>`;
   }
   body.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.day) { pick = +b.dataset.day; render(); emit('cal-pick', { day: pick, month: m + 1 }); return; }
+    if (b.dataset.evdel) { desk.calEvents = events().filter((x) => x.id !== b.dataset.evdel); render(); emit('cal-del'); return; }
+    if (b.classList.contains('tk-evadd')) { addEvent(); return; }
+    if (b.dataset.mv === undefined) return;
     const mv = +b.dataset.mv;
     if (mv === 0) { y = now.getFullYear(); m = now.getMonth(); pick = now.getDate(); } else { m += mv; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } pick = 1; }
     render();
@@ -151,7 +160,19 @@ export function takvim({ desk, body, emit }) {
     notes[`${y}-${m + 1}-${pick}`] = e.target.value;
     emit('cal-note', { text: e.target.value });
   });
-  body.addEventListener('change', render);
+  function addEvent() {
+    const title = body.querySelector('.tk-evt').value.trim();
+    const time = body.querySelector('.tk-evtime').value;
+    const rem = body.querySelector('.tk-evrem').value;
+    const err = !title ? 'Önce randevunun adını yazın.' : rem !== '' && !time ? 'Hatırlatma için bir saat seçin.' : '';
+    if (err) { body.querySelector('.tk-everr').textContent = err; return; }
+    const ev = { id: 'e' + Date.now(), date: `${y}-${m + 1}-${pick}`, time, title, remind: rem === '' ? null : +rem };
+    events().push(ev);
+    render();
+    emit('cal-add', { title, time, remind: ev.remind, day: pick, month: m + 1 });
+  }
+  body.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.classList.contains('tk-evt')) addEvent(); });
+  body.addEventListener('change', (e) => { if (!e.target.closest('.tk-evform')) render(); });
   render();
 }
 

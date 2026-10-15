@@ -1,6 +1,86 @@
-// Ek dersler: Ekran Klavyesi (5. hafta), sanal masaüstleri ve Görev Görünümü (5. hafta), adres mektup birleştirme (10. hafta).
+// Ek dersler: Takvim randevu ve hatırlatıcı, Ekran Klavyesi, sanal masaüstleri ve Görev Görünümü (5. hafta), adres mektup birleştirme (10. hafta).
 import { K, desktopReady, maxed, norm, put } from './common.js';
 import { rehberSoru } from './kalip.js';
+
+// ------------------------------------------------------------------ Takvim: randevu ve hatırlatıcı
+const hm = (d) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+const demoEv = (c) => (c.d.calEvents ||= []).find((e) => e.demo);
+
+export const takvimRandevu = {
+  id: 'takvim-randevu', icon: '📅', title: 'Takvim: randevu ve hatırlatıcı', minutes: 25, stage: 'desktop',
+  desc: 'Takvime doktor randevusu eklemek, bilgisayarın size önceden hatırlatmasını sağlamak ve randevuyu silmek.',
+  summary: [
+    ['Takvim → güne tıkla', 'Altta o günün randevuları ve “Randevu ekle” bölümü açılır'],
+    ['Ad + Saat + Hatırlatma → Ekle', 'Hatırlatma “15 dk önce” ise randevudan 15 dakika önce bildirim çıkar'],
+    ['Günde küçük bir nokta', 'O gün için not ya da randevu var demektir'],
+    ['Randevunun yanındaki ✕', 'Randevuyu siler'],
+    ['Hatırlatma', 'Bilgisayar açıkken ve sesi açıkken gelir; kapalıysa gelmez'],
+  ],
+  steps: [
+    {
+      title: 'Bu derste',
+      html: '<p>Doktor, kurs, bayram ziyareti, torunun okul toplantısı… Hepsini aklımızda tutmak yerine <b>Takvim</b>\'e yazabiliriz. Üstelik bilgisayar, randevu saatinden önce bize <b>hatırlatabilir</b>.</p>',
+      setup: (c) => { desktopReady(c); c.d.closeAll(); },
+    },
+    {
+      title: 'Takvimi açın',
+      html: '<p>⊞ <b>Başlat</b>\'tan <b>📅 Takvim</b>\'i açın. (Başlat\'ta <b>takvim</b> yazmak da olur.)</p>',
+      mouse: '🖱 Başlat → Takvim',
+      check: (c) => !!c.d.find('takvim'),
+      on: (ev) => ev.type === 'app-open' && ev.app === 'takvim',
+      done: 'Bugünün tarihi renkli kutuda. ‹ › ile aylar arasında gezilir; kırmızı günler resmî tatildir.',
+    },
+    {
+      title: 'Randevu ekleyin',
+      html: '<ol class="steps"><li>Takvimde <b>bir güne</b> tıklayın (yarın olabilir).</li><li>Altta <b>＋ Randevu ekle</b> bölümüne <b>Doktor randevusu</b> yazın.</li><li>Saati <b>10:30</b> yapın, hatırlatmayı <b>15 dk önce</b> seçin.</li><li><b>Ekle</b>\'ye basın.</li></ol>',
+      target: 'Doktor randevusu',
+      hint: 'Saat kutusuna tıklayıp 10, 30 yazabilirsiniz.',
+      setup: (c) => { c.d.ensure('takvim'); },
+      on: (ev, c) => {
+        if (ev.type !== 'cal-add') return false;
+        if (!norm(ev.title).includes('doktor')) { c.warn('Randevunun adına “Doktor randevusu” yazın.'); return false; }
+        if (!ev.time) { c.warn('Saati de seçin: 10:30. Saat yoksa bilgisayar hatırlatamaz.'); return false; }
+        if (ev.remind !== 15) { c.warn('Hatırlatma “15 dk önce” olmalı. Yanlış eklenen randevuyu ✕ ile silin, doğrusunu yeniden ekleyin.'); return false; }
+        return true;
+      },
+      done: 'Randevu listede, o günün üstünde de küçük bir nokta belirdi. Bilgisayar açıksa saatinden 15 dakika önce köşede bir bildirim çıkar.',
+    },
+    {
+      title: 'Hatırlatma gelsin',
+      html: '<p>Gerçek hatırlatmayı beklemeyelim: size <b>10 dakika sonrasına</b> “Diş doktoru” adlı bir deneme randevusu koyduk (15 dk önceden hatırlatır). <b>Sağ alttaki bildirimi</b> bekleyin; birkaç saniye sürer.</p>',
+      hint: 'Ses açıksa kısa bir zil de duyarsınız.',
+      setup: (c) => {
+        const w = c.d.find('takvim'); if (w) c.d.close(w);
+        if (!demoEv(c)) {
+          const at = new Date(c.d.now().getTime() + 10 * 60e3);
+          c.d.calEvents.push({ id: 'demo', demo: true, date: `${at.getFullYear()}-${at.getMonth() + 1}-${at.getDate()}`, time: hm(at), title: 'Diş doktoru', remind: 15 });
+        }
+        c.d.ensure('takvim');
+      },
+      check: (c) => !!demoEv(c)?.fired,
+      on: (ev) => ev.type === 'cal-remind',
+      done: 'Hatırlatma geldi. Böylece randevuyu unutmazsınız; ama bilgisayar kapalıysa bildirim çıkmaz.',
+    },
+    {
+      title: 'Randevuyu silin',
+      html: '<p>Diş doktoru randevusu iptal oldu diyelim. Takvimde bugünün altındaki <b>Diş doktoru</b> satırının yanındaki <b>✕</b>\'e basın.</p>',
+      mouse: '🖱 Diş doktoru → ✕',
+      setup: (c) => { c.d.ensure('takvim'); },
+      check: (c) => !demoEv(c),
+      on: (ev) => ev.type === 'cal-del',
+      done: 'Randevu silindi; günün üstündeki nokta da kalktı (başka randevu yoksa).',
+    },
+    rehberSoru({
+      title: 'Hatırlatma ne zaman gelir?',
+      html: '<p>Takvimdeki hatırlatma için hangisi doğru?</p>',
+      opts: ['Bilgisayar açıkken, seçtiğiniz süre kadar önce', 'Bilgisayar kapalıyken de, telefona mesaj olarak', 'Hiçbir zaman; takvime her gün bakmak gerekir'],
+      ok: 0,
+      wrong: 'Bildirim bilgisayarın kendisinden gelir; bilgisayar kapalıysa ya da uykudaysa çıkamaz.',
+      why: 'Hatırlatma bilgisayar açıkken ve sesi açıkken çalışır. Çok önemli randevular (ameliyat, sınav, ilaç) için telefonun takvimi daha güvenlidir.',
+    }),
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Takvimde randevu ve hatırlatıcı:</p>' },
+  ],
+};
 
 // ------------------------------------------------------------------ Ekran Klavyesi
 const access = (c) => { const w = c.d.ensure('settings'); w.api.go('access'); return w; };

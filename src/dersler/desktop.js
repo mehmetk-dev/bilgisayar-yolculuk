@@ -172,6 +172,7 @@ export class Desktop {
     this.stickies = []; // Yapışkan Notlar
     this.alarms = []; // Saat uygulamasındaki alarmlar: { id, time: 'SS:DD', label, on }
     this.timers = []; // zamanlayıcılar: { end, label }
+    this.calEvents = []; // Takvim'deki randevular (hatırlatıcılı)
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;
@@ -386,6 +387,18 @@ export class Desktop {
       a.last = `${d.getDate()}${hm}`;
       this.ring(a.label || 'Alarm', a.time, '⏰');
       this.emit('alarm-ring', { time: a.time, label: a.label });
+    }
+    // Takvim randevusu: hatırlatma saati gelince bir kez bildirim çıkar (randevu saati geçmişse çıkmaz)
+    const nowMs = d.getTime();
+    for (const e of this.calEvents || []) {
+      if (!e.time || e.remind == null || e.fired) continue;
+      const [y, mo, da] = e.date.split('-').map(Number), [h, mi] = e.time.split(':').map(Number);
+      const start = new Date(y, mo - 1, da, h, mi).getTime();
+      if (nowMs < start - e.remind * 60000) continue;
+      e.fired = true;
+      if (nowMs > start + 60000) continue;
+      this.ring(e.title, e.remind ? `${e.time} · ${e.remind} dakika sonra` : `${e.time} · şimdi`, '📅');
+      this.emit('cal-remind', { title: e.title, time: e.time });
     }
     const now = Date.now();
     for (const t of [...(this.timers || [])]) {
