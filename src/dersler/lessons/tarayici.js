@@ -7,7 +7,7 @@ const br = (c, url) => maxed(c, 'browser', url ? { url } : {});
 
 export const tarayici = {
   id: 'tarayici', icon: '🧩', title: 'Tarayıcı: uzantılar, geçmiş, gizli pencere', minutes: 40, stage: 'desktop',
-  desc: 'Tarayıcıya uzantı eklemek (reklam engelleyici), uzantının istediği izinleri okumak, zararlı uzantıyı kaldırmak; geçmiş, göz atma verilerini temizlemek, gizli pencere ve sayfada bul (Ctrl + F).',
+  desc: 'Uzantı eklemek, geçmişi temizlemek, gizli pencere, sayfada bul (Ctrl + F).',
   summary: [
     ['🧩 → Yeni uzantılar bul', 'Uzantı mağazasını açar'],
     ['Uzantı eklemeden önce', 'Doğrulanmış yayımcı ✔, kullanıcı sayısı, puan ve izinler'],

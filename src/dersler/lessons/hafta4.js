@@ -5,7 +5,7 @@ const intro = (html) => (el) => { el.className = 'sc sc-info'; el.innerHTML = ht
 
 export const donanim = {
   id: 'donanim', icon: '🧩', title: 'Donanım mı, yazılım mı?', minutes: 15, stage: 'scene',
-  desc: 'Ayırma oyunları: donanım ve yazılım, giriş ve çıkış birimleri, depolama ve USB bellek.',
+  desc: 'Ayırma oyunları: donanım-yazılım, giriş-çıkış birimleri, depolama.',
   summary: [
     ['Donanım', 'Elle tutulan parçalar: klavye, fare, ekran, kasa, yazıcı'],
     ['Yazılım', 'Programlar: Windows, Not Defteri, Paint, internet tarayıcısı'],

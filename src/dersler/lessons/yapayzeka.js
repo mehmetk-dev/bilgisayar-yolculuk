@@ -9,7 +9,7 @@ const nav = (host) => (ev) => ev.type === 'web-nav' && ev.host === host;
 
 export const yapayZeka = {
   id: 'yapay-zeka', icon: '🤖', title: 'Yapay zekâya soru soralım (Dijital Yardımcınız)', minutes: 30, stage: 'desktop',
-  desc: 'Yapay zekâ ile sohbet eder gibi yazışmak: resmî bir yazıyı özetletmek, yemek tarifi ve gezi planı istemek, dilekçe taslağı yazdırmak; T.C. kimlik ve kart bilgilerini asla yazmama kuralı; cevabı doğrulamak.',
+  desc: 'Yapay zekâyla yazışmak: özet, tarif, dilekçe taslağı; kişisel bilgi yazmama kuralı.',
   summary: [
     ['Soru yazmak', 'Sade Türkçeyle yazın: ne istediğinizi, kaç kişilik, kaç gün gibi ayrıntıları ekleyin'],
     ['Özetletmek', 'Uzun resmî yazıyı yapıştırıp “özetler misin?” deyin'],

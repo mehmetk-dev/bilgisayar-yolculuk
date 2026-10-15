@@ -11,7 +11,7 @@ const GOOD = slm('good', 'İlkbahar işleri', '<ul><li>Fideleri dikmek</li><li>T
 
 export const sunuKurallar = {
   id: 'sunu-kurallar', icon: '🎯', title: 'İyi bir sunu nasıl olur?', minutes: 25, stage: 'scene',
-  desc: 'Slaytta ne kadar yazı olmalı, yazı boyutu ve renk nasıl seçilir, resim ve animasyon ne zaman işe yarar; sunum öncesi hazırlık: yedek, projeksiyon bağlantısı ve ⊞ + P.',
+  desc: 'Slaytta ne kadar yazı olmalı, yazı boyutu ve renk; sunum öncesi hazırlık.',
   summary: [
     ['Az yazı', 'Slayt başına en çok 3–5 kısa madde; bütün cümleleri yazmayın, konuşurken siz anlatın'],
     ['Büyük yazı', 'Metin en az 24 punto, başlık 32–44 punto; arka sıradan okunmalı'],
@@ -81,7 +81,7 @@ const sl = (layout, o = {}) => ({ layout, title: '', sub: '', body: '', body2: '
 
 export const sunuAni = {
   id: 'sunu-ani', icon: '🎤', title: 'Sunum anı: konuşmacı notları ve kısayollar', minutes: 30, stage: 'desktop',
-  desc: 'Slayt numarası eklemek, konuşmacı notları yazmak (izleyici görmez), sunum sırasında B ile ekranı karartmak, rakam ve Enter ile istediğiniz slayda atlamak, Esc ile çıkmak.',
+  desc: 'Slayt numarası, konuşmacı notları, B ile ekranı karartmak, slayda atlamak.',
   summary: [
     ['＃ Slayt numarası', 'Ekle → Slayt numarası; her slaydın köşesine sıra numarası yazar'],
     ['Konuşmacı notları', 'Slaydın altındaki kutuya yazılır; izleyiciye görünmez, siz bakarsınız'],

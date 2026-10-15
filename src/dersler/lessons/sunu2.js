@@ -13,7 +13,7 @@ const when = (test) => (ev, c) => evs.includes(ev.type) && !!test(c);
 
 export const slaytDuzen = {
   id: 'slayt-duzen', icon: '🗂', title: 'Slayt düzenleri, çoğaltma ve Slayt Sıralayıcı', minutes: 30, stage: 'desktop',
-  desc: 'Başlık ve içerik, iki içerikli ya da boş slayt düzeni seçmek; benzer slaytı Slaytı Çoğalt ile kopyalamak; Slayt Sıralayıcı görünümünde bütün slaytları kuşbakışı dizmek.',
+  desc: 'Slayt düzeni seçmek, slaytı çoğaltmak, Slayt Sıralayıcı görünümü.',
   summary: [
     ['Yeni Slayt ▾', 'Düzen seçersiniz: Başlık ve içerik, İki içerik, Yalnızca başlık, Fotoğraf ve yazı, Boş'],
     ['⧉ Slaytı Çoğalt', 'Seçili slaydın kopyasını hemen altına ekler'],
@@ -91,7 +91,7 @@ export const slaytDuzen = {
 
 export const smartArt = {
   id: 'smartart', icon: '🌳', title: 'SmartArt ile şema ve aile soy ağacı', minutes: 25, stage: 'desktop',
-  desc: 'Karmaşık maddeleri tek tıkla renkli kutulara, süreç oklarına ya da aile soy ağacı ve organizasyon şemasına (SmartArt) dönüştürmek.',
+  desc: 'Maddeleri tek tıkla renkli kutulara ve oklara dönüştürmek (SmartArt).',
   summary: [
     ['Ekle → SmartArt', 'Maddeleri şemaya çevirir; yazıyı değiştirmek için önce listeye dönün'],
     ['Liste (renkli kutular)', 'Birbirinden bağımsız başlıklar'],
@@ -152,7 +152,7 @@ export const smartArt = {
 
 export const animasyon = {
   id: 'animasyon', icon: '✨', title: 'Nesnelere animasyon ekleme ve süre ayarı', minutes: 30, stage: 'desktop',
-  desc: 'Slayt geçişi ile animasyonun farkı; yazıların ve fotoğrafların ekrana tek tek gelmesi; tıklamayla ya da kendiliğinden başlaması; slaytların kendi kendine akması için süre vermek.',
+  desc: 'Slayt geçişi ve animasyon farkı; yazıların tek tek gelmesi.',
   summary: [
     ['Geçiş', 'Bir slayttan ötekine geçerkenki hareket (Geçişler sekmesi)'],
     ['Animasyon', 'Slaydın içindeki yazı ve resimlerin ekrana tek tek gelmesi (Animasyonlar sekmesi)'],
@@ -227,7 +227,7 @@ export const animasyon = {
 
 export const anıAlbumu = {
   id: 'ani-albumu', icon: '📸', title: 'Aile ve anı albümü sunusu', minutes: 40, stage: 'desktop',
-  desc: 'Klasördeki aile ve tatil fotoğraflarını slaytlara yerleştirmek, altına tarih ve not yazmak, resim boyutunu düzeltmek, müzik eklemek; sunuyu PDF ya da video olarak kaydetmek ve bir kâğıda 4 slayt yazdırmak.',
+  desc: 'Fotoğraflardan anı albümü yapmak, müzik eklemek, PDF veya video kaydetmek.',
   summary: [
     ['Ekle → 📸 Fotoğraf Albümü', 'Resimler klasöründeki fotoğraflar için birer slayt'],
     ['Altına yazı', 'Tarih ve kısa not; “Bayram 2026: dedenin bahçesinde”'],

@@ -12,7 +12,7 @@ const KART = `<div class="kurs-kart">🪪 Kurs için verilen bilgiler<br>T.C. Ki
 
 export const edevlet = {
   id: 'edevlet', icon: '🇹🇷', title: 'e-Devlet\'ten belge almak', minutes: 40, stage: 'desktop',
-  desc: 'e-Devlet\'e şifreyle giriş, hizmet arama, yerleşim yeri (ikametgâh) belgesi oluşturma, PDF olarak indirme, açma ve yazdırma, barkodla belge doğrulama, güvenli çıkış.',
+  desc: 'e-Devlet\'e giriş, ikametgâh belgesi almak, PDF indirmek, barkodla doğrulamak.',
   summary: [
     ['turkiye.gov.tr', 'e-Devlet\'in tek gerçek adresi (.gov.tr)'],
     ['Giriş yap → e-Devlet şifresi', 'T.C. Kimlik No ve şifre; şifre PTT\'den alınır'],
@@ -110,7 +110,7 @@ export const edevlet = {
 
 export const randevu = {
   id: 'randevu', icon: '🏥', title: 'Hastane randevusu: form doldurmak', minutes: 30, stage: 'desktop',
-  desc: 'MHRS\'den hastane randevusu almak: zorunlu alanlar (*), hata iletilerini okumak, açılır liste, seçenek düğmeleri, onay kutusu; randevuyu görmek ve iptal etmek.',
+  desc: 'MHRS\'den hastane randevusu almak, hataları okumak, randevuyu iptal etmek.',
   summary: [
     ['* (yıldız)', 'Doldurulması zorunlu alan'],
     ['Kırmızı yazı', 'O alanda hata var: okuyun, düzeltin, yeniden gönderin'],
@@ -174,7 +174,7 @@ export const randevu = {
 
 export const alisveris = {
   id: 'alisveris', icon: '🛒', title: 'İnternetten güvenli alışveriş', minutes: 40, stage: 'desktop',
-  desc: 'Sepete ekleme, adet değiştirme, kargo ücreti, teslimat adresi, kapıda ödeme ile kartla ödeme farkı, “kartımı kaydet” kutusu, 3D Secure SMS kodu, sipariş takibi.',
+  desc: 'Sepete eklemek, kargo, kapıda ödeme, 3D Secure SMS kodu, sipariş takibi.',
   summary: [
     ['Sepete ekle → Sepetim', 'Almak istediklerinizi toplar; − / + ile adet'],
     ['Kargo', 'Çoğu site belli tutarın üstünde kargoyu bedava yapar'],
@@ -267,7 +267,7 @@ const DAVET = { key: 'gorusme', from: 'elif@ornek.com', fromName: 'Elif (torunum
 
 export const gorusme = {
   id: 'gorusme', icon: '📹', title: 'Görüntülü görüşme', minutes: 30, stage: 'desktop',
-  desc: 'E-postadaki davet bağlantısıyla görüşmeye katılmak, kamera ve mikrofon izni, sessize alma ve sesi açma, kamerayı kapatma, sohbete yazma, el kaldırma, görüşmeden ayrılma.',
+  desc: 'Görüşmeye katılmak, kamera ve mikrofon, sessize alma, sohbete yazma.',
   summary: [
     ['Davet bağlantısı', 'Tıklayınca görüşme tarayıcıda açılır (adresine bakın!)'],
     ['Kamera ve mikrofon izni', 'Tanıdığınız görüşme sitesine “İzin ver”'],
@@ -359,7 +359,7 @@ export const gorusme = {
 const inPhone = (c, id) => id && c.d.fs.get(id) && c.d.fs.isInside(id, PHONE);
 export const telefon = {
   id: 'telefon', icon: '📱', title: 'Telefondan bilgisayara fotoğraf', minutes: 30, stage: 'desktop',
-  desc: 'Telefonu kabloyla bağlamak, telefonda “Dosya aktarımı”nı seçmek, telefondaki fotoğrafları Dosya Gezgini\'nde bulup kopyalamak, hepsini birden içeri aktarmak.',
+  desc: 'Telefonu kabloyla bağlayıp fotoğrafları bilgisayara kopyalamak.',
   summary: [
     ['Kabloyu takınca', 'Telefon önce yalnızca şarj olur'],
     ['Telefonda bildirim → Dosya aktarımı', 'Bilgisayar telefonun içini görür'],

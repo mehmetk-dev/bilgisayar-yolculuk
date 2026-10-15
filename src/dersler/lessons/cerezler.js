@@ -10,7 +10,7 @@ const third = (c) => (c.d.cookies || []).some((k) => k.party === 'third');
 
 export const cerezler = {
   id: 'cerezler', icon: '🍪', title: 'Çerezler: sizi hatırlayan küçük notlar', minutes: 35, stage: 'desktop',
-  desc: 'Çerez nedir; çerez penceresinde ne seçilir; sepetiniz neden hatırlanır; “baktığım ürünün reklamı beni takip ediyor” neden olur; çerezleri listeden görmek, üçüncü taraf çerezleri engellemek ve silmek.',
+  desc: 'Çerez nedir, çerez penceresinde ne seçilir, çerezleri görmek ve silmek.',
   summary: [
     ['Çerez', 'Sitenin tarayıcınıza bıraktığı küçük not: giriş, sepet, tercihlerinizi hatırlar'],
     ['Birinci taraf çerez', 'Gezdiğiniz sitenin kendi çerezi: çoğu zaman yararlıdır'],

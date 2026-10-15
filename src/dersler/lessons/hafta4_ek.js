@@ -6,7 +6,7 @@ const YOLCULUK = '<a class="btn" href="bilgisayar.html">🖥 Bilgisayarın İçi
 
 export const parcalar = {
   id: 'parcalar', icon: '🔩', title: 'Kasanın içi: parçalar ve görevleri', minutes: 25, stage: 'scene',
-  desc: 'Anakart, işlemci, RAM, disk, ekran kartı, güç kaynağı ve fan ne işe yarar? Kasanın içi ve dışı; benzetmelerle.',
+  desc: 'Anakart, işlemci, RAM, disk, ekran kartı ve fan ne işe yarar? Benzetmelerle.',
   summary: [
     ['Anakart', 'Bütün parçaların takıldığı büyük kart: şehrin yolları'],
     ['İşlemci (CPU)', 'Hesapları yapan beyin'],
@@ -65,7 +65,7 @@ export const parcalar = {
 
 export const portlar = {
   id: 'portlar', icon: '🔌', title: 'Portlar ve kablolar', minutes: 20, stage: 'scene',
-  desc: 'USB, USB-C, HDMI, ses girişleri ve Ethernet: hangi kablo nereye takılır? Takarken nelere dikkat edilir?',
+  desc: 'USB, HDMI, ses girişleri ve Ethernet: hangi kablo nereye takılır?',
   summary: [
     ['USB-A', 'Dikdörtgen; fare, klavye, USB bellek, yazıcı'],
     ['USB-C', 'Küçük ve oval; iki yönlü takılır; telefonlar, yeni dizüstüler'],
@@ -118,7 +118,7 @@ export const portlar = {
 
 export const bakim = {
   id: 'bakim', icon: '🧹', title: 'Bakım ve sağlıklı kullanım', minutes: 20, stage: 'scene',
-  desc: 'Bilgisayarı temiz ve güvende tutmak; havalandırma, güncelleme, elektrik; doğru oturuş ve göz sağlığı (20-20-20).',
+  desc: 'Bilgisayarı temiz tutmak, doğru oturuş ve göz sağlığı (20-20-20).',
   summary: [
     ['Ekran temizliği', 'Kapalıyken, kuru ya da hafif nemli yumuşak bezle'],
     ['Havalandırma', 'Deliklerin önü açık; dizüstü sert yüzeyde'],
@@ -169,7 +169,7 @@ export const bakim = {
 
 export const sorunGiderme = {
   id: 'sorun-giderme', icon: '🛠', title: 'Bir şey çalışmıyor! İlk kontroller', minutes: 20, stage: 'scene',
-  desc: 'Ekran kararıyor, fare oynamıyor, ses yok, internet yok, yazıcı yazmıyor… Panik yapmadan önce bakılacak basit şeyler.',
+  desc: 'Ekran kararıyor, ses yok, internet yok: panik yapmadan önce bakılacaklar.',
   summary: [
     ['1. Kablo ve düğme', 'Takılı mı, açık mı?'],
     ['2. Ses', 'Sessizde mi, kulaklık takılı mı?'],

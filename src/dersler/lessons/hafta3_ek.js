@@ -11,7 +11,7 @@ const GUNLUK = 'Bugün hava çok güzel.\nParkta uzun bir yürüyüş yaptık.\n
 
 export const secme = {
   id: 'secme', icon: '🖍', title: 'Seçmenin incelikleri', minutes: 25, stage: 'notepad',
-  desc: 'Sürükleyerek seçme, Shift + ok, Shift + End, üç kez tıklama, Ctrl + ok ile kelime atlama, Ctrl + Home/End.',
+  desc: 'Sürükleyerek seçme, Shift + ok, üç kez tıklama, Ctrl + ok.',
   setup: preload(GUNLUK),
   summary: [
     ['Sürüklemek', 'Sol tuş basılı, yazının üzerinden geçin'],
@@ -108,7 +108,7 @@ function kisayol({ title, html, combo, test, hint, done }) {
 
 export const kisayolYarisi = {
   id: 'kisayol-yarisi', icon: '⏱', title: 'Kısayol yarışı', minutes: 15, stage: 'notepad', parkur: true,
-  desc: 'Orta seviye: 9 görev, yalnızca kısayollarla ve klavyede ipucu yanmadan. Her görevin süresi tutulur.',
+  desc: 'Orta seviye: 9 görev, yalnızca kısayollarla. Süreler tutulur.',
   setup: preload('Kısayol yarışı başlasın!\nBu satırı da unutmayın.'),
   steps: [
     {
@@ -137,7 +137,7 @@ const firstRecipe = (c) => {
 
 export const tarif = {
   id: 'tarif', icon: '🍲', title: 'Tarifi düzene sokun', minutes: 25, stage: 'notepad',
-  desc: 'Orta seviye: karışık yazılmış bir tarifin adımlarını sıraya koymak, başlık ve malzeme eklemek, çoğaltıp değiştirmek, kaydetmek.',
+  desc: 'Orta seviye: karışık tarifi sıraya koymak, düzenlemek, kaydetmek.',
   setup: preload(TARIF),
   summary: [
     ['Satır taşımak', 'Üç kez tıkla → Ctrl + X → yeni yere tıkla → Ctrl + V'],
@@ -204,7 +204,7 @@ export const tarif = {
 
 export const kaydetPratik = {
   id: 'kaydet-pratik', icon: '💾', title: 'Kaydetme, farklı kaydetme ve açma', minutes: 25, stage: 'notepad',
-  desc: 'Doğru klasöre kaydetmek, değişikliği Ctrl + S ile kaydetmek, Farklı kaydet ile kopya almak, doğru dosyayı yeniden açmak.',
+  desc: 'Doğru klasöre kaydetmek, Ctrl + S, Farklı kaydet, dosyayı yeniden açmak.',
   summary: [
     ['Ctrl + S (ilk kez)', 'Ad ve klasör sorulur'],
     ['Ctrl + S (sonra)', 'Sormadan aynı dosyanın üzerine kaydeder'],
@@ -278,7 +278,7 @@ export const kaydetPratik = {
 
 export const kopyaOyun = {
   id: 'kopya-oyun', icon: '🧩', title: 'Kısayol eşleştirme', minutes: 15, stage: 'scene',
-  desc: 'Tekrar: hangi durumda Ctrl + C, X, V, Z? Hangi komut hangi menüde? Pano ve kaydetme soruları.',
+  desc: 'Tekrar: hangi durumda Ctrl + C, X, V, Z? Pano ve kaydetme soruları.',
   summary: [
     ['Ctrl + C', 'Kopyala: aslı yerinde kalır'],
     ['Ctrl + X', 'Kes: taşımanın ilk adımı'],

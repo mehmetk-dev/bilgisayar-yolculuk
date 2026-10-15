@@ -24,7 +24,7 @@ const P = (t) => `<p>${t}</p>`;
 
 export const apartmanDuyuru = {
   id: 'apartman-duyuru', icon: '📢', title: 'Apartman duyurusu hazırlayalım', minutes: 40, stage: 'desktop',
-  desc: 'Büyük ve ortalı başlık, önemli satırı renklendirmek, sayfaya çerçeve eklemek, tek kâğıda sığdırıp yazdırma önizlemesine (Ctrl + P) bakmak.',
+  desc: 'Başlık, renk, çerçeve; tek kâğıda sığdırıp yazdırma önizlemesi.',
   summary: [
     ['Başlık', 'Ortalı, büyük (24–28 punto), kalın'],
     ['Önemli satır', 'Renk ya da kalın: gözün hemen gördüğü yer'],
@@ -144,7 +144,7 @@ ${[
 
 export const sayfaDuzeni = {
   id: 'sayfa-duzeni', icon: '📄', title: 'Sayfa düzeni ve yazdırma hataları', minutes: 35, stage: 'desktop',
-  desc: 'Kâğıdı yatay/dikey yapmak, kenar boşlukları, yazının son satırlarının ikinci sayfaya taşmasını engellemek, filigran, Ctrl + Enter ile yeni sayfa.',
+  desc: 'Kâğıdı yatay/dikey yapmak, kenar boşlukları, filigran, yeni sayfa.',
   summary: [
     ['Düzen → Kenar boşlukları', 'Dar yaparsanız sayfaya daha çok yazı sığar'],
     ['Düzen → Yönlendirme', 'Dikey (mektup), Yatay (geniş tablo)'],
@@ -231,7 +231,7 @@ const AIDAT = `<p><b>Daire aidat çizelgesi (Ekim)</b></p>
 
 export const tabloInce = {
   id: 'tablo-ince', icon: '📋', title: 'Tablo incelikleri: aidat ve nöbet çizelgesi', minutes: 35, stage: 'desktop',
-  desc: 'Hazır tabloya sonradan satır ve sütun eklemek, silmek, hücreleri birleştirip üstte tek parça başlık yapmak, çizgileri kalınlaştırmak, hücre içini ortalamak.',
+  desc: 'Tabloya satır ve sütun eklemek, hücreleri birleştirmek, çizgileri kalınlaştırmak.',
   summary: [
     ['Tabloya tıklayın', 'Sekmelerin yanında “Tablo Düzeni” çıkar'],
     ['↓ Alta ekle / ↑ Üste ekle', 'Yeni satır'],
@@ -307,7 +307,7 @@ export const tabloInce = {
 
 export const simgeSekil = {
   id: 'simge-sekil', icon: '🔣', title: 'Simgeler ve şekiller: ₺, °C, ½, ©', minutes: 25, stage: 'desktop',
-  desc: 'Klavyede olmayan simgeleri eklemek (₺ °C ½ ©), kutu ve ok şekillerinin içine yazı yazmak.',
+  desc: '₺ °C ½ © gibi simgeleri eklemek, şekillerin içine yazı yazmak.',
   summary: [
     ['Ekle → Simge', 'Klavyede olmayan işaretleri verir: ₺ ° ½ © € ✓ ☎'],
     ['₺', 'Klavyede AltGr + T de olabilir; Simge menüsü her bilgisayarda çalışır'],
@@ -378,7 +378,7 @@ export const simgeSekil = {
 
 export const dilekceParkur = {
   id: 'dilekce-parkur', icon: '🏁', title: 'Dilekçe parkuru', minutes: 25, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: yönlendirme yok. Sıfırdan kısa bir dilekçe yazıp biçimlendirmek, tarih eklemek, kaydetmek ve PDF yapmak. Süreler tutulur.',
+  desc: 'Orta seviye: dilekçe yazıp biçimlendirmek, kaydetmek, PDF yapmak. Süreler tutulur.',
   steps: [
     {
       title: 'Dilekçe parkuru',

@@ -20,7 +20,7 @@ const FIYAT = () => ({
 
 export const duseyara = {
   id: 'duseyara', icon: '🔎', title: 'DÜŞEYARA: fiyat listesinden ürünü bulmak', minutes: 35, stage: 'desktop',
-  desc: 'Alışveriş listesindeki her ürünün fiyatını fiyat listesinden kendiliğinden getirmek: DÜŞEYARA işlevi, tam eşleşme (YANLIŞ), fiyat değişince toplamın güncellenmesi, #YOK hatası.',
+  desc: 'DÜŞEYARA ile fiyat listesinden ürünün fiyatını otomatik getirmek.',
   summary: [
     ['DÜŞEYARA', 'Bir listede ürünü bulup yanındaki fiyatı getirir (Excel\'in “rehberden numara bulma”sı)'],
     ['=DÜŞEYARA(A2;$F$2:$G$7;2;YANLIŞ)', 'A2\'deki ürünü F:G tablosunun ilk sütununda ara; 2. sütundaki fiyatı getir; tam eşleşme'],
@@ -113,7 +113,7 @@ const valids = (c) => X(c)?.valids || [];
 
 export const aidatTakip = {
   id: 'aidat-takip', icon: '✅', title: 'Açılır liste ve aidat takibi', minutes: 35, stage: 'desktop',
-  desc: 'Hücreye yazı yerine açılır listeden seçmek (veri doğrulama), listede olmayan yazıyı engellemek, EĞERSAY ile saymak, koşullu biçimle “Ödenmedi”leri kırmızıya boyamak.',
+  desc: 'Açılır liste, EĞERSAY ile saymak, koşullu biçimle renklendirmek.',
   summary: [
     ['✔ Açılır Liste', 'Hücrelere yalnızca belirlediğiniz seçenekler girilebilir; hücrenin yanında ▾ çıkar'],
     ['Seçenekleri yazmak', 'Virgülle ayırın: Ödendi, Ödenmedi, Kısmen'],

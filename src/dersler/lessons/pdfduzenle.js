@@ -8,7 +8,7 @@ const pdfInfo = (c) => c.d.find('pdf')?.api.info() || { annots: 0, page: 1 };
 
 export const pdfDuzenle = {
   id: 'pdf-duzenle', icon: '✍', title: 'PDF formu indirmek, doldurmak ve yazdırmak', minutes: 40, stage: 'desktop',
-  desc: 'Belediyenin PDF formunu internetten indirmek, bilgisayarda doldurmak (yazı ekleme, vurgulama, imza), kaydetmek; yazdırırken yalnızca gereken sayfayı seçmek, kopya sayısı ve iki yüze yazdırma ile kâğıt tasarrufu.',
+  desc: 'PDF formunu bilgisayarda doldurmak ve yalnızca gereken sayfayı yazdırmak.',
   summary: [
     ['⬇ PDF indir', 'Formu bilgisayara kaydeder: İndirilenler klasörü'],
     ['T Yazı ekle', 'Boşluğa tıklayıp yazı yazın (formu elle doldurmanıza gerek kalmaz)'],

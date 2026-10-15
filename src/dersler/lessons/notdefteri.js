@@ -12,7 +12,7 @@ export const notdefteri = {
   id: 'notdefteri',
   icon: '📝',
   title: 'Not Defteri ve kısayollar',
-  desc: 'Seçme, Ctrl+A/C/V/X/Z/Y, sağ tık menüsü, kaydetme (Ctrl+S) ve kaydettiğini yeniden açma (Ctrl+O).',
+  desc: 'Seçme, Ctrl+A/C/V/X/Z/Y, sağ tık menüsü, Ctrl+S ile kaydetme ve açma.',
   minutes: 25,
   stage: 'notepad',
   summary: [

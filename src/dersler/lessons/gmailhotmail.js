@@ -30,7 +30,7 @@ const TABS = [
 
 export const gmailHotmail = {
   id: 'gmail-hotmail', icon: '✉', title: 'Gmail ve Hotmail (Outlook): farkları nelerdir?', minutes: 25, stage: 'scene',
-  desc: 'İki yaygın e-posta hizmeti: adres sonları, Google ve Microsoft hesabı, sekme ve klasör düzeni, Spam ile Önemsiz E-posta, hangisini seçmeli; ikisi de ücretsizdir ve birbirine posta gönderir.',
+  desc: 'İki yaygın e-posta hizmeti: Gmail ve Hotmail; hangisini seçmeli?',
   summary: [
     ['Gmail', 'Google; adres sonu @gmail.com; Google hesabı (Android, YouTube, Drive)'],
     ['Hotmail / Outlook', 'Microsoft; @hotmail.com, @outlook.com, @live.com; Microsoft hesabı (Windows, Office, OneDrive)'],

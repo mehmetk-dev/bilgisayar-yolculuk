@@ -7,7 +7,7 @@ const explorerAt = (folder) => (c) => { const w = c.d.ensure('explorer'); if (fo
 
 export const dosyaTurleri = {
   id: 'dosya-turleri', icon: '🏷', title: 'Dosya türleri ve uzantılar', minutes: 20, stage: 'scene',
-  desc: '.txt, .pdf, .docx, .jpg, .mp3, .mp4, .exe, .zip ne demek? Hangi dosya hangi programla açılır? Tehlikeli uzantılar.',
+  desc: '.txt, .pdf, .docx, .jpg, .zip ne demek? Tehlikeli uzantılar.',
   summary: [
     ['.txt', 'Düz yazı (Not Defteri)'],
     ['.docx', 'Word belgesi'],
@@ -53,7 +53,7 @@ export const dosyaTurleri = {
 
 export const fotograflar = {
   id: 'fotograflar', icon: '🖼', title: 'Fotoğraflarla çalışmak', minutes: 25, stage: 'desktop',
-  desc: 'Resimler klasörü, fotoğraf açma, sonraki/önceki, yakınlaştırma, arka plan yapma, Albüm klasörü oluşturup fotoğraf kopyalama, ad verme.',
+  desc: 'Fotoğraf açmak, yakınlaştırmak, Albüm klasörü oluşturup fotoğraf kopyalamak.',
   setup: (c) => {
     put(c, 'pictures', 'torunum.jpg', 'file', PIC('👶', '#ffe0b2', '#f8bbd0'));
     put(c, 'pictures', 'bahçe.jpg', 'file', PIC('🌷', '#c8e6c9', '#fff59d'));
@@ -150,7 +150,7 @@ const ev_ = (c) => c.d.fs.find('docs', 'Ev');
 
 export const klasorAgaci = {
   id: 'klasor-agaci', icon: '🌳', title: 'Klasör içinde klasör', minutes: 25, stage: 'desktop',
-  desc: 'Dolap-çekmece-dosya düzeni: iç içe klasör oluşturma, klasörü klasöre taşıma, adres çubuğunu okuma, geri dönme, iç klasörlerde arama.',
+  desc: 'İç içe klasör oluşturmak, taşımak, adres çubuğunu okumak, aramak.',
   summary: [
     ['İç içe klasör', 'Dolap → çekmece → dosya gibi'],
     ['Adres çubuğu', 'Belgeler › Ev › Faturalar: neredeyim?'],
@@ -232,7 +232,7 @@ export const klasorAgaci = {
 
 export const copKutusu = {
   id: 'cop-kutusu', icon: '🗑', title: 'Geri Dönüşüm Kutusu', minutes: 20, stage: 'desktop',
-  desc: 'Üç yoldan silmek (sürükleme, Delete, sağ tık), kutuyu açmak, geri yüklemek ve kutuyu boşaltmak.',
+  desc: 'Dosyayı silmenin üç yolu, Geri Dönüşüm Kutusu ve geri yükleme.',
   setup: (c) => {
     put(c, 'desktop', 'eski liste.txt', 'file', 'Ekmek');
     put(c, 'desktop', 'deneme.txt', 'file', 'deneme');
@@ -298,7 +298,7 @@ export const copKutusu = {
 
 export const dosyaSenaryo = {
   id: 'dosya-senaryo', icon: '🤔', title: 'Ne yapardınız? Dosya durumları', minutes: 20, stage: 'scene',
-  desc: 'Günlük hayattan dosya durumları: USB\'den fotoğraf almak, dağınık masaüstü, silinen belge, biçimlendirme uyarısı, dolu disk.',
+  desc: 'Günlük hayattan dosya durumları: USB\'den fotoğraf almak, silinen belge, dolu disk.',
   summary: [
     ['USB\'den almak', 'Kopyalayın; aslı USB\'de kalsın'],
     ['Dağınık masaüstü', 'Klasör açıp içine taşıyın'],

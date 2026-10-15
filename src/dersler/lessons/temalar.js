@@ -8,7 +8,7 @@ const S = (c) => c.d.settings;
 
 export const temalar = {
   id: 'temalar', icon: '🎨', title: 'Temalar ve Mağaza', minutes: 35, stage: 'desktop',
-  desc: 'Bilgisayarı kişiselleştirmek: hazır tema, koyu mod, vurgu rengi; Mağaza\'dan tema ve uygulama indirmek; taklit uygulamayı yayımcısından, puanından ve istediği izinlerden tanımak.',
+  desc: 'Hazır tema, koyu mod, vurgu rengi; Mağaza\'dan uygulama indirmek.',
   summary: [
     ['Ayarlar → Kişiselleştirme → Temalar', 'Arka plan, renk ve koyu modu birlikte değiştirir'],
     ['Koyu mod', 'Pencereler ve görev çubuğu koyu renk olur; akşamları gözü yormaz'],

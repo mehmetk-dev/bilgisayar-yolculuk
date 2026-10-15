@@ -1,5 +1,6 @@
 // Dersler sayfası: ders listesi, adım adım yönlendirme, ilerlemenin ve adım sürelerinin kaydı.
 // Üç tür sahne vardır: 'notepad' (tek Not Defteri + klavye), 'desktop' (benzetim Windows), 'scene' (etkinlik).
+import { emojiIcon } from './svgicons.js';
 import { LESSONS, WEEKS } from './lessons/index.js';
 import { Keyboard, keyLabel } from './keyboard.js';
 import { Notepad } from './notepad.js';
@@ -127,7 +128,7 @@ function showHome() {
   clearTimeout(hintTimer);
   const card = (l) => {
     if (l.link) {
-      return `<article class="lcard link"><div class="licon">${l.icon}</div><div class="lmain"><h3>${l.title}</h3><p>${l.desc}</p>
+      return `<article class="lcard link"><div class="licon">${emojiIcon(l.icon)}</div><div class="lmain"><h3 title="${l.title}">${l.title}</h3><p title="${l.desc.replace(/"/g, '&quot;')}">${l.desc}</p>
         <div class="lfoot"><span class="sp"></span><a class="btn primary" href="${l.link}">Aç</a></div></div></article>`;
     }
     const p = store.lessons[l.id];
@@ -146,11 +147,12 @@ function showHome() {
       status = `<span class="tag">Adım ${p.step + 1} / ${total}</span>`;
       btn = `<button type="button" class="link" data-restart="${l.id}">Baştan</button><a class="btn primary" href="#ders/${l.id}">Devam</a>`;
     }
-    return `<article class="lcard${p?.done ? ' done' : ''}"><div class="licon">${l.icon}</div><div class="lmain">
-      <h3>${l.title}</h3><p>${l.desc}</p>
+    return `<article class="lcard${p?.done ? ' done' : ''}"><div class="licon">${emojiIcon(l.icon)}</div><div class="lmain">
+      <h3 title="${l.title}">${l.title}</h3><p title="${l.desc.replace(/"/g, '&quot;')}">${l.desc}</p>
       <div class="lfoot">${status}<span class="sp"></span>${btn}</div></div></article>`;
   };
-  $('#cards').innerHTML = WEEKS.map((w) => `<section class="week"><h2><span>${w.no ? `${w.no}. hafta` : 'Ek'}</span>${w.title}</h2>
+  const HUES = [215, 268, 330, 8, 32, 150, 190, 245, 290, 340, 128, 22, 170, 305];
+  $('#cards').innerHTML = WEEKS.map((w) => `<section class="week" style="--h:${w.no ? HUES[(w.no - 1) % HUES.length] : 200}"><h2><span>${w.no ? `${w.no}. hafta` : 'Ek'}</span>${w.title}</h2>
     <div class="wcards">${w.lessons.map(card).join('')}</div></section>`).join('');
 }
 
@@ -403,7 +405,7 @@ function restart() {
 }
 
 function printCard() {
-  $('#printCard').innerHTML = `<h1>${lesson.icon} ${lesson.title}</h1><p>Özet kartı: bilgisayarın yanında dursun.</p>
+  $('#printCard').innerHTML = `<h1>${emojiIcon(lesson.icon)} ${lesson.title}</h1><p>Özet kartı: bilgisayarın yanında dursun.</p>
     <table>${lesson.summary.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>
     <p class="pfoot">Ctrl ile başlayan kısayollarda: önce Ctrl'yi basılı tutun, sonra harfe bir kez basın, sonra ikisini bırakın.</p>`;
   print();

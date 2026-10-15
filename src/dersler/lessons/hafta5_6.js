@@ -4,7 +4,7 @@ import { K, desktopReady, put, PIC } from './common.js';
 
 export const masaustu = {
   id: 'masaustu', icon: '🖥', title: 'Masaüstü, Başlat ve görev çubuğu', minutes: 20, stage: 'desktop',
-  desc: 'Başlat menüsünden ve aramayla program açma, görev çubuğu, masaüstünü gösterme, Alt+Tab, ses simgesi.',
+  desc: 'Programları açmak, görev çubuğu, Alt+Tab, ses simgesi.',
   summary: [
     ['⊞ Başlat', 'Bütün programlar; açınca hemen yazarak arayabilirsiniz'],
     ['Görev çubuğu', 'Açık programlar: tıklayınca öne gelir ya da küçülür'],
@@ -86,7 +86,7 @@ const exFolder = (c) => c.d.find('explorer')?.api.folder;
 
 export const dosyalar = {
   id: 'dosyalar', icon: '📁', title: 'Dosya Gezgini ve USB bellek', minutes: 30, stage: 'desktop',
-  desc: 'Klasör oluşturma, ad değiştirme, taşıma, kopyalama, silme, Geri Dönüşüm Kutusu, arama, USB bellek.',
+  desc: 'Klasör oluşturma, taşıma, kopyalama, silme, Geri Dönüşüm Kutusu, USB bellek.',
   setup: (c) => put(c, 'docs', 'torun fotoğrafı.jpg', 'file', PIC('👧', '#f8bbd0', '#ce93d8')),
   summary: [
     ['📁 Dosya Gezgini', 'Bilgisayardaki bütün dosya ve klasörler'],

@@ -31,7 +31,7 @@ const fmtSure = (t) => (t >= 60 ? `${Math.floor(t / 60)} dk ${t % 60} sn` : `${t
 
 export const hiz = {
   id: 'hiz', icon: '⏱', title: 'Yazma hızı ölçümü', minutes: 10, stage: 'notepad',
-  desc: 'Kısa bir metni yazın; dakikada kaç kelime yazdığınız ve kaç hata yaptığınız ölçülür. Her hafta tekrar edip ilerlemenizi görün.',
+  desc: 'Kısa bir metin yazın; dakikada kaç kelime yazdığınız ölçülür.',
   steps: [
     {
       title: 'Yazma hızınızı ölçelim',

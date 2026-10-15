@@ -22,7 +22,7 @@ function hesap({ title, html, value, hint, done }) {
 
 export const hesapMakinesi = {
   id: 'hesap-makinesi', icon: '🧮', title: 'Hesap Makinesi ile günlük hesaplar', minutes: 25, stage: 'desktop',
-  desc: 'Market toplamı, fatura, kişi başı pay, aylık gider, indirim (%) ve para üstü. Hatalı rakamı ⌫ ile silmek, C ile sıfırlamak.',
+  desc: 'Market toplamı, fatura, kişi başı pay, indirim ve para üstü.',
   summary: [
     ['+ − × ÷', 'Toplama, çıkarma, çarpma, bölme'],
     ['=', 'Sonucu gösterir (klavyede Enter)'],
@@ -71,7 +71,7 @@ export const hesapMakinesi = {
 
 export const masaustuDuzen = {
   id: 'masaustu-duzen', icon: '🗂', title: 'Masaüstünü düzenleyin', minutes: 20, stage: 'desktop',
-  desc: 'Masaüstünde sağ tıkla yeni klasör, dosyaları içine taşımak, simgeleri büyütmek ve taşımak, arka planı değiştirmek, çöpü boşaltmak.',
+  desc: 'Masaüstünde klasör açmak, dosya taşımak, arka planı değiştirmek.',
   setup: (c) => {
     put(c, 'desktop', 'fatura.pdf');
     put(c, 'desktop', 'tatil fotoğrafı.jpg', 'file', PIC('🏖', '#4fc3f7', '#ffe082'));
@@ -152,7 +152,7 @@ export const masaustuDuzen = {
 
 export const baslatKesif = {
   id: 'baslat-kesif', icon: '⊞', title: 'Başlat menüsünü keşfedin', minutes: 20, stage: 'desktop',
-  desc: 'Başlat menüsündeki programlar, aramayla açma, görev çubuğundaki 🔍, güç menüsü, Esc ile kapatma, Ayarlar ve Dosya Gezgini.',
+  desc: 'Başlat menüsü, aramayla açma, görev çubuğundaki 🔍, güç menüsü.',
   summary: [
     ['⊞ Başlat', 'Programlar, arama, güç düğmesi'],
     ['Başlat açıkken yazmak', 'Arama yapar'],
@@ -223,7 +223,7 @@ export const baslatKesif = {
 
 export const oyunlar = {
   id: 'oyunlar', icon: '🎮', title: 'Oyunlarla pratik', minutes: 25, stage: 'desktop',
-  desc: 'Mola dersi: Mayın Tarlası (tıklama, sağ tıkla bayrak) ve Kart Dizme (sürükle-bırak). Pencereler arası geçiş ve kapatma.',
+  desc: 'Mola dersi: Mayın Tarlası ve Kart Dizme oyunları.',
   summary: [
     ['Mayın Tarlası: sol tık', 'Kareyi açar; rakam, çevresindeki mayın sayısıdır'],
     ['Mayın Tarlası: sağ tık', 'Mayın olduğunu düşündüğünüz kareye bayrak'],
@@ -299,7 +299,7 @@ export const oyunlar = {
 
 export const masaustuHarita = {
   id: 'masaustu-harita', icon: '🗺', title: 'Masaüstü haritası', minutes: 15, stage: 'scene',
-  desc: 'Tekrar: neyi nerede bulurum? Görev çubuğu, Başlat menüsü ve pencere üzerindeki parçaları ayırma oyunu ve sorular.',
+  desc: 'Tekrar: neyi nerede bulurum? Görev çubuğu ve Başlat menüsü soruları.',
   summary: [
     ['Görev çubuğu', 'Başlat, arama, açık programlar, saat, ses, Wi-Fi'],
     ['Başlat menüsü', 'Bütün programlar, Ayarlar, güç düğmesi'],

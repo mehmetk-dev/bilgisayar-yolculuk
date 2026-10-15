@@ -314,7 +314,7 @@ export const test4 = test({
 
 export const test5 = test({
   id: 'test5', no: 5, title: '5. hafta testi',
-  desc: 'Başlat menüsü, arama, görev çubuğu, Alt+Tab ve sağ alttaki simgeler üzerine 10 soru.',
+  desc: 'Başlat menüsü, arama, görev çubuğu ve Alt+Tab üzerine 10 soru.',
   qs: [
     {
       t: 'Başlat menüsü', pic: '⊞',
@@ -381,7 +381,7 @@ export const test5 = test({
 
 export const test6 = test({
   id: 'test6', no: 6, title: '6. hafta testi',
-  desc: 'Dosya ve klasör, taşıma-kopyalama, silme ve geri yükleme, arama ve USB bellek üzerine 10 soru.',
+  desc: 'Dosya ve klasör, taşıma-kopyalama, silme ve USB bellek üzerine 10 soru.',
   qs: [
     {
       t: 'Dosya ve klasör', pic: '📄 📁',
@@ -448,7 +448,7 @@ export const test6 = test({
 
 export const test7 = test({
   id: 'test7', no: 7, title: '7. hafta testi',
-  desc: 'Paint, Ekran Alıntısı ve Ayarlar (arka plan, ses, Wi-Fi, yazı boyutu) üzerine 12 soru.',
+  desc: 'Paint, Ekran Alıntısı ve Ayarlar üzerine 12 soru.',
   qs: [
     {
       t: 'Paint', pic: '🎨',
@@ -517,7 +517,7 @@ export const test7 = test({
 
 export const test8 = test({
   id: 'test8', no: 8, title: '8. hafta testi',
-  desc: 'İnternet, indirme, program kurma ve kaldırma, sürücüler ve işletim sistemi kurulumu üzerine 14 soru.',
+  desc: 'İnternet, indirme, program kurma ve işletim sistemi üzerine 14 soru.',
   qs: [
     {
       t: 'Adresi bilmiyorsanız', pic: '🔍',
@@ -589,7 +589,7 @@ export const test8 = test({
 // 3B "Donanım dersi"nin (bilgisayar.html#ders) tekrar testi
 export const testDonanim = test({
   id: 'testDonanim', no: 4, title: 'Donanım testi: kasanın içi',
-  desc: '3B donanım dersinin tekrarı: anakart, işlemci, RAM, disk, SSD, ekran kartı, güç kaynağı, fan ve kablolar üzerine 15 soru.',
+  desc: '3B donanım dersinin tekrarı: parçalar ve kablolar üzerine 15 soru.',
   qs: [
     { t: 'Anakart', pic: '🟩', q: 'Bütün parçaların takıldığı, onları birbirine bağlayan büyük kart hangisi?', opts: ['Ekran kartı', 'Anakart', 'Güç kaynağı'], ok: 1, why: 'Anakart şehrin yolları gibidir: işlemci, RAM, disk ve kartlar onun üzerinden haberleşir.' },
     { t: 'İşlemci', pic: '🧠', q: 'Bilgisayarın “beyni”, bütün hesapları yapan parça hangisi?', opts: ['İşlemci (CPU)', 'RAM', 'Fan'], ok: 0, why: 'İşlemci lokantadaki aşçı gibidir: tıkladığımız, yazdığımız her şey onun hesabından geçer.' },
@@ -611,7 +611,7 @@ export const testDonanim = test({
 
 export const test9 = test({
   id: 'test9', no: 9, title: '9. hafta testi',
-  desc: 'E-posta okuma, yanıtlama, iletme, Bilgi ve Gizli alıcılar, taslak, ek indirme, istenmeyen posta, bulut paylaşımı ve şifre sıfırlama üzerine 11 soru.',
+  desc: 'E-posta okuma, yanıtlama, ek, bulut paylaşımı üzerine 11 soru.',
   qs: [
     { t: 'E-posta adresi', pic: '✉', q: 'Hangi e-posta adresi doğru yazılmıştır?', opts: ['ayse yilmaz@ornek.com', 'ayse@örnek.com', 'ayse.yilmaz@ornek.com'], ok: 2, why: 'Adreste boşluk ve Türkçe harf (ç, ğ, ı, ö, ş, ü) olmaz; bir tane @ ve sonra noktalı bir alan adı olur.' },
     { t: 'Yanıtla', pic: '↩', q: 'Torununuz size fotoğraf gönderdi, teşekkür etmek istiyorsunuz. Hangi düğmeye basarsınız?', opts: ['↩ Yanıtla', '↪ İlet', '🗑 Sil'], ok: 0, why: 'Yanıtla: size yazana cevap verir; Kime kutusu kendiliğinden dolar.' },
@@ -629,7 +629,7 @@ export const test9 = test({
 
 export const test10 = test({
   id: 'test10', no: 10, title: '10. hafta testi',
-  desc: 'Kelime işlemci: biçimlendirme, sayfa düzeni ve yazdırma, tablo, simge ve şekil, kaydetme üzerine 10 soru.',
+  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme üzerine 10 soru.',
   qs: [
     { t: 'Başlık', pic: '📢', q: 'Merdivene asılacak duyurunun başlığını uzaktan okunur yapmak için ne yapılır?', opts: ['Küçük ve sola dayalı yazılır', 'Büyük, kalın ve ortalı yazılır', 'Altı çizgili yazılır'], ok: 1, why: 'Büyük, kalın ve ortalı başlık uzaktan okunur. Boyut “punto” ile ayarlanır (24–28).' },
     { t: 'İki yana yasla', pic: '≣', q: 'Resmî yazıların (dilekçe) paragrafları genellikle nasıl hizalanır?', opts: ['Ortalı', 'İki yana yaslı', 'Sağa dayalı'], ok: 1, why: 'İki yana yaslama (Ctrl + J) paragrafın iki kenarını da düz yapar. Tarih ve imza ise sağa hizalanır.' },
@@ -646,7 +646,7 @@ export const test10 = test({
 
 export const test11 = test({
   id: 'test11', no: 11, title: '11. hafta testi',
-  desc: 'Hesap tablosu: formüller, doldurma, sütun genişliği ve #####, birleştirme, çalışma sayfaları, yazdırma üzerine 11 soru.',
+  desc: 'Hesap tablosu: formüller, doldurma, yazdırma üzerine 11 soru.',
   qs: [
     { t: 'Formül', pic: '=', q: 'B2 ile B5 arasındaki sayıların toplamını bulan formül hangisidir?', opts: ['=TOPLA(B2:B5)', '=B2+B5', 'TOPLA B2 B5'], ok: 0, why: 'Formüller = ile başlar. TOPLA(B2:B5) iki nokta ile aralığı verir: B2, B3, B4 ve B5.' },
     { t: 'Otomatik doldurma', pic: '■ ↓', q: 'A2 hücresine Ocak yazdınız. Aralık\'a kadar devam ettirmenin en hızlı yolu hangisi?', opts: ['Her ayı tek tek yazmak', 'Hücrenin sağ alt köşesindeki kareyi aşağı çekmek', 'Hücreyi silmek'], ok: 1, why: 'Doldurma tutamacı ay, gün ve sayı listelerini kendiliğinden devam ettirir.' },
@@ -664,7 +664,7 @@ export const test11 = test({
 
 export const test12 = test({
   id: 'test12', no: 12, title: '12. hafta testi',
-  desc: 'Sunu: slayt düzenleri, çoğaltma, Slayt Sıralayıcı, SmartArt, geçiş ve animasyon farkı, anı albümü, PDF/video çıktısı üzerine 12 soru.',
+  desc: 'Sunu: slayt düzenleri, SmartArt, geçiş ve animasyon üzerine 12 soru.',
   qs: [
     { t: 'Slayt nedir?', pic: '📙', q: 'Bir sunudaki her bir sayfaya ne denir?', opts: ['Slayt', 'Hücre', 'Paragraf'], ok: 0, why: 'Sununun her sayfasına slayt denir. Kısa başlık, birkaç madde ve resim koyulur.' },
     { t: 'Az yazı', pic: '✍', q: 'Slaytlara yazı nasıl yazılmalıdır?', opts: ['Kısa maddelerle, az yazıyla', 'Uzun paragraflarla, bütün bilgiyi sığdırarak', 'En küçük punto ile'], ok: 0, why: 'Dinleyiciler okumaya değil sizi dinlemeye bakmalı. Slayta kısa maddeler ve resim koyulur.' },
@@ -683,7 +683,7 @@ export const test12 = test({
 
 export const test13 = test({
   id: 'test13', no: 13, title: '13. hafta testi',
-  desc: 'Günlük işler: ekran görüntüsü, fotoğraf kaydetme, tarayıcı, PDF dosyaları ve bilgisayarda mesajlaşma üzerine 12 soru.',
+  desc: 'Günlük işler: ekran görüntüsü, tarayıcı, PDF üzerine 12 soru.',
   qs: [
     { t: 'Ekran görüntüsü', pic: '📸', q: 'Bütün ekranın resmini almak için hangi tuşa basılır?', opts: ['Print Screen (PrtSc)', 'Caps Lock', 'Insert'], ok: 0, why: 'PrtSc bütün ekranı panoya alır; Paint\'e Ctrl + V ile yapıştırılır.' },
     { t: 'Kopyala ve taşı', pic: '⧉ ✂', q: 'Bir dosyayı USB belleğe kopyalarsanız asıl dosya ne olur?', opts: ['Yerinde kalır', 'Silinir', 'Bozulur'], ok: 0, why: 'Kopyalamada dosya iki yerde olur; taşımada asıl yerinden alınır.' },
@@ -702,7 +702,7 @@ export const test13 = test({
 
 export const test14 = test({
   id: 'test14', no: 14, title: '14. hafta testi',
-  desc: 'İnternette işlemler: e-Devlet, MHRS, e-Nabız, alışveriş, görüntülü görüşme ve ilan sitelerinde güvenlik üzerine 10 soru.',
+  desc: 'e-Devlet, MHRS, alışveriş ve ilan sitelerinde güvenlik üzerine 10 soru.',
   qs: [
     { t: 'Resmî site', pic: '🇹🇷', q: 'Devletin resmî sitelerinin adresi nasıl biter?', opts: ['.gov.tr', '.xyz', '.com'], ok: 0, why: '.gov.tr devlet kurumlarına verilir. turkiye-gov-giris.com gibi benzer adresler sahte olabilir.' },
     { t: 'Barkodlu belge', pic: '📄 ||||', q: 'e-Devlet\'ten aldığınız belgenin doğruluğunu karşı taraf nasıl kontrol eder?', opts: ['Belgedeki barkod numarasıyla e-Devlet\'te doğrulayarak', 'Yazıcıdan bakarak', 'Telefonla arayarak şifre sorarak'], ok: 0, why: 'Barkodlu belge, e-Devlet\'te barkod numarası yazılarak doğrulanır.' },

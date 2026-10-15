@@ -127,7 +127,7 @@ function ekranAyari(el, c) {
 
 export const videoHz = {
   id: 'video-hz', icon: '🎞', title: 'Video kalitesi (360p, 1080p, 4K) ve Hz nedir?', minutes: 30, stage: 'scene',
-  desc: 'Videodaki 144p, 720p, 1080p, 4K ne demek; kalite arttıkça netlik ve internet harcaması nasıl artar; ekranın yenileme hızı (Hz) nedir, 60 Hz ile 144 Hz farkı; ekran çözünürlüğü ayarı.',
+  desc: 'Video kalitesi (720p, 4K) ve ekran yenileme hızı (Hz) ne demek?',
   summary: [
     ['144p, 360p, 720p, 1080p, 4K', 'Videonun netliği; sayı büyüdükçe daha net, daha çok internet harcar'],
     ['Çözünürlük', 'Ekranda yan yana kaç nokta (piksel) olduğu: 1920 × 1080 = Full HD'],

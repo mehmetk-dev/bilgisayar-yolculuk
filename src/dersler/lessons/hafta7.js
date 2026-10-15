@@ -5,7 +5,7 @@ const paintOpen = (c) => maxed(c, 'paint');
 
 export const paint = {
   id: 'paint', icon: '🎨', title: 'Paint ile resim', minutes: 25, stage: 'desktop',
-  desc: 'Kalem, renk, fırça, şekiller, doldurma, yazı, silgi, geri alma, kaydetme ve arka plan yapma.',
+  desc: 'Kalem, renk, fırça, şekiller, yazı, silgi, kaydetme, arka plan yapma.',
   summary: [
     ['✏ Kalem / 🖌 Fırça', 'Sol tuşu basılı tutup çizin'],
     ['Renkler', 'Önce renge tıklayın, sonra çizin'],

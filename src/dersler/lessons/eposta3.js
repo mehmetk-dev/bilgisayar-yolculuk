@@ -9,7 +9,7 @@ const br = (c, url) => maxed(c, 'browser', url ? { url } : {});
 
 export const epostaIletme = {
   id: 'eposta-iletme', icon: '↪', title: 'E-posta: yanıtla, ilet, Bilgi (Cc), Gizli (Bcc) ve taslak', minutes: 30, stage: 'desktop',
-  desc: 'Yanıtlamak ile iletmenin farkı, çok kişiye posta atarken Bilgi (Cc) ve Gizli (Bcc) kullanımı, yarım kalan postayı Taslaklar\'da bulmak.',
+  desc: 'Yanıtlamak ile iletmenin farkı, Bilgi (Cc) ve Gizli (Bcc), Taslaklar.',
   summary: [
     ['↩ Yanıtla', 'Yalnızca size yazana cevap verir'],
     ['↪ İlet', 'Postayı başka birine gönderir; “Kime”yi siz yazarsınız'],
@@ -105,7 +105,7 @@ export const epostaIletme = {
 
 export const ekTasi = {
   id: 'ek-tasi', icon: '📎', title: 'Gelen belgeleri indirmek ve kendi klasörünüze taşımak', minutes: 25, stage: 'desktop',
-  desc: 'E-postayla gelen fatura ve tahlil sonucunu İndirilenler klasöründe bulup Belgeler içindeki kendi klasörünüze taşımak; dosyaya anlaşılır ad vermek.',
+  desc: 'E-postayla gelen belgeyi bulup kendi klasörünüze taşımak.',
   summary: [
     ['⬇ İndir', 'Eki bilgisayara kaydeder (İndirilenler)'],
     ['İndirilenler', 'Her indirme önce buraya düşer; zamanla dağılır'],
@@ -173,7 +173,7 @@ export const ekTasi = {
 
 export const sifreSifirla = {
   id: 'sifre-sifirla', icon: '🔑', title: '“Şifremi unuttum!” Şimdi ne olacak?', minutes: 25, stage: 'desktop',
-  desc: 'E-posta ya da e-Devlet şifresini unutunca panik yapmadan sıfırlamak: “Şifremi unuttum”, telefona gelen SMS kodunu ekrana girmek, yeni şifre belirlemek, güvenli şifre defteri.',
+  desc: 'Unutulan şifreyi SMS koduyla sıfırlamak, güvenli şifre defteri.',
   summary: [
     ['Giriş sayfası', '“Şifremi unuttum” bağlantısı genellikle şifre kutusunun altındadır'],
     ['Doğrulama kodu', 'SMS ile gelir; yalnızca ilgili sayfaya yazılır'],

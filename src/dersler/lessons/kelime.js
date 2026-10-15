@@ -15,7 +15,7 @@ const today = () => new Date().toLocaleDateString('tr-TR');
 
 export const dilekce = {
   id: 'dilekce', icon: '📘', title: 'Kelime işlemci: dilekçe yazalım', minutes: 40, stage: 'desktop',
-  desc: 'Kelime işlemciyi açmak, yazı yazmak, kalın, ortalama, yazı boyutu, iki yana yaslama, tarih ekleme, kaydetme ve yazdırma.',
+  desc: 'Yazı yazmak, kalın, ortalama, yazı boyutu, kaydetme ve yazdırma.',
   summary: [
     ['Ctrl + B', 'Kalın (K düğmesi)'],
     ['Ctrl + I / Ctrl + U', 'İtalik / altı çizili'],
@@ -130,7 +130,7 @@ export const dilekce = {
 
 export const belgeEkle = {
   id: 'belge-ekle', icon: '▦', title: 'Kelime işlemci: liste, tablo, resim', minutes: 40, stage: 'desktop',
-  desc: 'Ekle sekmesi: tablo ekleyip doldurmak (Tab ile hücreden hücreye), madde işaretli liste, yazı rengi, resim ekleme, PDF olarak kaydetme.',
+  desc: 'Tablo ekleyip doldurmak, madde işaretli liste, resim, PDF olarak kaydetme.',
   summary: [
     ['Ekle → Tablo', 'Satır ve sütun sayısını seçip tablo ekler'],
     ['Tab', 'Tabloda bir sonraki hücreye geçer (Shift + Tab: geri)'],
@@ -218,7 +218,7 @@ const whenDoc = (test) => (ev, c) => docEvents.includes(ev.type) && !!test(c);
 
 export const belgeDuzen = {
   id: 'belge-duzen', icon: '📰', title: 'Kelime işlemci: başlıklar, bul-değiştir, yazım denetimi', minutes: 40, stage: 'desktop',
-  desc: 'Hazır bir mahalle bültenini düzenlemek: Konu Başlığı ve Başlık 1 stilleri, Bul ve Değiştir (Ctrl + H), yazım denetimi (F7), vurgu rengi, kenar boşlukları, sözcük sayısı.',
+  desc: 'Bülteni düzenlemek: stiller, Bul ve Değiştir, yazım denetimi, kenar boşlukları.',
   summary: [
     ['Giriş → Stiller', 'Normal, Başlık 1, Başlık 2, Konu Başlığı: tek tıkla hazır başlık biçimi'],
     ['Ctrl + F', 'Bul: belgede bir kelimeyi bulur'],

@@ -4,7 +4,7 @@ import { info, ayir, sec } from './kalip.js';
 
 export const isg = {
   id: 'isg', icon: '🦺', title: 'Sağlıklı ve güvenli çalışma', minutes: 20, stage: 'scene',
-  desc: 'Ekranın yüksekliği ve uzaklığı, doğru oturuş, mola, ekran parlaklığı, kablolar ve priz, statik elektrik, elektrik yangını ve acil durum.',
+  desc: 'Doğru oturuş, mola, ekran parlaklığı, kablolar ve priz güvenliği.',
   summary: [
     ['Ekran', 'Bir kol boyu (50–70 cm) uzakta; üst kenarı göz hizasında ya da biraz altında'],
     ['Oturuş', 'Sırt dik ve desteklenmiş, ayaklar yerde, dirsekler 90 derece, bilekler düz'],

@@ -8,7 +8,7 @@ const hungWord = (c) => c.d.wins.find((w) => w.app === 'word' && w.hung);
 
 export const gorev = {
   id: 'gorev', icon: '📊', title: 'Program dondu! Görev Yöneticisi', minutes: 30, stage: 'desktop',
-  desc: 'Yanıt vermeyen programı Görev Yöneticisi ile kapatmak, işlemci ve bellek kullanımına bakmak, bilgisayarı yavaş açan başlangıç uygulamalarını kapatmak.',
+  desc: 'Yanıt vermeyen programı kapatmak, bilgisayarı yavaşlatan şeylere bakmak.',
   summary: [
     ['Görev çubuğuna sağ tık → Görev Yöneticisi', 'Görev Yöneticisi\'ni açar'],
     ['Ctrl + Shift + Esc', 'Görev Yöneticisi\'ni doğrudan açar'],

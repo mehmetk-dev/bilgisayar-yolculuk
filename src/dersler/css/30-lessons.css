@@ -274,35 +274,11 @@ button:hover, .btn:hover { border-color: #aab2bd; }
 .btn.primary:hover, button.primary:hover { background: #0a49ab; border-color: #0a49ab; }
 /* üst çubuk */
 #top { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 1px solid var(--line); padding: 0.45em 1.2em; }
-.brand { font-weight: 600; font-size: 1.05em; }
-.brand span { color: var(--mut); font-weight: 400; }
+.brand { font-weight: 800; font-size: 1.15em; }
+.brand span { background: linear-gradient(90deg, #0a5dc2, #7a4cf0, #ef5da8); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; }
 #crumb { font-weight: 500; }
-#top button, #top .btn { color: var(--mut); border-radius: 6px; font-weight: 400; }
-#top button:hover, #top .btn:hover { color: var(--fg); background: #f2f4f6; }
-#top .seg { background: none; border: 1px solid var(--line); border-radius: 6px; }
-#top .seg .fs-s { border-radius: 5px 0 0 5px; } #top .seg .fs-l { border-radius: 0 5px 5px 0; }
-/* ana sayfa */
-#home { padding: 2.2em 1.2em 4em; }
-.hero { margin-bottom: 1.6em; }
-.hero h1 { font-size: 1.7em; font-weight: 600; }
-.hero p { max-width: 44em; }
-.live, .live.robo { background: #fff; color: var(--fg); box-shadow: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.8em 1.1em; margin-bottom: 0.8em; margin-top: 0; transition: border-color 0.15s; }
-.live:hover { filter: none; border-color: var(--acc); }
-.live-txt b { font-size: 1.05em; font-weight: 600; }
-.live-txt small { color: var(--mut); opacity: 1; }
-.live-go, .live.robo .live-go { background: none; color: var(--acc); font-weight: 600; padding: 0; }
+#home { padding: 1.8em 1.2em 4em; }
 #cards { margin-top: 1.6em; gap: 2em; }
-.week h2 { font-size: 1.05em; font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 0.45em; margin-bottom: 0.8em; }
-.week h2 span { background: none; color: var(--mut); font-size: 0.85em; font-weight: 500; padding: 0; border-radius: 0; min-width: 4.2em; }
-.lcard { border: 1px solid var(--line); border-radius: 10px; padding: 0.9em 1em; transition: border-color 0.15s; }
-.lcard:hover { border-color: #b4bcc7; }
-.lcard.done { border-color: var(--line); }
-.lcard.link { background: #fafbfc; border-style: solid; }
-.licon { font-size: 1.4em; filter: grayscale(1); opacity: 0.7; }
-.lno { color: var(--mut); font-weight: 600; }
-.lcard h3 { font-size: 1.05em; font-weight: 600; }
-.tag { background: none; border: 1px solid var(--line); }
-.tag.ok { background: none; border-color: #b9dcc4; }
 /* ders paneli */
 #lesson { padding: 1.2em 1.4em; gap: 1.2em; }
 #guide, #scene { border: 1px solid var(--line); border-radius: 10px; }
@@ -334,7 +310,6 @@ button:hover, .btn:hover { border-color: #aab2bd; }
 .tb-bar button { border-radius: 6px; }
 /* alıştırma bilgisayarının dış çerçevesi incelsin (içi aynı kalır) */
 .dk { border-width: 3px; border-color: #3a4352; border-radius: 10px; box-shadow: none; }
-.lcard .btn.primary, .oz-btns .btn.primary { background: #fff; color: var(--acc); border-color: var(--acc); font-weight: 600; }
-.lcard .btn.primary:hover { background: var(--acc-bg); border-color: var(--acc); }
+.oz-btns .btn.primary { background: #fff; color: var(--acc); border-color: var(--acc); font-weight: 600; }
 .qz-exp { border-width: 1px; border-radius: 8px; }
 .qz-opts .btn.right { border-color: var(--ok); }

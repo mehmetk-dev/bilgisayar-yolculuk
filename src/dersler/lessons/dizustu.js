@@ -6,7 +6,7 @@ const pad = (inner) => `<div class="qz-pic" style="font-size:2.2em">${inner}</di
 
 export const dizustu = {
   id: 'dizustu', icon: '💻', title: 'Dizüstü bilgisayar ve touchpad', minutes: 30, stage: 'scene',
-  desc: 'Dokunmatik yüzeyde (touchpad) tek ve iki parmak hareketleri, yazarken avucun değmesi, pil ve şarj, kapağı kapatınca ne olur, Fn tuşuyla yanlışlıkla kapanan ses ve Wi-Fi, touchpad\'i kapatmak, taşırken dikkat.',
+  desc: 'Touchpad hareketleri, pil ve şarj, kapağı kapatınca ne olur.',
   summary: [
     ['Tek parmak', 'İmleci oynatır; hafifçe dokunmak = tık'],
     ['İki parmak dokunuş', 'Sağ tık'],

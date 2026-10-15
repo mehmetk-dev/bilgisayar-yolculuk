@@ -46,7 +46,7 @@ const tabHtml = (o) => `${o.mock}${fact(o.rows)}${o.note ? `<p class="tb-note">$
 
 export const isletimSistemleri = {
   id: 'isletim-sistemleri', icon: '🪟', title: 'İşletim sistemleri: Windows 7, 8, 10, 11, Linux ve Pardus', minutes: 30, stage: 'scene',
-  desc: 'İşletim sistemi nedir? Windows\'un sürümleri nasıl tanınır, hangisinin desteği bitti; Linux, açık kaynak ve yerli sistemimiz Pardus; hangi sistemi kullandığınızı nasıl öğrenirsiniz.',
+  desc: 'İşletim sistemi nedir; Windows, Linux ve yerli sistemimiz Pardus.',
   summary: [
     ['İşletim sistemi', 'Bilgisayarın yöneticisi: parçalarla programlar arasında köprü kurar'],
     ['Windows 7 (2009)', 'Yuvarlak Başlat düğmesi; desteği 2020\'de bitti'],

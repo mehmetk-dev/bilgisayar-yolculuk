@@ -7,7 +7,7 @@ const ayarlar = (c) => c.d.ensure('settings');
 
 export const bluetooth = {
   id: 'bluetooth', icon: '🎧', title: 'Bluetooth: kablosuz kulaklık ve hoparlör', minutes: 25, stage: 'desktop',
-  desc: 'Bluetooth\'u açmak, kablosuz kulaklık ya da hoparlör eşleştirmek, tanımadığınız cihazlara bağlanmamak, Bluetooth\'u ve uçak modunu kapatıp açmak.',
+  desc: 'Bluetooth\'u açmak, kablosuz kulaklık ya da hoparlör eşleştirmek.',
   desktop: { settings: { bluetooth: false } },
   summary: [
     ['Ayarlar → Bluetooth ve cihazlar', 'Bluetooth\'u açın, ＋ Cihaz ekle'],
@@ -114,7 +114,7 @@ export const bluetooth = {
 
 export const hesapPin = {
   id: 'hesap-pin', icon: '🔐', title: 'Bilgisayara şifre ve PIN koymak, ekranı kilitlemek', minutes: 25, stage: 'desktop',
-  desc: 'Bilgisayar açılırken şifre ya da PIN istemek, şifreyi değiştirmek, yerinizden kalkarken ekranı kilitlemek (⊞ + L), ortak kullanım için ayrı hesaplar.',
+  desc: 'Şifre ya da PIN koymak, ekranı kilitlemek (⊞ + L), ayrı hesaplar.',
   summary: [
     ['Ayarlar → Hesaplar', 'Şifre değiştirme, PIN ekleme'],
     ['Şifre', '8+ karakter, büyük-küçük harf ve rakam; ad, doğum yılı olmasın'],

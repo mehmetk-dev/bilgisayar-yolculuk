@@ -5,7 +5,7 @@ const hasCI = (c, word) => norm(c.np.value).split(/\s+/).includes(norm(word));
 
 export const klavye = {
   id: 'klavye', icon: '⌨', title: 'Klavyeyi tanıyalım', minutes: 25, stage: 'notepad',
-  desc: 'Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, işaretler ve ok tuşları.',
+  desc: 'Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, ok tuşları.',
   summary: [
     ['Boşluk', 'Kelimeler arasına boşluk'],
     ['Enter', 'Alt satıra geç'],

@@ -6,7 +6,7 @@ const ayarlarda = (page) => (c) => { const w = c.d.ensure('settings'); w.api.go(
 
 export const fareAyar = {
   id: 'fare-ayar', icon: '🖱', title: 'Fareyi kendinize göre ayarlayın', minutes: 25, stage: 'desktop',
-  desc: 'Çift tıklamakta zorlananlar için hız ayarı, sol elini kullananlar için düğme değişimi, kaybolan imleci büyütmek ve renklendirmek.',
+  desc: 'Fare hızını, düğmeleri ve imleç boyutunu kendinize göre ayarlamak.',
   desktop: { settings: { dblSpeed: 10 } },
   summary: [
     ['Ayarlar → Bluetooth ve cihazlar → Fare', 'Çift tıklama hızı, birincil düğme'],
@@ -111,7 +111,7 @@ export const fareAyar = {
 
 export const okumaKolay = {
   id: 'okuma-kolay', icon: '🔍', title: 'Gözümüz yorulmasın: Büyüteç ve okuma kolaylıkları', minutes: 20, stage: 'desktop',
-  desc: 'Küçük yazıları büyütmek: Ctrl ile fare tekerleği, Windows Büyüteç aracını açıp kapatmak ve yakınlaştırma düzeyini ayarlamak.',
+  desc: 'Küçük yazıları büyütmek: Ctrl + fare tekerleği ve Windows Büyüteç.',
   summary: [
     ['Ctrl + fare tekerleği', 'Pencerede yazıyı büyütür / küçültür'],
     ['Ctrl + artı / eksi', 'Aynı iş, klavyeyle'],

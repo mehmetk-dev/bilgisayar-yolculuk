@@ -16,7 +16,7 @@ const TARAMA = [`<p class="pdf-org">T.C. TAPU VE KADASTRO</p><h3>Tapu örneği (
 
 export const pdfCalis = {
   id: 'pdf-calis', icon: '📑', title: 'PDF dosyalarıyla çalışmak (fatura, tahlil, belge)', minutes: 30, stage: 'desktop',
-  desc: 'İndirilen PDF belgesini açmak, sayfalar arasında gezinmek, içinde kelime aramak, yan taranmış sayfayı döndürmek; indirme ve yazıcı simgelerini ayırt etmek.',
+  desc: 'PDF belgesini açmak, sayfalar arasında gezinmek, içinde kelime aramak.',
   summary: [
     ['PDF', 'Fatura, tahlil, resmî yazı… her bilgisayarda aynı görünür; yalnızca okunur'],
     ['◀ ▶', 'Önceki / sonraki sayfa'],
@@ -98,7 +98,7 @@ export const pdfCalis = {
 
 export const whatsappWeb = {
   id: 'mesajlas-web', icon: '💬', title: 'WhatsApp Web: telefondaki mesajlar bilgisayarda', minutes: 35, stage: 'desktop',
-  desc: 'WhatsApp\'ı karekod (QR) okutarak bilgisayarda açmak (alıştırma sitesi gerçeğine benzer); belge göndermek; gelen fotoğrafı indirip yazdırmak; sahte bağlantıları tanımak; işiniz bitince oturumu kapatmak.',
+  desc: 'WhatsApp\'ı bilgisayarda açmak, belge göndermek, sahte bağlantıları tanımak.',
   summary: [
     ['Karekod (QR)', 'Telefonunuzdan okutulur; telefonunuzla bilgisayar eşleşir'],
     ['📎 Ataş', 'Bilgisayardaki belge ya da fotoğrafı sohbete ekler'],

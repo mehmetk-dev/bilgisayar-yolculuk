@@ -22,7 +22,7 @@ const AD_FARKI = `<table class="tbl"><tr><th></th><th>Edge</th><th>Chrome</th><t
 
 export const tarayicilarBilgi = {
   id: 'tarayicilar', icon: '🧭', title: 'Tarayıcılar: Edge, Chrome, Firefox ve diğerleri', minutes: 25, stage: 'scene',
-  desc: 'Tarayıcı nedir, hangi tarayıcılar var, nerede bulunur; tarayıcı ile arama motoru (Google, Bing) arasındaki fark; varsayılan tarayıcı ve güncelleme; aynı işin farklı adları.',
+  desc: 'Tarayıcı nedir, hangileri var; tarayıcı ile arama motorunun farkı.',
   summary: [
     ['Tarayıcı', 'İnternet sitelerini açan program: Edge, Chrome, Firefox, Safari, Opera, Brave'],
     ['Arama motoru', 'Sitelerin fihristi: Google, Bing, Yandex, DuckDuckGo. Tarayıcının içinde kullanılır'],

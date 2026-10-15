@@ -30,7 +30,7 @@ const kbIntro = '<div class="fq-big">⌨ Q &nbsp;·&nbsp; F</div>';
 
 export const fqKlavye = {
   id: 'fq-klavye', icon: '⌨', title: 'F klavye ve Q klavye: fark nedir?', minutes: 20, stage: 'scene',
-  desc: 'Türkiye\'de kullanılan iki klavye düzeni: Q (bilgisayarlarda yaygın) ve F (Türkçe için tasarlanmış, daktilodan tanıdık). Hangisini kullandığınızı nasıl anlarsınız, hangisi neden böyle?',
+  desc: 'Q ve F klavye düzeni: hangisini kullandığınızı nasıl anlarsınız?',
   summary: [
     ['Q klavye', 'Üst sıra QWERTY…; bilgisayarların çoğunda böyledir; dünyada yaygın düzenin Türkçeye uyarlaması'],
     ['F klavye', 'Üst sıra FGĞIOD…; 1955\'te Türkçenin harf sıklığına göre tasarlanmış; sesli harfler sol elin altında'],
@@ -89,7 +89,7 @@ const layoutNow = (c) => c.d.settings.kbLayout;
 
 export const klavyeDili = {
   id: 'klavye-dili', icon: '🌐', title: 'Klavye dili ve düzeni: TUR, ENG, Q, F', minutes: 30, stage: 'desktop',
-  desc: 'Sağ alttaki TUR / ENG yazısı, Alt + Shift ile klavye dilini değiştirmek, ş ğ ü neden çıkmaz, @ işareti, Ayarlar\'dan Türkçe F klavye eklemek ve kullanmak.',
+  desc: 'TUR / ENG yazısı, klavye dilini değiştirmek, ş ğ ü neden çıkmaz.',
   summary: [
     ['TUR / ENG', 'Sağ alttaki yazı: klavye dili. ENG\'de ş ğ ü ö ç ı yazılmaz'],
     ['Alt + Shift', 'Klavye dilini değiştirir (aynı iş: ⊞ Windows + Boşluk)'],

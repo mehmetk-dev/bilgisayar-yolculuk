@@ -20,7 +20,7 @@ const butceData = () => {
 
 export const hesap1 = {
   id: 'hesap1', icon: '📗', title: 'Hesap tablosu: hücreler ve formüller', minutes: 40, stage: 'desktop',
-  desc: 'Satır, sütun, hücre adresi; hücreye yazı ve sayı yazmak; formül yazmak; ∑ Otomatik Toplam; TOPLA ve ORTALAMA; değer değişince sonucun kendiliğinden güncellenmesi.',
+  desc: 'Satır, sütun, hücre; formül yazmak, TOPLA ve ORTALAMA.',
   summary: [
     ['Sütun', 'Yukarıdan aşağı: A, B, C…'],
     ['Satır', 'Soldan sağa: 1, 2, 3…'],
@@ -124,7 +124,7 @@ export const hesap1 = {
 
 export const hesap2 = {
   id: 'hesap2', icon: '📊', title: 'Hesap tablosu: biçim, sıralama, grafik', minutes: 35, stage: 'desktop',
-  desc: 'Fareyle hücre aralığı seçmek, kalın ve para birimi biçimi, durum çubuğundaki toplam, büyükten küçüğe sıralama, sütun grafiği, yazdırma.',
+  desc: 'Hücre aralığı seçmek, biçimlendirme, sıralama, sütun grafiği.',
   summary: [
     ['Sürükleyerek seçmek', 'Birden fazla hücreyi seçer (aralık): B2:B6'],
     ['K (Ctrl + B)', 'Kalın'],
@@ -218,7 +218,7 @@ const rows = [2, 3, 4, 5, 6, 7];
 
 export const hesap3 = {
   id: 'hesap3', icon: '🎓', title: 'Hesap tablosu: EĞER ve formül kopyalama', minutes: 40, stage: 'desktop',
-  desc: 'Not çizelgesi: bir formülü yazıp bütün satırlara kopyalamak (Ctrl + C / Ctrl + V ve doldurma tutamacı), göreli başvuru, EĞER ile “Geçti / Kaldı”, koşullu biçimlendirme, MAK ve EĞERSAY, formüllü tabloyu sıralamak.',
+  desc: 'Not çizelgesi: formülü kopyalamak, EĞER ile “Geçti / Kaldı”, koşullu biçim.',
   summary: [
     ['Ctrl + C → aralığı seç → Ctrl + V', 'Formülü birçok hücreye kopyalar'],
     ['Doldurma tutamacı', 'Seçili hücrenin sağ altındaki küçük kare: aşağı sürükleyince kopyalar'],
@@ -322,7 +322,7 @@ const kdv = (i, o = 0.2) => ALIS[i][2] * (1 + o);
 
 export const hesap4 = {
   id: 'hesap4', icon: '🧾', title: 'Hesap tablosu: sabit başvuru, ETOPLA, filtre', minutes: 35, stage: 'desktop',
-  desc: 'Alışveriş ve fatura listesi: yüzde, $ ile sabit başvuru (=C4*(1+$B$1)), oran değişince hepsinin güncellenmesi, ETOPLA ile kategori toplamı, filtre ile yalnızca istenen satırları göstermek.',
+  desc: 'Fatura listesi: yüzde, sabit başvuru ($), ETOPLA ve filtre.',
   summary: [
     ['%20', 'Yüzde: hücreye %20 yazılır, hesapta 0,2 olarak kullanılır'],
     ['$B$1', 'Sabit başvuru: formül kopyalanınca B1 değişmez'],

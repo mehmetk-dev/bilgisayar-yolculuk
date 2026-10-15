@@ -8,7 +8,7 @@ const ownText = (body) => body.split(/\n--- /)[0].trim();
 
 export const eposta = {
   id: 'eposta', icon: '✉', title: 'E-posta: okuma, yanıtlama, ek', minutes: 35, stage: 'desktop',
-  desc: 'Posta kutusunu açmak, postayı okumak, eki indirmek, yanıtlamak; fotoğraf ekleyip yeni posta göndermek; sahte postayı tanımak.',
+  desc: 'Postayı okumak, yanıtlamak, eki indirmek, yeni posta göndermek.',
   summary: [
     ['E-posta adresi', 'ad@ornek.com: Türkçe harf ve boşluk olmaz; @ için AltGr + Q'],
     ['Kalın yazılı posta', 'Henüz okunmamış'],

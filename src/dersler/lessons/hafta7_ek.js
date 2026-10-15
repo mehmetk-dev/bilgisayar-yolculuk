@@ -10,7 +10,7 @@ const shape = (kind, test = () => true) => (ev) => ev.type === 'paint-shape' && 
 
 export const evCiz = {
   id: 'ev-ciz', icon: '🏠', title: 'Paint ile ev çizelim', minutes: 25, stage: 'desktop',
-  desc: 'Şekil araçlarıyla bir ev: dikdörtgen gövde, çizgilerle çatı, kapı ve pencereler, sarı güneş, doldurma, fırçayla çimen; kaydetme.',
+  desc: 'Şekil araçlarıyla bir ev çizmek: gövde, çatı, kapı, güneş, çimen.',
   summary: [
     ['▭ Dikdörtgen', 'Bir köşeden karşı köşeye sürükleyin'],
     ['╱ Çizgi', 'Başlangıçtan bitişe sürükleyin'],
@@ -101,7 +101,7 @@ export const evCiz = {
 
 export const tebrikKarti = {
   id: 'tebrik-karti', icon: '🎂', title: 'Paint ile tebrik kartı', minutes: 25, stage: 'desktop',
-  desc: 'Orta seviye: arka planı boyamak, şekil ve doldurma, yazı eklemek, fırça kalınlığı, geri alma, kaydetme ve arka plan yapma.',
+  desc: 'Orta seviye: arka plan, şekil, yazı, fırça, kaydetme.',
   summary: [
     ['🪣 Boş tuvale Doldur', 'Bütün arka planı boyar'],
     ['A Metin', 'Tıklayın, yazın, Enter'],
@@ -184,7 +184,7 @@ export const tebrikKarti = {
 
 export const alintiPratik = {
   id: 'alinti-pratik', icon: '🆘', title: 'Ekran alıntısıyla yardım istemek', minutes: 20, stage: 'desktop',
-  desc: 'Bir hata sayfasının resmini almak, Paint\'te sorunlu yeri kırmızıyla işaretlemek ve kaydetmek: yardım isterken en büyük kolaylık.',
+  desc: 'Hata sayfasının resmini alıp Paint\'te işaretlemek: yardım isterken en büyük kolaylık.',
   summary: [
     ['⊞ + Shift + S', 'Gerçek bilgisayarda Ekran Alıntısı'],
     ['Alanı sürükleyin', 'Yalnızca gerekli kısmı alın'],
@@ -246,7 +246,7 @@ export const alintiPratik = {
 
 export const ayarlarParkur = {
   id: 'ayarlar-parkur', icon: '🏁', title: 'Ayarlar parkuru', minutes: 25, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: 11 görev, yönlendirme yok. Koyu mod, arka plan, parlaklık, yazı boyutu, Wi-Fi, saat dilimi, güncelleme. Süreler tutulur.',
+  desc: 'Orta seviye: 11 görev, yönlendirme yok. Süreler tutulur.',
   steps: [
     {
       title: 'Ayarlar parkuru',

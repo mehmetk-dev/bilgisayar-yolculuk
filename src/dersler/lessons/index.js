@@ -63,7 +63,7 @@ import { aramaPratik, tuzaklar, internetParkur } from './hafta8_ek.js';
 
 const donanimDersi = {
   link: 'bilgisayar.html#ders', icon: '🎓', title: 'Donanım dersi: kasanın içi adım adım (3B)',
-  desc: '22 adım: anakart, işlemci (i5, nesil ne demek?), RAM (geçici hafıza), disk, SSD, ekran kartı, güç kaynağı, fan, kablolar, portlar; her adımda günlük hayattan örnek ve sınıfa soru.',
+  desc: '22 adım: anakart, işlemci, RAM, disk, ekran kartı, güç kaynağı ve portlar.',
 };
 
 const yolculuk = {

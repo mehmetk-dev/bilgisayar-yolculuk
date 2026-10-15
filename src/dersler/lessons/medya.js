@@ -6,7 +6,7 @@ const br = (c, url) => maxed(c, 'browser', url ? { url } : {});
 
 export const medya = {
   id: 'video-gazete', icon: '▶', title: 'İnternetten video izleme, radyo ve gazete okuma', minutes: 35, stage: 'desktop',
-  desc: 'Video aramak, reklamı atlamak, tam ekran yapıp Esc ile çıkmak, altyazı açmak, konuşmayı yavaşlatmak; internetten radyo dinlemek; gazete okurken reklamlardan ve galeri tuzaklarından kaçınmak.',
+  desc: 'Video izlemek, altyazı açmak, internetten radyo dinlemek.',
   summary: [
     ['🔍 Video ara', 'Konuyu yazın: “çay demleme”'],
     ['Reklamı atla ▶', 'Birkaç saniye sonra çıkar; reklamın kendisine tıklamayın'],

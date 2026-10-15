@@ -9,7 +9,7 @@ const KART = `<div class="kurs-kart">🪪 Kurs için verilen bilgiler<br>T.C. Ki
 
 export const eNabiz = {
   id: 'e-nabiz', icon: '🩺', title: 'e-Nabız: reçete ve tahlil sonuçlarınıza bakmak', minutes: 30, stage: 'desktop',
-  desc: 'MHRS\'nin devamı: e-Nabız\'a e-Devlet üzerinden girmek (şifre yalnızca e-Devlet sayfasına yazılır); geçmiş reçetelere, tahlil sonuçlarına ve aile hekimi bilgilerine bakmak; sonucu PDF olarak indirmek.',
+  desc: 'e-Nabız\'a e-Devlet üzerinden girmek, tahlil sonuçlarına bakmak.',
   summary: [
     ['enabiz.gov.tr', '.gov.tr: devletin sitesi; “e-Devlet ile giriş yap” sizi e-Devlet\'e götürür'],
     ['Şifre nerede yazılır?', 'Yalnızca adres çubuğunda turkiye.gov.tr yazan sayfada; e-Nabız şifreyi görmez'],
@@ -111,7 +111,7 @@ export const eNabiz = {
 
 export const ilanTuzak = {
   id: 'ilan-tuzak', icon: '🏠', title: 'İlan sitelerinde arama ve kapora tuzakları', minutes: 30, stage: 'desktop',
-  desc: 'Emlak ve ikinci el sitelerinde il, oda ve fiyat filtresi kullanmak, fotoğrafları ve satıcıyı incelemek; sahte ilanları ve “önden kapora gönderin” dolandırıcılığını tanımak.',
+  desc: 'İlan sitelerinde filtre kullanmak, sahte ilanı ve kapora dolandırıcılığını tanımak.',
   summary: [
     ['Filtre', 'İl, oda sayısı ve en çok fiyat: arama sonucunu daraltır'],
     ['Satıcı bilgisi', 'Üyelik süresi, telefon doğrulaması'],
@@ -193,7 +193,7 @@ export const ilanTuzak = {
 
 export const eHizmetParkur = {
   id: 'ehizmet-parkur', icon: '🏁', title: 'e-Hizmet parkuru', minutes: 30, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: yönlendirme yok. e-Devlet\'ten belge indirmek, hastane randevusu alıp randevu belgesini indirmek, e-Nabız\'dan tahlil sonucu almak. Süreler tutulur.',
+  desc: 'Orta seviye: e-Devlet belgesi, hastane randevusu, e-Nabız. Süreler tutulur.',
   steps: [
     {
       title: 'e-Hizmet parkuru',

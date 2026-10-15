@@ -8,7 +8,7 @@ const pageFile = (c) => ['docs', 'desktop', 'downloads'].map((f) => c.d.fs.find(
 
 export const resimWeb = {
   id: 'resim-web-dosyalari', icon: '🖼', title: 'Resim ve web dosyaları: PNG, JPG, HTML', minutes: 40, stage: 'desktop',
-  desc: 'PNG ve JPG arasındaki fark (hangisi ne zaman); aynı resmi iki türde kaydetmek; web sayfasının aslında HTML adlı bir yazı dosyası olduğunu görmek: Not Defteri\'nde yazıp tarayıcıda açmak.',
+  desc: 'PNG ve JPG farkı; web sayfasının aslında bir yazı dosyası olduğunu görmek.',
   summary: [
     ['JPG (JPEG)', 'Fotoğraflar için: küçük boyutlu, çok renkli; her kaydedişte hafif kalite kaybı'],
     ['PNG', 'Çizim, logo, ekran alıntısı ve yazılı görseller için: net kenarlı, kayıpsız; saydam alan destekler'],

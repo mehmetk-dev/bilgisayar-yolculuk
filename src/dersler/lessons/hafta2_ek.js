@@ -6,7 +6,7 @@ const HOME = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon
 
 export const onparmak = {
   id: 'onparmak', icon: '🖐', title: 'On parmak: temel sıra', minutes: 25, stage: 'notepad',
-  desc: 'Doğru oturuş, parmakların klavyedeki yeri (A S D F – J K L Ş), F ve J\'deki çıkıntılar; kademeli yazma alıştırmaları.',
+  desc: 'Doğru oturuş, parmakların klavyedeki yeri (A S D F – J K L Ş).',
   summary: [
     ['Sol el', 'Serçe parmak A, yüzük S, orta D, işaret F'],
     ['Sağ el', 'İşaret J, orta K, yüzük L, serçe Ş'],
@@ -40,7 +40,7 @@ export const onparmak = {
 
 export const rakamlar = {
   id: 'rakamlar', icon: '🔢', title: 'Rakamlar ve sayılar', minutes: 25, stage: 'notepad',
-  desc: 'Rakam sırası, telefon numarası, tarih, saat, para tutarı, yüzde; sağdaki sayı tuşları ve Num Lock.',
+  desc: 'Rakam sırası, telefon numarası, tarih, para tutarı, sayı tuşları.',
   summary: [
     ['Rakam sırası', 'Harflerin üstündeki 1 2 3 … 0'],
     ['Tarih', '29.10.2026 (nokta: sağ alttaki . tuşu)'],
@@ -80,7 +80,7 @@ export const rakamlar = {
 
 export const isaretler = {
   id: 'isaretler', icon: '❗', title: 'İşaretler: ( ) / = " # €', minutes: 20, stage: 'notepad',
-  desc: 'Parantez, eğik çizgi, tire, eşittir, tırnak, alt çizgi, # ve € işaretleri. Shift ve AltGr ile hangi işaret yazılır?',
+  desc: 'Parantez, eğik çizgi, tire, tırnak, # ve € işaretleri: Shift ve AltGr.',
   summary: [
     ['Shift + 8 / Shift + 9', '( ve )'],
     ['Shift + 7', '/ (eğik çizgi)'],
@@ -110,7 +110,7 @@ export const isaretler = {
 
 export const klavyeOyun = {
   id: 'klavye-oyun', icon: '🧩', title: 'Klavye eşleştirme oyunu', minutes: 15, stage: 'scene',
-  desc: 'Tekrar: hangi tuş ne işe yarar? Hangi işaret Shift ile, hangisi AltGr ile yazılır? Kartları sürükleyerek ayırın.',
+  desc: 'Tekrar: hangi tuş ne işe yarar? Kartları sürükleyerek ayırın.',
   summary: [
     ['Silme', 'Backspace (sol), Delete (sağ)'],
     ['Hareket', 'Ok tuşları, Home, End, Tab'],

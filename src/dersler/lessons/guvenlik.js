@@ -16,7 +16,7 @@ const clue = (t, why) => `<span class="clue" title="${why}">${t}<em>${why}</em><
 
 export const guvenlik = {
   id: 'guvenlik', icon: '🛡', title: 'İnternette güvenlik', minutes: 20, stage: 'scene',
-  desc: 'Sahte mesaj, arama ve siteleri tanıma; doğrulama kodu, sahte virüs uyarısı ve güçlü şifre.',
+  desc: 'Sahte mesaj, arama ve siteleri tanımak; doğrulama kodu, güçlü şifre.',
   summary: [
     ['Acele ettiren, korkutan mesaj', 'Durun, düşünün, kimseye hemen bilgi vermeyin'],
     ['Şifre, kart bilgisi, SMS kodu', 'Bankanız ve devlet kurumları ASLA telefonla ya da SMS ile istemez'],

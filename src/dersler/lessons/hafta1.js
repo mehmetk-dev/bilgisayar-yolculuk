@@ -440,7 +440,7 @@ export const surukle = {
 
 export const pencereler = {
   id: 'pencereler', icon: '🪟', title: 'Pencereler', minutes: 20, stage: 'desktop',
-  desc: 'Program açma, küçültme, ekranı kaplama, kapatma, pencereyi sürükleme, görev çubuğundan geri getirme.',
+  desc: 'Program açma, küçültme, kapatma, pencereyi sürükleme.',
   summary: [
     ['—', 'Simge durumuna küçült: pencere görev çubuğuna iner'],
     ['☐', 'Ekranı kapla (büyüt)'],
@@ -559,7 +559,7 @@ export const pencereler = {
 // Her adım bir görev; süreler son adımda listelenir (eğitmen kimin nerede takıldığını görür)
 export const parkur = {
   id: 'parkur', icon: '🏁', title: 'Fare parkuru', minutes: 15, stage: 'desktop', parkur: true,
-  desc: 'Tekrar: 11 görevlik parkur. Her görevin süresi tutulur; sonunda kim nerede takıldı görülür.',
+  desc: 'Tekrar: 11 görevlik parkur. Her görevin süresi tutulur.',
   setup: (c) => put(c, 'desktop', 'çöp.txt', 'file', ''),
   steps: [
     {

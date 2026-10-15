@@ -86,7 +86,7 @@ const adim = (title, html, codes, times) => ({
 
 export const harfbul = {
   id: 'harfbul', icon: '🔤', title: 'Harf bulma alıştırması', minutes: 20, stage: 'scene', keyboard: true,
-  desc: 'Tuşların yerini yeni öğrenenler için: ekranda çıkan harfi klavyede bulun. Takılınca tuş yanar; zorlandığınız harfler tekrar sorulur.',
+  desc: 'Ekranda çıkan harfi klavyede bulun; zorlandığınız harfler tekrar sorulur.',
   summary: [
     ['Temel sıra', 'A S D F G H J K L Ş İ: parmakların beklediği sıra'],
     ['Üst sıra', 'Q W E R T Y U I O P Ğ Ü'],

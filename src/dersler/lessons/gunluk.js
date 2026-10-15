@@ -8,7 +8,7 @@ const PHOTO_SITE = 'www.ucretsiz-fotograflar.com.tr';
 
 export const gunlukPc = {
   id: 'gunluk-pc', icon: '🖥', title: 'Günlük işler: bilgisayarda', minutes: 35, stage: 'desktop',
-  desc: 'Bilgisayarın kendisinde: Print Screen ile bütün ekranın resmi, Paint\'e yapıştırıp kaydetme, fotoğrafı masaüstü arka planı yapma, dosyayı USB belleğe kopyalama, kopyalama ile taşımanın farkı.',
+  desc: 'Ekran görüntüsü almak, Paint\'e yapıştırmak, USB belleğe kopyalamak.',
   summary: [
     ['PrtSc (Print Screen)', 'Bütün ekranın resmini panoya alır; Paint\'te Ctrl + V'],
     ['⊞ + Shift + S', 'Ekranın istediğiniz bölümünün resmi (Ekran Alıntısı)'],
@@ -89,7 +89,7 @@ export const gunlukPc = {
 
 export const gunlukWeb = {
   id: 'gunluk-web', icon: '🌐', title: 'Günlük işler: tarayıcıda', minutes: 35, stage: 'desktop',
-  desc: 'İnternet tarayıcısında: fotoğraf indirmek (sağ tık → Resmi farklı kaydet ve İndir düğmesi), sayfadan yazı kopyalamak, tarayıcının web yakalama aracı, sayfayı yakınlaştırmak, sık kullanılanlara eklemek.',
+  desc: 'Tarayıcıda fotoğraf indirmek, yazı kopyalamak, yakınlaştırmak.',
   summary: [
     ['Resme sağ tık → Resmi farklı kaydet', 'Fotoğrafı istediğiniz klasöre kaydeder'],
     ['İndir düğmesi', 'Dosya İndirilenler klasörüne gider'],

@@ -12,7 +12,7 @@ const URL_PARTS = `<div class="url-anat"><span class="bu-scheme">https://</span>
 
 export const adres = {
   id: 'adres', icon: '🔗', title: 'İnternet adresini (URL) okumak', minutes: 40, stage: 'desktop',
-  desc: 'Adresin parçaları (https, www, alan adı, uzantı, sayfa), kilit simgesi ve site bilgileri, .gov.tr ve .com.tr, yazım hatası, sahte reklam, kilitli sahte site, alt alan adı tuzağı, “Güvenli değil”, adres önerileri, bildirim izni, adresi kopyalamak.',
+  desc: 'Adresin parçaları, kilit simgesi, sahte siteler ve “Güvenli değil” uyarısı.',
   summary: [
     ['Alan adı', 'Adresin ilk “/” işaretinden hemen önceki kısmı: sitenin asıl adı (turkiye.gov.tr)'],
     ['Sağdan sola okuyun', 'bankam.com.tr.hesap-dogrulama.xyz → site hesap-dogrulama.xyz\'nindir'],

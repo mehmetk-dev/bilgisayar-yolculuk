@@ -10,7 +10,7 @@ const onPage = (page) => ({ check: (c) => !!c.d.find('settings')?.el.querySelect
 
 export const saatTarih = {
   id: 'saat-tarih', icon: '🕒', title: 'Saati ve tarihi değiştirmek', minutes: 30, stage: 'desktop',
-  desc: 'Sağ alttaki saat yanlışsa ne olur (siteler açılmaz), saati otomatik ve elle ayarlamak, 24 saatlik biçim, takvim, saat dilimi; saat sürekli sıfırlanıyorsa neden.',
+  desc: 'Saat yanlışsa ne olur, otomatik ve elle ayarlamak, saat dilimi.',
   desktop: { settings: { autoTime: false, timeOffset: WRONG } },
   summary: [
     ['Sağ alttaki saate tıklayın', 'Takvim ve tarih açılır; “Tarih ve saat ayarları” bağlantısı da oradadır'],

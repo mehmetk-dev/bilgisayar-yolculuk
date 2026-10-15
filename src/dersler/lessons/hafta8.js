@@ -5,7 +5,7 @@ const brOpen = (c, url) => maxed(c, 'browser', url ? { url } : {});
 
 export const internet = {
   id: 'internet', icon: '🌐', title: 'İnternette gezinme ve indirme', minutes: 25, stage: 'desktop',
-  desc: 'Adres çubuğu ile arama farkı, sonuçlar, geri dönme, sekmeler, reklam tuzakları ve dosya indirme.',
+  desc: 'Adres çubuğu ile arama farkı, sekmeler, reklam tuzakları, dosya indirme.',
   summary: [
     ['Adres çubuğu', 'Adresi biliyorsanız yazın (www…); bilmiyorsanız aradığınızı kelimelerle yazın'],
     ['←', 'Bir önceki sayfaya dön'],
@@ -199,7 +199,7 @@ export const kurulum = {
 
 export const yazici = {
   id: 'yazici', icon: '🖨', title: 'Yazıcı ve sürücüler', minutes: 20, stage: 'desktop',
-  desc: 'Yazıcı ekleme, test sayfası, Not Defteri\'nden yazdırma, Aygıt Yöneticisi ile sürücü güncelleme.',
+  desc: 'Yazıcı ekleme, test sayfası, Not Defteri\'nden yazdırma, sürücü güncelleme.',
   summary: [
     ['Sürücü (driver)', 'Bir parçanın bilgisayarla anlaşmasını sağlayan küçük program'],
     ['Ayarlar → Bluetooth ve cihazlar → Yazıcılar', 'Cihaz ekle'],
@@ -276,7 +276,7 @@ const osWait = (screen) => (ev) => ev.type === 'os-screen' && ev.screen === scre
 
 export const oskurulum = {
   id: 'oskurulum', icon: '🪟', title: 'İşletim sistemi kurulumu (gösterim)', minutes: 20, stage: 'desktop',
-  desc: 'Windows\'un sıfırdan kurulumunu adım adım izleyin: dil, ürün anahtarı, disk, ilk ayarlar.',
+  desc: 'Windows\'un sıfırdan kurulumunu adım adım izleyin.',
   summary: [
     ['Önce yedek!', 'Kurulum, seçilen diskteki her şeyi silebilir'],
     ['Kurulum USB\'si', 'Windows\'un resmî aracıyla hazırlanır'],

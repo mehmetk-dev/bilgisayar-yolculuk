@@ -1,6 +1,6 @@
 :root {
   --fs: 20px;
-  --bg: #eef2f7;
+  --bg: #eef2f9;
   --card: #ffffff;
   --fg: #1c2430;
   --mut: #5a6676;
@@ -37,22 +37,27 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 #crumb { color: var(--mut); font-weight: 600; flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #crumb:not(:empty)::before { content: "›"; margin-right: 0.5em; }
 .sp { flex: 1; }
-/* Apple tarzı sade üst çubuk: çerçevesiz düğmeler, üzerine gelince hafif gri; yazı boyutu tek bölmeli denetim */
-#top button, #top .btn { font-size: 0.8em; padding: 0.3em 0.75em; border: 0; background: transparent; border-radius: 999px; font-weight: 500; color: var(--fg); transition: background 0.15s; }
-#top button:hover, #top .btn:hover { background: rgba(0,0,0,0.06); }
-#top button:active, #top .btn:active { background: rgba(0,0,0,0.1); }
-#top .seg { display: inline-flex; align-items: center; background: rgba(0,0,0,0.05); border-radius: 999px; margin: 0 0.2em; }
-#top .seg button { padding: 0.2em 0.85em; line-height: 1.4; color: var(--mut); }
-#top .seg button:hover { color: var(--fg); background: rgba(0,0,0,0.06); }
-#top .seg button + button { position: relative; }
-#top .seg button + button::before { content: ""; position: absolute; left: 0; top: 25%; bottom: 25%; width: 1px; background: rgba(0,0,0,0.18); }
-#top .seg .fs-s { font-size: 0.7em; border-radius: 999px 0 0 999px; }
-#top .seg .fs-l { font-size: 1em; border-radius: 0 999px 999px 0; }
+/* Üst çubuk: her düğmenin görünür çerçevesi ve rengi var; ne olduğu ve tıklanabilir olduğu hemen anlaşılır */
+#top { gap: 0.5em; padding: 0.55em 1em; }
+#top button, #top .btn { font-size: 0.8em; font-weight: 700; padding: 0.35em 0.9em; border: 2px solid var(--bc, #aab6c6); background: #fff; color: var(--bt, var(--fg)); border-radius: 999px; box-shadow: 0 1px 0 rgba(0,0,0,0.06); transition: background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s; }
+#top button:hover, #top .btn:hover { background: var(--bc, #aab6c6); color: #fff; border-color: var(--bc, #aab6c6); box-shadow: 0 4px 12px rgba(0,0,0,0.14); transform: translateY(-1px); }
+#top button:active, #top .btn:active { transform: translateY(0); box-shadow: none; }
+#who { --bc: #0a5dc2; --bt: #0a5dc2; }
+#soundBtn { --bc: #d9780f; --bt: #b45f00; }
+#top .btn[href="#ozet"] { --bc: #158a47; --bt: #0f7a3b; }
+#top .btn[href="robot.html"] { --bc: #7a4cf0; --bt: #6a3df0; }
+#top .btn[href="bilgisayar.html"] { --bc: #0a5dc2; --bt: #0a5dc2; }
+#top .seg { display: inline-flex; align-items: stretch; background: #fff; border: 2px solid #8a96a8; border-radius: 999px; overflow: hidden; margin: 0 0.2em; }
+#top .seg button { border: 0; border-radius: 0; box-shadow: none; padding: 0.15em 0.9em; line-height: 1.5; color: var(--fg); --bc: #8a96a8; }
+#top .seg button:hover { transform: none; box-shadow: none; }
+#top .seg button + button { border-left: 2px solid #8a96a8; }
+#top .seg .fs-s { font-size: 0.7em; }
+#top .seg .fs-l { font-size: 1em; }
 
 /* ana sayfa */
-#home { flex: 1; overflow-y: auto; padding: 1.5em 1em 3em; }
+#home { flex: 1; overflow-y: auto; padding: 1.5em 1em 3em; background: radial-gradient(60em 28em at 8% -5%, #ffd9ec88, transparent 60%), radial-gradient(54em 26em at 95% 0%, #cfe4ff, transparent 60%), radial-gradient(50em 30em at 55% 100%, #dcf7e4aa, transparent 60%); }
 .hero { max-width: 60em; margin: 0 auto 1.2em; }
-.hero h1 { font-size: 1.9em; }
+.hero h1 { font-size: 2.1em; letter-spacing: -0.01em; background: linear-gradient(90deg, #0a5dc2, #7a4cf0 55%, #ef5da8); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; }
 .hero p { color: var(--mut); font-size: 1.05em; }
 .live { max-width: 64em; margin: 0 auto 1.6em; display: flex; align-items: center; gap: 1em; padding: 1em 1.3em; border-radius: 18px; text-decoration: none; color: #fff; background: linear-gradient(120deg, #0a3d7a, #0a5dc2 55%, #3aa0ff); box-shadow: 0 8px 24px #0a5dc244; }
 .live.robo { margin-top: -0.8em; background: linear-gradient(120deg, #6a3df0, #a35cff 55%, #ff8a3d); box-shadow: 0 8px 24px #7a5cff44; }
@@ -65,20 +70,30 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 .live-txt small { font-size: 0.9em; opacity: 0.9; }
 .live-go { background: #fff; color: var(--acc); font-weight: 800; border-radius: 10px; padding: 0.4em 1em; white-space: nowrap; }
 #cards { max-width: 64em; margin: 0 auto; display: flex; flex-direction: column; gap: 1.4em; }
-.week h2 { font-size: 1.2em; display: flex; align-items: center; gap: 0.6em; margin-bottom: 0.5em; }
-.week h2 span { background: var(--acc); color: #fff; font-size: 0.75em; border-radius: 999px; padding: 0.15em 0.7em; white-space: nowrap; }
-.wcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19em), 1fr)); gap: 0.8em; }
-.lcard { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 0.9em; display: flex; gap: 0.7em; }
-.lcard.done { border-color: #9fd4b1; }
-.lcard.link { background: #f4f7fb; border-style: dashed; }
-.licon { font-size: 2.2em; line-height: 1; }
-.lmain { flex: 1; display: flex; flex-direction: column; }
+.week { --h: 215; --c1: hsl(var(--h) 80% 46%); --c2: hsl(calc(var(--h) + 28) 85% 58%); --tint: hsl(var(--h) 90% 95%); --deep: hsl(var(--h) 75% 34%); }
+.week h2 { font-size: 1.25em; display: flex; align-items: center; gap: 0.6em; margin-bottom: 0.6em; }
+.week h2 span { background: linear-gradient(135deg, var(--c1), var(--c2)); color: #fff; font-size: 0.72em; border-radius: 999px; padding: 0.2em 0.85em; white-space: nowrap; box-shadow: 0 3px 10px hsl(var(--h) 80% 50% / 0.35); }
+.wcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19em), 1fr)); gap: 0.9em; }
+.lcard { position: relative; background: var(--card); border: 2px solid hsl(var(--h) 45% 86%); border-top: 5px solid var(--c1); border-radius: 18px; padding: 0.9em; display: flex; gap: 0.75em; box-shadow: 0 6px 18px hsl(var(--h) 60% 40% / 0.1); transition: transform 0.15s, box-shadow 0.15s; }
+.lcard:hover { transform: translateY(-3px); box-shadow: 0 12px 26px hsl(var(--h) 60% 40% / 0.2); }
+.lcard.done { border-color: #8fd0a6; border-top-color: #1f9d55; background: linear-gradient(180deg, #f1fbf4, #fff 45%); }
+.lcard.link { background: var(--tint); border-style: dashed; border-top-style: solid; }
+.licon { flex: none; width: 2.1em; height: 2.1em; display: flex; align-items: center; justify-content: center; font-size: 1.6em; line-height: 1; border-radius: 0.3em; background: linear-gradient(145deg, var(--tint), hsl(var(--h) 90% 88%)); color: var(--deep); border: 1px solid hsl(var(--h) 60% 80%); }
+.licon .sv { width: 1.05em; height: 1.05em; display: block; }
+.printcard .sv, #printCard .sv { width: 1em; height: 1em; vertical-align: -0.1em; }
+.lmain { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .lno { font-size: 0.75em; font-weight: 700; color: var(--acc); text-transform: uppercase; letter-spacing: 0.06em; }
-.lcard h3 { font-size: 1.2em; margin: 0.1em 0 0.2em; }
-.lcard p { color: var(--mut); font-size: 0.9em; flex: 1; }
+.lcard h3 { font-size: 1.15em; margin: 0.1em 0 0.2em; color: var(--deep); }
+.lcard p { color: var(--mut); font-size: 0.9em; flex: 1; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; min-height: 4.05em; }
+.lcard h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .lfoot { display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap; margin-top: 0.6em; }
-.tag { font-size: 0.8em; background: #eef2f7; border-radius: 999px; padding: 0.15em 0.7em; color: var(--mut); }
+.tag { font-size: 0.8em; background: var(--tint); border-radius: 999px; padding: 0.15em 0.7em; color: var(--deep); font-weight: 600; }
 .tag.ok { background: var(--ok-bg); color: var(--ok); font-weight: 700; }
+.lcard .btn { border-color: var(--c1); color: var(--c1); font-weight: 700; border-radius: 999px; padding: 0.3em 1em; background: #fff; }
+.lcard .btn:hover { background: var(--tint); }
+.lcard .btn.primary { background: linear-gradient(135deg, var(--c1), var(--c2)); border-color: var(--c1); color: #fff; box-shadow: 0 3px 10px hsl(var(--h) 80% 50% / 0.35); }
+.lcard .btn.primary:hover { filter: brightness(1.08); background: linear-gradient(135deg, var(--c1), var(--c2)); }
+.lcard button.link { color: var(--c1); }
 
 /* ders ekranı */
 #lesson { flex: 1; display: grid; grid-template-columns: minmax(18em, 24em) 1fr; gap: 1em; padding: 1em; min-height: 0; }

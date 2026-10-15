@@ -9,7 +9,7 @@ const appOpen = (app) => ({
 
 export const donatilar = {
   id: 'donatilar', icon: '🗒', title: 'Yapışkan Notlar, Ses Kaydedici ve Alarm', minutes: 30, stage: 'desktop',
-  desc: 'Unutulmayacak işler için renkli notlar, konuşarak not almak ve ilaç ya da yemek için alarm ve zamanlayıcı kurmak.',
+  desc: 'Renkli notlar, konuşarak not almak, alarm ve zamanlayıcı kurmak.',
   summary: [
     ['🗒 Yapışkan Notlar', 'Kısa notlar; renkli kâğıtlar, kapatınca silinmez'],
     ['＋ Yeni not', 'Boş bir kâğıt açar'],

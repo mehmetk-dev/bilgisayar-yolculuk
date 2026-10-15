@@ -8,7 +8,7 @@ const ex = (c, folder) => maxed(c, 'explorer', { folder });
 
 export const zip = {
   id: 'zip', icon: '🗜', title: 'Sıkıştırılmış (zip) dosyalar ve ayrıntılar', minutes: 30, stage: 'desktop',
-  desc: 'Dosya Gezgini\'nde ayrıntılar görünümü (boyut, tarih, tür), sıralama, en büyük dosyayı bulmak; .zip dosyasını ayıklamak, klasörü sıkıştırmak, aramak.',
+  desc: 'Dosya Gezgini görünümleri, sıralama; zip dosyasını açmak ve klasörü sıkıştırmak.',
   summary: [
     ['☰ Ayrıntılar', 'Dosyaların boyutu, tarihi ve türü sütun sütun'],
     ['Sütun başlığına tık', 'O sütuna göre sıralar (bir daha tık: ters)'],
@@ -73,7 +73,7 @@ export const zip = {
 
 export const eposta2 = {
   id: 'eposta2', icon: '👥', title: 'E-posta: kişiler, imza ve istenmeyenler', minutes: 30, stage: 'desktop',
-  desc: 'İstenmeyen klasörüne yanlışlıkla düşen postayı kurtarmak, adres defterine kişi eklemek, adresin otomatik tamamlanması, imza oluşturmak.',
+  desc: 'İstenmeyen klasöründeki postayı kurtarmak, adres defteri, imza oluşturmak.',
   summary: [
     ['⚠ İstenmeyen', 'Şüpheli postalar buraya düşer; ara sıra kontrol edin'],
     ['✔ İstenmeyen değil', 'Yanlışlıkla oraya düşen postayı Gelen Kutusu\'na alır'],
@@ -128,7 +128,7 @@ export const eposta2 = {
 
 export const bulutPaylas = {
   id: 'bulut-paylas', icon: '☁', title: 'Büyük dosyayı buluttan paylaşmak', minutes: 35, stage: 'desktop',
-  desc: 'E-postaya sığmayan (25 MB\'den büyük) videoyu Bulut Depo\'ya yüklemek, “yalnızca eklediğim kişiler” ile paylaşmak, bağlantıyı kopyalayıp e-postayla göndermek, bağlantıyı açıp görmek.',
+  desc: 'Büyük videoyu Bulut Depo\'ya yükleyip bağlantıyla paylaşmak.',
   summary: [
     ['E-posta eki sınırı', 'Genellikle 25 MB'],
     ['☁ Bulut Depo → Yükle', 'Dosyayı internetteki deponuza koyar'],
@@ -200,7 +200,7 @@ const docEv = ['doc-input', 'doc-format', 'doc-replace', 'doc-hf', 'doc-pagenum'
 
 export const ozgecmis = {
   id: 'ozgecmis', icon: '👤', title: 'Şablondan özgeçmiş (CV)', minutes: 40, stage: 'desktop',
-  desc: 'Hazır şablondan özgeçmiş hazırlamak: [köşeli parantezleri] doldurmak, Bul ile kalan parantezleri bulmak, üst bilgi, alt bilgi ve sayfa numarası, PDF olarak kaydetmek.',
+  desc: 'Şablondan özgeçmiş hazırlamak, üst bilgi, sayfa numarası, PDF.',
   summary: [
     ['Dosya → Yeni… → şablon', 'Başlıkları ve düzeni hazır belge'],
     ['[Köşeli parantez]', 'Kendi bilginizle değiştirilecek yer'],
@@ -271,7 +271,7 @@ export const ozgecmis = {
 const X = (c) => c.d.find('sheet')?.api;
 export const butce = {
   id: 'butce', icon: '💰', title: 'Ev bütçesi ve pasta grafiği', minutes: 35, stage: 'desktop',
-  desc: 'Hazır bütçe şablonuyla aylık gelir ve giderleri yazmak; toplamların ve kalanın kendiliğinden değişmesi; pasta grafiğiyle giderlerin payını görmek; kaydetmek.',
+  desc: 'Bütçe şablonuyla gelir ve gider yazmak, toplamlar ve pasta grafiği.',
   summary: [
     ['Dosya → Yeni… → Aylık ev bütçesi', 'Formülleri hazır şablon'],
     ['Rakamı değiştirmek', 'Toplam ve kalan kendiliğinden hesaplanır'],

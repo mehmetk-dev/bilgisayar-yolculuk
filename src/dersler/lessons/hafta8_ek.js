@@ -8,7 +8,7 @@ const dec = (p) => { try { return decodeURIComponent(p || ''); } catch { return 
 
 export const aramaPratik = {
   id: 'arama-pratik', icon: '🔎', title: 'İnternette bilgi bulmak', minutes: 25, stage: 'desktop',
-  desc: 'Orta seviye: aramayla hava durumu, tarif ve haber bulmak; sayfayı okuyup soruyu cevaplamak; sekmeler, geri dönme.',
+  desc: 'Orta seviye: aramayla hava durumu, tarif ve haber bulmak; sekmeler.',
   summary: [
     ['Kısa arama', '“izmir hava durumu”, “mercimek çorbası tarifi”: birkaç anahtar kelime yeter'],
     ['Sonuçlar', 'Adrese (yeşil yazı) bakın; “Reklam” yazanları atlayın'],
@@ -98,7 +98,7 @@ export const aramaPratik = {
 
 export const tuzaklar = {
   id: 'tuzaklar', icon: '🪤', title: 'İnternetteki tuzakları tanıyalım', minutes: 20, stage: 'scene',
-  desc: 'Sahte indirme düğmeleri, “ödül kazandınız” pencereleri, bildirim izni, sahte güncelleme, çerez uyarısı, benzer adresler.',
+  desc: 'Sahte indirme düğmeleri, “ödül kazandınız” pencereleri, sahte güncelleme.',
   summary: [
     ['Büyük renkli İNDİR', 'Genellikle reklam'],
     ['“Kazandınız!”', 'Kapatın; kimse bedava telefon vermez'],
@@ -172,7 +172,7 @@ export const tuzaklar = {
 
 export const internetParkur = {
   id: 'internet-parkur', icon: '🏁', title: 'İnternet parkuru', minutes: 25, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: 11 görev, yönlendirme yok. Arama, sayfayı okuma, adres yazma, doğru bağlantıdan indirme, kurulumu başlatma. Süreler tutulur.',
+  desc: 'Orta seviye: 11 görev, yönlendirme yok. Süreler tutulur.',
   steps: [
     {
       title: 'İnternet parkuru',

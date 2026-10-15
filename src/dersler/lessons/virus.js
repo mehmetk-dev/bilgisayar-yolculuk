@@ -12,7 +12,7 @@ const ZARARLI = [
 
 export const virusAntivirus = {
   id: 'virus-antivirus', icon: '🦠', title: 'Virüsler ve antivirüs programları', minutes: 30, stage: 'scene',
-  desc: 'Virüs, truva atı, fidye ve casus yazılım nedir; nasıl bulaşır, hangi belirtileri verir; Windows Güvenliği ve ücretli antivirüsler; bulaştıysa ne yapılır; yedek almanın önemi.',
+  desc: 'Virüs nedir, nasıl bulaşır, belirtileri; bulaştıysa ne yapılır.',
   summary: [
     ['Nasıl bulaşır?', 'Tanımadığınız e-posta eki, “bedava” programlar, başkasından alınan USB, sahte “güncelle” düğmeleri'],
     ['Belirtiler', 'Birden yavaşlama, açılır reklam pencereleri, ana sayfanın değişmesi, tanımadığınız programlar'],

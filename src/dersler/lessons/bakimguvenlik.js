@@ -6,7 +6,7 @@ const ws = (page) => (c) => { const w = c.d.ensure('guvenlik'); w.api.onArgs?.({
 
 export const bakimGuvenlik = {
   id: 'bakim-guvenlik', icon: '🛡', title: 'Virüs taraması, güvenlik duvarı ve Disk Temizleme', minutes: 30, stage: 'desktop',
-  desc: 'Windows Güvenliği ile bilgisayarı ve takılan USB belleği virüslere karşı taratmak, güvenlik duvarını tanımak, Disk Temizleme ile gereksiz dosyaları silip yer açmak.',
+  desc: 'Virüs taraması, güvenlik duvarı ve gereksiz dosyaları silip yer açmak.',
   summary: [
     ['Windows Güvenliği', 'Windows\'un kendi virüs programı; ek program indirmeye gerek yok'],
     ['⚡ Hızlı tarama', 'Bilgisayarı birkaç dakikada tarar'],

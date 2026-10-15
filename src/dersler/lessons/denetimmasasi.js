@@ -8,7 +8,7 @@ const cpOpened = (item) => (ev) => ev.type === 'cp-open' && ev.item === item;
 
 export const denetimMasasi = {
   id: 'denetim-masasi', icon: '🎛', title: 'Denetim Masası', minutes: 35, stage: 'desktop',
-  desc: 'Windows\'un eski ayar paneli: nasıl açılır, kategori ve simge görünümü, arama; program kaldırmak, bilgisayarın RAM ve işlemcisine bakmak, ekran ve uyku süresini ayarlamak; Ayarlar\'la farkı.',
+  desc: 'Windows\'un eski ayar paneli: açmak, program kaldırmak, bilgisayara bakmak.',
   summary: [
     ['Nasıl açılır?', 'Başlat → “Denetim Masası” yazın; Windows 7\'de Başlat menüsünde hazırdır; ⊞ + R, control'],
     ['Kategori / Büyük simgeler', 'Sağ üstteki “Görüntüleme ölçütü”; simge görünümü daha hızlıdır'],

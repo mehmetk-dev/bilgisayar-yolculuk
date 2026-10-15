@@ -11,7 +11,7 @@ const info = (html) => (el) => { el.className = 'sc sc-info'; el.innerHTML = htm
 
 export const eslestir = {
   id: 'eslestir', icon: '🧩', title: 'Eşleştirme oyunları', minutes: 15, stage: 'scene',
-  desc: 'Tekrar: hangi iş hangi fare hareketiyle yapılır? Uyku mu, Kapat mı, Yeniden başlat mı? Kartları sürükleyerek ayırın.',
+  desc: 'Tekrar: hangi iş hangi fare hareketiyle yapılır? Kartları sürükleyerek ayırın.',
   summary: [
     ['Tek tık', 'Seçmek, düğmeye basmak'],
     ['Çift tık', 'Açmak (program, dosya, klasör)'],
@@ -113,7 +113,7 @@ function av({ title, q, codes, hint, done }) {
 
 export const tusavi = {
   id: 'tusavi', icon: '🎯', title: 'Tuş avı', minutes: 20, stage: 'notepad',
-  desc: 'Orta seviye: ekranda ipucu yanmadan, sorulan tuşu kendiniz bulun. Sonunda işaretler ve e-posta adresi.',
+  desc: 'Orta seviye: ekranda ipucu yanmadan, sorulan tuşu kendiniz bulun.',
   summary: [
     ['Enter', 'Alt satır'],
     ['⌫ Backspace / Delete', 'Soldakini / sağdakini siler'],
@@ -196,7 +196,7 @@ const FIX = ['Bugün', 'çok', 'güzel', 'Akşam', 'yemeğe'];
 
 export const kart = {
   id: 'kart', icon: '💌', title: 'Bayram kartı yazalım', minutes: 25, stage: 'notepad',
-  desc: 'Orta seviye: büyük harf, Türkçe harfler ve noktalama ile bir mesaj yazmak, yazım hatalarını düzeltmek, kaydetmek.',
+  desc: 'Orta seviye: bir mesaj yazmak, yazım hatalarını düzeltmek, kaydetmek.',
   summary: [
     ['Cümle başı', 'Büyük harfle başlar (Shift)'],
     ['Cümle sonu', 'Nokta (.), soru (?) ya da ünlem (!)'],
@@ -263,7 +263,7 @@ const count = (c, w) => items(c).filter((l) => closeEnough(l, w)).length;
 
 export const liste = {
   id: 'liste', icon: '🛒', title: 'Alışveriş listesini düzenleyin', minutes: 25, stage: 'notepad',
-  desc: 'Orta seviye: hazır bir listede satır taşıma, ekleme, silme, geri alma, çoğaltma ve kaydetme. Nasıl yapılacağı yazmaz.',
+  desc: 'Orta seviye: listede satır taşıma, ekleme, silme ve kaydetme.',
   setup: (c) => { if (!c.np.value.trim()) c.np.setText(LISTE); },
   summary: [
     ['Çift tık', 'Kelimeyi seç'],
@@ -366,7 +366,7 @@ function ilanSoru({ title, text = ILAN, q, opts, ok, why }) {
 
 export const ilanOku = {
   id: 'ilan', icon: '🏷', title: 'Bilgisayar ilanını okuyalım', minutes: 20, stage: 'scene',
-  desc: 'Orta seviye: KB, MB, GB, TB ne demek? Kalıcı ve geçici bellek; bir bilgisayar ilanında RAM, disk ve ekran boyutunu okumak.',
+  desc: 'Orta seviye: KB, MB, GB ne demek? Bilgisayar ilanını okumak.',
   summary: [
     ['KB → MB → GB → TB', 'Her biri bir öncekinin yaklaşık 1000 katı'],
     ['Bir fotoğraf', 'Yaklaşık 3–5 MB'],
@@ -464,7 +464,7 @@ const aramaIle = (app, name) => (ev, c) => {
 
 export const masaustuParkur = {
   id: 'masaustu-parkur', icon: '🏁', title: 'Masaüstü parkuru', minutes: 20, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: 10 görev, yönlendirme yok. Arayarak açma, görev çubuğu, pencereler arası geçiş, ses. Her görevin süresi tutulur.',
+  desc: 'Orta seviye: 10 görev, yönlendirme yok. Süreler tutulur.',
   steps: [
     {
       title: 'Masaüstü parkuru',
@@ -554,7 +554,7 @@ const explorerAt = (folder) => (c) => { const w = c.d.ensure('explorer'); if (fo
 
 export const dosyaParkur = {
   id: 'dosya-parkur', icon: '🗂', title: 'Dağınık klasörü toparlayın', minutes: 25, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: Belgeler klasörü karışmış. Klasör açma, taşıma, silme, geri yükleme, ad değiştirme, arama ve USB\'ye yedekleme görevleri.',
+  desc: 'Orta seviye: karışık Belgeler klasörünü düzenlemek, USB\'ye yedeklemek.',
   setup: (c) => {
     put(c, 'docs', 'tahlil sonucu.pdf');
     put(c, 'docs', 'reçete.jpg', 'file', PIC('💊', '#c8e6c9', '#fff9c4'));

@@ -11,7 +11,7 @@ const open = (c) => maxed(c, 'slides');
 
 export const sunu = {
   id: 'sunu', icon: '📙', title: 'Sunu hazırlayalım', minutes: 40, stage: 'desktop',
-  desc: 'Sunu programı: başlık slaytı, yeni slayt ve madde işaretleri, tasarım teması, resim, slayt geçişi, slaytların sırası, slayt gösterisi (F5) ve kaydetme.',
+  desc: 'Başlık slaytı, yeni slayt, resim, tema, F5 ile slayt gösterisi, kaydetme.',
   summary: [
     ['Slayt', 'Sununun her bir sayfası'],
     ['Giriş → Yeni Slayt', 'Düzen seçerek slayt ekler (Başlık ve içerik…)'],

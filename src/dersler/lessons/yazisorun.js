@@ -6,7 +6,7 @@ const HEDEF = 'Dikkat: Yarın pazar.';
 
 export const yaziSorun = {
   id: 'yazi-sorun', icon: '🆘', title: 'Yazı yazarken başıma gelenler', minutes: 25, stage: 'notepad',
-  desc: 'Klavyeye basıyorum ama yazı gelmiyor; harfler birbirini yiyor; her şey BÜYÜK çıkıyor; sayılar çalışmıyor; ş, ğ, ü yazmıyor. Nedenleri ve çözümleri.',
+  desc: 'Yazı gelmiyor, her şey BÜYÜK çıkıyor, ş ğ ü yazmıyor: nedenleri ve çözümleri.',
   summary: [
     ['Yazı gelmiyor', 'İmleç (yanıp sönen çizgi) yazı alanında mı? Yazı alanının içine tıklayın'],
     ['Harfler siliniyor', `${K('Insert')} tuşuna basılmıştır (Üzerine yaz). Aynı tuşa bir daha basın`],

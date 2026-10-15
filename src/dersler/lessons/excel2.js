@@ -34,7 +34,7 @@ const GENIS = () => ({
 
 export const hucreInce = {
   id: 'hucre-ince', icon: '📐', title: 'Hücre incelikleri: Birleştir ve Ortala, Metni Kaydır, #####', minutes: 30, stage: 'desktop',
-  desc: 'Uzun başlığı Birleştir ve Ortala ile tek başlık yapmak, sığmayan yazıyı Metni Kaydır ile alt satıra indirmek, sütun dar gelince çıkan ##### işaretini düzeltmek.',
+  desc: 'Birleştir ve Ortala, Metni Kaydır, ##### işaretini düzeltmek.',
   summary: [
     ['Birleştir ve Ortala', 'Yan yana hücreleri seçin; başlığı tek hücre yapar ve ortalar'],
     ['Metni Kaydır', 'Uzun yazıyı hücre içinde alt satıra indirir; satır yükselir'],
@@ -100,7 +100,7 @@ export const hucreInce = {
 
 export const doldurDondur = {
   id: 'doldur-dondur', icon: '📅', title: 'Otomatik doldurma ve üst satırı dondurma', minutes: 30, stage: 'desktop',
-  desc: 'Kulpundan çekerek 1, 2, 3… ve Ocak, Şubat… listelerini saniyede doldurmak; uzun listede aşağı inerken başlık satırının kaybolmaması için Üst Satırı Dondur.',
+  desc: 'Doldurma tutamacıyla listeleri doldurmak, Üst Satırı Dondur.',
   summary: [
     ['Doldurma tutamacı', 'Seçili hücrenin sağ alt köşesindeki küçük kare; sürükleyin'],
     ['Ocak → Şubat → Mart', 'Ay ve gün adları kendiliğinden devam eder'],
@@ -165,7 +165,7 @@ export const doldurDondur = {
 
 export const calismaSayfalari = {
   id: 'calisma-sayfalari', icon: '📑', title: 'Çalışma sayfaları: Ocak sayfasını Şubat\'a kopyalamak', minutes: 30, stage: 'desktop',
-  desc: 'Alttaki sekmelerle yeni sayfa açmak, sayfa adını değiştirmek ve renklendirmek; geçen ayın hazır tablosunu bozmadan Taşı veya Kopyala ile yeni aya çoğaltmak.',
+  desc: 'Yeni sayfa açmak, adını değiştirmek, sayfayı çoğaltmak.',
   summary: [
     ['＋ (alt sekme çubuğunda)', 'Yeni çalışma sayfası ekler'],
     ['Sekmeye çift tık', 'Sayfanın adını değiştirir'],
@@ -237,7 +237,7 @@ export const calismaSayfalari = {
 
 export const excelYazdir = {
   id: 'excel-yazdir', icon: '🖨', title: 'Excel\'de yazdırma: tablom neden iki sayfaya bölündü?', minutes: 30, stage: 'desktop',
-  desc: 'Yazdırırken tablonun son sütununun ikinci kâğıda taşmasını "Tüm sütunları bir sayfaya sığdır" ve yatay kâğıtla çözmek, kâğıtta tablo çizgilerinin çıkmasını sağlamak.',
+  desc: 'Tabloyu tek kâğıda sığdırmak ve çizgileriyle yazdırmak.',
   summary: [
     ['Ctrl + P', 'Yazdırma önizlemesi: kaç sayfa olacağını gösterir'],
     ['Tüm sütunları bir sayfaya sığdır', 'Tabloyu küçültüp tek kâğıda alır'],
@@ -303,7 +303,7 @@ export const excelYazdir = {
 
 export const tabloParkur = {
   id: 'tablo-parkur', icon: '🏁', title: 'Tablo parkuru', minutes: 25, stage: 'desktop', parkur: true,
-  desc: 'Orta seviye: yönlendirme yok. Beş kalemlik pazar harcamasını yazıp toplatmak, biçimlendirmek, büyükten küçüğe sıralamak ve kaydetmek. Süreler tutulur.',
+  desc: 'Orta seviye: pazar harcamasını yazıp toplatmak, sıralamak. Süreler tutulur.',
   steps: [
     {
       title: 'Tablo parkuru',

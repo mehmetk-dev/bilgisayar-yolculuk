@@ -8,7 +8,7 @@ const searched = (re) => (ev) => ev.type === 'web-search' && re.test(ev.q);
 
 export const aramaMotorlari = {
   id: 'arama-motorlari', icon: '🔎', title: 'Arama motorları: Google, Bing, Yandex… nasıl aranır?', minutes: 35, stage: 'desktop',
-  desc: 'Arama motoru nedir, nasıl çalışır; sonuç sayfasını okumak, reklamı ayırt etmek, Görseller ve Haberler sekmeleri; daha iyi sonuç için arama kelimeleri; ilk sonucun doğru olduğunu varsaymamak.',
+  desc: 'Arama motoru nedir, sonuç sayfasını okumak, reklamı ayırt etmek.',
   summary: [
     ['Arama motoru', 'Siteleri sürekli tarayan dev bir fihrist: Google, Bing, Yandex, DuckDuckGo'],
     ['Tarayıcı değil', 'Chrome, Edge gibi tarayıcının içinde açılan bir sitedir'],
