@@ -149,59 +149,6 @@ dl.tb-facts { display: grid; }
 .tb-note { background: var(--acc-bg); border-radius: 10px; padding: 0.5em 0.8em; margin: 0; }
 .tb-warn { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 0.5em 0.8em; margin: 0; }
 
-/* Küçük ekran taslakları: işletim sistemlerinin görünüşü */
-.osm { position: relative; height: 12em; width: 100%; max-width: 32em; margin: 0 auto; border-radius: 10px; overflow: hidden; border: 3px solid #2b2f36; font-size: 0.8em; color: #fff; }
-.osm * { box-sizing: border-box; }
-.osm-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2em; display: flex; align-items: center; gap: 0.5em; padding: 0 0.6em; }
-.osm-bar b { width: 1.3em; height: 1.3em; border-radius: 4px; background: #ffffff55; display: inline-block; }
-.osm-bar .clk { margin-left: auto; font-size: 0.8em; }
-.osm-ic { position: absolute; left: 0.7em; top: 0.6em; display: flex; flex-direction: column; gap: 0.5em; font-size: 1.3em; }
-.osm-win { position: absolute; left: 30%; top: 12%; width: 46%; height: 52%; border-radius: 6px; background: #fff; color: #333; box-shadow: 0 6px 18px #0005; overflow: hidden; }
-.osm-win::before { content: ""; display: block; height: 1.3em; background: #dfe6ef; }
-.osm-tag { position: absolute; right: 0.5em; top: 0.4em; background: #0008; padding: 0 0.5em; border-radius: 999px; font-size: 0.85em; }
-/* Windows 7: cam görünümlü pencere, yuvarlak Başlat düğmesi */
-.osm-w7 { background: linear-gradient(135deg, #0b3d91, #2aa6c9 55%, #0a2a66); }
-.osm-w7 .osm-bar { background: linear-gradient(#4a78b8cc, #1c3f78ee); border-top: 1px solid #ffffff66; }
-.osm-w7 .osm-orb { width: 1.7em; height: 1.7em; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #bfeaff, #1b6fd1 70%); box-shadow: 0 0 6px #fff9; }
-.osm-w7 .osm-win { background: #ffffffaa; border: 1px solid #ffffffcc; }
-.osm-w7 .osm-win::before { background: #9ec4ee99; }
-/* Windows 8: kutucuklu Başlat ekranı */
-.osm-w8 { background: #3b2a7a; padding: 0.7em; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 3.2em; gap: 0.35em; align-content: start; }
-.osm-w8 i { border-radius: 0; font-style: normal; display: grid; place-items: center; font-size: 1.1em; }
-.osm-w8 i:nth-child(1) { grid-column: span 2; background: #2d89ef; } .osm-w8 i:nth-child(2) { background: #00a300; } .osm-w8 i:nth-child(3) { background: #e3a21a; }
-.osm-w8 i:nth-child(4) { background: #b91d47; } .osm-w8 i:nth-child(5) { grid-column: span 2; background: #da532c; } .osm-w8 i:nth-child(6) { background: #7e3878; } .osm-w8 i:nth-child(7) { background: #00aba9; }
-.osm-w8::after { content: "Başlat ekranı: Başlat düğmesi ve menüsü yok"; position: absolute; left: 0.7em; bottom: 0.5em; font-size: 0.85em; color: #ffffffcc; }
-/* Windows 10: sol altta Başlat menüsü ve kutucuklar */
-.osm-w10 { background: linear-gradient(140deg, #0a3d8f, #1c8be0 60%, #082d66); }
-.osm-w10 .osm-bar { background: #1c1c1cf2; }
-.osm-w10 .osm-logo { width: 1.3em; height: 1.3em; background: linear-gradient(#fff, #fff) 0 0/48% 48% no-repeat, linear-gradient(#fff, #fff) 100% 0/48% 48% no-repeat, linear-gradient(#fff, #fff) 0 100%/48% 48% no-repeat, linear-gradient(#fff, #fff) 100% 100%/48% 48% no-repeat; }
-.osm-w10 .osm-menu { position: absolute; left: 0; bottom: 2em; width: 46%; height: 78%; background: #1f1f1ff2; display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.4em; padding: 0.5em; }
-.osm-w10 .osm-menu u { background: #ffffff1f; text-decoration: none; display: block; }
-.osm-w10 .osm-menu span { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25em; }
-.osm-w10 .osm-menu span i { background: #0078d7; } .osm-w10 .osm-menu span i:nth-child(2) { background: #107c10; } .osm-w10 .osm-menu span i:nth-child(3) { background: #d83b01; } .osm-w10 .osm-menu span i:nth-child(4) { background: #5c2d91; }
-/* Windows 11: ortada görev çubuğu ve yuvarlak köşeler */
-.osm-w11 { background: radial-gradient(circle at 30% 40%, #8ab4ff, #5b6fe0 45%, #1d2a6b); }
-.osm-w11 .osm-bar { justify-content: center; background: #f3f3f3d9; color: #333; gap: 0.6em; }
-.osm-w11 .osm-bar b { background: #5b6fe0; border-radius: 6px; }
-.osm-w11 .osm-bar b:nth-child(2) { background: #107c10; } .osm-w11 .osm-bar b:nth-child(3) { background: #d83b01; } .osm-w11 .osm-bar b:nth-child(4) { background: #e3a21a; }
-.osm-w11 .osm-menu { position: absolute; left: 50%; bottom: 2.6em; transform: translateX(-50%); width: 52%; height: 70%; background: #f6f6f6f0; border-radius: 12px; box-shadow: 0 6px 18px #0005; padding: 0.6em; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4em; align-content: start; }
-.osm-w11 .osm-menu i { aspect-ratio: 1; border-radius: 8px; background: #5b6fe0; } .osm-w11 .osm-menu i:nth-child(3n) { background: #107c10; } .osm-w11 .osm-menu i:nth-child(4n) { background: #e3a21a; }
-/* Linux (GNOME benzeri): üstte şerit, solda simge çubuğu */
-.osm-lnx { background: linear-gradient(150deg, #5e2750, #c4481c 70%, #e9803a); }
-.osm-lnx .osm-top { position: absolute; left: 0; right: 0; top: 0; height: 1.7em; background: #1d1d1df0; display: flex; align-items: center; padding: 0 0.7em; font-size: 0.9em; }
-.osm-lnx .osm-top em { margin: 0 auto; font-style: normal; }
-.osm-lnx .osm-dock { position: absolute; left: 0; top: 1.7em; bottom: 0; width: 2.6em; background: #1d1d1de0; display: flex; flex-direction: column; gap: 0.45em; align-items: center; padding-top: 0.6em; }
-.osm-lnx .osm-dock b { width: 1.4em; height: 1.4em; border-radius: 6px; background: #ffffff66; }
-.osm-lnx .osm-win { left: 28%; top: 22%; }
-/* Pardus: yeşilimsi masaüstü, üstte şerit, altta simge çubuğu */
-.osm-prd { background: linear-gradient(150deg, #0e5a52, #1a9a8a 60%, #0b3f45); }
-.osm-prd .osm-top { position: absolute; left: 0; right: 0; top: 0; height: 1.6em; background: #ffffffdd; color: #234; display: flex; align-items: center; padding: 0 0.7em; font-size: 0.9em; gap: 0.6em; }
-.osm-prd .osm-top em { margin-left: auto; font-style: normal; }
-.osm-prd .osm-dock { position: absolute; left: 50%; bottom: 0.4em; transform: translateX(-50%); background: #ffffff55; border-radius: 12px; display: flex; gap: 0.5em; padding: 0.3em 0.6em; }
-.osm-prd .osm-dock b { width: 1.5em; height: 1.5em; border-radius: 6px; background: #fffc; }
-.osm-prd .osm-paw { position: absolute; right: 0.3em; bottom: 0.3em; font-size: 2.4em; line-height: 1; opacity: 0.55; }
-.osm-prd .osm-win { left: 14%; top: 22%; }
-
 /* E-posta hizmetleri karşılaştırması: küçük gelen kutusu taslakları */
 .mlm { display: grid; grid-template-columns: 8.5em 1fr; border: 2px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 0.8em; background: #fff; width: 100%; max-width: 34em; margin: 0 auto; }
 .mlm aside { background: #f3f5f8; padding: 0.6em; display: flex; flex-direction: column; gap: 0.25em; }
