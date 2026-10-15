@@ -1,0 +1,52 @@
+/* Dalın (birlestirme-yarim) yeni parçaları: Görev Görünümü ve sanal masaüstleri, Ekran Klavyesi, adres mektup birleştirme */
+/* Görev Görünümü ve sanal masaüstleri */
+.tb-tv { width: 2.5em; height: 2.5em; border: 0 !important; background: none; border-radius: 6px !important; padding: 0 !important; position: relative; display: flex; align-items: center; justify-content: center; }
+.tb-tv:hover { background: #ffffffb0; }
+.tb-tv i { position: absolute; width: 0.9em; height: 0.75em; border: 2px solid currentColor; border-radius: 2px; background: #eef2f7; }
+.tb-tv i:first-child { transform: translate(-0.22em, -0.18em); }
+.tb-tv i:last-child { transform: translate(0.22em, 0.18em); }
+.dk-dark .tb-tv i { background: #202020; }
+.win.vd-off { display: none; }
+.dk-tv { position: absolute; inset: 0 0 3em 0; z-index: 5500; background: #1c2430d9; backdrop-filter: blur(6px); display: flex; flex-direction: column; padding: 1.5em; gap: 1em; color: #fff; animation: fadein 0.15s; }
+@keyframes fadein { from { opacity: 0; } }
+.tv-wins { flex: 1; display: flex; flex-wrap: wrap; gap: 1em; align-content: center; justify-content: center; overflow: auto; }
+.tv-win { position: relative; width: 13em; height: 9em; border: 2px solid transparent !important; border-radius: 10px !important; background: #f3f5f9; color: #1c2430; display: flex; flex-direction: column; padding: 0 !important; overflow: hidden; box-shadow: 0 8px 24px #0006; }
+.tv-win:hover { border-color: #fff !important; }
+.tv-ttl { padding: 0.35em 2em 0.35em 0.6em; background: #e2e8f0; font-size: 0.85em; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+.tv-big { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 3em; }
+.tv-win > i { position: absolute; right: 0.3em; top: 0.25em; font-style: normal; font-size: 0.8em; width: 1.6em; height: 1.6em; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.tv-win > i:hover { background: #e81123; color: #fff; }
+.tv-empty { margin: auto; opacity: 0.8; }
+.tv-tip { text-align: center; opacity: 0.75; font-size: 0.85em; margin: 0; }
+.tv-desks { display: flex; gap: 0.8em; justify-content: center; flex-wrap: wrap; background: #ffffff14; border-radius: 10px; padding: 0.7em; }
+.tv-desk { position: relative; display: flex; flex-direction: column; gap: 0.3em; align-items: center; border: 2px solid transparent !important; background: none; color: #fff; border-radius: 8px !important; padding: 0.3em !important; }
+.tv-desk.on { border-color: var(--dk-acc, #4c9be8) !important; background: #ffffff1a; }
+.tv-desk:hover { background: #ffffff22; }
+.tv-thumb { width: 8em; height: 4.6em; border-radius: 5px; display: flex; align-items: center; justify-content: center; gap: 0.2em; font-size: 1.2em; background: #ffffff22; }
+.tv-thumb i { font-style: normal; background: #fffd; border-radius: 4px; padding: 0 0.15em; }
+.tv-desk > i { position: absolute; right: 0.2em; top: 0.2em; font-style: normal; font-size: 0.75em; background: #0008; border-radius: 4px; padding: 0 0.35em; }
+.tv-desk > i:hover { background: #e81123; }
+.tv-new .tv-thumb { border: 2px dashed #fff8; background: none; font-size: 2em; }
+.dk-vdflash { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); background: #1c2430e6; color: #fff; padding: 0.8em 2em; border-radius: 10px; font-size: 1.3em; z-index: 7000; pointer-events: none; animation: fadein 0.2s; }
+
+/* Ekran Klavyesi */
+.osk { background: #1f2329 !important; padding: 0.4em; gap: 0.3em; justify-content: center; user-select: none; }
+.osk-row { display: flex; gap: 0.3em; flex: 1; min-height: 0; }
+.osk button { flex: 1; min-width: 0; border: 1px solid #3a414b !important; background: #2d333c; color: #fff; border-radius: 5px !important; font-size: 1.05em; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
+.osk button:hover { background: #3b434f; }
+.osk button:active { background: var(--acc); }
+.osk .osk-sp { font-size: 0.8em; color: #c9d1dc; }
+.osk .osk-sp.on { background: var(--acc); color: #fff; }
+
+/* Adres mektup birleştirme */
+.wd-field { background: #e3e8ef; border-radius: 3px; padding: 0 0.15em; color: #1f3d6b; }
+.wd-field.pv { background: #fff3c4; color: inherit; }
+.wd-mmcount { font-size: 0.8em; color: #157a3c; font-weight: 600; margin-left: 0.3em; }
+.wd-mmrec { font-size: 0.85em; min-width: 3.5em; text-align: center; }
+.wd-rib button:disabled { opacity: 0.4; }
+.wd-fields { flex-direction: column; min-width: 10em; }
+.wd-fields button { justify-content: flex-start; }
+.wd-mmwrap { position: relative; }
+.wd-mpop { position: absolute; top: 2.1em; left: 0; z-index: 5; background: #fff; border: 1px solid #c8c8c8; border-radius: 6px; padding: 0.35em; display: flex; gap: 0.3em; box-shadow: 0 4px 14px #0003; }
+.wd-fin { flex-direction: column; white-space: nowrap; font-size: 0.85em; }
+.dk-tv .tv-win .tv-ttl { color: #1c2430; }

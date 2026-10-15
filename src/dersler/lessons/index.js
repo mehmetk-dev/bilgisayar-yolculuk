@@ -4,6 +4,7 @@ import { dizustu } from './dizustu.js';
 import { yaziSorun } from './yazisorun.js';
 import { donatilar } from './donatilar.js';
 import { fareAyar, okumaKolay } from './erisim.js';
+import { ekranKlavyesi, mektup, sanalMasaustu } from './ileri2.js';
 import { bluetooth, hesapPin } from './bluetooth.js';
 import { bakimGuvenlik } from './bakimguvenlik.js';
 import { medya } from './medya.js';
@@ -76,12 +77,12 @@ export const WEEKS = [
   { no: 2, title: 'Klavye', lessons: [klavye, fqKlavye, harfbul, onparmak, rakamlar, isaretler, yaziSorun, klavyeDili, tusavi, kart, klavyeOyun, odev2, test2] },
   { no: 3, title: 'Metin seçme ve kısayollar', lessons: [notdefteri, secme, kaydetPratik, liste, tarif, kisayolYarisi, kopyaOyun, odev3, test3] },
   { no: 4, title: 'Donanım ve yazılım', lessons: [yolculuk, donanimDersi, donanim, parcalar, portlar, ilanOku, bakim, isg, sorunGiderme, odev4, test4, testDonanim] },
-  { no: 5, title: 'Masaüstü, Başlat menüsü ve pencereler', lessons: [masaustu, baslatKesif, masaustuDuzen, hesapMakinesi, donatilar, fareAyar, okumaKolay, oyunlar, gorev, masaustuParkur, masaustuHarita, odev5, test5] },
+  { no: 5, title: 'Masaüstü, Başlat menüsü ve pencereler', lessons: [masaustu, baslatKesif, masaustuDuzen, hesapMakinesi, donatilar, fareAyar, okumaKolay, ekranKlavyesi, oyunlar, gorev, sanalMasaustu, masaustuParkur, masaustuHarita, odev5, test5] },
   { no: 6, title: 'Dosyalar ve klasörler', lessons: [dosyalar, dosyaTurleri, resimWeb, klasorAgaci, fotograflar, zip, copKutusu, dosyaParkur, dosyaSenaryo, odev6, test6] },
   { no: 7, title: 'Paint, Ekran Alıntısı ve Ayarlar', lessons: [paint, evCiz, tebrikKarti, alinti, alintiPratik, ayarlar, saatTarih, denetimMasasi, temalar, bluetooth, hesapPin, ayarlarParkur, odev7, test7] },
   { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, tarayicilarBilgi, adres, aramaPratik, aramaMotorlari, medya, videoHz, tuzaklar, kurulum, yazici, bakimGuvenlik, virusAntivirus, isletimSistemleri, oskurulum, internetParkur, odev8, test8] },
   { no: 9, title: 'E-posta', lessons: [eposta, gmailHotmail, epostaIletme, eposta2, ekTasi, bulutPaylas, sifreSifirla, odev9, test9] },
-  { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, tabloInce, belgeDuzen, sayfaDuzeni, simgeSekil, ozgecmis, dilekceParkur, odev10, test10] },
+  { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, tabloInce, belgeDuzen, sayfaDuzeni, simgeSekil, mektup, ozgecmis, dilekceParkur, odev10, test10] },
   { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, hucreInce, hesap3, hesap4, duseyara, doldurDondur, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
   { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, animasyon, sunuAni, anıAlbumu, odev12, test12] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukPc, telefon, gunlukWeb, tarayici, cerezler, pdfCalis, pdfDuzenle, whatsappWeb, odev13, test13] },

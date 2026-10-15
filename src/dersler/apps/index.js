@@ -10,6 +10,7 @@ import { photos, viewer, pdf, music } from './media.js';
 import { devmgr } from './devmgr.js';
 import { snip } from './snip.js';
 import { taskmgr } from './taskmgr.js';
+import { osk, magnifier } from './araclar.js';
 import { bulut } from './bulut.js';
 import { store, takvim, hava } from './store.js';
 import { mail } from './mail.js';
@@ -63,6 +64,8 @@ export const APPS = {
   bulut: { name: 'Bulut Depo', icon: '☁', w: 0.8, h: 0.82, single: true, keywords: ['bulut', 'depo', 'drive', 'onedrive', 'yedek', 'paylaş', 'yükle'], create: bulut },
   takvim: { name: 'Takvim', icon: '📅', w: 0.6, h: 0.75, installable: true, keywords: ['takvim', 'tarih', 'gün', 'ay'], create: takvim },
   hava: { name: 'Hava Durumu', icon: '🌤', w: 0.55, h: 0.7, installable: true, keywords: ['hava', 'yağmur', 'sıcaklık'], create: hava },
+  osk: { name: 'Ekran Klavyesi', icon: '⌨', w: 0.7, h: 0.42, single: true, top: true, noFocus: true, keywords: ['klavye', 'ekran klavyesi', 'erişilebilirlik'], create: osk },
+  magnifier: { name: 'Büyüteç', icon: '🔍', keywords: ['büyüteç', 'büyüt', 'yakınlaştır', 'erişilebilirlik', 'görme'], launch: magnifier },
   snip: { name: 'Ekran Alıntısı', icon: '✂', w: 0.48, h: 0.55, single: true, keywords: ['ekran', 'alıntı', 'görüntü', 'snip'], create: snip },
   notlar: { name: 'Yapışkan Notlar', icon: '🗒', w: 0.6, h: 0.7, single: true, keywords: ['not', 'yapışkan', 'hatırlatma', 'sticky'], create: notlar },
   kayit: { name: 'Ses Kaydedici', icon: '🎙', w: 0.45, h: 0.7, single: true, keywords: ['ses', 'kayıt', 'mikrofon'], create: kayit },
@@ -74,4 +77,4 @@ export const APPS = {
   kartlar: { name: 'Kart Dizme', icon: '🃏', w: 0.8, h: 0.8, keywords: ['oyun', 'kart', 'solitaire'], create: kartlar },
 };
 
-export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'slides', 'store', 'bulut', 'taskmgr', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer', 'takvim', 'hava', 'notlar', 'kayit', 'saat', 'guvenlik'];
+export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'slides', 'store', 'bulut', 'taskmgr', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer', 'takvim', 'hava', 'notlar', 'kayit', 'saat', 'guvenlik', 'osk'];

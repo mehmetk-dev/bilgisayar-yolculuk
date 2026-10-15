@@ -141,7 +141,9 @@ export function settings({ desk, body, args, emit, dialogs }) {
         <div class="st-row">Renk ${[['white', 'Beyaz', '#fff'], ['black', 'Siyah', '#000'], ['yellow', 'Sarı', '#ffd600'], ['green', 'Yeşil', '#2e7d32']].map(([k, l, c]) => `<button type="button" class="st-btn st-swatch${s.cursorColor === k ? ' primary' : ''}" data-curcolor="${k}"><i style="background:${c}"></i>${l}</button>`).join('')}</div></section>
         <section><h3>Büyüteç</h3><p class="st-note">Ekranın bir bölümünü yakınlaştırır. Gerçek bilgisayarda ${'<b>⊞ Windows</b> + <b>artı (+)</b>'} ile açılır, ${'<b>⊞ Windows</b> + <b>Esc</b>'} ile kapanır.</p>
         ${toggle('magnifier', s.magnifier, 'Büyüteç')}
-        <div class="st-row">Yakınlaştırma düzeyi <button type="button" class="st-btn" data-mag="-">−</button><b>%${s.magZoom}</b><button type="button" class="st-btn" data-mag="+">＋</button></div></section>`;
+        <div class="st-row">Yakınlaştırma düzeyi <button type="button" class="st-btn" data-mag="-">−</button><b>%${s.magZoom}</b><button type="button" class="st-btn" data-mag="+">＋</button></div></section>
+        <section><h3>⌨ Ekran klavyesi</h3><p class="st-note">Klavyesi bozuk olanlar ya da dokunmatik ekran kullananlar için: tuşlara fareyle tıklayarak yazılır.</p>
+          <button type="button" class="st-btn" data-act="osk">Ekran klavyesini aç</button></section>`;
     } else if (page === 'update') {
       h += `<section><div class="st-upd">${flow.update || '✅ <b>Güncel durumdasınız</b><small>Son denetim: bugün</small>'}</div>
         ${flow.updateBtns ?? '<button type="button" class="st-btn primary" data-act="checkUpdate">Güncelleştirmeleri denetle</button>'}</section>`;
@@ -231,6 +233,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
         render();
         emit('bt-remove', { name: b.dataset.n });
         return;
+      case 'osk': desk.open('osk'); return;
       case 'moreThemes': desk.open('store', { page: 'themes' }); emit('more-themes'); return;
       case 'soundTest': {
         const t = playTune(desk, [523, 659, 784]);
