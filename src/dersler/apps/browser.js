@@ -50,8 +50,20 @@ export function browser({ desk, body, args, emit, setTitle }) {
   const extOn = (id) => s.ext[id] === true;
   const history = () => (desk.history ||= []);
 
-  const fmtUrl = (loc) => (loc.host === 'tarayici' ? 'tarayici:/' + loc.path : loc.host + (loc.path === '/' ? '' : loc.path) + (loc.q ? '?q=' + loc.q : ''));
-  const internal = (loc) => loc && (loc.host === 'tarayici' || loc.host === EXT_HOST);
+  const fmtUrl = (loc) => (loc.host === 'tarayici' ? 'tarayici:/' + loc.path : loc.host === 'dosya' ? 'dosya://' + loc.path : loc.host === 'kaynak' ? 'view-source:dosya://' + loc.path : loc.host + (loc.path === '/' ? '' : loc.path) + (loc.q ? '?q=' + loc.q : ''));
+  const internal = (loc) => loc && (loc.host === 'tarayici' || loc.host === EXT_HOST || loc.host === 'dosya' || loc.host === 'kaynak');
+  // Bilgisayardaki bir .html dosyasını tarayıcıda açmak: dosya içeriği güvenli bir süzgeçten geçirilip çizilir
+  const fileLoc = (node) => ({ host: 'dosya', path: `/C:/Kullanıcılar/${desk.settings.user}/${desk.fs.label(node.parent)}/${node.name}`, q: '', node: node.id });
+  function safeHtml(src) {
+    const d = new DOMParser().parseFromString(String(src || ''), 'text/html');
+    d.querySelectorAll('script, style, iframe, object, embed, link, meta, form, input, button, textarea, select, base, noscript').forEach((e) => e.remove());
+    d.querySelectorAll('*').forEach((e) => {
+      for (const a of [...e.attributes]) { if (/^on/i.test(a.name) || a.name === 'style' || (a.name === 'href' || a.name === 'src') ) e.removeAttribute(a.name); }
+      if (e.tagName === 'A') e.setAttribute('title', 'Bağlantı');
+      if (e.tagName === 'IMG') e.remove();
+    });
+    return { html: d.body.innerHTML, title: d.title };
+  }
 
   function newTab(loc, focus = true) {
     const t = { id: tabSeq++, hist: [], idx: -1, title: 'Yeni sekme' };
@@ -79,6 +91,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     navigate(loc, via);
   }
 
+  const clockOff = () => Math.abs(desk.now() - Date.now()) > 864e5;
   function show() {
     const t = cur;
     const loc = t.hist[t.idx];
@@ -96,6 +109,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     } else if (!site) {
       title = loc.host;
       html = `<div class="wp err"><div class="err-ic">😕</div><h1>Bu siteye ulaşılamıyor</h1><p><b>${esc(loc.host)}</b> adresi bulunamadı.</p><ul><li>Adreste yazım hatası olabilir. Harfleri kontrol edin.</li><li>Adresi bilmiyorsanız, adres çubuğuna aradığınız şeyi kelimelerle yazın.</li></ul></div>`;
+    } else if (site.secure && clockOff()) {
+      // Bilgisayarın saati/tarihi çok yanlışsa güvenli (https) siteler açılmaz: sertifikanın geçerlilik tarihi kontrol edilir
+      title = 'Bağlantınız gizli değil';
+      html = `<div class="wp err"><div class="err-ic">🕒⚠</div><h1>Bağlantınız gizli değil</h1><p><b>${esc(loc.host)}</b> sitesinin güvenlik sertifikası doğrulanamadı.</p><p class="mut">NET::ERR_CERT_DATE_INVALID</p>
+        <div class="ed-note">Sık görülen bir neden: <b>bilgisayarınızın tarih ve saati yanlış</b>. Bilgisayarınız şu an tarihi <b>${esc(desk.now().toLocaleDateString('tr-TR'))}</b> sanıyor. Sağ alttaki saate bakın.</div>
+        <p><button type="button" class="ed-btn" data-clock="settings">🕒 Tarih ve saat ayarlarını aç</button> <button type="button" class="ed-btn ghost" data-clock="retry">⟳ Yeniden dene</button></p></div>`;
+      setTimeout(() => emit('web-clock-error', { host: loc.host }), 0);
     } else {
       const r = site.render(loc.path, loc.q || '', webCtx(loc));
       title = r.title;
@@ -165,6 +185,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       state: ((desk.webState ||= {})[siteName(loc.host)] ||= {}),
       emit: (type, data = {}) => emit(type, { host: loc.host, ...data }),
       go: (path, q = '') => navigate({ host: loc.host, path, q }, 'form'),
+      visit: (host, path = '/', q = '') => navigate({ host, path, q }, 'form'),
       refresh: () => { const y = pageEl.scrollTop; show(); pageEl.scrollTop = y; },
       download: (name, content) => {
         const node = desk.fs.write('downloads', name, content);
@@ -326,7 +347,24 @@ export function browser({ desk, body, args, emit, setTitle }) {
   url.addEventListener('copy', () => emit('web-url-copy', { url: url.value.slice(url.selectionStart, url.selectionEnd) || url.value }));
 
   // ---- Tarayıcının kendi sayfaları: geçmiş, uzantılar, ayarlar ve uzantı mağazası ----
+  // Tarayıcının sakladığı çerezler: girişler ve sepetler sitelerin durumundan, reklam çerezleri desk.cookies'ten gelir; her birinin silinmesi gerçek etkiyi yaratır
+  function getCookies() {
+    const out = [];
+    for (const [site, st] of Object.entries(desk.webState || {})) {
+      if (st.user) out.push({ site, name: 'oturum', party: 'first', purpose: 'Giriş yaptığınızı hatırlar: her sayfada yeniden şifre sormaz', del: () => { st.user = false; } });
+      if (st.cart?.length) out.push({ site, name: 'sepet', party: 'first', purpose: 'Sepetinizdeki ürünleri hatırlar', del: () => { st.cart = []; } });
+    }
+    for (const c of desk.cookies || []) out.push({ ...c, del: () => { desk.cookies.splice(desk.cookies.indexOf(c), 1); } });
+    return out;
+  }
   function internalPage(loc) {
+    if (loc.host === 'dosya' || loc.host === 'kaynak') {
+      const n = loc.node && desk.fs.get(loc.node);
+      const text = typeof n?.content === 'string' ? n.content : '';
+      if (loc.host === 'kaynak') return { title: `view-source:${n?.name || ''}`, html: `<div class="wp src"><pre>${esc(text) || '(dosya boş)'}</pre></div>` };
+      const r = safeHtml(text);
+      return { title: r.title || n?.name || 'Dosya', html: `<div class="wp filepg"><div class="fp-bar">📁 Bu sayfa internette değil, bilgisayarınızdaki bir dosyadır: <b>${esc(n?.name || '')}</b></div><div class="fp-body">${r.html || '<p><i>(Dosya boş)</i></p>'}</div></div>` };
+    }
     if (loc.host === EXT_HOST) {
       const id = loc.path.slice(1);
       const x = EXTS[id];
@@ -342,7 +380,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
         <div class="xs-grid">${Object.entries(EXTS).map(([k, e]) => `<a class="xs-card" data-href="${EXT_HOST}/${k}"><span class="xs-ic">${e.icon}</span><b>${e.name}</b><small>${esc(e.pub)} ${e.verified ? '✔' : ''}</small><small class="xs-stars">${stars(e.stars)} · ${e.users}</small></a>`).join('')}</div></div>` };
     }
     const page = loc.path.slice(1);
-    const nav = `<nav class="ti-nav">${[['gecmis', '🕘 Geçmiş'], ['uzantilar', '🧩 Uzantılar'], ['ayarlar', '⚙ Ayarlar']].map(([k, l]) => `<a data-go="tarayici://${k}" class="${k === page ? 'on' : ''}">${l}</a>`).join('')}</nav>`;
+    const nav = `<nav class="ti-nav">${[['gecmis', '🕘 Geçmiş'], ['uzantilar', '🧩 Uzantılar'], ['cerezler', '🍪 Çerezler'], ['ayarlar', '⚙ Ayarlar']].map(([k, l]) => `<a data-go="tarayici://${k}" class="${k === page ? 'on' : ''}">${l}</a>`).join('')}</nav>`;
     if (page === 'gecmis') {
       const h = history();
       return { title: 'Geçmiş', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Geçmiş</h1>${priv ? '<p class="ti-note">🕶 Gizli pencerede gezdikleriniz buraya yazılmaz.</p>' : ''}
@@ -356,8 +394,20 @@ export function browser({ desk, body, args, emit, setTitle }) {
           <label class="ti-tog"><input type="checkbox" data-exttog="${k}" ${extOn(k) ? 'checked' : ''}><i></i></label><button type="button" class="xs-btn" data-extdel="${k}">Kaldır</button></div>`).join('') : '<p class="ti-note">Henüz uzantı eklenmedi.</p>'}
         <p><a class="xs-link" data-href="${EXT_HOST}">🧩 Uzantı Mağazası'nda yeni uzantılar bulun</a></p></div></div>` };
     }
+    if (page === 'cerezler') {
+      const list = getCookies();
+      const third = list.filter((c) => c.party === 'third').length;
+      return { title: 'Çerezler ve site verileri', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Çerezler ve site verileri</h1>
+        <p class="ti-note">Çerez, sitelerin tarayıcınıza bıraktığı küçük bir <b>not</b>tur: giriş yaptığınızı, sepetinizi, tercihlerinizi hatırlamak için. Kendi sitenin bıraktığına <b>birinci taraf</b>, sayfaya gömülü başka bir şirketin (genellikle reklam) bıraktığına <b>üçüncü taraf</b> çerez denir.</p>
+        <label class="ti-line"><input type="checkbox" data-blockthird="1" ${s.blockThird ? 'checked' : ''}> Üçüncü taraf çerezlerini engelle <small>(reklam şirketlerinin sizi siteden siteye izlemesini zorlaştırır)</small></label>
+        <h3>Saklanan çerezler (${list.length})</h3>${list.length ? `<div class="ti-ck">${list.map((c, i) => `<div class="ti-row ck-${c.party}"><b>${esc(c.site)}</b><span class="ck-tag ${c.party}">${c.party === 'third' ? 'Üçüncü taraf' : 'Birinci taraf'}</span><span class="ck-nm">${esc(c.name)}</span><button type="button" data-ckdel="${i}" title="Bu çerezi sil">✕ Sil</button><small>${esc(c.purpose)}${c.interest ? ` <i>(kaydedilen: ${esc(c.interest)})</i>` : ''}</small></div>`).join('')}</div>
+        <p><button type="button" class="xs-btn" data-ckall="1">🗑 Tümünü sil</button></p>` : '<p class="ti-note">Saklanan çerez yok.</p>'}
+        ${third ? '<p class="ti-note">⚠ Listede <b>üçüncü taraf</b> çerezler var: bunlar sizi başka sitelerde de tanır.</p>' : ''}</div></div>` };
+    }
     return { title: 'Ayarlar', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Ayarlar</h1>
       <section><h3>Gizlilik</h3><label class="ti-line"><input type="checkbox" data-popblock="1" ${s.popupBlock ? 'checked' : ''}> Açılır pencereleri engelle</label>
+        <label class="ti-line"><input type="checkbox" data-blockthird="1" ${s.blockThird ? 'checked' : ''}> Üçüncü taraf çerezlerini engelle</label>
+        <p><a data-go="tarayici://cerezler">🍪 Çerezler ve site verilerini gör</a></p>
         <button type="button" class="xs-btn" data-clear="1">🧹 Göz atma verilerini temizle</button></section>
       <section><h3>Sıfırla</h3><p class="ti-note">Tarayıcı kendiliğinden değiştiyse (istemediğiniz araç çubuğu, ana sayfa, uzantı) ayarları ilk hâline döndürün.</p>
         <button type="button" class="xs-btn" data-reset="1">↺ Ayarları varsayılanlarına sıfırla</button></section></div></div>` };
@@ -396,6 +446,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const a = await desk.dialogs.ask({ title: 'Göz atma verilerini temizle', icon: '🧹', text: '<b>Şunlar silinecek:</b><ul><li>Göz atma geçmişi</li><li>Çerezler ve site verileri (sitelerdeki oturumlarınız kapanır)</li><li>Önbellekteki resimler ve dosyalar</li></ul>İndirdiğiniz dosyalar ve sık kullanılanlar silinmez.', buttons: [['yes', 'Şimdi temizle', true], ['no', 'İptal']] });
     if (a !== 'yes') return;
     history().length = 0;
+    desk.cookies = [];
+    desk.webState = {}; // giriş yapılmış oturumlar ve sepetler de çerezlerle birlikte silinir
     desk.toast('Temizlendi', 'Göz atma verileri silindi.', '🧹', 3000);
     emit('web-clear');
     show();
@@ -412,7 +464,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     menu.dataset.kind = kind;
     if (kind === 'more') {
       const items = [['newtab', '＋ Yeni sekme', 'Ctrl+T'], ['private', '🕶 Yeni gizli pencere', 'Ctrl+Shift+N'], '-', ['history', '🕘 Geçmiş', 'Ctrl+H'], ['downloads', '⬇ İndirilenler', 'Ctrl+J'], ['bookmark', '☆ Sık kullanılanlara ekle', 'Ctrl+D'], ['extensions', '🧩 Uzantılar', ''], '-',
-        ['zoom', `🔍 Yakınlaştır <span class="br-mz"><button type="button" data-z="-10">−</button> %${zoom} <button type="button" data-z="10">＋</button></span>`, ''], ['print', '🖨 Yazdır', 'Ctrl+P'], ['find', '🔎 Sayfada bul', 'Ctrl+F'], ['clear', '🧹 Göz atma verilerini temizle', 'Ctrl+Shift+Del'], '-', ['settings', '⚙ Ayarlar', '']];
+        ['zoom', `🔍 Yakınlaştır <span class="br-mz"><button type="button" data-z="-10">−</button> %${zoom} <button type="button" data-z="10">＋</button></span>`, ''], ['print', '🖨 Yazdır', 'Ctrl+P'], ['find', '🔎 Sayfada bul', 'Ctrl+F'], ['source', '</> Sayfa kaynağını görüntüle', 'Ctrl+U'], ['clear', '🧹 Göz atma verilerini temizle', 'Ctrl+Shift+Del'], '-', ['settings', '⚙ Ayarlar', '']];
       menu.innerHTML = items.map((it) => (it === '-' ? '<hr>' : `<div class="br-mi" data-m="${it[0]}" role="button" tabindex="0"><span>${it[1]}</span><kbd>${it[2]}</kbd></div>`)).join('');
     } else {
       const mine = Object.keys(s.ext);
@@ -436,6 +488,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     else if (m === 'print') print();
     else if (m === 'find') openFind();
     else if (m === 'clear') clearData();
+    else if (m === 'source') viewSource();
+  }
+  // Sayfa kaynağı (Ctrl + U): sayfanın yazıldığı metin. Bilgisayardaki .html dosyaları için çalışır.
+  function viewSource() {
+    const loc = cur.hist[cur.idx];
+    if (loc?.host === 'dosya') { newTab({ ...loc, host: 'kaynak' }); emit('web-source', { name: desk.fs.get(loc.node)?.name }); return; }
+    desk.toast('Sayfa kaynağı', 'Bu alıştırmada yalnızca bilgisayarınızdaki .html dosyalarının kaynağı gösterilir.', '</>', 4500);
   }
   async function print() {
     const r = await desk.dialogs.print({ printers: s.printers, doc: cur.title });
@@ -516,6 +575,12 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const k = e.target.dataset.exttog;
     if (k) { setExt(k, e.target.checked); return; }
     if (e.target.dataset.popblock) { s.popupBlock = e.target.checked; emit('web-popup-setting', { on: s.popupBlock }); }
+    if (e.target.dataset.blockthird) {
+      s.blockThird = e.target.checked;
+      if (s.blockThird) desk.cookies = (desk.cookies || []).filter((c) => c.party !== 'third');
+      emit('cookie-block-third', { on: s.blockThird });
+      show();
+    }
   });
 
   body.addEventListener('click', (e) => {
@@ -541,6 +606,9 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (e.target.closest('[data-addext]')) { addExt(e.target.closest('[data-addext]').dataset.addext); return; }
     if (e.target.closest('[data-extdel]')) { delExt(e.target.closest('[data-extdel]').dataset.extdel); return; }
     if (e.target.closest('[data-clear]')) { clearData(); return; }
+    const cd = e.target.closest('[data-ckdel]');
+    if (cd) { const c = getCookies()[+cd.dataset.ckdel]; if (c) { c.del(); emit('cookie-delete', { site: c.site, name: c.name, party: c.party }); show(); } return; }
+    if (e.target.closest('[data-ckall]')) { const n = getCookies().length; desk.cookies = []; desk.webState = {}; emit('cookie-clear-all', { count: n }); show(); return; }
     const hd = e.target.closest('[data-hdel]');
     if (hd) { history().splice(+hd.dataset.hdel, 1); show(); emit('web-history-del'); return; }
     if (e.target.closest('[data-reset]')) {
@@ -573,6 +641,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     }
     const dl = e.target.closest('[data-download]');
     if (dl) { download(dl.dataset.download, dl.dataset.photo); return; }
+    const ck = e.target.closest('[data-clock]');
+    if (ck) { if (ck.dataset.clock === 'settings') desk.open('settings', { page: 'time' }); else { show(); emit('web-reload'); } return; }
     const sa = e.target.closest('.br-page [data-act]');
     if (sa && sa.tagName !== 'FORM' && !sa.disabled) { e.preventDefault(); siteAct(sa); return; }
     const tab = e.target.closest('[data-tab]');
@@ -669,6 +739,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     else if (e.code === 'KeyD') { e.preventDefault(); bookmark(); }
     else if (e.code === 'KeyS' && e.shiftKey) { e.preventDefault(); capture(); }
     else if (e.code === 'KeyF') { e.preventDefault(); openFind(); }
+    else if (e.code === 'KeyU') { e.preventDefault(); menuCmd('source'); }
     else if (e.code === 'KeyH') { e.preventDefault(); menuCmd('history'); }
     else if (e.code === 'KeyJ') { e.preventDefault(); menuCmd('downloads'); }
     else if (e.code === 'KeyP') { e.preventDefault(); print(); }
@@ -730,11 +801,12 @@ export function browser({ desk, body, args, emit, setTitle }) {
     destroy: () => { if (s.ext.reader) window.speechSynthesis?.cancel(); },
     get private() { return priv; },
     get findCount() { return hits.length; },
-    onArgs: (a) => { if (a.url) newTab(resolve(a.url)); },
+    onArgs: (a) => { if (a.url) newTab(resolve(a.url)); if (a.file) { const n = desk.fs.get(a.file); if (n) newTab(fileLoc(n)); } },
     go,
     get url() { const l = cur?.hist[cur.idx]; return l ? fmtUrl(l) : ''; },
     get tabs() { return tabs.length; },
   };
-  newTab(args.url ? resolve(args.url) : priv ? null : { host: SEARCH_HOST, path: '/', q: '' }, false);
+  const fileNode = args.file && desk.fs.get(args.file);
+  newTab(fileNode ? fileLoc(fileNode) : args.url ? resolve(args.url) : priv ? null : { host: SEARCH_HOST, path: '/', q: '' }, false);
   return api;
 }

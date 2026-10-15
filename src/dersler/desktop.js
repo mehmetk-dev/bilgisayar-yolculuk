@@ -4,7 +4,7 @@
 import { VFS, RECYCLE, USB, PHONE } from './vfs.js';
 import { Dialogs, esc, fileIcon } from './dialog.js';
 import { APPS, START_APPS } from './apps/index.js';
-import { pictureURL } from './apps/util.js';
+import { pictureURL, playTune } from './apps/util.js';
 import { osInstall } from './apps/osinstall.js';
 
 export const WALLPAPERS = {
@@ -50,11 +50,16 @@ export const ACCENTS = [['Mavi', '#0a5dc2'], ['Lacivert', '#1f3d8a'], ['Turkuaz'
 const CELL_W = 6.2, CELL_H = 5.7; // em
 const PINNED = ['explorer', 'browser'];
 
+import { KB, mapKey } from './keymap.js';
+
 const DEFAULT_SETTINGS = () => ({
   wallpaper: 'mavi', customWall: null, volume: 50, muted: false, brightness: 100, wifi: true, network: 'EvAğı',
   knownNetworks: ['EvAğı'], autoTime: true, timeOffset: 0, tz: 'İstanbul (UTC+3)', textScale: 100, dark: false,
   user: 'Öğrenci', password: '1234', printers: ['PDF olarak kaydet'], installed: [], unknownDevice: true,
   theme: 'windows', accent: '#0a5dc2', themes: [], startupOff: [], ext: {}, popupBlock: false,
+  swapButtons: false, dblSpeed: 5, cursorSize: 'normal', cursorColor: 'white', magnifier: false, magZoom: 200,
+  bluetooth: true, btDevices: [], airplane: false, pin: '',
+  kbLayout: 'trq', kbList: ['trq', 'eng'], time24: true, powerPlan: 'dengeli', screenOff: 10, sleepAfter: 30, blockThird: false,
 });
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -90,6 +95,7 @@ export class Desktop {
           </div>
           <div class="tb-tray">
             <button type="button" class="tb-usb" hidden title="USB Bellek: güvenle kaldır">💾</button>
+            <button type="button" class="tb-lang" title="Giriş dili ve klavye düzeni"></button>
             <button type="button" class="tb-net" title="Ağ ve ses"><span class="tb-wifi"></span><span class="tb-vol"></span></button>
             <button type="button" class="tb-clock"><span class="tb-time"></span><span class="tb-date"></span></button>
             <button type="button" class="tb-showdesk" title="Masaüstünü göster"></button>
@@ -114,8 +120,16 @@ export class Desktop {
     this.bindIcons();
     this.bindTaskbar();
     this.bindKeys();
+    // Büyüteç açıkken görüntü fare işaretçisini izler
+    root.addEventListener('pointermove', (e) => {
+      if (!this.root.classList.contains('dk-magnified')) return;
+      const r = root.getBoundingClientRect();
+      const x = e.clientX - r.left - root.clientLeft - this.screen.offsetLeft, y = e.clientY - r.top - root.clientTop - this.screen.offsetTop;
+      this.screen.style.transformOrigin = `${x}px ${y}px`;
+    });
     this.tick();
     setInterval(() => this.tick(), 10000);
+    setInterval(() => this.checkAlarms(), 1000);
     this.applySettings();
     this.renderIcons();
     this.renderTaskbar();
@@ -137,7 +151,15 @@ export class Desktop {
     this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
     this.bookmarks = []; // tarayıcının sık kullanılanları
     this.history = []; // tarayıcı geçmişi
+    this.webState = {}; // sitelerin durumu (giriş yapılmış mı, sepet, görüşme); önceki dersten kalmasın
+    this.sitePerms = {}; // sitelere verilen kamera, mikrofon, bildirim izinleri
+    this.textClip = null;
+    this.cookies = []; // sitelerin bıraktığı çerezler (üçüncü taraf takip çerezleri dahil)
     this.stopped = null; // Görev Yöneticisinden sonlandırılan arka plan işlemleri
+    this.sec = null; // Windows Güvenliği: disk doluluğu, güvenlik duvarı, tarama bilgisi
+    this.stickies = []; // Yapışkan Notlar
+    this.alarms = []; // Saat uygulamasındaki alarmlar: { id, time: 'SS:DD', label, on }
+    this.timers = []; // zamanlayıcılar: { end, label }
     this.iconPos = {};
     this.selected = null;
     this.fileClip = null;
@@ -186,11 +208,11 @@ export class Desktop {
       case 'login': {
         o.innerHTML = `<div class="pw-login" style="background:${this.wallCss()}"><div class="pw-card">
             <div class="pw-avatar">👤</div><div class="pw-user">${esc(this.settings.user)}</div>
-            <div class="pw-pass"><input type="password" placeholder="Şifre" autocomplete="off" aria-label="Şifre"><button type="button" class="pw-eye" title="Şifreyi göster">👁</button><button type="button" class="pw-go" title="Giriş">➜</button></div>
-            <div class="pw-err"></div><div class="pw-hint">Alıştırma şifresi: <b>${esc(this.settings.password)}</b></div></div></div>`;
+            <div class="pw-pass"><input type="password" placeholder="${this.settings.pin ? 'PIN ya da şifre' : 'Şifre'}" autocomplete="off" aria-label="Şifre"><button type="button" class="pw-eye" title="Şifreyi göster">👁</button><button type="button" class="pw-go" title="Giriş">➜</button></div>
+            <div class="pw-err"></div><div class="pw-hint">Alıştırma şifresi: <b>${esc(this.settings.password)}</b>${this.settings.pin ? ` · PIN: <b>${esc(this.settings.pin)}</b>` : ''}</div></div></div>`;
         const inp = o.querySelector('input');
         const go = () => {
-          const ok = inp.value === this.settings.password;
+          const ok = inp.value === this.settings.password || (!!this.settings.pin && inp.value === this.settings.pin);
           this.emit('login', { ok });
           if (ok) { this.setPower('welcome'); return; }
           o.querySelector('.pw-err').textContent = 'Şifre yanlış. Lütfen tekrar deneyin.';
@@ -241,12 +263,73 @@ export class Desktop {
     this.root.querySelector('.dk-wall').style.background = this.wallCss();
     this.root.style.setProperty('--dk-scale', s.textScale / 100);
     this.root.querySelector('.dk-dim').style.opacity = (100 - s.brightness) / 140;
-    this.root.querySelector('.tb-wifi').textContent = s.wifi && s.network ? '📶' : '🚫';
+    this.root.querySelector('.tb-wifi').textContent = s.airplane ? '✈' : s.wifi && s.network ? '📶' : '🚫';
     this.root.querySelector('.tb-vol').textContent = s.muted || !s.volume ? '🔇' : s.volume < 40 ? '🔈' : '🔊';
     this.root.classList.toggle('dk-dark', !!s.dark);
     this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
     this.root.classList.toggle('tb-left', !!s.taskbarLeft);
+    const lang = this.root.querySelector('.tb-lang');
+    if (lang) { lang.textContent = KB[s.kbLayout]?.[0] || 'TUR'; lang.title = `Giriş dili: ${KB[s.kbLayout]?.[1] || ''}. Değiştirmek için tıklayın ya da Alt + Shift`; }
+    this.applyCursor();
+    this.applyMagnifier();
     this.tick();
+  }
+
+  // Ekranı kilitle (Win + L, Başlat → hesap → Kilitle, Ayarlar → Hesaplar): programlar açık kalır
+  lockScreen(via = 'key') {
+    if (this.power !== 'desktop') return;
+    this.emit('screen-lock', { via });
+    this.setPower('lock');
+    // Kilit açılınca (login → welcome → desktop) pencereler yerinde kalır; setPower('lock') pencereleri yok etmez
+  }
+
+  // Uçak modu: Wi-Fi ve Bluetooth birlikte kapanır; kapatılınca Wi-Fi geri gelir
+  setAirplane(on) {
+    const s = this.settings;
+    s.airplane = on;
+    if (on) { s.wifi = false; s.network = null; s.bluetooth = false; s.btDevices = []; }
+    else { s.wifi = true; s.network = s.knownNetworks[0] || null; }
+    this.applySettings();
+    this.emit('airplane', { on });
+    this.wins.forEach((w) => w.api?.onSettings?.());
+  }
+
+  // Fare işaretçisi: boyut ve renk (Ayarlar → Erişilebilirlik)
+  applyCursor() {
+    const s = this.settings;
+    const custom = s.cursorSize !== 'normal' || s.cursorColor !== 'white';
+    this.root.classList.toggle('dk-cur', custom);
+    if (!custom) return;
+    const px = { normal: 24, big: 40, huge: 64 }[s.cursorSize];
+    const fill = { white: '#fff', black: '#000', yellow: '#ffd600', green: '#2e7d32' }[s.cursorColor];
+    const edge = s.cursorColor === 'black' ? '#fff' : '#000';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 24 24"><path d="M3 2v18l5-4.5 3.5 7.5 3-1.4-3.5-7.3H19z" fill="${fill}" stroke="${edge}" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+    this.root.style.setProperty('--dk-cursor', `url("data:image/svg+xml,${encodeURIComponent(svg)}") 3 2, auto`);
+  }
+
+  // Büyüteç: ekranı fare işaretçisinin çevresinde yakınlaştırır
+  applyMagnifier() {
+    const s = this.settings;
+    const on = !!s.magnifier && this.power === 'desktop';
+    this.screen.style.transform = on ? `scale(${s.magZoom / 100})` : '';
+    if (!on) this.screen.style.transformOrigin = '';
+    this.root.classList.toggle('dk-magnified', on);
+    let bar = this.root.querySelector('.dk-magbar');
+    if (!on) { bar?.remove(); return; }
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'dk-magbar';
+      bar.innerHTML = '<span>🔍 Büyüteç</span><button type="button" data-m="-" title="Uzaklaştır">−</button><b></b><button type="button" data-m="+" title="Yakınlaştır">＋</button><button type="button" data-m="x" title="Büyüteci kapat">✕</button>';
+      bar.onclick = (e) => {
+        const m = e.target.closest('[data-m]')?.dataset.m;
+        if (!m) return;
+        if (m === 'x') this.setSetting('magnifier', false);
+        else this.setSetting('magZoom', Math.max(150, Math.min(400, this.settings.magZoom + (m === '+' ? 50 : -50))));
+        this.emit('magnifier', { on: this.settings.magnifier, zoom: this.settings.magZoom });
+      };
+      this.root.append(bar);
+    }
+    bar.querySelector('b').textContent = '%' + s.magZoom;
   }
 
   applyTheme(key) {
@@ -272,10 +355,36 @@ export class Desktop {
     return d;
   }
 
+  // Alarm ve zamanlayıcı: Saat uygulaması kapalıyken de çalar
+  checkAlarms() {
+    if (this.power !== 'desktop') return;
+    const d = this.now();
+    const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    for (const a of this.alarms || []) {
+      if (!a.on || a.time !== hm || a.last === `${d.getDate()}${hm}`) continue;
+      a.last = `${d.getDate()}${hm}`;
+      this.ring(a.label || 'Alarm', a.time, '⏰');
+      this.emit('alarm-ring', { time: a.time, label: a.label });
+    }
+    const now = Date.now();
+    for (const t of [...(this.timers || [])]) {
+      if (t.end > now) continue;
+      this.timers.splice(this.timers.indexOf(t), 1);
+      this.ring(t.label, 'Süre doldu', '⏳');
+      this.emit('timer-ring', { label: t.label });
+    }
+    this.wins.forEach((w) => w.api?.onAlarm?.());
+  }
+
+  ring(title, text, icon) {
+    this.toast(title, text, icon, 12000);
+    playTune(this, [880, 660, 880, 660, 880], 0.22);
+  }
+
   tick() {
     if (!this.root.querySelector('.tb-time')) return;
     const d = this.now();
-    this.root.querySelector('.tb-time').textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    this.root.querySelector('.tb-time').textContent = this.settings.time24 === false ? `${pad(d.getHours() % 12 || 12)}:${pad(d.getMinutes())} ${d.getHours() < 12 ? 'ÖÖ' : 'ÖS'}` : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
     this.root.querySelector('.tb-date').textContent = d.toLocaleDateString('tr-TR');
   }
 
@@ -509,7 +618,8 @@ export class Desktop {
     if (name.endsWith('.zip')) return this.extractZip(n, true);
     if (name.endsWith('.exe')) return this.runSetup(n);
     if (name.endsWith('.pdf')) return this.open('pdf', { node: n.id });
-    if (name.endsWith('.mp3')) return this.open('music', { node: n.id });
+    if (/\.html?$/.test(name)) return this.open('browser', { file: n.id });
+    if (/\.(mp3|m4a|wav)$/.test(name)) return this.open('music', { node: n.id });
     this.toast('Açılamadı', 'Bu dosyayı açacak bir program yok.', '⚠');
     return null;
   }
@@ -654,7 +764,7 @@ export class Desktop {
   bindTaskbar() {
     const $ = (s) => this.root.querySelector(s);
     this.screen.addEventListener('pointerdown', (e) => {
-      if (!e.target.closest('.dk-ctx, .dk-start, .tb-start, .tb-search, .dk-winx, .dk-quick, .tb-net')) this.closeMenus();
+      if (!e.target.closest('.dk-ctx, .dk-start, .tb-start, .tb-search, .dk-winx, .dk-quick, .tb-net, .tb-clock')) this.closeMenus();
     });
     $('.tb-start').onclick = () => this.toggleStart();
     $('.tb-start').oncontextmenu = (e) => { e.preventDefault(); this.winxMenu(); };
@@ -670,7 +780,15 @@ export class Desktop {
       this.menu($('.tb-usb').getBoundingClientRect().left, $('.tb-usb').getBoundingClientRect().top - 60,
         [{ cmd: 'eject', label: '⏏ USB Belleği çıkar' }], () => this.ejectUsb(), 'usb');
     };
-    $('.tb-clock').onclick = () => this.open('settings', { page: 'time' });
+    $('.tb-clock').onclick = () => this.toggleCalendar();
+    $('.tb-clock').oncontextmenu = (e) => {
+      e.preventDefault();
+      this.menu(e.clientX - 60, e.clientY - 56, [{ cmd: 'time', label: '🕒 Tarih ve saati ayarla' }], () => this.open('settings', { page: 'time' }), 'clock');
+    };
+    $('.tb-lang').onclick = () => {
+      const r = $('.tb-lang').getBoundingClientRect();
+      this.menu(r.left - 150, r.top - (this.settings.kbList.length * 40 + 12), this.settings.kbList.map((id) => ({ cmd: id, label: `${this.settings.kbLayout === id ? '✔' : '\u2003'} <b>${KB[id][0]}</b> ${KB[id][1]}` })), (id) => this.setKbLayout(id, 'menu'), 'lang');
+    };
     // Görev çubuğuna sağ tık: boş yerde Görev Yöneticisi, uygulama düğmesinde pencereyi kapat
     $('.dk-taskbar').addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -753,6 +871,12 @@ export class Desktop {
       const b = e.target.closest('[data-app]');
       if (b) { this.closeMenus(); this.emit('start-open', { app: b.dataset.app, via: 'click' }); this.open(b.dataset.app); return; }
       if (e.target.closest('.st-power')) this.powerMenu(e.target.closest('.st-power'));
+      const um = e.target.closest('.st-user');
+      if (um) {
+        const r = um.getBoundingClientRect();
+        this.menu(r.left, r.top - 60, [{ cmd: 'settings', label: '⚙ Hesap ayarlarını değiştir' }, { cmd: 'lock', label: '🔒 Kilitle' }],
+          (cmd) => { this.startEl.hidden = true; if (cmd === 'lock') this.lockScreen('start'); else this.open('settings', { page: 'accounts' }); }, 'startuser');
+      }
     });
     // Windows'ta olduğu gibi Başlat açıkken doğrudan yazmaya başlamak arama yapar
     setTimeout(() => input.focus({ preventScroll: true }), focusSearch ? 0 : 30);
@@ -814,19 +938,67 @@ export class Desktop {
     }, 'winx');
   }
 
+  // Sağ alttaki saate tıklayınca açılan takvim
+  toggleCalendar() {
+    const q = this.root.querySelector('.dk-quick');
+    if (!q.hidden && q.classList.contains('qk-cal')) { q.hidden = true; return; }
+    this.closeMenus();
+    const d = this.now(), y = d.getFullYear(), m = d.getMonth();
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+    const cells = Array.from({ length: lead }, () => '<i></i>').concat(Array.from({ length: days }, (_, i) => `<span class="${i + 1 === d.getDate() ? 'today' : ''}">${i + 1}</span>`)).join('');
+    q.classList.add('qk-cal');
+    q.innerHTML = `<div class="ck-time">${this.root.querySelector('.tb-time').textContent}<small>${d.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small></div>
+      <div class="ck-head">${d.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}</div>
+      <div class="ck-grid">${['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((n) => `<b>${n}</b>`).join('')}${cells}</div>
+      <button type="button" class="qk-all">🕒 Tarih ve saat ayarları</button>`;
+    q.hidden = false;
+    this.emit('calendar', { open: true });
+    q.querySelector('.qk-all').onclick = () => { q.hidden = true; this.open('settings', { page: 'time' }); };
+  }
+
+  // Giriş dili ve klavye düzeni (TUR Q, TUR F, ENG): görev çubuğundan, Alt + Shift ile ya da Ayarlar'dan
+  setKbLayout(id, via = 'menu') {
+    if (!this.settings.kbList.includes(id)) return;
+    this.settings.kbLayout = id;
+    this.applySettings();
+    this.wins.forEach((w) => w.api?.onSettings?.());
+    const t = this.toast(`${KB[id][0]}`, KB[id][1], '⌨', 1800);
+    t.classList.add('dk-osd');
+    this.emit('kb-layout', { layout: id, lang: KB[id][0], via });
+  }
+
+  cycleKb(via) {
+    const l = this.settings.kbList, i = l.indexOf(this.settings.kbLayout);
+    this.setKbLayout(l[(i + 1) % l.length], via);
+  }
+
+  // F ya da İngilizce düzende gerçek klavyedeki tuşun harfi değişir: yazı alanlarına doğru harf yazılır
+  remapKey(e) {
+    const el = e.target;
+    if (!el?.matches?.('textarea, input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]), [contenteditable=""], [contenteditable="true"]')) return;
+    const ch = mapKey(this.settings.kbLayout, e);
+    if (ch == null) return;
+    e.preventDefault();
+    document.execCommand('insertText', false, ch);
+  }
+
   toggleQuick() {
     const q = this.root.querySelector('.dk-quick');
     if (!q.hidden) { q.hidden = true; return; }
     this.closeMenus();
+    q.classList.remove('qk-cal');
     const s = this.settings;
     q.innerHTML = `<div class="qk-row"><button type="button" class="qk-wifi ${s.wifi ? 'on' : ''}">📶<span>${s.wifi ? (s.network || 'Bağlı değil') : 'Wi-Fi kapalı'}</span></button>
-        <button type="button" class="qk-bt">🔵<span>Bluetooth</span></button></div>
+        <button type="button" class="qk-bt ${s.bluetooth ? 'on' : ''}">🔵<span>${s.bluetooth ? 'Bluetooth açık' : 'Bluetooth kapalı'}</span></button>
+        <button type="button" class="qk-air ${s.airplane ? 'on' : ''}">✈<span>Uçak modu</span></button></div>
       <label class="qk-sl">☀ <input type="range" class="qk-bri" min="20" max="100" value="${s.brightness}"></label>
       <label class="qk-sl"><button type="button" class="qk-mute" title="Sesi kapat/aç">${s.muted ? '🔇' : '🔊'}</button><input type="range" class="qk-vol" min="0" max="100" value="${s.volume}"><b class="qk-vv">${s.volume}</b></label>
       <button type="button" class="qk-all">⚙ Tüm ayarlar</button>`;
     q.hidden = false;
     this.emit('quick', { open: true });
     q.querySelector('.qk-wifi').onclick = () => { this.setSetting('wifi', !s.wifi); if (!s.wifi) this.settings.network = null; else this.settings.network = this.settings.knownNetworks[0] || null; this.applySettings(); q.hidden = true; this.toggleQuick(); };
+    q.querySelector('.qk-bt').onclick = () => { this.setSetting('bluetooth', !s.bluetooth); if (!s.bluetooth) this.settings.btDevices = []; this.emit('toggle', { key: 'bluetooth', on: s.bluetooth }); q.hidden = true; this.toggleQuick(); };
+    q.querySelector('.qk-air').onclick = () => { this.setAirplane(!s.airplane); q.hidden = true; this.toggleQuick(); };
     q.querySelector('.qk-bri').oninput = (e) => this.setSetting('brightness', +e.target.value);
     q.querySelector('.qk-vol').oninput = (e) => { this.setSetting('volume', +e.target.value); q.querySelector('.qk-vv').textContent = e.target.value; if (s.muted) this.setSetting('muted', false); };
     q.querySelector('.qk-mute').onclick = (e) => { this.setSetting('muted', !s.muted); e.target.textContent = s.muted ? '🔇' : '🔊'; };
@@ -1080,6 +1252,11 @@ export class Desktop {
     this.screen.addEventListener('keydown', (e) => {
       if (this.power === 'lock') { e.preventDefault(); this.setPower('login'); return; }
       if (this.power === 'sleep' && Date.now() - this.sleepAt > 900) { this.emit('wake'); this.setPower('lock'); return; }
+      if (e.metaKey && e.code === 'KeyL') { e.preventDefault(); this.lockScreen('key'); return; }
+      // Alt + Shift: Windows'taki gibi tuşlar bırakılınca dil değişir; arada başka tuşa (ör. Tab) basıldıysa değişmez
+      if (e.key === 'Shift' || e.key === 'Alt') { if ((e.altKey && e.shiftKey)) this.kbArm = true; } else this.kbArm = false;
+      if (e.metaKey && e.code === 'Space') { e.preventDefault(); if (!e.repeat) this.cycleKb('key'); return; }
+      if (this.settings.kbLayout !== 'trq' && this.power === 'desktop') this.remapKey(e);
       if (e.altKey && e.key === 'Tab') { e.preventDefault(); this.altTab(); return; }
       if (e.altKey && e.key === 'F4' && this.active) { e.preventDefault(); this.close(this.active); return; }
       // Ctrl + Shift + Esc: Görev Yöneticisi. Ctrl + Alt + Delete: güvenlik ekranı. (Windows bu tuşları kendisi yakalayabilir.)
@@ -1094,7 +1271,10 @@ export class Desktop {
       }
       if (e.target === this.iconsEl && (e.ctrlKey || e.metaKey) && e.code === 'KeyV') this.pasteFile('desktop');
     });
-    this.screen.addEventListener('keyup', (e) => { if (e.key === 'Alt' && this.switcher) this.altTabEnd(); });
+    this.screen.addEventListener('keyup', (e) => {
+      if (e.key === 'Alt' && this.switcher) this.altTabEnd();
+      if ((e.key === 'Shift' || e.key === 'Alt') && this.kbArm) { this.kbArm = false; this.cycleKb('key'); }
+    });
     // Gerçek Alt+Tab, işletim sistemi tarafından yakalanır: sayfa odağı kaybedip geri alınca anlarız
     addEventListener('blur', () => { this.blurAt = Date.now(); });
     addEventListener('focus', () => { if (this.blurAt && Date.now() - this.blurAt > 150 && this.root.offsetParent) this.emit('alttab', { real: true }); this.blurAt = 0; });

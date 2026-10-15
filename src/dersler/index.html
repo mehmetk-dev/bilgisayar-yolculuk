@@ -10,16 +10,18 @@
 </head>
 <body data-view="home">
 <header id="top">
-  <a class="brand" href="#">💻 Bilgisayar <span>Dersleri</span></a>
+  <a class="brand" href="#">Bilgisayar <span>Dersleri</span></a>
   <span id="crumb"></span>
   <span class="sp"></span>
   <button id="who" type="button" title="Bu bilgisayarı kimin kullandığını seçin; her öğrencinin ilerlemesi ayrı saklanır"></button>
-  <button id="fontDown" type="button" title="Yazıyı küçült">A−</button>
-  <button id="fontUp" type="button" title="Yazıyı büyüt">A+</button>
+  <span class="seg" role="group" aria-label="Yazı boyutu">
+    <button id="fontDown" type="button" class="fs-s" title="Yazıyı küçült" aria-label="Yazıyı küçült">A</button>
+    <button id="fontUp" type="button" class="fs-l" title="Yazıyı büyüt" aria-label="Yazıyı büyüt">A</button>
+  </span>
   <button id="soundBtn" type="button" title="Başarı sesini aç/kapat"></button>
-  <a class="btn" href="#ozet" title="Bu bilgisayardaki öğrencilerin ilerlemesi">📊 Özet</a>
-  <a class="btn" href="robot.html" title="Çocuklar için robotik kodlama dersleri">🤖 Robo ile Kodlama</a>
-  <a class="btn" href="bilgisayar.html" title="Bilgisayarın içini üç boyutlu görün">🖥 Bilgisayarı canlı gör</a>
+  <a class="btn" href="#ozet" title="Bu bilgisayardaki öğrencilerin ilerlemesi">Özet</a>
+  <a class="btn" href="robot.html" title="Çocuklar için robotik kodlama dersleri">Robo ile Kodlama</a>
+  <a class="btn" href="bilgisayar.html" title="Bilgisayarın içini üç boyutlu görün">Bilgisayarı canlı gör</a>
 </header>
 
 <main id="home">
@@ -28,14 +30,12 @@
     <p>Bir ders seçin. Her adımda ne yapacağınız yazar; doğru yaptığınızda ekran size haber verir. Acele etmeyin, yanlış yapmaktan korkmayın: burada hiçbir şey bozulmaz. Yandaki bilgisayar bir <b>alıştırma bilgisayarıdır</b>; gerçek dosyalarınıza dokunmaz.</p>
   </div>
   <a class="live" href="bilgisayar.html">
-    <span class="live-ic">🖥</span>
     <span class="live-txt"><b>Bilgisayarı canlı görün</b><small>Kasayı açın, parçaları tek tek inceleyin: 1990'lardan bugüne üç boyutlu bilgisayar.</small></span>
-    <span class="live-go">Aç ▶</span>
+    <span class="live-go">Aç</span>
   </a>
   <a class="live robo" href="robot.html">
-    <span class="live-ic">🤖</span>
-    <span class="live-txt"><b>Robo ile Kodlama (8–12 yaş)</b><small>7 haftalık kodlama eğitimi: Robo ile algoritma, döngü ve koşullar; ardından Scratch gibi bloklarla animasyon ve oyun yapımı.</small></span>
-    <span class="live-go">Başla ▶</span>
+    <span class="live-txt"><b>Robo ile Kodlama (8–12 yaş)</b><small>8 haftalık kodlama eğitimi: Robo ile algoritma, döngü ve koşullar; ardından Scratch gibi bloklarla animasyon ve oyun yapımı.</small></span>
+    <span class="live-go">Başla</span>
   </a>
   <div id="cards"></div>
 </main>
@@ -44,7 +44,7 @@
 
 <main id="lesson">
   <section id="guide" aria-live="polite">
-    <div id="kbAlerts"><div id="layoutAlert" hidden></div><div id="capsAlert" hidden>🔠 <b>Caps Lock açık:</b> harfler büyük yazılıyor. Kapatmak için <kbd>Caps Lock</kbd> tuşuna bir kez basın.</div></div>
+    <div id="kbAlerts"><div id="layoutAlert" hidden></div><div id="capsAlert" hidden><b>Caps Lock açık:</b> harfler büyük yazılıyor. Kapatmak için <kbd>Caps Lock</kbd> tuşuna bir kez basın.</div></div>
     <div class="prog"><span id="stepNo"></span><div id="bar"><i></i></div></div>
     <div id="dots" aria-label="Adımlar"></div>
     <h2 id="stepTitle"></h2>
@@ -53,11 +53,11 @@
     <div id="msg" hidden></div>
     <div id="hint" hidden></div>
     <button id="manual" type="button" class="primary" hidden></button>
-    <button id="next" type="button" class="primary" hidden>Devam ▶</button>
+    <button id="next" type="button" class="primary" hidden>Devam</button>
     <div class="gnav">
-      <button id="prev" type="button">◀ Önceki adım</button>
-      <button id="hintBtn" type="button">💡 İpucu</button>
-      <button id="skip" type="button" title="Algılanmadıysa bir sonraki adıma geçer">Adımı geç ▶</button>
+      <button id="prev" type="button">Önceki adım</button>
+      <button id="hintBtn" type="button">İpucu</button>
+      <button id="skip" type="button" title="Algılanmadıysa bir sonraki adıma geçer">Adımı geç</button>
     </div>
   </section>
   <section id="work">
@@ -65,7 +65,7 @@
     <div id="desk"></div>
     <div id="scene"></div>
     <div class="under">
-      <div id="pano" class="empty"><h3>📋 Pano <span class="pflash"></span></h3><div class="ptext"></div></div>
+      <div id="pano" class="empty"><h3>Pano <span class="pflash"></span></h3><div class="ptext"></div></div>
       <div class="kbwrap"><div id="kb" class="kb" aria-hidden="true"></div></div>
     </div>
   </section>

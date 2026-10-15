@@ -13,6 +13,9 @@ import { taskmgr } from './taskmgr.js';
 import { bulut } from './bulut.js';
 import { store, takvim, hava } from './store.js';
 import { mail } from './mail.js';
+import { guvenlik } from './guvenlik.js';
+import { denetim } from './denetim.js';
+import { notlar, kayit, saat } from './donatilar.js';
 import { word } from './word.js';
 import { sheet } from './sheet.js';
 import { slides } from './slides.js';
@@ -61,9 +64,14 @@ export const APPS = {
   takvim: { name: 'Takvim', icon: '📅', w: 0.6, h: 0.75, installable: true, keywords: ['takvim', 'tarih', 'gün', 'ay'], create: takvim },
   hava: { name: 'Hava Durumu', icon: '🌤', w: 0.55, h: 0.7, installable: true, keywords: ['hava', 'yağmur', 'sıcaklık'], create: hava },
   snip: { name: 'Ekran Alıntısı', icon: '✂', w: 0.48, h: 0.55, single: true, keywords: ['ekran', 'alıntı', 'görüntü', 'snip'], create: snip },
+  notlar: { name: 'Yapışkan Notlar', icon: '🗒', w: 0.6, h: 0.7, single: true, keywords: ['not', 'yapışkan', 'hatırlatma', 'sticky'], create: notlar },
+  kayit: { name: 'Ses Kaydedici', icon: '🎙', w: 0.45, h: 0.7, single: true, keywords: ['ses', 'kayıt', 'mikrofon'], create: kayit },
+  saat: { name: 'Saat', icon: '⏰', w: 0.5, h: 0.65, single: true, keywords: ['saat', 'alarm', 'zamanlayıcı', 'hatırlatıcı'], create: saat },
+  guvenlik: { name: 'Windows Güvenliği', icon: '🛡', w: 0.72, h: 0.78, single: true, keywords: ['güvenlik', 'virüs', 'antivirüs', 'tarama', 'duvar', 'disk', 'temizleme', 'temizle'], create: guvenlik },
+  denetim: { name: 'Denetim Masası', icon: '🎛', w: 0.78, h: 0.8, single: true, keywords: ['denetim', 'control', 'panel', 'program kaldır', 'programlar ve özellikler', 'güç seçenekleri', 'sistem', 'ayar'], create: denetim },
   hedef: { name: 'Hedef Oyunu', icon: '🎯', w: 0.84, h: 0.88, keywords: ['oyun', 'fare'], create: hedef },
   mayin: { name: 'Mayın Tarlası', icon: '💣', w: 0.46, h: 0.86, keywords: ['oyun', 'mayın'], create: mayin },
   kartlar: { name: 'Kart Dizme', icon: '🃏', w: 0.8, h: 0.8, keywords: ['oyun', 'kart', 'solitaire'], create: kartlar },
 };
 
-export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'slides', 'store', 'bulut', 'taskmgr', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer', 'takvim', 'hava'];
+export const START_APPS = ['notepad', 'calc', 'paint', 'explorer', 'settings', 'browser', 'mail', 'word', 'sheet', 'slides', 'store', 'bulut', 'taskmgr', 'snip', 'photos', 'music', 'mayin', 'hedef', 'kartlar', 'viewer', 'takvim', 'hava', 'notlar', 'kayit', 'saat', 'guvenlik'];

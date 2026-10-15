@@ -12,7 +12,7 @@ const ROWS = [
 // Sağdaki küçük blok: Delete, Home, End ve ok tuşları (boş hücreler null)
 const SIDE = [
   [['Delete', 'Delete'], ['Home', 'Home'], ['End', 'End']],
-  [null, null, null],
+  [['Insert', 'Insert'], null, null],
   [null, null, null],
   [null, ['ArrowUp', '↑'], null],
   [['ArrowLeft', '←'], ['ArrowDown', '↓'], ['ArrowRight', '→']],

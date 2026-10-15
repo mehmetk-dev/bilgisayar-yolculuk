@@ -3,7 +3,7 @@
 // sipariş takibi) ve görüntülü görüşme (kamera/mikrofon izni, sessize alma, sohbet). Hepsi uydurmadır.
 // render(path, q, ctx) sayfayı çizer; act(ad, formDeğerleri, ctx, düğme) data-act düğmelerine ve formlarına cevap verir.
 // ctx.state her sitenin kendi bilgisidir (giriş yapıldı mı, sepet…); masaüstü sıfırlanınca silinir.
-import { esc } from './util.js';
+import { esc, setCookie } from './util.js';
 
 const page = (title, html, cls = '') => ({ title, html: `<div class="wp ${cls}">${html}</div>` });
 const tl = (n) => n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
@@ -46,8 +46,15 @@ const EDEVLET = {
   name: 'e-Devlet Kapısı', secure: true,
   render(path, q, ctx) {
     const st = ctx.state, head = edHead(st);
+    if (path === '/onay') {
+      if (!st.user || st.back !== 'enabiz') return page('e-Devlet Kapısı', `${head}<div class="ed"><h1>Bekleyen bir istek yok</h1><p>Başka bir uygulamadan gelen bir giriş isteği görünmüyor.</p></div>`);
+      return page('e-Devlet Kapısı: Onay', `${head}<div class="ed"><h1>🩺 e-Nabız kimliğinizi öğrenmek istiyor</h1><p>e-Nabız uygulamasına giriş yapabilmeniz için aşağıdaki bilgileriniz <b>e-Devlet</b> tarafından e-Nabız'a aktarılacak:</p>
+        <ul><li>T.C. Kimlik Numarası</li><li>Ad ve soyad</li></ul><p class="ed-note">Şifreniz e-Nabız'a <b>verilmez</b>. Yalnızca beklediğiniz bir uygulamaysa onaylayın.</p>
+        <p><button type="button" class="ed-btn" data-act="consent">Onayla ve e-Nabız'a dön</button><button type="button" class="ed-btn ghost" data-act="consentNo">Vazgeç</button></p></div>`);
+    }
     if (path === '/giris') {
-      return page('e-Devlet Kapısı: Giriş', `${head}<form class="ed-login" data-act="login"><h1>Kimliğinizi doğrulayın</h1><p class="ed-tabs"><b>🔑 e-Devlet Şifresi</b> <span>📱 Mobil İmza</span> <span>💳 e-İmza</span></p>
+      const geldi = st.back === 'enabiz' ? '<div class="ed-note">🩺 <b>e-Nabız</b> sizi buraya yönlendirdi. Kimliğinizi yalnızca e-Devlet doğrular; şifrenizi e-Nabız görmez. Adres çubuğunda <b>turkiye.gov.tr</b> yazdığına dikkat edin.</div>' : '';
+      return page('e-Devlet Kapısı: Giriş', `${head}<form class="ed-login" data-act="login">${geldi}<h1>Kimliğinizi doğrulayın</h1><p class="ed-tabs"><b>🔑 e-Devlet Şifresi</b> <span>📱 Mobil İmza</span> <span>💳 e-İmza</span></p>
         ${errTop(st)}<label>T.C. Kimlik No<input name="tc" inputmode="numeric" maxlength="11" autocomplete="off" value="${val(st, 'tc')}"></label>${errOf(st, 'tc')}
         <label>e-Devlet Şifresi<input name="sifre" type="password" autocomplete="off"></label>${errOf(st, 'sifre')}
         <button class="ed-btn">Giriş Yap</button><p class="ed-small">Şifreniz yoksa kimliğinizle PTT\'den alabilirsiniz. Şifrenizi kimseyle paylaşmayın.</p></form>`);
@@ -101,11 +108,19 @@ const EDEVLET = {
       st.user = true;
       st.userName = ctx.desk.settings.user;
       st.form = {};
-      ctx.go(st.next || '/');
+      ctx.go(st.back === 'enabiz' ? '/onay' : st.next || '/');
       st.next = null;
       return;
     }
-    if (a === 'logout') { st.user = false; ctx.emit('edevlet-logout'); ctx.go('/cikis'); return; }
+    if (a === 'consent' || a === 'consentNo') {
+      const ok = a === 'consent';
+      if (ok) { const nb = ((ctx.desk.webState ||= {})['enabiz.gov.tr'] ||= {}); nb.user = true; nb.name = st.userName; }
+      st.back = null;
+      ctx.emit(ok ? 'nabiz-login' : 'nabiz-login-cancel', { ok });
+      ctx.visit('enabiz.gov.tr', '/');
+      return;
+    }
+    if (a === 'logout') { st.user = false; st.back = null; ctx.emit('edevlet-logout'); ctx.go('/cikis'); return; }
     if (a === 'make') {
       if (!v.amac) { st.err.amac = 'Belgenin nereye verileceğini seçin.'; ctx.emit('edevlet-form-error'); ctx.refresh(); return; }
       const id = el.dataset.svc;
@@ -164,7 +179,8 @@ const MHRS = {
     if (path === '/onay' && st.last) {
       const r = st.last;
       return page('Randevunuz alındı - MHRS', `${head}<div class="ed"><div class="ed-ok">✅ Randevunuz alındı.</div><dl class="mh-dl"><dt>Randevu kodu</dt><dd>${r.kod}</dd><dt>Hastane</dt><dd>${esc(r.hastane)}</dd><dt>Klinik</dt><dd>${esc(r.klinik)}</dd><dt>Tarih</dt><dd>${esc(r.gun)} · ${r.saat}</dd></dl>
-        <p class="ed-note">Randevu saatinden 15 dakika önce hastanede olun. Gidemeyecekseniz <b>Randevularım</b>'dan iptal edin; başka biri o saati kullanabilir.</p></div>`);
+        <p class="ed-note">Randevu saatinden 15 dakika önce hastanede olun. Gidemeyecekseniz <b>Randevularım</b>'dan iptal edin; başka biri o saati kullanabilir.</p>
+        <p><button type="button" class="ed-btn small" data-act="pdf">⬇ Randevu belgesini indir (PDF)</button></p></div>`);
     }
     if (path === '/randevularim') {
       const list = st.list || [];
@@ -195,6 +211,13 @@ const MHRS = {
       ctx.desk.toast('SMS · MHRS', `${r.gun} ${r.saat} ${esc(r.klinik)} randevunuz alınmıştır. Kod: ${r.kod}`, '💬', 8000);
       ctx.emit('appointment', { ...r });
       ctx.go('/onay');
+      return;
+    }
+    if (a === 'pdf') {
+      const r = st.last;
+      if (!r) return;
+      ctx.download('randevu belgesi.pdf', { pages: [`<p class="pdf-org">T.C. SAĞLIK BAKANLIĞI<br>Merkezi Hekim Randevu Sistemi</p><h3>Randevu Belgesi</h3><p>Randevu kodu: <b>${r.kod}</b></p><p>Hastane: ${esc(r.hastane)}</p><p>Klinik: ${esc(r.klinik)}</p><p>Tarih ve saat: <b>${esc(r.gun)} · ${r.saat}</b></p><p class="pdf-small">Randevu saatinden 15 dakika önce hastanede olunuz. Kimliğinizi yanınızda getirin.</p>`] });
+      ctx.emit('mhrs-pdf', { kod: r.kod });
       return;
     }
     if (a === 'cancel') {
@@ -280,6 +303,9 @@ const SHOP = {
     if (a === 'add') {
       if (line) line.n++; else cart.push({ id: el.dataset.id, n: 1 });
       ctx.desk.toast('Sepete eklendi', `${esc(URUNLER.find((u) => u.id === el.dataset.id).name)} · Sepette ${count(st)} ürün`, '🛒', 2500);
+      const ur = URUNLER.find((u) => u.id === el.dataset.id);
+      // Üçüncü taraf: alışveriş sitesine gömülü reklam şirketi, baktığınız ürünü başka sitelerde reklam göstermek için kaydeder
+      setCookie(ctx.desk, { site: 'reklam-takip.net', name: 'ilgi-alani', party: 'third', purpose: 'Baktığınız ürünü hatırlar; başka sitelerde size o ürünün reklamını gösterir', interest: ur.name });
       ctx.emit('shop-add', { id: el.dataset.id, count: count(st) });
       ctx.refresh();
       return;

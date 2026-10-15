@@ -35,3 +35,13 @@ export function played(notes, seq) {
   for (const n of notes) if (n === seq[k]) { k++; if (k === seq.length) return true; }
   return false;
 }
+
+// Görev betiklerinde sık kullanılan kısa yazımlar (değer, koşul ve betik denetimi)
+export const V = (v) => ({ r: 'var', v });
+export const R = (a, b) => ({ r: 'rand', a, b });
+export const J = (a, b) => ({ r: 'join', a, b });
+export const touch = (o) => ({ k: 'touch', o });
+export const key = (k) => ({ k: 'key', key: k });
+export const cmp = (a, op, b) => ({ k: 'cmp', a, op, b });
+export const has = (a, name, s) => JSON.stringify(a.w.sprite(name)?.scripts || []).includes(s);
+export const visibleCount = (a, name) => a.w.sprites.filter((s) => s.name === name && s.isClone && s.visible).length;

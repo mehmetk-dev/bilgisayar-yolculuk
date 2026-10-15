@@ -261,6 +261,7 @@ export const alisveris = {
   ],
 };
 
+const permOk = (c) => { const p = c.d.sitePerms?.['bulalim.com']; return p?.camera === 'allow' && p?.mic === 'allow'; };
 const DAVET = { key: 'gorusme', from: 'elif@ornek.com', fromName: 'Elif (torunum)', subject: 'Bu akşam görüntülü görüşelim mi? 📹', url: 'gorusme.bulalim.com/aile', urlText: 'Görüşmeye katılmak için tıklayın',
   body: 'Merhaba!\n\nBu akşam hep birlikte görüntülü görüşelim. Ahmet amcam da gelecek. Aşağıdaki bağlantıya tıklamanız yeterli; hiçbir şey kurmanıza gerek yok.\n\nSevgiler,\nElif' };
 
@@ -294,11 +295,14 @@ export const gorusme = {
     },
     {
       title: 'Kamera ve mikrofon izni',
-      html: '<p>Tarayıcı, sitenin <b>kameranızı</b> ve <b>mikrofonunuzu</b> kullanmasına izin isteyip istemediğinizi soruyor. Görüntülü görüşme için <b>İzin ver</b>\'e basın.</p>',
+      html: '<p>Tarayıcı, sitenin <b>kameranızı</b> ve <b>mikrofonunuzu</b> kullanmasına izin isteyip istemediğinizi soruyor (adres çubuğunun altındaki kutu). Görüntülü görüşme için <b>İzin ver</b>\'e basın.</p>',
       mouse: '🖱 İzin ver',
+      hint: 'Kutu kapandıysa ya da yanlışlıkla Engelle dediyseniz: adres çubuğundaki 🔒 kilide tıklayın, Kamera ve Mikrofon\'u “İzin ver” yapın.',
+      // Soru "Devam"dan önce cevaplanmış ya da izinler kilit menüsünden tek tek verilmiş olabilir: olaya değil duruma bakılır
+      check: permOk,
       on: (ev, c) => {
-        if (ev.type === 'meet-perm' && ev.value === 'block') { c.warn('Engellediniz. Düzeltmek için: adres çubuğundaki 🔒 kilit → Kamera ve Mikrofon → İzin ver, sonra ⟳ yenile.'); return false; }
-        return (ev.type === 'meet-perm' && ev.value === 'allow') || (ev.type === 'web-perm' && ev.perm === 'mic' && ev.value === 'allow' && c.d.sitePerms?.['bulalim.com']?.camera === 'allow');
+        if (ev.type === 'meet-perm' && ev.value === 'block') { c.warn('Engellediniz. Düzeltmek için: adres çubuğundaki 🔒 kilit → Kamera ve Mikrofon → “İzin ver” yapın, sonra sayfayı yenileyin (⟳).'); return false; }
+        return (ev.type === 'meet-perm' || ev.type === 'web-perm') && permOk(c);
       },
       done: 'İzin verdiniz; kendi görüntünüzü görüyorsunuz. Bu izni yalnızca tanıdığınız görüşme sitelerine verin.',
     },
@@ -334,9 +338,17 @@ export const gorusme = {
       done: 'Mesajınız herkese gitti. Ses gelmediğinde ya da bağlantı kötüyken sohbet çok işe yarar.',
     },
     {
-      title: 'El kaldırın, sonra ayrılın',
-      html: '<p>Kalabalık görüşmelerde söz istemek için <b>✋ El kaldır</b>\'a basın. Sonra görüşmeyi bitirmek için kırmızı <b>📞 Ayrıl</b>\'a basın.</p>',
-      mouse: '🖱 ✋ → 📞 Ayrıl',
+      title: 'El kaldırın',
+      html: '<p>Kalabalık görüşmelerde herkes aynı anda konuşmasın diye söz istemek için <b>✋ El kaldır</b>\'a basın.</p>',
+      mouse: '🖱 ✋ El kaldır',
+      on: (ev) => ev.type === 'meet-hand' && ev.on,
+      done: 'Elinizi kaldırdınız; ekranda “Elinizi kaldırdınız” yazıyor. Söz sırası size gelince elinizi indirirsiniz (aynı düğme).',
+    },
+    {
+      title: 'Görüşmeden ayrılın',
+      html: '<p>Görüşmeyi bitirmek için kırmızı <b>📞 Ayrıl</b> düğmesine basın.</p>',
+      mouse: '🖱 📞 Ayrıl',
+      hint: 'Düğmeler görüşme ekranının altında, ortada. Ayrıl en sağdaki kırmızı düğmedir.',
       on: (ev) => ev.type === 'meet-leave',
       done: 'Görüşmeden ayrıldınız. Pencereyi ya da sekmeyi kapatmak da görüşmeden çıkarır.',
     },

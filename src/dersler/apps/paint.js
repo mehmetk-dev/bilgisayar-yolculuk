@@ -193,15 +193,20 @@ export function paint({ desk, body, args, emit, setTitle, dialogs }) {
   async function save(asNew) {
     if (dialogs.busy) return false;
     if (!fileName || asNew) {
-      const r = await dialogs.file({ mode: 'save', fs: fsApi, folder, name: fileName || '', ext: '.png', typeLabel: 'PNG (*.png)' });
+      const r = await dialogs.file({ mode: 'save', fs: fsApi, folder, name: fileName || '', ext: '.png', typeLabel: 'PNG (*.png)', types: [['.png', 'PNG (*.png)'], ['.jpg', 'JPEG (*.jpg; *.jpeg)']] });
       body.focus({ preventScroll: true });
       if (!r) return false;
       fileName = r.name; folder = r.folder;
     }
-    desk.fs.write(folder, fileName, cv.toDataURL('image/png'));
+    const jpeg = /\.jpe?g$/i.test(fileName);
+    if (jpeg) { // JPEG saydam alan bilmez: arka plan beyaz olur
+      const t = document.createElement('canvas'); t.width = cv.width; t.height = cv.height;
+      const tg = t.getContext('2d'); tg.fillStyle = '#fff'; tg.fillRect(0, 0, t.width, t.height); tg.drawImage(cv, 0, 0);
+      desk.fs.write(folder, fileName, t.toDataURL('image/jpeg', 0.8));
+    } else desk.fs.write(folder, fileName, cv.toDataURL('image/png'));
     dirty = false;
     title();
-    emit('save', { name: fileName, folder, label: desk.fs.label(folder) });
+    emit('save', { name: fileName, folder, label: desk.fs.label(folder), format: jpeg ? 'jpg' : 'png' });
     return true;
   }
 

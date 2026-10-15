@@ -42,13 +42,14 @@ export class Dialogs {
 
   // mode: 'save' | 'open'. fs: { folders(), list(folderId) → [{id,name,folder}], label(folderId) }
   // accept: açma penceresinde gösterilecek dosyalar (verilmezse uzantıya göre)
-  file({ mode, fs, folder, name = '', ext = '.txt', typeLabel = 'Metin Belgeleri (*.txt)', accept }) {
+  // types (isteğe bağlı, kaydetmede): [[uzantı, etiket], …] → “Kayıt türü” listesi çıkar; uzantı '*' ise yazılan ad olduğu gibi kalır
+  file({ mode, fs, folder, name = '', ext = '.txt', typeLabel = 'Metin Belgeleri (*.txt)', accept, types }) {
     const title = mode === 'save' ? 'Farklı kaydet' : 'Aç';
     const inner = `
       <div class="dlg-path"><button type="button" class="dlg-up" title="Bir üst klasör">⬆</button><span class="dlg-crumb"></span></div>
       <div class="dlg-body"><ul class="dlg-side"></ul><ul class="dlg-files"></ul></div>
       <label class="dlg-row"><span>Dosya adı:</span><input class="dlg-name" autocomplete="off" spellcheck="false" autofocus></label>
-      <div class="dlg-row"><span>Kayıt türü:</span><span class="dlg-type">${esc(typeLabel)}</span></div>
+      <div class="dlg-row"><span>Kayıt türü:</span>${types && mode === 'save' ? `<select class="dlg-type">${types.map(([e, l]) => `<option value="${e}">${esc(l)}</option>`).join('')}</select>` : `<span class="dlg-type">${esc(typeLabel)}</span>`}</div>
       <div class="dlg-err" aria-live="polite"></div>
       <div class="dlg-btns"><button type="button" class="dlg-ok">${mode === 'save' ? 'Kaydet' : 'Aç'}</button><button type="button" class="dlg-cancel">İptal</button></div>`;
     const p = this.shell('dlg-file', title, inner, mode);
@@ -94,6 +95,19 @@ export class Dialogs {
       if (e.target.closest('[data-file]')) ok();
     });
     input.addEventListener('input', () => { overwrite = null; $('.dlg-err').textContent = ''; });
+    const typeSel = types && mode === 'save' ? $('select.dlg-type') : null;
+    if (typeSel) {
+      // Tür değişince adın uzantısı da değişir (ör. resim.png → resim.jpg)
+      typeSel.addEventListener('change', () => {
+        overwrite = null;
+        const v = typeSel.value;
+        if (v !== '*') input.value = input.value.replace(/\.[^.\\/]*$/, '') + v;
+        this.emit('dialog-type', { ext: v });
+      });
+      // Açılışta ad zaten bir türe uyuyorsa o tür seçili olsun
+      const m = types.find(([e]) => e !== '*' && name.toLocaleLowerCase('tr').endsWith(e));
+      if (m) typeSel.value = m[0];
+    }
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); ok(); } });
 
     const err = (t) => { $('.dlg-err').textContent = t; input.focus(); };
@@ -101,7 +115,10 @@ export class Dialogs {
       let n = input.value.trim();
       if (!n || n === ext || n === '*' + ext) return err('Lütfen “Dosya adı” kutusuna bir ad yazın.');
       if (BAD_CHARS.test(n)) return err('Dosya adında şu işaretler olamaz:  \\ / : * ? " < > |');
-      if (!extRe.test(n) && !(mode === 'open' && acc.test(n))) n += ext;
+      if (typeSel) {
+        const hit = types.find(([e]) => e !== '*' && n.toLocaleLowerCase('tr').endsWith(e));
+        if (typeSel.value !== '*') { if (hit) typeSel.value = hit[0]; else n += typeSel.value; }
+      } else if (!extRe.test(n) && !(mode === 'open' && acc.test(n))) n += ext;
       const exists = fs.list(cur).some((it) => !it.folder && it.name.toLocaleLowerCase('tr') === n.toLocaleLowerCase('tr'));
       if (mode === 'open' && !exists) return err(`“${n}” bulunamadı. Listeden bir dosyaya tıklayın.`);
       if (mode === 'save' && exists && overwrite !== n && !(n === name && cur === folder)) {
@@ -129,16 +146,61 @@ export class Dialogs {
     return p;
   }
 
-  print({ printers, doc }) {
-    const inner = `<div class="dlg-pr">
+  // preview (isteğe bağlı): { html, pages, orient, border, wm, padding } — Word gibi programların yazdırma önizlemesi
+  // pvHtml: yazdırma önizlemesinin hazır HTML'i (Hesap Tablosu gibi programlar kendisi çizer)
+  // pages (isteğe bağlı): belgenin sayfa sayısı; verilirse sayfa aralığı, renk, iki yüz ve yaprak sayısı seçenekleri de çıkar (PDF Okuyucu)
+  print({ printers, doc, preview, pvHtml, pages, current = 1 }) {
+    const pv = preview ? `<div class="dlg-pv"><div class="dlg-pvbox ${preview.orient === 'yatay' ? 'yatay' : ''}"><div class="wd-page dlg-pvp ${preview.border === 'kutu' ? 'bordered' : preview.border === 'cift' ? 'bordered2' : ''} ${preview.orient === 'yatay' ? 'yatay' : ''}" data-wm="${esc(preview.wm || '')}" style="padding:${preview.padding}">${preview.html}</div></div>
+        <div class="dlg-pvnote ${preview.pages > 1 ? 'bad' : 'ok'}">${preview.pages > 1 ? `⚠ Belge <b>${preview.pages} sayfa</b>; her sayfa ayrı kâğıda çıkar. Tek kâğıda sığdırmak için yazı boyutunu ya da kenar boşluklarını küçültün.` : '✔ Belge <b>tek kâğıda</b> sığıyor.'}<br><small>Kâğıt: A4, ${preview.orient === 'yatay' ? 'yatay' : 'dikey'}</small></div></div>` : '';
+    const inner = `${pvHtml ? `<div class="dlg-pv">${pvHtml}</div>` : pv}<div class="dlg-pr">
         <label class="dlg-row"><span>Yazıcı:</span><select class="dlg-printer">${printers.map((p) => `<option>${esc(p)}</option>`).join('')}</select></label>
         <label class="dlg-row"><span>Kopya sayısı:</span><input class="dlg-copies" type="number" min="1" max="9" value="1"></label>
+        ${pages ? `<label class="dlg-row"><span>Sayfalar:</span><select class="dlg-range"><option value="all">Tümü (1–${pages})</option><option value="current">Geçerli sayfa (${current})</option><option value="custom">Aralık yaz…</option></select></label>
+        <label class="dlg-row dlg-rng-row" hidden><span></span><input class="dlg-rng" placeholder="ör. 1 ya da 1-2" autocomplete="off"></label>
+        <label class="dlg-row"><span>Renk:</span><select class="dlg-color"><option value="color">Renkli</option><option value="bw">Siyah-beyaz</option></select></label>
+        <label class="dlg-row"><span>İki yüze:</span><input type="checkbox" class="dlg-duplex"> <small>kâğıdın iki yüzüne yazdır (tasarruf)</small></label>
+        <div class="dlg-pvnote ok dlg-sheets"></div>` : ''}
         <div class="dlg-row"><span>Belge:</span><b>${esc(doc)}</b></div></div>
       <div class="dlg-btns"><button type="button" class="dlg-ok">🖨 Yazdır</button><button type="button" class="dlg-cancel">İptal</button></div>`;
     const p = this.shell('dlg-print', 'Yazdır', inner, 'print');
     const back = this._last;
-    back.querySelector('.dlg-ok').onclick = () => back.close({ printer: back.querySelector('.dlg-printer').value, copies: +back.querySelector('.dlg-copies').value || 1 });
-    back.querySelector('.dlg-cancel').onclick = () => back.close(null);
+    const q = (x) => back.querySelector(x);
+    // Seçilen sayfa aralığı: [ilk, son] ya da geçersizse null
+    const span = () => {
+      if (!pages) return null;
+      const r = q('.dlg-range').value;
+      if (r === 'all') return [1, pages];
+      if (r === 'current') return [current, current];
+      const m = q('.dlg-rng').value.trim().match(/^(\d+)(?:\s*[-–]\s*(\d+))?$/);
+      if (!m) return null;
+      const a = +m[1], b = +(m[2] || m[1]);
+      return a >= 1 && b >= a && b <= pages ? [a, b] : null;
+    };
+    const info = () => {
+      if (!pages) return;
+      q('.dlg-rng-row').hidden = q('.dlg-range').value !== 'custom';
+      const sp = span(), copies = Math.max(1, +q('.dlg-copies').value || 1), duplex = q('.dlg-duplex').checked;
+      const box = q('.dlg-sheets');
+      if (!sp) { box.className = 'dlg-pvnote bad dlg-sheets'; box.innerHTML = '⚠ Sayfa aralığını doğru yazın (ör. 1 ya da 1-2; belgede ' + pages + ' sayfa var).'; return; }
+      const n = sp[1] - sp[0] + 1, sheets = copies * Math.ceil(n / (duplex ? 2 : 1));
+      box.className = 'dlg-pvnote ' + (sheets > 2 ? 'bad' : 'ok') + ' dlg-sheets';
+      box.innerHTML = `${n} sayfa × ${copies} kopya${duplex ? ', iki yüzlü' : ''} = <b>${sheets} yaprak kâğıt</b>`;
+    };
+    back.addEventListener('input', info);
+    back.addEventListener('change', info);
+    info();
+    q('.dlg-ok').onclick = () => {
+      const sp = span();
+      if (pages && !sp) { info(); return; }
+      const copies = +q('.dlg-copies').value || 1;
+      const out = { printer: q('.dlg-printer').value, copies };
+      if (pages) {
+        const duplex = q('.dlg-duplex').checked, n = sp[1] - sp[0] + 1;
+        Object.assign(out, { from: sp[0], to: sp[1], pagesPrinted: n, range: q('.dlg-range').value, color: q('.dlg-color').value !== 'bw', duplex, sheets: copies * Math.ceil(n / (duplex ? 2 : 1)) });
+      }
+      back.close(out);
+    };
+    q('.dlg-cancel').onclick = () => back.close(null);
     return p;
   }
 
@@ -152,8 +214,10 @@ export function fileIcon(name) {
   if (/\.xlsx?$/i.test(name)) return '📗';
   if (/\.pptx?$/i.test(name)) return '📙';
   if (/\.pdf$/i.test(name)) return '📕';
+  if (/\.html?$/i.test(name)) return '🌐';
+  if (/\.gif$/i.test(name)) return '🖼';
   if (/\.exe$/i.test(name)) return '💿';
-  if (/\.(mp3|wav)$/i.test(name)) return '🎵';
+  if (/\.(mp3|wav|m4a)$/i.test(name)) return '🎵';
   if (/\.zip$/i.test(name)) return '🗜';
   if (/\.(mp4|avi|mov)$/i.test(name)) return '🎬';
   return '📄';

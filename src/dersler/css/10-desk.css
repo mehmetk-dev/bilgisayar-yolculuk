@@ -97,7 +97,7 @@
 .qk-row { display: flex; gap: 0.5em; }
 .qk-row button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.2em; padding: 0.6em !important; border-radius: 8px !important; background: #fff; font-size: 0.85em; }
 .qk-row button span { font-size: 0.95em; }
-.qk-wifi.on { background: var(--dk-acc, #0a5dc2) !important; color: #fff; }
+.qk-wifi.on, .qk-bt.on, .qk-air.on { background: var(--dk-acc, #0a5dc2) !important; color: #fff; }
 .qk-sl { display: flex; align-items: center; gap: 0.6em; }
 .qk-sl input { flex: 1; accent-color: var(--dk-acc, #0a5dc2); }
 .qk-mute { border: 0 !important; background: none; font-size: 1.1em; padding: 0 !important; }
@@ -270,3 +270,22 @@
 .prg i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--dk-acc, #0a5dc2), #3aa0ff); }
 .spin { display: inline-block; width: 1em; height: 1em; border: 2px solid var(--dk-acc, #0a5dc2); border-right-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: -0.15em; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Erişilebilirlik: fare işaretçisi ve Büyüteç */
+.dk-cur .dk-screen, .dk-cur .dk-screen * { cursor: var(--dk-cursor) !important; }
+.dk-magnified .dk-screen { transition: transform 0.15s ease-out; }
+.dk-magbar { position: absolute; z-index: 9000; left: 50%; top: 0.5em; transform: translateX(-50%); display: flex; align-items: center; gap: 0.5em; background: #202124ee; color: #fff; padding: 0.3em 0.8em; border-radius: 2em; font-size: 0.95em; box-shadow: 0 3px 10px #0006; }
+.dk-magbar button { background: #ffffff22; color: #fff; border: 0; border-radius: 50%; width: 1.8em; height: 1.8em; font-size: 1em; padding: 0; }
+.dk-magbar button:hover { background: #ffffff44; }
+
+/* Dil göstergesi, takvim, klavye değişim uyarısı */
+.tb-lang { font-weight: 600; letter-spacing: 0.02em; }
+.dk-quick.qk-cal { width: 17em; }
+.ck-time { font-size: 2em; font-weight: 300; line-height: 1.1; }
+.ck-time small { display: block; font-size: 0.38em; color: #556; font-weight: 400; margin-top: 0.3em; }
+.ck-head { font-weight: 600; text-transform: capitalize; border-top: 1px solid #c9d1dc; padding-top: 0.5em; }
+.ck-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.15em; text-align: center; font-size: 0.85em; }
+.ck-grid b { color: #667; font-weight: 600; }
+.ck-grid span { padding: 0.25em 0; border-radius: 50%; }
+.ck-grid span.today { background: var(--dk-acc, #0a5dc2); color: #fff; font-weight: 700; }
+.dk-dark .ck-time small, .dk-dark .ck-grid b { color: #bbb; }
+.dk-toast.dk-osd { min-width: 11em; }

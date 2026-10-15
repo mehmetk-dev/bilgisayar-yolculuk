@@ -110,7 +110,7 @@ function showOzet() {
   const t = ozetTable();
   $('#ozet').innerHTML = `<div class="oz"><h1>📊 Eğitmen özeti</h1>
     <p class="mut">Bu bilgisayarda kayıtlı öğrencilerin her haftada bitirdiği ders sayısı ve test puanı (ilk denemede doğru bilinen sorular). Yeşil: hafta tamam, sarı: yarım. Kayıtlar yalnızca bu bilgisayarın tarayıcısındadır; her bilgisayarın özeti ayrıdır.</p>
-    ${t ? `<div class="oz-wrap">${t}</div><div class="oz-btns"><button type="button" class="btn" id="ozPrint">🖨 Yazdır</button><a class="btn" href="#">🏠 Ders listesi</a></div>` : '<p>Henüz kayıtlı öğrenci yok. Öğrenciler üstteki 👤 düğmesinden adlarını ekleyince burada görünür.</p><a class="btn" href="#">🏠 Ders listesi</a>'}</div>`;
+    ${t ? `<div class="oz-wrap">${t}</div><div class="oz-btns"><button type="button" class="btn" id="ozPrint">Yazdır</button><a class="btn" href="#">Ders listesi</a></div>` : '<p>Henüz kayıtlı öğrenci yok. Öğrenciler üstteki 👤 düğmesinden adlarını ekleyince burada görünür.</p><a class="btn" href="#">Ders listesi</a>'}</div>`;
   const pr = $('#ozPrint');
   if (pr) pr.onclick = () => {
     $('#printCard').innerHTML = `<h1>📊 Eğitmen özeti</h1><p>${new Date().toLocaleDateString('tr-TR')}</p>${t}`;
@@ -128,13 +128,13 @@ function showHome() {
   const card = (l) => {
     if (l.link) {
       return `<article class="lcard link"><div class="licon">${l.icon}</div><div class="lmain"><h3>${l.title}</h3><p>${l.desc}</p>
-        <div class="lfoot"><span class="sp"></span><a class="btn primary" href="${l.link}">Aç ▶</a></div></div></article>`;
+        <div class="lfoot"><span class="sp"></span><a class="btn primary" href="${l.link}">Aç</a></div></div></article>`;
     }
     const p = store.lessons[l.id];
     const total = l.steps.length;
     const sc = l.test && testScore(l);
-    let status = `<span class="tag">⏱ ~${l.minutes} dk · ${sc ? `${sc.total} soru` : `${total} adım`}</span>`;
-    let btn = `<a class="btn primary" href="#ders/${l.id}">Başla ▶</a>`;
+    let status = `<span class="tag">~${l.minutes} dk · ${sc ? `${sc.total} soru` : `${total} adım`}</span>`;
+    let btn = `<a class="btn primary" href="#ders/${l.id}">Başla</a>`;
     const last = store.logs?.[l.id]?.at(-1);
     if (last?.wpm != null) {
       status = `<span class="tag ok">⌨ Son ölçüm: ${last.wpm} kelime/dk</span>`;
@@ -144,7 +144,7 @@ function showHome() {
       btn = `<a class="btn" href="#ders/${l.id}" data-restart="${l.id}">↻ Tekrar yap</a>`;
     } else if (p?.step > 0) {
       status = `<span class="tag">Adım ${p.step + 1} / ${total}</span>`;
-      btn = `<button type="button" class="link" data-restart="${l.id}">Baştan</button><a class="btn primary" href="#ders/${l.id}">Devam ▶</a>`;
+      btn = `<button type="button" class="link" data-restart="${l.id}">Baştan</button><a class="btn primary" href="#ders/${l.id}">Devam</a>`;
     }
     return `<article class="lcard${p?.done ? ' done' : ''}"><div class="licon">${l.icon}</div><div class="lmain">
       <h3>${l.title}</h3><p>${l.desc}</p>
@@ -168,6 +168,7 @@ $('#cards').addEventListener('click', (e) => {
 function openLesson(l) {
   if (lesson === l) return;
   lesson = l;
+  late = [];
   const stage = l.stage || 'notepad';
   document.body.dataset.view = 'lesson';
   document.body.dataset.stage = stage;
@@ -213,13 +214,23 @@ function ctxBase() {
 }
 
 // ---- Adımlar ----
+// Öğrenci "Devam"a basmadan sonraki adımın işini yapmış olabilir (ör. tarayıcının izin sorusunu hemen cevaplamak).
+// Bitmiş adımda, tamamlanmadan kısa süre sonra gelen olaylar saklanır ve yeni adım açılınca ona da gösterilir;
+// böyle sonraki adım "yaptığım iş sayılmadı" diye takılıp kalmaz.
+let doneAt = 0;
+let late = [];
+const LATE_MIN = 250, LATE_MAX = 120000;
+
 function showStep(i, resumed = false) {
   clearTimeout(hintTimer);
   if (step && ctx) { try { step.leave?.(ctx); } catch (err) { console.error(err); } }
+  const now = performance.now();
+  const carry = lesson.stage === 'desktop' && !resumed && i === idx + 1 ? late.filter((e) => now - e.t < LATE_MAX) : [];
+  late = [];
   idx = i;
   step = lesson.steps[i];
   done = false;
-  stepStart = performance.now();
+  stepStart = now;
   stepWarns = 0;
   ctx = Object.assign(Object.create(ctxBase()), {
     s: {},
@@ -249,7 +260,7 @@ function showStep(i, resumed = false) {
   if (step.combo) parts.push(`<span class="keys">${step.combo.map((c) => `<kbd class="cap" data-code="${c}">${keyLabel(c)}</kbd>`).join('<b>+</b>')}</span>`);
   $('#combo').innerHTML = parts.join('');
   $('#combo').hidden = !parts.length;
-  $('#hint').innerHTML = step.hint ? '💡 ' + step.hint : '';
+  $('#hint').innerHTML = step.hint ? '<b>İpucu:</b> ' + step.hint : '';
   $('#hint').hidden = true;
   $('#hintBtn').hidden = !step.hint;
   msg('', '');
@@ -257,13 +268,13 @@ function showStep(i, resumed = false) {
 
   const info = !step.on && !step.manual;
   $('#next').hidden = !info || !!step.final;
-  $('#next').textContent = i === 0 ? 'Başlayalım ▶' : 'Devam ▶';
+  $('#next').textContent = i === 0 ? 'Başlayalım' : 'Devam';
   $('#manual').hidden = !step.manual;
   $('#manual').textContent = step.manual || '';
   $('#prev').disabled = i === 0;
   $('#skip').hidden = info;
   document.body.classList.toggle('waiting', !info);
-  if (info) done = true;
+  if (info) { done = true; doneAt = now; }
 
   if (lesson.stage === 'scene') {
     const sc = $('#scene');
@@ -272,6 +283,12 @@ function showStep(i, resumed = false) {
     try { (step.scene || lesson.scene)?.(sc, ctx); } catch (err) { console.error(err); }
   }
   try { step.setup?.(ctx); } catch (err) { console.error(err); }
+  for (const e of carry) {
+    if (done || !step.on) break;
+    let ok = false;
+    try { ok = step.on(e.ev, ctx); } catch (err) { console.error(err); }
+    if (ok) complete();
+  }
   if (step.final) finish();
   if (step.hint) hintTimer = setTimeout(() => { if (!done) $('#hint').hidden = false; }, HINT_DELAY);
   $('#guide').scrollTop = 0;
@@ -286,6 +303,7 @@ function showStep(i, resumed = false) {
 
 function complete() {
   done = true;
+  doneAt = performance.now();
   clearTimeout(hintTimer);
   const p = store.lessons[lesson.id];
   (p.stats ||= {})[idx] = { t: Math.round((performance.now() - stepStart) / 1000), w: stepWarns };
@@ -321,25 +339,25 @@ function finalHtml() {
   let report = '';
   if (lesson.parkur && timed.length) {
     const total = timed.reduce((a, s) => a + s.t, 0);
-    report = `<h3 class="rep-h">⏱ Parkur süresi: ${fmtTime(total)}</h3><table class="sum rep">${timed.sort((a, b) => a.i - b.i).map((s) => `<tr class="${s.t === slow[0].t ? 'slow' : ''}"><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table>
+    report = `<h3 class="rep-h">Parkur süresi: ${fmtTime(total)}</h3><table class="sum rep">${timed.sort((a, b) => a.i - b.i).map((s) => `<tr class="${s.t === slow[0].t ? 'slow' : ''}"><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table>
       <p class="mut">Kırmızı satır, en uzun süren görevdir. Öğrencinin takıldığı yeri gösterir.</p>`;
   } else if (lesson.test) {
     const sc = testScore(lesson);
     report = `<div class="score"><b>${sc.right} / ${sc.total}</b><span>soruyu ilk denemede doğru bildiniz</span></div>
       ${sc.missed.length ? `<details class="rep-d" open><summary>Tekrar bakılacak konular</summary><ul>${sc.missed.map((s) => `<li>${esc(s.title)}</li>`).join('')}</ul></details>` : '<p>Hepsini ilk denemede bildiniz! 🌟</p>'}`;
   } else if (slow.length >= 3) {
-    report = `<details class="rep-d"><summary>⏱ En uzun süren adımlar (eğitmen için)</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
+    report = `<details class="rep-d"><summary>En uzun süren adımlar (eğitmen için)</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
   }
   const keyish = (k) => /^(Ctrl|Shift|Alt|AltGr|Enter|Tab|Delete|Esc|F\d|⊞|⌫|Caps)/.test(k);
   const sum = lesson.summary ? `<table class="sum">${lesson.summary.map(([k, v]) => `<tr><th>${keyish(k) ? k.split(' + ').map((x) => `<kbd>${x}</kbd>`).join(' + ') : k}</th><td>${v}</td></tr>`).join('')}</table>` : '';
   const nx = nextLesson();
   return `${sum}${report}
     <div class="fbtns">
-      ${nx ? `<a class="btn primary" href="#ders/${nx.id}">Sonraki ders: ${esc(nx.title)} ▶</a>` : ''}
-      ${lesson.summary ? '<button type="button" class="btn" data-act="print">🖨 Özet kartını yazdır</button>' : ''}
+      ${nx ? `<a class="btn primary" href="#ders/${nx.id}">Sonraki ders: ${esc(nx.title)}</a>` : ''}
+      ${lesson.summary ? '<button type="button" class="btn" data-act="print">Özet kartını yazdır</button>' : ''}
       ${lesson.stage === 'notepad' ? '<button type="button" class="btn" data-act="download">⬇ Yazımı bilgisayara indir</button>' : ''}
-      <button type="button" class="btn" data-act="restart">↻ Dersi baştan yap</button>
-      <a class="btn" href="#">🏠 Ders listesi</a>
+      <button type="button" class="btn" data-act="restart">Dersi baştan yap</button>
+      <a class="btn" href="#">Ders listesi</a>
     </div>
     ${lesson.stage === 'scene' ? '' : '<p class="mut">Yandaki alanda dilediğiniz kadar serbestçe alıştırma yapabilirsiniz.</p>'}`;
 }
@@ -412,6 +430,9 @@ function onEvent(ev) {
     let ok = false;
     try { ok = step.on(ev, ctx); } catch (err) { console.error(err); }
     if (ok) { complete(); return; }
+  } else if (done && lesson.stage === 'desktop' && performance.now() - doneAt > LATE_MIN) {
+    if (late.length >= 40) late.shift();
+    late.push({ ev, t: performance.now() });
   }
   general(ev);
 }
@@ -482,7 +503,7 @@ $('#dots').addEventListener('click', (e) => {
 
 function applyFont() {
   document.documentElement.style.setProperty('--fs', store.fs + 'px');
-  $('#soundBtn').textContent = store.sound ? '🔔 Ses açık' : '🔕 Ses kapalı';
+  $('#soundBtn').textContent = store.sound ? 'Ses açık' : 'Ses kapalı';
 }
 $('#fontUp').onclick = () => { store.fs = Math.min(30, store.fs + 2); applyFont(); persist(); desk?.renderIcons(); };
 $('#fontDown').onclick = () => { store.fs = Math.max(14, store.fs - 2); applyFont(); persist(); desk?.renderIcons(); };
@@ -545,7 +566,7 @@ addEventListener('beforeunload', (e) => {
 
 // ---- Öğrenci seçimi ----
 const pick = $('#pick');
-$('#who').textContent = who ? `👤 ${who}` : '👤 Öğrenci seç';
+$('#who').textContent = who ? who : 'Öğrenci seç';
 $('#who').onclick = () => openPicker();
 if (who) $('.hero h1').textContent = `Hoş geldiniz, ${who}!`;
 
@@ -565,7 +586,7 @@ function openPicker(first = false) {
   pickFirst = first;
   pick.hidden = false;
   pick.innerHTML = `<div class="pickbox" role="dialog" aria-label="Öğrenci seçimi">
-  <h2>👤 Bu bilgisayarı kim kullanıyor?</h2>
+  <h2>Bu bilgisayarı kim kullanıyor?</h2>
   <div class="plist">${profiles().map((n) => `<span class="pone"><button type="button" class="pname${n === who ? ' cur' : ''}" data-n="${esc(n)}">${esc(n)}</button><button type="button" class="pdel" data-n="${esc(n)}" title="${esc(n)} kaydını sil">🗑</button></span>`).join('') || '<p class="mut">Henüz kayıtlı kimse yok. Adınızı yazıp ekleyin.</p>'}</div>
   <form class="padd"><input type="text" maxlength="30" placeholder="Adınız soyadınız" aria-label="Adınız"><button type="submit" class="primary">➕ Ekle ve başla</button></form>
   <div class="pfoot"><button type="button" class="link pguest">Misafir olarak devam et</button>${first ? '' : '<button type="button" class="link pclose">Kapat</button>'}</div>

@@ -18,6 +18,9 @@ const rec = (no) => {
   r.score ||= {};
   return r;
 };
+// Sertifika 8 haftalık programın sonunda verilir; ek bölümler programın dışındadır
+const CORE = LESSONS.filter((l) => !l.extra);
+const wkLabel = (L) => (L.extra ? 'Ek bölüm' : `${L.week}. Hafta`);
 const RENDER = { story: renderStory, order: renderOrder, quiz: renderQuiz, grid: renderGrid, scratch: renderScratch };
 let cleanup = null;
 
@@ -56,13 +59,13 @@ function showMap() {
   <span class="nfoot"><span class="chip">Kavram: ${l.concept}</span><span class="nprog"><i style="width:${(n / l.steps.length) * 100}%"></i></span><span class="ncount">${n}/${l.steps.length}${st ? ` · ⭐${st}` : ''}</span></span></span></span>
 </a></li>`;
   };
-  const nodes = WEEKS.map((w, wi) => `<li class="whead"><span>${wi + 1}. Hafta</span>${w.title}<small>4 ders × 40 dk</small></li>${w.lessons.map(node).join('')}`).join('');
+  const nodes = WEEKS.map((w, wi) => `<li class="whead"><span>${w.extra ? 'Ek' : `${wi + 1}. Hafta`}</span>${w.title}<small>${w.extra ? 'hızlı bitirenler ve tekrar için' : '4 ders × 40 dk'}</small></li>${w.lessons.map(node).join('')}`).join('');
   mapEl.innerHTML = `<div class="mwrap">
 <section class="hero">
   <div class="sbot wave">${roboSVG()}</div>
   <div class="htxt">
     <h1>${profile.name ? `Merhaba ${esc(profile.name)}! 👋` : 'Robo ile Kodlama Macerası'}</h1>
-    <p>Önce Robo'ya <b>adım adım komut</b> vererek algoritmanın sırlarını öğren; sonra Scratch gibi renkli bloklarla kendi animasyonlarını ve oyunlarını yap! <b>8 hafta, 32 bölüm.</b></p>
+    <p>Önce Robo'ya <b>adım adım komut</b> vererek algoritmanın sırlarını öğren; sonra Scratch gibi renkli bloklarla kendi animasyonlarını ve oyunlarını yap! <b>8 hafta, 32 bölüm</b> ve hızlı bitirenler için <b>ek bölümler</b> (bulmaca, müzik, oyunlar).</p>
     <a class="btn primary big" href="#b${next.no}">${started ? 'Kaldığın yerden devam et' : 'Maceraya başla'} ▶</a>
     ${profile.name ? `<button type="button" class="link notme">Sen ${esc(profile.name)} değil misin? Değiştir</button>` : ''}
   </div>
@@ -91,7 +94,7 @@ function lessonHead(L, i) {
 
 function showStep(L, i) {
   show('lesson');
-  crumb.textContent = `${L.week}. Hafta · ${L.no}. Bölüm`;
+  crumb.textContent = `${wkLabel(L)} · ${L.no}. Bölüm`;
   const r = rec(L.no);
   const s = L.steps[i];
   lesEl.innerHTML = `<div class="lwrap" style="--c:${L.color}">${lessonHead(L, i)}
@@ -126,7 +129,7 @@ function showStep(L, i) {
 
 function showFinish(L) {
   show('lesson');
-  crumb.textContent = `${L.week}. Hafta · ${L.no}. Bölüm`;
+  crumb.textContent = `${wkLabel(L)} · ${L.no}. Bölüm`;
   const r = rec(L.no);
   // Bölüm ancak bütün adımları yapılınca “bitti” sayılır (öğretmen üstteki düğmelerle atlayabilir)
   if (L.steps.every((_, k) => r.steps[k])) { r.done = true; psave(KEY, progress); }
@@ -136,10 +139,10 @@ function showFinish(L) {
     <div class="sbot dance">${roboSVG()}</div>
     <div class="badge"><span>${L.icon}</span><b>${L.no}. Bölüm tamam!</b></div>
     <h3>Tebrikler, harika bir programcısın! 🎉</h3>
-    ${next ? '' : certHTML()}
+    ${L.no === CORE.length ? certHTML() : ''}
     <div class="learned"><h4>Bu bölümde öğrendiklerin</h4><ul>${L.learned.map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="tnote"><h4>👩‍🏫 Sınıfta oynayın</h4><p>${L.teacher}</p></div>
-    <div class="fbtns">${next ? `<a class="btn primary big" href="#b${next.no}">${next.icon} ${next.no}. Bölüm: ${next.title} ▶</a>` : '<span class="soon-txt">🏆 Bütün bölümleri bitirdin!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
+    <div class="fbtns">${next ? `<a class="btn primary big" href="#b${next.no}">${next.extra && !L.extra ? '🎁 Ek bölümler: ' : ''}${next.icon} ${next.no}. Bölüm: ${next.title} ▶</a>` : '<span class="soon-txt">🏆 Bütün bölümleri bitirdin!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
   </div></div>`;
   play('win');
   confetti(110);
@@ -154,8 +157,8 @@ function showFinish(L) {
 
 // Son bölümün sonunda yazdırılabilir sertifika
 function certHTML() {
-  const total = LESSONS.reduce((n, l) => n + Object.values(rec(l.no).score).reduce((a, b) => a + b, 0), 0);
-  const done = LESSONS.filter((l) => rec(l.no).done).length;
+  const total = CORE.reduce((n, l) => n + Object.values(rec(l.no).score).reduce((a, b) => a + b, 0), 0);
+  const done = CORE.filter((l) => rec(l.no).done).length;
   const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   return `<div class="certwrap">
   <label class="cnamebox">Adın soyadın: <input class="cname" type="text" maxlength="40" value="${esc(load('robo-ad', '') || profile.name)}" placeholder="Adını yaz"></label>
@@ -163,7 +166,7 @@ function certHTML() {
     <div class="cert-robo">${roboSVG()}</div>
     <div class="cert-t">🏅 Başarı Sertifikası</div>
     <div class="cert-name"></div>
-    <p><b>Robo ile Kodlama</b> eğitiminin <b>${done}/${LESSONS.length}</b> bölümünü tamamlayarak algoritma, döngü, fonksiyon, koşul, değişken ve oyun tasarımını öğrenmiştir.</p>
+    <p><b>Robo ile Kodlama</b> eğitiminin <b>${done}/${CORE.length}</b> bölümünü tamamlayarak algoritma, döngü, fonksiyon, koşul, değişken ve oyun tasarımını öğrenmiştir.</p>
     <p class="cert-s">${total ? `Toplam ⭐ ${total} yıldız · ` : ''}${date}</p>
   </div>
   <button type="button" class="primary cprint">🖨 Sertifikayı yazdır</button>

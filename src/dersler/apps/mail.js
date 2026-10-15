@@ -53,7 +53,7 @@ export function deliverMail(desk, o, quiet) {
   return m;
 }
 
-const FOLDERS = [['inbox', '📥', 'Gelen Kutusu'], ['sent', '📤', 'Gönderilenler'], ['spam', '⚠', 'İstenmeyen'], ['trash', '🗑', 'Çöp Kutusu']];
+const FOLDERS = [['inbox', '📥', 'Gelen Kutusu'], ['drafts', '📝', 'Taslaklar'], ['sent', '📤', 'Gönderilenler'], ['spam', '⚠', 'İstenmeyen'], ['trash', '🗑', 'Çöp Kutusu']];
 const attSize = (desk, a) => a.size ?? desk.fs.sizeOf({ name: a.name, content: a.content, type: 'file' });
 // E-posta adresinde Türkçe harf, boşluk ve virgül olmaz; bir tane @ ve @'den sonra noktalı bir alan adı olur
 export function addrProblem(a) {
@@ -66,6 +66,10 @@ export function addrProblem(a) {
   if (!/^[^@]+@[^@]+\.[a-z]{2,}$/i.test(a)) return '@ işaretinden sonra “ornek.com” gibi noktalı bir adres olmalı.';
   return '';
 }
+
+// Birden çok alıcı noktalı virgülle (;) ayrılır: ali@ornek.com; ayse@ornek.com
+export const splitAddrs = (s) => String(s || '').split(';').map((x) => x.trim()).filter(Boolean);
+const listProblem = (s) => splitAddrs(s).map(addrProblem).find(Boolean) || '';
 
 export function mail({ desk, body, emit, setTitle }) {
   const mb = box(desk);
@@ -86,6 +90,7 @@ export function mail({ desk, body, emit, setTitle }) {
       <datalist id="pm-people">${mb.contacts.map((c) => `<option value="${esc(c.email)}">${esc(c.name)}</option>`).join('')}</datalist>`;
     if (view?.kind === 'compose') {
       $('.pm-to').value = view.to; $('.pm-subj').value = view.subject; $('.pm-body').value = view.text;
+      if ($('.pm-cc')) { $('.pm-cc').value = view.cc; $('.pm-bcc').value = view.bcc; }
     }
   }
 
@@ -102,7 +107,7 @@ export function mail({ desk, body, emit, setTitle }) {
     const list = mb.mails.filter((m) => m.folder === folder);
     const label = FOLDERS.find((f) => f[0] === folder)[2];
     return `<h2 class="pm-h">${label}</h2>${folder === 'spam' ? '<p class="pm-hint">⚠ İstenmeyen klasörüne şüpheli postalar kendiliğinden düşer. Ara sıra bakın: bazen gerçek postalar da buraya düşer.</p>' : ''}${list.length ? `<ul class="pm-list">${list.map((m) => `<li><button type="button" data-open="${m.id}" class="${m.read ? '' : 'unread'}">
-      <span class="pm-from">${esc(folder === 'sent' ? 'Kime: ' + m.to : m.fromName)}</span><span class="pm-subj">${esc(m.subject || '(Konu yok)')}${m.attachments.length ? ' 📎' : ''}</span><span class="pm-time">${esc(m.time)}</span></button></li>`).join('')}</ul>` : '<p class="pm-empty">Bu klasörde posta yok.</p>'}`;
+      <span class="pm-from">${esc(folder === 'sent' ? 'Kime: ' + m.to : folder === 'drafts' ? '📝 Taslak' + (m.to ? ' · ' + m.to : '') : m.fromName)}</span><span class="pm-subj">${esc(m.subject || '(Konu yok)')}${m.attachments.length ? ' 📎' : ''}</span><span class="pm-time">${esc(m.time)}</span></button></li>`).join('')}</ul>` : '<p class="pm-empty">Bu klasörde posta yok.</p>'}`;
   }
 
   function readHtml(m) {
@@ -112,7 +117,7 @@ export function mail({ desk, body, emit, setTitle }) {
         ${m.folder === 'inbox' ? '<button type="button" class="pm-spam">⚠ İstenmeyen</button>' : ''}${m.folder === 'spam' ? '<button type="button" class="pm-notspam">✔ İstenmeyen değil</button>' : ''}
         ${m.folder !== 'sent' && !mb.contacts.some((c) => c.email === m.from) && !m.danger ? '<button type="button" class="pm-savec">👤 Kişilere ekle</button>' : ''}${m.folder === 'trash' ? '' : '<button type="button" class="pm-del">🗑 Sil</button>'}</div>
       <h2 class="pm-h">${esc(m.subject || '(Konu yok)')}</h2>
-      <div class="pm-meta"><b>${esc(m.fromName || 'Ben')}</b> &lt;${esc(m.from)}&gt;<br><span>Kime: ${esc(m.to)} · ${esc(m.date)} ${esc(m.time)}</span></div>
+      <div class="pm-meta"><b>${esc(m.fromName || 'Ben')}</b> &lt;${esc(m.from)}&gt;<br><span>Kime: ${esc(m.to)}${m.cc ? ` · Bilgi: ${esc(m.cc)}` : ''}${m.bcc ? ` · Gizli: ${esc(m.bcc)}` : ''} · ${esc(m.date)} ${esc(m.time)}</span></div>
       <div class="pm-text">${esc(m.body).replace(/\n/g, '<br>')}</div>
       ${m.link ? `<p><a href="#" class="pm-link" data-danger="1">👉 ${esc(m.link)}</a></p>` : ''}${m.url ? `<p><a href="#" class="pm-url" data-url="${esc(m.url)}" title="${esc(m.url)}">👉 ${esc(m.urlText || m.url)}</a><br><small class="pm-urlnote">Bağlantı adresi: ${esc(m.url)}</small></p>` : ''}${att}`;
   }
@@ -120,7 +125,9 @@ export function mail({ desk, body, emit, setTitle }) {
   function composeHtml() {
     return `<div class="pm-tools"><button type="button" class="pm-send primary">➤ Gönder</button><button type="button" class="pm-attach">📎 Dosya ekle</button><button type="button" class="pm-discard">✕ Vazgeç</button></div>
       <h2 class="pm-h">${view.title}</h2>
-      <label class="pm-field"><span>Kime:</span><input class="pm-to" type="text" spellcheck="false" autocomplete="off" placeholder="ornek@ornek.com" list="pm-people"></label>
+      <label class="pm-field"><span>Kime:</span><input class="pm-to" type="text" spellcheck="false" autocomplete="off" placeholder="ornek@ornek.com (birden çok adres için ; ile ayırın)" list="pm-people">${view.showCc ? '' : '<button type="button" class="pm-ccbtn" title="Bilgi (Cc) ve Gizli (Bcc) alanlarını göster">Bilgi / Gizli</button>'}</label>
+      ${view.showCc ? `<label class="pm-field"><span>Bilgi (Cc):</span><input class="pm-cc" type="text" spellcheck="false" autocomplete="off" placeholder="Bilgisi olsun istediğiniz kişiler (herkes görür)"></label>
+      <label class="pm-field"><span>Gizli (Bcc):</span><input class="pm-bcc" type="text" spellcheck="false" autocomplete="off" placeholder="Gizli alıcılar (diğerleri görmez)"></label>` : ''}
       <label class="pm-field"><span>Konu:</span><input class="pm-subj" type="text" autocomplete="off"></label>
       ${view.attachments.length ? `<div class="pm-atts">${view.attachments.map((a, i) => `<div class="pm-att">${isImage(a.name) ? `<img src="${pictureURL(a.content)}" alt="">` : `<span>${fileIcon(a.name)}</span>`}<b>${esc(a.name)}</b><small>${fmtSize(attSize(desk, a))}</small><button type="button" data-unatt="${i}" title="Eki çıkar">✕</button></div>`).join('')}</div>` : ''}
       <div class="pm-err" aria-live="polite"></div>
@@ -128,12 +135,32 @@ export function mail({ desk, body, emit, setTitle }) {
   }
 
   // Yazma ekranındaki kutuların içeriği yeniden çizimde kaybolmasın
-  const keep = () => { if (view?.kind === 'compose' && $('.pm-to')) { view.to = $('.pm-to').value; view.subject = $('.pm-subj').value; view.text = $('.pm-body').value; } };
+  const keep = () => {
+    if (view?.kind === 'compose' && $('.pm-to')) {
+      view.to = $('.pm-to').value; view.subject = $('.pm-subj').value; view.text = $('.pm-body').value;
+      if ($('.pm-cc')) { view.cc = $('.pm-cc').value; view.bcc = $('.pm-bcc').value; }
+    }
+  };
+
+  // Yazma ekranından ayrılınca (başka klasöre geçince, başka posta açınca) yarım kalan posta Taslaklar'a kaydedilir
+  function saveDraft() {
+    keep();
+    if (view?.kind !== 'compose') return;
+    const filled = view.to.trim() || view.cc.trim() || view.subject.trim() || view.text.trim() !== view.initText.trim() || view.attachments.length;
+    if (!filled) return;
+    let d = view.draftId && get(view.draftId);
+    if (!d) { d = { id: 'm' + seq++, folder: 'drafts', read: true, from: ME, fromName: 'Ben', date: today(), attachments: [] }; mb.mails.unshift(d); view.draftId = d.id; }
+    Object.assign(d, { to: view.to.trim(), cc: view.cc, bcc: view.bcc, subject: view.subject.trim(), body: view.text, attachments: view.attachments, time: new Date().toTimeString().slice(0, 5), replyTo: view.replyTo, forwardOf: view.forwardOf, initText: view.initText, title: view.title });
+    desk.toast('Taslak kaydedildi', 'Yarım kalan postanız Taslaklar klasöründe duruyor.', '📝', 3500);
+    emit('mail-draft-save', { id: d.id, subject: d.subject });
+  }
 
   function compose(o = {}) {
-    keep();
-    view = { kind: 'compose', title: 'Yeni posta', to: '', subject: '', text: mb.signature ? `\n\n--\n${mb.signature}` : '', attachments: [], ...o };
+    saveDraft();
+    view = { kind: 'compose', title: 'Yeni posta', to: '', cc: '', bcc: '', showCc: false, subject: '', text: mb.signature ? `\n\n--\n${mb.signature}` : '', attachments: [], ...o };
     if (o.text != null && mb.signature) view.text = `\n\n--\n${mb.signature}${o.text}`;
+    if (view.cc || view.bcc) view.showCc = true;
+    view.initText = o.draftId ? (o.initText ?? '') : view.text;
     render();
     emit('mail-compose', { reply: !!o.replyTo, forward: !!o.forwardOf });
     setTimeout(() => (view.to ? $('.pm-body') : $('.pm-to'))?.focus(), 0);
@@ -141,6 +168,12 @@ export function mail({ desk, body, emit, setTitle }) {
 
   function openMail(id) {
     const m = get(id);
+    if (m.folder === 'drafts') {
+      compose({ title: m.title || 'Taslak', to: m.to, cc: m.cc || '', bcc: m.bcc || '', subject: m.subject, text: m.body, attachments: [...m.attachments], replyTo: m.replyTo, forwardOf: m.forwardOf, draftId: m.id, initText: m.initText });
+      emit('mail-draft-open', { id: m.id, subject: m.subject });
+      return;
+    }
+    saveDraft();
     m.read = true;
     view = { kind: 'read', id };
     render();
@@ -150,22 +183,25 @@ export function mail({ desk, body, emit, setTitle }) {
   function send() {
     keep();
     const to = view.to.trim(), err = (t) => { $('.pm-err').textContent = t; emit('mail-error', { what: t }); };
-    const p = addrProblem(to);
+    const p = !splitAddrs(to).length ? addrProblem('') : listProblem(to);
     if (p) { err(p); $('.pm-to').focus(); return; }
+    const pc = listProblem(view.cc) || listProblem(view.bcc);
+    if (pc) { err('Bilgi (Cc) ya da Gizli (Bcc) alanında: ' + pc); return; }
     const big = view.attachments.find((a) => attSize(desk, a) > MAX_ATTACH);
     if (big) { err(`Ek çok büyük: “${big.name}” ${fmtSize(attSize(desk, big))}. E-postayla en fazla 25 MB gönderilebilir. Dosyayı buluta (☁ Bulut Depo) yükleyip paylaşım bağlantısını gönderin.`); emit('mail-too-big', { name: big.name }); return; }
     const go = () => {
-      const m = { id: 'm' + seq++, folder: 'sent', read: true, from: ME, fromName: 'Ben', to, subject: view.subject.trim(), body: view.text, attachments: view.attachments, date: today(), time: new Date().toTimeString().slice(0, 5), replyTo: view.replyTo, forwardOf: view.forwardOf };
+      const m = { id: 'm' + seq++, folder: 'sent', read: true, from: ME, fromName: 'Ben', to, cc: view.cc.trim(), bcc: view.bcc.trim(), subject: view.subject.trim(), body: view.text, attachments: view.attachments, date: today(), time: new Date().toTimeString().slice(0, 5), replyTo: view.replyTo, forwardOf: view.forwardOf };
       mb.mails.unshift(m);
+      if (view.draftId) mb.mails = mb.mails.filter((x) => x.id !== view.draftId);
       folder = 'inbox';
       view = null;
       render();
       desk.toast('Posta gönderildi', `Kime: ${esc(to)}`, '✉');
-      emit('mail-send', { id: m.id, to, subject: m.subject, body: m.body, attachments: m.attachments.map((a) => a.name), replyTo: m.replyTo, replyKey: m.replyTo && get(m.replyTo)?.key, forwardOf: m.forwardOf });
-      const c = CONTACTS[to.toLowerCase()];
+      emit('mail-send', { id: m.id, to, toList: splitAddrs(to), cc: splitAddrs(m.cc), bcc: splitAddrs(m.bcc), subject: m.subject, body: m.body, attachments: m.attachments.map((a) => a.name), replyTo: m.replyTo, replyKey: m.replyTo && get(m.replyTo)?.key, forwardOf: m.forwardOf });
+      const c = CONTACTS[splitAddrs(to)[0].toLowerCase()];
       if (c) setTimeout(() => {
         if (desk.mail !== mb) return; // bu arada ders değişti
-        const r = { id: 'm' + seq++, folder: 'inbox', read: false, from: to.toLowerCase(), fromName: c.name, to: ME, subject: /^Ynt:/.test(m.subject) ? m.subject : 'Ynt: ' + (m.subject || ''), body: c.reply(m), attachments: [], date: today(), time: new Date().toTimeString().slice(0, 5), replyOf: m.id, key: 'cevap' };
+        const r = { id: 'm' + seq++, folder: 'inbox', read: false, from: splitAddrs(to)[0].toLowerCase(), fromName: c.name, to: ME, subject: /^Ynt:/.test(m.subject) ? m.subject : 'Ynt: ' + (m.subject || ''), body: c.reply(m), attachments: [], date: today(), time: new Date().toTimeString().slice(0, 5), replyOf: m.id, key: 'cevap' };
         mb.mails.unshift(r);
         if (!view) render(); else setTitle(`E-posta (${unread()})`);
         body.querySelectorAll('[data-folder="inbox"]').forEach((b) => { b.innerHTML = `📥 Gelen Kutusu <b>${unread()}</b>`; });
@@ -218,9 +254,10 @@ export function mail({ desk, body, emit, setTitle }) {
       emit('mail-signature', { text: mb.signature });
       return;
     }
-    if (t.dataset.folder) { keep(); folder = t.dataset.folder; view = null; render(); emit('mail-folder', { folder }); return; }
+    if (t.dataset.folder) { saveDraft(); folder = t.dataset.folder; view = null; render(); emit('mail-folder', { folder }); return; }
     if (t.dataset.open) return openMail(t.dataset.open);
     if (t.classList.contains('pm-back')) { view = null; render(); return; }
+    if (t.classList.contains('pm-ccbtn')) { keep(); view.showCc = true; render(); emit('mail-cc-show'); setTimeout(() => $('.pm-cc')?.focus(), 0); return; }
     const m = view?.kind === 'read' && get(view.id);
     if (m && t.classList.contains('pm-reply')) return compose({ title: 'Yanıtla', to: m.from, subject: m.subject.startsWith('Ynt:') ? m.subject : 'Ynt: ' + m.subject, text: `\n\n--- ${m.fromName} yazdı ---\n${m.body}`, replyTo: m.id });
     if (m && t.classList.contains('pm-fwd')) return compose({ title: 'İlet', subject: 'İlt: ' + m.subject, text: `\n\n--- İletilen posta ---\nKimden: ${m.fromName} <${m.from}>\nKonu: ${m.subject}\n\n${m.body}`, attachments: [...m.attachments], forwardOf: m.id });
@@ -258,7 +295,7 @@ export function mail({ desk, body, emit, setTitle }) {
       if (t.classList.contains('pm-send')) return send();
       if (t.classList.contains('pm-attach')) return attach();
       if (t.dataset.unatt) { keep(); view.attachments.splice(+t.dataset.unatt, 1); render(); return; }
-      if (t.classList.contains('pm-discard')) { view = null; render(); emit('mail-discard'); }
+      if (t.classList.contains('pm-discard')) { if (view.draftId) mb.mails = mb.mails.filter((x) => x.id !== view.draftId); view = null; render(); emit('mail-discard'); }
     }
   });
   // Yeni kişi formu

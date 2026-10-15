@@ -42,7 +42,7 @@ export const TEMPLATES = {
 export function word({ desk, body, args, emit, setTitle }) {
   body.classList.add('wd');
   body.innerHTML = `
-    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="review">Gözden Geçir</button></div>
+    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button></div>
     <div class="wd-rib" data-tab="home">
       <div class="wd-grp"><button type="button" data-cmd="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-cmd="redo" title="Yinele (Ctrl + Y)">↷</button></div>
       <div class="wd-grp"><button type="button" class="wd-clip" data-clip="cut" title="Kes (Ctrl + X)">✂</button><button type="button" class="wd-clip" data-clip="copy" title="Kopyala (Ctrl + C)">⧉</button><button type="button" class="wd-clip" data-clip="paste" title="Yapıştır (Ctrl + V)">📋</button><button type="button" class="wd-painter" title="Biçim Boyacısı: seçili yazının biçimini kopyalar, sonra başka bir yazıyı seçin">🖌</button></div>
@@ -63,16 +63,26 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp"><button type="button" class="wd-pic">🖼 Resim</button><button type="button" class="wd-date">📅 Tarih</button></div>
       <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-sym" title="Simge: klavyede olmayan işaretler">Ω Simge</button><span class="wd-pal wd-spal" hidden>${SYMBOLS.map((c) => `<button type="button" data-sym="${c}">${c}</button>`).join('')}</span></span>
         <span class="wd-colorwrap"><button type="button" class="wd-link" title="Bağlantı (Ctrl + K)">🔗 Bağlantı</button><span class="wd-tpop wd-lpop" hidden><label>Adres <input class="wd-lurl" placeholder="www.ornek.com.tr"></label><button type="button" class="wd-lok">Ekle</button></span></span>
-        <button type="button" class="wd-pb" title="Sayfa sonu (Ctrl + Enter): yazının kalanı yeni sayfadan başlar">⤓ Sayfa sonu</button></div>
+        <button type="button" class="wd-pb" title="Sayfa sonu (Ctrl + Enter): yazının kalanı yeni sayfadan başlar">⤓ Sayfa sonu</button>
+        <span class="wd-colorwrap"><button type="button" class="wd-shbtn" title="Şekil: içine yazı yazılabilen kutu ve oklar">◇ Şekil</button><span class="wd-pal wd-shpal" hidden><button type="button" data-shape="kutu">▭ Kutu</button><button type="button" data-shape="yuvarlak">▢ Yuvarlak kutu</button><button type="button" data-shape="ok">➜ Ok</button></span></span></div>
       <div class="wd-grp"><button type="button" class="wd-hdrbtn" title="Her sayfanın en üstünde tekrarlanan yazı">▔ Üst bilgi</button><button type="button" class="wd-ftrbtn" title="Her sayfanın en altında tekrarlanan yazı">▁ Alt bilgi</button><button type="button" class="wd-pnbtn" title="Alt bilgiye sayfa numarası ekler">#️ Sayfa numarası</button></div>
     </div>
     <div class="wd-rib" data-tab="layout" hidden>
       <div class="wd-grp">Kenar boşlukları: ${Object.entries(MARGINS).map(([k, [n, cm]]) => `<button type="button" data-margin="${k}" title="${cm}">${n}</button>`).join('')}</div>
       <div class="wd-grp">Yönlendirme: <button type="button" data-orient="dikey" title="Dikey (uzun kenar yukarıda)">▯ Dikey</button><button type="button" data-orient="yatay" title="Yatay (geniş kenar yukarıda)">▭ Yatay</button></div>
       <div class="wd-grp">Sütunlar: <button type="button" data-cols="1">▮ Bir</button><button type="button" data-cols="2">▮▮ İki</button></div>
+      <div class="wd-grp">Sayfa kenarlığı: <button type="button" data-border="yok">Yok</button><button type="button" data-border="kutu" title="Sayfanın çevresine çerçeve">▣ Kutu</button><button type="button" data-border="cift" title="Çift çizgili çerçeve">▨ Çift çizgi</button></div>
+      <div class="wd-grp">Filigran (arka plana silik yazı): <button type="button" data-wm="ÖRNEKTİR">ÖRNEKTİR</button><button type="button" data-wm="ACİL">ACİL</button><button type="button" data-wm="TASLAK">TASLAK</button><button type="button" data-wm="">Yok</button></div>
     </div>
     <div class="wd-rib" data-tab="review" hidden>
       <div class="wd-grp"><button type="button" class="wd-spell" title="Yazım denetimi (F7)">ABC✓ Yazım denetimi</button><button type="button" class="wd-count" title="Sözcük sayısı">123 Sözcük sayısı</button></div>
+    </div>
+    <div class="wd-rib" data-tab="table" hidden>
+      <div class="wd-grp">Satır: <button type="button" data-tb="rowAbove">↑ Üste ekle</button><button type="button" data-tb="rowBelow">↓ Alta ekle</button><button type="button" data-tb="rowDel">✕ Satırı sil</button></div>
+      <div class="wd-grp">Sütun: <button type="button" data-tb="colLeft">← Sola ekle</button><button type="button" data-tb="colRight">→ Sağa ekle</button><button type="button" data-tb="colDel">✕ Sütunu sil</button></div>
+      <div class="wd-grp"><button type="button" data-tb="merge" title="Önce birleştirmek istediğiniz yan yana hücreleri fareyle sürükleyerek seçin">⊞ Hücreleri birleştir</button></div>
+      <div class="wd-grp">Hücre içi: <button type="button" data-tb="vTop">⬆ Üst</button><button type="button" data-tb="vMid">↕ Orta</button><button type="button" data-tb="vBot">⬇ Alt</button></div>
+      <div class="wd-grp">Çizgiler: <button type="button" data-tb="bThin">İnce</button><button type="button" data-tb="bThick">Kalın</button><button type="button" data-tb="tblDel">🗑 Tabloyu sil</button></div>
     </div>
     <div class="wd-find" hidden><b class="wd-fh">Bul ve Değiştir</b><label>Aranan <input class="wd-fq"></label><label class="wd-rrow">Yeni <input class="wd-rq"></label>
       <span class="wd-fn"></span><button type="button" data-f="next">Sonrakini bul</button><button type="button" data-f="repl" class="wd-rrow">Değiştir</button><button type="button" data-f="all" class="wd-rrow">Tümünü değiştir</button><button type="button" data-f="close" title="Kapat">✕</button></div>
@@ -83,7 +93,7 @@ export function word({ desk, body, args, emit, setTitle }) {
   const $ = (s) => body.querySelector(s);
   const page = $('.wd-page');
   let fileName = null, folder = 'docs', dirty = false, range = null;
-  const DEF_LAYOUT = { margin: 'normal', orient: 'dikey', cols: 1 };
+  const DEF_LAYOUT = { margin: 'normal', orient: 'dikey', cols: 1, border: 'yok', wm: '' };
   const layout = { ...DEF_LAYOUT };
 
   const title = () => setTitle(`${dirty ? '*' : ''}${fileName || 'Belge1'} - Kelime İşlemci`);
@@ -127,9 +137,58 @@ export function word({ desk, body, args, emit, setTitle }) {
   const onSel = () => {
     if (!page.isConnected) { document.removeEventListener('selectionchange', onSel); return; }
     const s = getSelection();
-    if (s.rangeCount && page.contains(s.anchorNode)) { range = s.getRangeAt(0).cloneRange(); syncTools(); }
+    if (s.rangeCount && page.contains(s.anchorNode)) { range = s.getRangeAt(0).cloneRange(); syncTools(); syncTableTab(); }
   };
   document.addEventListener('selectionchange', onSel);
+  // Tablo Düzeni sekmesi yalnızca imleç bir tablonun içindeyken görünür
+  const cellOf = (node) => { const el = node && (node.nodeType === 1 ? node : node.parentElement); const td = el?.closest('td'); return td && page.contains(td) ? td : null; };
+  function syncTableTab() {
+    const inTable = !!cellOf(range?.startContainer);
+    const tab = $('.wd-tabtbl');
+    if (tab.hidden === !inTable) return;
+    tab.hidden = !inTable;
+    if (!inTable && tab.classList.contains('on')) $('.wd-tabs [data-tab="home"]').click();
+  }
+  function tableOp(op) {
+    const td = cellOf(range?.startContainer);
+    if (!td) return;
+    const tr = td.parentElement, table = td.closest('table');
+    const idx = td.cellIndex;
+    const newRow = () => { const r = document.createElement('tr'); const n = [...table.rows[0].cells].reduce((a, c) => a + c.colSpan, 0); r.innerHTML = '<td><br></td>'.repeat(n); return r; };
+    switch (op) {
+      case 'rowAbove': tr.before(newRow()); break;
+      case 'rowBelow': tr.after(newRow()); break;
+      case 'rowDel': if (table.rows.length === 1) table.remove(); else tr.remove(); break;
+      case 'colLeft': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.insertAdjacentHTML('beforebegin', '<td><br></td>'); break;
+      case 'colRight': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.insertAdjacentHTML('afterend', '<td><br></td>'); break;
+      case 'colDel': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.remove(); if (![...table.rows].some((r) => r.cells.length)) table.remove(); break;
+      case 'tblDel': table.remove(); break;
+      case 'bThick': table.classList.add('thick'); break;
+      case 'bThin': table.classList.remove('thick'); break;
+      case 'vTop': case 'vMid': case 'vBot': {
+        const v = { vTop: 'top', vMid: 'middle', vBot: 'bottom' }[op];
+        const cells = [...table.querySelectorAll('td')].filter((c) => range.intersectsNode(c));
+        (cells.length ? cells : [td]).forEach((c) => { c.style.verticalAlign = v; });
+        break;
+      }
+      case 'merge': {
+        const a = cellOf(range.startContainer), b = cellOf(range.endContainer);
+        const cells = [...table.querySelectorAll('td')].filter((c) => range.intersectsNode(c) && c.parentElement === a.parentElement);
+        if (!b || a === b || cells.length < 2) { desk.toast('Hücreleri önce seçin', 'Birleştirmek istediğiniz yan yana hücreleri fareyle sürükleyerek seçin, sonra “Hücreleri birleştir”e tıklayın.', '▦', 5000); emit('doc-table', { op: 'merge', ok: false }); return; }
+        if (cells.some((c) => c.parentElement !== a.parentElement)) { desk.toast('Aynı satır', 'Yalnızca aynı satırdaki hücreler birleştirilebilir.', '▦'); return; }
+        const first = cells[0];
+        first.colSpan = cells.reduce((n, c) => n + c.colSpan, 0);
+        first.innerHTML = cells.map((c) => c.innerHTML.replace(/^<br>$/, '')).filter(Boolean).join(' ') || '<br>';
+        cells.slice(1).forEach((c) => c.remove());
+        break;
+      }
+    }
+    // Hücre silindiyse ya da birleştiyse kayıtlı seçim artık geçersizdir
+    if (['rowDel', 'colDel', 'tblDel', 'merge'].includes(op)) range = null;
+    syncTableTab();
+    changed();
+    emit('doc-table', { op, ok: true, rows: page.querySelector('table')?.rows.length || 0, cols: page.querySelector('table')?.rows[0]?.cells.length || 0 });
+  }
   function restore() {
     page.focus({ preventScroll: true });
     if (range) { const s = getSelection(); s.removeAllRanges(); s.addRange(range); }
@@ -221,8 +280,10 @@ export function word({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (c === 'print') {
-      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Belge1' });
-      if (r) { desk.toast('Yazdırılıyor', `“${esc(fileName || 'Belge1')}” → ${esc(r.printer)}`, '🖨'); emit('doc-print', { ...r, doc: fileName }); }
+      const pages = pageCount();
+      emit('doc-print-open', { pages });
+      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Belge1', preview: { html: cleanHtml(), pages, orient: layout.orient, border: layout.border, wm: layout.wm, padding: MARGINS[layout.margin][2] } });
+      if (r) { desk.toast('Yazdırılıyor', `“${esc(fileName || 'Belge1')}” → ${esc(r.printer)}`, '🖨'); emit('doc-print', { ...r, doc: fileName, pages }); }
       return;
     }
     if (c === 'pdf') {
@@ -499,6 +560,11 @@ export function word({ desk, body, args, emit, setTitle }) {
     page.classList.toggle('yatay', layout.orient === 'yatay');
     $('.wd-scroll').classList.toggle('yatay', layout.orient === 'yatay');
     page.style.columnCount = layout.cols > 1 ? layout.cols : '';
+    page.classList.toggle('bordered', layout.border === 'kutu');
+    page.classList.toggle('bordered2', layout.border === 'cift');
+    page.dataset.wm = layout.wm || '';
+    body.querySelectorAll('[data-border]').forEach((b) => b.classList.toggle('on', b.dataset.border === layout.border));
+    body.querySelectorAll('[data-wm]').forEach((b) => b.classList.toggle('on', b.dataset.wm === (layout.wm || '')));
     body.querySelectorAll('[data-margin]').forEach((b) => b.classList.toggle('on', b.dataset.margin === layout.margin));
     body.querySelectorAll('[data-orient]').forEach((b) => b.classList.toggle('on', b.dataset.orient === layout.orient));
     body.querySelectorAll('[data-cols]').forEach((b) => b.classList.toggle('on', +b.dataset.cols === layout.cols));
@@ -542,9 +608,12 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.dataset.style) return setStyle(t.dataset.style);
     if (t.classList.contains('wd-findbtn')) return openFind(false);
     if (t.classList.contains('wd-replbtn')) return openFind(true);
+    if (t.dataset.tb) return tableOp(t.dataset.tb);
     if (t.dataset.margin) return setLayout({ margin: t.dataset.margin });
     if (t.dataset.orient) return setLayout({ orient: t.dataset.orient });
     if (t.dataset.cols) return setLayout({ cols: +t.dataset.cols });
+    if (t.dataset.border) return setLayout({ border: t.dataset.border });
+    if (t.dataset.wm !== undefined) return setLayout({ wm: t.dataset.wm });
     if (t.classList.contains('wd-spell')) return spellCheck();
     if (t.classList.contains('wd-count')) return wordCount();
     if (t.dataset.zoom) return setZoom(zoom + +t.dataset.zoom);
@@ -574,6 +643,8 @@ export function word({ desk, body, args, emit, setTitle }) {
       $('.wd-tpop').hidden = true;
       return insertHtml(`<table class="wd-t">${`<tr>${'<td><br></td>'.repeat(c)}</tr>`.repeat(r)}</table><p><br></p>`, 'table');
     }
+    if (t.classList.contains('wd-shbtn')) return pal('.wd-shpal');
+    if (t.dataset.shape) { $('.wd-shpal').hidden = true; return insertHtml(`<span class="wd-shape wd-sh-${t.dataset.shape}" contenteditable="true">Yazınız</span>&nbsp;`, 'shape'); }
     if (t.classList.contains('wd-pic')) return insertPicture();
     if (t.classList.contains('wd-date')) return insertHtml(esc(today()), 'date');
   });
@@ -652,6 +723,8 @@ export function word({ desk, body, args, emit, setTitle }) {
         };
       });
       return {
+        pages: pageCount(), shapes: page.querySelectorAll('.wd-shape').length,
+        table: (() => { const t = page.querySelector('table'); return t && { rows: t.rows.length, cols: Math.max(...[...t.rows].map((r) => r.cells.length)), merged: [...t.querySelectorAll('td')].some((c) => c.colSpan > 1), thick: t.classList.contains('thick'), valign: [...t.querySelectorAll('td')].some((c) => c.style.verticalAlign === 'middle') }; })(),
         blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, fileName, dirty,
         links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,

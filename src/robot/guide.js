@@ -82,20 +82,20 @@ export function renderGuide(el) {
     return `<li><span class="gtype" title="${TYPE[s.type][1]}">${TYPE[s.type][0]}</span> ${s.title}${a ? `<details><summary>Cevap</summary><div class="gans">${a}</div></details>` : ''}</li>`;
   }).join('')}</ol>
 </section>`).join('');
-    return `<section class="gweek"><h2><span>${wi + 1}. Hafta</span> ${w.title}</h2>${lessons}</section>`;
+    return `<section class="gweek"><h2><span>${w.extra ? 'Ek' : `${wi + 1}. Hafta`}</span> ${w.title}</h2>${w.extra ? '<p class="mut">Ek bölümler 8 haftalık programın dışındadır: hızlı bitirenler, tekrar ya da ek ders saati için. İlerleme numaraları (ve sertifika) etkilenmez.</p>' : ''}${lessons}</section>`;
   }).join('');
 
   el.innerHTML = `<div class="guide">
   <div class="ghead">
     <h1>📘 Öğretmen Kılavuzu</h1>
-    <p>Robo ile Kodlama: 8–12 yaş · ${WEEKS.length} hafta · ${LESSONS.length} bölüm · haftada bir gün, 4 ders × 40 dakika.</p>
+    <p>Robo ile Kodlama: 8–12 yaş · ${WEEKS.filter((w) => !w.extra).length} hafta · ${LESSONS.filter((l) => !l.extra).length} bölüm (+ ${LESSONS.filter((l) => l.extra).length} ek bölüm) · haftada bir gün, 4 ders × 40 dakika.</p>
     <div class="gbtns"><a class="btn" href="#">🗺 Haritaya dön</a><button type="button" class="btn gopen">Bütün cevapları aç</button><button type="button" class="primary gprint">🖨 Yazdır</button></div>
   </div>
   <section class="gplan">
     <h2>Önerilen ders akışı (40 dk)</h2>
     <ol><li><b>5–10 dk</b> Bölümün sonundaki bilgisayarsız sınıf etkinliği ile kavramı tanıtın.</li><li><b>25 dk</b> Öğrenciler adımları kendi hızlarında yapsın. Hızlı bitirenler ⭐ bonus görevlere geçsin.</li><li><b>5 dk</b> Paylaşım: “Hangi görev zordu, nasıl çözdünüz?”</li></ol>
     <p><b>İpuçları:</b> Her öğrenci başta kendi adını seçmeli (sağ üstte 👤); ilerlemesi ve kodları o bilgisayarda ayrı saklanır. Numaralı adım düğmeleriyle istediğiniz adıma geçebilirsiniz. Gerçek Scratch'ten farklı olarak burada 🏁 sahneyi başa alır.</p>
-    <table class="gtable"><thead><tr><th>Hafta</th><th>Konu</th><th>Bölümler</th></tr></thead><tbody>${WEEKS.map((w, wi) => `<tr><td>${wi + 1}</td><td>${w.title}</td><td>${w.lessons.map((l) => `${l.no}. ${l.title}`).join(' · ')}</td></tr>`).join('')}</tbody></table>
+    <table class="gtable"><thead><tr><th>Hafta</th><th>Konu</th><th>Bölümler</th></tr></thead><tbody>${WEEKS.map((w, wi) => `<tr><td>${w.extra ? 'Ek' : wi + 1}</td><td>${w.title}</td><td>${w.lessons.map((l) => `${l.no}. ${l.title}`).join(' · ')}</td></tr>`).join('')}</tbody></table>
   </section>
   ${weeks}
 </div>`;

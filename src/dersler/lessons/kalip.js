@@ -8,6 +8,33 @@ const plain = (s) => s.replace(/<[^>]+>/g, '');
 // 'scene' derslerinde sağdaki bilgi kartı
 export const info = (html) => (el) => { el.className = 'sc sc-info'; el.innerHTML = html; };
 
+// Sekmeli bilgi kartı ('scene' dersleri): sekmelere tıklayıp her birini okurlar.
+// tabs: [{ id, label, icon, html }]; html metin ya da () => metin olabilir.
+// Her sekme ilk açılışında 'tab' ({ id, left }), hepsi gezilince 'tabs-done' olayı gider.
+export function sekmeler({ tabs, intro, empty = 'Yukarıdan bir sekmeye tıklayın.' }) {
+  return (el, c) => {
+    el.className = 'sc sc-tabs';
+    const seen = new Set();
+    el.innerHTML = `${intro ? `<p class="tb-intro">${intro}</p>` : ''}<div class="tb-bar" role="tablist">${tabs.map((t, i) => `<button type="button" role="tab" data-i="${i}">${t.icon ? `<span>${t.icon}</span> ` : ''}${t.label}</button>`).join('')}</div>
+      <div class="tb-panel"><p class="tb-empty">${empty}</p></div><div class="tb-count"></div>`;
+    const count = () => { el.querySelector('.tb-count').textContent = seen.size < tabs.length ? `${seen.size} / ${tabs.length} sekme okundu` : '✔ Hepsini okudunuz'; };
+    count();
+    el.querySelector('.tb-bar').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-i]');
+      if (!b) return;
+      const t = tabs[+b.dataset.i];
+      el.querySelectorAll('.tb-bar [data-i]').forEach((x) => x.classList.toggle('on', x === b));
+      b.classList.add('seen');
+      el.querySelector('.tb-panel').innerHTML = typeof t.html === 'function' ? t.html() : t.html;
+      const first = !seen.has(t.id);
+      seen.add(t.id);
+      count();
+      if (first) c.emit('tab', { id: t.id, left: tabs.length - seen.size });
+      if (first && seen.size === tabs.length) c.emit('tabs-done');
+    });
+  };
+}
+
 // Sürükleyerek ayırma adımı ('scene' dersleri)
 export function ayir({ title, html, bins, items, done }) {
   return {

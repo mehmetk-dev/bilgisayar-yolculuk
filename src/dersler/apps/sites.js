@@ -1,9 +1,15 @@
 // Tarayıcıda açılan örnek web siteleri. Hepsi uydurmadır; gerçek bir siteye bağlanılmaz.
 // Bağlantılar data-href, düğmeler data-act ile çalışır; indirmeler data-download ile yapılır.
 
-import { pictureURL } from './util.js';
+import { pictureURL, esc, setCookie } from './util.js';
 import { GUNLUK_SITES } from './siteler-gunluk.js';
 import { BULUT_SITE } from './bulut.js';
+import { MEDYA_SITES } from './siteler-medya.js';
+import { HESAP_SITES } from './siteler-hesap.js';
+import { MESAJ_SITES } from './siteler-mesaj.js';
+import { HIZMET_SITES } from './siteler-hizmet.js';
+import { YZ_SITES } from './siteler-yz.js';
+import { BELGE_SITES } from './siteler-belge.js';
 
 export const SEARCH_HOST = 'www.bulalim.com';
 
@@ -31,6 +37,13 @@ const RESULTS = [
   { keys: ['e-devlet', 'edevlet', 'devlet', 'türkiye', 'turkiye', 'barkodlu', 'belge'], title: 'e-Devlet Kapısı', url: 'www.turkiye.gov.tr', snip: 'Kamu hizmetlerine tek noktadan, güvenli erişim.' },
   { keys: ['meb', 'milli', 'eğitim', 'egitim', 'okul', 'kurs'], title: 'Millî Eğitim Bakanlığı', url: 'www.meb.gov.tr', snip: 'Bakanlığın resmî sitesi: duyurular, haberler, hayat boyu öğrenme kursları.' },
   { keys: ['randevu', 'hastane', 'mhrs', 'doktor', 'muayene', 'hekim'], title: 'MHRS: Hastane ve Aile Hekimi Randevusu', url: 'www.mhrs.gov.tr', snip: 'Merkezi Hekim Randevu Sistemi. Randevu alın, randevularınızı görün ve iptal edin.' },
+  { keys: ['video', 'youtube', 'izle', 'izleyelim', 'radyo', 'altyazı', 'dinle', 'egzersiz', 'domates'], title: 'İzleyelim: videolar ve internet radyosu', url: 'www.izleyelim.com', snip: 'Tarif, bahçe, sağlık videoları ve canlı radyo kanalları.' },
+  { keys: ['gazete', 'gazete-oku', 'yerel', 'günlük', 'belediye'], title: 'Gazete Oku: günün yerel haberleri', url: 'www.gazete-oku.com.tr', snip: 'Güne bir bakışta: yerel haberler ve duyurular.' },
+  { keys: ['whatsapp', 'mesajlaş', 'mesajlas', 'sohbet', 'karekod', 'qr', 'mesaj'], title: 'Mesajlaş Web: mesajlarınız bilgisayarınızda', url: 'web.mesajlas.com', snip: 'Telefondaki mesajlaşma uygulamasını karekodla bilgisayarda açın.' },
+  { keys: ['enabız', 'e-nabız', 'nabız', 'reçete', 'tahlil', 'aile hekimi', 'sağlık'], title: 'e-Nabız: reçete ve tahlil sonuçlarınız', url: 'enabiz.gov.tr', snip: 'Reçetelerinize, tahlil sonuçlarınıza ve aile hekiminize bakın.' },
+  { keys: ['ilan', 'kiralık', 'kiralik', 'emlak', 'ev', 'daire', 'satılık'], title: 'İlan Pazarı: kiralık ve satılık evler', url: 'www.ilan-pazari.com.tr', snip: 'Kiralık daire ilanlarını il, oda ve fiyata göre arayın.' },
+  { keys: ['yapay', 'zeka', 'zekâ', 'yardımcı', 'yardimci', 'sohbet', 'asistan', 'özetle'], title: 'Dijital Yardımcı: yapay zekâ ile yazışın', url: 'yardimci.bulalim.com', snip: 'Yazı özetletin, tarif ve gezi planı isteyin (alıştırma sürümü).' },
+  { keys: ['belediye', 'form', 'dilekçe', 'dilekce', 'başvuru', 'basvuru', 'su abonelik', 'abonelik', 'pdf'], title: 'Örnek Belediyesi: form ve dilekçeler', url: 'www.ornek-belediyesi.bel.tr', snip: 'Su abonelik başvuru formu ve diğer formları PDF olarak indirin.' },
   { keys: ['indirim', 'alışveriş', 'alisveris', 'fırsat', 'firsat', 'kampanya'], title: 'Fırsat Pazarı: günün indirimleri', url: 'www.firsat-pazari.com.tr', snip: 'Mutfak, ev ve elektronikte günün fırsatları.' },
 ];
 const AD = { title: 'Bilgisayarınız YAVAŞ mı? 10 KAT Hızlandırın!', url: 'www.super-hizlandirici.xyz', snip: 'Hemen indirin, ücretsiz tarama yapın!!!' };
@@ -65,15 +78,37 @@ const BOREK_STEPS = [
 export const SITES = {
   [SEARCH_HOST]: {
     name: 'Bulalım', secure: true,
-    render(path, q) {
+    act(a, v, ctx, el) {
+      if (a !== 'tab') return;
+      ctx.state.tab = el.dataset.v;
+      ctx.state.tabQ = ctx.loc.q;
+      ctx.emit('search-tab', { tab: el.dataset.v });
+      ctx.refresh();
+    },
+    render(path, q, ctx) {
       if (path.startsWith('/ara')) {
+        const tab = ctx && ctx.state.tabQ === q ? ctx.state.tab || 'all' : 'all';
+        const tabs = `<div class="se-tabs">${[['all', 'Tümü'], ['img', '🖼 Görseller'], ['news', '📰 Haberler']].map(([k, l]) => `<button type="button" data-act="tab" data-v="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+        if (tab === 'img') {
+          const ws = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
+          const all = Object.values(PHOTOS), pick = all.filter((p) => ws.some((w) => (p.title + ' ' + p.name).toLocaleLowerCase('tr').includes(w)));
+          const list = pick.length ? pick : all;
+          return page(`${q} - Görseller - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>${tabs}
+            <p class="se-count">“${esc(q)}” için görseller${pick.length ? '' : ' (tam eşleşme yok, benzerleri gösteriliyor)'}</p><div class="se-imgs">${list.map((p) => `<figure><span style="background:linear-gradient(135deg,${p.bg[0]},${p.bg[1]})">${p.emoji}</span><figcaption>${esc(p.title)}</figcaption></figure>`).join('')}</div>
+            <p class="mut">Görsellerin çoğunun <b>telif hakkı</b> vardır: izinsiz kullanmayın; serbest kullanım yazan sitelerden alın.</p>`, 'se');
+        }
+        if (tab === 'news') {
+          return page(`${q} - Haberler - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>${tabs}
+            <p class="se-count">“${esc(q)}” için son haberler</p>${[['Belediyeden yaşlılara ücretsiz bilgisayar kursu', 'Günün Haberleri · 2 saat önce'], ['Kış lastiği uygulaması yarın başlıyor', 'Günün Haberleri · 5 saat önce'], ['Dolandırıcılara karşı uyarı: kodunuzu kimseyle paylaşmayın', 'Günün Haberleri · dün']].map(([t, m]) => `<div class="se-res"><cite>${m}</cite><a data-href="www.gunun-haberleri.com.tr">${t}</a></div>`).join('')}
+            <p class="mut">Haber sonuçları tarihe göre sıralanır; yine de haberin asıl kaynağına ve tarihine bakın.</p>`, 'se');
+        }
         const words = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
         const hits = RESULTS.map((r) => ({ r, score: words.filter((w) => r.keys.some((k) => k.includes(w) || w.includes(k))).length })).filter((x) => x.score).sort((a, b) => b.score - a.score).map((x) => x.r);
         const devlet = words.some((w) => w.includes('devlet'));
         const ad = devlet ? AD_DEVLET : AD;
         const showAd = devlet || words.some((w) => ['indir', 'program', 'yavaş', 'hızlandır', 'resim'].some((k) => w.includes(k)));
         return page(`${q} - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>
-          <p class="se-count">Yaklaşık ${hits.length ? hits.length * 1240 : 0} sonuç bulundu</p>
+          ${tabs}<p class="se-count">Yaklaşık ${hits.length ? hits.length * 1240 : 0} sonuç bulundu</p>
           ${showAd ? `<div class="se-res ad"><small class="ad-tag">Reklam</small><a data-href="${ad.url}" data-ad="1">${ad.title}</a><cite>${ad.url}</cite><p>${ad.snip}</p></div>` : ''}
           ${hits.map((r) => `<div class="se-res"><cite>${r.url.split('/')[0]}</cite><a data-href="${r.url}">${r.title}</a><p>${r.snip}</p></div>`).join('') || '<p>Aramanızla eşleşen sonuç bulunamadı. Farklı kelimelerle deneyin.</p>'}`, 'se');
       }
@@ -83,7 +118,21 @@ export const SITES = {
   },
   'www.lezzetli-tarifler.com.tr': {
     name: 'Lezzetli Tarifler', secure: true,
-    render(path) {
+    act(a, v, ctx, el) {
+      if (a !== 'ck') return;
+      const all = el.dataset.v === 'all';
+      ctx.state.cookie = all ? 'all' : 'need';
+      setCookie(ctx.desk, { site: 'lezzetli-tarifler.com.tr', name: 'tercihler', party: 'first', purpose: 'Çerez seçiminizi hatırlar; pencere bir daha çıkmaz' });
+      if (all) setCookie(ctx.desk, { site: 'reklam-takip.net', name: 'izleme', party: 'third', purpose: 'Gezdiğiniz sayfaları reklam göstermek için izler' });
+      ctx.emit('cookie-choice', { choice: ctx.state.cookie });
+      ctx.refresh();
+    },
+    render(path, q, ctx) {
+      const r = this.body(path);
+      const ban = ctx && !ctx.state.cookie ? `<div class="ck-banner"><b>🍪 Çerezleri kullanıyoruz</b><p>Size daha iyi hizmet vermek ve reklam göstermek için çerez kullanıyoruz.</p><div><button type="button" class="ed-btn small" data-act="ck" data-v="all">Tümünü kabul et</button><button type="button" class="ed-btn small ghost" data-act="ck" data-v="need">Yalnızca gerekli olanlar</button></div></div>` : '';
+      return { ...r, html: r.html.replace(/^<div class="wp[^"]*">/, (m) => m + ban) };
+    },
+    body(path) {
       const head = '<header class="lt-head">🥘 Lezzetli Tarifler<nav><a data-href="www.lezzetli-tarifler.com.tr">Ana sayfa</a></nav></header>';
       if (path === '/borek') {
         return page('Ispanaklı Börek Tarifi', `${head}<article class="lt"><h1>Ispanaklı Börek</h1><div class="lt-img">🥧</div>
@@ -118,12 +167,15 @@ export const SITES = {
   },
   'www.gunun-haberleri.com.tr': {
     name: 'Günün Haberleri', secure: true,
-    render(path) {
+    render(path, q, ctx) {
+      // Üçüncü taraf çerezi varsa reklam, başka bir sitede baktığınız ürüne göre kişiselleştirilir
+      const ilgi = (ctx?.desk.cookies || []).find((c) => c.party === 'third' && c.interest);
+      const reklam = ilgi ? `<div class="ad gh-ad">🎯 <b>Size özel:</b> ${esc(ilgi.interest)} bugün %20 indirimli!<small>Reklam · “az önce baktığınız ürün”</small></div>` : '<div class="ad gh-ad">📣 <b>Yeni sezon ürünleri</b> mağazalarda!<small>Reklam · herkese aynı</small></div>';
       const news = [['Kış lastiği uygulaması yarın başlıyor', 'Sürücülerin kış lastiği takması için son gün yaklaşıyor. Uzmanlar, lastik diş derinliğinin en az 4 mm olmasını öneriyor.'], ['Belediyeden yaşlılara ücretsiz bilgisayar kursu', 'Kurslar her hafta salı ve perşembe günleri yapılacak. Katılımcılara sertifika verilecek.'], ['Dolandırıcılara karşı uyarı: kodunuzu kimseyle paylaşmayın', 'Bankalar, telefonla aranıp şifre ya da doğrulama kodu istenmesinin dolandırıcılık olduğunu hatırlattı.']];
       const m = path.match(/^\/haber\/(\d)/);
       const head = '<header class="gh-head">📰 Günün Haberleri<nav><a data-href="www.gunun-haberleri.com.tr">Ana sayfa</a></nav></header>';
-      if (m) { const n = news[+m[1]] || news[0]; return page(n[0], `${head}<article class="gh"><h1>${n[0]}</h1><p>${n[1]}</p><p>${n[1]}</p></article>`); }
-      return page('Günün Haberleri', `${head}<div class="gh">${news.map((n, i) => `<a class="gh-item" data-href="www.gunun-haberleri.com.tr/haber/${i}"><span>📰</span><b>${n[0]}</b></a>`).join('')}</div>`);
+      if (m) { const n = news[+m[1]] || news[0]; return page(n[0], `${head}${reklam}<article class="gh"><h1>${n[0]}</h1><p>${n[1]}</p><p>${n[1]}</p></article>`); }
+      return page('Günün Haberleri', `${head}${reklam}<div class="gh">${news.map((n, i) => `<a class="gh-item" data-href="www.gunun-haberleri.com.tr/haber/${i}"><span>📰</span><b>${n[0]}</b></a>`).join('')}</div>`);
     },
   },
   'www.program-indir.com.tr': {
@@ -206,7 +258,7 @@ export const SITES = {
   },
 };
 
-Object.assign(SITES, GUNLUK_SITES, BULUT_SITE);
+Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES);
 
 function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 

@@ -1,6 +1,16 @@
 // Uygulamaların ortak yardımcıları
 export { esc } from '../dialog.js';
 
+// Sitelerin tarayıcıya bıraktığı çerezler: { site, name, party: 'first' | 'third', purpose, interest? }
+// Üçüncü taraf çerezleri engelliyse bırakılmaz. Aynı site ve ad bir kez saklanır.
+export function setCookie(desk, c) {
+  if (c.party === 'third' && desk.settings.blockThird) return false;
+  const list = (desk.cookies ||= []);
+  const old = list.find((x) => x.site === c.site && x.name === c.name);
+  if (old) Object.assign(old, c); else list.push({ ...c });
+  return true;
+}
+
 const picCache = new Map();
 
 // Resim dosyasının içeriğinden görüntülenebilir bir adres üretir.

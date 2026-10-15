@@ -51,7 +51,7 @@ export class Notepad {
       <div class="np-menu">${Object.keys(MENUS).map((m) => `<button type="button" data-menu="${m}">${m}</button>`).join('')}</div>
       <div class="np-drop" hidden></div>
       <textarea class="np-ta" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Not Defteri yazı alanı"></textarea>
-      <div class="np-status"><span class="np-pos"></span><span class="np-zoom"></span><span>Windows (CRLF)</span><span>UTF-8</span></div>`;
+      <div class="np-status"><span class="np-pos"></span><span class="np-ins" hidden>Üzerine yaz (INS)</span><span class="np-zoom"></span><span>Windows (CRLF)</span><span>UTF-8</span></div>`;
     this.root = root;
     this.ta = root.querySelector('.np-ta');
     this.prev = '';
@@ -73,6 +73,12 @@ export class Notepad {
     return { start, end, text: value.slice(start, end) };
   }
   focus() { this.ta.focus({ preventScroll: true }); }
+
+  // Üzerine yazma kipini (Insert) derslerden açıp kapatmak için
+  setOverwrite(on) {
+    this.overwrite = on;
+    this.root.querySelector('.np-ins').hidden = !on;
+  }
   get title() { return (this.dirty ? '*' : '') + (this.fileName ? this.fileName.replace(/\.txt$/i, '') : 'Adsız') + ' - Not Defteri'; }
 
   setText(text, fileName = null, folder = this.folder) {
@@ -126,6 +132,13 @@ export class Notepad {
     ta.addEventListener('keydown', (e) => {
       this.emit('key', { e });
       if (isCtrl(e)) this.shortcut(e);
+      // Insert: "üzerine yaz" kipi. Yazılan harf imlecin sağındaki harfi siler (gerçek programlardaki gibi)
+      if (e.code === 'Insert' && !isCtrl(e)) {
+        this.setOverwrite(!this.overwrite);
+        this.emit('insert-toggle', { on: this.overwrite });
+      } else if (this.overwrite && e.key.length === 1 && !isCtrl(e) && !e.altKey && ta.selectionStart === ta.selectionEnd && ta.value[ta.selectionStart] && ta.value[ta.selectionStart] !== '\n') {
+        ta.setSelectionRange(ta.selectionStart, ta.selectionStart + 1);
+      }
     });
     ta.addEventListener('wheel', (e) => {
       if (!isCtrl(e)) return;
@@ -279,7 +292,7 @@ export class Notepad {
       this.emit('save', { name: this.fileName, folder: this.folder, label: this.fs.label(this.folder), quick: true });
       return true;
     }
-    const r = await this.dialogs.file({ mode: 'save', fs: this.fs, folder: this.folder, name: this.fileName || '' });
+    const r = await this.dialogs.file({ mode: 'save', fs: this.fs, folder: this.folder, name: this.fileName || '', types: [['.txt', 'Metin Belgeleri (*.txt)'], ['*', 'Tüm Dosyalar (*.*)']] });
     this.focus();
     if (!r) return false;
     this.fs.write(r.folder, r.name, this.ta.value);
@@ -293,7 +306,7 @@ export class Notepad {
 
   async openFile() {
     if (this.dialogs.busy || !(await this.confirmDiscard())) return;
-    const r = await this.dialogs.file({ mode: 'open', fs: this.fs, folder: this.folder });
+    const r = await this.dialogs.file({ mode: 'open', fs: this.fs, folder: this.folder, accept: /\.(txt|html?)$/i });
     this.focus();
     if (!r) return;
     const content = this.fs.read(r.folder, r.name);
