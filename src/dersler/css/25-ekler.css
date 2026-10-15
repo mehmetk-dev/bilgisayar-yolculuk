@@ -50,3 +50,41 @@
 .wd-mpop { position: absolute; top: 2.1em; left: 0; z-index: 5; background: #fff; border: 1px solid #c8c8c8; border-radius: 6px; padding: 0.35em; display: flex; gap: 0.3em; box-shadow: 0 4px 14px #0003; }
 .wd-fin { flex-direction: column; white-space: nowrap; font-size: 0.85em; }
 .dk-tv .tv-win .tv-ttl { color: #1c2430; }
+
+/* Vurgu rengi ve görünüm ayarları: Başlat menüsü ve görev çubuğu, başlık çubuğu, saydamlık */
+.dk { --acc: var(--dk-acc, #0a5dc2); --acc-bg: color-mix(in srgb, var(--dk-acc, #0a5dc2) 14%, #fff); }
+.st-nav button.on { box-shadow: inset 3px 0 0 var(--acc); }
+.st-row input[type="range"] { accent-color: var(--acc); }
+.st-tog input:checked + i { background: var(--acc); border-color: var(--acc); }
+.st-tog input:focus-visible + i { outline-color: var(--acc); }
+.st-btn.primary { background: var(--acc); border-color: var(--acc) !important; }
+.st-item.con { border-color: var(--acc); background: var(--acc-bg); }
+.dk-acctitle .win.active .win-bar { background: var(--dk-acc); color: #fff; }
+.dk-acctitle .win.active .win-bar button { color: #fff; }
+.dk-acctitle .win.active .win-bar button:hover { background: #ffffff33; }
+.dk-notrans .dk-taskbar, .dk-notrans .dk-start, .dk-notrans .dk-quick { backdrop-filter: none; background-color: #eef2f7; }
+.dk-notrans.dk-dark .dk-taskbar, .dk-notrans.dk-dark .dk-start { background-color: #202020; }
+/* Vurgu rengi saydamlık ayarından sonra gelir ve onu ezer (kapalı saydamlıkta da görev çubuğu vurgu renginde kalır) */
+.dk.dk-accbars .dk-taskbar { background: color-mix(in srgb, var(--dk-acc) 82%, #000); color: #fff; border-color: transparent; }
+.dk.dk-accbars .dk-start { background: color-mix(in srgb, var(--dk-acc) 30%, #f3f5f9); }
+.dk-accbars .tb-tray button, .dk-accbars .tb-clock { color: #fff; }
+.dk-accbars .tb-apps button.act::after { background: #fff; }
+.dk-accbars .tb-search { background: #ffffffd9; color: #222; }
+.to-btns { display: flex; gap: 0.4em; margin-top: 0.4em; }
+.to-btns button { font-size: 0.9em; padding: 0.2em 0.7em; }
+
+/* Kelime İşlemci: büyük/küçük harf menüsü, cetvel, yeni stiller */
+.wd-cases { flex-direction: column; min-width: 15em; }
+.wd-cases button { justify-content: flex-start; }
+.wd-styles .wd-st-blockquote { font-style: italic; color: #555; }
+.wd-chk { display: flex; gap: 0.3em; align-items: center; font-size: 0.9em; }
+.wd-vnote { margin-left: 1em; color: #666; }
+.wd-ruler { height: 1.4em; width: min(42em, 100%); margin: 0 auto 0.4em; background: #fff repeating-linear-gradient(90deg, transparent 0 calc(2.5em - 1px), #999 calc(2.5em - 1px) 2.5em) 3em 60% / calc(100% - 6em) 40% no-repeat; border: 1px solid #d0d0d0; position: relative; }
+.wd-ruler span { position: absolute; inset: 0 3em; background: repeating-linear-gradient(90deg, transparent 0 calc(0.625em - 1px), #bbb calc(0.625em - 1px) 0.625em) 0 80% / 100% 20% no-repeat; }
+.wd-scroll.yatay .wd-ruler { width: min(60em, 100%); }
+
+/* Tarayıcı: Yapışkan Not uzantısının kutusu */
+.br-ntext { width: 100%; box-sizing: border-box; font: inherit; padding: 0.35em 0.5em; border: 1px solid #c4cad3; border-radius: 5px; resize: none; margin: 0.2em 0 0.4em; }
+.br-npar { margin: 0.3em 0.6em 0; font-size: 0.9em; color: #555; }
+.br-menu textarea + .xs-btn { margin: 0 0.6em 0.5em; }
+

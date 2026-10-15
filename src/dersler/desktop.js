@@ -26,6 +26,8 @@ export const WALLPAPERS = {
   kis: ['Karlı Dağlar', svgWall(`<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fb8de"/><stop offset="1" stop-color="#e9f2fa"/></linearGradient></defs><rect width="160" height="90" fill="url(#g)"/>
     <path d="M0 70L30 34l14 16 22-30 26 34 18-18 50 34v20H0z" fill="#5b7fa6"/><path d="M30 34l-6 7 6-2 4 3 5-1zM66 20l-8 11 5-2 4 4 5-3 6 2zM110 36l-5 5 5-1 3 2 4-1z" fill="#fff"/><path d="M0 78q40-10 80 0t80-4v16H0z" fill="#fff"/>
     <g fill="#fff">${Array.from({ length: 40 }, (_, i) => `<circle cx="${(i * 37) % 160}" cy="${(i * 23) % 70}" r="${0.4 + (i % 3) * 0.3}"/>`).join('')}</g>`), ['#5b7fa6', '#e9f2fa'], true],
+  uzay: ['Uzay', 'radial-gradient(circle at 75% 30%, #f6c177 0 4%, #c27c2c 6%, transparent 6.4%), radial-gradient(circle at 10% 20%, #fff9 0 1px, transparent 2px) 0 0/70px 70px, radial-gradient(circle at 60% 80%, #fff6 0 1px, transparent 2px) 0 0/110px 110px, radial-gradient(ellipse at 30% 80%, #5b2a86 0%, transparent 60%), linear-gradient(180deg, #05051a, #12123a)', ['#12123a', '#05051a'], true],
+  yayla: ['Karadeniz Yaylası', 'radial-gradient(ellipse at 30% 100%, #2e7d32 0 30%, transparent 30.5%), radial-gradient(ellipse at 80% 105%, #1b5e20 0 35%, transparent 35.5%), linear-gradient(180deg, #cfe8ef 0%, #a9d3c9 45%, #6fae7a 70%, #3f7f46 100%)', ['#a9d3c9', '#3f7f46'], true],
 };
 
 function svgWall(inner) {
@@ -40,10 +42,13 @@ export const THEMES = {
   gunbatimi: { name: 'Gün batımı', wall: 'gunbatimi', accent: '#c4314b', dark: false },
   orman: { name: 'Orman', wall: 'orman', accent: '#2e7d32', dark: false },
   lavanta: { name: 'Lavanta', wall: 'lavanta', accent: '#7a3fc4', dark: false },
+  deniz: { name: 'Deniz', wall: 'deniz', accent: '#0e7490', dark: false },
   kapadokya: { name: 'Kapadokya', wall: 'kapadokya', accent: '#c25a0a', dark: false, store: true, size: '14 MB', desc: 'Peribacaları ve gün doğumunda sıcak hava balonları.' },
   lale: { name: 'Lale Bahçesi', wall: 'lale', accent: '#c2185b', dark: false, store: true, size: '9 MB', desc: 'İlkbaharda rengârenk lale bahçesi.' },
   bogaz: { name: 'Boğaz', wall: 'bogaz', accent: '#3a7bd5', dark: true, store: true, size: '12 MB', desc: 'Gün batımında köprü ve kıyı. Koyu modla gelir.' },
   kis: { name: 'Karlı Dağlar', wall: 'kis', accent: '#3a6ea5', dark: false, store: true, size: '11 MB', desc: 'Kar yağarken sessiz dağlar.' },
+  uzay: { name: 'Uzay', wall: 'uzay', accent: '#8b5cf6', dark: true, store: true, size: '30 MB', desc: 'Yıldızlar ve bir gezegen. Koyu modla gelir.' },
+  yayla: { name: 'Karadeniz Yaylası', wall: 'yayla', accent: '#15803d', dark: false, store: true, size: '16 MB', desc: 'Sisli yayla ve yemyeşil çimenler.' },
 };
 export const ACCENTS = [['Mavi', '#0a5dc2'], ['Lacivert', '#1f3d8a'], ['Turkuaz', '#00838f'], ['Yeşil', '#2e7d32'], ['Turuncu', '#c25a0a'], ['Kırmızı', '#c4314b'], ['Pembe', '#c2185b'], ['Mor', '#7a3fc4'], ['Gri', '#5f6b7a']];
 
@@ -56,7 +61,7 @@ const DEFAULT_SETTINGS = () => ({
   wallpaper: 'mavi', customWall: null, volume: 50, muted: false, brightness: 100, wifi: true, network: 'EvAğı',
   knownNetworks: ['EvAğı'], autoTime: true, timeOffset: 0, tz: 'İstanbul (UTC+3)', textScale: 100, dark: false,
   user: 'Öğrenci', password: '1234', printers: ['PDF olarak kaydet'], installed: [], unknownDevice: true,
-  theme: 'windows', accent: '#0a5dc2', themes: [], startupOff: [], ext: {}, popupBlock: false,
+  theme: 'windows', accent: '#0a5dc2', accentBars: false, accentTitle: false, transparency: true, themes: [], startupOff: [], ext: {}, popupBlock: false,
   swapButtons: false, dblSpeed: 5, cursorSize: 'normal', cursorColor: 'white', magnifier: false, magZoom: 200,
   bluetooth: true, btDevices: [], airplane: false, pin: '',
   kbLayout: 'trq', kbList: ['trq', 'eng'], time24: true, powerPlan: 'dengeli', screenOff: 10, sleepAfter: 30, blockThird: false,
@@ -159,6 +164,7 @@ export class Desktop {
     this.fs.reset();
     this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
     this.bookmarks = []; // tarayıcının sık kullanılanları
+    this.webNotes = {}; // tarayıcıdaki Yapışkan Not uzantısının notları
     this.vdesks = ['Masaüstü 1']; this.vd = 0;
     this.lastInput = null;
     this.screen.querySelector('.dk-tv')?.remove();
@@ -281,6 +287,9 @@ export class Desktop {
     this.root.classList.toggle('dk-dark', !!s.dark);
     this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
     this.root.classList.toggle('tb-left', !!s.taskbarLeft);
+    this.root.classList.toggle('dk-accbars', !!s.accentBars); // vurgu rengi Başlat menüsünde ve görev çubuğunda
+    this.root.classList.toggle('dk-acctitle', !!s.accentTitle); // vurgu rengi etkin pencerenin başlık çubuğunda
+    this.root.classList.toggle('dk-notrans', s.transparency === false); // saydamlık efektleri kapalı
     const lang = this.root.querySelector('.tb-lang');
     if (lang) { lang.textContent = KB[s.kbLayout]?.[0] || 'TUR'; lang.title = `Giriş dili: ${KB[s.kbLayout]?.[1] || ''}. Değiştirmek için tıklayın ya da Alt + Shift`; }
     this.applyCursor();
@@ -382,10 +391,11 @@ export class Desktop {
     if (this.power !== 'desktop') return;
     const d = this.now();
     const hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    for (const a of this.alarms || []) {
+    for (const a of [...(this.alarms || [])]) {
       if (!a.on || a.time !== hm || a.last === `${d.getDate()}${hm}`) continue;
       a.last = `${d.getDate()}${hm}`;
-      this.ring(a.label || 'Alarm', a.time, '⏰');
+      this.ring(a.label || 'Alarm', a.time, '⏰', a);
+      if (a.once) this.alarms = this.alarms.filter((x) => x !== a); // ertelenen alarm bir kez çalar
       this.emit('alarm-ring', { time: a.time, label: a.label });
     }
     // Takvim randevusu: hatırlatma saati gelince bir kez bildirim çıkar (randevu saati geçmişse çıkmaz)
@@ -410,9 +420,20 @@ export class Desktop {
     this.wins.forEach((w) => w.api?.onAlarm?.());
   }
 
-  ring(title, text, icon) {
-    this.toast(title, text, icon, 12000);
+  // alarm verilirse bildirimde "Ertele (5 dk)" düğmesi çıkar: aynı alarm 5 dakika sonra bir kez daha çalar
+  ring(title, text, icon, alarm) {
+    const t = this.toast(title, `${text}${alarm ? '<div class="to-btns"><button type="button" data-snooze="1">💤 Ertele (5 dk)</button></div>' : ''}`, icon, alarm ? 45000 : 12000);
     playTune(this, [880, 660, 880, 660, 880], 0.22);
+    if (alarm) {
+      t.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-snooze]')) return;
+        const d = new Date(this.now().getTime() + 5 * 60e3);
+        this.alarms.push({ id: 'a' + Date.now(), time: `${pad(d.getHours())}:${pad(d.getMinutes())}`, label: `${alarm.label || 'Alarm'} (ertelendi)`, on: true, once: true });
+        t.remove();
+        this.emit('alarm-snooze', { label: alarm.label });
+      });
+    }
+    return t;
   }
 
   tick() {

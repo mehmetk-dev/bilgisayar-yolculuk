@@ -100,8 +100,11 @@ export function settings({ desk, body, args, emit, dialogs }) {
         <p>Bir resim seçin:</p><div class="st-walls">${walls.map(([k, [n, css]]) => `<button type="button" data-wall="${k}" title="${n}" class="${s.wallpaper === k ? 'on' : ''}" style="background:${css}"><span>${n}</span></button>`).join('')}</div>
         <button type="button" class="st-btn" data-act="browseWall">🖼 Fotoğraflara göz atın…</button></section>
         <section><h3>Renkler</h3>${toggle('dark', s.dark, 'Koyu mod (pencere başlıkları, görev çubuğu ve Windows uygulamaları koyu renk olur)')}
+        ${toggle('transparency', s.transparency, 'Saydamlık efektleri (Başlat menüsü ve görev çubuğu yarı saydam)')}
         <p>Vurgu rengi <small class="st-note">(Başlat düğmesi, seçili düğmeler, açık programın görev çubuğundaki çizgisi)</small></p>
-        <div class="st-accents">${ACCENTS.map(([n, c]) => `<button type="button" data-accent="${c}" title="${n}" class="${s.accent === c ? 'on' : ''}" style="background:${c}"></button>`).join('')}</div></section>
+        <div class="st-accents">${ACCENTS.map(([n, c]) => `<button type="button" data-accent="${c}" title="${n}" class="${s.accent === c ? 'on' : ''}" style="background:${c}"></button>`).join('')}</div>
+        ${toggle('accentBars', s.accentBars, 'Vurgu rengini Başlat menüsünde ve görev çubuğunda göster')}
+        ${toggle('accentTitle', s.accentTitle, 'Vurgu rengini başlık çubuklarında göster')}</section>
         <section><h3>Görev çubuğu</h3>${toggle('taskbarLeft', s.taskbarLeft, 'Görev çubuğu simgelerini sola hizala (eski Windows gibi)')}</section>`;
     } else if (page === 'apps') {
       const list = [...BUILTIN, ...s.installed];

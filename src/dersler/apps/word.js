@@ -10,7 +10,16 @@ const SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36, 48];
 const COLORS = [['Siyah', '#000000'], ['Kırmızı', '#c00000'], ['Mavi', '#1f4e9c'], ['Yeşil', '#2e7d32'], ['Turuncu', '#e46c0a'], ['Mor', '#7030a0']];
 const ALIGN = { justifyLeft: 'Sola hizala', justifyCenter: 'Ortala', justifyRight: 'Sağa hizala', justifyFull: 'İki yana yasla' };
 const HILITE = [['Sarı', '#fff176'], ['Yeşil', '#b9f6ca'], ['Turkuaz', '#a7ecf4'], ['Pembe', '#ffc1e3'], ['Vurgu yok', 'transparent']];
-const STYLES = [['p', 'Normal'], ['h1', 'Başlık 1'], ['h2', 'Başlık 2'], ['title', 'Konu Başlığı']];
+const STYLES = [['p', 'Normal'], ['h1', 'Başlık 1'], ['h2', 'Başlık 2'], ['h3', 'Başlık 3'], ['title', 'Konu Başlığı'], ['blockquote', 'Alıntı']];
+// Büyük/küçük harf değiştir (Türkçe harf kurallarıyla: i ↔ İ, ı ↔ I)
+const trUp = (t) => t.toLocaleUpperCase('tr');
+const trLow = (t) => t.toLocaleLowerCase('tr');
+const CASES = {
+  sentence: ['Cümle düzeni.', (t) => trLow(t).replace(/(^\s*|[.!?]\s+)(\p{L})/gu, (m, a, b) => a + trUp(b))],
+  lower: ['küçük harf', trLow],
+  upper: ['BÜYÜK HARF', trUp],
+  title: ['Her Sözcüğün İlk Harfi Büyük', (t) => trLow(t).replace(/(^|\s)(\p{L})/gu, (m, a, b) => a + trUp(b))],
+};
 const SPACING = ['1,0', '1,15', '1,5', '2,0'];
 const SYMBOLS = ['₺', '€', '$', '©', '®', '™', '°', '±', '×', '÷', '½', '¼', '²', '³', '✓', '✗', '★', '☎', '✉', '→', '•', '…', '«', '»'];
 const MARGINS = { normal: ['Normal', '2,5 cm', '2.5em 3em'], dar: ['Dar', '1,27 cm', '1.3em 1.5em'], genis: ['Geniş', '5 cm (yanlar)', '2.5em 5.5em'] };
@@ -42,12 +51,13 @@ export const TEMPLATES = {
 export function word({ desk, body, args, emit, setTitle }) {
   body.classList.add('wd');
   body.innerHTML = `
-    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button></div>
+    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button></div>
     <div class="wd-rib" data-tab="home">
       <div class="wd-grp"><button type="button" data-cmd="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-cmd="redo" title="Yinele (Ctrl + Y)">↷</button></div>
       <div class="wd-grp"><button type="button" class="wd-clip" data-clip="cut" title="Kes (Ctrl + X)">✂</button><button type="button" class="wd-clip" data-clip="copy" title="Kopyala (Ctrl + C)">⧉</button><button type="button" class="wd-clip" data-clip="paste" title="Yapıştır (Ctrl + V)">📋</button><button type="button" class="wd-painter" title="Biçim Boyacısı: seçili yazının biçimini kopyalar, sonra başka bir yazıyı seçin">🖌</button></div>
       <div class="wd-grp"><select class="wd-font" title="Yazı tipi">${FONTS.map(([n]) => `<option>${n}</option>`).join('')}</select>
-        <select class="wd-size" title="Yazı tipi boyutu">${SIZES.map((s) => `<option${s === 11 ? ' selected' : ''}>${s}</option>`).join('')}</select></div>
+        <select class="wd-size" title="Yazı tipi boyutu">${SIZES.map((s) => `<option${s === 11 ? ' selected' : ''}>${s}</option>`).join('')}</select>
+        <span class="wd-mmwrap"><button type="button" class="wd-casebtn" title="Büyük/küçük harf değiştir">Aa▾</button><span class="wd-mpop wd-cases" hidden>${Object.entries(CASES).map(([k, [l]]) => `<button type="button" data-case="${k}">${l}</button>`).join('')}</span></span></div>
       <div class="wd-grp"><button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button><button type="button" data-cmd="underline" title="Altı çizili (Ctrl + U)"><u>A</u></button><button type="button" data-cmd="strikeThrough" title="Üstü çizili"><s>abc</s></button><button type="button" data-cmd="subscript" title="Alt simge (H₂O)">x₂</button><button type="button" data-cmd="superscript" title="Üst simge (m²)">x²</button>
         <span class="wd-colorwrap"><button type="button" class="wd-hilite" title="Metin vurgu rengi (fosforlu kalem)"><span>🖍</span><i style="background:#fff176"></i></button><span class="wd-pal wd-hpal" hidden>${HILITE.map(([n, c]) => `<button type="button" data-hilite="${c}" title="${n}" style="background:${c}">${c === 'transparent' ? '∅' : ''}</button>`).join('')}</span></span>
         <span class="wd-colorwrap"><button type="button" class="wd-color" title="Yazı tipi rengi"><span>A</span><i style="background:#c00000"></i></button><span class="wd-pal" hidden>${COLORS.map(([n, c]) => `<button type="button" data-color="${c}" title="${n}" style="background:${c}"></button>`).join('')}</span></span>
@@ -83,6 +93,9 @@ export function word({ desk, body, args, emit, setTitle }) {
     <div class="wd-rib" data-tab="review" hidden>
       <div class="wd-grp"><button type="button" class="wd-spell" title="Yazım denetimi (F7)">ABC✓ Yazım denetimi</button><button type="button" class="wd-count" title="Sözcük sayısı">123 Sözcük sayısı</button></div>
     </div>
+    <div class="wd-rib" data-tab="view" hidden>
+      <div class="wd-grp"><label class="wd-chk"><input type="checkbox" class="wd-rulerchk"> Cetvel</label><small class="wd-vnote">Yakınlaştırma: sağ alttaki çubuk ya da Ctrl + fare tekerleği</small></div>
+    </div>
     <div class="wd-rib" data-tab="table" hidden>
       <div class="wd-grp">Satır: <button type="button" data-tb="rowAbove">↑ Üste ekle</button><button type="button" data-tb="rowBelow">↓ Alta ekle</button><button type="button" data-tb="rowDel">✕ Satırı sil</button></div>
       <div class="wd-grp">Sütun: <button type="button" data-tb="colLeft">← Sola ekle</button><button type="button" data-tb="colRight">→ Sağa ekle</button><button type="button" data-tb="colDel">✕ Sütunu sil</button></div>
@@ -94,7 +107,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       <span class="wd-fn"></span><button type="button" data-f="next">Sonrakini bul</button><button type="button" data-f="repl" class="wd-rrow">Değiştir</button><button type="button" data-f="all" class="wd-rrow">Tümünü değiştir</button><button type="button" data-f="close" title="Kapat">✕</button></div>
     <div class="wd-spane" hidden></div>
     <div class="wd-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="pdf">📕 PDF olarak kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button><button type="button" data-file="close">✕ Kapat</button></div>
-    <div class="wd-scroll"><div class="wd-hf wd-hdr" contenteditable="true" spellcheck="false" data-ph="Üst bilgi" hidden></div><div class="wd-page" contenteditable="true" spellcheck="false"><p><br></p></div><div class="wd-hf wd-ftr" hidden><span class="wd-ftxt" contenteditable="true" spellcheck="false" data-ph="Alt bilgi"></span><span class="wd-pn" hidden></span></div></div>
+    <div class="wd-scroll"><div class="wd-ruler" hidden><span></span></div><div class="wd-hf wd-hdr" contenteditable="true" spellcheck="false" data-ph="Üst bilgi" hidden></div><div class="wd-page" contenteditable="true" spellcheck="false"><p><br></p></div><div class="wd-hf wd-ftr" hidden><span class="wd-ftxt" contenteditable="true" spellcheck="false" data-ph="Alt bilgi"></span><span class="wd-pn" hidden></span></div></div>
     <div class="wd-status"><span class="wd-words"></span><span class="wd-lang">Türkçe (Türkiye)</span><span class="wd-zoom"><button type="button" data-zoom="-10" title="Uzaklaştır">−</button><input type="range" class="wd-zr" min="50" max="200" step="10" value="100" aria-label="Yakınlaştırma"><button type="button" data-zoom="10" title="Yakınlaştır">+</button><b>%100</b></span></div>`;
   const $ = (s) => body.querySelector(s);
   const page = $('.wd-page');
@@ -335,7 +348,7 @@ export function word({ desk, body, args, emit, setTitle }) {
   function selectedBlocks() {
     const r = range;
     if (!r) return [];
-    const all = [...page.querySelectorAll('p, h1, h2, h3, li, div')].filter((b) => (b.parentElement === page || b.tagName === 'LI') && r.intersectsNode(b));
+    const all = [...page.querySelectorAll('p, h1, h2, h3, li, blockquote, div')].filter((b) => (b.parentElement === page || b.tagName === 'LI') && r.intersectsNode(b));
     return all.length ? all : [blockOf(r.startContainer)].filter(Boolean);
   }
   function setStyle(k) {
@@ -347,6 +360,14 @@ export function word({ desk, body, args, emit, setTitle }) {
     emit('doc-style', { style: k });
     emit('doc-format', { cmd: 'style', value: k });
     syncTools();
+  }
+  function changeCase(k) {
+    restore();
+    const t = getSelection().toString();
+    if (!t) { desk.toast('Önce seçin', 'Harflerini değiştirmek istediğiniz yazıyı seçin.', 'Aa', 3000); return; }
+    document.execCommand('insertText', false, CASES[k][1](t));
+    changed();
+    emit('doc-case', { mode: k });
   }
   function setSpacing(v) {
     const lh = parseFloat(v.replace(',', '.'));
@@ -585,11 +606,13 @@ export function word({ desk, body, args, emit, setTitle }) {
   function setZoom(z) {
     zoom = Math.max(50, Math.min(200, z));
     page.style.zoom = zoom / 100;
+    $('.wd-ruler').style.zoom = zoom / 100;
     $('.wd-zr').value = zoom;
     $('.wd-zoom b').textContent = `%${zoom}`;
     emit('doc-zoom', { zoom });
   }
   $('.wd-zr').addEventListener('input', (e) => setZoom(+e.target.value));
+  $('.wd-rulerchk').addEventListener('change', (e) => { $('.wd-ruler').hidden = !e.target.checked; emit('doc-ruler', { on: e.target.checked }); });
   $('.wd-scroll').addEventListener('wheel', (e) => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); setZoom(zoom + (e.deltaY < 0 ? 10 : -10)); }, { passive: false });
 
   // ---- Postalar: adres mektup birleştirme ----
@@ -641,7 +664,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     }
   }
   function mergeClick(t) {
-    if (t.classList.contains('wd-fieldbtn') || t.classList.contains('wd-finbtn')) { const p = t.nextElementSibling; const open = p.hidden; body.querySelectorAll('.wd-mpop').forEach((x) => { x.hidden = true; }); p.hidden = !open; return true; }
+    if (t.classList.contains('wd-fieldbtn') || t.classList.contains('wd-finbtn') || t.classList.contains('wd-casebtn')) { const p = t.nextElementSibling; const open = p.hidden; body.querySelectorAll('.wd-mpop').forEach((x) => { x.hidden = true; }); p.hidden = !open; return true; }
     if (t.dataset.field) { $('.wd-fields').hidden = true; insertHtml(`<span class="wd-field" contenteditable="false" data-field="${esc(t.dataset.field)}">«${esc(t.dataset.field)}»</span>&nbsp;`, 'field'); renderMM(); emit('merge-field', { field: t.dataset.field }); return true; }
     const k = t.dataset.mm;
     if (!k) return false;
@@ -674,6 +697,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-file')) { $('.wd-menu').hidden = !$('.wd-menu').hidden; return; }
     if (t.dataset.file) return fileCmd(t.dataset.file);
     if (t.dataset.cmd) return exec(t.dataset.cmd);
+    if (t.dataset.case) { t.closest('.wd-mpop').hidden = true; return changeCase(t.dataset.case); }
     if (mergeClick(t)) return;
     if (t.dataset.clip) return clipCmd(t.dataset.clip);
     if (t.classList.contains('wd-painter')) { if (painter) { painter = null; page.classList.remove('painting'); t.classList.remove('on'); } else pickPainter(); return; }
@@ -799,7 +823,7 @@ export function word({ desk, body, args, emit, setTitle }) {
         table: (() => { const t = page.querySelector('table'); return t && { rows: t.rows.length, cols: Math.max(...[...t.rows].map((r) => r.cells.length)), merged: [...t.querySelectorAll('td')].some((c) => c.colSpan > 1), thick: t.classList.contains('thick'), valign: [...t.querySelectorAll('td')].some((c) => c.style.verticalAlign === 'middle') }; })(),
         blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, fileName, dirty,
         fields: [...page.querySelectorAll('.wd-field')].map((x) => x.dataset.field), merge: mm && { list: mm.name, count: mm.rows.length, preview: mm.preview },
-        links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
+        ruler: !$('.wd-ruler').hidden, links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,
         header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: !pn.hidden,
       };

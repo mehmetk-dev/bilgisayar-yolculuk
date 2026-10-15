@@ -1,4 +1,4 @@
-// Görev Yöneticisi: açık uygulamalar ve arka plan işlemleri (işlemci, bellek), yanıt vermeyen programı kapatma,
+// Görev Yöneticisi: açık uygulamalar ve arka plan işlemleri (işlemci, bellek, disk, ağ; sütuna göre sıralama), yanıt vermeyen programı kapatma, Yeni görev çalıştır,
 // performans grafikleri (işlemci, bellek, disk, Wi-Fi) ve başlangıç uygulamaları (açılışta kendiliğinden çalışanlar).
 import { esc } from './util.js';
 
@@ -25,6 +25,13 @@ export const STARTUP = [
   { id: 'toolbar', icon: '🔎', name: 'Süper Arama Yardımcısı', pub: 'Bilinmiyor', impact: 'Yüksek', sec: 6.5, when: (s) => s.toolbar },
 ];
 const MEM_TOTAL = 8192; // MB
+// Yaklaşık disk (MB/sn) ve ağ (Mb/sn) kullanımı: uygulama ya da arka plan işlemi kimliğine göre
+const IO = { browser: [0.25, 1.6], mail: [0.1, 0.6], av: [0.5, 0], explorer: [0.1, 0], sync: [0.9, 0.8], upd: [0.1, 0.2], toolbar: [0.4, 2.8] };
+// "Yeni görev çalıştır" penceresine yazılabilen adlar → program kimliği
+const RUN = {
+  notepad: 'notepad', calc: 'calc', mspaint: 'paint', paint: 'paint', explorer: 'explorer', winword: 'word', word: 'word', excel: 'sheet',
+  powerpnt: 'slides', msedge: 'browser', chrome: 'browser', taskmgr: 'taskmgr', control: 'settings', 'ms-settings:': 'settings', devmgmt: 'devmgr', 'devmgmt.msc': 'devmgr',
+};
 const APP_MEM = { browser: 380, word: 160, sheet: 150, slides: 170, paint: 90, mail: 120, photos: 110, explorer: 60, settings: 55 };
 
 const jitter = (v, k = 0.35) => Math.max(0, v * (1 + (Math.random() * 2 - 1) * k));
@@ -34,7 +41,7 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
   body.classList.add('tm');
   const s = desk.settings;
   s.startupOff ||= [];
-  let tab = args.tab || 'proc', sel = null, perfKind = 'cpu';
+  let tab = args.tab || 'proc', sel = null, perfKind = 'cpu', sortKey = null;
   const hist = { cpu: [], mem: [], disk: [], net: [] };
   const procCpu = {}; // her işlemin son işlemci değeri (titreşimli)
 
@@ -71,23 +78,50 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
     return { cpu, mem, all };
   };
 
+  // Düğme alanı her saniye yeniden çizilirse basılı tutulan düğme kaybolur ve tıklama gider; yalnızca değişince yazılır
+  function setActs(html) {
+    const a = $('.tm-acts');
+    if (a.dataset.sig === html) return;
+    a.dataset.sig = html;
+    a.innerHTML = html;
+  }
   function renderProc() {
     const { apps, bg } = processes();
     const t = totals();
     const heat = (v, max) => `style="background:rgba(255,186,0,${Math.min(0.55, (v / max) * 0.9 + 0.06).toFixed(2)})"`;
+    // Her işlemin bu çizimdeki değerleri (sıralama da bunlara göre yapılır)
+    const val = {};
+    for (const p of [...apps, ...bg]) { const [d, n] = IO[p.app || p.id] || [0.05, 0]; val[p.id] = { cpu: cpuOf(p), mem: p.mem, disk: p.hung ? 0 : jitter(d, 0.5), net: p.hung ? 0 : jitter(n, 0.5) }; }
+    const sum = (k) => Object.values(val).reduce((a, v) => a + v[k], 0);
+    const order = (list) => (sortKey ? [...list].sort((a, b) => val[b.id][sortKey] - val[a.id][sortKey]) : list);
     const row = (p) => {
-      const c = cpuOf(p);
+      const v = val[p.id];
       return `<tr data-proc="${p.id}" class="${p.id === sel ? 'sel' : ''} ${p.hung ? 'hung' : ''}" tabindex="-1">
         <td><span class="tm-ic">${p.icon}</span>${esc(p.name)}</td><td class="tm-st">${p.hung ? '⏳ Yanıt vermiyor' : ''}</td>
-        <td ${heat(c, 30)}>%${fmt(c)}</td><td ${heat(p.mem, 900)}>${fmt(p.mem, 1)} MB</td></tr>`;
+        <td ${heat(v.cpu, 30)}>%${fmt(v.cpu)}</td><td ${heat(p.mem, 900)}>${fmt(p.mem, 1)} MB</td><td ${heat(v.disk, 2)}>${fmt(v.disk)} MB/sn</td><td ${heat(v.net, 3)}>${fmt(v.net)} Mb/sn</td></tr>`;
     };
-    $('.tm-body').innerHTML = `<table class="tm-t"><thead><tr><th>Ad</th><th>Durum</th><th>İşlemci<small>%${Math.round(t.cpu)}</small></th><th>Bellek<small>%${Math.round((t.mem / MEM_TOTAL) * 100)}</small></th></tr></thead>
-      <tbody><tr class="tm-grp"><td colspan="4">Uygulamalar (${apps.length})</td></tr>${apps.map(row).join('')}
-      <tr class="tm-grp"><td colspan="4">Arka plan işlemleri (${bg.length})</td></tr>${bg.map(row).join('')}</tbody></table>`;
+    const th = (k, label, sub) => `<th data-sort="${k}" class="tm-sort${sortKey === k ? ' on' : ''}" title="Bu sütuna göre sırala (büyükten küçüğe)">${label}${sortKey === k ? ' ▾' : ''}<small>${sub}</small></th>`;
+    $('.tm-body').innerHTML = `<table class="tm-t"><thead><tr><th>Ad</th><th>Durum</th>${th('cpu', 'İşlemci', `%${Math.round(t.cpu)}`)}${th('mem', 'Bellek', `%${Math.round((t.mem / MEM_TOTAL) * 100)}`)}${th('disk', 'Disk', `${fmt(sum('disk'))} MB/sn`)}${th('net', 'Ağ', `${fmt(sum('net'))} Mb/sn`)}</tr></thead>
+      <tbody><tr class="tm-grp"><td colspan="6">Uygulamalar (${apps.length})</td></tr>${order(apps).map(row).join('')}
+      <tr class="tm-grp"><td colspan="6">Arka plan işlemleri (${bg.length})</td></tr>${order(bg).map(row).join('')}</tbody></table>`;
     const p = [...apps, ...bg].find((x) => x.id === sel);
     if (!p) sel = null;
-    $('.tm-acts').innerHTML = p?.restart ? '<button type="button" class="tm-btn" data-act="restart">⟳ Yeniden başlat</button>'
-      : `<button type="button" class="tm-btn" data-act="end" ${!p || p.sys || p.self ? 'disabled' : ''}>⊘ Görevi sonlandır</button>`;
+    setActs('<button type="button" class="tm-btn" data-act="run">▶ Yeni görev çalıştır</button>' + (p?.restart ? '<button type="button" class="tm-btn" data-act="restart">⟳ Yeniden başlat</button>'
+      : `<button type="button" class="tm-btn" data-act="end" ${!p || p.sys || p.self ? 'disabled' : ''}>⊘ Görevi sonlandır</button>`));
+  }
+
+  // Yeni görev çalıştır: program adını yazarak açar (notepad, calc, mspaint, explorer…)
+  async function runTask() {
+    const v = await dialogs.form({
+      title: 'Yeni görev oluştur', icon: '▶', ok: 'Tamam',
+      text: 'Açmak istediğiniz programın adını yazın; Windows sizin için açsın.<br><small>Örnek: <b>notepad</b>, <b>calc</b>, <b>mspaint</b>, <b>explorer</b></small>',
+      fields: [{ name: 'cmd', label: 'Aç:' }],
+      check: (x) => { const k = x.cmd.trim().toLowerCase().replace(/\.exe$/, ''); return !k ? 'Bir ad yazın.' : RUN[k] ? '' : `Windows “${x.cmd.trim()}” öğesini bulamıyor. Adın doğru yazıldığından emin olun.`; },
+    });
+    if (!v) return;
+    const app = RUN[v.cmd.trim().toLowerCase().replace(/\.exe$/, '')];
+    desk.open(app);
+    emit('task-run', { cmd: v.cmd.trim(), app });
   }
 
   async function endTask() {
@@ -149,7 +183,7 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
     const [title, color, , details, model] = kinds[perfKind];
     $('.tm-body').innerHTML = `<div class="tm-perf"><div class="tm-plist">${Object.entries(kinds).map(([k, [n, c, sub]]) => `<button type="button" data-perf="${k}" class="${k === perfKind ? 'on' : ''}">${graph(hist[k].slice(-30), c)}<span><b>${n}</b><small>${sub}</small></span></button>`).join('')}</div>
       <div class="tm-pmain"><div class="tm-ptitle"><b>${title}</b><span>${model}</span></div>${graph(hist[perfKind], color)}<small class="tm-pcap">60 saniye · %100</small>${details}</div></div>`;
-    $('.tm-acts').innerHTML = '';
+    setActs('');
   }
 
   // ---- Başlangıç uygulamaları ----
@@ -161,7 +195,7 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
       ${list.map((x) => { const off = s.startupOff.includes(x.id); return `<tr data-start="${x.id}" class="${x.id === sel ? 'sel' : ''}"><td><span class="tm-ic">${x.icon}</span>${x.name}</td><td>${x.pub}</td><td>${off ? 'Devre dışı' : 'Etkin'}</td><td class="tm-imp ${x.impact === 'Yüksek' ? 'hi' : ''}">${off ? 'Yok' : x.impact}</td></tr>`; }).join('')}</tbody></table>`;
     const x = list.find((i) => i.id === sel);
     const off = x && s.startupOff.includes(x.id);
-    $('.tm-acts').innerHTML = `<button type="button" class="tm-btn" data-act="toggleStart" ${x ? '' : 'disabled'}>${off ? '✔ Etkinleştir' : '⊘ Devre dışı bırak'}</button>`;
+    setActs(`<button type="button" class="tm-btn" data-act="toggleStart" ${x ? '' : 'disabled'}>${off ? '✔ Etkinleştir' : '⊘ Devre dışı bırak'}</button>`);
   }
 
   function render() {
@@ -174,11 +208,14 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
 
   body.addEventListener('click', (e) => {
     const b = e.target.closest('button');
+    const so = e.target.closest('th[data-sort]');
+    if (so) { sortKey = sortKey === so.dataset.sort ? null : so.dataset.sort; render(); emit('task-sort', { key: sortKey }); return; }
     const tr = e.target.closest('tr[data-proc], tr[data-start]');
     if (tr) { sel = tr.dataset.proc || tr.dataset.start; render(); emit('task-select', { id: sel }); return; }
     if (!b) return;
     if (b.dataset.tab) { tab = b.dataset.tab; sel = null; render(); emit('task-tab', { tab }); return; }
     if (b.dataset.perf) { perfKind = b.dataset.perf; render(); emit('task-perf', { kind: perfKind }); return; }
+    if (b.dataset.act === 'run') return runTask();
     if (b.dataset.act === 'end') return endTask();
     if (b.dataset.act === 'restart') return restartExplorer();
     if (b.dataset.act === 'toggleStart') {
@@ -201,11 +238,15 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
   });
   body.addEventListener('keydown', (e) => { if (e.key === 'Delete' && tab === 'proc' && sel) { e.preventDefault(); endTask(); } });
 
+  // Fareyle basılıyken yeniden çizmeyiz: basma ile bırakma arasında satır ya da başlık değişirse tıklama kaybolurdu
+  let pressed = false;
+  body.addEventListener('pointerdown', () => { pressed = true; });
+  document.addEventListener('pointerup', () => setTimeout(() => { pressed = false; }, 0));
   for (let i = 0; i < 20; i++) sample();
   const timer = setInterval(() => {
     if (!body.isConnected) { clearInterval(timer); return; }
     sample();
-    if (tab !== 'startup') render();
+    if (tab !== 'startup' && !pressed) render();
   }, 1000);
   render();
 

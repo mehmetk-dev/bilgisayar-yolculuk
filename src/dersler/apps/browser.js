@@ -11,6 +11,7 @@ const EXT_HOST = 'uzantilar.bulalim.com';
 export const EXTS = {
   adblock: { icon: '🛡', name: 'Reklam Kalkanı', pub: 'Kalkan Yazılım', verified: true, users: '10.000.000+', stars: 4.7, desc: 'Sayfalardaki reklamları ve açılır pencereleri gizler.', perms: ['Ziyaret ettiğiniz sitelerdeki reklamları görme ve gizleme'] },
   dark: { icon: '🌙', name: 'Gece Okuma', pub: 'Okuma Araçları', verified: true, users: '2.000.000+', stars: 4.5, desc: 'Beyaz sayfaları koyu renkte gösterir; akşamları gözü yormaz.', perms: ['Sitelerin görünüşünü değiştirme'] },
+  note: { icon: '🗒', name: 'Yapışkan Not', pub: 'Verimlilik Araçları', verified: true, users: '500.000+', stars: 4.2, desc: 'Bir sayfaya kendinize küçük bir not yapıştırın; sayfayı yeniden açınca not orada olsun. Simgesine tıklayın.', perms: ['Notlarınızı bu bilgisayarda saklama'] },
   reader: { icon: '🔊', name: 'Sesli Okuyucu', pub: 'Erişilebilirlik Derneği', verified: true, users: '800.000+', stars: 4.6, desc: 'Seçtiğiniz yazıyı (seçim yoksa sayfayı) sesli okur. Simgesine tıklayın.', perms: ['Seçtiğiniz yazıyı okuma'] },
   fake: { icon: '⚡', name: 'Süper İndirici PRO', pub: 'free-dl-pro-2026', verified: false, users: '312', stars: 1.9, desc: 'İNDİRMELERİNİZİ 10 KAT HIZLANDIRIR!!! Tamamen BEDAVA!!!', perms: ['Ziyaret ettiğiniz BÜTÜN sitelerdeki verilerinizi okuma ve değiştirme', 'Kayıtlı şifrelerinizi görme', 'İndirmelerinizi yönetme', 'Ana sayfanızı ve arama motorunuzu değiştirme'] },
 };
@@ -48,6 +49,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
   if (priv) body.classList.add('br-private');
   const s = desk.settings;
   const extOn = (id) => s.ext[id] === true;
+  const notes = (desk.webNotes ||= {}); // Yapışkan Not: sayfa adresine göre notlar
+  const curUrl = () => (cur?.hist[cur.idx] ? fmtUrl(cur.hist[cur.idx]) : '');
   const history = () => (desk.history ||= []);
 
   const fmtUrl = (loc) => (loc.host === 'tarayici' ? 'tarayici:/' + loc.path : loc.host === 'dosya' ? 'dosya://' + loc.path : loc.host === 'kaynak' ? 'view-source:dosya://' + loc.path : loc.host + (loc.path === '/' ? '' : loc.path) + (loc.q ? '?q=' + loc.q : ''));
@@ -454,7 +457,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   }
 
   function renderExts() {
-    $('.br-exts').innerHTML = Object.keys(s.ext).filter(extOn).map((k) => `<button type="button" data-extbtn="${k}" title="${EXTS[k].name}">${EXTS[k].icon}${k === 'adblock' && cur?.blocked ? `<sup>${cur.blocked}</sup>` : ''}</button>`).join('');
+    $('.br-exts').innerHTML = Object.keys(s.ext).filter(extOn).map((k) => `<button type="button" data-extbtn="${k}" title="${EXTS[k].name}">${EXTS[k].icon}${k === 'adblock' && cur?.blocked ? `<sup>${cur.blocked}</sup>` : ''}${k === 'note' && notes[curUrl()] ? '<sup>•</sup>' : ''}</button>`).join('');
   }
 
   // ---- Açılır menüler: ⋯ ve 🧩 ----
@@ -463,7 +466,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (!menu.hidden && menu.dataset.kind === kind) { menu.hidden = true; return; }
     menu.dataset.kind = kind;
     if (kind === 'more') {
-      const items = [['newtab', '＋ Yeni sekme', 'Ctrl+T'], ['private', '🕶 Yeni gizli pencere', 'Ctrl+Shift+N'], '-', ['history', '🕘 Geçmiş', 'Ctrl+H'], ['downloads', '⬇ İndirilenler', 'Ctrl+J'], ['bookmark', '☆ Sık kullanılanlara ekle', 'Ctrl+D'], ['extensions', '🧩 Uzantılar', ''], '-',
+      const items = [['newtab', '＋ Yeni sekme', 'Ctrl+T'], ['private', '🕶 Yeni gizli pencere', 'Ctrl+Shift+N'], '-', ['history', '🕘 Geçmiş', 'Ctrl+H'], ['downloads', '⬇ İndirilenler', 'Ctrl+J'], ['bookmark', '☆ Sık kullanılanlara ekle', 'Ctrl+D'], ['bmbar', '⭐ Sık kullanılanlar çubuğunu göster/gizle', 'Ctrl+Shift+B'], ['extensions', '🧩 Uzantılar', ''], '-',
         ['zoom', `🔍 Yakınlaştır <span class="br-mz"><button type="button" data-z="-10">−</button> %${zoom} <button type="button" data-z="10">＋</button></span>`, ''], ['print', '🖨 Yazdır', 'Ctrl+P'], ['find', '🔎 Sayfada bul', 'Ctrl+F'], ['source', '</> Sayfa kaynağını görüntüle', 'Ctrl+U'], ['clear', '🧹 Göz atma verilerini temizle', 'Ctrl+Shift+Del'], '-', ['settings', '⚙ Ayarlar', '']];
       menu.innerHTML = items.map((it) => (it === '-' ? '<hr>' : `<div class="br-mi" data-m="${it[0]}" role="button" tabindex="0"><span>${it[1]}</span><kbd>${it[2]}</kbd></div>`)).join('');
     } else {
@@ -474,6 +477,15 @@ export function browser({ desk, body, args, emit, setTitle }) {
     menu.hidden = false;
     emit('web-menu', { kind });
   }
+  // Yapışkan Not uzantısı: bu sayfaya küçük bir not (sayfa adresine göre saklanır)
+  function openNote() {
+    menu.dataset.kind = 'note';
+    menu.innerHTML = `<div class="br-mh">🗒 Yapışkan Not</div><p class="br-npar">Bu sayfa için notunuz:</p><textarea class="br-ntext" rows="3" maxlength="200" placeholder="ör. Fiyatı yarın tekrar bak"></textarea><button type="button" class="xs-btn primary" data-notesave="1">💾 Notu kaydet</button>`;
+    menu.querySelector('.br-ntext').value = notes[curUrl()] || '';
+    menu.hidden = false;
+    menu.querySelector('.br-ntext').focus();
+    emit('web-menu', { kind: 'note' });
+  }
   function menuCmd(m) {
     menu.hidden = true;
     emit('web-menu-cmd', { cmd: m });
@@ -482,6 +494,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     else if (m === 'history') newTab({ host: 'tarayici', path: '/gecmis', q: '' });
     else if (m === 'downloads') renderDl(true);
     else if (m === 'bookmark') bookmark();
+    else if (m === 'bmbar') toggleBmBar();
     else if (m === 'extensions') newTab({ host: 'tarayici', path: '/uzantilar', q: '' });
     else if (m === 'extstore') newTab({ host: EXT_HOST, path: '/', q: '' });
     else if (m === 'settings') newTab({ host: 'tarayici', path: '/ayarlar', q: '' });
@@ -587,6 +600,14 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (!e.target.closest('.br-menu, .br-more, .br-ext')) menu.hidden = true;
     const g = e.target.closest('[data-go]');
     if (g) { e.preventDefault(); go(g.dataset.go, 'link'); return; }
+    if (e.target.closest('[data-notesave]')) {
+      const u = curUrl(), v = menu.querySelector('.br-ntext').value.trim();
+      if (v) notes[u] = v; else delete notes[u];
+      menu.hidden = true;
+      renderExts();
+      emit('ext-note', { url: u, text: v });
+      return;
+    }
     const mi = e.target.closest('[data-m]');
     if (mi && !e.target.closest('[data-z]')) { menuCmd(mi.dataset.m); return; }
     const z = e.target.closest('[data-z]');
@@ -599,6 +620,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       if (k === 'reader') readAloud();
       else if (k === 'adblock') desk.toast('Reklam Kalkanı', `Bu sayfada <b>${cur.blocked || 0}</b> reklam engellendi.`, '🛡', 3000);
       else if (k === 'dark') setExt('dark', false);
+      else if (k === 'note') openNote();
       else desk.toast('Süper İndirici PRO', 'REKLAMSIZ SÜRÜM İÇİN ŞİMDİ ÖDEYİN!!! (İşte zararlı uzantı böyle davranır.)', '⚡', 5000);
       emit('ext-click', { id: k });
       return;
@@ -687,8 +709,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const on = bms.some((b) => b.url === u);
     $('.br-star').textContent = on ? '★' : '☆';
     $('.br-star').classList.toggle('on', on);
-    $('.br-bm').hidden = !bms.length;
+    $('.br-bm').hidden = !bms.length || s.bmBar === false;
     $('.br-bm').innerHTML = bms.map((b, i) => `<button type="button" data-bm="${i}" title="${esc(b.url)}">⭐ ${esc(b.title.slice(0, 24))}</button>`).join('');
+  }
+  function toggleBmBar() {
+    s.bmBar = s.bmBar === false;
+    renderBm();
+    emit('web-bmbar', { on: s.bmBar !== false });
   }
   function bookmark() {
     const loc = cur.hist[cur.idx];
@@ -736,6 +763,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd') { e.preventDefault(); setZoom(zoom + 10); }
     else if (e.key === '-' || e.code === 'NumpadSubtract') { e.preventDefault(); setZoom(zoom - 10); }
     else if (e.key === '0' || e.code === 'Numpad0') { e.preventDefault(); setZoom(100); }
+    else if (e.code === 'KeyB' && e.shiftKey) { e.preventDefault(); toggleBmBar(); }
     else if (e.code === 'KeyD') { e.preventDefault(); bookmark(); }
     else if (e.code === 'KeyS' && e.shiftKey) { e.preventDefault(); capture(); }
     else if (e.code === 'KeyF') { e.preventDefault(); openFind(); }

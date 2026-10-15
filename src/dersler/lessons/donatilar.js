@@ -109,6 +109,18 @@ export const donatilar = {
       on: (ev) => ev.type === 'timer-ring',
       done: 'Süre doldu! Ses çaldı ve köşede uyarı çıktı. Gerçekte de böyle çalışır.',
     },
+    {
+      title: 'Alarm çalınca: Ertele',
+      html: '<p>Alarm çalarken “beş dakika daha” demek isteyebilirsiniz. Size şimdi çalan bir <b>deneme alarmı</b> kurduk. Köşede çıkan bildirimde <b>💤 Ertele (5 dk)</b> düğmesine basın.</p>',
+      hint: 'Bildirim birkaç saniye içinde sağ altta çıkar. Çıkmazsa biraz bekleyin.',
+      setup: (c) => {
+        const d = c.d.now(); if (d.getSeconds() >= 57) d.setMinutes(d.getMinutes() + 1);
+        const p2 = (n) => String(n).padStart(2, '0');
+        if (!c.d.alarms.some((a) => a.demo)) c.d.alarms.push({ id: 'demo-ertele', demo: true, once: true, time: `${p2(d.getHours())}:${p2(d.getMinutes())}`, label: 'Deneme alarmı', on: true });
+      },
+      on: (ev) => ev.type === 'alarm-snooze',
+      done: 'Alarm 5 dakika sonraya ertelendi; o saatte bir kez daha çalacak. Gerçek ilaç ya da randevu alarmlarında da böyle kullanırsınız.',
+    },
     rehberSoru({
       title: 'Alarm neden çalmadı?',
       html: '<p>Komşunuz şikâyetçi: “Alarm kurdum, öğleden sonra bilgisayarın başında değildim, çalmadı. Neden olabilir?” Hangisi <b>muhtemel bir nedendir</b>?</p>',
