@@ -11,6 +11,10 @@ import { HIZMET_SITES } from './siteler-hizmet.js';
 import { YZ_SITES } from './siteler-yz.js';
 import { BELGE_SITES } from './siteler-belge.js';
 import { AG_SITES } from './siteler-ag.js';
+import { FOTO_SITES } from './siteler-foto.js';
+import { HARITA_SITES } from './siteler-harita.js';
+import { BANKA_SITES } from './siteler-banka.js';
+import { KAMU_SITES } from './siteler-kamu.js';
 
 export const SEARCH_HOST = 'www.bulalim.com';
 
@@ -259,7 +263,7 @@ export const SITES = {
   },
 };
 
-Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES);
+Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES, FOTO_SITES, HARITA_SITES, BANKA_SITES, KAMU_SITES);
 
 function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 

@@ -355,6 +355,7 @@ function finalHtml() {
   } else if (lesson.test) {
     const sc = testScore(lesson);
     report = `<div class="score"><b>${sc.right} / ${sc.total}</b><span>soruyu ilk denemede doğru bildiniz</span></div>
+      ${lesson.sertifika ? (sc.right / sc.total >= 0.7 ? '<div class="cert-ok">🎓 Kursu başarıyla tamamladınız! Belgenizi yazdırabilirsiniz.</div><p><button type="button" class="btn primary" data-act="cert">🎓 Kurs bitirme belgesini yazdır</button></p>' : '<p class="mut">Belge için soruların en az %70\'ini ilk denemede bilmek gerekir. Aşağıdaki konulara bakıp sınavı yeniden çözebilirsiniz.</p>') : ''}
       ${sc.missed.length ? `<details class="rep-d" open><summary>Tekrar bakılacak konular</summary><ul>${sc.missed.map((s) => `<li>${esc(s.title)}</li>`).join('')}</ul></details>` : '<p>Hepsini ilk denemede bildiniz! 🌟</p>'}`;
   } else if (slow.length >= 3) {
     report = `<details class="rep-d"><summary>En çok zaman aldığınız adımlar</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
@@ -398,6 +399,7 @@ function finish() {
 $('#stepBody').addEventListener('click', (e) => {
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'print') printCard();
+  if (act === 'cert') printCert();
   if (act === 'download') download();
   if (act === 'restart') restart();
 });
@@ -420,6 +422,16 @@ function printCard() {
   $('#printCard').innerHTML = `<h1>${emojiIcon(lesson.icon)} ${lesson.title}</h1><p>Özet kartı: bilgisayarın yanında dursun.</p>
     <table>${lesson.summary.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>
     <p class="pfoot">Ctrl ile başlayan kısayollarda: önce Ctrl'yi basılı tutun, sonra harfe bir kez basın, sonra ikisini bırakın.</p>`;
+  print();
+}
+
+// Kurs bitirme sınavında %70 ve üstü: adı, tarihi ve puanı yazan basit bir belge
+function printCert() {
+  const sc = testScore(lesson);
+  const d = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+  $('#printCard').innerHTML = `<div class="cert"><div class="cert-ic">🎓</div><h1>Kurs Bitirme Belgesi</h1><p class="cert-name">${esc(who || 'Kursiyer')}</p>
+    <p>14 haftalık <b>Temel Bilgisayar Kullanımı</b> kursunu tamamlamış ve kurs bitirme sınavında <b>${sc.right} / ${sc.total}</b> soruyu ilk denemede doğru cevaplamıştır.</p>
+    <p class="cert-date">${d}</p><div class="cert-sign"><span>Eğitmen</span><span>İmza</span></div></div>`;
   print();
 }
 

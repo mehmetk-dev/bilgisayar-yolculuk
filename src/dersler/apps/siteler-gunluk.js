@@ -25,7 +25,22 @@ const SERVICES = [
   { id: 'adli', name: 'Adli Sicil Kaydı (Sabıka Kaydı) Sorgulama', kurum: 'Adalet Bakanlığı', keys: ['sabıka', 'sabika', 'adli', 'sicil'], belge: true },
   { id: 'recete', name: 'Reçete Bilgilerim', kurum: 'Sağlık Bakanlığı', keys: ['reçete', 'recete', 'ilaç', 'ilac'] },
   { id: 'arac', name: 'Adıma Kayıtlı Araç Sorgulama', kurum: 'Emniyet Genel Müdürlüğü', keys: ['araç', 'arac', 'araba', 'plaka'] },
+  { id: 'emekli', name: 'SGK Emekli Aylık Bilgileri', kurum: 'Sosyal Güvenlik Kurumu', keys: ['emekli', 'aylık', 'maaş', 'maas', 'kesinti'] },
+  { id: 'hat', name: 'Mobil Hat Sorgulama (Adıma Kayıtlı Hatlar)', kurum: 'Bilgi Teknolojileri ve İletişim Kurumu', keys: ['hat', 'telefon', 'gsm', 'numara', 'operatör'] },
+  { id: 'sirket', name: 'Şirket Ortaklık Bilgileri (Adıma Kayıtlı Şirketler)', kurum: 'Ticaret Bakanlığı', keys: ['şirket', 'sirket', 'ortak', 'ticaret'] },
 ];
+// Belge vermeyen, bilgi gösteren hizmetler (14. hafta: emekli aylığı, kayıtlı hatlar, şirket ortaklığı)
+const INFO = {
+  emekli: `<table class="nb-tbl"><tr><th>Dönem</th><th>Aylık</th><th>Kesinti</th><th>Ödenen</th><th>Ödeme günü</th></tr>
+    <tr><td>Ağustos 2026</td><td>15.240,00 ₺</td><td>-</td><td>15.240,00 ₺</td><td>17.08.2026</td></tr><tr><td>Eylül 2026</td><td>15.240,00 ₺</td><td>-</td><td>15.240,00 ₺</td><td>17.09.2026</td></tr>
+    <tr class="hi"><td>Ekim 2026</td><td>15.240,00 ₺</td><td>1.250,00 ₺<br><small>Kredi taksiti (Bankam)</small></td><td>13.990,00 ₺</td><td>17.10.2026</td></tr></table>
+    <p class="ed-note">Kesintilerin nedeni tabloda yazar. Tanımadığınız bir kesinti görürseniz <b>ALO 170</b>'i arayıp SGK'ya sorun.</p>`,
+  hat: `<table class="nb-tbl"><tr><th>Operatör</th><th>Numara</th><th>Tür</th><th>Açılış tarihi</th></tr>
+    <tr><td>Mavi GSM</td><td>0532 *** ** 17</td><td>Faturalı</td><td>14.05.2009</td></tr><tr><td>Yıldız Mobil</td><td>0505 *** ** 42</td><td>Hazır kart</td><td>02.11.2015</td></tr>
+    <tr class="hi"><td>Hızlı Net</td><td>0551 *** ** 08</td><td>Faturalı</td><td>03.10.2026</td></tr></table>
+    <p class="ed-note">⚠ Bilmediğiniz bir hat görürseniz dolandırıcılar adınıza hat çıkarmış olabilir: hemen o operatöre başvurup hattı kapattırın, gerekirse savcılığa şikâyette bulunun.</p>`,
+  sirket: '<div class="ed-ok">✅ Adınıza kayıtlı bir şirket ya da şirket ortaklığı bulunmamaktadır.</div><p class="ed-note">Kimlik bilgileriniz ele geçirilirse adınıza şirket kurulup borç çıkarılabilir. Yılda bir kez bu sayfaya bakmak iyi bir alışkanlıktır.</p>',
+};
 const AMAC = ['Resmî kuruma verilecek', 'Bankaya verilecek', 'İşverene verilecek', 'Okula verilecek'];
 const edHead = (st) => `<header class="ed-head">🇹🇷 e-Devlet Kapısı<nav><a data-href="www.turkiye.gov.tr">Ana sayfa</a>
   ${st.user ? `<span class="ed-user">👤 ${esc(st.userName)}</span><button type="button" class="ed-out" data-act="logout">⏻ Çıkış</button>` : '<a data-href="www.turkiye.gov.tr/giris">Giriş yap</a>'}</nav></header>`;
@@ -77,7 +92,10 @@ const EDEVLET = {
           <button type="button" class="ed-btn" data-act="needLogin" data-next="${path}">Giriş Yap</button></div>`);
       }
       const doc = st.docs?.[svc.id];
-      if (!svc.belge) return page(svc.name, `${head}<div class="ed"><h1>${esc(svc.name)}</h1><p class="ed-kurum">${esc(svc.kurum)}</p><p>Bu hizmette kayıtlı bilgi bulunmamaktadır.</p></div>`);
+      if (!svc.belge) {
+        if (INFO[svc.id]) setTimeout(() => ctx.emit('edevlet-view', { svc: svc.id }), 0);
+        return page(svc.name, `${head}<div class="ed"><h1>${esc(svc.name)}</h1><p class="ed-kurum">${esc(svc.kurum)}</p>${INFO[svc.id] || '<p>Bu hizmette kayıtlı bilgi bulunmamaktadır.</p>'}</div>`);
+      }
       return page(svc.name, `${head}<div class="ed"><h1>${esc(svc.name)}</h1><p class="ed-kurum">${esc(svc.kurum)}</p>
         ${doc ? `<div class="ed-ok">✅ Belgeniz oluşturuldu.<br>Barkod numarası: <b>${doc.barkod}</b></div><button type="button" class="ed-btn" data-act="dl" data-svc="${svc.id}">📄 Belgeyi indir (PDF)</button>
           <p class="ed-small">Belgeyi yazdırıp götürebilir ya da e-postayla gönderebilirsiniz. Alan kurum barkoddan doğruluğunu kontrol eder.</p>`

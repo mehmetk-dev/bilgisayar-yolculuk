@@ -25,16 +25,17 @@ function soru({ t, pic, q, opts, ok, why }) {
   };
 }
 
-function test({ id, no, title, desc, qs }) {
+// intro / scene / icon verilirse haftalık test yerine başka bir sınav olur (ör. kurs bitirme sınavı)
+export function test({ id, no, title, desc, qs, intro, scene, icon = '✅' }) {
   return {
-    id, icon: '✅', title, desc, stage: 'scene', test: true, minutes: Math.round(qs.length * 1.5),
+    id, icon, title, desc, stage: 'scene', test: true, minutes: Math.round(qs.length * 1.5),
     steps: [
       {
         title: 'Nasıl çözülür?',
-        html: `<p>${no}. haftada öğrendiklerimizi <b>${qs.length} soruyla</b> tekrar edeceğiz.</p>
+        html: `<p>${intro || `${no}. haftada öğrendiklerimizi`} <b>${qs.length} soruyla</b> tekrar edeceğiz.</p>
           <ul class="big-list"><li>Her soruda doğru cevaba tıklayın.</li><li>Yanlış seçerseniz açıklama çıkar; okuyup yeniden deneyin.</li><li>Sonunda kaç soruyu <b>ilk denemede</b> bildiğinizi göreceksiniz.</li></ul>
           <p class="mut">Not değil, tekrar içindir. Acele etmeyin.</p>`,
-        scene: info(`<div class="sc-big">✅ ❓ ✅</div><p>${no}. hafta tekrar testi</p>`),
+        scene: info(scene || `<div class="sc-big">✅ ❓ ✅</div><p>${no}. hafta tekrar testi</p>`),
       },
       ...qs.map(soru),
       { final: true, title: 'Test bitti! 🎉', html: '', scene: info('<div class="sc-big">🏆</div><p>Tebrikler! Sonucunuz solda.</p>') },
@@ -314,7 +315,7 @@ export const test4 = test({
 
 export const test5 = test({
   id: 'test5', no: 5, title: '5. hafta testi',
-  desc: 'Başlat menüsü, arama, görev çubuğu, pencereler, Alt+Tab ve sağ alttaki simgeler üzerine 10 soru.',
+  desc: 'Başlat menüsü, arama, görev çubuğu, pencereler, Alt+Tab ve sağ alttaki simgeler üzerine 11 soru.',
   qs: [
     {
       t: 'Başlat menüsü', pic: '⊞',
@@ -376,12 +377,13 @@ export const test5 = test({
       opts: ['Bilgisayarı soğutur', 'Saati gösterir', 'Sık kullanılan programlara ve dosyalara hızlı ulaşmayı sağlar'], ok: 2,
       why: 'Simgeye çift tıklayınca program ya da dosya açılır.',
     },
+    { t: 'Yan yana pencere', pic: '🪟🪟', q: 'Bir pencereyi ekranın sağ yarısına yerleştirmenin kısayolu hangisi?', opts: ['⊞ Windows tuşu + → (sağ ok)', 'Ctrl + →', 'Alt + F4'], ok: 0, why: 'Windows tuşu + sağ ok pencereyi sağ yarıya yerleştirir; sol ok sol yarıya. Pencereyi ekranın kenarına sürüklemek de aynı işi yapar.' },
   ],
 });
 
 export const test6 = test({
   id: 'test6', no: 6, title: '6. hafta testi',
-  desc: 'Dosya ve klasör, taşıma-kopyalama, silme ve USB bellek üzerine 10 soru.',
+  desc: 'Dosya ve klasör, taşıma-kopyalama, silme ve USB bellek üzerine 12 soru.',
   qs: [
     {
       t: 'Dosya ve klasör', pic: '📄 📁',
@@ -443,6 +445,8 @@ export const test6 = test({
       opts: ['Hayır, yalnızca yazıda çalışır', 'Evet: dosyayı seçip Ctrl + C, gideceği klasörde Ctrl + V', 'Yalnızca USB bellekte çalışır'], ok: 1,
       why: 'Ctrl + X ile kesip Ctrl + V ile yapıştırmak da dosyayı taşır.',
     },
+    { t: 'Tek tek seçmek', pic: 'Ctrl + 🖱', q: 'Klasördeki 50 fotoğraftan yalnızca 3\'ünü seçmek için ne yaparsınız?', opts: ['Ctrl\'yi basılı tutup istediklerime tek tek tıklarım', 'Shift\'i basılı tutup ilkine ve sonuncusuna tıklarım', 'Ctrl + A\'ya basarım'], ok: 0, why: 'Ctrl ile aradan istediklerinizi seçersiniz. Shift baştan sona aralık seçer, Ctrl + A hepsini seçer.' },
+    { t: 'Kayıp dosya', pic: '🕵️', q: 'Az önce kaydettiğiniz belgeyi bulamıyorsunuz. En hızlı yol?', opts: ['Dosya Gezgini → Giriş → Son kullanılan dosyalar', 'Bilgisayarı yeniden başlatmak', 'Belgeyi baştan yazmak'], ok: 0, why: 'Giriş sayfası son açılan ve kaydedilen dosyaları gösterir; sağ tık → Dosya konumunu aç ile klasörü de bulursunuz.' },
   ],
 });
 
@@ -517,7 +521,7 @@ export const test7 = test({
 
 export const test8 = test({
   id: 'test8', no: 8, title: '8. hafta testi',
-  desc: 'İnternet, indirme, program kurma ve işletim sistemi üzerine 14 soru.',
+  desc: 'İnternet, indirme, program kurma ve işletim sistemi üzerine 16 soru.',
   qs: [
     {
       t: 'Adresi bilmiyorsanız', pic: '🔍',
@@ -583,6 +587,8 @@ export const test8 = test({
     { t: 'Tarayıcı mı, arama motoru mu?', pic: '🌐 🔎', q: 'Hangisi bir arama motorudur?', opts: ['Microsoft Edge', 'Google Chrome', 'Bing'], ok: 2, why: 'Edge ve Chrome tarayıcıdır (program); Bing, Google, Yandex arama motorudur (tarayıcının içinde açılan site).' },
     { t: 'Antivirüs', pic: '🛡', q: 'Windows 10 ve 11’de ek antivirüs programı almak zorunlu mudur?', opts: ['Hayır; Windows Güvenliği hazır gelir ve kendiliğinden güncellenir', 'Evet, yoksa bilgisayar açılmaz', 'Evet, ama yalnızca ücretli olanlar işe yarar'], ok: 0, why: 'Windows Güvenliği çoğu ev kullanıcısı için yeterlidir. Birden çok antivirüs birbirini bozar.' },
     { t: 'Video kalitesi', pic: '🎞 1080p', q: 'Telefonda kotanız kısıtlı. Video izlerken hangi kalite kotanızı en az harcar?', opts: ['4K', '360p', '1080p'], ok: 1, why: 'Sayı küçüldükçe video daha az veri harcar. Küçük ekranda 360p–480p yeterlidir.' },
+    { t: 'Allow / Block', pic: 'Allow · Block', q: 'Ekrana “Allow” ve “Block” düğmeleri çıktı. “Block” ne demek?', opts: ['Engelle', 'İzin ver', 'İleri'], ok: 0, why: 'Allow izin ver, Block engelle, Next ileri, Cancel vazgeç demektir.' },
+    { t: 'Modem', pic: '📶❌', q: 'Wi-Fi bağlı görünüyor ama internet yok. Modemi nasıl yeniden başlatırsınız?', opts: ['Kapatır, yaklaşık 10 saniye bekler, yeniden açarım', 'Kapatıp hemen açarım', 'Kablolarını sökerim'], ok: 0, why: 'Modem tam kapansın diye 10 saniye beklenir; açılınca ışıklar yerine oturana kadar 1–2 dakika bekleyin.' },
   ],
 });
 
@@ -611,7 +617,7 @@ export const testDonanim = test({
 
 export const test9 = test({
   id: 'test9', no: 9, title: '9. hafta testi',
-  desc: 'E-posta okuma, yanıtlama, ek, bulut paylaşımı üzerine 11 soru.',
+  desc: 'E-posta okuma, yanıtlama, ek, bulut paylaşımı üzerine 12 soru.',
   qs: [
     { t: 'E-posta adresi', pic: '✉', q: 'Hangi e-posta adresi doğru yazılmıştır?', opts: ['ayse yilmaz@ornek.com', 'ayse@örnek.com', 'ayse.yilmaz@ornek.com'], ok: 2, why: 'Adreste boşluk ve Türkçe harf (ç, ğ, ı, ö, ş, ü) olmaz; bir tane @ ve sonra noktalı bir alan adı olur.' },
     { t: 'Yanıtla', pic: '↩', q: 'Torununuz size fotoğraf gönderdi, teşekkür etmek istiyorsunuz. Hangi düğmeye basarsınız?', opts: ['↩ Yanıtla', '↪ İlet', '🗑 Sil'], ok: 0, why: 'Yanıtla: size yazana cevap verir; Kime kutusu kendiliğinden dolar.' },
@@ -624,12 +630,13 @@ export const test9 = test({
     { t: 'Büyük dosya', pic: '🎬 ☁', q: 'Torunun düğün videosu 850 MB. E-postaya sığmıyor. Ne yaparsınız?', opts: ['Videoyu parçalayıp 50 postayla gönderirim', 'Buluta yükleyip paylaşım bağlantısını postayla gönderirim', 'Videoyu silerim'], ok: 1, why: 'E-postayla en fazla 25 MB gönderilir. Büyük dosyalar buluta yüklenir, bağlantı gönderilir.' },
     { t: 'Şifre sıfırlama', pic: '🔑', q: 'Biri sizi arayıp “size gelen SMS kodunu söyleyin” diyor. Ne yaparsınız?', opts: ['Kodu söylerim', 'Kapatırım; doğrulama kodu yalnızca ilgili sayfaya yazılır', 'Kodun yarısını söylerim'], ok: 1, why: 'Hiçbir görevli kodu telefonda istemez. İsteyen dolandırıcıdır. Kod yalnızca kendi ekranınızdaki sayfaya yazılır.' },
     { t: 'Gmail ve Hotmail', pic: '@gmail · @hotmail', q: 'Adresi @hotmail.com olan biri ile @gmail.com olan biri birbirine e-posta gönderebilir mi?', opts: ['Evet, e-posta hizmetleri birbirine posta gönderir', 'Hayır, aynı hizmette olmaları gerekir', 'Yalnızca ek yoksa'], ok: 0, why: 'E-posta ortak bir sistemdir: hangi hizmette olursanız olun adres doğruysa posta ulaşır.' },
+    { t: 'Abonelikten çık', pic: '📰', q: 'Her gün gelen reklam bülteninden kurtulmak için ne yaparsınız?', opts: ['Postadaki “Abonelikten çık” bağlantısını kullanırım', 'Her gün tek tek silerim', 'E-posta adresimi kapatırım'], ok: 0, why: 'Abonelikten çıkınca bülten bir daha gelmez. (Tanımadığınız, şüpheli postalardaki bağlantılara ise tıklamayın.)' },
   ],
 });
 
 export const test10 = test({
   id: 'test10', no: 10, title: '10. hafta testi',
-  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme, bul ve değiştir üzerine 12 soru.',
+  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme, bul ve değiştir üzerine 14 soru.',
   qs: [
     { t: 'Başlık', pic: '📢', q: 'Merdivene asılacak duyurunun başlığını uzaktan okunur yapmak için ne yapılır?', opts: ['Küçük ve sola dayalı yazılır', 'Büyük, kalın ve ortalı yazılır', 'Altı çizgili yazılır'], ok: 1, why: 'Büyük, kalın ve ortalı başlık uzaktan okunur. Boyut “punto” ile ayarlanır (24–28).' },
     { t: 'İki yana yasla', pic: '≣', q: 'Resmî yazıların (dilekçe) paragrafları genellikle nasıl hizalanır?', opts: ['Ortalı', 'İki yana yaslı', 'Sağa dayalı'], ok: 1, why: 'İki yana yaslama (Ctrl + J) paragrafın iki kenarını da düz yapar. Tarih ve imza ise sağa hizalanır.' },
@@ -643,12 +650,14 @@ export const test10 = test({
     { t: 'Kaydetmek', pic: '💾', q: 'Dilekçeyi yazdınız ve bilgisayarı kapatmadan önce yazdıklarınızın kaybolmamasını istiyorsunuz. Ne yaparsınız?', opts: ['Ctrl + S ile kaydeder, ad verip Belgeler klasörüne koyarım', 'Yalnızca Enter\'a basarım', 'Pencereyi kapatıp \"Kaydetme\" derim'], ok: 0, why: 'Ctrl + S dosyayı kaydeder. İlk kayıtta ad verilir ve klasör seçilir; sonra aynı tuşla güncellenir. Kaydetmeden kapatırsanız yazı kaybolur.' },
     { t: 'Bul ve değiştir', pic: 'Ctrl + H', q: 'Dilekçede “Ahmet” adını on iki yerde “Mehmet” yapacaksınız. En hızlı yol hangisi?', opts: ['Ctrl + H ile Bul ve Değiştir\'i açıp Tümünü değiştir demek', 'Her ismi tek tek bulup elle yazmak', 'Belgeyi baştan yazmak'], ok: 0, why: 'Bul ve Değiştir (Ctrl + H) aranan kelimeyi bütün belgede bulur ve istediğiniz kelimeyle değiştirir.' },
     { t: 'Simge', pic: '₺ ½ ©', q: 'Klavyenizde ₺ ya da ½ işareti bulamıyorsunuz. Ne yaparsınız?', opts: ['İnternetten kopyalarım', 'Ekle → Simge menüsünden seçerim', 'O işareti hiç yazamam'], ok: 1, why: 'Simge menüsünde klavyede olmayan işaretler hazır durur.' },
+    { t: 'Kaçan resim', pic: '🖼', q: 'Word\'e eklediğiniz resim yazının arasında sıkışıyor, istediğiniz yere taşınmıyor. Ne yaparsınız?', opts: ['Resmin yanındaki Düzen Seçenekleri\'nden Kare ya da Sıkı\'yı seçerim', 'Resmi silip yeniden eklerim', 'Yazı tipini büyütürüm'], ok: 0, why: 'Kare/Sıkı seçilince yazı resmin çevresinden akar, resim serbestçe sürüklenir.' },
+    { t: 'Biçim Boyacısı', pic: '🖌', q: 'Beğendiğiniz bir başlığın rengini ve boyutunu öbür başlıklara kopyalamak için?', opts: ['Biçim Boyacısı (fırça)', 'Kopyala - Yapıştır', 'Satır aralığı'], ok: 0, why: 'Biçim Boyacısı yalnızca biçimi kopyalar, yazıyı değil. Çift tıklarsanız birden çok başlığa sürebilirsiniz.' },
   ],
 });
 
 export const test11 = test({
   id: 'test11', no: 11, title: '11. hafta testi',
-  desc: 'Hesap tablosu: formüller, doldurma, yazdırma üzerine 11 soru.',
+  desc: 'Hesap tablosu: formüller, doldurma, yazdırma üzerine 12 soru.',
   qs: [
     { t: 'Formül', pic: '=', q: 'B2 ile B5 arasındaki sayıların toplamını bulan formül hangisidir?', opts: ['=TOPLA(B2:B5)', '=B2+B5', 'TOPLA B2 B5'], ok: 0, why: 'Formüller = ile başlar. TOPLA(B2:B5) iki nokta ile aralığı verir: B2, B3, B4 ve B5.' },
     { t: 'Otomatik doldurma', pic: '■ ↓', q: 'A2 hücresine Ocak yazdınız. Aralık\'a kadar devam ettirmenin en hızlı yolu hangisi?', opts: ['Her ayı tek tek yazmak', 'Hücrenin sağ alt köşesindeki kareyi aşağı çekmek', 'Hücreyi silmek'], ok: 1, why: 'Doldurma tutamacı ay, gün ve sayı listelerini kendiliğinden devam ettirir.' },
@@ -661,12 +670,13 @@ export const test11 = test({
     { t: 'Sayfa sekmeleri', pic: '＋', q: 'Çalışma kitabına yeni bir sayfa eklemek için nereye tıklanır?', opts: ['Alttaki sekmelerin yanındaki ＋', 'Formül çubuğuna', 'Sütun harflerine'], ok: 0, why: 'Alt kısımdaki ＋ düğmesi yeni çalışma sayfası ekler. Sekmeye çift tıklayarak adı değiştirilir.' },
     { t: 'Yazdırma', pic: '🖨', q: 'Tablonun son sütunu ikinci kâğıda taşıyor. Hangisi sorunu çözer?', opts: ['Yazdırma ayarında “Tüm sütunları bir sayfaya sığdır”ı seçmek', 'Yazıcının kablosunu değiştirmek', 'Yazıcıyı kapatıp açmak'], ok: 0, why: 'Çözüm yazdırma ayarlarındadır: sütunları bir sayfaya sığdırmak ya da kâğıdı yatay yapmak. Kablonun ya da yazıcıyı kapatıp açmanın alakası yok.' },
     { t: 'DÜŞEYARA', pic: '🔎 =DÜŞEYARA(…)', q: 'Ürün adını yazınca fiyatını fiyat listesinden getiren işlev hangisidir?', opts: ['TOPLA', 'DÜŞEYARA', 'ORTALAMA'], ok: 1, why: 'DÜŞEYARA, bir listede aranan değeri bulup yanındaki bilgiyi getirir. Bulamazsa #YOK çıkar.' },
+    { t: 'Excel hataları', pic: '#DEĞER!', q: 'Bir toplamda #DEĞER! hatası çıktı. En olası neden?', opts: ['Bir hücreye sayı yerine yazı yazılmış (ör. “iki yüz”)', 'Sütun dar', 'Dosya kaydedilmemiş'], ok: 0, why: 'Excel yazıyla yazılmış sayıyı toplayamaz; rakamla yazınca düzelir. Dar sütun ##### gösterir.' },
   ],
 });
 
 export const test12 = test({
   id: 'test12', no: 12, title: '12. hafta testi',
-  desc: 'Sunu: slayt düzenleri, SmartArt, geçiş ve animasyon üzerine 12 soru.',
+  desc: 'Sunu: slayt düzenleri, SmartArt, Asıl Slayt, tablo, geçiş ve animasyon üzerine 14 soru.',
   qs: [
     { t: 'Slayt nedir?', pic: '📙', q: 'Bir sunudaki her bir sayfaya ne denir?', opts: ['Slayt', 'Hücre', 'Paragraf'], ok: 0, why: 'Sununun her sayfasına slayt denir. Kısa başlık, birkaç madde ve resim koyulur.' },
     { t: 'Az yazı', pic: '✍', q: 'Slaytlara yazı nasıl yazılmalıdır?', opts: ['Kısa maddelerle, az yazıyla', 'Uzun paragraflarla, bütün bilgiyi sığdırarak', 'En küçük punto ile'], ok: 0, why: 'Dinleyiciler okumaya değil sizi dinlemeye bakmalı. Slayta kısa maddeler ve resim koyulur.' },
@@ -680,12 +690,14 @@ export const test12 = test({
     { t: 'Kâğıt tasarrufu', pic: '🖨 4', q: '30 slaytlık sunuyu az kâğıtla yazdırmak için ne yaparsınız?', opts: ['Bir kâğıda 4 slayt düzenini seçerim', 'Her slaytı ayrı kâğıda yazdırırım', 'Hiç yazdırmam'], ok: 0, why: 'Yazdırırken “bir kâğıda 4 slayt” seçilirse 30 slayt yalnızca 8 kâğıda çıkar.' },
     { t: 'Kara ekran', pic: '▶ B', q: 'Slayt gösterisi sırasında ekranı geçici olarak karartmak için hangi tuşa basılır?', opts: ['B', 'Z', 'Esc'], ok: 0, why: 'B kara ekran, W beyaz ekran yapar. Aynı tuşla ya da başka bir tuşla sunuya dönülür. Esc gösteriyi bitirir.' },
     { t: 'Yazı miktarı', pic: '📄', q: 'İyi bir slaytta yazı nasıl olmalıdır?', opts: ['Bütün cümleler küçük puntoyla yazılı', 'Az, kısa maddeler ve büyük punto', 'Sadece resim, hiç yazı yok'], ok: 1, why: 'Slayt dinleyiciye yardım eder, sizin yerinize konuşmaz: 3–5 kısa madde, büyük yazı.' },
+    { t: 'Asıl Slayt', pic: '🎨', q: 'Sununun bütün slaytlarına aynı logoyu ve alt bilgiyi tek seferde eklemek için?', opts: ['Görünüm → Asıl Slayt', 'Her slayda tek tek eklemek', 'Slayt Sıralayıcı'], ok: 0, why: 'Asıl Slayt bütün slaytların ortak kalıbıdır; burada yapılan her değişiklik bütün slaytlara geçer.' },
+    { t: 'Tabloda Tab', pic: '▦ Tab', q: 'Slayttaki tablonun son hücresindeyken Tab tuşuna basarsanız ne olur?', opts: ['Tabloya yeni bir satır eklenir', 'Tablo silinir', 'Slayt gösterisi başlar'], ok: 0, why: 'Tab sonraki hücreye geçer; son hücrede yeni satır açar.' },
   ],
 });
 
 export const test13 = test({
   id: 'test13', no: 13, title: '13. hafta testi',
-  desc: 'Günlük işler: ekran görüntüsü, tarayıcı, PDF üzerine 12 soru.',
+  desc: 'Günlük işler: ekran görüntüsü, tarayıcı, PDF, fotoğraf küçültme ve harita üzerine 14 soru.',
   qs: [
     { t: 'Ekran görüntüsü', pic: '📸', q: 'Bütün ekranın resmini almak için hangi tuşa basılır?', opts: ['Print Screen (PrtSc)', 'Caps Lock', 'Insert'], ok: 0, why: 'PrtSc bütün ekranı panoya alır; Paint\'e Ctrl + V ile yapıştırılır.' },
     { t: 'Kopyala ve taşı', pic: '⧉ ✂', q: 'Bir dosyayı USB belleğe kopyalarsanız asıl dosya ne olur?', opts: ['Yerinde kalır', 'Silinir', 'Bozulur'], ok: 0, why: 'Kopyalamada dosya iki yerde olur; taşımada asıl yerinden alınır.' },
@@ -699,12 +711,14 @@ export const test13 = test({
     { t: 'Sahte mesaj', pic: '🎣', q: 'Tanımadığınız numaradan “hesabınız kapanacak, bağlantıya tıklayın” mesajı geldi. Ne yaparsınız?', opts: ['Tıklamam, numarayı engellerim', 'Bağlantıya tıklayıp bilgilerimi doğrularım', 'Şifremi gönderirim'], ok: 0, why: 'Hiçbir uygulama hesabınızı bağlantıyla doğrulatmaz. Tıklarsanız sahte sayfaya düşersiniz.' },
     { t: 'Çerez', pic: '🍪', q: 'Alışveriş sitesinde baktığınız ürünün reklamı başka sitelerde de karşınıza çıkıyorsa bunun nedeni nedir?', opts: ['Bilgisayarınız dinleniyor', 'Üçüncü taraf (reklam) çerezleri', 'Tesadüf'], ok: 1, why: 'Reklam şirketleri birçok sitede çerez bırakıp sizi tanır. Üçüncü taraf çerezleri engellemek bunu azaltır.' },
     { t: 'PDF yazdırma', pic: '🖨 PDF', q: 'Beş sayfalık bir PDF’den yalnızca ikinci sayfayı yazdıracaksınız. Ne yaparsınız?', opts: ['Hepsini yazdırıp gerisini atarım', 'Yazdırma penceresinde Sayfalar’dan yalnızca 2. sayfayı seçerim', 'PDF’i silerim'], ok: 1, why: 'Sayfalar bölümünden “Aralık: 2” yazılarak yalnızca istenen sayfa yazdırılır; kâğıt ve mürekkep tasarrufu olur.' },
+    { t: '2 MB sınırı', pic: '📐', q: 'Bir site “Dosya boyutu 2 MB\'den büyük olamaz” diyor; fotoğrafınız 4,8 MB. Ne yaparsınız?', opts: ['Paint\'te Yeniden boyutlandır ile küçültüp yeni adla kaydederim', 'Dosyanın adını kısaltırım', 'Fotoğrafı başka klasöre taşırım'], ok: 0, why: 'Dosyanın boyutunu fotoğraftaki nokta (piksel) sayısı belirler. En ve boy yarıya inince dosya dörtte birine iner.' },
+    { t: 'Sokak Görünümü', pic: '🧍', q: 'Haritada gideceğiniz binanın kapısını önceden görmek için ne yaparsınız?', opts: ['Sarı insanı o sokağın üzerine sürükleyip bırakırım', 'Uydu düğmesine basarım', 'Haritayı yazdırırım'], ok: 0, why: 'Sarı insan Sokak Görünümü\'nü açar; ⬆ ile ilerler, ↶ ↷ ile binalara bakarsınız.' },
   ],
 });
 
 export const test14 = test({
   id: 'test14', no: 14, title: '14. hafta testi',
-  desc: 'e-Devlet, MHRS, alışveriş ve ilan sitelerinde güvenlik üzerine 10 soru.',
+  desc: 'e-Devlet, MHRS, alışveriş, internet bankacılığı ve ilan sitelerinde güvenlik üzerine 13 soru.',
   qs: [
     { t: 'Resmî site', pic: '🇹🇷', q: 'Devletin resmî sitelerinin adresi nasıl biter?', opts: ['.gov.tr (belediyelerde .bel.tr)', '.xyz', '.com'], ok: 0, why: '.gov.tr devlet kurumlarına, .bel.tr belediyelere verilir. turkiye-gov-giris.com gibi benzer adresler sahte olabilir.' },
     { t: 'Barkodlu belge', pic: '📄 ||||', q: 'e-Devlet\'ten aldığınız belgenin doğruluğunu karşı taraf nasıl kontrol eder?', opts: ['Belgedeki barkod numarasıyla e-Devlet\'te doğrulayarak', 'Yazıcıdan bakarak', 'Telefonla arayarak şifre sorarak'], ok: 0, why: 'Barkodlu belge, e-Devlet\'te barkod numarası yazılarak doğrulanır.' },
@@ -716,5 +730,8 @@ export const test14 = test({
     { t: 'Sahte ilan', pic: '🏚 💸', q: '“Ev sahibi yurtdışında, anahtar kargoyla, hemen kapora yatırın” diyen ilan hakkında ne düşünürsünüz?', opts: ['Dolandırıcılık olabilir; kapora göndermem', 'Çok iyi fırsat, hemen yatırırım', 'Ev sahibi çok güvenilir'], ok: 0, why: 'Evi göstermeden ve acele ettirerek para isteyen ilan genellikle sahtedir.' },
     { t: 'Kapora zamanı', pic: '💰', q: 'Kaporayı ne zaman verirsiniz?', opts: ['Evi görüp sözleşmeyi imzaladıktan sonra, makbuzla', 'Hemen, ilanı gördüğüm gün', 'Fotoğrafı beğenince'], ok: 0, why: 'Evi görmeden ve sözleşmesiz hiçbir ödeme yapılmaz.' },
     { t: 'Çıkış', pic: '⏻', q: 'Kütüphanede e-Devlet\'ten belge aldınız. Çıkarken ne yapmalısınız?', opts: ['Çıkış yapmalı', 'Sekmeyi açık bırakmalı', 'Hiçbir şey yapmamalı'], ok: 0, why: 'Ortak bilgisayarda mutlaka çıkış yapılır; açık oturumu sonraki kişi kullanabilir.' },
+    { t: 'IBAN', pic: 'TR…', q: 'Apartman yöneticisi IBAN\'ını mesajla gönderdi. Bankada nasıl yazarsınız?', opts: ['Mesajdan seçip kopyalar, bankadaki kutuya yapıştırırım', 'Bakarak elle yazarım', 'Yalnızca son 4 hanesini yazarım'], ok: 0, why: 'IBAN 26 karakterdir; tek rakam hatası paranın gitmemesine ya da yanlış kişiye gitmesine yol açar. Kopyala-yapıştır en güvenlisidir.' },
+    { t: 'Sanal kart', pic: '💳', q: 'İnternet alışverişi için limitli sanal kart kullanmanın faydası nedir?', opts: ['Bilgileri çalınsa bile en fazla limiti kadar harcanabilir', 'Kargo ücretsiz olur', 'Şifre gerekmez'], ok: 0, why: 'Sanal kart asıl kartınızdan ayrı bir numaradır; iş bitince silinebilir.' },
+    { t: 'Adıma kayıtlı hat', pic: '📱', q: 'e-Devlet\'te adınıza açılmış, bilmediğiniz bir telefon hattı gördünüz. Ne yaparsınız?', opts: ['Hattı açan operatöre başvurup kapattırırım; gerekirse savcılığa şikâyet ederim', 'Önemsemem', 'Hattı ben de kullanırım'], ok: 0, why: 'Dolandırıcılar kopyalanan kimlikle hat açabilir; hemen kapattırın.' },
   ],
 });

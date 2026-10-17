@@ -204,6 +204,7 @@ export class VFS {
     const c = n.content;
     if (typeof c === 'string') return c.startsWith('data:') ? Math.round(c.length * 0.75) : new Blob([c]).size;
     if (c?.zip) return Math.round(c.zip.reduce((s, x) => s + this.sizeOf(x), 0) * 0.85);
+    if (c?.w && c?.h) return Math.round(c.w * c.h * (/\.png$/i.test(n.name) ? 1.1 : 0.4)); // telefon fotoğrafı ya da küçültülmüş resim
     if (c?.emoji) return 2.1e6 + (n.name.length * 104729 % 1.4e6);
     if (c?.html) return 14e3 + c.html.length * 2;
     if (c?.cells) return 9e3 + JSON.stringify(c).length;

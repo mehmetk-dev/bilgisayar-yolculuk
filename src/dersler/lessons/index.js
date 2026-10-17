@@ -21,7 +21,7 @@ import { kayipDosya } from './kayipdosya.js';
 import { ingilizce } from './ingilizce.js';
 import { internetKesildi } from './internetkesildi.js';
 import { epostaTemizlik } from './epostatemizlik.js';
-import { epostaParkur } from './parkurlar.js';
+import { epostaParkur, gunlukParkur } from './parkurlar.js';
 import { wordResim, bicimBoyacisi } from './kelime3.js';
 import { excelHata } from './excel4.js';
 import { isletimSistemleri } from './isletim.js';
@@ -37,6 +37,12 @@ import { resimWeb } from './resimweb.js';
 import { cerezler } from './cerezler.js';
 import { aramaMotorlari } from './aramamotoru.js';
 import { sunuKurallar, sunuAni } from './sunu3.js';
+import { asilSlayt, sunuParkur } from './sunu4.js';
+import { fotoBoyut } from './fotoboyut.js';
+import { harita } from './harita.js';
+import { sanalKart } from './odeme.js';
+import { kamuHizmet } from './kamu.js';
+import { kursSinavi, buyukParkur } from './final.js';
 import { duseyara, aidatTakip } from './excel3.js';
 import { odev1, odev2, odev3, odev4, odev5, odev6, odev7, odev8, odev9, odev10, odev11, odev12, odev13, odev14 } from './odevler.js';
 import { klavye } from './hafta2.js';
@@ -93,10 +99,10 @@ export const WEEKS = [
   { no: 9, title: 'E-posta', lessons: [eposta, gmailHotmail, epostaIletme, eposta2, ekTasi, bulutPaylas, sifreSifirla, epostaTemizlik, epostaParkur, odev9, test9] },
   { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, dilekceParkur, odev10, test10] },
   { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, hucreInce, hesap3, hesap4, duseyara, excelHata, doldurDondur, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
-  { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, animasyon, sunuAni, anıAlbumu, odev12, test12] },
-  { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukPc, telefon, gunlukWeb, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, whatsappWeb, odev13, test13] },
-  { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevlet, randevu, alisveris, gorusme, eNabiz, ilanTuzak, eHizmetParkur, odev14, test14] },
-  { no: 0, title: 'İnternette güvenlik, yapay zekâ ve yazma hızı', lessons: [guvenlik, yapayZeka, hiz] },
+  { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, animasyon, sunuAni, anıAlbumu, sunuParkur, odev12, test12] },
+  { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukPc, telefon, gunlukWeb, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, fotoBoyut, harita, whatsappWeb, gunlukParkur, odev13, test13] },
+  { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevlet, randevu, alisveris, sanalKart, gorusme, eNabiz, kamuHizmet, ilanTuzak, eHizmetParkur, odev14, test14] },
+  { no: 0, title: 'İnternette güvenlik, yapay zekâ, yazma hızı ve kurs bitirme', lessons: [guvenlik, yapayZeka, hiz, buyukParkur, kursSinavi] },
 ];
 
 export const LESSONS = WEEKS.flatMap((w) => w.lessons);

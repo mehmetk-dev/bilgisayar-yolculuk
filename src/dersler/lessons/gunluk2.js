@@ -5,7 +5,7 @@ import { WA_HOST } from '../apps/siteler-mesaj.js';
 
 const br = (c, url) => maxed(c, 'browser', url ? { url } : {});
 
-const FATURA = [
+export const FATURA = [
   `<p class="pdf-org">ELEKTRİK DAĞITIM A.Ş.</p><h3>Ekim 2026 Elektrik Faturası</h3><p>Abone adı: <b>Ahmet Yılmaz</b></p><p>Tesisat no: 4417 2209 83</p>
     <table class="pdf-tbl"><tr><th>Dönem</th><th>Tüketim</th></tr><tr><td>Ekim 2026</td><td>312 kWh</td></tr><tr><td>Eylül 2026</td><td>298 kWh</td></tr></table><p class="pdf-small">Sayfa 1: abone ve tüketim bilgileri.</p>`,
   `<p class="pdf-org">ELEKTRİK DAĞITIM A.Ş.</p><h3>Fatura bedeli</h3><table class="pdf-tbl"><tr><td>Enerji bedeli</td><td>1.012,40 ₺</td></tr><tr><td>Dağıtım bedeli</td><td>233,10 ₺</td></tr><tr><th>TOPLAM</th><th>1.245,50 ₺</th></tr></table>

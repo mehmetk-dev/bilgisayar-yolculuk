@@ -2,6 +2,7 @@
 // Karekodu telefonla okutmak, sohbet, belge ve fotoğraf göndermek, gelen fotoğrafı indirmek, oturumu kapatmak, sahte mesaj bağlantısı.
 import { esc, pictureURL, isImage } from './util.js';
 import { fmtSize } from './explorer.js';
+import { YONETICI } from './siteler-banka.js';
 
 const page = (title, html, cls = '') => ({ title, html: `<div class="wp ${cls}">${html}</div>` });
 export const WA_HOST = 'web.mesajlas.com';
@@ -10,18 +11,21 @@ const CONTACTS = [
   { id: 'elif', name: 'Elif (torunum)', av: '👧', last: 'Fotoğraflar geldi mi?' },
   { id: 'ahmet', name: 'Ahmet (oğlum)', av: '👨', last: 'Bankada lazım olacak belge' },
   { id: 'komsu', name: 'Mahalle Komşuları', av: '🏘', last: 'Cumartesi toplantı' },
+  { id: 'yonetici', name: 'Hasan Bey (apt. yöneticisi)', av: '🏢', last: 'Ekim aidatı' },
   { id: 'bilinmeyen', name: '+90 555 010 99 88', av: '❓', last: 'Hesabınız kapatılacak' },
 ];
 const seed = () => ({
   elif: [{ f: 'o', t: 'Dedeciğim, bayramda çektiğimiz fotoğrafları gönderiyorum. Geldi mi?', time: '10:02' }, { f: 'o', kind: 'photo', name: 'bayram sofrası.jpg', content: { emoji: '🍽', bg: ['#ffe082', '#ffab91'] }, time: '10:03' }],
   ahmet: [{ f: 'o', t: 'Baba, bankada işim var. İkametgâh belgeni (PDF) buradan gönderir misin? Masaüstünde duruyor olmalı.', time: '09:15' }],
   komsu: [{ f: 'o', who: 'Fatma Hanım', t: 'Cumartesi 14.00\'te bahçede toplantı var, herkes gelsin 🙂', time: 'Dün' }, { f: 'o', who: 'Mehmet Bey', t: 'Ben de geleceğim.', time: 'Dün' }],
+  yonetici: [{ f: 'o', t: `Merhaba komşum, Ekim ayı aidatı ${YONETICI.aidat} ₺. Apartman hesabı benim adıma: ${YONETICI.ad}`, time: '09:30' }, { f: 'o', t: `IBAN: ${YONETICI.iban}`, time: '09:30' }, { f: 'o', t: 'Açıklamaya daire numaranızı yazın lütfen. Ödeyince dekontu buraya atarsanız sevinirim 🙏', time: '09:31' }],
   bilinmeyen: [{ f: 'o', t: '⚠ Mesajlaş hesabınız 24 saat içinde kapatılacaktır! Kapanmaması için hemen doğrulayın:', time: '08:40' }, { f: 'o', kind: 'link', t: 'mesajlas-dogrulama.xyz/hesabi-koru', time: '08:40' }],
 });
 const REPLY = {
   elif: (m) => (m.kind === 'photo' ? 'Çok güzel olmuş dedeciğim! 😍' : m.kind === 'doc' ? 'Teşekkürler dede, aldım.' : 'Tamam dedeciğim 💙'),
   ahmet: (m) => (m.kind === 'doc' && /ikametg/i.test(m.name) ? 'Teşekkürler baba, belgeyi aldım 👍 Bu iş tamam.' : m.kind === 'doc' ? 'Bu başka bir dosya galiba baba, ikametgâh belgesini gönderir misin?' : 'Tamam baba.'),
   komsu: () => 'Teşekkürler! 👍',
+  yonetici: (m) => (m.kind === 'doc' && /dekont/i.test(m.name) ? 'Dekont geldi, aidatınız ulaştı. Teşekkür ederim 🙏' : m.kind === 'doc' ? 'Bu dekont değil galiba; bankadan indirdiğiniz dekontu gönderir misiniz?' : 'Tamamdır 👍'),
   bilinmeyen: () => '',
 };
 const qrSvg = () => {

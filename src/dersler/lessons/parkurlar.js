@@ -1,7 +1,11 @@
-// Haftaların eksik parkurları (yönlendirmesiz, süreli uygulama): 9. hafta e-posta, 12. hafta sunu, 13. hafta günlük işler.
-// Eğitmen notu: son ekranda her görevin süresi görünür.
-import { desktopReady } from './common.js';
+// Haftaların eksik parkurları (yönlendirmesiz, süreli uygulama): 9. hafta e-posta, 13. hafta günlük işler
+// (12. hafta sunu parkuru sunu4.js'de). Eğitmen notu: son ekranda her görevin süresi görünür.
+import { desktopReady, put } from './common.js';
+import { rehberSoru } from './kalip.js';
 import { mailBox } from '../apps/mail.js';
+import { FATURA } from './gunluk2.js';
+import { HARITA_HOST } from '../apps/siteler-harita.js';
+import { WA_HOST } from '../apps/siteler-mesaj.js';
 
 const keyOf = (c, id) => mailBox(c.d).mails.find((m) => m.id === id)?.key;
 const lower = (s) => String(s || '').toLocaleLowerCase('tr');
@@ -58,5 +62,81 @@ export const epostaParkur = {
       },
     },
     { final: true, title: 'Parkur bitti! 🏁', html: '<p>E-postayla ilgili bütün işleri kendiniz yaptınız.</p>' },
+  ],
+};
+
+export const gunlukParkur = {
+  id: 'gunluk-parkur', icon: '🏁', title: 'Günlük işler parkuru', minutes: 25, stage: 'desktop', parkur: true,
+  desc: 'Orta seviye: yol tarifinin ekran resmini kaydetmek, PDF\'de bilgi bulup tek sayfa yazdırmak, belge gönderip oturumu kapatmak. Süreler tutulur.',
+  setup: (c) => { put(c, 'desktop', 'elektrik faturası.pdf', 'file', { pages: FATURA }); },
+  steps: [
+    {
+      title: 'Günlük işler parkuru',
+      html: `<p>13. haftada öğrendiklerinizi sırayla yapın. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>
+        <p>Adresler: Haritalar <b>${HARITA_HOST}</b>, Mesajlaş Web <b>${WA_HOST}</b>.</p>`,
+      setup: (c) => { desktopReady(c); c.d.closeAll(); },
+    },
+    {
+      title: '1. Yol tarifi', html: '<p>Haritalar sitesinde evinizden <b>Kültür Merkezi</b>\'ne <b>otobüsle</b> yol tarifi alın.</p>',
+      hint: `İnternet → ${HARITA_HOST} → “kültür” arayın → ➜ Yol tarifi → Nereden: 📍 Konumunuz (ya da Lale Sokak 5) → 🚌 → Yol tarifi al.`,
+      on: (ev, c) => {
+        if (ev.type !== 'map-route') return false;
+        if (ev.to !== 'kultur') { c.note('Yol tarifi başka bir yere çıktı. Nereye kutusuna “kültür merkezi” yazın.'); return false; }
+        if (ev.mode !== 'bus') { c.note('Yol tarifi alındı ama otobüsle değil: 🚌 Toplu taşıma\'yı seçip yeniden deneyin.'); return false; }
+        return true;
+      },
+    },
+    {
+      title: '2. Ekran resmi', html: '<p>Yol tarifi ekrandayken <b>ekranın resmini</b> alın.</p>',
+      hint: 'PrtSc tuşu bütün ekranı, ⊞ + Shift + S istediğiniz parçayı alır.',
+      on: (ev) => ev.type === 'printscreen' || ev.type === 'snip',
+    },
+    {
+      title: '3. Resmi kaydedin', html: '<p>Ekran resmini Paint\'e yapıştırıp <b>Resimler</b> klasörüne <b>yol tarifi</b> adıyla kaydedin.</p>',
+      hint: 'Başlat → Paint → Ctrl + V → Ctrl + S → Resimler → Dosya adı: yol tarifi → Kaydet.',
+      on: (ev, c) => {
+        if (ev.type !== 'save' || !/^yol tarifi\.(png|jpe?g)$/i.test(ev.name || '')) return false;
+        if (ev.folder !== 'pictures') { c.note(`Kaydedildi ama ${ev.label || 'başka bir klasöre'}. Resimler klasörüne kaydedin (Farklı kaydet).`); return false; }
+        return true;
+      },
+    },
+    rehberSoru({
+      title: '4. Faturada bilgi',
+      html: '<p>Masaüstündeki <b>elektrik faturası.pdf</b>\'yi açın. Faturanın <b>son ödeme tarihi</b> ne?</p>',
+      hint: 'Belgeyi açıp Ctrl + F ile “ödeme” arayın ya da sayfalar arasında gezin.',
+      opts: ['25 Ekim 2026', '25 Kasım 2026', '1 Aralık 2026'], ok: 1,
+      wrong: 'PDF\'de “Son ödeme tarihi” satırını bulun.',
+      why: 'Doğru: 25 Kasım 2026, ikinci sayfada.',
+    }),
+    {
+      title: '5. Tek sayfa yazdırın', html: '<p>Faturanın <b>yalnızca son ödeme tarihinin yazdığı sayfayı</b> yazdırın.</p>',
+      hint: 'PDF Okuyucu → 🖨 Yazdır → Sayfalar: Geçerli sayfa (2. sayfadayken) ya da Aralık yaz → 2.',
+      on: (ev, c) => {
+        if (ev.type !== 'pdf-print') return false;
+        if (ev.pagesPrinted !== 1 || ev.from !== 2) { c.note(`${ev.pagesPrinted} sayfa yazdırıldı (${ev.from}–${ev.to}). Yalnızca 2. sayfa çıkmalıydı: yeniden yazdırın.`); return false; }
+        return true;
+      },
+    },
+    {
+      title: '6. Mesajlaş Web', html: '<p>Mesajlaş Web\'i açıp telefonunuzla <b>bağlanın</b>.</p>',
+      hint: `İnternet → ${WA_HOST} → 📷 Telefonla karekodu okut.`,
+      on: (ev) => ev.type === 'wa-scan',
+    },
+    {
+      title: '7. Faturayı gönderin', html: '<p>Faturayı (<b>elektrik faturası.pdf</b>) <b>Ahmet</b>\'e gönderin.</p>',
+      hint: 'Ahmet (oğlum) sohbetini açın → 📎 → Masaüstü → elektrik faturası.pdf → Aç.',
+      on: (ev, c) => {
+        if (ev.type !== 'wa-send-doc') return false;
+        if (!/fatura/i.test(ev.name)) { c.note(`Gönderilen dosya “${ev.name}”. Elektrik faturasını gönderin.`); return false; }
+        if (ev.toId !== 'ahmet') { c.warn('Belge yanlış kişiye gitti! Ahmet\'in sohbetini açıp yeniden gönderin.'); return false; }
+        return true;
+      },
+    },
+    {
+      title: '8. Oturumu kapatın', html: '<p>Ortak bilgisayardasınız: Mesajlaş Web\'den <b>çıkın</b>.</p>',
+      hint: 'Sohbet listesinin üstündeki ⋮ → ⏻ Oturumu kapat.',
+      on: (ev) => ev.type === 'wa-logout',
+    },
+    { final: true, title: 'Parkur bitti! 🏁', html: '<p>Günlük işleri yönlendirme olmadan kendiniz yaptınız.</p>' },
   ],
 };

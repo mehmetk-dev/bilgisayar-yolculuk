@@ -17,6 +17,7 @@ const picCache = new Map();
 // İçerik ya bir data: adresidir (Paint'te çizilen) ya da { emoji, bg } biçiminde örnek bir fotoğraftır.
 export function pictureURL(content) {
   if (typeof content === 'string' && content.startsWith('data:')) return content;
+  if (content?.src) return content.src;
   const c = content && typeof content === 'object' ? content : { emoji: '🖼', bg: ['#cfd8dc', '#90a4ae'] };
   const key = c.emoji + c.bg.join();
   if (picCache.has(key)) return picCache.get(key);
