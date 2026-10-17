@@ -1,16 +1,18 @@
 // Her haftanın sonunda “Gerçek bilgisayarda deneyin” ödevi: alıştırma bilgisayarı yerine kursiyerin kendi (ya da kurstaki gerçek) bilgisayarında
-// yapacağı 6 küçük görev. Her görev “Yaptım” ile işaretlenir; son ekran yazdırılabilir ödev kâğıdıdır (takıldığım yerler için boşluklu).
+// yapacağı 6–8 küçük görev. Her görev “Yaptım” ile işaretlenir; son ekran yazdırılabilir ödev kâğıdıdır (takıldığım yerler için boşluklu).
 import { info } from './kalip.js';
 
 const KURAL = '<p class="mut">Gerçek bilgisayarda çalışırken <b>şifrelerinizi ve kimlik bilgilerinizi</b> yalnızca bildiğiniz, güvendiğiniz sitelere yazın. Takıldığınız yeri not alın, derste sorun: hata yapmak öğrenmenin parçasıdır.</p>';
 
 // görev: [başlık, anlatım, ipucu (isteğe bağlı), simge]
+const SAYI = ['', 'Bir', 'İki', 'Üç', 'Dört', 'Beş', 'Altı', 'Yedi', 'Sekiz', 'Dokuz', 'On'];
 function odev(n, konu, icon, gorevler) {
+  const kac = SAYI[gorevler.length] || gorevler.length;
   const steps = [
     {
       title: 'Gerçek bilgisayarda deneyin',
       html: `<p>Bu ödev <b>alıştırma bilgisayarında değil</b>, <b>kendi bilgisayarınızda</b> (ya da kurstaki gerçek bilgisayarda) yapılır. ${n}. haftada öğrendiğiniz <b>${konu}</b> konusunu gerçekte denersiniz.</p>
-        <p>Altı küçük görev var. Her birini yapınca <b>Yaptım ✔</b>'ya basın. Hepsi bitince son ekranda yazdırılabilir <b>ödev kâğıdı</b> çıkar.</p>${KURAL}`,
+        <p>${kac} küçük görev var. Her birini yapınca <b>Yaptım ✔</b>'ya basın. Hepsi bitince son ekranda yazdırılabilir <b>ödev kâğıdı</b> çıkar.</p>${KURAL}`,
       scene: info(`<div class="sc-big">${icon}<br>💻</div><p>${n}. hafta ödevi: kendi bilgisayarınızda</p>`),
     },
     ...gorevler.map(([t, h, ip, ic], i) => ({
@@ -25,7 +27,7 @@ function odev(n, konu, icon, gorevler) {
   ];
   return {
     id: `odev${n}`, icon: '🏠', title: `${n}. hafta ödevi: gerçek bilgisayarda deneyin`, minutes: 25, stage: 'scene',
-    desc: `${konu}: altı küçük görev. Kendi bilgisayarınızda yapılır; ödev kâğıdı yazdırılabilir.`,
+    desc: `${konu}: ${kac.toLocaleLowerCase('tr')} küçük görev. Kendi bilgisayarınızda yapılır; ödev kâğıdı yazdırılabilir.`,
     summary: [...gorevler.map(([t], i) => [`☐ ${i + 1}. ${t}`, 'Not: ______________']), ['Takıldığım yerler', '__________________________________']],
     steps,
   };
@@ -83,6 +85,8 @@ export const odev6 = odev(6, 'dosyalar ve klasörler', '📁', [
   ['Silin ve geri alın', 'Dosyayı seçip <b>Delete</b> ile silin. Masaüstündeki <b>Geri Dönüşüm Kutusu</b>\'nu açıp dosyayı bulun ve <b>sağ tık → Geri yükle</b> deyin.', 'Kutuyu boşaltırsanız dosyalar kalıcı olarak gider.', '🗑'],
   ['Uzantıları gösterin', 'Dosya Gezgini\'nde <b>Görünüm → Göster → Dosya adı uzantıları</b>\'nı işaretleyin. Dosyaların sonundaki .txt, .jpg, .pdf yazılarını okuyun.', 'Sahte dosya hilesini (belge.pdf.exe) bu ayar sayesinde görürsünüz.', '🏷'],
   ['Bellekten kopyalayın', 'Varsa bir <b>USB bellek</b> takın; içindeki bir dosyayı <b>Belgeler</b>\'e kopyalayın. Sonra belleği tepsideki <b>⏏ Güvenle kaldır</b> ile çıkarın.', 'Belleği çekmeden önce mutlaka güvenle kaldırın.', '💾'],
+  ['Birkaç dosya seçin', 'Resimler klasöründe <b>Ctrl</b>\'yi basılı tutup üç fotoğrafa tek tek tıklayın; üçü birden seçilsin. Sağ tıklayıp <b>Kopyala</b>, sonra yeni bir klasöre <b>Yapıştır</b>.', 'Shift ile tıklarsanız aradaki hepsi seçilir. Yanlış seçerseniz boş bir yere tıklayıp yeniden başlayın.', '🖱'],
+  ['Son kullanılanlar', 'Dosya Gezgini\'ni açın; soldaki <b>Giriş</b> (ya da Hızlı Erişim) sayfasında <b>son açtığınız dosyalara</b> bakın. Birine sağ tıklayıp <b>Dosya konumunu aç</b>\'ı seçin.', 'Nereye kaydettiğinizi unuttuğunuz dosyayı en hızlı buradan bulursunuz.', '🕵️'],
 ]);
 
 export const odev7 = odev(7, 'Paint, ekran alıntısı ve ayarlar', '🎨', [
@@ -101,6 +105,8 @@ export const odev8 = odev(8, 'internet, güvenlik ve bakım', '🌐', [
   ['Resim indirin', 'Güvendiğiniz bir siteden bir fotoğraf indirin (sağ tık → Resmi farklı kaydet). Kaydet penceresinde klasör olarak <b>İndirilenler</b>\'i seçin. Sonra Dosya Gezgini\'nde <b>İndirilenler</b> klasöründe bulun.', 'İndirdiğiniz dosyayı hemen kendi klasörünüze taşıyın.', '⬇'],
   ['Virüs taraması', '<b>Başlat → Windows Güvenliği → Virüs ve tehdit koruması → Hızlı tarama</b> deyin ve bitmesini bekleyin. Sonucu kâğıda yazın.', 'Tarama sırasında bilgisayarı kullanabilirsiniz.', '🛡'],
   ['Güncellemeye bakın', '<b>Ayarlar → Windows Update</b>\'e (Windows 10\'da <b>Ayarlar → Güncelleştirme ve Güvenlik → Windows Update</b>) girin: “Güncelsiniz” mi yazıyor, yoksa bekleyen güncelleme var mı? Varsa işinizi kaydedip güncelleyin.', 'Güncelleme sırasında bilgisayarı kapatmayın.', '🔄'],
+  ['İngilizce pencere', 'Bir sitede “<b>Allow / Block</b>” ya da “<b>Accept / Reject</b>” soran bir pencere görünce okuyun: Allow izin ver, Block engelle demektir. Bildirim isteyen siteye <b>Block</b> deyin.', 'Emin olmadığınız İngilizce pencerede Cancel (vazgeç) ya da ✕ güvenlidir.', '🔤'],
+  ['Modem ve hız', 'Evinizdeki modemin <b>ışıklarına</b> bakın: Power, Internet/DSL ve WLAN yanıyor mu? Sonra tarayıcıda “<b>hız testi</b>” arayıp internet hızınızı ölçün ve not alın.', 'İnternet kesilirse modemi kapatın, 10 saniye bekleyip açın.', '📶'],
 ]);
 
 export const odev9 = odev(9, 'e-posta', '✉', [
@@ -109,6 +115,8 @@ export const odev9 = odev(9, 'e-posta', '✉', [
   ['Yanıtlayın', 'Gelen “Deneme” postasını açıp <b>Yanıtla</b>\'ya basın ve bir cümle yazıp gönderin.', 'Yanıtla yalnızca gönderene cevap verir.', '↩'],
   ['İletin', 'Aynı postayı güvendiğiniz bir yakınınıza <b>İlet</b> ile gönderin; <b>Cc</b> kutusuna kendinizi de yazın.', 'Cc: bilgisi olsun istediğiniz kişi.', '↪'],
   ['Spam klasörü', '<b>Spam</b> (ya da Önemsiz E-posta) klasörüne bakın. Tanıdığınız birinin postası yanlışlıkla orada mı? Varsa “Spam değil” deyin. Bağlantılara tıklamayın.', 'Şüpheli postadaki bağlantılara hiç tıklamayın.', '🚫'],
+  ['Eski postayı bulun', 'E-postanızın arama kutusuna bir <b>göndericinin adını</b> (ör. bankanız ya da elektrik şirketi) yazın; geçen ayki postayı bulun. Ekli postalar için arama seçeneklerine bakın.', 'Gmail\'de “has:attachment”, Outlook\'ta “Ekleri var” filtresi ekli postaları gösterir.', '🔍'],
+  ['Abonelikten çıkın', 'Sürekli gelen bir reklam bülteninin en altındaki <b>Abonelikten çık</b> (Unsubscribe) bağlantısını bulun ve bültenden çıkın.', 'Yalnızca tanıdığınız mağazaların bültenlerinde yapın; şüpheli postadaki bağlantıya tıklamayın, silin.', '📰'],
   ['Çıkış yapın', 'Bir eki varsa indirip kendi klasörünüze taşıyın. İşiniz bitince hesabınızdan <b>Oturumu kapat</b> (Çıkış yap) düğmesine basın.', 'Ortak bilgisayarda çıkış yapmak şarttır.', '🚪'],
 ]);
 
@@ -118,6 +126,8 @@ export const odev10 = odev(10, 'kelime işlemci (Word)', '📘', [
   ['Önizleyin', '<b>Ctrl + P</b> ile yazdırma önizlemesine bakın: kaç sayfa? Tek sayfa olmalı.', 'Taşıyorsa kenar boşluklarını daraltın.', '👁'],
   ['PDF yapın', 'Belgeyi <b>PDF olarak kaydedin</b> (Yazdır → PDF olarak kaydet ya da Dışa aktar). PDF\'i çift tıklayıp açın.', 'PDF, her bilgisayarda aynı görünür.', '📕'],
   ['Tablo ekleyin', 'Yeni bir belgede <b>3 sütun × 4 satırlık</b> bir tablo ekleyin (Ekle → Tablo) ve içine aidat bilgilerini yazın.', 'Tab tuşu bir sonraki hücreye geçirir.', '▦'],
+  ['Resmi yerleştirin', 'Word\'e bir fotoğraf ekleyin. Fotoğrafa tıklayıp yanındaki <b>Düzen Seçenekleri</b> simgesinden <b>Kare</b>\'yi seçin; resmi sürükleyerek yazının yanına taşıyın, köşesinden küçültün.', 'Resim yazıyı dağıtırsa Ctrl + Z ile geri alın.', '🖼'],
+  ['Biçim Boyacısı', 'Bir başlığı renkli ve büyük yapın. Başlığa tıklayıp <b>Biçim Boyacısı</b>\'na (fırça) basın, sonra başka bir başlığı fareyle boyayın. Satırları <b>1,5 satır aralığı</b> ile ferahlatın.', 'Fırçaya çift tıklarsanız birden çok başlığa sürebilirsiniz; Esc ile bırakılır.', '🖌'],
   ['Kaydedin', 'Her ikisini de <b>Belgeler</b> klasörüne anlaşılır adlarla kaydedin: <b>dilekçe</b> ve <b>aidat tablosu</b>. Dosya Gezgini\'nde görün.', 'Ad olarak tarih eklemek bulmayı kolaylaştırır.', '💾'],
 ]);
 
@@ -127,6 +137,8 @@ export const odev11 = odev(11, 'hesap tablosu (Excel)', '📗', [
   ['Para biçimi', 'Tutarları seçip <b>₺ (Para birimi)</b> biçimine çevirin.', 'Sütun dar kalırsa ##### çıkar; çizgisine çift tıklayın.', '₺'],
   ['Sıralayın', 'Tutarlara göre <b>büyükten küçüğe</b> sıralayın: en pahalı kalem en üstte görünsün.', 'Seçerken 1. satırdaki başlıkları ve toplam satırını dahil etmeyin (yalnızca 2–8. satırlar).', '↓'],
   ['Başlığı donatın', 'Tablonun üstüne yeni bir satır ekleyin (1. satır numarasına sağ tık → Ekle). <b>A1</b>\'e <b>HAFTALIK HARCAMA</b> yazıp A1 ile B1\'i seçin ve <b>Birleştir ve Ortala</b> ile tek başlık yapın.', 'Başlığı kalın yapmak okunurluğu artırır.', '🏷'],
+  ['Hatayı düzeltin', 'Bir sayının yerine yazıyla “<b>iki yüz</b>” yazın ve toplamın <b>#DEĞER!</b> verdiğini görün. Rakamla <b>200</b> yazarak düzeltin.', 'Hata kodları: #DEĞER! yazı var, #AD? işlev adı yanlış, #SAYI/0! sıfıra bölme.', '⚠'],
+  ['Özet Tablo', 'Harcamalarınıza bir <b>Kategori</b> sütunu ekleyin (Market, Fatura…). Tabloya tıklayıp <b>Ekle → Özet Tablo</b> ile her kategorinin toplamını çıkarın.', 'Özet Tablo\'da Satırlar: Kategori, Değerler: Tutar toplamı.', '🧮'],
   ['Kaydedin', '<b>Ctrl + S</b> ile <b>harcamalar</b> adıyla <b>Belgeler</b> klasörüne kaydedin. Kapatıp yeniden açarak toplamın durduğunu görün.', 'Haftaya yeni bir sayfa sekmesiyle devam edin.', '💾'],
 ]);
 
@@ -136,6 +148,8 @@ export const odev12 = odev(12, 'sunu (PowerPoint)', '📙', [
   ['Geçiş seçin', 'Slaytlara bir <b>geçiş</b> (Soldurma (Fade) ya da İtme) verin. Fazla çeşit kullanmayın; hepsine aynısını verin.', 'Geçiş, slayttan slayda geçerkenki hareket.', '✨'],
   ['Gösterin', '<b>F5</b> ile sunuyu baştan izleyin; ok tuşları ya da tıklamayla ilerleyin; <b>Esc</b> ile çıkın.', 'B tuşu ekranı karartır.', '▶'],
   ['PDF yapın', 'Sunuyu <b>PDF olarak kaydedin</b> ve açıp bakın: herkesin telefonunda açılır.', 'WhatsApp\'tan göndermek için PDF idealdir.', '📕'],
+  ['Asıl Slayt', 'Görünüm → <b>Asıl Slayt</b>\'ı açın; alt bilgiye adınızı yazın ya da köşeye küçük bir resim koyun. Asıl görünümü kapatıp bütün slaytlarda göründüğüne bakın.', 'PowerPoint\'te Görünüm → Asıl Slayt; çıkmak için Asıl Görünümü Kapat.', '🎨'],
+  ['Tablo ya da grafik', 'Bir slayda <b>Ekle → Tablo</b> ile küçük bir tablo (ör. haftalık yürüyüş süreleri) ya da <b>Ekle → Grafik</b> ile sütun grafiği ekleyin.', 'Tabloda Tab sonraki hücreye geçer; son hücrede yeni satır açar.', '📊'],
   ['Birine gösterin', 'Sununuzu bir yakınınıza gösterin ve bir <b>iyi</b>, bir de <b>geliştirilecek</b> yanını sorun. Kâğıda not alın.', 'Eleştiri öğrenmenin en hızlı yoludur.', '👥'],
 ]);
 
@@ -145,6 +159,8 @@ export const odev13 = odev(13, 'günlük işler: bilgisayarda ve tarayıcıda', 
   ['PDF\'i yazdırma önizlemesi', 'Aynı PDF için <b>Ctrl + P</b> ile yazdırma penceresini açın; <b>yalnızca 1. sayfayı</b> seçin (yazdırmadan iptal edebilirsiniz).', 'İki yüze yazdırmak kâğıdı yarıya indirir.', '🖨'],
   ['Çerezleri görün', 'Tarayıcının Ayarlar sayfasında <b>Çerezler ve site verileri</b>\'ni bulun; kaç site çerez bırakmış? <b>Üçüncü taraf çerezler</b> engelli mi?', 'Engellemek reklam takibini azaltır; siteler yine çalışır.', '🍪'],
   ['Gizli pencere', '<b>Ctrl + Shift + N</b> (Firefox\'ta <b>Ctrl + Shift + P</b>) ile gizli pencere açıp bir site gezin; pencereyi kapatınca geçmişte görünüp görünmediğine bakın.', 'Gizli pencere sizi internette görünmez yapmaz.', '🕶'],
+  ['Fotoğraf küçültün', 'Telefondan aldığınız bir fotoğrafı Paint\'te açın; <b>Yeniden boyutlandır</b> ile yüzde 50 küçültüp <b>Farklı kaydet</b> ile yeni adla kaydedin. İki dosyanın boyutunu (MB) karşılaştırın.', 'Dosya Gezgini\'nde dosyaya sağ tık → Özellikler boyutu gösterir.', '📐'],
+  ['Yol tarifi', 'Gerçek bir harita sitesinde evinizden sık gittiğiniz bir yere (hastane, pazar) <b>yol tarifi</b> alın. Sonra <b>Sokak Görünümü</b> ile oranın kapısına bakın.', 'Harita konum izni isterse yalnızca harita sitesine verin.', '🗺'],
   ['WhatsApp Web ve çıkış', 'Dilerseniz <b>web.whatsapp.com</b>\'a girip telefonla karekodu okutun; bir mesaja bakın; <b>mutlaka “Oturumu kapat”</b> yapın.', 'Ortak bilgisayarda bunu atlamayın.', '💬'],
 ]);
 
@@ -154,6 +170,8 @@ export const odev14 = odev(14, 'e-Devlet, randevu ve internette işlemler', '�
   ['Barkodu doğrulayın', 'e-Devlet\'te <b>Barkodlu Belge Doğrulama</b> sayfasına gidip az önceki belgenin barkodunu yazarak doğrulayın.', 'Size verilen bir belgeyi bu yolla sorgulatırsınız.', '🔎'],
   ['Randevuları görün', '<b>MHRS</b> sitesine (mhrs.gov.tr) <b>e-Devlet ya da T.C. kimlik numaranızla giriş yaparak</b> girin ve <b>Randevularım</b> bölümüne bakın. (İstemiyorsanız yeni randevu almayın.)', 'Gidemeyecekseniz randevuyu iptal edin.', '🏥'],
   ['e-Nabız\'a bakın', '<b>e-Devlet ile giriş</b> yoluyla e-Nabız\'a girin ve reçete ya da tahlil listenize bakın. <b>Şifreyi e-Nabız sayfasında değil, e-Devlet sayfasında</b> yazdığınızı kontrol edin.', 'Sağlık bilgileriniz özeldir; işiniz bitince çıkış yapın.', '🩺'],
+  ['Kayıtlı hatlar', 'e-Devlet\'te “<b>Mobil Hat Sorgulama</b>”yı açıp adınıza kayıtlı hatlara bakın. Tanımadığınız bir hat var mı?', 'Bilmediğiniz bir hat varsa operatörüne başvurup kapattırın.', '📱'],
+  ['Kart ayarları', 'Bankanızın mobil uygulamasında ya da internet şubesinde kartınızın <b>internet alışverişi</b> ayarını ve <b>sanal kart</b> seçeneğini bulun. Değiştirmeniz gerekmez; yerini öğrenin.', 'Şifrenizi yalnızca bankanın kendi uygulamasına yazın; SMS kodunu kimseye söylemeyin.', '💳'],
   ['Çıkış yapın', 'Bütün sitelerden <b>Çıkış</b> yapın. Sonra tarayıcıda <b>Ctrl + Shift + Del</b> ile göz atma verilerini temizlemeyi düşünün (ortak bilgisayardaysanız).', 'Oturum açık kalırsa sonraki kişi girebilir.', '🚪'],
 ]);
 
