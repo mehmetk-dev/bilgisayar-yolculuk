@@ -18,6 +18,8 @@ const FIYAT = () => ({
   colW: { 0: 10, 2: 11, 3: 10, 5: 10, 6: 10 },
 });
 
+const isVlookup = (raw) => /^=\s*(DÜŞEYARA|DUSEYARA|VLOOKUP)\s*\(/i.test(raw || '');
+
 export const duseyara = {
   id: 'duseyara', icon: '🔎', title: 'DÜŞEYARA: fiyat listesinden ürünü bulmak', minutes: 35, stage: 'desktop',
   desc: 'DÜŞEYARA ile fiyat listesinden ürünün fiyatını otomatik getirmek.',
@@ -40,7 +42,7 @@ export const duseyara = {
     },
     {
       title: 'Formülün parçaları',
-      html: `<p>Yazacağımız formül:</p><div class="target">=DÜŞEYARA(A2;$F$2:$G$7;2;YANLIŞ)</div>
+      html: `<p>Yazacağımız formül:</p><div class="target" style="font-size:1.05em;overflow-wrap:break-word">=DÜŞEYARA(A2;<wbr>$F$2:$G$7;<wbr>2;<wbr>YANLIŞ)</div>
         <ol class="steps"><li><b>A2</b>: aranan (ürünün adı)</li><li><b>$F$2:$G$7</b>: aranacak tablo (fiyat listesi)</li><li><b>2</b>: tablonun <b>2. sütunundaki</b> değer getirilsin (Fiyat)</li><li><b>YANLIŞ</b>: tam eşleşme (yaklaşık değil)</li></ol>
         <p class="mut">Parçaları noktalı virgülle ayırın. $ işaretlerini ve tablo adresini yazmakla uğraşmayın: fareyle seçerek de yazabilirsiniz.</p>`,
       manual: 'Anladım ✔',
@@ -48,15 +50,19 @@ export const duseyara = {
     {
       title: 'İlk formülü yazın',
       html: '<p><b>C2</b> hücresine tıklayın ve yukarıdaki formülü <b>aynen</b> yazıp Enter\'a basın. Domates\'in fiyatı (45 ₺) gelmeli.</p>',
-      hint: 'Formül = ile başlar. Noktalı virgül: Shift + virgül tuşu. Tırnak koymayın; YANLIŞ yazı değil, bir sözcüktür.',
-      on: when((c) => near(cell(c, 'C2').value, 45)),
+      hint: 'Formül = ile başlar. Noktalı virgül: Shift + virgül tuşu. Tırnak koymayın; YANLIŞ yazı değil, bir sözcüktür. 45\'i elle yazmayın: formülü yazın.',
+      on: (ev, c) => {
+        if (!evs.includes(ev.type) || !near(cell(c, 'C2').value, 45)) return false;
+        if (!isVlookup(cell(c, 'C2').raw)) { c.warn('45 yazmışsınız ama bu bir formül değil. C2\'ye =DÜŞEYARA(A2;$F$2:$G$7;2;YANLIŞ) formülünü yazın.'); return false; }
+        return true;
+      },
       done: 'Domates için 45 ₺ geldi! Formül, “Domates”i fiyat listesinde bulup yanındaki fiyatı aldı.',
     },
     {
       title: 'Aşağı kopyalayın',
       html: '<p>C2\'yi seçip sağ alt köşesindeki <b>doldurma tutamacını</b> <b>C5</b>\'e kadar aşağı çekin. Diğer ürünlerin fiyatları da gelmeli.</p>',
-      hint: 'C2 hücresini seçin; köşedeki küçük kareyi C5\'e kadar sürükleyin.',
-      on: when((c) => near(cell(c, 'C3').value, 120.5) && near(cell(c, 'C4').value, 15) && near(cell(c, 'C5').value, 38.75)),
+      hint: 'C2 hücresini seçin; köşedeki küçük kareyi C5\'e kadar sürükleyin. Aşağıda #YOK çıkarsa formüldeki $ işaretlerini unutmuşsunuzdur: C2\'ye formülü $F$2:$G$7 diye, $ işaretleriyle yazıp yeniden kopyalayın.',
+      on: when((c) => isVlookup(cell(c, 'C3').raw) && near(cell(c, 'C3').value, 120.5) && near(cell(c, 'C4').value, 15) && near(cell(c, 'C5').value, 38.75)),
       done: 'Dört ürünün fiyatı geldi. Bu mümkün oldu çünkü tablo adresi <b>$ ile sabitlenmişti</b>: aşağı kopyalanırken kaymadı, yalnızca A2 → A3, A4… oldu.',
     },
     rehberSoru({
@@ -141,11 +147,11 @@ export const aidatTakip = {
       html: '<p>Şeritteki <b>✔ Açılır Liste</b> düğmesine tıklayın. Kutuya <b>Ödendi, Ödenmedi, Kısmen</b> yazın (virgülle ayırarak) ve <b>Uygula</b>\'ya basın.</p>',
       hint: 'Düğme Koşullu Biçim\'in yanında. Üç seçeneği virgülle ayırın.',
       on: (ev, c) => ev.type === 'xl-valid' && ev.list.length >= 3 && ev.range === 'C2:C9',
-      done: 'Kural kondu. Artık C2:C9\'a bir hücreye tıkladığınızda yanında küçük bir <b>▾</b> belirir.',
+      done: 'Kural kondu. Artık C2:C9 aralığındaki bir hücreye tıkladığınızda yanında küçük bir <b>▾</b> belirir.',
     },
     {
       title: 'Listeden seçin',
-      html: '<p>C2\'ye tıklayın, yanındaki <b>▾</b>\'ya basıp <b>Ödendi</b>\'yi seçin. Sonra C3, C4 ve C5 için de listeden seçin (örneğin Ödendi, Ödenmedi, Kısmen).</p>',
+      html: '<p>C2\'ye tıklayın, yanındaki <b>▾</b>\'ya basıp <b>Ödendi</b>\'yi seçin. Sonra C3, C4 ve C5 için de listeden seçin. Bu dört hücrenin <b>en az biri Ödenmedi</b> olsun (sonra boyayacağız); öbürlerini istediğiniz gibi seçin.</p>',
       hint: 'Hücre seçiliyken sağ kenarında küçük bir ok görünür. Oka tıklayınca seçenekler çıkar.',
       on: (ev, c) => {
         if (ev.type !== 'xl-pick') return false;

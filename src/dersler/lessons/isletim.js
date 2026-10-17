@@ -47,7 +47,7 @@ export const isletimSistemleri = {
   steps: [
     {
       title: 'İşletim sistemi nedir?',
-      html: `<p><b>İşletim sistemi</b>, bilgisayar açılınca ilk çalışan ve her şeyi yöneten programdır. Bir <b>apartman yöneticisi</b> gibi düşünün: hangi kiracının (programın) hangi daireyi (hafızayı) kullanacağını, elektriği ve suyu (gücü) kim alacak, hepsini o dağıtır.</p>
+      html: `<p><b>İşletim sistemi</b>, bilgisayar açılınca ilk çalışan ve her şeyi yöneten programdır. Bir <b>apartman yöneticisi</b> gibi düşünün: hangi kiracının (programın) hangi daireyi (hafızayı) kullanacağına, elektriği ve suyu (gücü) kimin ne kadar alacağına o karar verir.</p>
         <p>Ekranda gördüğünüz masaüstü, Başlat menüsü, pencereler ve simgeler işletim sisteminin yüzüdür. Aynı bilgisayara farklı işletim sistemi kurulursa görünüş değişir; parçalar aynı kalır.</p>
         <p class="mut">Telefonunuzda da bir işletim sistemi vardır: Android ya da iOS.</p>`,
       scene: info('<div class="sc-big">🏢<br>🖥 ⇄ 🧩</div><p>Yönetici: işletim sistemi<br>Kiracılar: programlar</p>'),
@@ -97,13 +97,13 @@ export const isletimSistemleri = {
     {
       title: 'Linux: Ubuntu',
       html: `<p><b>Linux</b> ücretsizdir ve kodu herkese açıktır. En çok kullanılan çeşitlerinden biri <b>Ubuntu</b>\'dur. Burada Başlat düğmesi yoktur:</p>
-        <ol class="steps"><li>Giriş yapın.</li><li>Sol üstteki <b>Etkinlikler</b>\'e tıklayın: açık pencereler ve arama kutusu görünür.</li><li>Soldaki çubuktan ya da en alttaki <b>⋮⋮⋮ Uygulamaları Göster</b>\'den <b>Dosyalar</b>\'ı açın.</li></ol>
+        <ol class="steps"><li>Giriş yapın.</li><li>Sol üstteki <b>Etkinlikler</b>\'e tıklayın: açık pencereler ve arama kutusu görünür.</li><li>Soldaki çubuktan ya da çubuğun en altındaki <b>⋮⋮⋮ Uygulamaları Göster</b>\'den <b>Dosyalar</b>\'ı açın.</li></ol>
         ${fact([['Başlangıcı', '1991\'de Linus Torvalds başlattı'], ['Fiyatı', '<b>Ücretsiz</b>; istediğiniz kadar bilgisayara kurulur'], ['Çeşitleri', 'Ubuntu, Linux Mint, Debian, Pardus… Her birine <b>“dağıtım”</b> denir']])}
-        <p class="tb-note"><b>Kek tarifi benzetmesi:</b> Windows, formülü sır olan bir içecek gibidir. Linux ise herkese açık bir kek tarifidir: herkes bakar, değiştirir, dağıtır. Buna <b>açık kaynak</b> denir.</p>`,
+        <p class="tb-note"><b>Kek tarifi benzetmesi:</b> Windows, tarifi gizli tutulan bir pastane keki gibidir: tadına bakarsınız ama tarifi göremez, değiştiremezsiniz. Linux ise tarifi herkesin görebildiği, değiştirebildiği ve başkasına verebildiği bir kektir. Buna <b>açık kaynak</b> denir.</p>`,
       hint: 'Dosyalar, soldaki koyu çubukta gri bir dosya dolabı simgesidir. Etkinlikler\'de “dosya” yazıp Enter\'a da basabilirsiniz.',
       scene: osSahne('lnx'),
       on: (ev) => isOs(ev, 'lnx', 'os-open') && ev.app === 'files',
-      done: 'Linux\'ta “C:” sürücüsü yoktur; dosyalarınız “Ev” klasöründedir. İsterseniz soldaki çubuktan Uçbirim\'i açıp <b>ls</b> ya da <b>date</b> yazmayı deneyin.',
+      done: 'Linux\'ta “C:” sürücüsü yoktur; dosyalarınız “Ev” klasöründedir. İsterseniz sol alttaki <b>Uygulamaları Göster</b> düğmesiyle yüklü programlara da bakın.',
     },
     {
       title: 'Pardus: yerli işletim sistemimiz',
@@ -149,7 +149,7 @@ export const isletimSistemleri = {
       done: 'Windows ile Linux ailesini ayırt ediyorsunuz.',
     }),
     sec({
-      title: 'Akıllı tahta', text: '<p>Çocuğunuzun okulunda sınıftaki <b>akıllı tahta</b> açılırken Türk bayrağı, Ay-yıldız ve bir <b>parsı</b> logosu görüyorsunuz.</p>',
+      title: 'Akıllı tahta', text: '<p>Çocuğunuzun okulunda sınıftaki <b>akıllı tahta</b> açılırken Ay-yıldızlı Türk bayrağı ve bir <b>parsı</b> logosu görüyorsunuz.</p>',
       q: 'Tahtada hangi işletim sistemi çalışıyor?', opts: ['Pardus (ETAP)', 'Windows 7', 'Android'], ok: 0,
       why: 'Pardus ETAP. TÜBİTAK ULAKBİM tarafından geliştirilen yerli sistemdir; okullardaki akıllı tahtalarda kullanılır.',
     }),

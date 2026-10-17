@@ -15,7 +15,7 @@ const TABS = [
   },
   {
     id: 'outlook', label: 'Hotmail / Outlook', icon: '📧',
-    html: () => `${OUTLOOK}${fact([['Kim yapar?', 'Microsoft'], ['Adres sonu', '<b>@hotmail.com</b>, <b>@outlook.com</b>, @live.com'], ['Hesabın adı', '<b>Microsoft hesabı</b>: Windows\'a giriş, Word ve Excel (internette), OneDrive, Skype hepsi aynı hesap'], ['Depolama', 'Posta kutusu yaklaşık 15 GB; bulut depo (OneDrive) ayrıdır'], ['Düzen', 'Soldaki <b>klasörler</b>; üstte Odaklanmış / Diğer'], ['İstenmeyen posta', '“<b>Önemsiz E-posta</b>” klasörü'], ['Siteye giriş', 'outlook.com']])}<p class="tb-note"><b>Hotmail</b> eskiden ayrı bir hizmetti; Microsoft 2013\'te adını <b>Outlook.com</b> yaptı. Eski @hotmail.com adresleri hâlâ çalışır; insanlar da hâlâ “hotmail” der.</p>`,
+    html: () => `${OUTLOOK}${fact([['Kim yapar?', 'Microsoft'], ['Adres sonu', '<b>@hotmail.com</b>, <b>@outlook.com</b>, @live.com'], ['Hesabın adı', '<b>Microsoft hesabı</b>: Windows\'a giriş, Outlook, OneDrive, Teams, Word ve Excel (internette) hepsi aynı hesap'], ['Depolama', 'Posta kutusu yaklaşık 15 GB; bulut depo (OneDrive) ayrıdır'], ['Düzen', 'Soldaki <b>klasörler</b>; üstte Odaklanmış / Diğer'], ['İstenmeyen posta', '“<b>Önemsiz E-posta</b>” klasörü'], ['Siteye giriş', 'outlook.com']])}<p class="tb-note"><b>Hotmail</b> eskiden ayrı bir hizmetti; Microsoft 2013\'te adını <b>Outlook.com</b> yaptı. Eski @hotmail.com adresleri hâlâ çalışır; insanlar da hâlâ “hotmail” der.</p>`,
   },
   {
     id: 'ortak', label: 'Ortak yönleri', icon: '🤝',
@@ -61,14 +61,11 @@ export const gmailHotmail = {
       items: [
         { label: 'Adres @gmail.com ile biter', icon: '@', bin: 'g', why: 'Gmail adresleri böyle biter.' },
         { label: 'Adres @hotmail.com ya da @outlook.com ile biter', icon: '@', bin: 'o', why: 'Microsoft\'un posta adresleri.' },
-        { label: 'Google hesabı (Android telefonla gelir)', icon: '🤖', bin: 'g', why: 'Android telefon açarken Google hesabı istenir.' },
-        { label: 'Microsoft hesabı (Windows ve Office ile gelir)', icon: '🪟', bin: 'o', why: 'Windows\'a Microsoft hesabıyla giriliyorsa Outlook hazırdır.' },
         { label: 'İstenmeyenler “Spam” klasörüne düşer', icon: '🚫', bin: 'g', why: 'Gmail\'de adı Spam.' },
         { label: 'İstenmeyenler “Önemsiz E-posta” klasörüne düşer', icon: '🚫', bin: 'o', why: 'Outlook\'ta adı Önemsiz E-posta.' },
         { label: 'Üstte Birincil / Promosyonlar / Sosyal sekmeleri', icon: '🗂', bin: 'g', why: 'Gmail postaları sekmelere ayırır.' },
         { label: 'Ücretsizdir', icon: '🆓', bin: 'b', why: 'İkisi de ücretsiz, karşılığında reklam gösterir.' },
         { label: 'Birbirine posta gönderir', icon: '🔁', bin: 'b', why: 'Hangi hizmette olursanız olun posta ulaşır.' },
-        { label: 'İki adımlı doğrulama açılabilir', icon: '🔐', bin: 'b', why: 'İkisinde de hesabı korumak için vardır.' },
       ],
       done: 'İki hizmeti ayırt ediyorsunuz.',
     }),
@@ -83,9 +80,9 @@ export const gmailHotmail = {
       why: 'Her hesabın şifresi, o hesabı veren firmanın sitesinden sıfırlanır: Hotmail/Outlook için Microsoft, Gmail için Google. Bunun için adresin sonuna bakmak yeter.',
     }),
     sec({
-      title: 'Hangisini açmalı?', text: '<p>Yeni bir <b>Android telefon</b> aldınız ve ilk açılışta sizden bir hesap istiyor. E-posta adresiniz yok.</p>',
-      q: 'En kolay yol?', opts: ['Telefonun istediği Google hesabını (Gmail) açıp onu kullanmak', 'Önce Hotmail açıp sonra Google\'a tanıtmak zorundasınız', 'Hesap açmadan kullanmak'], ok: 0,
-      why: 'Android telefonlar Google hesabıyla çalışır; açtığınız Gmail adresi hem e-posta hem telefon hesabınız olur. İsterseniz Hotmail\'i sonradan ekleyebilirsiniz.',
+      title: 'Hangisini açmalı?', text: '<p>Yeni bir <b>Android telefon</b> aldınız ve ilk açılışta sizden bir <b>Google hesabı</b> istiyor. Hiç e-posta adresiniz yok.</p>',
+      q: 'Ne yaparsınız?', opts: ['Telefonun önerdiği gibi yeni bir Google hesabı (Gmail adresi) açarım', 'Önce Hotmail açarım; Google hesabı onsuz açılmaz', 'Hesap açmam; telefon hesapsız da tam çalışır'], ok: 0,
+      why: 'Android telefonlar Google hesabıyla çalışır; açtığınız Gmail adresi hem e-posta hem telefon hesabınız olur. Hotmail\'e ihtiyaç yoktur; isterseniz sonradan ekleyebilirsiniz.',
     }),
     sec({
       title: 'Şüpheli uyarı', kind: 'mail', from: 'Hotmail Destek <destek@hotmail-hesap.xyz>', subject: 'Hesabınız 24 saat içinde kapatılacak!',

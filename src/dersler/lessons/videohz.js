@@ -66,7 +66,7 @@ function hzSahnesi(el, c) {
   el.innerHTML = `<div class="hz-track"><span class="hz-man">🏃</span><div class="hz-line"></div></div>
     <div class="vh-btns">${HZ.map((h) => `<button type="button" data-hz="${h}">${h} Hz</button>`).join('')}</div>
     <p class="hz-say">Bir hıza tıklayın: adam hep aynı hızla koşuyor; yalnızca ekranın <b>saniyede kaç kez yenilendiği</b> değişiyor.</p>
-    <p class="mut">Gerçekte ucuz ekranlar 60 Hz, oyuncu ekranları ve yeni telefonlar 90–144 Hz gösterir. 144 Hz, bundan da akıcıdır.</p>`;
+    <p class="mut">Gerçekte çoğu ekran ve televizyon 60 Hz gösterir; bazı yeni telefonlar ve özel ekranlar 90–144 Hz gösterir. 144 Hz, 60 Hz’den de akıcıdır.</p>`;
   const man = el.querySelector('.hz-man'), say = el.querySelector('.hz-say'), tried = new Set();
   let timer = 0, x = 0, last = performance.now();
   const stop = () => clearInterval(timer);
@@ -131,11 +131,11 @@ export const videoHz = {
   summary: [
     ['144p, 360p, 720p, 1080p, 4K', 'Videonun netliği; sayı büyüdükçe daha net, daha çok internet harcar'],
     ['Çözünürlük', 'Ekranda yan yana kaç nokta (piksel) olduğu: 1920 × 1080 = Full HD'],
-    ['Kotalı internet', 'Telefonda kotanızı korumak için 360p–480p seçin; 4K bir saatte yaklaşık 7 GB harcar'],
-    ['Otomatik kalite', 'İnternet yavaşsa video kendiliğinden kaliteyi düşürür'],
+    ['Kotalı internet', 'Telefonda kotanızı korumak için 360p ya da 480p seçin; 4K bir saatte yaklaşık 7 GB harcar'],
+    ['Otomatik kalite', 'Kalite ayarı “Otomatik” ise internet yavaşlayınca video kaliteyi kendiliğinden düşürür'],
     ['Hz (hertz)', 'Ekranın saniyede kaç kez yenilendiği: 60 Hz = saniyede 60 resim'],
     ['60 Hz ve 144 Hz', '144 Hz hareketi daha akıcı gösterir; ofis ve internet için 60 Hz yeterli'],
-    ['Hz ve FPS', 'Ekran kartı 400 kare üretse de 60 Hz ekran saniyede 60 tanesini gösterebilir'],
+    ['Hz ve saniyedeki kare', 'Video saniyede 120 kare olsa da 60 Hz ekran saniyede en çok 60 tanesini gösterir'],
     ['Ekran ayarı', 'Çözünürlükte “Önerilen” yazanı seçin; yoksa görüntü bulanıklaşır'],
   ],
   steps: [
@@ -149,10 +149,10 @@ export const videoHz = {
     {
       title: 'Netliği deneyin',
       html: `<p>Sağdaki manzara bir videonun bir karesidir. <b>144p</b>'ye tıklayın; yazıya ve evin penceresine bakın. Sonra <b>1080p</b> ve <b>4K</b>'yı deneyin. Her seferinde sağdaki bilgilere de bakın.</p>
-        <p class="mut">p, “piksel” demektir: videonun yüksekliğindeki nokta sayısı. 1080p = yukarıdan aşağıya 1080 nokta.</p>`,
+        <p class="mut">1080, ekranın yukarıdan aşağı 1080 nokta (piksel) olduğunu söyler. Sondaki p ise görüntünün tek seferde, satır atlamadan çizildiğini gösterir (İngilizce “progressive”). Siz yalnızca sayıya bakın.</p>`,
       scene: kaliteSahnesi,
       on: (ev, c) => ev.type === 'vh-q' && ev.tried.includes('144') && (ev.tried.includes('1080') || ev.tried.includes('2160')),
-      done: '144p’de resim kocaman karelerden oluşuyor, yazı okunmuyor; 1080p ve 4K’da yazı bile keskin. Ama dikkat: kalite arttıkça video çok daha fazla internet harcıyor.',
+      done: '144p’de resim kocaman karelerden oluşuyor, yazı okunmuyor; 1080p ve 4K’da yazı bile keskin. Ama dikkat: kalite arttıkça video çok daha fazla internet harcıyor. Video sitelerinde kaliteyi, videonun üstündeki ⚙ (dişli) simgesinden seçersiniz; “Otomatik” seçiliyse internet yavaşlayınca kalite kendiliğinden düşer.',
     },
     sec({
       title: 'Kotanız dar', text: '<p>Telefonunuzda <b>mobil internet kotanız</b> kısıtlı: ayda 10 GB. Bir yemek tarifi videosunu telefonda izleyeceksiniz.</p>',
@@ -170,7 +170,7 @@ export const videoHz = {
         <p><b>5 Hz</b>, <b>15 Hz</b>, <b>30 Hz</b> ve <b>60 Hz</b>'i sırayla deneyin. Adam her seferinde aynı hızda koşuyor; yalnızca ekranın <b>yenilenme sayısı</b> değişiyor.</p>`,
       scene: hzSahnesi,
       on: (ev) => ev.type === 'vh-hz' && ev.tried.includes(5) && ev.tried.includes(60) && ev.tried.length >= 3,
-      done: 'Hz, ekranın <b>saniyede kaç kez yenilendiğidir</b>. 60 Hz akıcı; 144 Hz’de hareket “tereyağı gibi” akar. Bu yüzden oyun ve hızlı hareketler için yüksek Hz ekranlar sevilir.',
+      done: 'Hz, ekranın <b>saniyede kaç kez yenilendiğidir</b>. 60 Hz akıcı; 144 Hz’de hareket daha da yumuşak akar. Bu fark en çok maç yayını gibi hızlı hareketlerde fark edilir; ofis ve internet işleri için 60 Hz yeterlidir.',
     },
     sec({
       title: 'Hz nedir?', text: '<div class="qz-pic">🖥 60 Hz</div>',
@@ -178,9 +178,9 @@ export const videoHz = {
       why: 'Hertz (Hz) “saniyedeki sayı”dır. 60 Hz = saniyede 60 resim. Kablolu elektrikteki 50 Hz de aynı mantık: saniyede 50 titreşim.',
     }),
     sec({
-      title: 'Hz mi, FPS mi?', text: '<p>Bir oyuncu: “Ekran kartım oyunda saniyede <b>400 kare</b> çiziyor ama monitörüm <b>60 Hz</b>. Neden akıcı değil?”</p>',
-      q: 'Gerçekte ekranda kaç kare görür?', opts: ['400', '60: ekran saniyede en fazla 60 kare gösterebilir', '144'], ok: 1,
-      why: 'Kare çizen (ekran kartı) ile kare gösteren (ekran) ayrıdır. 60 Hz ekran saniyede en çok 60 kare gösterir; fazlası boşa gider. Bu yüzden akıcılık için ekranın Hz değeri de yüksek olmalıdır.',
+      title: 'Kare sayısı ve Hz', text: '<p>Bir tanıdığınız: “Telefonum maçı saniyede <b>120 kare</b> olarak kaydetti, ama televizyonum <b>60 Hz</b>. Hepsini görebilir miyim?”</p>',
+      q: 'Gerçekte ekranda kaç kare görür?', opts: ['120', '60: ekran saniyede en fazla 60 kare gösterebilir', '240'], ok: 1,
+      why: 'Kare üreten (kamera, video, bilgisayar) ile kare gösteren (ekran) ayrıdır. 60 Hz ekran saniyede en çok 60 kare gösterir; fazlası görünmez. Bu yüzden çok akıcı görüntü için ekranın da yüksek Hz desteklemesi gerekir.',
     }),
     {
       title: 'Ekran ayarı',

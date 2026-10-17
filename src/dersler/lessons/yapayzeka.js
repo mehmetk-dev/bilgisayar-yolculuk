@@ -41,7 +41,13 @@ export const yapayZeka = {
     {
       title: 'Özeti okuyun',
       html: '<p>Yardımcının cevabını okuyun. Kurs hangi günler yapılacak? Cevabın altında <b>🔎 Doğru mu? Kontrol et</b> düğmesi var; ona tıklayın.</p>',
-      on: (ev) => ev.type === 'ai-verify' && ev.ok,
+      // Kontrol düğmesi her cevabın altında olabilir: yalnızca bu adımın cevabınınki geçer, öbürleri öğrenciyi uyarır
+      on: (ev, c) => {
+        if (ev.type !== 'ai-verify') return false;
+        if (ev.intent === 'ozet') return true;
+        c.note('Bu düğme başka bir cevabın altında. <b>Özetin</b> (resmî yazıyı özetleyen cevabın) altındaki <b>Kontrol et</b> düğmesine tıklayın.');
+        return false;
+      },
       done: 'Özet doğru çıktı: tarihler ve saatler yazıyla uyuşuyor. Yine de resmî bir işlemde asıl yazıya da bakın.',
     },
     {
@@ -68,38 +74,43 @@ export const yapayZeka = {
       html: `<p>Dilekçeye kimliğinizi ekletmek istediğinizi düşünün. Kutuya şunu yazıp gönderin:<br><b>Dilekçeye T.C. kimlik numaramı da ekle: 12345678901</b></p>
         <p class="mut">Gerçek yapay zekâ sizi uyarmayabilir ve yazdıklarınızı saklayabilir. Bu alıştırma sitesi uyaracak.</p>`,
       on: (ev) => ev.type === 'ai-sensitive',
-      done: 'Mesajınız gönderilmedi ve kırmızı uyarı çıktı. İşte yapay zekâya <b>yazılmaması</b> gerekenler: T.C. kimlik, kart numarası ve CVV, IBAN, şifre, SMS kodu.',
+      done: 'Mesajınız gönderilmedi ve kırmızı uyarı çıktı. Kutuda yazı kaldıysa silin (kimlik numaranızı kutuda bırakmayın) ve sonraki soruya geçin. İşte yapay zekâya <b>yazılmaması</b> gerekenler: T.C. kimlik, kart numarası ve CVV, IBAN, şifre, SMS kodu.',
     },
     rehberSoru({
       title: 'Hangisini yazmazsınız?',
       html: '<p>Yapay zekâya hangisini <b>kesinlikle yazmazsınız</b>?</p>',
-      opts: ['Çorba tarifi istemek', 'Banka kart numarasını ve arkasındaki 3 haneli kodu', 'Hangi kitabı okuyayım diye sormak'], ok: 1,
+      opts: ['Çorba tarifi istemek', 'Hangi kitabı okuyayım diye sormak', 'Banka kart numarasını ve arkasındaki 3 haneli kodu'], ok: 2,
       wrong: 'Bu sorular zararsız. Para çalınmasına yol açabilecek olan hangisi?',
       why: 'Doğru. Kart numarası ve CVV, T.C. kimlik, IBAN ve şifre hiçbir yapay zekâya ve sohbete yazılmaz.',
     }),
     {
       title: 'Bilmediği şeyi sorun',
-      html: '<p>Şimdi bir tuzak: <b>Mahallemizin muhtarı kim?</b> diye sorun.</p>',
+      html: '<p>Şimdi bir tuzak: <b>Mahallemizin muhtarı kim?</b> diye sorun. (Kutuda eski bir yazı kalmışsa önce silin.)</p>',
       on: (ev) => ev.type === 'ai-ask' && ev.intent === 'yerel',
       done: 'Çok emin bir cevap verdi: isim, saat, telefon… Ama yapay zekâ sizin mahallenizi bilebilir mi?',
     },
     {
       title: 'Doğru mu? Kontrol edin',
-      html: '<p>Cevabın altındaki <b>🔎 Doğru mu? Kontrol et</b>\'e tıklayın ve sonucu okuyun.</p>',
-      on: (ev) => ev.type === 'ai-verify' && !ev.ok,
+      html: '<p><b>En alttaki</b> cevabın (muhtarı söyleyen cevabın) altındaki <b>🔎 Doğru mu? Kontrol et</b>\'e tıklayın ve sonucu okuyun. Yukarıdaki eski cevapların altındaki düğmeler bu adım için değildir.</p>',
+      on: (ev, c) => {
+        if (ev.type !== 'ai-verify') return false;
+        if (ev.intent === 'yerel') return true;
+        c.note('Bu düğme eski bir cevabın altında. <b>En alttaki</b> cevabın (muhtarı söyleyen cevabın) altındaki <b>Kontrol et</b> düğmesine tıklayın.');
+        return false;
+      },
       done: 'Turuncu uyarı çıktı: güvenilir kaynak bulunamadı. Yapay zekâ bilmediği şeyi de <b>emin bir sesle uydurabilir</b>.',
     },
     rehberSoru({
       title: 'Ne yaparsınız?',
       html: '<p>Yapay zekâ size bir doktor ismi, telefon numarası ve çalışma saatleri verdi. Bu bilgiyle ne yaparsınız?</p>',
-      opts: ['Doğrudan güvenirim', 'Resmî kaynaktan (e-Nabız, MHRS, hastane sitesi) ya da telefonla doğrularım', 'Hiç bakmam'], ok: 1,
+      opts: ['Resmî kaynaktan (e-Nabız, MHRS, hastane sitesi) ya da telefonla doğrularım', 'Doğrudan güvenirim', 'Hiç bakmam'], ok: 0,
       wrong: 'Kontrol etmeden güvenmek tehlikeli olabilir.',
       why: 'Doğru. Yapay zekâ güçlü bir yardımcıdır ama her zaman haklı değildir. Önemli bilgileri (sağlık, para, adres, telefon) resmî kaynaktan doğrulayın.',
     }),
     rehberSoru({
       title: 'İyi bir soru',
       html: '<p>Hangi soru yapay zekâdan <b>daha iyi cevap</b> alır?</p>',
-      opts: ['Yemek', 'Dört kişilik, etsiz, 30 dakikada hazır olan bir akşam yemeği tarifi ver', 'Ne yapayım?'], ok: 1,
+      opts: ['Yemek', 'Ne yapayım?', 'Dört kişilik, etsiz, 30 dakikada hazır olan bir akşam yemeği tarifi ver'], ok: 2,
       wrong: 'Bu çok kısa ve belirsiz. Daha ayrıntılı bir soru düşünün.',
       why: 'Doğru. Kaç kişilik, nasıl bir yemek, ne kadar zamanınız olduğu gibi ayrıntıları yazdıkça cevap daha işinize yarar olur.',
     }),

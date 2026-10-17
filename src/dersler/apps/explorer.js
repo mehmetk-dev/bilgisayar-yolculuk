@@ -62,7 +62,16 @@ export function explorer({ desk, body, args, emit, setTitle }) {
     return [...list].sort((a, b) => ((a.type === 'folder') - (b.type === 'folder')) * -1 || (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0) * (sortDesc ? -1 : 1));
   }
 
-  function render() {
+  // Düğmeler yeniden çizilince klavye odağı gövdeden kaybolmasın (Ctrl+V, Delete çalışmaya devam etsin)
+  function keepFocus(fn) {
+    const had = body.contains(document.activeElement);
+    fn();
+    if (had && !renaming && !body.contains(document.activeElement)) body.focus({ preventScroll: true });
+  }
+
+  function render() { keepFocus(draw); }
+
+  function draw() {
     setTitle(label(cur));
     const path = cur === 'pc' ? [] : fs.path(cur);
     $('.ex-addr').innerHTML = `<span>💻</span>` + ['pc', ...path.map((n) => n.id)].map((id) => `<button type="button" data-go="${id}">${esc(label(id))}</button>`).join('<i>›</i>');
@@ -100,7 +109,9 @@ export function explorer({ desk, body, args, emit, setTitle }) {
   }
 
   // Komut çubuğu ve durum satırı (seçim değişince yalnızca bunlar yenilenir)
-  function chrome() {
+  function chrome() { keepFocus(drawChrome); }
+
+  function drawChrome() {
     const inRecycle = cur === RECYCLE;
     const s = sel && fs.get(sel);
     $('.ex-cmd').innerHTML = inRecycle
@@ -114,7 +125,8 @@ export function explorer({ desk, body, args, emit, setTitle }) {
          <button type="button" data-cmd="delete" ${s ? '' : 'disabled'} title="Sil (Delete)">🗑 Sil</button>
          ${cur === USB || (cur !== 'pc' && fs.isInside(cur, USB)) ? '<button type="button" data-cmd="eject">⏏ Çıkar</button>' : ''}
          ${fs.phone && cur !== 'pc' && fs.isInside(cur, PHONE) ? '<button type="button" data-cmd="import">🖼 Fotoğrafları içeri aktar</button>' : ''}
-         ${s && /\.zip$/i.test(s.name) ? '<span class="sep"></span><button type="button" data-cmd="extract" class="ex-hl">🗜 Tümünü ayıkla</button>' : s ? '<button type="button" data-cmd="compress" title="Seçili öğeden sıkıştırılmış (.zip) klasör yapar">🗜 Sıkıştır</button>' : ''}
+         <span class="sep"></span>
+         ${s && /\.zip$/i.test(s.name) ? '<button type="button" data-cmd="extract" class="ex-zip ex-hl">🗜 Tümünü ayıkla</button>' : `<button type="button" data-cmd="compress" class="ex-zip" ${s && !isSpecial(cur) ? '' : 'disabled'} title="Seçili öğeden sıkıştırılmış (.zip) klasör yapar">🗜 Sıkıştır</button>`}
          <span class="ex-right"><label>Sırala: <select class="ex-sort">${[['name', 'Ad'], ['date', 'Tarih'], ['type', 'Tür'], ['size', 'Boyut']].map(([k, l]) => `<option value="${k}" ${sortBy === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
            <button type="button" data-cmd="view" title="Görünümü değiştir">${mode === 'details' ? '▦ Simgeler' : '☰ Ayrıntılar'}</button></span>`;
     $('.ex-status').textContent = cur === 'pc' ? '' : `${items().length} öğe${s ? ` · 1 öğe seçili${s.type === 'file' ? ` · ${fmtSize(fs.sizeOf(s))}` : ''}` : ''}`;

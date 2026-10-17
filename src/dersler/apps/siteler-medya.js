@@ -45,7 +45,7 @@ const IZ = {
           <div class="iz-ctrls"><button type="button" data-act="play" title="Oynat / durdur">${st.playing ? '⏸' : '▶'}</button><span class="iz-time">${fmtT(st.t)} / ${fmtT(LEN)}</span>
             <button type="button" data-act="mute" title="Ses">${st.mute ? '🔇' : '🔊'}</button><span class="iz-sp"></span>
             <button type="button" data-act="cc" class="${st.cc ? 'on' : ''}" title="Altyazı">CC</button>
-            <button type="button" data-act="speed" title="Oynatma hızı">⚙ ${st.speed}x</button>
+            <button type="button" data-act="speed" title="Oynatma hızı">⚙ ${String(st.speed).replace('.', ',')}x</button>
             <button type="button" data-act="full" title="Tam ekran">${st.full ? '🗗' : '⛶'}</button></div></div>
         ${st.full ? '<div class="iz-esc">Tam ekrandan çıkmak için <b>Esc</b> tuşuna basın</div>' : ''}</div>`;
       return page(v.title, `${izHead()}<div class="iz-body iz-watch">${player}${st.full ? '' : `<h1>${esc(v.title)}</h1><p class="iz-by">${esc(v.by)} · ${v.views} izlenme</p>
@@ -123,6 +123,13 @@ const NEWS = [
 const gzHead = '<header class="gz-head">📰 Gazete Oku<small>Güne bir bakışta</small></header>';
 const gzAd = (txt, cls = '') => `<div class="gz-ad ad ${cls}" data-ad="1" data-act="adclick"><span class="iz-adtag">Reklam</span><button type="button" class="gz-adx" data-act="adclose" title="Reklamı kapat">✕</button><b>${txt}</b></div>`;
 
+// Reklama tıklayınca uyarı: bildirim kutusu (toast) sayfadaki düğmeleri örttüğü için sayfanın üstünde, akışın içinde gösterilir
+function gzAdNote(el) {
+  const gz = el.closest('.gz');
+  if (!gz) return;
+  gz.querySelector(':scope > .gz-adnote')?.remove();
+  gz.insertAdjacentHTML('afterbegin', '<div class="ed-note gz-adnote" style="position:sticky;top:0;z-index:5">⚠ <b>Reklama tıkladınız.</b> Gerçekte sizi satıcının sayfasına götürürdü. Habere dönmek için geri (←) düğmesine basın.</div>');
+}
 const GZ = {
   name: 'Gazete Oku', secure: true,
   render(path) {
@@ -148,7 +155,7 @@ const GZ = {
       <a class="gz-item gz-clickbait" data-act="gallery" data-n="1"><span>😱</span><b>ŞOK! Ünlülerin son hâlini görünce inanamayacaksınız (Galeri)</b></a>${gzAd('Dolar yükselmeden önce mutlaka okuyun', 'big')}</div>`, 'gz-wrap');
   },
   act(a, v, ctx, el) {
-    if (a === 'adclick') { ctx.emit('gz-ad-click'); ctx.desk.toast('Reklama tıkladınız', 'Gerçekte sizi satıcının sayfasına götürürdü. Habere dönmek için geri (←) düğmesine basın.', '⚠', 5000); return; }
+    if (a === 'adclick') { ctx.emit('gz-ad-click'); gzAdNote(el); return; }
     if (a === 'adclose') { el.closest('.gz-ad')?.remove(); ctx.emit('gz-ad-close'); return; }
     if (a === 'gallery') { ctx.emit('gz-gallery', { n: +el.dataset.n }); ctx.go(`/galeri/${el.dataset.n}`); }
   },

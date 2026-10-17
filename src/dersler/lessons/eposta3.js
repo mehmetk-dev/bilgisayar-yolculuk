@@ -22,7 +22,7 @@ export const epostaIletme = {
     {
       title: 'Yanıtla mı, ilet mi?',
       html: `<p>Gelen bir postayla iki şey yapabilirsiniz:</p>
-        <ul class="big-list"><li><b>↩ Yanıtla</b>: size yazana cevap verirsiniz.</li><li><b>↪ İlet</b>: postayı <b>başka birine</b> gönderirsiniz (örneğin faturayı oğlunuza).</li></ul>
+        <ul class="big-list"><li><b>↩ Yanıtla</b>: size yazana cevap verirsiniz.</li><li><b>↪ İlet</b>: postayı <b>başka birine</b> gönderirsiniz (örneğin faturayı kardeşiniz Ahmet'e).</li></ul>
         <p>Ayrıca bir postayı <b>çok kişiye</b> atarken <b>Bilgi (Cc)</b> ve <b>Gizli (Bcc)</b> kutuları vardır.</p>`,
       setup: (c) => {
         desktopReady(c); c.d.closeAll();
@@ -30,18 +30,18 @@ export const epostaIletme = {
       },
     },
     {
-      title: 'Faturayı oğlunuza iletin',
+      title: 'Faturayı kardeşinize iletin',
       html: `<p>Gelen Kutusu'ndaki <b>Ekim ayı faturanız</b> postasını açın. Üstteki <b>↪ İlet</b>'e tıklayın.</p>
-        <p><b>Kime</b>: <b>ahmet@ornek.com</b> (oğlunuz). Faturayı ödemesi için bir cümle yazıp <b>Gönder</b>.</p>`,
+        <p><b>Kime</b>: <b>ahmet@ornek.com</b> (kardeşiniz Ahmet). Faturayı ödemesi için bir cümle yazıp <b>Gönder</b>.</p>`,
       hint: 'Konu kendiliğinden “İlt: …” olur ve fatura eki yanında gelir; siz yalnızca Kime ve kısa bir not ekleyin.',
       setup: mailOpen,
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
         if (!ev.forwardOf) { c.warn('Posta gitti ama iletme değil. Faturayı açıp ↪ İlet\'e tıklamalıydınız.'); return false; }
-        if (!ev.toList.includes('ahmet@ornek.com')) { c.warn(`Posta <b>${ev.to}</b> adresine gitti. Oğlunuzun adresi: ahmet@ornek.com`); return false; }
+        if (!ev.toList.includes('ahmet@ornek.com')) { c.warn(`Posta <b>${ev.to}</b> adresine gitti. Kardeşiniz Ahmet'in adresi: ahmet@ornek.com`); return false; }
         return true;
       },
-      done: 'Fatura ekiyle birlikte oğlunuza gitti. İletilen postanın en üstüne kendi notunuzu yazmayı unutmayın.',
+      done: 'Fatura ekiyle birlikte kardeşinize gitti. İletilen postanın en üstüne kendi notunuzu yazmayı unutmayın.',
     },
     {
       title: 'Bilgi (Cc) ekleyin',
@@ -59,11 +59,11 @@ export const epostaIletme = {
     {
       title: 'Gizli (Bcc) ile duyuru',
       html: `<p>Mahalle komşularına bayram mesajı atacaksınız. Komşuların e-posta adresleri birbirine <b>görünmemeli</b>; yoksa adresler tanımadıkları kişilerin eline de geçer.</p>
-        <p>Yeni posta açın. <b>Kime</b>'ye kendi adresinizi (<b>ogrenci@ornek.com</b>), <b>Gizli (Bcc)</b>'ye iki komşuyu <b>noktalı virgülle</b> yazın: <b>fatma@ornek.com; ayse@ornek.com</b>. Konu: <b>Bayramınız mübarek olsun</b>. Gönderin.</p>`,
-      hint: 'Bcc alanı Cc\'nin altında. İki adres arasına ; (noktalı virgül) koyun: Shift + virgül tuşu.',
+        <p>Yeni posta açın. <b>Kime</b> kutusunun yanındaki <b>Bilgi / Gizli</b> bağlantısına tıklayın; Bilgi (Cc) ve <b>Gizli (Bcc)</b> kutuları açılır. <b>Kime</b>'ye kendi adresinizi (<b>ogrenci@ornek.com</b>), <b>Gizli (Bcc)</b>'ye iki komşuyu <b>noktalı virgülle</b> yazın: <b>fatma@ornek.com; ayse@ornek.com</b>. Konu: <b>Bayramınız mübarek olsun</b>. Gönderin.</p>`,
+      hint: 'Bilgi / Gizli bağlantısı Kime kutusunun sağında. Bcc alanı Cc\'nin altında. İki adres arasına ; (noktalı virgül) koyun: Shift + virgül tuşu.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
-        if (ev.bcc.length < 2) { c.warn('Gizli (Bcc) alanına iki adres yazmalıydınız: fatma@ornek.com; ayse@ornek.com'); return false; }
+        if (ev.bcc.length < 2) { c.warn('Gizli (Bcc) alanına iki adres yazmalıydınız: fatma@ornek.com; ayse@ornek.com. Alan görünmüyorsa Kime kutusunun yanındaki “Bilgi / Gizli”ye tıklayın.'); return false; }
         return true;
       },
       done: 'Komşular birbirinin adresini görmez. Kalabalık gruplara posta atarken (duyuru, bayram mesajı) Bcc en güvenlisidir; yoksa adresleriniz ortalığa saçılır.',
@@ -125,7 +125,7 @@ export const ekTasi = {
     },
     {
       title: 'Tahlil sonucunu indirin',
-      html: '<p>E-postayı açın, <b>Tahlil sonucunuz</b> postasındaki eki <b>⬇ İndir</b> ile indirin.</p>',
+      html: '<p>E-postayı açın, <b>Tahlil sonucunuz</b> postasındaki eki <b>⬇ İndir</b> ile indirin.</p><p class="mut"><b>Güvenlik notu:</b> Ek açmadan önce göndericiye bakın. Tanımadığınız birinden gelen eki açmayın. <b>.exe</b> ve <b>.zip</b> uzantılı eklere özellikle dikkat edin. Bu posta beklediğiniz bir tahlil sonucu ve gönderen adresi <b>.gov.tr</b>; bu yüzden güvenle açabilirsiniz.</p>',
       setup: mailOpen,
       on: (ev) => ev.type === 'mail-download' && /tahlil/i.test(ev.name),
       done: 'Dosya <b>İndirilenler</b> klasörüne düştü.',
@@ -133,7 +133,7 @@ export const ekTasi = {
     {
       title: 'Sağlık klasörü açın',
       html: `<p>Dosya Gezgini'ni açın (⊞ Başlat → 📁). <b>Belgeler</b> klasörüne girin ve içinde <b>Sağlık</b> adında yeni bir klasör oluşturun: boşluğa <b>sağ tık → Yeni → Klasör</b>, adını yazıp Enter.</p>`,
-      setup: (c) => c.d.ensure('explorer', { folder: 'docs' }),
+      setup: (c) => { const w = c.d.ensure('explorer', { folder: 'docs' }); w.api?.go?.('docs'); },
       hint: 'Belgeler klasöründeki boş alana sağ tıklayın.',
       on: (ev, c) => ev.type === 'fs' && !!c.d.fs.children('docs').find((n) => n.type === 'folder' && /^sağlık$/i.test(n.name)),
       check: (c) => !!c.d.fs.children('docs').find((n) => n.type === 'folder' && /^sağlık$/i.test(n.name)),
@@ -143,7 +143,7 @@ export const ekTasi = {
       title: 'Tahlil sonucunu taşıyın',
       html: `<p><b>İndirilenler</b> klasöründeki <b>tahlil sonucu.pdf</b>'yi <b>Belgeler → Sağlık</b> klasörüne <b>taşıyın</b>: dosyaya tıklayın, ${K('Ctrl', 'X')} (kes); Sağlık klasörüne girip ${K('Ctrl', 'V')} (yapıştır). Ya da fareyle klasörün üzerine sürükleyin.</p>`,
       hint: 'İndirilenler klasörü Dosya Gezgini\'nin solunda. Dosyayı Sağlık klasörüne sürükleyip bırakmak da olur.',
-      setup: (c) => c.d.ensure('explorer', { folder: 'downloads' }),
+      setup: (c) => { const w = c.d.ensure('explorer', { folder: 'downloads' }); w.api?.go?.('downloads'); },
       on: (ev, c) => {
         if (!['fs', 'file-paste', 'drop'].includes(ev.type)) return false;
         const inSaglik = c.d.fs.children('docs').some((n) => n.type === 'folder' && /^sağlık$/i.test(n.name) && c.d.fs.children(n.id).some((f) => /tahlil/i.test(f.name)));
@@ -197,13 +197,17 @@ export const sifreSifirla = {
     },
     {
       title: 'Yanlış şifre',
-      html: `<p>E-posta kutusuna <b>${HESAP_MAIL}</b>, şifre olarak aklınıza gelen <b>bir şifre</b> (örneğin <b>Kedi2020</b>) yazıp <b>Giriş yap</b>'a tıklayın. Hata çıkacak.</p>`,
-      on: (ev) => ev.type === 'hesap-login' && !ev.ok,
+      html: `<p>E-posta kutusuna <b>${HESAP_MAIL}</b>, şifre olarak <b>yanlış bir şifre</b> (örneğin <b>Kedi2020</b>) yazıp <b>Giriş yap</b>'a tıklayın. Unuttuğunuzu varsaydığımız için hata çıkacak.</p>`,
+      hint: 'Doğru şifreyi bilmiyormuş gibi yapın: Kedi2020 ya da rastgele bir şifre yazın.',
+      on: (ev, c) => {
+        if (ev.type === 'hesap-login' && ev.ok) { c.note('Şifre doğru çıktı ve içeri girdiniz. Burada unuttuğunuzu varsayıyoruz: sayfadaki ⏻ Çıkış\'a basın, sonra yanlış bir şifre (örneğin Kedi2020) yazın.'); return false; }
+        return ev.type === 'hesap-login' && !ev.ok;
+      },
       done: 'Bu hata normal. Şifreyi tahmin etmeye devam edip hesabı kilitletmek yerine sıfırlayın.',
     },
     {
       title: 'Şifremi unuttum',
-      html: '<p>Şifre kutusunun altındaki <b>Şifremi unuttum</b> bağlantısına tıklayın.</p>',
+      html: '<p><b>Giriş yap</b> düğmesinin altındaki <b>Şifremi unuttum</b> bağlantısına tıklayın.</p>',
       on: (ev) => ev.type === 'web-nav' && ev.path === '/sifirla',
       done: 'Sıfırlama sayfası açıldı.',
     },
@@ -226,7 +230,7 @@ export const sifreSifirla = {
       html: `<p>İki kutuya da <b>aynı yeni şifreyi</b> yazın. Şifre en az <b>8 karakter</b> olsun, hem <b>büyük hem küçük harf</b> ve bir <b>rakam</b> içersin. Eski şifre (Kedi2019) olmasın.</p>
         <p class="mut">Örnek bir fikir: sevdiğiniz bir cümle ➜ “Ben3Yilda1Kez!”. (Bu örneği değil, kendi şifrenizi yazın.)</p>`,
       on: (ev, c) => { if (ev.type === 'hesap-newpass' && !ev.ok) c.note('Şifre kabul edilmedi; kırmızı uyarıyı okuyup düzeltin.'); return ev.type === 'hesap-newpass' && ev.ok; },
-      done: 'Yeni şifreniz kaydedildi. Şimdi onu bir yere yazalım ki yine unutmayın.',
+      done: 'Yeni şifreniz kaydedildi. Yine unutmamak için onu evde güvenli bir yerde duran bir deftere yazın (sayfadaki not da bunu hatırlatıyor).',
     },
     {
       title: 'Yeni şifreyle girin',

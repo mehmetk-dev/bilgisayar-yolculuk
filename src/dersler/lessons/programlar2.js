@@ -28,7 +28,7 @@ export const zip = {
       html: '<p>Komut çubuğunun sağındaki <b>☰ Ayrıntılar</b>\'a tıklayın.</p>',
       mouse: '🖱 ☰ Ayrıntılar',
       on: (ev) => ev.type === 'ex-view' && ev.mode === 'details',
-      done: 'Artık her dosyanın <b>değiştirme tarihi</b>, <b>türü</b> ve <b>boyutu</b> görünüyor. KB < MB < GB: 1000 KB bir MB, 1000 MB bir GB eder.',
+      done: 'Artık her dosyanın <b>değiştirme tarihi</b>, <b>türü</b> ve <b>boyutu</b> görünüyor. KB < MB < GB: yaklaşık 1000 KB bir MB, yaklaşık 1000 MB bir GB eder (tam olarak 1024).',
     },
     {
       title: 'En büyük dosya',
@@ -47,8 +47,8 @@ export const zip = {
     }),
     {
       title: 'Zip dosyasını açın',
-      html: '<p>Soldan <b>İndirilenler</b>\'e dönün. <b>🗜 tatil fotoğrafları.zip</b> dosyasına çift tıklayın ve <b>Ayıkla</b>\'ya basın.</p>',
-      mouse: '🖱 İndirilenler → tatil fotoğrafları.zip (çift tık) → Ayıkla',
+      html: '<p>Soldan <b>İndirilenler</b>\'e dönün. <b>🗜 tatil fotoğrafları.zip</b> dosyasına çift tıklayın ve <b>Tümünü ayıkla</b>\'ya basın.</p>',
+      mouse: '🖱 İndirilenler → tatil fotoğrafları.zip (çift tık) → Tümünü ayıkla',
       hint: 'Dosyayı seçip üstteki sarı <b>🗜 Tümünü ayıkla</b> düğmesine de basabilirsiniz.',
       on: (ev) => ev.type === 'zip-extract',
       done: 'Zip\'in içindeki dört fotoğraf <b>“tatil fotoğrafları”</b> adlı normal bir klasöre çıktı. Zip; e-postayla ya da internetten gelen, birçok dosyayı tek pakette taşıyan bir “koli”dir.',
@@ -84,7 +84,7 @@ export const eposta2 = {
   steps: [
     {
       title: 'İstenmeyen klasörü',
-      html: '<p><b>✉ E-posta</b>\'yı açın ve soldaki <b>⚠ İstenmeyen</b> klasörüne tıklayın. Buraya şüpheli postalar kendiliğinden düşer.</p>',
+      html: '<p><b>✉ E-posta</b>\'yı açın ve soldaki <b>⚠ İstenmeyen</b> klasörüne tıklayın. Buraya şüpheli postalar kendiliğinden düşer.</p><p class="mut">Aynı klasörün adı Gmail\'de <b>Spam</b>, Outlook\'ta <b>Önemsiz E-posta</b>; bu alıştırmadaki programda <b>İstenmeyen</b>. Üçü de aynı işe yarar.</p>',
       mouse: '🖱 E-posta → İstenmeyen',
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
       on: (ev) => ev.type === 'mail-folder' && ev.folder === 'spam',
@@ -113,14 +113,14 @@ export const eposta2 = {
     },
     {
       title: 'Kayıtlı kişiye yazın',
-      html: '<p><b>✏ Yeni posta</b>\'ya basın. <b>Kime</b> kutusuna yalnızca <b>fat</b> yazın ve çıkan öneriden Fatma Teyze\'nin adresini seçin. Konuya <b>Merhaba</b>, metne kısa bir selam yazıp gönderin. İmzanın en altta olduğuna bakın.</p>',
+      html: '<p><b>✏ Yeni posta</b>\'ya basın. <b>Kime</b> kutusuna yalnızca <b>fat</b> yazın ve çıkan öneriden Fatma Teyze\'nin adresini seçin. Konuya <b>Merhaba</b> yazın. Metne kısa bir selam yazın: mesajınızı imzanın üstüne yazın, imza altta kalsın. Sonra gönderin.</p>',
       mouse: '🖱 Yeni posta → Kime: fat… → öneri',
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
         if (ev.to !== 'fatma@ornek.com') { c.note('Posta gitti ama Fatma Teyze\'ye değil. Kime kutusuna “fat” yazıp öneriden seçin.'); return false; }
         return true;
       },
-      done: 'Gönderildi. Postanın sonuna imzanız eklendi; adresi de tek harf yanlış yazmadan öneriden seçtiniz.',
+      done: 'Gönderildi. Postanın sonuna imzanız eklendi. Kayıtlı kişilerde adı yazmaya başlayınca çıkan öneriden seçmek, adresi yanlış yazmaktan korur; elle yazarsanız her harfine dikkat edin.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>E-postada düzen:</p>' },
   ],
@@ -130,7 +130,7 @@ export const bulutPaylas = {
   id: 'bulut-paylas', icon: '☁', title: 'Büyük dosyayı buluttan paylaşmak', minutes: 35, stage: 'desktop',
   desc: 'Büyük videoyu Bulut Depo\'ya yükleyip bağlantıyla paylaşmak.',
   summary: [
-    ['E-posta eki sınırı', 'Genellikle 25 MB'],
+    ['E-posta eki sınırı', 'Genellikle 20–25 MB'],
     ['☁ Bulut Depo → Yükle', 'Dosyayı internetteki deponuza koyar'],
     ['🔗 Paylaş', 'Dosyaya bağlantı (link) oluşturur'],
     ['👥 Yalnızca eklediğim kişiler', 'Bağlantıyı başkası bulsa da açamaz'],
@@ -140,11 +140,11 @@ export const bulutPaylas = {
   steps: [
     {
       title: 'Video e-postaya sığmıyor',
-      html: '<p>Torununuzun düğün videosunu Elif\'e göndermek istiyorsunuz. <b>✉ E-posta</b>\'yı açın, <b>✏ Yeni posta</b>, <b>Kime</b>: elif@ornek.com. <b>📎 Dosya ekle</b> ile <b>Resimler</b>\'deki <b>torunumun düğünü.mp4</b>\'ü ekleyip <b>Gönder</b>\'e basın.</p>',
+      html: '<p>Torununuz Elif\'in düğün videosunu ona göndermek istiyorsunuz. <b>✉ E-posta</b>\'yı açın, <b>✏ Yeni posta</b>, <b>Kime</b>: elif@ornek.com. <b>📎 Dosya ekle</b> ile <b>Resimler</b>\'deki <b>torunumun düğünü.mp4</b>\'ü ekleyip <b>Gönder</b>\'e basın.</p>',
       mouse: '🖱 E-posta → Yeni posta → Dosya ekle → Gönder',
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
       on: (ev) => ev.type === 'mail-too-big',
-      done: 'Gönderilmedi: video <b>850 MB</b>, e-postayla en fazla <b>25 MB</b> gönderilebilir. Çözüm: dosyayı <b>buluta</b> koyup bağlantısını göndermek. Posta penceresini açık bırakın.',
+      done: 'Gönderilmedi: video <b>850 MB</b>, e-postayla genellikle en fazla <b>20–25 MB</b> gönderilebilir. Çözüm: dosyayı <b>buluta</b> koyup bağlantısını göndermek. Posta penceresini açık bırakın.',
     },
     {
       title: 'Buluta yükleyin',
@@ -156,7 +156,7 @@ export const bulutPaylas = {
     },
     {
       title: 'Yalnızca Elif görsün',
-      html: `<ol class="steps"><li>Videonun yanındaki <b>🔗 Paylaş</b>\\'a basın.</li><li><b>👥 Yalnızca eklediğim kişiler</b> seçili kalsın.</li><li>Kişi ekle kutusuna <b>elif@ornek.com</b> yazıp <b>Ekle</b>\\'ye basın.</li><li><b>Bağlantı oluştur</b>.</li></ol>`,
+      html: `<ol class="steps"><li>Videonun yanındaki <b>🔗 Paylaş</b>'a basın.</li><li><b>👥 Yalnızca eklediğim kişiler</b> seçili kalsın.</li><li>Kişi ekle kutusuna <b>elif@ornek.com</b> yazıp <b>Ekle</b>'ye basın.</li><li><b>Bağlantı oluştur</b>.</li></ol>`,
       mouse: '🖱 Paylaş → Kişi ekle → Bağlantı oluştur',
       on: (ev, c) => {
         if (ev.type === 'cloud-share' && ev.who === 'anyone') { c.note('“Bağlantıya sahip herkes” seçtiniz. Aile videosu için “Yalnızca eklediğim kişiler” daha güvenli; değiştirip Kaydet\'e basın.'); return false; }
@@ -237,7 +237,7 @@ export const ozgecmis = {
     },
     {
       title: 'Unutulan yerleri bulun',
-      html: `<p>Uzun belgede doldurmayı unuttuğunuz yer kalmasın: ${K('Ctrl', 'F')} ile <b>Bul</b>\\'u açın ve <b>[</b> yazıp <b>Sonrakini bul</b>\\'a basın. Bulunan her yeri doldurun ya da o satırı silin. Hiç <b>[</b> kalmayınca adım tamamlanır.</p>`,
+      html: `<p>Uzun belgede doldurmayı unuttuğunuz yer kalmasın: ${K('Ctrl', 'F')} ile <b>Bul</b>'u açın ve <b>[</b> yazıp <b>Sonrakini bul</b>'a basın. Bulunan her yeri doldurun ya da o satırı silin. Hiç <b>[</b> kalmayınca adım tamamlanır.</p>`,
       combo: ['Ctrl', 'KeyF'],
       hint: '[ işareti klavyede AltGr + 8 ile yazılır. İstemediğiniz bir satırı (ör. hiç iş deneyiminiz yoksa) seçip Delete ile silebilirsiniz.',
       on: (ev, c) => docEv.includes(ev.type) && !winfo(c).text.includes('['),
@@ -247,12 +247,12 @@ export const ozgecmis = {
       title: 'Üst bilgi',
       html: '<p><b>Ekle</b> sekmesinde <b>▔ Üst bilgi</b>\'ye basın ve sayfanın üstünde açılan alana <b>Özgeçmiş</b> yazın.</p>',
       mouse: '🖱 Ekle → Üst bilgi',
-      on: (ev) => ev.type === 'doc-hf' && ev.which === 'header' && /özgeçmiş/i.test(ev.text),
+      on: (ev) => ev.type === 'doc-hf' && ev.which === 'header' && norm(ev.text).includes('özgeçmiş'),
       done: 'Üst bilgi her sayfanın en üstünde tekrarlanır. Resmî yazılarda kurum adı, raporlarda belgenin adı yazılır.',
     },
     {
       title: 'Sayfa numarası',
-      html: '<p><b>Ekle</b> sekmesinde <b>#️ Sayfa numarası</b>\'na basın. Sayfanın en altına bakın.</p>',
+      html: '<p><b>Ekle</b> sekmesinde <b>#️ Sayfa numarası</b>\'na basın. Sonra belgeyi en alta kaydırıp sayfanın en altına bakın.</p>',
       mouse: '🖱 Ekle → Sayfa numarası',
       on: (ev) => ev.type === 'doc-pagenum' && ev.on,
       done: 'Alt bilgide “Sayfa 1 / 1” çıktı. Belge yazdırılıp sayfalar karışırsa sırası bulunur.',
@@ -326,7 +326,7 @@ export const butce = {
     }),
     {
       title: 'Kaydedin',
-      html: `<p>${K('Ctrl', 'S')} ile <b>Belgeler</b>\\'e <b>bütçe</b> adıyla kaydedin. Gelecek ay aynı dosyayı açıp rakamları değiştirmeniz yeter.</p>`,
+      html: `<p>${K('Ctrl', 'S')} ile <b>Belgeler</b>'e <b>bütçe</b> adıyla kaydedin. Gelecek ay aynı dosyayı açıp rakamları değiştirmeniz yeter.</p>`,
       combo: ['Ctrl', 'KeyS'],
       on: (ev) => ev.type === 'xl-save',
       done: 'Kaydedildi. Her ay için ayrı bir kopya isterseniz “Farklı kaydet” ile “bütçe ekim”, “bütçe kasım” diye kaydedebilirsiniz.',

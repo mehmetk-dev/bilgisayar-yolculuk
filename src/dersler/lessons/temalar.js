@@ -73,7 +73,7 @@ export const temalar = {
     },
     {
       title: 'Taklit uygulamayı inceleyin',
-      html: '<p>Mağaza\'da <b>Kelime İşlemci PRO 2026 Ücretsiz!!</b> uygulamasına tıklayıp sayfasını açın. <b>Yayımcısına</b>, <b>puanına</b>, <b>değerlendirmelere</b> ve <b>istediği izinlere</b> bakın. Yüklemeyin!</p>',
+      html: '<p>Mağaza\'da <b>Kelime İşlemci PRO 2026 Ücretsiz!!</b> uygulamasına tıklayıp sayfasını açın. <b>Yayımcısına</b>, <b>puanına</b>, <b>değerlendirmelere</b> ve <b>istediği izinlere</b> bakın. İzinler ve yorumlar için sayfayı aşağı kaydırın. Yüklemeyin!</p>',
       mouse: '🖱 Kelime İşlemci PRO 2026 Ücretsiz!!',
       setup: (c) => c.d.ensure('store', { page: 'apps' }),
       on: (ev, c) => {
@@ -103,7 +103,8 @@ export const temalar = {
       html: '<p>Son olarak: Ayarlar → Kişiselleştirme\'nin en altında <b>Görev çubuğu simgelerini sola hizala</b>\'yı açın. Eski Windows\'a alışkın olanlar böyle sever.</p>',
       mouse: '🖱 Ayarlar → Kişiselleştirme → Görev çubuğu',
       setup: (c) => c.d.ensure('settings', { page: 'personal' }),
-      on: (ev) => ev.type === 'toggle' && ev.key === 'taskbarLeft',
+      check: (c) => !!S(c).taskbarLeft,
+      on: (ev) => ev.type === 'toggle' && ev.key === 'taskbarLeft' && ev.on,
       done: 'Başlat düğmesi sola geçti. Beğenmezseniz aynı anahtarı kapatmanız yeter.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Bilgisayarınızı kişiselleştirdiniz:</p>' },

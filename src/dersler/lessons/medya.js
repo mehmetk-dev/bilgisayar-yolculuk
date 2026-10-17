@@ -15,7 +15,7 @@ export const medya = {
     ['⚙ Hız', 'Yavaşlatınca konuşma rahat anlaşılır (0,75x, 0,5x)'],
     ['📻 Radyo', 'Kanalın yanındaki ▶; başka kanal seçince öncekisi susar'],
     ['Gazete', 'Habere tıklayın; “Sponsorlu” kutular reklamdır; “Galeri” sayfaları sizi oyalar'],
-    ['Reklam engelleyici', 'Tarayıcı uzantısı; reklamlar hiç gelmez'],
+    ['Reklam engelleyici', 'Tarayıcı uzantısı; reklamların çoğunu engeller'],
   ],
   steps: [
     {
@@ -82,7 +82,7 @@ export const medya = {
     {
       title: 'Konuşmayı yavaşlatın',
       html: `<p>Konuşma çok hızlı geliyorsa <b>⚙ 1x</b> düğmesine tıklayarak hızı değiştirin. Düğmeye her tıklayışta hız değişir. <b>0,75x</b> ya da <b>0,5x</b> yapın.</p>`,
-      hint: 'Düğme “⚙ 1x” yazıyor. Tıkladıkça 0.75x, 0.5x, 1.25x… diye değişir.',
+      hint: 'Düğme “⚙ 1x” yazıyor. Tıkladıkça 0,75x, 0,5x, 1,25x… diye değişir.',
       on: (ev) => ev.type === 'iz-speed' && ev.speed < 1,
       done: 'Video yavaşladı; tarifi not almak ya da yabancı dil dinlemek için çok iyi.',
     },
@@ -113,7 +113,7 @@ export const medya = {
     rehberSoru({
       title: 'Haberi okuyun',
       html: '<p>Haberi okuyup bulun: Bilgisayar kursu <b>hangi günler</b> yapılacak? (Ortadaki büyük yeşil “HABERİN DEVAMI İÇİN TIKLAYIN” düğmesine <b>tıklamayın</b>, o reklamdır.)</p>',
-      opts: ['Pazartesi ve çarşamba', 'Salı ve perşembe', 'Cumartesi ve pazar'], ok: 1,
+      opts: ['Salı ve perşembe', 'Pazartesi ve çarşamba', 'Cumartesi ve pazar'], ok: 0,
       wrong: 'Haberin ilk paragrafına tekrar bakın.',
       why: 'Doğru: her salı ve perşembe saat 10.00. Haberin gerçek metni zaten sayfada; “devamı için tıklayın” diyen düğme reklam tuzağıdır.',
     }),
@@ -127,7 +127,7 @@ export const medya = {
     rehberSoru({
       title: 'Ne yaparsınız?',
       html: '<p>Bir haber sayfasında “<b>Ünlünün son hâli (Galeri 1/20)</b>” bağlantısı var. Tıklarsanız ne olur?</p>',
-      opts: ['Haberin tamamını bir sayfada görürüm', 'Her seferinde bir sayfa açılır, 20 sayfa boyunca reklam görürüm', 'Bilgisayar bozulur'], ok: 1,
+      opts: ['Haberin tamamını tek sayfada görürüm', 'Hiçbir şey olmaz, sayfa açılmaz', 'Sayfa sayfa gezdirilirim, her sayfada reklam görürüm'], ok: 2,
       wrong: 'Bu pek öyle değil. Böyle bağlantıların amacı ne olabilir?',
       why: 'Doğru. Galeri bağlantıları sizi sayfa sayfa gezdirip her adımda reklam gösterir. Asıl haber çoğu zaman ilk sayfada zaten vardır.',
     }),

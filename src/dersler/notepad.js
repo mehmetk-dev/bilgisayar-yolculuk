@@ -57,6 +57,15 @@ export class Notepad {
     this.prev = '';
     this.bindTextarea();
     this.bindMenu();
+    // Çoğu dizüstünde Insert tuşu yok: durum çubuğundaki yazıya tıklayınca da kip değişsin
+    const ins = root.querySelector('.np-ins');
+    ins.title = 'Üzerine yazmayı kapatmak için tıklayın (ya da Insert tuşuna basın)';
+    ins.addEventListener('mousedown', (e) => e.preventDefault()); // yazı alanının odağı gitmesin
+    ins.addEventListener('click', () => {
+      this.setOverwrite(!this.overwrite);
+      this.emit('insert-toggle', { on: this.overwrite });
+      this.focus();
+    });
     if (opts.global) {
       // Odak yazı alanında değilken de Ctrl+S/O/P sayfanın kendi işlevlerini açmasın
       document.addEventListener('keydown', (e) => {

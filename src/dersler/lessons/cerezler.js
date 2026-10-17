@@ -31,7 +31,8 @@ export const cerezler = {
     },
     {
       title: 'Çerez penceresi',
-      html: '<p><b>İnternet</b>\'i açıp <b>www.lezzetli-tarifler.com.tr</b> adresine gidin. Sayfanın üstünde bir <b>çerez penceresi</b> çıkacak. <b>Yalnızca gerekli olanlar</b>\'a tıklayın.</p>',
+      html: `<p><b>İnternet</b>\'i açıp <b>www.lezzetli-tarifler.com.tr</b> adresine gidin. Sayfanın üstünde bir <b>çerez penceresi</b> çıkacak. <b>Yalnızca gerekli olanlar</b>\'a tıklayın.</p>
+        <p class="mut">Dikkat: siteler “Tümünü kabul et” düğmesini bilerek büyük ve renkli yapar. Düğmenin rengine değil, yazısına bakarak seçin.</p>`,
       setup: br,
       hint: 'Pencerede iki düğme var: Tümünü kabul et ve Yalnızca gerekli olanlar. İkincisini seçin.',
       on: (ev, c) => {
@@ -40,14 +41,14 @@ export const cerezler = {
         return true;
       },
       done: (c) => c.s.choice === 'need'
-        ? 'Güvenli seçim: yalnızca sitenin çalışması için gerekli çerezler kaldı. “Tümünü kabul et” deseydiniz izleme çerezlerine de izin vermiş olurdunuz.'
-        : '“Tümünü kabul et” dediniz: bu, reklam amaçlı izleme çerezlerine de izin verir. Sorun değil; birazdan listede görüp silmeyi öğreneceğiz. Sonraki sefer “Yalnızca gerekli olanlar”ı deneyin.',
+        ? 'Güvenli seçim: yalnızca sitenin çalışması için gerekli çerezler kaldı. “Tümünü kabul et” deseydiniz izleme çerezlerine de izin vermiş olurdunuz. Bu seçim yalnızca bu site için geçerlidir; başka sitelerde ayrıca karşınıza çıkar ya da hiç sorulmaz.'
+        : '“Tümünü kabul et” dediniz: bu, reklam amaçlı izleme çerezlerine de izin verir. Sorun değil; birazdan listede görüp silmeyi öğreneceğiz. Sonraki sefer “Yalnızca gerekli olanlar”ı deneyin. Bu seçim yalnızca bu site için geçerlidir.',
     },
     {
       title: 'Sepete ürün koyun',
       html: '<p>Şimdi <b>www.firsat-pazari.com.tr</b> adresine gidin. <b>Döküm tava</b>\'nın altındaki <b>Sepete ekle</b>\'ye tıklayın.</p>',
       on: (ev) => ev.type === 'shop-add' && ev.id === 'tava',
-      done: 'Ürün sepette. Sayfayı kapatıp yarın dönseniz bile sepetiniz durur: çünkü site tarayıcınıza bir <b>çerez</b> bıraktı.',
+      done: 'Ürün sepette. Sayfayı kapatıp yarın dönseniz bile sepetiniz durur: çünkü site tarayıcınıza bir <b>çerez</b> bıraktı. Bu sitede çerez penceresi çıkmadı; yani önceki sitede yaptığınız seçim buraya geçmez, her site kendi kuralıyla çalışır.',
     },
     {
       title: 'Başka bir sitede',
@@ -58,7 +59,7 @@ export const cerezler = {
     rehberSoru({
       title: 'Reklam neden çıktı?',
       html: '<p>Haber sitesi, alışveriş sitesinde ne baktığınızı <b>nereden</b> biliyor?</p>',
-      opts: ['Bilgisayarınızı dinliyor', 'Alışveriş sitesine gömülü bir reklam şirketi, tarayıcınıza “üçüncü taraf çerez” bıraktı; aynı şirketin reklamı haber sitesinde de olduğu için sizi tanıdı', 'Tesadüf'], ok: 1,
+      opts: ['Bilgisayarınızı dinliyor', 'Tesadüf', 'Alışveriş sitesine gömülü bir reklam şirketi, tarayıcınıza “üçüncü taraf çerez” bıraktı ve haber sitesinde sizi tanıdı'], ok: 2,
       wrong: 'Bu tesadüf ya da dinleme değil. Notu kim bıraktı, kim okudu?',
       why: 'Doğru. Bir reklam şirketi birçok sitede reklam gösterir. Birinde bıraktığı çerezi diğerinde okuyunca “bu kişi tava bakıyordu” diye bilir. Buna <b>üçüncü taraf çerez</b> denir. Siz o şirketle hiç ilişki kurmadınız ama sizi tanır.',
     }),
@@ -72,7 +73,7 @@ export const cerezler = {
     rehberSoru({
       title: 'Hangisi izliyor?',
       html: '<p>Listeye bakın: <b>“Üçüncü taraf”</b> etiketli çerezi hangi adres bırakmış?</p>',
-      opts: ['firsat-pazari.com.tr', 'reklam-takip.net', 'lezzetli-tarifler.com.tr'], ok: 1,
+      opts: ['reklam-takip.net', 'firsat-pazari.com.tr', 'lezzetli-tarifler.com.tr'], ok: 0,
       wrong: 'Üçüncü taraf, gezdiğiniz sitenin kendisi değil, başka bir şirkettir. Turuncu etiketi arayın.',
       why: 'Doğru: reklam-takip.net. Siz bu adrese hiç girmediniz, ama gezdiğiniz sitelere gömülü reklamlarla çerezini bıraktı. Birinci taraf çerezler (firsat-pazari, lezzetli-tarifler) kendi sitenizin hatırlama notlarıdır.',
     }),
@@ -105,7 +106,7 @@ export const cerezler = {
     rehberSoru({
       title: 'Çerez virüs müdür?',
       html: '<p>Bir komşunuz: “Çerezler virüs, hepsini kapatmak lazım” diyor. Ne dersiniz?</p>',
-      opts: ['Doğru, çerez virüstür', 'Hayır: çerez yalnızca bir yazı dosyasıdır, program değildir; ama bazıları sizi izlemek için kullanılır', 'Çerezler bilgisayarı yavaşlatır'], ok: 1,
+      opts: ['Doğru, çerez virüstür', 'Çerezler bilgisayarı çok yavaşlatır', 'Hayır: çerez yalnızca bir yazı dosyasıdır; ama bazıları sizi izlemek için kullanılır'], ok: 2,
       wrong: 'Çerez çalışan bir program değildir. Ama amacı yararlı ya da gözetleyici olabilir.',
       why: 'Çerez bir program değil, küçük bir yazı notudur; bilgisayara zarar vermez. Sorun, bazılarının sizi izlemek için kullanılmasıdır. Bu yüzden “yalnızca gerekli olanlar” seçmek ve üçüncü tarafları engellemek iyi alışkanlıktır.',
     }),

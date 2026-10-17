@@ -16,9 +16,9 @@ const CHIPS = [
 const RULES = [
   { intent: 'ozet', re: /özet|ozet/i, ans: 'Özet:\n• Belediye 60 yaş üstü vatandaşlar için ücretsiz bilgisayar kursu açıyor.\n• Kurs her salı ve perşembe 10.00\'da, Kültür Merkezi\'nde.\n• Başvuru 20 Ekim\'e kadar (Kültür Merkezi ya da internet sitesi).\n• Kontenjan 24 kişi; kurs sonunda belge verilecek.\n\nÖnemli tarihleri ve saatleri asıl yazıdan da bir kez kontrol edin.', v: 'ok' },
   { intent: 'tarif', re: /tarif|yemek|çorba|corba|börek|nasıl yapılır/i, ans: 'Mercimek çorbası (4 kişilik)\nMalzemeler: 1 su bardağı kırmızı mercimek, 1 soğan, 1 havuç, 1 yemek kaşığı un, 6 su bardağı su, tuz.\nYapılışı:\n1) Soğan ve havucu doğrayıp mercimekle birlikte tencereye koyun.\n2) Suyunu ekleyip 25 dakika pişirin.\n3) Blenderdan geçirin, tuzunu ayarlayın.\nAfiyet olsun! Alerjiniz ya da diyetiniz varsa doktorunuza danışın.', v: 'ok' },
-  { intent: 'gezi', re: /gezi|plan|tatil|nereye|rota/i, ans: '3 günlük Kapadokya önerisi:\n• 1. gün: Göreme Açık Hava Müzesi, Uçhisar Kalesi, akşam yemeği.\n• 2. gün: Paşabağ vadisi, Avanos çömlek atölyeleri.\n• 3. gün: Derinkuyu yeraltı şehri, dönüş.\nNot: müze saatleri ve fiyatlar değişir; gitmeden önce resmî sitelerden ya da telefonla kontrol edin.', v: 'ok' },
+  { intent: 'gezi', re: /gezi|(?<!\p{L})plan(?:[ıiI]|[ıiI]n[ıiI])?(?!\p{L})|tatil|nereye|rota/iu, ans: '3 günlük Kapadokya önerisi:\n• 1. gün: Göreme Açık Hava Müzesi, Uçhisar Kalesi, akşam yemeği.\n• 2. gün: Paşabağ vadisi, Avanos çömlek atölyeleri.\n• 3. gün: Derinkuyu yeraltı şehri, dönüş.\nNot: müze saatleri ve fiyatlar değişir; gitmeden önce resmî sitelerden ya da telefonla kontrol edin.', v: 'ok' },
   { intent: 'dilekce', re: /dilekçe|dilekce/i, ans: 'MAHALLE MUHTARLIĞINA\n\nKonu: Sokak aydınlatmasının onarılması\n\nMahallemizin Lale Sokağı\'ndaki aydınlatma lambaları bir aydır yanmamaktadır. Akşamları sokak karanlık olduğundan yürümek tehlikeli olmaktadır. Lambaların onarılması için gereğinin yapılmasını saygılarımla arz ederim.\n\nTarih: [tarih]\nAdı Soyadı: [adınız]\nİmza\n\n(Kimlik numaranızı ve telefonunuzu taslağı kendi bilgisayarınızda ekleyin; buraya yazmayın.)', v: 'ok' },
-  { intent: 'yerel', re: /muhtar|komşu|apartman|mahalle|kim/i, ans: 'Mahallenizin muhtarı Hüseyin Aydın\'dır. Hafta içi 09.00–12.00 arasında muhtarlıkta bulunur; telefon numarası 0312 000 11 22\'dir.', v: 'bad' },
+  { intent: 'yerel', re: /muhtar|komşu|apartman|mahalle|(?<!\p{L})kim(?!\p{L})/iu, ans: 'Mahallenizin muhtarı Hüseyin Aydın\'dır. Hafta içi 09.00–12.00 arasında muhtarlıkta bulunur; telefon numarası 0312 000 11 22\'dir.', v: 'bad' },
   { intent: 'selam', re: /merhaba|selam|günaydın|iyi günler/i, ans: 'Merhaba! Size nasıl yardımcı olabilirim? Bir yazıyı özetleyebilir, tarif, gezi planı ya da dilekçe taslağı hazırlayabilirim.', v: null },
 ];
 // Yazılmaması gereken bilgiler
@@ -48,7 +48,7 @@ const YZ = {
     if (a === 'verify') {
       const m = st.msgs[+el.dataset.i];
       m.checked = true;
-      ctx.emit('ai-verify', { ok: m.v === 'ok' });
+      ctx.emit('ai-verify', { ok: m.v === 'ok', intent: m.intent });
       ctx.refresh();
       return;
     }
@@ -56,7 +56,8 @@ const YZ = {
       const text = (v.msg || '').trim();
       if (!text) return;
       const bad = SENSITIVE.find(([, re]) => re.test(text));
-      if (bad) { st.warn = bad[2]; st.draft = text; ctx.emit('ai-sensitive', { kind: bad[0] }); ctx.refresh(); return; }
+      // özel bilgi kutuda kalmasın: sonraki soru onun arkasına eklenmesin
+      if (bad) { st.warn = bad[2]; st.draft = ''; ctx.emit('ai-sensitive', { kind: bad[0] }); ctx.refresh(); return; }
       st.warn = ''; st.draft = '';
       st.msgs.push({ f: 'me', t: text });
       const rule = RULES.find((r) => r.re.test(text));
@@ -65,7 +66,7 @@ const YZ = {
       ctx.refresh();
       setTimeout(() => {
         st.typing = false;
-        st.msgs.push({ f: 'ai', t: rule ? rule.ans : 'Bunu tam anlayamadım. İsterseniz bir yazıyı özetletebilir, tarif, gezi planı ya da dilekçe taslağı isteyebilirsiniz. Sorunuzu başka sözlerle yazar mısınız?', v: rule?.v || null });
+        st.msgs.push({ f: 'ai', intent: rule?.intent, t: rule ? rule.ans : 'Bunu tam anlayamadım. İsterseniz bir yazıyı özetletebilir, tarif, gezi planı ya da dilekçe taslağı isteyebilirsiniz. Sorunuzu başka sözlerle yazar mısınız?', v: rule?.v || null });
         ctx.refresh();
       }, 900);
     }

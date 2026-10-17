@@ -18,17 +18,17 @@ export const pdfCalis = {
   id: 'pdf-calis', icon: '📑', title: 'PDF dosyalarıyla çalışmak (fatura, tahlil, belge)', minutes: 30, stage: 'desktop',
   desc: 'PDF belgesini açmak, sayfalar arasında gezinmek, içinde kelime aramak.',
   summary: [
-    ['PDF', 'Fatura, tahlil, resmî yazı… her bilgisayarda aynı görünür; yalnızca okunur'],
+    ['PDF', 'Fatura, tahlil, resmî yazı… her bilgisayarda aynı görünür; yazısı Word\'deki gibi değiştirilemez'],
     ['◀ ▶', 'Önceki / sonraki sayfa'],
     ['🔍 Ara (Ctrl + F)', 'Belgede kelime arar; bulunanları boyar'],
     ['⟳ Döndür', 'Yan taranmış sayfayı düzeltir'],
     ['⬇ İndir', 'Belgenin bir kopyasını bilgisayarınıza kaydeder'],
-    ['🖨 Yazdır', 'Kâğıda çıkarır; indirme ile karıştırmayın'],
+    ['🖨 Yazdır', 'Yazıcıya gönderir (ya da PDF olarak kaydeder); indirme ile karıştırmayın'],
   ],
   steps: [
     {
       title: 'PDF nedir?',
-      html: `<p><b>PDF</b>, belgeyi her bilgisayarda ve telefonda <b>aynı görünüşle</b> gösteren dosya türüdür. Fatura, tahlil sonucu, banka dekontu, resmî yazılar çoğunlukla PDF gelir. Yazısı <b>değiştirilemez</b>, yalnızca okunur, aranır ve yazdırılır.</p>
+      html: `<p><b>PDF</b>, belgeyi her bilgisayarda ve telefonda <b>aynı görünüşle</b> gösteren dosya türüdür. Fatura, tahlil sonucu, banka dekontu, resmî yazılar çoğunlukla PDF gelir. Belgenin kendi yazısı Word\'deki gibi <b>değiştirilemez</b>; okunur, aranır ve yazdırılır. Ama üstüne yazı, vurgu ya da imza eklenebilir (bunu “PDF formu indirmek, doldurmak ve yazdırmak” dersinde göreceğiz).</p>
         <p>Masaüstünde bir <b>elektrik faturası</b> ile <b>eski bir tarama</b> hazır.</p>`,
       setup: (c) => {
         desktopReady(c); c.d.closeAll();
@@ -53,28 +53,28 @@ export const pdfCalis = {
       title: 'Belgede arayın',
       html: `<p>Uzun belgede aradığınızı bulmak için <b>🔍 Ara</b>'ya ya da ${K('Ctrl', 'F')}'ye basın. Açılan kutuya <b>ödeme</b> yazın. Bulunan her yer sarıya boyanır; <b>▼</b> ile sonraki sonuca geçersiniz.</p>`,
       combo: ['Ctrl', 'KeyF'],
-      hint: 'Ara düğmesi PDF Okuyucu\'nun üst çubuğunda.',
+      hint: 'Ara düğmesi PDF Okuyucu\'nun üst çubuğunda. Ctrl + F çalışmazsa önce belgeye bir kez tıklayın.',
       on: (ev) => ev.type === 'pdf-find' && norm(ev.q).includes('ödeme') && ev.found >= 2,
       done: (c) => 'Birkaç yerde “ödeme” geçiyor. Aramak, 30 sayfalık belgede bile saniyeler içinde yerini bulmanızı sağlar.',
     },
     rehberSoru({
       title: 'Son ödeme tarihi?',
       html: '<p>Faturayı okuyun (ikinci sayfa). <b>Son ödeme tarihi</b> nedir?</p>',
-      opts: ['5 Ekim 2026', '25 Kasım 2026', '31 Aralık 2026'], ok: 1,
+      opts: ['5 Ekim 2026', '31 Aralık 2026', '25 Kasım 2026'], ok: 2,
       wrong: 'İkinci sayfada koyu yazılmış satıra bakın.',
       why: 'Doğru: 25 Kasım 2026. Bu tarihten sonra ödeme gecikme zammıyla yapılır.',
     }),
     {
       title: 'Yan çıkmış belge',
-      html: '<p><b>Tapu örneği (tarama).pdf</b> yan taranmış. Masaüstünden açın, <b>⟳ Döndür</b>\'e tıklayıp yazıyı dik duruma getirin (gerekirse birkaç kez).</p>',
-      hint: 'Dosyaya çift tıklayın; her tıklayışta 90 derece döner. Yazı yatay okunana kadar tıklayın.',
+      html: '<p><b>Tapu örneği (tarama).pdf</b> yan taranmış. Masaüstünden çift tıklayarak açın, <b>⟳ Döndür</b>\'e tıklayıp yazıyı dik duruma getirin (gerekirse birkaç kez).</p>',
+      hint: 'Belge açılınca üstteki ⟳ Döndür düğmesine basın; her basışta 90 derece döner. Yazı dik okunana kadar basın.',
       on: (ev) => ev.type === 'pdf-rotate' && ev.fixed,
       done: 'Sayfa düzeldi. Döndürme belgeyi bozmaz; yalnızca nasıl göründüğünü değiştirir.',
     },
     {
       title: 'Faturayı kopyalayın: ⬇',
       html: `<p>Faturaya (<b>elektrik faturası.pdf</b>) geri dönüp <b>⬇ İndir</b>'e tıklayın. Belgenin bir <b>kopyası</b> <b>İndirilenler</b> klasörüne kaydolur. (Web sitesinden gelen PDF'yi de böyle saklarsınız.)</p>`,
-      hint: 'Fatura penceresi arkada kaldıysa görev çubuğundan seçin ya da masaüstünden yeniden açın.',
+      hint: 'Açık duran fatura penceresine dönün (görev çubuğundan seçebilirsiniz); yeni pencere açmanıza gerek yok.',
       on: (ev) => ev.type === 'pdf-download',
       done: 'Bir kopya İndirilenler klasöründe. Asıl belge yerinde kaldı.',
     },
@@ -82,13 +82,14 @@ export const pdfCalis = {
       title: 'Yazdırın: 🖨',
       html: `<p>Faturayı kâğıda çıkarmak için <b>🖨 Yazdır</b>'a (ya da ${K('Ctrl', 'P')}) tıklayıp yazıcıyı seçin ve yazdırın.</p>`,
       combo: ['Ctrl', 'KeyP'],
+      hint: 'Ctrl + P çalışmazsa önce belgeye bir kez tıklayın, ya da 🖨 Yazdır düğmesini kullanın.',
       on: (ev) => ev.type === 'pdf-print',
-      done: 'Fatura yazıcıya gitti. İndirme dosyayı bilgisayara kaydeder, yazdırma kâğıda döker.',
+      done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse kâğıt çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir. İndirme ise belgenin kopyasını bilgisayara kaydeder.',
     },
     rehberSoru({
       title: 'Hangi simge hangisi?',
       html: '<p>PDF faturayı <b>bilgisayarınıza saklamak</b> istiyorsunuz (kâğıda değil). Hangi simgeye basarsınız?</p>',
-      opts: ['🖨 Yazdır', '⬇ İndir', '⟳ Döndür'], ok: 1,
+      opts: ['⬇ İndir', '🖨 Yazdır', '⟳ Döndür'], ok: 0,
       wrong: 'Yazdır kâğıda çıkarır. Bilgisayara kaydeden simge hangisi?',
       why: 'Doğru: ⬇ İndir bilgisayara kaydeder. 🖨 kâğıda çıkarır, ⟳ yalnızca sayfayı çevirir.',
     }),
@@ -97,7 +98,7 @@ export const pdfCalis = {
 };
 
 export const whatsappWeb = {
-  id: 'mesajlas-web', icon: '💬', title: 'WhatsApp Web: telefondaki mesajlar bilgisayarda', minutes: 35, stage: 'desktop',
+  id: 'mesajlas-web', icon: '💬', title: 'WhatsApp Web (alıştırma: Mesajlaş Web)', minutes: 35, stage: 'desktop',
   desc: 'WhatsApp\'ı bilgisayarda açmak, belge göndermek, sahte bağlantıları tanımak.',
   summary: [
     ['Karekod (QR)', 'Telefonunuzdan okutulur; telefonunuzla bilgisayar eşleşir'],
@@ -140,7 +141,7 @@ export const whatsappWeb = {
       html: '<p>Sağ üstte ya da sağ altta çıkan <b>İndirilenler</b> panelinde <b>Dosyayı aç</b>\'a tıklayın. Fotoğraf açılınca <b>🖨 Yazdır</b>\'a tıklayıp yazdırın.</p>',
       hint: 'İndirme paneli kapandıysa tarayıcıdaki ⬇ simgesine tıklayın ya da Dosya Gezgini → İndirilenler.',
       on: (ev) => ev.type === 'photo-print',
-      done: 'Fotoğraf yazıcıya gitti. Torununuzun fotoğrafı kâğıtta.',
+      done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse kâğıt çıkar; “PDF olarak kaydet” seçiliyse fotoğraf dosya olarak kaydedilir.',
     },
     {
       title: 'Oğlunuzun sohbeti',
@@ -176,13 +177,13 @@ export const whatsappWeb = {
     rehberSoru({
       title: 'Ne yaparsınız?',
       html: '<p>Tanımadığınız numaradan: “Hesabınız 24 saat içinde kapatılacak, hemen şu bağlantıyla doğrulayın.” Ne yaparsınız?</p>',
-      opts: ['Bağlantıya tıklar, bilgilerimi girerim', 'Tıklamam; numarayı engeller ve yakınlarıma haber veririm', 'Arkadaşlarıma iletirim'], ok: 1,
+      opts: ['Bağlantıya tıklar, bilgilerimi girerim', 'Arkadaşlarıma iletirim', 'Tıklamam; numarayı engeller ve yakınlarıma haber veririm'], ok: 2,
       wrong: 'Bu bir tuzak. Hesap doğrulaması için hiçbir uygulama size bağlantı göndermez.',
       why: 'Doğru. Mesajlaşma uygulamaları hesabınızı bağlantıyla doğrulamanızı istemez; tıklarsanız sahte sayfaya düşersiniz.',
     }),
     {
       title: 'Oturumu kapatın',
-      html: '<p>İşiniz bitti. Pencerenin sol üstündeki <b>⋮</b> işaretine tıklayıp <b>⏻ Oturumu kapat</b>\'ı seçin. Ortak bilgisayarda bunu yapmazsanız sonra gelen herkes mesajlarınızı okuyabilir.</p>',
+      html: '<p>İşiniz bitti. Sohbet listesinin en üstündeki, sağ taraftaki <b>⋮</b> işaretine tıklayıp <b>⏻ Oturumu kapat</b>\'ı seçin. Ortak bilgisayarda bunu yapmazsanız sonra gelen herkes mesajlarınızı okuyabilir.</p>',
       hint: 'Üç noktalı ⋮ simgesi, sohbet listesinin en üstünde sağdadır.',
       setup: (c) => br(c),
       on: (ev) => ev.type === 'wa-logout',
@@ -191,7 +192,7 @@ export const whatsappWeb = {
     rehberSoru({
       title: 'Kütüphane bilgisayarı',
       html: '<p>Kütüphanedeki ortak bilgisayarda mesajlarınıza baktınız. Çıkarken ne yapmalısınız?</p>',
-      opts: ['Sekmeyi açık bırakırım', 'Oturumu kapatır, sekmeyi kapatırım', 'Hiçbir şey; bilgisayar kapanınca silinir'], ok: 1,
+      opts: ['Oturumu kapatır, sekmeyi kapatırım', 'Sekmeyi açık bırakırım', 'Hiçbir şey; bilgisayar kapanınca silinir'], ok: 0,
       wrong: 'Açık kalan oturumu sonra gelen kişi görür.',
       why: 'Doğru. Ortak bilgisayarda iş bitince “Oturumu kapat”; yalnızca sekmeyi kapatmak yetmez.',
     }),

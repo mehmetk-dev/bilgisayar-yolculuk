@@ -97,14 +97,14 @@ export const bluetooth = {
     rehberSoru({
       title: 'Kulaklık çalışmıyor',
       html: '<p>Komşunuzun Bluetooth kulaklığı eşleşmiş ama ses gelmiyor. İlk neye bakarsınız?</p>',
-      opts: ['Bilgisayarı sıfırlarım', 'Bluetooth açık mı, kulaklık açık ve şarjlı mı, bağlı görünüyor mu', 'Kulaklığı atarım'], ok: 1,
+      opts: ['Bilgisayarı sıfırlarım', 'Bluetooth açık mı, kulaklık açık ve şarjlı mı, bağlı görünüyor mu', 'Kulaklığı hemen yenisiyle değiştiririm'], ok: 1,
       wrong: 'Bu kadar büyük bir adıma gerek yok. Önce basit kontroller yapılır.',
-      why: 'Evet. Çoğu zaman kulaklığın şarjı bitmiş, Bluetooth ya da uçak modu kapalı ya da kulaklık başka bir cihaza (telefona) bağlıdır.',
+      why: 'Evet. Çoğu zaman kulaklığın şarjı bitmiş, Bluetooth kapalı, uçak modu açık ya da kulaklık başka bir cihaza (telefona) bağlıdır.',
     }),
     rehberSoru({
       title: 'Bilmediğiniz cihaz',
       html: '<p>Aramada “TV-4F2A” adında bir cihaz çıkıyor ve siz televizyon almadınız. Ne yaparsınız?</p>',
-      opts: ['Bağlanırım, belki işe yarar', 'Bağlanmam', 'Hepsini kırarım'], ok: 1,
+      opts: ['Bağlanırım, belki işe yarar', 'Bağlanmam', 'Bağlanır, şifre sorarsa 0000 yazarım'], ok: 1,
       wrong: 'Tanımadığınız bir cihaza bağlanmamak gerekir.',
       why: 'Doğru. Bilmediğiniz cihazlara bağlanmayın; komşunun televizyonu olabilir ama yabancı biri de olabilir.',
     }),
@@ -141,8 +141,8 @@ export const hesapPin = {
       title: 'Şifreyi güçlendirin',
       html: `<p><b>Şifre</b> satırında <b>Değiştir</b>'e tıklayın. <b>Şu anki şifre</b>: 1234. <b>Yeni şifre</b> için şunlara dikkat edin:</p>
         <ul class="big-list"><li>En az <b>8 karakter</b></li><li><b>Büyük ve küçük harf</b>, bir <b>rakam</b></li><li>Adınız, doğum yılınız olmasın</li></ul>
-        <p>Yeni şifreyi iki kez yazıp <b>Kaydet</b>'e tıklayın. Şifrenizi <b>unutmayacağınız ama başkalarının tahmin edemeyeceği</b> bir cümleden yapabilirsiniz (örn. “Kedim2Yasinda!”).</p>`,
-      hint: 'Şu anki şifre 1234. Yeni şifre için örnek: Cay5Demli! (kendi şifrenizi yazın, bunu değil).',
+        <p>Yeni şifreyi iki kez yazıp <b>Kaydet</b>'e tıklayın. Şifrenizi <b>unutmayacağınız ama başkalarının tahmin edemeyeceği</b> bir cümleden yapabilirsiniz (kendi şifrenizi uydurun; örnek: “Kedim2Yasinda!”).</p>`,
+      hint: 'Şu anki şifre 1234. Yeni şifreyi kendiniz uydurun; örnek: Kedim2Yasinda! (kendi şifrenizi yazın, bunu değil).',
       setup: ayarlarda('accounts'),
       on: (ev, c) => {
         if (ev.type !== 'pw-change') return false;
@@ -167,7 +167,8 @@ export const hesapPin = {
     {
       title: 'Ekranı kilitleyin',
       html: `<p>Çay almaya kalkacaksınız. Ekranı kilitleyin: <b>⊞ Başlat</b> açıp altta <b>hesap adınıza</b> tıklayın ve <b>🔒 Kilitle</b>'yi seçin. (Klavyede ${K('⊞', 'L')}; bazı bilgisayarlarda sayfa bunu algılamayabilir.)</p>
-        <p>Kilit ekranı açılınca ekrana tıklayın, <b>PIN</b>'inizi ya da şifrenizi yazın ve girin.</p>`,
+        <p>Kilit ekranı açılınca ekrana tıklayın, <b>PIN</b>'inizi ya da şifrenizi yazın ve girin.</p>
+        <p class="mut">Kilit ekranında alıştırma için bir şifre ipucu yazabilir; bu yalnız alıştırma içindir. Gerçekte şifrenizi kimse görmemeli, ekranda ya da bir kâğıtta bırakmayın.</p>`,
       hint: 'Başlat menüsünün altında sol köşede 👤 ile hesap adınız yazıyor. Ona tıklayın.',
       on: (ev, c) => {
         if (ev.type === 'screen-lock') c.s.locked = true;

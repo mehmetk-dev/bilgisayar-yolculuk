@@ -37,9 +37,9 @@ export const saatTarih = {
     },
     {
       title: 'Bir siteyi açın',
-      html: '<p>Takvimi kapatın. ⊞ Başlat → <b>🌐 İnternet</b> ile tarayıcıyı açıp adres çubuğuna <b>www.hava-durumu.com.tr</b> yazın.</p>',
-      setup: (c) => maxed(c, 'browser'),
-      on: (ev) => ev.type === 'web-clock-error',
+      html: '<p>Takvimi kapatın. ⊞ Başlat → <b>🌐 İnternet</b> ile tarayıcıyı açıp adres çubuğuna <b>www.hava-durumu.com.tr</b> yazın.</p><p class="mut">Tarayıcı açılırken ilk sayfada hata gösterirse şaşırmayın; adresi yazınca asıl sayfa gelir.</p>',
+      hint: 'Adres çubuğu pencerenin üstündedir. Adresi yazıp Enter\'a basın.',
+      on: (ev) => ev.type === 'web-clock-error' && ev.host === 'www.hava-durumu.com.tr',
       done: 'Site açılmadı! <b>“Bağlantınız gizli değil”</b> yazıyor. Güvenli (🔒) siteler, bilgisayarınızın saatiyle kendi sertifikalarının tarihini karşılaştırır; saat 2019 ise sertifika “henüz geçersiz” görünür. Bilgisayar ve site sağlam: sorun saatte.',
     },
     {
@@ -92,9 +92,9 @@ export const saatTarih = {
     },
     {
       title: '24 saatlik biçim',
-      html: '<p>Saat <b>14:05</b> mi, yoksa <b>02:05 ÖS</b> gibi mi görünsün? <b>24 saatlik biçim</b> düğmesini <b>Kapalı</b> yapıp sağ alttaki saate bakın; sonra yeniden <b>Açık</b> yapın.</p>',
+      html: '<p>Saat <b>14.05</b> mi, yoksa <b>2.05 ÖS</b> (öğleden sonra) gibi mi görünsün? <b>24 saatlik biçim</b> düğmesini <b>Kapalı</b> yapıp sağ alttaki saate bakın; sonra yeniden <b>Açık</b> yapın.</p>',
       on: (ev, c) => { if (ev.type === 'toggle' && ev.key === 'time24' && !ev.on) c.s.off = true; return ev.type === 'toggle' && ev.key === 'time24' && ev.on && !!c.s.off; },
-      done: 'ÖÖ/ÖS (öğleden önce/sonra) 12 saatlik düzendir; Türkiye\'de çoğu kişi 24 saatlik biçimi tercih eder: 14.05 demek 2.05 öğleden sonra demektir.',
+      done: 'ÖÖ/ÖS (öğleden önce/sonra) 12 saatlik düzendir; Türkiye\'de çoğu kişi 24 saatlik biçimi tercih eder: 14.05, öğleden sonra 2.05 demektir.',
     },
     {
       title: 'Saate sağ tıklayın',

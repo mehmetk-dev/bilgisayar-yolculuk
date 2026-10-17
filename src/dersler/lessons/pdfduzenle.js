@@ -45,7 +45,7 @@ export const pdfDuzenle = {
       html: '<p>Sağdaki indirme panelinde <b>Dosyayı aç</b>\'a tıklayın (kaçırdıysanız tarayıcıdaki ⬇ simgesine ya da Dosya Gezgini → İndirilenler\'e bakın). <b>PDF Okuyucu</b> açılır.</p>',
       check: (c) => !!c.d.find('pdf'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'pdf',
-      done: 'Form PDF Okuyucu\'da açıldı. Üstte bu kez bir <b>✎ Düzenle</b> şeridi de var.',
+      done: 'Form PDF Okuyucu\'da açıldı. Üstteki <b>✎ Düzenle</b> şeridini kullanacağız.',
     },
     {
       title: 'Yazı ekleyin',
@@ -89,6 +89,7 @@ export const pdfDuzenle = {
       title: 'Yazdırma seçeneklerini açın',
       html: `<p>Formu yazdıracağız. <b>🖨 Yazdır</b>'a (ya da ${K('Ctrl')} + ${K('P')}) tıklayın. Bu sefer pencerede <b>Sayfalar</b>, <b>Renk</b> ve <b>İki yüze</b> seçenekleri var; en altta da <b>kaç yaprak kâğıt</b> harcanacağı yazıyor.</p>`,
       combo: ['Ctrl', 'KeyP'],
+      hint: 'Ctrl + P çalışmazsa önce belgeye bir kez tıklayın, ya da 🖨 Yazdır düğmesini kullanın.',
       on: (ev) => ev.type === 'pdf-print-open',
       done: 'Yazdırma penceresi açıldı. Seçenekleri değiştirdikçe alttaki yaprak sayısı da değişir.',
     },
@@ -105,26 +106,26 @@ export const pdfDuzenle = {
         if (ev.color) { c.note('Renkli yazdırdınız; form için siyah-beyaz yeter. Yine de yazdırıldı: bir daha yazdırıp Renk kutusunu Siyah-beyaz yapın.'); return false; }
         return true;
       },
-      done: 'Yalnızca 1. sayfa, 2 kopya ve siyah-beyaz: toplam 2 yaprak. Bütün belgeyi renkli yazdırsaydınız mürekkep ve kâğıt iki katını harcayacaktı.',
+      done: 'Yalnızca 1. sayfa, 2 kopya ve siyah-beyaz: toplam 2 yaprak. Bütün belgeyi renkli yazdırsaydınız mürekkep ve kâğıt iki katını harcayacaktı. Gerçek yazıcı seçiliyse kâğıt çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir.',
     },
     rehberSoru({
       title: 'Kâğıt hesabı',
       html: '<p>Bir belgenin <b>2 sayfasını</b> yazdıracaksınız, <b>2 kopya</b> ve <b>kâğıdın iki yüzüne</b>. Kaç yaprak kâğıt harcanır?</p>',
-      opts: ['1', '2', '4'], ok: 1,
+      opts: ['2', '1', '4'], ok: 0,
       wrong: 'Her kopya 2 sayfa; iki yüzlü yazdırınca 2 sayfa 1 yaprağa sığar.',
       why: 'Doğru: 2. Her kopya iki yüzlü 1 yaprak tutar; 2 kopya = 2 yaprak. İki yüzlü yazdırmak kâğıdı yarıya indirir.',
     }),
     rehberSoru({
       title: 'Yazıyı değiştirmek',
       html: '<p>Bir PDF faturadaki <b>adres yazısını</b> düzeltmek istiyorsunuz. PDF Okuyucu\'da asıl yazıya tıklayıp yazmayı denediniz, olmadı. Neden?</p>',
-      opts: ['Program bozuk', 'PDF belgesinin kendi yazısı değiştirilemez; yalnızca üstüne yazı eklenir. Düzeltme için asıl belge (Word) ya da belgeyi veren kurum gerekir', 'Yazıyı silmek yasak'], ok: 1,
+      opts: ['Program bozuk', 'Yazıyı silmek yasak', 'PDF’in kendi yazısı değiştirilemez; yalnızca üstüne yazı eklenir. Düzeltme için asıl belge (Word) gerekir'], ok: 2,
       wrong: 'PDF, belgenin “fotoğrafı” gibidir. Düzenleme araçları yalnızca üstüne ekleme yapar.',
       why: 'PDF\'in amacı belgenin aynen korunmasıdır. Üstüne yazı, vurgu, imza eklenir; asıl yazı ise ancak belgenin kaynağından (Word dosyası) ya da özel dönüştürme programlarıyla değiştirilir. Resmî bir belgeyi değiştirmek de doğru değildir.',
     }),
     rehberSoru({
       title: 'Taranmış belge',
       html: '<p>Bir kurumun taranarak gönderdiği PDF\'te Ctrl + F ile <b>kelime aradınız</b> ama hiçbir şey bulunamadı. Metin açıkça görünüyor. Neden?</p>',
-      opts: ['Bilgisayar kelimeyi bilmiyor', 'Taranmış PDF aslında bir resimdir; yazılar “yazı” değil, görüntü olarak durur', 'Kelime yanlış yazılmış'], ok: 1,
+      opts: ['Taranmış PDF aslında bir resimdir; yazılar “yazı” değil, görüntü olarak durur', 'Bilgisayar kelimeyi bilmiyor', 'Kelime yanlış yazılmış'], ok: 0,
       wrong: 'Bilgisayar, resimdeki harfleri okuyamaz. Ama tarama nasıl bir dosya üretir?',
       why: 'Taranmış belge bir fotoğraf gibidir; arama ve kopyalama çalışmaz. Gerçek yazı içeren (bilgisayarda üretilmiş) PDF’lerde arama çalışır.',
     }),

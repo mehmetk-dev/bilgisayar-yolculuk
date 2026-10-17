@@ -32,9 +32,9 @@ function odev(n, konu, icon, gorevler) {
 }
 
 export const odev1 = odev(1, 'açma-kapama ve fare', '🖱', [
-  ['Bilgisayarı açın', 'Bilgisayarı <b>kendiniz açın</b>: güç düğmesine bir kez basın, ekran gelene kadar bekleyin. Oturum açma ekranında <b>şifrenizi ya da PIN\'inizi</b> yazın ve masaüstünün gelmesini bekleyin.', 'Açılırken düğmeye tekrar tekrar basmayın; birkaç saniye bekleyin.', '⏻'],
+  ['Bilgisayarı açın', 'Bilgisayarı <b>kendiniz açın</b>: güç düğmesine bir kez basın, ekran gelene kadar bekleyin. Bilgisayar zaten açıksa önce kapatıp yeniden açın. Oturum açma ekranında <b>şifrenizi ya da PIN\'inizi</b> yazın ve masaüstünün gelmesini bekleyin.', 'Açılırken düğmeye tekrar tekrar basmayın; birkaç saniye bekleyin.', '⏻'],
   ['İmleci gezdirin', 'Fareyi tutup imleci (oku) masaüstünde gezdirin. Bir simgenin üzerine <b>tıklamadan</b> götürün, sonra <b>bir kez tıklayarak</b> seçin (renkleniyor).', 'Fare kayıyorsa fare altına kitap ya da fare altlığı koyun.', '🖱'],
-  ['Çift tıklayıp kapatın', 'Bir klasöre (örneğin <b>Belgeler</b>) <b>çift tıklayarak</b> açın. Sonra pencerenin <b>sağ üstündeki ✕</b> ile kapatın.', 'Çift tıklamak zor geliyorsa Ayarlar → Fare\'den çift tıklama hızını yavaşlatın.', '📂'],
+  ['Çift tıklayıp kapatın', '<b>Dosya Gezgini</b>\'nde (ya da masaüstünde) bir klasöre (örneğin <b>Belgeler</b>) <b>çift tıklayarak</b> açın. Sonra pencerenin <b>sağ üstündeki ✕</b> ile kapatın.', 'Çift tıklamak zor geliyorsa Ayarlar → Fare\'den çift tıklama hızını yavaşlatın.', '📂'],
   ['Sağ tık menüsü', 'Masaüstünün boş bir yerine <b>sağ tıklayın</b>. Açılan menüyü okuyun; <b>hiçbir şeye basmadan</b> klavyede <b>Esc</b> tuşuyla kapatın.', 'Menüyü kapatmak için boş bir yere sol tıklamak da olur.', '☰'],
   ['Pencereyi taşıyın', 'Bir programı (örneğin Hesap Makinesi) açın ve <b>başlık çubuğundan</b> tutup sürükleyerek masaüstünde başka yere taşıyın. Sonra kapatın.', 'Başlık çubuğu, pencerenin en üstündeki ad yazan çubuktur.', '🪟'],
   ['Doğru kapatın', 'İşiniz bitince bilgisayarı <b>güç düğmesiyle değil</b> menüden kapatın: <b>Başlat → ⏻ Güç → Kapat</b>. Ekran kararıp ışık sönene kadar bekleyin.', 'Dizüstüyse kapağı kapatmak bilgisayarı kapatmaz, uykuya alır.', '🔌'],
@@ -42,7 +42,7 @@ export const odev1 = odev(1, 'açma-kapama ve fare', '🖱', [
 
 export const odev2 = odev(2, 'klavye', '⌨', [
   ['Adınızı yazın', '<b>Not Defteri</b>\'ni açın ve adınızı soyadınızı yazın: ilk harfler büyük, kalanı küçük olsun (büyük harf için <b>Shift</b>).', 'Shift tuşunu basılı tutup harfe basın, sonra bırakın.', '✍'],
-  ['Türkçe harfler', 'Şu cümleyi yazın: <b>Şükrü\'nün çocuğu İğdır\'dan geldi.</b> ş, ğ, ü, ö, ç, ı, İ harflerinin hepsi çıkmalı.', 'Harfler çıkmıyorsa sağ alttaki dil yazısı TUR mu? Alt + Shift ile değiştirin.', 'Ş'],
+  ['Türkçe harfler', 'Şu cümleyi yazın: <b>Şükrü öğlen İğdır\'dan çıkıp aşağı indi.</b> ş, ğ, ü, ö, ç, ı, İ harflerinin hepsi çıkmalı.', 'Harfler çıkmıyorsa sağ alttaki dil yazısı TUR mu? Alt + Shift ile değiştirin.', 'Ş'],
   ['Caps Lock\'u deneyin', '<b>Caps Lock</b>\'a basıp <b>MERHABA</b> yazın, sonra tekrar basıp kapatın ve <b>merhaba</b> yazın. Tuşun (ya da ekrandaki) ışığına bakın.', 'Şifreniz “yanlış” çıkıyorsa Caps Lock açık olabilir.', '🔠'],
   ['Silme tuşları', 'Bir cümle yazın. <b>Backspace</b> imlecin <b>solundaki</b> harfi, <b>Delete</b> ise <b>sağındakini</b> siler: ikisini de deneyin. <b>Enter</b> ile alt satıra geçin.', 'Ok tuşlarıyla imleci yazının içinde gezdirin.', '⌫'],
   ['@ işareti', 'Kendi e-posta adresinizi Not Defteri\'ne yazın. <b>@</b> işareti için <b>AltGr + Q</b> (ya da Ctrl + Alt + Q) tuşlarına basın.', 'Telefon numaralarınızı ve adresinizi bu şekilde ayrı satırlara yazıp kaydedebilirsiniz.', '@'],
@@ -70,10 +70,10 @@ export const odev4 = odev(4, 'donanım ve yazılım', '🧰', [
 export const odev5 = odev(5, 'masaüstü, Başlat menüsü ve pencereler', '🪟', [
   ['Başlat ve arama', '<b>Başlat</b> düğmesine tıklayın, arama kutusuna <b>hesap</b> yazın ve <b>Hesap Makinesi</b>\'ni açıp bir toplama yapın.', 'Başlat menüsünü kapatmak için Esc ya da boş bir yere tıklayın.', '🔍'],
   ['Pencere boyutu', 'Hesap Makinesi\'nde (ya da başka bir pencerede) sağ üstteki <b>—</b> (küçült), <b>☐</b> (büyüt) ve <b>✕</b> (kapat) düğmelerini sırayla deneyin; küçülen pencereyi görev çubuğundan geri getirin.', 'Küçültülen pencere kapanmaz, görev çubuğunda bekler.', '➖'],
-  ['Yan yana yerleştirin', 'İki pencere açın. <b>⊞ Windows + ←</b> ile birini sola, <b>⊞ + →</b> ile ötekini sağa yapıştırın.', 'Dizüstüyseniz pencereyi ekranın kenarına sürükleyin.', '↔'],
+  ['Yan yana yerleştirin', 'İki pencere açın. <b>⊞ Windows + ←</b> ile birini sola, <b>⊞ + →</b> ile ötekini sağa yapıştırın.', 'Kısayol çalışmazsa pencereyi başlık çubuğundan tutup ekranın sol ya da sağ kenarına sürükleyin; yarım ekran olur.', '↔'],
   ['Klasör oluşturun', 'Masaüstünün boş yerine <b>sağ tık → Yeni → Klasör</b> deyin ve adını <b>Ödevlerim</b> yapıp Enter\'a basın.', 'Adı değiştirmek için klasörü seçip F2 tuşuna basın.', '📁'],
   ['Arka planı değiştirin', '<b>Başlat → Ayarlar → Kişiselleştirme → Arka plan</b> bölümünden bir resim seçin. Sonra tekrar eskisine döndürün.', 'Ortak bilgisayarda değiştirdiğiniz ayarı eski hâline getirin.', '🖼'],
-  ['Alarm kurun', '<b>Başlat</b>\'ta <b>Saat</b> (ya da Alarmlar) yazıp açın; 5 dakika sonrasına <b>“Çay”</b> adında bir alarm kurun.', 'Alarm için bilgisayarın açık ve sesinin açık olması gerekir.', '⏰'],
+  ['Alarm kurun', '<b>Başlat</b>\'ta <b>Saat</b> (Windows 10\'da <b>Alarmlar ve Saat</b>) yazıp açın; 5 dakika sonrasına <b>“Çay”</b> adında bir alarm kurun.', 'Alarm için bilgisayarın açık ve sesinin açık olması gerekir.', '⏰'],
 ]);
 
 export const odev6 = odev(6, 'dosyalar ve klasörler', '📁', [
@@ -98,9 +98,9 @@ export const odev8 = odev(8, 'internet, güvenlik ve bakım', '🌐', [
   ['Arama yapın', 'Tarayıcıyı açın ve <b>bugünün hava durumu</b> diye aratın. İlk sonuç <b>reklam</b> mı (“Reklam” yazıyor mu)? Hangi siteye girdiniz? Adresi okuyun.', 'Adres çubuğundaki adrese bakın: .com.tr, .gov.tr…', '🔎'],
   ['Kilidi kontrol edin', 'Adres çubuğunun solundaki <b>🔒 kilide</b> tıklayın. “Bağlantı güvenli” yazıyor mu? Sitenin asıl adını bulun.', 'Kilit, sitenin dürüst olduğunu göstermez; yalnızca bağlantının şifreli olduğunu.', '🔒'],
   ['Sık kullanılanlara ekleyin', 'Sık girdiğiniz bir siteyi açıp <b>Ctrl + D</b> ile sık kullanılanlara ekleyin; sonra tarayıcının üst çubuğundan bulun.', 'Ad olarak anlaşılır bir şey yazın.', '⭐'],
-  ['Resim indirin', 'Güvendiğiniz bir siteden bir fotoğraf indirin (sağ tık → Resmi farklı kaydet). Dosya Gezgini\'nde <b>İndirilenler</b> klasöründe bulun.', 'İndirdiğiniz dosyayı hemen kendi klasörünüze taşıyın.', '⬇'],
+  ['Resim indirin', 'Güvendiğiniz bir siteden bir fotoğraf indirin (sağ tık → Resmi farklı kaydet). Kaydet penceresinde klasör olarak <b>İndirilenler</b>\'i seçin. Sonra Dosya Gezgini\'nde <b>İndirilenler</b> klasöründe bulun.', 'İndirdiğiniz dosyayı hemen kendi klasörünüze taşıyın.', '⬇'],
   ['Virüs taraması', '<b>Başlat → Windows Güvenliği → Virüs ve tehdit koruması → Hızlı tarama</b> deyin ve bitmesini bekleyin. Sonucu kâğıda yazın.', 'Tarama sırasında bilgisayarı kullanabilirsiniz.', '🛡'],
-  ['Güncellemeye bakın', '<b>Ayarlar → Windows Update</b>\'e girin: “Güncelsiniz” mi yazıyor, yoksa bekleyen güncelleme var mı? Varsa işinizi kaydedip güncelleyin.', 'Güncelleme sırasında bilgisayarı kapatmayın.', '🔄'],
+  ['Güncellemeye bakın', '<b>Ayarlar → Windows Update</b>\'e (Windows 10\'da <b>Ayarlar → Güncelleştirme ve Güvenlik → Windows Update</b>) girin: “Güncelsiniz” mi yazıyor, yoksa bekleyen güncelleme var mı? Varsa işinizi kaydedip güncelleyin.', 'Güncelleme sırasında bilgisayarı kapatmayın.', '🔄'],
 ]);
 
 export const odev9 = odev(9, 'e-posta', '✉', [
@@ -109,7 +109,7 @@ export const odev9 = odev(9, 'e-posta', '✉', [
   ['Yanıtlayın', 'Gelen “Deneme” postasını açıp <b>Yanıtla</b>\'ya basın ve bir cümle yazıp gönderin.', 'Yanıtla yalnızca gönderene cevap verir.', '↩'],
   ['İletin', 'Aynı postayı güvendiğiniz bir yakınınıza <b>İlet</b> ile gönderin; <b>Cc</b> kutusuna kendinizi de yazın.', 'Cc: bilgisi olsun istediğiniz kişi.', '↪'],
   ['Spam klasörü', '<b>Spam</b> (ya da Önemsiz E-posta) klasörüne bakın. Tanıdığınız birinin postası yanlışlıkla orada mı? Varsa “Spam değil” deyin. Bağlantılara tıklamayın.', 'Şüpheli postadaki bağlantılara hiç tıklamayın.', '🚫'],
-  ['Çıkış yapın', 'Bir eki varsa indirip kendi klasörünüze taşıyın. İşiniz bitince hesabınızdan <b>Çıkış yap</b>\'a basın.', 'Ortak bilgisayarda çıkış yapmak şarttır.', '🚪'],
+  ['Çıkış yapın', 'Bir eki varsa indirip kendi klasörünüze taşıyın. İşiniz bitince hesabınızdan <b>Oturumu kapat</b> (Çıkış yap) düğmesine basın.', 'Ortak bilgisayarda çıkış yapmak şarttır.', '🚪'],
 ]);
 
 export const odev10 = odev(10, 'kelime işlemci (Word)', '📘', [
@@ -122,18 +122,18 @@ export const odev10 = odev(10, 'kelime işlemci (Word)', '📘', [
 ]);
 
 export const odev11 = odev(11, 'hesap tablosu (Excel)', '📗', [
-  ['Harcama tablosu', 'Excel ya da benzeri programda <b>A sütununa</b> bir haftanın harcama kalemlerini (market, ulaşım, ilaç…), <b>B sütununa</b> tutarlarını yazın.', 'Ondalık için virgül kullanın: 45,50.', '📋'],
-  ['Toplamı bulun', 'Tutarların altındaki hücreye <b>=TOPLA(B2:B8)</b> yazın ya da <b>∑ Otomatik Toplam</b> düğmesine basın.', 'Tutar değişince toplam kendiliğinden güncellenir.', '∑'],
+  ['Harcama tablosu', 'Excel ya da benzeri programda 1. satıra başlıkları yazın: <b>A1</b>\'e <b>Kalem</b>, <b>B1</b>\'e <b>Tutar</b>. Sonra 2. satırdan başlayarak <b>A sütununa</b> bir haftanın 7 harcama kalemini (market, ulaşım, ilaç…), <b>B sütununa</b> tutarlarını yazın.', 'Ondalık için virgül kullanın: 45,50.', '📋'],
+  ['Toplamı bulun', 'Tutarların altındaki hücreye (<b>B9</b>) <b>=TOPLA(B2:B8)</b> yazın ya da <b>∑ Otomatik Toplam</b> düğmesine basın.', 'Tutar değişince toplam kendiliğinden güncellenir.', '∑'],
   ['Para biçimi', 'Tutarları seçip <b>₺ (Para birimi)</b> biçimine çevirin.', 'Sütun dar kalırsa ##### çıkar; çizgisine çift tıklayın.', '₺'],
-  ['Sıralayın', 'Tutarlara göre <b>büyükten küçüğe</b> sıralayın: en pahalı kalem en üstte görünsün.', 'Seçerken başlık satırını da dahil etmeyin.', '↓'],
-  ['Başlığı donatın', 'En üste bir <b>başlık</b> (HAFTALIK HARCAMA) yazıp birkaç hücreyi <b>Birleştir ve Ortala</b> ile tek başlık yapın.', 'Başlığı kalın yapmak okunurluğu artırır.', '🏷'],
+  ['Sıralayın', 'Tutarlara göre <b>büyükten küçüğe</b> sıralayın: en pahalı kalem en üstte görünsün.', 'Seçerken 1. satırdaki başlıkları ve toplam satırını dahil etmeyin (yalnızca 2–8. satırlar).', '↓'],
+  ['Başlığı donatın', 'Tablonun üstüne yeni bir satır ekleyin (1. satır numarasına sağ tık → Ekle). <b>A1</b>\'e <b>HAFTALIK HARCAMA</b> yazıp A1 ile B1\'i seçin ve <b>Birleştir ve Ortala</b> ile tek başlık yapın.', 'Başlığı kalın yapmak okunurluğu artırır.', '🏷'],
   ['Kaydedin', '<b>Ctrl + S</b> ile <b>harcamalar</b> adıyla <b>Belgeler</b> klasörüne kaydedin. Kapatıp yeniden açarak toplamın durduğunu görün.', 'Haftaya yeni bir sayfa sekmesiyle devam edin.', '💾'],
 ]);
 
 export const odev12 = odev(12, 'sunu (PowerPoint)', '📙', [
-  ['Üç slayt', 'Sunu programında <b>“Ailem”</b> konulu üç slaytlık bir sunu hazırlayın: kapak, bir aile üyesinin tanıtımı, bir anı.', 'Slayt başına en çok 3–4 kısa madde yazın.', '📙'],
+  ['Üç slayt', 'Sunu programında <b>“Ailem”</b> konulu üç slaytlık bir sunu hazırlayın: kapak, bir aile üyesinin tanıtımı, bir anı.', 'Slayt başına en çok 3–5 kısa madde yazın.', '📙'],
   ['Fotoğraf ekleyin', 'Bilgisayarınızdaki bir fotoğrafı slayda ekleyin (Ekle → Resim) ve boyutunu ayarlayın.', 'Fotoğrafın köşelerinden tutup büyütebilirsiniz.', '🖼'],
-  ['Geçiş seçin', 'Slaytlara bir <b>geçiş</b> (Solma ya da İtme) verin. Fazla çeşit kullanmayın; hepsine aynısını verin.', 'Geçiş, slayttan slayda geçerkenki hareket.', '✨'],
+  ['Geçiş seçin', 'Slaytlara bir <b>geçiş</b> (Soldurma (Fade) ya da İtme) verin. Fazla çeşit kullanmayın; hepsine aynısını verin.', 'Geçiş, slayttan slayda geçerkenki hareket.', '✨'],
   ['Gösterin', '<b>F5</b> ile sunuyu baştan izleyin; ok tuşları ya da tıklamayla ilerleyin; <b>Esc</b> ile çıkın.', 'B tuşu ekranı karartır.', '▶'],
   ['PDF yapın', 'Sunuyu <b>PDF olarak kaydedin</b> ve açıp bakın: herkesin telefonunda açılır.', 'WhatsApp\'tan göndermek için PDF idealdir.', '📕'],
   ['Birine gösterin', 'Sununuzu bir yakınınıza gösterin ve bir <b>iyi</b>, bir de <b>geliştirilecek</b> yanını sorun. Kâğıda not alın.', 'Eleştiri öğrenmenin en hızlı yoludur.', '👥'],
@@ -144,15 +144,15 @@ export const odev13 = odev(13, 'günlük işler: bilgisayarda ve tarayıcıda', 
   ['PDF\'te arayın', 'Bir PDF (fatura, tahlil) açıp <b>Ctrl + F</b> ile içinde bir kelime arayın.', 'Taranmış PDF\'lerde arama çalışmaz.', '📑'],
   ['PDF\'i yazdırma önizlemesi', 'Aynı PDF için <b>Ctrl + P</b> ile yazdırma penceresini açın; <b>yalnızca 1. sayfayı</b> seçin (yazdırmadan iptal edebilirsiniz).', 'İki yüze yazdırmak kâğıdı yarıya indirir.', '🖨'],
   ['Çerezleri görün', 'Tarayıcının Ayarlar sayfasında <b>Çerezler ve site verileri</b>\'ni bulun; kaç site çerez bırakmış? <b>Üçüncü taraf çerezler</b> engelli mi?', 'Engellemek reklam takibini azaltır; siteler yine çalışır.', '🍪'],
-  ['Gizli pencere', '<b>Ctrl + Shift + N</b> ile gizli pencere açıp bir site gezin; pencereyi kapatınca geçmişte görünüp görünmediğine bakın.', 'Gizli pencere sizi internette görünmez yapmaz.', '🕶'],
+  ['Gizli pencere', '<b>Ctrl + Shift + N</b> (Firefox\'ta <b>Ctrl + Shift + P</b>) ile gizli pencere açıp bir site gezin; pencereyi kapatınca geçmişte görünüp görünmediğine bakın.', 'Gizli pencere sizi internette görünmez yapmaz.', '🕶'],
   ['WhatsApp Web ve çıkış', 'Dilerseniz <b>web.whatsapp.com</b>\'a girip telefonla karekodu okutun; bir mesaja bakın; <b>mutlaka “Oturumu kapat”</b> yapın.', 'Ortak bilgisayarda bunu atlamayın.', '💬'],
 ]);
 
 export const odev14 = odev(14, 'e-Devlet, randevu ve internette işlemler', '🏛', [
   ['e-Devlet\'e girin', '<b>turkiye.gov.tr</b> adresini <b>kendiniz yazarak</b> girin; <b>T.C. kimlik numaranızı ve e-Devlet şifrenizi yalnızca bu adreste</b> yazın. Giriş yapın.', 'Arama sonucunda çıkan reklamlardan girmeyin.', '🏛'],
-  ['Belge alın', '“Yerleşim yeri belgesi” (ikametgâh) hizmetini bulup belgeyi oluşturun ve <b>PDF olarak indirin</b>. İndirilenler\'de bulun.', 'Belgenin altındaki barkodu not edin.', '📄'],
+  ['Belge alın', '“Yerleşim yeri belgesi” (ikametgâh) hizmetini bulup belgeyi oluşturun ve <b>PDF olarak indirin</b>. İndirilenler\'de bulun. Belgede kişisel bilgileriniz var: ortak bilgisayarda işiniz bitince dosyayı silin (Geri Dönüşüm Kutusu\'nu da boşaltın).', 'Belgenin altındaki barkodu not edin.', '📄'],
   ['Barkodu doğrulayın', 'e-Devlet\'te <b>Barkodlu Belge Doğrulama</b> sayfasına gidip az önceki belgenin barkodunu yazarak doğrulayın.', 'Size verilen bir belgeyi bu yolla sorgulatırsınız.', '🔎'],
-  ['Randevuları görün', '<b>MHRS</b> sitesine (mhrs.gov.tr) girip <b>Randevularım</b> bölümüne bakın. (İstemiyorsanız yeni randevu almayın.)', 'Gidemeyecekseniz randevuyu iptal edin.', '🏥'],
+  ['Randevuları görün', '<b>MHRS</b> sitesine (mhrs.gov.tr) <b>e-Devlet ya da T.C. kimlik numaranızla giriş yaparak</b> girin ve <b>Randevularım</b> bölümüne bakın. (İstemiyorsanız yeni randevu almayın.)', 'Gidemeyecekseniz randevuyu iptal edin.', '🏥'],
   ['e-Nabız\'a bakın', '<b>e-Devlet ile giriş</b> yoluyla e-Nabız\'a girin ve reçete ya da tahlil listenize bakın. <b>Şifreyi e-Nabız sayfasında değil, e-Devlet sayfasında</b> yazdığınızı kontrol edin.', 'Sağlık bilgileriniz özeldir; işiniz bitince çıkış yapın.', '🩺'],
   ['Çıkış yapın', 'Bütün sitelerden <b>Çıkış</b> yapın. Sonra tarayıcıda <b>Ctrl + Shift + Del</b> ile göz atma verilerini temizlemeyi düşünün (ortak bilgisayardaysanız).', 'Oturum açık kalırsa sonraki kişi girebilir.', '🚪'],
 ]);

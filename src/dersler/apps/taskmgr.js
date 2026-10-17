@@ -41,7 +41,7 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
   body.classList.add('tm');
   const s = desk.settings;
   s.startupOff ||= [];
-  let tab = args.tab || 'proc', sel = null, perfKind = 'cpu', sortKey = null;
+  let tab = args.tab || 'proc', sel = null, perfKind = 'cpu', sortKey = null, sortAsc = false;
   const hist = { cpu: [], mem: [], disk: [], net: [] };
   const procCpu = {}; // her işlemin son işlemci değeri (titreşimli)
 
@@ -93,14 +93,14 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
     const val = {};
     for (const p of [...apps, ...bg]) { const [d, n] = IO[p.app || p.id] || [0.05, 0]; val[p.id] = { cpu: cpuOf(p), mem: p.mem, disk: p.hung ? 0 : jitter(d, 0.5), net: p.hung ? 0 : jitter(n, 0.5) }; }
     const sum = (k) => Object.values(val).reduce((a, v) => a + v[k], 0);
-    const order = (list) => (sortKey ? [...list].sort((a, b) => val[b.id][sortKey] - val[a.id][sortKey]) : list);
+    const order = (list) => (sortKey ? [...list].sort((a, b) => (val[b.id][sortKey] - val[a.id][sortKey]) * (sortAsc ? -1 : 1)) : list);
     const row = (p) => {
       const v = val[p.id];
       return `<tr data-proc="${p.id}" class="${p.id === sel ? 'sel' : ''} ${p.hung ? 'hung' : ''}" tabindex="-1">
         <td><span class="tm-ic">${p.icon}</span>${esc(p.name)}</td><td class="tm-st">${p.hung ? '⏳ Yanıt vermiyor' : ''}</td>
         <td ${heat(v.cpu, 30)}>%${fmt(v.cpu)}</td><td ${heat(p.mem, 900)}>${fmt(p.mem, 1)} MB</td><td ${heat(v.disk, 2)}>${fmt(v.disk)} MB/sn</td><td ${heat(v.net, 3)}>${fmt(v.net)} Mb/sn</td></tr>`;
     };
-    const th = (k, label, sub) => `<th data-sort="${k}" class="tm-sort${sortKey === k ? ' on' : ''}" title="Bu sütuna göre sırala (büyükten küçüğe)">${label}${sortKey === k ? ' ▾' : ''}<small>${sub}</small></th>`;
+    const th = (k, label, sub) => `<th data-sort="${k}" class="tm-sort${sortKey === k ? ' on' : ''}" title="Bu sütuna göre sırala (yeniden tıklayınca ters çevrilir)">${label}${sortKey === k ? (sortAsc ? ' ▴' : ' ▾') : ''}<small>${sub}</small></th>`;
     $('.tm-body').innerHTML = `<table class="tm-t"><thead><tr><th>Ad</th><th>Durum</th>${th('cpu', 'İşlemci', `%${Math.round(t.cpu)}`)}${th('mem', 'Bellek', `%${Math.round((t.mem / MEM_TOTAL) * 100)}`)}${th('disk', 'Disk', `${fmt(sum('disk'))} MB/sn`)}${th('net', 'Ağ', `${fmt(sum('net'))} Mb/sn`)}</tr></thead>
       <tbody><tr class="tm-grp"><td colspan="6">Uygulamalar (${apps.length})</td></tr>${order(apps).map(row).join('')}
       <tr class="tm-grp"><td colspan="6">Arka plan işlemleri (${bg.length})</td></tr>${order(bg).map(row).join('')}</tbody></table>`;
@@ -175,7 +175,7 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
     const last = (k) => hist[k].at(-1) ?? 0;
     const memUsed = t.mem / 1024;
     const kinds = {
-      cpu: ['İşlemci (CPU)', '#1f7ad1', `%${Math.round(last('cpu'))} · 3,20 GHz`, `<dl><dt>Kullanım</dt><dd>%${Math.round(last('cpu'))}</dd><dt>Temel hız</dt><dd>3,20 GHz</dd><dt>Çekirdek</dt><dd>6</dd><dt>Mantıksal işlemci</dt><dd>12</dd><dt>İşlem sayısı</dt><dd>${t.all.length + 87}</dd><dt>Açık kalma süresi</dt><dd>0:01:${String(new Date().getSeconds()).padStart(2, '0')}</dd></dl>`, 'Intel Core i5-12400'],
+      cpu: ['İşlemci (CPU)', '#1f7ad1', `%${Math.round(last('cpu'))} · 3,20 GHz`, `<dl><dt>Kullanım</dt><dd>%${Math.round(last('cpu'))}</dd><dt>Temel hız</dt><dd>3,20 GHz</dd><dt>Çekirdek</dt><dd>6</dd><dt>Mantıksal işlemci</dt><dd>12</dd><dt>İşlem sayısı</dt><dd>${t.all.length + 87}</dd><dt>Açık kalma süresi</dt><dd>0:01:${String(new Date().getSeconds()).padStart(2, '0')}</dd></dl>`, 'Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz'],
       mem: ['Bellek (RAM)', '#8b3fc4', `${fmt(memUsed)}/8,0 GB (%${Math.round(last('mem'))})`, `<dl><dt>Kullanımda</dt><dd>${fmt(memUsed)} GB</dd><dt>Kullanılabilir</dt><dd>${fmt(8 - memUsed)} GB</dd><dt>Hız</dt><dd>3200 MT/sn</dd><dt>Yuva</dt><dd>2 / 2</dd></dl>`, '8,0 GB DDR4'],
       disk: ['Disk 0 (C:)', '#2e8b3a', `SSD · %${Math.round(last('disk'))}`, `<dl><dt>Etkin süre</dt><dd>%${Math.round(last('disk'))}</dd><dt>Kapasite</dt><dd>512 GB</dd><dt>Tür</dt><dd>SSD (NVMe)</dd></dl>`, 'NVMe SSD 512 GB'],
       net: ['Wi-Fi', '#c25a0a', s.wifi && s.network ? `Al: ${Math.round(last('net') * 12)} Kbps` : 'Bağlantı kesildi', `<dl><dt>Ağ</dt><dd>${esc(s.wifi && s.network ? s.network : '—')}</dd><dt>Alma</dt><dd>${Math.round(last('net') * 12)} Kbps</dd><dt>Gönderme</dt><dd>${Math.round(last('net') * 3)} Kbps</dd></dl>`, 'Kablosuz Ağ Bağdaştırıcısı'],
@@ -209,7 +209,7 @@ export function taskmgr({ desk, body, args, emit, dialogs }) {
   body.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     const so = e.target.closest('th[data-sort]');
-    if (so) { sortKey = sortKey === so.dataset.sort ? null : so.dataset.sort; render(); emit('task-sort', { key: sortKey }); return; }
+    if (so) { if (sortKey === so.dataset.sort) sortAsc = !sortAsc; else { sortKey = so.dataset.sort; sortAsc = false; } render(); emit('task-sort', { key: sortKey, asc: sortAsc }); return; }
     const tr = e.target.closest('tr[data-proc], tr[data-start]');
     if (tr) { sel = tr.dataset.proc || tr.dataset.start; render(); emit('task-select', { id: sel }); return; }
     if (!b) return;

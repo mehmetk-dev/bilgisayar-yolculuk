@@ -83,7 +83,7 @@ export const fareAyar = {
     },
     {
       title: 'Rengini değiştirin',
-      html: '<p>Aynı yerde işaretçi <b>rengi</b> olarak <b>Sarı</b>\'yı seçin. Sarı ve yeşil, açık renkli arka planlarda bile iyi seçilir.</p>',
+      html: '<p>Aynı yerde işaretçi <b>rengi</b> olarak <b>Sarı</b>\'yı seçin. Siyah ya da ters renkli imleç açık zeminde, beyaz imleç koyu zeminde iyi seçilir. Renkli imleçte canlı bir renk seçmek gerekir; sarı bunlardan biridir ve koyu zeminde çok belirgindir.</p>',
       setup: ayarlarda('access'),
       on: (ev) => ev.type === 'cursor-color' && ev.color === 'yellow',
       done: 'Sarı, büyük bir imleç çok daha rahat görünür.',

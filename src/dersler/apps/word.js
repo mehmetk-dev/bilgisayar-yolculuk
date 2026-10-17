@@ -34,7 +34,7 @@ const SPELL = {
 const today = () => new Date().toLocaleDateString('tr-TR');
 // Hazır şablonlar (Dosya → Yeni). [Köşeli parantez] içindekiler kendi bilgilerinizle değiştirilir.
 export const TEMPLATES = {
-  cv: ['👤 Özgeçmiş (CV)', `<h1 class="wd-title">[Adınız Soyadınız]</h1><p>📞 [Telefon] · ✉ [E-posta] · 📍 [Şehir]</p>
+  cv: ['👤 Özgeçmiş (CV)', `<h1 class="wd-title">[Adınız Soyadınız]</h1><p>Telefon: [Telefon] · E-posta: [E-posta] · Şehir: [Şehir]</p>
 <h2>Hakkımda</h2><p>[Kendinizi iki üç cümleyle anlatın: deneyiminiz, nasıl biri olduğunuz, ne iş aradığınız.]</p>
 <h2>İş Deneyimi</h2><p><b>[Göreviniz]</b> · [İş yeri] · [Başlangıç – bitiş yılı]</p><ul><li>[Yaptığınız işler]</li></ul>
 <h2>Eğitim</h2><p>[Okulunuz] · [Mezuniyet yılı]</p>
@@ -175,14 +175,15 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (!td) return;
     const tr = td.parentElement, table = td.closest('table');
     const idx = td.cellIndex;
+    let keep = null; // işlemden sonra imlecin gideceği hücre (tablo duruyorsa Tablo Düzeni sekmesi açık kalır)
     const newRow = () => { const r = document.createElement('tr'); const n = [...table.rows[0].cells].reduce((a, c) => a + c.colSpan, 0); r.innerHTML = '<td><br></td>'.repeat(n); return r; };
     switch (op) {
       case 'rowAbove': tr.before(newRow()); break;
       case 'rowBelow': tr.after(newRow()); break;
-      case 'rowDel': if (table.rows.length === 1) table.remove(); else tr.remove(); break;
+      case 'rowDel': { const nr = tr.nextElementSibling || tr.previousElementSibling; if (table.rows.length === 1) table.remove(); else { keep = nr.cells[Math.min(idx, nr.cells.length - 1)]; tr.remove(); } break; }
       case 'colLeft': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.insertAdjacentHTML('beforebegin', '<td><br></td>'); break;
       case 'colRight': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.insertAdjacentHTML('afterend', '<td><br></td>'); break;
-      case 'colDel': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.remove(); if (![...table.rows].some((r) => r.cells.length)) table.remove(); break;
+      case 'colDel': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.remove(); if (![...table.rows].some((r) => r.cells.length)) table.remove(); else keep = tr.cells[Math.min(idx, tr.cells.length - 1)]; break;
       case 'tblDel': table.remove(); break;
       case 'bThick': table.classList.add('thick'); break;
       case 'bThin': table.classList.remove('thick'); break;
@@ -201,11 +202,15 @@ export function word({ desk, body, args, emit, setTitle }) {
         first.colSpan = cells.reduce((n, c) => n + c.colSpan, 0);
         first.innerHTML = cells.map((c) => c.innerHTML.replace(/^<br>$/, '')).filter(Boolean).join(' ') || '<br>';
         cells.slice(1).forEach((c) => c.remove());
+        keep = first;
         break;
       }
     }
     // Hücre silindiyse ya da birleştiyse kayıtlı seçim artık geçersizdir
-    if (['rowDel', 'colDel', 'tblDel', 'merge'].includes(op)) range = null;
+    if (['rowDel', 'colDel', 'tblDel', 'merge'].includes(op)) {
+      range = null;
+      if (keep?.isConnected) { const r = document.createRange(); r.selectNodeContents(keep); r.collapse(true); range = r; restore(); }
+    }
     syncTableTab();
     changed();
     emit('doc-table', { op, ok: true, rows: page.querySelector('table')?.rows.length || 0, cols: page.querySelector('table')?.rows[0]?.cells.length || 0 });
@@ -318,9 +323,28 @@ export function word({ desk, body, args, emit, setTitle }) {
   }
 
   // ---- Ekle ----
+  // Paragrafın sonuna satır içi öğe (alan, şekil, bağlantı) eklenirken tarayıcı onu paragrafın DIŞINA, sayfaya çıplak bırakabilir:
+  // sonradan sayfaya eklenmiş çıplak öğeleri imlecin bulunduğu (hemen öncesindeki) paragrafın içine alır
+  function adoptStray(before) {
+    const inline = (n) => n.nodeType === 3 || !/^(P|H[1-6]|DIV|UL|OL|LI|TABLE|HR|BLOCKQUOTE)$/.test(n.tagName);
+    const stray = [...page.childNodes].filter((n) => !before.has(n) && inline(n));
+    if (!stray.length) return;
+    let host = stray[0].previousSibling;
+    while (host && host.nodeType === 3 && !host.textContent.trim()) host = host.previousSibling;
+    if (!host || host.nodeType !== 1 || !/^(P|H[1-6])$/.test(host.tagName)) { host = document.createElement('p'); stray[0].before(host); }
+    host.append(...stray);
+    const r = document.createRange();
+    r.setStartAfter(host.lastChild);
+    r.collapse(true);
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+  }
   function insertHtml(html, what) {
     restore();
+    const before = new Set(page.childNodes);
     document.execCommand('insertHTML', false, html);
+    adoptStray(before);
     changed();
     emit('doc-insert', { what });
   }
@@ -427,8 +451,17 @@ export function word({ desk, body, args, emit, setTitle }) {
   // ---- Bul ve değiştir ----
   const findBox = $('.wd-find'), fq = $('.wd-fq'), rq = $('.wd-rq');
   let fpos = null; // son bulunan yerin sonu
+  // Bul kutusu ve yazım denetimi paneli şeridin altında, sayfanın üst köşesinde dursun (şerit düğmelerini ve paletleri örtmesin)
+  function placeFloats() {
+    const sc = $('.wd-scroll');
+    for (const el of [findBox, $('.wd-spane')]) {
+      if (el.hidden || !el.offsetParent) continue;
+      el.style.top = (sc.getBoundingClientRect().top - el.offsetParent.getBoundingClientRect().top + 6) + 'px';
+    }
+  }
   function openFind(repl) {
     findBox.hidden = false;
+    placeFloats();
     findBox.classList.toggle('repl', !!repl);
     const sel = getSelection().toString();
     if (sel && sel.length < 40 && page.contains(getSelection().anchorNode)) fq.value = sel;
@@ -555,6 +588,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       ${errs.map((sp, i) => `<div class="wd-spr"><s>${esc(sp.textContent)}</s> → <b>${esc(suggest(sp.textContent))}</b><button type="button" data-sp="${i}">Değiştir</button></div>`).join('')}
       <button type="button" data-sp="all" class="wd-spall">Tümünü değiştir</button><button type="button" data-sp="ignore">Yoksay</button>`;
     spane.hidden = false;
+    placeFloats();
     errs[0].scrollIntoView({ block: 'nearest' });
   }
   spane.addEventListener('click', (e) => {
@@ -691,6 +725,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.dataset.tab) {
       body.querySelectorAll('.wd-tabs [data-tab]').forEach((b) => b.classList.toggle('on', b === t));
       body.querySelectorAll('.wd-rib').forEach((r) => { r.hidden = r.dataset.tab !== t.dataset.tab; });
+      placeFloats();
       emit('doc-tab', { tab: t.dataset.tab });
       return;
     }
@@ -740,7 +775,12 @@ export function word({ desk, body, args, emit, setTitle }) {
       return insertHtml(`<table class="wd-t">${`<tr>${'<td><br></td>'.repeat(c)}</tr>`.repeat(r)}</table><p><br></p>`, 'table');
     }
     if (t.classList.contains('wd-shbtn')) return pal('.wd-shpal');
-    if (t.dataset.shape) { $('.wd-shpal').hidden = true; return insertHtml(`<span class="wd-shape wd-sh-${t.dataset.shape}" contenteditable="true">Yazınız</span>&nbsp;`, 'shape'); }
+    if (t.dataset.shape) {
+      $('.wd-shpal').hidden = true;
+      // İmleç bir şeklin içindeyse (içine yazı yazılmışsa) yeni şekil onun İÇİNE değil, dışına, sonrasına eklenir
+      const cur = range && (range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement)?.closest('.wd-shape');
+      if (cur && page.contains(cur)) { range = document.createRange(); range.setStartAfter(cur); range.collapse(true); }
+      return insertHtml(`<span class="wd-shape wd-sh-${t.dataset.shape}" contenteditable="true">Yazınız</span>&nbsp;`, 'shape'); }
     if (t.classList.contains('wd-pic')) return insertPicture();
     if (t.classList.contains('wd-date')) return insertHtml(esc(today()), 'date');
   });
@@ -748,6 +788,18 @@ export function word({ desk, body, args, emit, setTitle }) {
   $('.wd-size').addEventListener('change', (e) => exec('fontSize', +e.target.value));
   $('.wd-lh').addEventListener('change', (e) => setSpacing(e.target.value));
   $('.wd-lurl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('.wd-lok').click(); } });
+  // Üç tık: yalnızca tıklanan paragraf seçilir (tarayıcı kendi başına sonraki boş paragrafı da seçerdi; Ctrl + E ikisini de ortalardı)
+  page.addEventListener('mousedown', (e) => {
+    if (e.detail !== 3 || e.button !== 0 || e.target.closest('.wd-shape, td')) return;
+    const blk = blockOf(e.target);
+    if (!blk || !/^(P|H[1-6]|LI|BLOCKQUOTE|DIV)$/.test(blk.tagName)) return;
+    e.preventDefault();
+    const r = document.createRange();
+    r.selectNodeContents(blk);
+    const s = getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  });
   // Bağlantıya Ctrl + tık: tarayıcıda açılır
   page.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]');

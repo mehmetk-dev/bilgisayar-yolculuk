@@ -48,7 +48,8 @@ export const dilekce = {
       target: 'ÇİÇEK MAHALLESİ MUHTARLIĞINA',
       setup: wordOpen,
       hint: 'Büyük İ, Ş\'nin yanındaki tuştur. Ğ için P\'nin sağındaki tuş.',
-      on: when((c) => { const b = info(c).blocks; return b.length >= 2 && norm(b[0].text).includes('muhtarlığına'); }),
+      // Belge iki boş paragrafla açılır: başlık hangisine yazılırsa yazılsın, altında yeni bir paragraf (Enter) olması yeter
+      on: when((c) => { const b = info(c).blocks, i = b.findIndex((x) => norm(x.text).includes('muhtarlığına')); return i >= 0 && b.length > i + 1; }),
       done: 'Başlık yazıldı. Şimdi onu biçimlendireceğiz.',
     },
     {
@@ -122,7 +123,7 @@ export const dilekce = {
       html: `<p>${K('Ctrl', 'P')}\'ye basın (ya da <b>Dosya → Yazdır</b>), yazıcıyı seçip <b>🖨 Yazdır</b>\'a tıklayın.</p>`,
       combo: ['Ctrl', 'KeyP'],
       on: (ev) => ev.type === 'doc-print',
-      done: 'Dilekçeniz yazıcıya gönderildi.',
+      done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse kâğıda çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>İlk belgenizi hazırladınız:</p>' },
   ],
@@ -209,8 +210,8 @@ export const belgeEkle = {
 };
 
 // Hazır bülten: başlıksız, yazım hatalı; ders boyunca düzenlenir
-const BULTEN = `<p>Mahalle Bülteni</p><p>Yeni Parkımız</p><p>Herkez cumartesi sabahı parkın açılışına davetlidir. Açılışta çocuklar için oyunlar, büyükler için çay ikramı olacak.</p>
-<p>Bahçe Günü</p><p>Malesef geçen hafta yağmur yüzünden yapılamayan bahçe günü bu pazar yapılacak. Bahçe günü saat 10.00'da başlayacak; eldiven ve şapka getirmeyi unutmayın.</p>
+const BULTEN = `<p>Mahalle Bülteni</p><p>Yeni parkımız</p><p>Herkez cumartesi sabahı parkın açılışına davetlidir. Açılışta çocuklar için oyunlar, büyükler için çay ikramı olacak.</p>
+<p>Bahçe günü</p><p>Malesef geçen hafta yağmur yüzünden yapılamayan bahçe günü bu pazar yapılacak. Bahçe günü saat 10.00'da başlayacak; eldiven ve şapka getirmeyi unutmayın.</p>
 <p>Duyurular</p><p>Muhtarlık şuan yeni adresinde, caminin karşısında hizmet veriyor.</p>`;
 const HEADS = ['yeni parkımız', 'günü', 'duyurular'];
 const docEvents = [...formatEvents, 'doc-style', 'doc-replace', 'doc-spell-fix', 'doc-layout'];
@@ -252,7 +253,7 @@ export const belgeDuzen = {
     },
     {
       title: 'Ara başlıklar',
-      html: '<p>Aynı şekilde <b>Yeni Parkımız</b>, <b>Bahçe Günü</b> ve <b>Duyurular</b> satırlarının her birine tıklayıp <b>Başlık 1</b> stilini verin.</p>',
+      html: '<p>Aynı şekilde <b>Yeni parkımız</b>, <b>Bahçe günü</b> ve <b>Duyurular</b> satırlarının her birine tıklayıp <b>Başlık 1</b> stilini verin.</p>',
       mouse: '🖱 Satıra tık → Başlık 1 (üç kez)',
       on: whenDoc((c) => HEADS.every((h) => { const b = info(c).blocks.find((x) => norm(x.text).endsWith(h) && x.text.length < 25); return b?.tag === 'H1'; })),
       done: 'Belgenin iskeleti belli oldu: okuyan kişi başlıklara bakarak istediği bölümü hemen bulur. Uzun belgelerde içindekiler tablosu da bu başlıklardan yapılır.',
@@ -260,14 +261,14 @@ export const belgeDuzen = {
     {
       title: 'Bul ve değiştir',
       html: `<p>Bahçe günü artık <b>fidan şenliği</b> olacak. Belgedeki bütün “bahçe günü” yazılarını tek tek düzeltmek yerine:</p>
-        <ol class="steps"><li>${K('Ctrl', 'H')}\'ye basın (ya da Giriş → <b>⇄ Değiştir</b>).</li><li><b>Aranan</b>: bahçe günü &nbsp; <b>Yeni</b>: fidan şenliği</li><li><b>Tümünü değiştir</b>\'e tıklayın.</li></ol>`,
+        <ol class="steps"><li>${K('Ctrl', 'H')}\'ye basın (ya da Giriş → <b>⇄ Değiştir</b>).</li><li><b>Aranan</b>: bahçe günü &nbsp; <b>Yeni</b>: fidan şenliği</li><li><b>Tümünü değiştir</b>\'e tıklayın.</li><li>Sonra kutunun köşesindeki <b>✕</b>\'e basarak <b>Bul ve Değiştir</b> kutusunu kapatın.</li></ol>`,
       combo: ['Ctrl', 'KeyH'],
       on: (ev, c) => {
         if (ev.type !== 'doc-replace') return false;
         if (!ev.all) { c.note('Tek tek değiştirmek de olur; ama <b>Tümünü değiştir</b> hepsini birden yapar.'); return !/bahçe günü/i.test(info(c).text); }
         return /bahçe/i.test(ev.from) && ev.count >= 3;
       },
-      done: 'Kelime işlemci hepsini bir anda değiştirdi; cümle başındaki büyük harf de korundu. Kaç değişiklik yapıldığını sağ alttaki bildirim söyledi.',
+      done: 'Kelime işlemci hepsini bir anda değiştirdi; cümle başındaki büyük harf de korundu. Kaç değişiklik yapıldığını sağ alttaki bildirim söyledi. Bul ve Değiştir kutusunu ✕ ile kapatın; sonraki adımda yazının üstünü örtmesin.',
     },
     {
       title: 'Yazım denetimi',
@@ -282,6 +283,7 @@ export const belgeDuzen = {
       title: 'Önemli yeri boyayın',
       html: `<ol class="steps"><li><b>Giriş</b> sekmesine dönün.</li><li><b>bu pazar</b> kelimelerini fareyle sürükleyerek seçin.</li><li>Şeritteki <b>🖍</b> (metin vurgu rengi) düğmesinden <b>sarı</b>\'yı seçin.</li></ol>`,
       mouse: '🖱 “bu pazar”ı seçin → 🖍 → Sarı',
+      setup: (c) => { c.d.find('word')?.el.querySelector('.wd-find:not([hidden]) [data-f="close"]')?.click(); },
       on: whenDoc((c) => [...(W(c)?.page.querySelectorAll('[style*="background"]') || [])].some((s) => /pazar/i.test(s.textContent) && !/transparent|rgba\(0, 0, 0, 0\)/.test(s.style.backgroundColor))),
       done: 'Fosforlu kalem gibi: okuyanın gözü önce oraya gider. Az kullanın; her yer boyalıysa hiçbir yer önemli görünmez.',
     },

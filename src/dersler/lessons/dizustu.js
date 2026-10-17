@@ -89,11 +89,11 @@ export const dizustu = {
     ayir({
       title: 'Fn tuşuyla ne olur?',
       html: `<p>Dizüstünde üst sıradaki tuşlar (F1–F12) ${K('Fn')} ile birlikte basılınca küçük simgelerini çalıştırır. Yanlışlıkla basılan tuşların sonucunu doğru kutuya bırakın.</p>`,
-      bins: [{ id: 'ses', label: 'Ses', icon: '🔊' }, { id: 'net', label: 'İnternet / ekran', icon: '📶' }],
+      bins: [{ id: 'ses', label: 'Ses', icon: '🔊' }, { id: 'net', label: 'İnternet / ekran parlaklığı', icon: '📶' }],
       items: [
         { label: 'Hoparlör çizili tuş: video sessiz kaldı', icon: '🔇', bin: 'ses', why: 'Aynı tuşa bir kez daha basın ya da sağ alttaki hoparlör simgesinden sesi açın.' },
         { label: 'Sesi kısma tuşuna çok basıldı', icon: '🔉', bin: 'ses', why: 'Ses simgesini tıklayıp kaydırıcıyı sağa çekin.' },
-        { label: 'Uçak ya da anten tuşu: Wi-Fi kapandı', icon: '✈', bin: 'net', why: 'Uçak modu internetin bağlantısını keser. Aynı tuşa ya da sağ alttaki Wi-Fi simgesine tıklayarak kapatın.' },
+        { label: 'Uçak ya da anten tuşu: Wi-Fi kapandı', icon: '✈', bin: 'net', why: 'Uçak modu internet bağlantısını keser. Aynı tuşa ya da sağ alttaki Wi-Fi simgesine tıklayarak kapatın.' },
         { label: 'Ekran karardı (parlaklık sıfır)', icon: '🔅', bin: 'net', why: 'Parlaklık artırma tuşuna basın. Bilgisayar bozulmadı.' },
       ],
       done: 'Fn tuşunun yanlışlıkla neler kapatabileceğini biliyorsunuz.',
@@ -101,25 +101,25 @@ export const dizustu = {
     sec({
       title: 'Wi-Fi yok!', text: pad('📶 ❌ ✈'),
       q: 'Sağ altta uçak simgesi var ve internet yok. Doğru çözüm hangisi?',
-      opts: ['Uçak modunu kapatırım (simgeye tıklayıp ya da Fn + uçak tuşu)', 'Bilgisayarı sıfırlarım', 'Modemi bahçeye atarım'], ok: 0,
+      opts: ['Uçak modunu kapatırım (simgeye tıklayıp ya da Fn + uçak tuşu)', 'Bilgisayarı sıfırlarım', 'Modemi yenisiyle değiştiririm'], ok: 0,
       why: 'Çoğu zaman bilgisayar bozuk değildir; yalnızca bir kapatma tuşuna yanlışlıkla basılmıştır. Önce sağ alttaki simgelere bakın.',
     }),
     sec({
       title: 'Kapağı kapatmak', text: pad('💻 ➜ 😴'),
       q: 'Çay almaya giderken dizüstünün kapağını kapattınız. Ne olur?',
-      opts: ['Çoğu bilgisayar kapanmaz, uykuya geçer; kapağı açınca kaldığınız yerden devam eder', 'Bütün dosyalar kaybolur', 'Bilgisayar bozulur'], ok: 0,
-      why: 'Kapak kapanınca bilgisayar genellikle <b>uykuya</b> geçer: açık işler bellekte durur. Uzun süre kullanmayacaksanız Başlat → Güç → Kapat daha doğrudur; uyku da pili yavaşça tüketir. Bu davranış Ayarlar → Sistem → Güç bölümünden değiştirilebilir.',
+      opts: ['Uykuya geçer; kapağı açınca kaldığınız yerden devam eder', 'Bütün dosyalar kaybolur', 'Bilgisayar bozulur'], ok: 0,
+      why: 'Kapak kapanınca bilgisayar genellikle <b>uykuya</b> geçer: açık işler bellekte durur. Uzun süre kullanmayacaksanız Başlat → Güç → Kapat daha doğrudur; uyku da pili yavaşça tüketir. Bu davranış Ayarlar → Sistem → Güç bölümünden değiştirilebilir (Windows 10\'da: Ayarlar → Sistem → Güç ve uyku).',
     }),
     sec({
       title: 'Şarj aleti', text: pad('🔌 🔋'),
       q: 'Dizüstüyü çoğu zaman şarj aletine takılı kullanıyorsunuz. Ne yapmalısınız?',
-      opts: ['Bir şey yapmayın; bilgisayar kendini korur, yalnızca havalandırma deliklerini kapatmayın ve aşırı ısınmasına izin vermeyin', 'Her gün pili sıfıra kadar bitirin', 'Şarj aletini her gece çıkarıp tekrar takın'], ok: 0,
+      opts: ['Bir şey yapmayın; yalnızca havalandırmayı kapatmayın', 'Her gün pili sıfıra kadar bitirin', 'Şarj aletini her gece çıkarıp tekrar takın'], ok: 0,
       why: 'Yeni dizüstüler pil dolunca şarjı keser. Önemli olan <b>ısıdır</b>: bilgisayarı yatağın, battaniyenin üzerinde kapatarak kullanmayın; havalandırması açık dursun. Pili sürekli sıfıra kadar bitirmek de ömrünü kısaltır.',
     }),
     sec({
       title: 'Touchpad kapatmak', text: pad('☝ ▭ ⚙'),
       q: 'Dışarıdan fare kullanıyorsunuz ve yazarken touchpad sürekli imleci kaçırıyor. Touchpad\'i nasıl kapatırsınız?',
-      opts: ['Ayarlar → Bluetooth ve cihazlar → Dokunmatik yüzey → Kapalı (ya da Fn + touchpad tuşu)', 'Bilgisayarı kapatırım', 'Touchpad\'in üstüne bant yapıştırırım'], ok: 0,
+      opts: ['Ayarlar → Bluetooth ve cihazlar → Dokunmatik yüzey → Kapalı (Windows 10\'da Ayarlar → Aygıtlar → Dokunmatik yüzey); ya da Fn + touchpad tuşu', 'Bilgisayarı kapatırım', 'Touchpad\'in üstüne bant yapıştırırım'], ok: 0,
       why: 'Dokunmatik yüzey ayarlarından touchpad kapatılır, açılır; hassasiyet ve kaydırma yönü de oradan değiştirilir. Fare takılınca kapanması da seçilebilir.',
     }),
     sec({

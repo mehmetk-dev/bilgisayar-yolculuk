@@ -24,7 +24,7 @@ export const aramaMotorlari = {
     {
       title: 'Arama motoru nedir?',
       html: `<p>İnternette milyonlarca site var. Aradığınızı nasıl bulursunuz? <b>Arama motoruyla.</b> Arama motoru, internetin <b>dev bir fihristidir</b>: siteleri gece gündüz gezip not alır; siz bir şey yazınca o notlardan uygun olanları sıralar.</p>
-        <p>Bilinen arama motorları: <b>Google</b>, <b>Bing</b> (Microsoft), <b>Yandex</b>, <b>DuckDuckGo</b>. Bu derste <b>Bulalım</b> adlı alıştırma arama motorunu kullanacağız; gerçekleri de aynı çalışır.</p>
+        <p>Bilinen arama motorları: <b>Google</b>, <b>Bing</b> (Microsoft), <b>Yandex</b>, <b>DuckDuckGo</b>. Bu derste <b>Bulalım</b> adlı alıştırma arama motorunu kullanacağız. Gerçek arama motorları da buna çok benzer çalışır.</p>
         <p class="mut">Arama motoru, tarayıcı <b>değildir</b>: tarayıcının (Edge, Chrome) içinde açılan bir sitedir.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
@@ -55,7 +55,7 @@ export const aramaMotorlari = {
         if (ev.type === 'web-ad') c.warn('Reklama tıkladınız. “Reklam” yazan kutu parayla çıkar; altındaki normal sonuca tıklayın.');
         return ev.type === 'web-nav' && ev.host === 'www.program-indir.com.tr';
       },
-      done: 'Doğru. Reklamın adresi <b>super-hizlandirici.xyz</b> gibi bir şeydi: tanımadığınız ve .xyz ile biten adres uyarı işaretidir.',
+      done: 'Doğru. Reklamın adresi <b>super-hizlandirici.xyz</b> gibi bir şeydi: tanımadığınız ve .xyz ile biten adres uyarı işaretidir. Gerçekte bir programı indirirken en güvenlisi, programın üreticisinin resmî sitesini kullanmaktır.',
     },
     {
       title: 'Görseller sekmesi',
@@ -63,7 +63,7 @@ export const aramaMotorlari = {
       hint: 'Önce arama kutusuna manzara yazıp Enter; sonuç sayfasında Tümü yanındaki Görseller.',
       setup: br,
       on: (ev) => ev.type === 'search-tab' && ev.tab === 'img',
-      done: 'Resimler küçük kareler olarak sıralandı. Unutmayın: <b>görsellerin çoğunun telif hakkı vardır</b>. Kendi kullanımınız için bakmak serbesttir; başkasına ait fotoğrafı izinsiz kullanmayın.',
+      done: 'Sonuçlar resim olarak gösterildi. Unutmayın: <b>görsellerin çoğunun telif hakkı vardır</b>. Kendi kullanımınız için bakmak serbesttir; başkasına ait fotoğrafı izinsiz kullanmayın.',
     },
     {
       title: 'Haberler sekmesi',
@@ -74,35 +74,35 @@ export const aramaMotorlari = {
     rehberSoru({
       title: 'Hangi arama daha iyi?',
       html: '<p>Belediyeden su abonelik formunu arıyorsunuz. Hangi arama <b>daha iyi sonuç</b> verir?</p>',
-      opts: ['form', 'Örnek Belediyesi su abonelik başvuru formu', 'su'], ok: 1,
+      opts: ['form', 'su', 'Örnek Belediyesi su abonelik başvuru formu'], ok: 2,
       wrong: 'Çok kısa aramalar binlerce alakasız sonuç getirir. Ne, nerede, ne işe yarayan?',
       why: 'Doğru. <b>Konu</b> (su abonelik), <b>yer</b> (belediye) ve <b>ne istediğiniz</b> (başvuru formu) kelimeleri sonucu daraltır. Tek kelime (“form”) çok geniştir.',
     }),
     rehberSoru({
       title: 'Tırnak içinde arama',
       html: '<p>Bir şiirin tam bir dizesini hatırlıyorsunuz ve <b>aynen o cümlenin</b> geçtiği sayfaları istiyorsunuz. Ne yaparsınız?</p>',
-      opts: ['Cümleyi tırnak içine alıp aratırım: “...”', 'Hiçbir şey; arama motoru bunu yapamaz', 'Cümleyi büyük harfle yazarım'], ok: 0,
+      opts: ['Hiçbir şey; arama motoru bunu yapamaz', 'Cümleyi tırnak içine alıp aratırım: “...”', 'Cümleyi büyük harfle yazarım'], ok: 1,
       wrong: 'Arama motorunun “sözcükleri birlikte ara” diyen bir işareti var.',
       why: 'Doğru. Tırnak (“ ”) içindeki cümle, sözcükler dağılmadan <b>aynı sırayla</b> aranır. Tarif adı, şiir dizesi, bir kişinin adı soyadı gibi aramalarda işe yarar.',
     }),
     rehberSoru({
       title: 'İlk sonuç doğru mu?',
       html: '<p>Bir ilaç hakkında arama yaptınız. İlk sonuç, tanımadığınız bir sitede “<b>Bu ilaç kesin çözüm!</b>” diyor. Ne yaparsınız?</p>',
-      opts: ['İlk sonuç en doğrusudur, inanırım', 'Adrese bakarım; sağlık gibi konularda resmî kaynağa (.gov.tr, hastane sitesi) ve doktora danışırım', 'Hepsini silerim'], ok: 1,
+      opts: ['Adrese bakarım; resmî kaynağa (.gov.tr, hastane sitesi) ve doktora danışırım', 'İlk sonuç en doğrusudur, inanırım', 'Sonuçların hepsini kapatır, hiç araştırmam'], ok: 0,
       wrong: 'İlk sıra “en doğru” demek değildir: sıralama reklam ve popülerliğe de bağlıdır.',
       why: 'Doğru. Arama motoru sayfaları <b>sıralar</b>, doğruluğunu <b>garanti etmez</b>. Sağlık, para ve hukuk konularında resmî kaynaktan ve uzmandan doğrulayın.',
     }),
     rehberSoru({
       title: 'Kutuya ne yazılmaz?',
       html: '<p>Arama kutusuna hangisini <b>yazmamalısınız</b>?</p>',
-      opts: ['“hava durumu Ankara”', 'T.C. kimlik numaranızı ya da kart numaranızı', '“ıspanaklı börek tarifi”'], ok: 1,
+      opts: ['“hava durumu Ankara”', '“ıspanaklı börek tarifi”', 'T.C. kimlik numaranızı ya da kart numaranızı'], ok: 2,
       wrong: 'Aramalar kaydedilebilir. Para ya da kimlik çalınmasına yol açabilecek olan hangisi?',
       why: 'Doğru. Arama motoruna yazdıklarınız kaydedilebilir. Kimlik numarası, kart bilgisi, şifre ve SMS kodunu <b>hiçbir yere yazdığınız arama kutusuna</b> yazmayın.',
     }),
     {
       title: 'Kendi bilgisayarınızda',
       html: `<p>Kendi tarayıcınızda hangi arama motorunun kullanıldığını görmek için tarayıcının <b>Ayarlar</b> sayfasında <b>“Arama motoru”</b> bölümüne bakın: Google, Bing, Yandex ya da DuckDuckGo seçilebilir.</p>
-        <p>Hangisi daha iyi? Hepsi işinizi görür. <b>DuckDuckGo</b> aramalarınızı izlememeyi vaat eder; <b>Google</b> en çok sonucu bulur; <b>Yandex</b> Türkçe sonuçlarda güçlüdür; <b>Bing</b> Windows ile gelir.</p>`,
+        <p>Hangisi daha iyi? Hepsi işinizi görür. <b>DuckDuckGo</b> aramalarınızı izlememeyi vaat eder; <b>Google</b> en çok sonucu bulur; <b>Yandex</b> Türkçe sonuçlarda güçlüdür; <b>Bing</b> Microsoft’undur; Microsoft Edge’in hazır arama motoru Bing’dir.</p>`,
       manual: 'Baktım ✔',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Arama motorunu kullanmayı öğrendiniz:</p>' },

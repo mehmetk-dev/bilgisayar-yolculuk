@@ -36,14 +36,14 @@ export function guvenlik({ desk, body, args, emit, dialogs }) {
         ${flow.result ? `<div class="ws-card ok">${flow.result}</div>` : ''}
         <div class="ws-btns"><button type="button" class="ws-btn primary" data-act="scan" ${flow.scan ? 'disabled' : ''}>⚡ Hızlı tarama</button>
           <button type="button" class="ws-btn" data-act="scanUsb" ${flow.scan ? 'disabled' : ''}>💾 USB belleği tara</button></div>
-        <p class="ws-note">${usb ? 'USB bellek takılı: başkasından aldığınız belleği açmadan önce taratın.' : 'USB bellek takılı değil.'} Virüs programı bilgisayar açıkken kendisi de arka planda tarar; ayrıca el ile tarayabilirsiniz.</p>`;
+        <p class="ws-note">${usb ? 'USB bellek takılı: başkasından aldığınız belleği açmadan önce taratın.' : 'USB bellek takılı değil.'} Virüs programı bilgisayar açıkken kendisi de arka planda tarar; ayrıca el ile tarayabilirsiniz.<br><small>(Gerçek Windows'ta: USB için sürücüye sağ tık → Microsoft Defender ile tara)</small></p>`;
     } else if (page === 'duvar') {
       h = `<h2>🧱 Güvenlik duvarı</h2><p class="ws-note">Güvenlik duvarı, internetten izinsiz gelen bağlantıları durdurur. <b>Açık kalmalıdır.</b></p>
         <div class="ws-card ${sec.firewall ? 'ok' : 'bad'}">${sec.firewall ? '✅ <b>Güvenlik duvarı açık</b><small>Ev ağı: etkin</small>' : '⚠ <b>Güvenlik duvarı kapalı</b><small>Bilgisayarınız korunmuyor!</small>'}</div>
         <label class="ws-tog"><input type="checkbox" data-act="fw" ${sec.firewall ? 'checked' : ''}><i></i><span>${sec.firewall ? 'Açık' : 'Kapalı'}</span></label>`;
     } else {
       const total = CATS.map((c) => c[0]).filter((k) => !done(k)).reduce((a, k) => a + catSize(k), 0);
-      h = `<h2>🧹 Disk Temizleme</h2>
+      h = `<h2>🧹 Disk Temizleme</h2><p class="ws-note"><small>(Gerçek Windows'ta: Disk Temizleme ayrı bir programdır)</small></p>
         <div class="ws-disk"><div class="ws-bar"><i style="width:${sec.used / DISK_TOTAL * 100}%"></i></div><small>Yerel Disk (C:) · ${gb(sec.used)} dolu / ${DISK_TOTAL} GB · <b>${gb(DISK_TOTAL - sec.used)} boş</b></small></div>
         ${flow.clean ? '<div class="ws-prog"></div>' : `<div class="ws-list">${CATS.map(([k, n, d, , on, risk]) => {
           const sz = catSize(k);

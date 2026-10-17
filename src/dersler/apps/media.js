@@ -211,7 +211,12 @@ export function pdf({ desk, body, args, setTitle, emit }) {
     if (e.code === 'KeyF') { e.preventDefault(); openFind(); }
   });
   render();
-  return { focus: () => body.focus({ preventScroll: true }), info: () => ({ page: at + 1, total: pages.length, rot, q, annots: annots.length }) };
+  return { focus: () => {
+    if (desk.dialogs.busy) return;
+    const a = document.activeElement;
+    if (a && body.contains(a) && a.matches('input, textarea, select')) return; // arama kutusunda ya da yazı eklerken odak yerinde kalsın
+    body.focus({ preventScroll: true }); // Ctrl + F, Ctrl + P ilk basışta çalışsın
+  }, info: () => ({ page: at + 1, total: pages.length, rot, q, annots: annots.length }) };
 }
 
 export function music({ desk, body, args, emit, setTitle }) {

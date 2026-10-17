@@ -152,7 +152,16 @@ function showHome() {
       <div class="lfoot">${status}<span class="sp"></span>${btn}</div></div></article>`;
   };
   const HUES = [215, 268, 330, 8, 32, 150, 190, 245, 290, 340, 128, 22, 170, 305];
-  $('#cards').innerHTML = WEEKS.map((w) => `<section class="week" style="--h:${w.no ? HUES[(w.no - 1) % HUES.length] : 200}"><h2><span>${w.no ? `${w.no}. hafta` : 'Ek'}</span>${w.title}</h2>
+  // Hafta rengi: aynı ton, ama beyaz yazı (rozet, Başla düğmesi) ve renkli yazı en az 4,5:1 okunsun diye parlaklık tona göre düşürülür
+  const rgb = (h, sat, l) => { sat /= 100; l /= 100; const a = sat * Math.min(l, 1 - l); const f = (n) => { const k = (n + h / 30) % 12; return l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); }; return [f(0), f(8), f(4)]; };
+  const lum = (c) => { const [r, g, b] = c.map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const contrast = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  const fit = (h, sat, l, ...bgs) => { while (l > 8 && bgs.some((bg) => contrast(rgb(h, sat, l), bg) < 4.6)) l--; return l; };
+  const weekColors = (h) => {
+    const tint = rgb(h, 90, 95);
+    return `--h:${h};--l1:${fit(h, 80, 46, [1, 1, 1], tint)}%;--l2:${fit((h + 28) % 360, 85, 58, [1, 1, 1])}%;--ld:${fit(h, 75, 34, [1, 1, 1], tint)}%`;
+  };
+  $('#cards').innerHTML = WEEKS.map((w) => `<section class="week" style="${weekColors(w.no ? HUES[(w.no - 1) % HUES.length] : 200)}"><h2><span>${w.no ? `${w.no}. hafta` : 'Ek'}</span>${w.title}</h2>
     <div class="wcards">${w.lessons.map(card).join('')}</div></section>`).join('');
 }
 
@@ -342,16 +351,19 @@ function finalHtml() {
   if (lesson.parkur && timed.length) {
     const total = timed.reduce((a, s) => a + s.t, 0);
     report = `<h3 class="rep-h">Parkur süresi: ${fmtTime(total)}</h3><table class="sum rep">${timed.sort((a, b) => a.i - b.i).map((s) => `<tr class="${s.t === slow[0].t ? 'slow' : ''}"><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table>
-      <p class="mut">Kırmızı satır, en uzun süren görevdir. Öğrencinin takıldığı yeri gösterir.</p>`;
+      <p class="mut">Kırmızı satır, en çok zaman aldığınız görevdir. Takıldığınız yeri gösterir.</p>`;
   } else if (lesson.test) {
     const sc = testScore(lesson);
     report = `<div class="score"><b>${sc.right} / ${sc.total}</b><span>soruyu ilk denemede doğru bildiniz</span></div>
       ${sc.missed.length ? `<details class="rep-d" open><summary>Tekrar bakılacak konular</summary><ul>${sc.missed.map((s) => `<li>${esc(s.title)}</li>`).join('')}</ul></details>` : '<p>Hepsini ilk denemede bildiniz! 🌟</p>'}`;
   } else if (slow.length >= 3) {
-    report = `<details class="rep-d"><summary>En uzun süren adımlar (eğitmen için)</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
+    report = `<details class="rep-d"><summary>En çok zaman aldığınız adımlar</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
   }
-  const keyish = (k) => /^(Ctrl|Shift|Alt|AltGr|Enter|Tab|Delete|Esc|F\d|⊞|⌫|Caps)/.test(k);
-  const sum = lesson.summary ? `<table class="sum">${lesson.summary.map(([k, v]) => `<tr><th>${keyish(k) ? k.split(' + ').map((x) => `<kbd>${x}</kbd>`).join(' + ') : k}</th><td>${v}</td></tr>`).join('')}</table>` : '';
+  // Yalnızca salt tuş birleşimleri (Ctrl + C, Alt + Shift, Shift + End / Home) tuş kutusuna çevrilir; "Ctrl + C → Resimler → Ctrl + V" gibi cümleler düz kalır
+  const KEYTOK = /^(Ctrl|Shift|Alt|AltGr|Enter|Tab|Delete|Esc|Space|Boşluk|Backspace|Insert|Home|End|Caps Lock|⌫ Backspace|⌫ Geri|⌫|⊞|F\d{1,2}|[A-Z0-9*−-]|[←→↑↓])$/;
+  const keyParts = (k) => { const p = k.split(/( \+ | \/ )/); return p.every((x, i) => i % 2 || KEYTOK.test(x)) ? p : null; };
+  const sumRow = ([k, v]) => { const p = keyParts(k); return `<tr><th${p ? '' : ' class="txt"'}>${p ? p.map((x, i) => (i % 2 ? x : `<kbd>${x}</kbd>`)).join('') : k}</th><td>${v}</td></tr>`; };
+  const sum = lesson.summary ? `<table class="sum">${lesson.summary.map(sumRow).join('')}</table>` : '';
   const nx = nextLesson();
   return `${sum}${report}
     <div class="fbtns">

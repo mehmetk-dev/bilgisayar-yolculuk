@@ -59,7 +59,17 @@ const ENABIZ = {
       ctx.visit('www.turkiye.gov.tr', ed.user ? '/onay' : '/giris');
       return;
     }
-    if (a === 'logout') { st.user = false; ctx.emit('nabiz-logout'); ctx.go('/'); return; }
+    if (a === 'logout') {
+      st.user = false;
+      // e-Nabız e-Devlet kimliğiyle açıldığı için, çıkışta e-Devlet oturumu da kapatılır (ortak bilgisayarda açık kalmasın)
+      const ed = (ctx.desk.webState ||= {})['turkiye.gov.tr'];
+      let closed = false;
+      if (ed?.user) { ed.user = false; ed.back = null; ctx.desk.toast('Güvenli çıkış', 'e-Nabız ile birlikte e-Devlet oturumunuz da kapatıldı.', '🔒', 5000); closed = true; }
+      ctx.emit('nabiz-logout');
+      if (closed) ctx.emit('edevlet-logout', { via: 'nabiz' }); // e-Devlet'ten çıkış sayılır (e-Hizmet parkuru bu olayı bekler)
+      ctx.go('/');
+      return;
+    }
     if (a === 'pdf') {
       const t = TAHLIL.find((x) => x.id === el.dataset.id);
       const name = `tahlil sonucu - ${t.ad.toLocaleLowerCase('tr')}.pdf`;

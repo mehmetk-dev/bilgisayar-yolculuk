@@ -10,7 +10,7 @@ export const denetimMasasi = {
   id: 'denetim-masasi', icon: '🎛', title: 'Denetim Masası', minutes: 35, stage: 'desktop',
   desc: 'Windows\'un eski ayar paneli: açmak, program kaldırmak, bilgisayara bakmak.',
   summary: [
-    ['Nasıl açılır?', 'Başlat → “Denetim Masası” yazın; Windows 7\'de Başlat menüsünde hazırdır; ⊞ + R, control'],
+    ['Nasıl açılır?', 'Başlat → “Denetim Masası” yazın; Windows 7\'de Başlat menüsünde hazırdır; (başka yol) ⊞ + R, control yazıp Enter'],
     ['Kategori / Büyük simgeler', 'Sağ üstteki “Görüntüleme ölçütü”; simge görünümü daha hızlıdır'],
     ['Arama kutusu', 'Sağ üstte: “fare”, “yazıcı”, “saat” yazın; ilgili öğe çıkar'],
     ['Programlar ve Özellikler', 'Yüklü programlar; birini seçip Kaldır'],

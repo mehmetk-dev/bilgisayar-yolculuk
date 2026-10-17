@@ -52,7 +52,7 @@ export const hucreInce = {
     {
       title: '##### nedir?',
       html: `<p><b>Tutar</b> sütununa bakın: sayıların yerinde <b>#####</b> yazıyor. Bilgisayar bozulmadı, sayılar da silinmedi.</p>
-        <p><b>#####</b>, “sayı bu sütuna sığmıyor” demektir. Bir hücreye tıklayın; üstteki formül çubuğunda gerçek sayıyı göreceksiniz.</p>`,
+        <p><b>#####</b>, “sayı bu sütuna sığmıyor” demektir. <b>Tutar</b> sütunundaki bir hücreye tıklayın; üstteki formül çubuğunda gerçek sayıyı göreceksiniz.</p>`,
       hint: 'Tutar sütunundaki herhangi bir hücreye tıklayın (B4 gibi).',
       setup: (c) => { if (!X(c)) sheetOpen(c, gider()); },
       on: (ev, c) => ev.type === 'xl-select' && /^B[4-7]$/.test(ev.addr) && X(c).hashes > 0,
@@ -139,7 +139,7 @@ export const doldurDondur = {
       html: '<p>Şeritteki <b>❄ Üst Satırı Dondur</b> düğmesine tıklayın. Sonra tabloyu yeniden aşağı kaydırın: başlık satırı yerinde kalır.</p>',
       mouse: '🖱 ❄ Üst Satırı Dondur',
       on: (ev) => ev.type === 'xl-freeze' && ev.on,
-      done: 'Başlık satırı artık sarı ve sabit. Aşağıdaki 30 satır akıp gider, başlık yerinde kalır.',
+      done: 'Başlık satırı artık sabit. Aşağıdaki 30 satır akıp gider, başlık yerinde kalır.',
     },
     {
       title: 'Kaydırıp doğrulayın',
@@ -204,12 +204,13 @@ export const calismaSayfalari = {
       title: 'Kopyayı Şubat yapın',
       html: '<p>Yeni sekmeye (<b>Ocak (2)</b>) çift tıklayıp adını <b>Şubat</b> yapın.</p>',
       on: (ev) => ev.type === 'xl-sheet' && ev.op === 'rename' && norm(ev.name) === 'şubat',
+      done: 'Sekme artık “Şubat”. Şimdi bu sayfanın rakamlarını güncelleyeceğiz.',
     },
     {
       title: 'Şubat\'ın rakamlarını girin',
       html: `<p>Şubat sayfasındayken <b>Market</b> giderini (B5) <b>7.350</b> olarak değiştirin: B5'e tıklayıp <b>7350</b> yazın, Enter.</p>`,
       hint: 'B5, “Market” satırındaki tutar. Toplam kendiliğinden güncellenir.',
-      on: when((c) => X(c).sheets[X(c).sheetIndex]?.name === 'Şubat' && near(cell(c, 'B5').value, 7350)),
+      on: when((c) => norm(X(c).sheets[X(c).sheetIndex]?.name || '') === 'şubat' && near(cell(c, 'B5').value, 7350)),
       done: 'Toplam kendiliğinden yeniden hesaplandı. Formüller kopyayla birlikte geldi.',
     },
     {
@@ -264,13 +265,13 @@ export const excelYazdir = {
       html: '<p>Şeritteki <b>⤢ Tüm sütunları bir sayfaya sığdır</b>\'a tıklayın. Tablo küçülüp tek kâğıda girer.</p>',
       mouse: '🖱 Tüm sütunları bir sayfaya sığdır',
       on: (ev) => ev.type === 'xl-page' && ev.fit,
-      done: 'Düğme yeşil renkte (açık). Yazı biraz küçülecek ama bütün sütunlar tek kâğıtta olacak.',
+      done: 'Düğme yeşil renkte (açık). Tablo biraz küçülecek ama bütün sütunlar tek kâğıtta olacak.',
     },
     {
       title: 'Yatay kâğıt',
       html: '<p>Bir de başka çözüm var: kâğıdı <b>yan çevirmek</b>. Şeritte <b>▭ Yatay</b>\'a tıklayın.</p>',
       on: (ev) => ev.type === 'xl-page' && ev.orient === 'yatay',
-      done: 'Yatay kâğıt geniş tablolar içindir: daha çok sütun sığar, yazı küçülmez.',
+      done: 'Yatay kâğıt geniş tablolar içindir: kâğıt yan döner, daha çok sütun sığar. “Bir sayfaya sığdır” açıkken de yazı daha az küçülür.',
     },
     {
       title: 'Tablo çizgileri',
@@ -288,7 +289,7 @@ export const excelYazdir = {
         else if (!ev.grid) c.warn('Sayfa tek ama çizgiler yok. “Kılavuz çizgilerini yazdır”ı açıp yeniden yazdırın.');
         return ev.pages === 1 && ev.grid;
       },
-      done: 'Tablo tek sayfada, çizgileriyle yazıcıya gitti.',
+      done: 'Yazdır\'a bastınız: tablo tek sayfada, çizgileriyle çıkar. Gerçek yazıcı seçiliyse kâğıda, “PDF olarak kaydet” seçiliyse dosyaya yazılır.',
     },
     rehberSoru({
       title: 'Hangisi çözüm?',
@@ -307,14 +308,14 @@ export const tabloParkur = {
   steps: [
     {
       title: 'Tablo parkuru',
-      html: '<p>11. haftada öğrendiklerinizi bir pazar alışverişinde kullanın. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p><div class="box">Eğitmen notu: son ekranda her görevin süresi görünür.</div>',
+      html: '<p>11. haftada öğrendiklerinizi bir pazar alışverişinde kullanın. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>',  // Eğitmen notu: son ekranda her görevin süresi görünür.
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
-    { title: '1. Hesap tablosunu açın', html: '<p><b>Hesap Tablosu</b>\'nu açın.</p>', hint: 'Başlat → Hesap Tablosu.', check: (c) => !!X(c), on: (ev) => ev.type === 'app-open' && ev.app === 'sheet' },
+    { title: '1. Hesap tablosunu açın', html: '<p><b>Hesap Tablosu</b>\'nu açın.</p>', hint: 'Başlat\'a tıklayın; aramaya “hesap tablosu” yazın ya da listeden Hesap Tablosu\'nu seçin. (Yalnız “hesap” yazarsanız Hesap Makinesi açılır.)', check: (c) => !!X(c), on: (ev) => ev.type === 'app-open' && ev.app === 'sheet' },
     {
       title: '2. Pazar listesini yazın',
       html: '<p>A1\'den A5\'e ürün adlarını, B1\'den B5\'e fiyatlarını yazın:<br><b>Domates 45 · Peynir 120,50 · Zeytin 85 · Ekmek 15 · Süt 38,75</b></p>',
-      hint: 'Adı yazıp Tab\'a basarsanız yan hücreye geçersiniz. Virgülü kuruş için kullanın: 120,50.',
+      hint: 'Her satırda ürün adını yazıp Tab\'a basın (yan hücreye geçer), fiyatı yazıp Enter\'a basın (alt satırın başına iner). Virgülü kuruş için kullanın: 120,50.',
       setup: (c) => { if (!X(c)) sheetOpen(c); },
       on: when((c) => norm(cell(c, 'A1').raw) === 'domates' && near(cell(c, 'B1').value, 45) && near(cell(c, 'B2').value, 120.5) && near(cell(c, 'B3').value, 85) && near(cell(c, 'B4').value, 15) && near(cell(c, 'B5').value, 38.75)),
     },

@@ -11,6 +11,13 @@ const sl = (layout, o = {}) => ({ layout, title: '', sub: '', body: '', body2: '
 const evs = ['ppt-input', 'ppt-new-slide', 'ppt-theme', 'ppt-trans', 'ppt-insert', 'ppt-move', 'ppt-delete', 'ppt-select', 'ppt-format', 'ppt-dup', 'ppt-smartart', 'ppt-anim', 'ppt-autotime', 'ppt-album', 'ppt-imgsize', 'ppt-music', 'ppt-view'];
 const when = (test) => (ev, c) => evs.includes(ev.type) && !!test(c);
 
+// İki içerikli slaydın sağ listesi (küçük resimden okunur; slayttan ayrılınca da kaybolmaz)
+const twoRight = (c) => {
+  const i = info(c).slides.findIndex((x) => x.layout === 'two');
+  const ul = c.d.find('slides')?.el.querySelectorAll(`.pp-th[data-i="${i}"] .pp-mini ul`)[1];
+  return ul ? [...ul.querySelectorAll('li')].map((x) => norm(x.textContent)).filter(Boolean) : [];
+};
+
 export const slaytDuzen = {
   id: 'slayt-duzen', icon: '🗂', title: 'Slayt düzenleri, çoğaltma ve Slayt Sıralayıcı', minutes: 30, stage: 'desktop',
   desc: 'Slayt düzeni seçmek, slaytı çoğaltmak, Slayt Sıralayıcı görünümü.',
@@ -41,8 +48,9 @@ export const slaytDuzen = {
       title: 'İki listeyi doldurun',
       html: '<p>Sol kutuya <b>Elma</b>, <b>Armut</b>; sağ kutuya <b>Gül</b>, <b>Papatya</b> yazın (her biri ayrı satır).</p>',
       hint: 'Kutuya tıklayıp yazın, Enter yeni madde açar. Maddeler yan yana iki sütunda görünür.',
-      on: when((c) => { const s = P(c)?.info().slides.find((x) => x.layout === 'two'); return s && s.items.length >= 2; }),
+      on: when((c) => { const s = info(c).slides.find((x) => x.layout === 'two'); const r = twoRight(c); return s && s.items.length >= 2 && r.length >= 2 && r.some((x) => x.includes('gül')) && r.some((x) => x.includes('papatya')); }),
       check: () => false,
+      done: 'İki liste yan yana doldu: solda meyveler, sağda çiçekler.',
     },
     {
       title: 'Slaytı çoğaltın',
@@ -117,7 +125,7 @@ export const smartArt = {
       title: 'Süreç okları',
       html: '<p>Şimdi aynı yerden <b>Süreç (oklu adımlar)</b>\'ı seçin. Kutular oklarla birleşir: adım adım işleri anlatmak içindir.</p>',
       on: (ev) => ev.type === 'ppt-smartart' && ev.kind === 'surec' && ev.ok,
-      done: 'Dedem ➜ Babam ➜ Hala ➜ Amca. Soy ağacı için bu uygun değil; bir de “ağaç”a bakalım.',
+      done: 'Dedem ➜ Babam ➜ Halam ➜ Amcam. Soy ağacı için bu uygun değil; bir de “ağaç”a bakalım.',
     },
     {
       title: 'Aile soy ağacı',
@@ -127,7 +135,7 @@ export const smartArt = {
     },
     {
       title: 'Listeye dönüp değiştirin',
-      html: '<p>Bir kişi eksik: <b>Ekle → SmartArt → ↩ Listeye geri dön</b>\'ü seçin, listeye <b>Teyzem Fatma</b> maddesini ekleyip yeniden <b>Soy ağacı</b> yapın.</p>',
+      html: '<p>Bir kişi eksik: <b>Ekle → SmartArt → ↩ Listeye geri dön</b>\'ü seçin, listeye <b>Halam Fatma</b> maddesini ekleyip yeniden <b>Soy ağacı</b> yapın.</p>',
       hint: 'Önce Listeye geri dön, maddeler yazılabilir olur. Son maddenin sonuna tıklayıp Enter ve yeni madde.',
       on: when((c) => { const s = info(c).slides[0]; return s.art === 'agac' && s.items.some((x) => norm(x).includes('fatma')); }),
       done: 'Soy ağacında dört değil beş kişi var. Şemayı değiştirmek için önce listeye dönmek gerekir.',
@@ -193,6 +201,7 @@ export const animasyon = {
       html: `<p>${K('Esc')} tuşuyla gösteriden çıkın.</p>`,
       keys: ['Escape'],
       on: (ev) => ev.type === 'ppt-show-exit',
+      done: 'Gösteri kapandı, düzenleme ekranına döndünüz.',
     },
     {
       title: 'Kendiliğinden gelsin',
@@ -248,7 +257,7 @@ export const anıAlbumu = {
     },
     {
       title: 'Sunuyu açın',
-      html: '<p>⊞ Başlat → <b>📙 Sunu</b>. İlk slayda başlık olarak <b>Aile Albümümüz</b> yazın.</p>',
+      html: '<p><b>📙 Sunu</b> açıldı. İlk slayda başlık olarak <b>Aile Albümümüz</b> yazın.</p>',
       setup: (c) => slidesOpen(c),
       on: when((c) => norm(info(c).slides[0]?.title || '').includes('albüm')),
     },

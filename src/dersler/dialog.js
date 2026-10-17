@@ -167,9 +167,9 @@ export class Dialogs {
   }
 
   // preview (isteğe bağlı): { html, pages, orient, border, wm, padding } — Word gibi programların yazdırma önizlemesi
-  // pvHtml: yazdırma önizlemesinin hazır HTML'i (Hesap Tablosu gibi programlar kendisi çizer)
+  // pvHtml: yazdırma önizlemesinin hazır HTML'i (Hesap Tablosu gibi programlar kendisi çizer); pvWide: pencereyi genişletir
   // pages (isteğe bağlı): belgenin sayfa sayısı; verilirse sayfa aralığı, renk, iki yüz ve yaprak sayısı seçenekleri de çıkar (PDF Okuyucu)
-  print({ printers, doc, preview, pvHtml, pages, current = 1 }) {
+  print({ printers, doc, preview, pvHtml, pvWide, pages, current = 1 }) {
     const pv = preview ? `<div class="dlg-pv"><div class="dlg-pvbox ${preview.orient === 'yatay' ? 'yatay' : ''}"><div class="wd-page dlg-pvp ${preview.border === 'kutu' ? 'bordered' : preview.border === 'cift' ? 'bordered2' : ''} ${preview.orient === 'yatay' ? 'yatay' : ''}" data-wm="${esc(preview.wm || '')}" style="padding:${preview.padding}">${preview.html}</div></div>
         <div class="dlg-pvnote ${preview.pages > 1 ? 'bad' : 'ok'}">${preview.pages > 1 ? `⚠ Belge <b>${preview.pages} sayfa</b>; her sayfa ayrı kâğıda çıkar. Tek kâğıda sığdırmak için yazı boyutunu ya da kenar boşluklarını küçültün.` : '✔ Belge <b>tek kâğıda</b> sığıyor.'}<br><small>Kâğıt: A4, ${preview.orient === 'yatay' ? 'yatay' : 'dikey'}</small></div></div>` : '';
     const inner = `${pvHtml ? `<div class="dlg-pv">${pvHtml}</div>` : pv}<div class="dlg-pr">
@@ -184,6 +184,7 @@ export class Dialogs {
       <div class="dlg-btns"><button type="button" class="dlg-ok">🖨 Yazdır</button><button type="button" class="dlg-cancel">İptal</button></div>`;
     const p = this.shell('dlg-print', 'Yazdır', inner, 'print');
     const back = this._last;
+    if (pvWide) back.querySelector('.dlg').style.width = 'min(62em, 100%)'; // geniş önizleme (Hesap Tablosu): yazı okunsun
     const q = (x) => back.querySelector(x);
     // Seçilen sayfa aralığı: [ilk, son] ya da geçersizse null
     const span = () => {

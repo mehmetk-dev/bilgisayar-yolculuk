@@ -51,7 +51,6 @@ export const sunuKurallar = {
       items: [
         { label: 'Slayt başına 3–5 kısa madde', icon: '📝', bin: 'iyi', why: 'Sade ve okunaklı.' },
         { label: 'Yazıyı en az 24 punto yapmak', icon: '🔠', bin: 'iyi', why: 'Arka sıradan okunur.' },
-        { label: 'Konuyla ilgili net bir fotoğraf koymak', icon: '🖼', bin: 'iyi', why: 'Görsel, söylediğinizi pekiştirir.' },
         { label: 'Slaytta söyleyeceğiniz her cümleyi yazmak', icon: '📄', bin: 'kotu', why: 'Dinleyici slaytı okur, sizi dinlemez.' },
         { label: 'Her maddeye ayrı bir animasyon ve ses koymak', icon: '🎆', bin: 'kotu', why: 'Dikkat dağıtır, sunuyu uzatır.' },
         { label: 'Koyu mavi zeminde lacivert yazı', icon: '🌑', bin: 'kotu', why: 'Zıtlık yok, okunmaz.' },
@@ -61,7 +60,7 @@ export const sunuKurallar = {
     }),
     sec({
       title: 'Sunum günü', text: '<p>Dernek toplantısında sunumunuzu <b>kendi dizüstünüzle</b> yapacaksınız. Salonda bir projeksiyon var ve sizin bilgisayarınızı bağlayacaklar.</p>',
-      q: 'Sunumdan önce hangisini <b>mutlaka</b> yaparsınız?', opts: ['Hiçbir şey; her zaman çalışır', 'Sunuyu bir USB belleğe ya da e-postanıza yedeklerim; bağlantıyı önceden denerim; bilgisayarı şarja takarım', 'Sunuyu yalnızca telefonda tutarım'], ok: 1,
+      q: 'Sunumdan önce hangisini <b>mutlaka</b> yaparsınız?', opts: ['Hiçbir şey; her zaman çalışır', 'Sunuyu yedeklerim, bağlantıyı önceden denerim', 'Sunuyu yalnızca telefonda tutarım'], ok: 1,
       why: 'Teknik aksilik her zaman olur: kablo uymaz, bilgisayar açılmaz. Sunuyu ikinci bir yerde (USB, e-posta, PDF) saklayın, bağlantıyı salonda önceden deneyin.',
     }),
     sec({
@@ -96,7 +95,7 @@ export const sunuAni = {
     {
       title: 'Sunum günü',
       html: `<p>Sunuyu hazırladınız; şimdi izleyicinin karşısındasınız. Sunum sırasında işinizi kolaylaştıracak üç şey: <b>slayt numarası</b>, <b>konuşmacı notları</b> ve <b>kısayollar</b>.</p>
-        <p>Önünüzde 3 slaytlık “Bahçe Takvimi” sunusu var.</p>`,
+        <p>Önünüzde 4 slaytlık “Bahçe Takvimi” sunusu var.</p>`,
       setup: (c) => {
         desktopReady(c); c.d.closeAll();
         maxed(c, 'slides', { data: { theme: 'mavi', slides: [sl('title', { title: 'Bahçe Takvimi', sub: 'Her mevsim' }), sl('content', { title: 'İlkbahar işleri', body: li('Fideleri dikmek', 'Toprağı çapalamak', 'Sulamayı başlatmak') }), sl('content', { title: 'Yaz işleri', body: li('Sabah sulamak', 'Domatesleri toplamak')}), sl('content', { title: 'Sonbahar işleri', body: li('Toprağı gübrelemek', 'Soğan dikmek') })] } });
@@ -123,6 +122,7 @@ export const sunuAni = {
       combo: ['F5'],
       check: (c) => !!inf(c).showing,
       on: (ev) => ev.type === 'ppt-show-start',
+      done: 'Gösteri başladı: slayt tüm ekranı kapladı. İzleyici de perdede bunu görür.',
     },
     {
       title: 'Ekranı karartın: B',
@@ -147,6 +147,7 @@ export const sunuAni = {
       html: `<p>${K('Esc')} tuşuyla sunudan çıkın.</p>`,
       keys: ['Escape'],
       on: (ev) => ev.type === 'ppt-show-exit',
+      done: 'Gösteri kapandı. Esc, sunuda her zaman çıkış tuşudur.',
     },
     rehberSoru({
       title: 'Notlar görünür mü?',

@@ -200,7 +200,7 @@ export const hesap2 = {
       html: `<p>${K('Ctrl', 'P')} ile tabloyu yazdırın.</p>`,
       combo: ['Ctrl', 'KeyP'],
       on: (ev) => ev.type === 'xl-print',
-      done: 'Tablonuz yazıcıya gönderildi.',
+      done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse tablo kâğıda çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Hesap tablosunu biçimlendirip sıraladınız ve grafiğini çizdiniz:</p>' },
   ],

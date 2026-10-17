@@ -36,7 +36,7 @@ export const apartmanDuyuru = {
   steps: [
     {
       title: 'Apartman duyurusu',
-      html: `<p>Apartmanın girişine asılan duyuru, özgeçmişten çok daha sık işinize yarar: toplantı, su kesintisi, asansör bakımı…</p>
+      html: `<p>Apartmanın girişine asılan duyuru her gün onlarca komşunuzun gözüne çarpar: toplantı, su kesintisi, asansör bakımı…</p>
         <p>İyi bir duyuru <b>uzaktan okunur</b>: büyük başlık, ortalı yazı, önemli satırın rengi ve çerçeve.</p>
         <p>Bugün <b>cumartesi günü bahçe toplantısı</b> için bir duyuru hazırlayacağız.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
@@ -64,12 +64,14 @@ export const apartmanDuyuru = {
     {
       title: 'Metni yazın',
       html: `<p>Başlığın altındaki satırlara şunları yazın (her biri ayrı satır, ${K('Enter')} ile):</p>
-        <div class="target">Sayın apartman sakinleri,</div><div class="target">Cumartesi günü saat 14.00'te bahçede toplantı yapılacaktır.</div><div class="target">Katılımınızı rica ederiz.</div>`,
+        <div class="target">Sayın apartman sakinleri,</div><div class="target">Cumartesi günü saat 14.00'te bahçede toplantı yapılacaktır.</div><div class="target">Katılımınızı rica ederiz.</div>
+        <p class="mut">Başlığı ortaladıktan sonra alt satır da ortalı kalmış olabilir. Alt satıra geçince <b>Sola Hizala</b>\'ya (${K('Ctrl', 'L')}) basın.</p>`,
+      hint: 'Satırlar ortalı geliyorsa Ctrl + L ile sola hizalayın.',
       on: when((c) => block(c, 'sayın apartman') && block(c, 'cumartesi') && block(c, 'rica ederiz')),
     },
     {
       title: 'Önemli satırı renklendirin',
-      html: `<p>En önemli satır <b>tarih ve saat</b>. “Cumartesi günü…” satırını üç tıkla seçin; şeritteki <b>A</b> (yazı rengi) düğmesinin yanından <b>kırmızı</b> bir renk seçin. İsterseniz kalın da yapın.</p>`,
+      html: `<p>En önemli satır <b>tarih ve saat</b>. “Cumartesi günü…” satırını üç tıkla seçin; şeritteki <b>A</b> (yazı rengi) düğmesine tıklayın; açılan renklerden <b>kırmızı</b> olanı seçin. İsterseniz kalın da yapın.</p>`,
       hint: 'Yazı rengi düğmesi “A” harfi ve altında renkli çizgi. Tıklayınca renk paleti açılır.',
       on: when((c) => { const b = block(c, 'cumartesi'); return b && b.colors.some((x) => x !== BLACK); }),
       done: 'Kırmızı satır dikkat çekiyor. Çok renk kullanmayın: bir ya da iki yeterli.',
@@ -97,7 +99,7 @@ export const apartmanDuyuru = {
         if (ev.pages > 1) c.warn(`Belge ${ev.pages} sayfa. Duyurunun tek kâğıda sığması gerekir; yazı boyutunu küçültüp yeniden yazdırın.`);
         return ev.pages === 1;
       },
-      done: 'Duyuru yazıcıya gitti.',
+      done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse duyuru kâğıda çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir.',
     },
     {
       title: 'Kaydedin',
@@ -123,7 +125,7 @@ export const apartmanDuyuru = {
 // Birkaç satırı ikinci kâğıda taşan belge: toplantı tutanağı
 const TUTANAK = `<h1>APARTMAN YÖNETİM KURULU TOPLANTI TUTANAĞI</h1>
 ${[
-  'Toplantı 11 Ekim Pazar günü saat 14.00\'te bahçede yapılmıştır. 14 daire sahibi toplantıya katılmıştır.',
+  'Toplantı 11 Ekim pazar günü saat 14.00\'te bahçede yapılmıştır. 14 daire sahibi toplantıya katılmıştır.',
   'Gündemin birinci maddesi olan asansör bakımı görüşülmüş, aylık bakım ücretinin 450 TL olarak sürdürülmesi oy birliğiyle kabul edilmiştir.',
   'İkinci madde olan bahçe düzenlemesi için komşulardan ağaç dikim önerileri alınmıştır. Dut ve kiraz ağaçları önerilmiştir.',
   'Üçüncü madde olarak çöp toplama saatleri yeniden düzenlenmiş, çöplerin akşam 19.00\'dan sonra bahçe kapısının yanındaki kutulara bırakılması kararlaştırılmıştır.',
@@ -133,11 +135,12 @@ ${[
   'Yedinci madde ortak alanların temizliği için çalışan kişiye verilecek ücretin 4.500 TL olması yönünde karara varılmıştır.',
   'Sekizinci madde, aidatların her ayın beşinde yönetime teslim edilmesidir.',
   'Dokuzuncu madde: su sayacı okuma günü her ayın ilk haftası olarak belirlenmiştir.',
-  'Onuncu madde olarak dilek ve temenniler alınmış, bir sonraki toplantı Kasım ayının ilk Pazar günü yapılmak üzere toplantıya son verilmiştir.',
+  'Onuncu madde olarak dilek ve temenniler alınmıştır.',
   'On birinci madde olarak bahçedeki oyun alanının yenilenmesi için çocuk sahibi aileler görüşlerini yazılı olarak yönetime iletecektir.',
   'On ikinci madde: kış aylarında kazan dairesinin çalışma saatleri sabah altı ile gece on arasında olarak yeniden düzenlenmiştir.',
   'On üçüncü madde, apartman girişine konulacak yeni zil panelinin renkli ve numaralı olmasıdır. Fiyat araştırması komşulardan biri tarafından yapılacaktır.',
   'On dördüncü madde olarak komşuların birbirini haberdar etmesi için apartman girişine bir duyuru panosu asılmasına karar verilmiştir.',
+  'Başka söz alan olmadığından, bir sonraki toplantı Kasım ayının ilk pazar günü yapılmak üzere toplantıya son verilmiştir.',
   'Saygılarımızla,',
   'Yönetim Kurulu',
 ].map(P).join('')}`;
@@ -171,7 +174,7 @@ export const sayfaDuzeni = {
     {
       title: 'Kenar boşluklarını daraltın',
       html: '<p><b>Düzen</b> sekmesinde <b>Kenar boşlukları</b> yanındaki <b>Dar</b>\'a tıklayın. Kenar boşluğu azalınca sayfaya daha çok satır sığar.</p>',
-      hint: 'Düzen sekmesi, Giriş\'in iki yanındaki sekmelerden biri. Kenar boşlukları: Normal, Dar, Geniş.',
+      hint: 'Düzen sekmesi, üstteki sekmelerde Ekle\'nin hemen sağındadır. Kenar boşlukları: Normal, Dar, Geniş.',
       on: (ev, c) => {
         if (ev.type !== 'doc-layout') return false;
         if (ev.margin !== 'dar') { c.note('Bu sefer “Dar”ı seçin.'); return false; }
@@ -181,12 +184,16 @@ export const sayfaDuzeni = {
       done: (c) => `Kenarlar daraldı. Belge şimdi ${info(c).pages} sayfa.`,
     },
     {
-      title: 'Hâlâ taşıyorsa',
-      html: `<p>Belge hâlâ iki sayfaysa <b>Ctrl + A</b> ile hepsini seçip <b>yazı boyutunu 10</b> yapın. Önizlemede <b>tek sayfa</b> yazana kadar deneyin; sonra ${K('Ctrl', 'P')} ile bakın.</p>
-        <p class="mut">Yazıyı çok küçültmeyin; 10 punto okunur olmalı. Çok kısa bir belge için sayfayı iki yapmak daha iyidir.</p>`,
-      hint: 'Ctrl + A hepsini seçer. Giriş sekmesindeki boyut kutusundan 10\'u seçin.',
-      on: (ev, c) => (ev.type === 'doc-print-open' || formatEvents.includes(ev.type)) && info(c).pages === 1,
-      check: (c) => info(c).pages === 1,
+      title: 'Önizlemeyle doğrulayın',
+      html: `<p>${K('Ctrl', 'P')} ile önizlemeyi yeniden açın. Şimdi <b>tek sayfa</b> yazmalı. Sonra <b>İptal</b>'e basarak kapatın.</p>
+        <p class="mut">Hâlâ iki sayfa yazıyorsa <b>Ctrl + A</b> ile hepsini seçip yazı boyutunu <b>10</b> yapın ve yine bakın. Yazıyı çok küçültmeyin; 10 punto okunur olmalı.</p>`,
+      combo: ['Ctrl', 'KeyP'],
+      hint: 'Önizlemenin altında sayfa sayısı yazar. İki sayfa görünüyorsa önce Giriş → boyut 10 deneyin.',
+      on: (ev, c) => {
+        if (ev.type !== 'doc-print-open') return false;
+        if (ev.pages > 1) { c.note(`Önizleme ${ev.pages} sayfa. İptal'e basın, yazı boyutunu 10 yapın ve yine ${K('Ctrl', 'P')} ile bakın.`); return false; }
+        return true;
+      },
       done: 'Tek sayfa oldu. Önemli: önce kenar boşluğu, sonra yazı boyutu.',
     },
     {
@@ -203,12 +210,13 @@ export const sayfaDuzeni = {
     },
     {
       title: 'Filigranı kaldırın',
-      html: '<p>Şimdi <b>Yok</b>\'a tıklayarak filigranı kaldırın.</p>',
+      html: '<p>Şimdi <b>Filigran</b> satırındaki <b>Yok</b>\'a tıklayarak filigranı kaldırın. (Yanlışlıkla <b>Sayfa kenarlığı</b> satırındaki Yok\'a basmayın.)</p>',
       on: (ev) => ev.type === 'doc-layout' && ev.wm === '',
+      done: 'Filigran kalktı. İstediğiniz zaman yeniden ekleyebilirsiniz.',
     },
     {
       title: 'Yeni sayfa: Ctrl + Enter',
-      html: `<p>“Saygılarımızla,” satırının <b>başına</b> tıklayın ve ${K('Ctrl', 'Enter')}'a basın: imza kısmı yeni sayfadan başlar.</p>
+      html: `<p>Sayfayı <b>aşağı kaydırın</b>. “Saygılarımızla,” satırının <b>başına</b> tıklayın ve ${K('Ctrl', 'Enter')}'a basın: imza kısmı yeni sayfadan başlar.</p>
         <p class="mut">Yeni sayfaya geçmek için Enter'a onlarca kez basmayın; yazı değişince o boşluklar bozulur.</p>`,
       combo: ['Ctrl', 'Enter'],
       hint: 'Satırın başına gelmek için tıkladıktan sonra Home tuşuna basın.',
@@ -278,9 +286,9 @@ export const tabloInce = {
     {
       title: 'Üstte tek parça başlık',
       html: `<ol class="steps"><li>Başlık satırındaki bir hücreye tıklayın, <b>↑ Üste ekle</b>'ye basın. Tablonun en üstünde boş bir satır belirir.</li>
-        <li>O boş satırdaki <b>tüm hücreleri</b> fareyle soldan sağa <b>sürükleyerek</b> seçin (mavi olur).</li><li><b>⊞ Hücreleri birleştir</b>'e basın.</li><li>Tek büyük hücreye <b>AİDAT ÇİZELGESİ</b> yazın.</li></ol>`,
-      hint: 'Sürükleyerek seçerken fare tuşunu bırakmadan üç hücrenin üzerinden geçin. Sonra birleştirin.',
-      on: when((c) => { const t = info(c).table; return t && t.merged && norm(info(c).text).includes('aidat çizelgesi'); }),
+        <li>O boş satırdaki <b>tüm hücreleri</b> fareyle soldan sağa <b>sürükleyerek</b> seçin (mavi olur).</li><li><b>⊞ Hücreleri birleştir</b>'e basın.</li><li>Tek büyük hücreye <b>AİDAT ÇİZELGESİ</b> yazın. (Birleştirince Tablo Düzeni sekmesi kapanabilir; tabloya tekrar tıklamanız yeter.)</li></ol>`,
+      hint: 'Sürükleyerek seçerken fare tuşunu bırakmadan üç hücrenin üzerinden geçin. Sonra birleştirin. Birleştirince Tablo Düzeni sekmesi kapanabilir: tabloya tekrar tıklayın.',
+      on: when((c) => { const cell = W(c)?.page.querySelector('table')?.rows[0]?.cells[0]; return !!cell && cell.colSpan > 1 && norm(cell.textContent).includes('aidat çizelgesi'); }),
       done: 'Başlık artık tabloyu baştan sona kaplıyor. Çizelgelerde başlık böyle yapılır.',
     },
     {
@@ -304,6 +312,9 @@ export const tabloInce = {
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Tabloları sonradan değiştirebiliyorsunuz:</p>' },
   ],
 };
+
+// Sayfadaki şekillerin yazıları (küçük harf, boşluksuz kenar)
+const shapeTexts = (c) => [...(W(c)?.page.querySelectorAll('.wd-shape') || [])].map((x) => norm(x.textContent));
 
 export const simgeSekil = {
   id: 'simge-sekil', icon: '🔣', title: 'Simgeler ve şekiller: ₺, °C, ½, ©', minutes: 25, stage: 'desktop',
@@ -355,15 +366,15 @@ export const simgeSekil = {
     },
     {
       title: 'Şeklin içine yazın',
-      html: '<p>Okun içindeki “Yazınız” yazısına tıklayın, tümünü silin ve <b>GİRİŞ</b> yazın.</p>',
-      hint: 'Şeklin içine bir kez tıklayın, Ctrl + A bütün şekil yazısını seçer, sonra GİRİŞ yazın.',
-      on: when((c) => info(c).shapes >= 1 && norm(info(c).text).includes('giriş') && !norm(info(c).text).includes('yazınız')),
+      html: '<p>Okun içindeki “Yazınız” sözcüğüne <b>çift tıklayarak</b> seçin ve yerine <b>GİRİŞ</b> yazın.</p>',
+      hint: '“Yazınız” sözcüğüne çift tıklayıp seçin, sonra GİRİŞ yazın. Ctrl + A kullanmayın: bütün sayfayı seçer.',
+      on: when((c) => shapeTexts(c).includes('giriş')),
       done: 'GİRİŞ → duyurularda yön göstermek için çok işe yarar.',
     },
     {
       title: 'Kutu şekli',
-      html: '<p>Bir de <b>Ekle → Şekil → ▭ Kutu</b> ekleyin ve içine <b>ÖNEMLİ</b> yazın.</p>',
-      on: when((c) => info(c).shapes >= 2 && norm(info(c).text).includes('önemli')),
+      html: '<p>Önce <b>şeklin dışına</b> çıkın: şeklin sağındaki boş yere tıklayıp Enter\'a basın, imleç alt satıra insin. Şeklin içindeyken eklerseniz kutu şeklin içine girer. Sonra <b>Ekle → Şekil → ▭ Kutu</b> ekleyin; “Yazınız” sözcüğüne çift tıklayıp seçin ve <b>ÖNEMLİ</b> yazın.</p>',
+      on: when((c) => info(c).shapes >= 2 && shapeTexts(c).includes('önemli')),
     },
     rehberSoru({
       title: 'Hangisi doğru?',
@@ -382,17 +393,17 @@ export const dilekceParkur = {
   steps: [
     {
       title: 'Dilekçe parkuru',
-      html: '<p>10. haftada öğrendiklerinizi tek bir dilekçede birleştirin. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p><div class="box">Eğitmen notu: son ekranda her görevin süresi görünür.</div>',
+      html: '<p>10. haftada öğrendiklerinizi tek bir dilekçede birleştirin. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>',  // Eğitmen notu: son ekranda her görevin süresi görünür.
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     { title: '1. Programı açın', html: '<p><b>Kelime İşlemci</b>\'yi açın.</p>', hint: 'Başlat → Kelime İşlemci.', check: (c) => !!c.d.find('word'), on: (ev) => ev.type === 'app-open' && ev.app === 'word' },
-    { title: '2. Makamı yazın', html: '<p>İlk satıra <b>MUHTARLIĞINA</b> kelimesini büyük harflerle yazın, Enter\'a basın.</p>', hint: 'Caps Lock ya da Shift ile büyük harf. İ ve Ğ harflerine dikkat.', setup: wordOpen, on: when((c) => { const b = info(c).blocks; return b.length >= 2 && norm(b[0].text).includes('muhtarlığına'); }) },
-    { title: '3. Başlığı biçimlendirin', html: '<p>Makam başlığını <b>ortalı, kalın ve 14 punto</b> yapın.</p>', hint: 'Başlığı üç tıkla seçin; Ctrl + E, Ctrl + B ve boyut kutusu.', on: when((c) => { const b = block(c, 'muhtarlığına'); return b && b.align === 'center' && b.bold && b.size >= 14; }) },
-    { title: '4. Konuyu yazın', html: '<p>Alt satıra <b>Konu: Sokak lambası hakkında</b> yazın.</p>', on: when((c) => block(c, 'konu: sokak lambası')) },
-    { title: '5. Metin', html: '<p>Bir paragraf yazın (en az iki cümle): sokağınızdaki lambanın yanmadığını ve değiştirilmesini rica edin. Gereğinin yapılmasını rica ettiğiniz bir son cümleyle bitirin.</p>', hint: 'Satır sonlarında Enter\'a basmayın.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && /lamba/i.test(b.text))) },
+    { title: '2. Makamı yazın', html: '<p>İlk satıra makamı büyük harflerle yazın: <b>ÇINAR MAHALLESİ MUHTARLIĞINA</b> (kendi mahallenizin adını da yazabilirsiniz). Enter\'a basın.</p>', hint: 'Caps Lock ya da Shift ile büyük harf. İ, Ş ve Ğ harflerine dikkat. Resmî dilekçede makam “… MAHALLESİ MUHTARLIĞINA” diye yazılır.', setup: wordOpen, on: when((c) => { const b = info(c).blocks; return b.length >= 2 && norm(b[0].text).includes('mahallesi muhtarlığına'); }) },
+    { title: '3. Başlığı biçimlendirin', html: '<p>Makam başlığını <b>ortalı, kalın ve 14 punto</b> yapın.</p>', hint: 'Başlığı üç tıkla seçin; Ctrl + E, Ctrl + B ve boyut kutusu. Altındaki satır da ortalandıysa, ona geçince Ctrl + L ile sola hizalayın.', on: when((c) => { const b = block(c, 'muhtarlığına'); return b && b.align === 'center' && b.bold && b.size >= 14; }) },
+    { title: '4. Konuyu yazın', html: '<p>Alt satıra <b>Konu: Sokak lambası hakkında</b> yazın. Satır ortalı geliyorsa önce <b>Sola Hizala</b>\'ya (Ctrl + L) basın.</p>', on: when((c) => block(c, 'konu: sokak lambası')) },
+    { title: '5. Metin', html: '<p>Bir paragraf yazın (en az iki cümle): sokağınızdaki lambanın yanmadığını ve değiştirilmesini rica edin. Paragrafı şu cümleyle bitirin: <b>Gereğini saygılarımla arz ederim.</b></p>', hint: 'Satır sonlarında Enter\'a basmayın. Her cümlenin sonuna nokta koyun.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && norm(b.text).includes('lamba') && (b.text.match(/[.!?]/g) || []).length >= 2 && norm(b.text).includes('saygılarımla arz ederim'))) },
     { title: '6. İki yana yaslayın', html: '<p>Yazdığınız metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: 'Paragrafa üç tıkla; Ctrl + J.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && b.align === 'justify')) },
     { title: '7. Tarih ve ad', html: '<p>Altına <b>bugünün tarihini</b> (Ekle → Tarih) ve <b>adınızı soyadınızı</b> yazıp ikisini <b>sağa hizalayın</b>.</p>', hint: 'Ekle → Tarih. İkisini birlikte seçip Ctrl + R.', on: when((c) => { const b = info(c).blocks.filter((x) => x.text); const i = b.findIndex((x) => x.text.includes(today())); return i >= 0 && b[i].align === 'right' && b.slice(i + 1).some((x) => x.align === 'right' && /\p{L}{2,}/u.test(x.text)); }) },
-    { title: '8. Kaydedin', html: '<p>Belgeyi <b>dilekçe</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S.', on: (ev) => ev.type === 'doc-save' && /dilek/i.test(ev.name) },
+    { title: '8. Kaydedin', html: '<p>Belgeyi <b>dilekçe</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S.', on: (ev) => ev.type === 'doc-save' && ev.name.toLocaleLowerCase('tr').includes('dilek') },
     { title: '9. PDF yapın', html: '<p>Aynı belgeyi <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet.', on: (ev) => ev.type === 'doc-pdf' },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Bir dilekçeyi baştan sona hazırladınız.</p>' },
   ],

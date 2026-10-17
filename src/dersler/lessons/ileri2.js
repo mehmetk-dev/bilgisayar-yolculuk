@@ -10,6 +10,7 @@ const demoEv = (c) => (c.d.calEvents ||= []).find((e) => e.demo);
 export const takvimRandevu = {
   id: 'takvim-randevu', icon: '📅', title: 'Takvim: randevu ve hatırlatıcı', minutes: 25, stage: 'desktop',
   desc: 'Takvime doktor randevusu eklemek, bilgisayarın size önceden hatırlatmasını sağlamak ve randevuyu silmek.',
+  desktop: { settings: { installed: ['takvim'] } },
   summary: [
     ['Takvim → güne tıkla', 'Altta o günün randevuları ve “Randevu ekle” bölümü açılır'],
     ['Ad + Saat + Hatırlatma → Ekle', 'Hatırlatma “15 dk önce” ise randevudan 15 dakika önce bildirim çıkar'],
@@ -35,7 +36,7 @@ export const takvimRandevu = {
       title: 'Randevu ekleyin',
       html: '<ol class="steps"><li>Takvimde <b>bir güne</b> tıklayın (yarın olabilir).</li><li>Altta <b>＋ Randevu ekle</b> bölümüne <b>Doktor randevusu</b> yazın.</li><li>Saati <b>10:30</b> yapın, hatırlatmayı <b>15 dk önce</b> seçin.</li><li><b>Ekle</b>\'ye basın.</li></ol>',
       target: 'Doktor randevusu',
-      hint: 'Saat kutusuna tıklayıp 10, 30 yazabilirsiniz.',
+      hint: 'Saat kutusuna tıklayıp 10, 30 yazabilirsiniz. Randevu ekle bölümü Takvim\'in altındadır; görünmüyorsa Takvim penceresinde aşağı kaydırın.',
       setup: (c) => { c.d.ensure('takvim'); },
       on: (ev, c) => {
         if (ev.type !== 'cal-add') return false;
@@ -48,12 +49,12 @@ export const takvimRandevu = {
     },
     {
       title: 'Hatırlatma gelsin',
-      html: '<p>Gerçek hatırlatmayı beklemeyelim: size <b>10 dakika sonrasına</b> “Diş doktoru” adlı bir deneme randevusu koyduk (15 dk önceden hatırlatır). <b>Sağ alttaki bildirimi</b> bekleyin; birkaç saniye sürer.</p>',
+      html: '<p>Gerçek hatırlatmayı beklemeyelim: size <b>15 dakika sonrasına</b> “Diş doktoru” adlı bir deneme randevusu koyduk. Hatırlatma randevudan 15 dakika önce geleceği için bildirim <b>hemen</b> çıkar. <b>Sağ alttaki bildirimi</b> bekleyin; birkaç saniye sürer.</p>',
       hint: 'Ses açıksa kısa bir zil de duyarsınız.',
       setup: (c) => {
         const w = c.d.find('takvim'); if (w) c.d.close(w);
         if (!demoEv(c)) {
-          const at = new Date(c.d.now().getTime() + 10 * 60e3);
+          const at = new Date(c.d.now().getTime() + 15 * 60e3);
           c.d.calEvents.push({ id: 'demo', demo: true, date: `${at.getFullYear()}-${at.getMonth() + 1}-${at.getDate()}`, time: hm(at), title: 'Diş doktoru', remind: 15 });
         }
         c.d.ensure('takvim');
@@ -105,7 +106,7 @@ export const ekranKlavyesi = {
     },
     {
       title: 'Ekran klavyesini açın',
-      html: '<p><b>Ayarlar → Erişilebilirlik</b> açıldı. En alttaki <b>⌨ Ekran klavyesi</b> bölümünde <b>Ekran klavyesini aç</b>\'a basın.</p>',
+      html: '<p><b>Ayarlar → Erişilebilirlik</b> açıldı. En alttaki <b>⌨ Ekran klavyesi</b> bölümünde <b>Ekran klavyesini aç</b>\'a basın. Düğmeyi görmek için pencerede <b>aşağı kaydırın</b>.</p>',
       mouse: '🖱 Ekran klavyesini aç',
       setup: access,
       hint: 'Başlat\'ta “ekran klavyesi” yazarak da açılır.',
@@ -137,7 +138,7 @@ export const ekranKlavyesi = {
 
 // ------------------------------------------------------------------ Adres mektup birleştirme
 const LIST = { A1: 'Ad', B1: 'Adres', C1: 'Şehir', A2: 'Ayşe Kaya', B2: 'Gül Sokak No: 3', C2: 'İzmir', A3: 'Hasan Demir', B3: 'Lale Sokak No: 7', C3: 'Ankara', A4: 'Fatma Ak', B4: 'Nar Sokak No: 1', C4: 'Bursa', A5: 'Mehmet Öz', B5: 'Çam Sokak No: 12', C5: 'İstanbul' };
-const LETTER = '<p>Sayın ,</p><p>Adres: </p><p>Mahallemizin geleneksel kermesi bu Pazar saat 11:00\'de okul bahçesinde yapılacaktır. Sizi de aramızda görmekten mutluluk duyarız.</p><p>Saygılarımızla,<br>Kermes Komitesi</p>';
+const LETTER = '<p>Sayın&nbsp;</p><p>Adres:&nbsp;</p><p>Mahallemizin geleneksel kermesi bu pazar saat 11.00\'de okul bahçesinde yapılacaktır. Sizi de aramızda görmekten mutluluk duyarız.</p><p>Saygılarımızla,<br>Kermes Komitesi</p>';
 const wdM = (c) => c.d.find('word');
 const fields = (c) => wdM(c)?.api.info().fields || [];
 const mmOpen = (c) => {
@@ -162,7 +163,8 @@ export const mektup = {
     {
       title: 'Bu derste',
       html: `<p>Kermes için <b>4 komşuya</b> davet mektubu göndereceğiz. Mektup aynı, yalnızca <b>ad</b> ve <b>adres</b> değişiyor.</p>
-        <p>Dört kez kopyala-yapıştır yapmak yerine kelime işlemcinin <b>adres mektup birleştirme</b> özelliğini kullanacağız. Liste 400 kişi olsa da aynı süre sürer.</p>`,
+        <p>Dört kez kopyala-yapıştır yapmak yerine kelime işlemcinin <b>adres mektup birleştirme</b> özelliğini kullanacağız. Liste 400 kişi olsa da yapılacak iş değişmez; yalnızca liste uzar.</p>
+        <p>(Gerçek Word\'de önce <b>Postalar → Birleştirmeyi Başlat → Mektuplar</b> seçilir. Burada bu adım hazır.)</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); mmOpen(c); },
     },
     {
@@ -177,7 +179,7 @@ export const mektup = {
     },
     {
       title: 'Ad alanını ekleyin',
-      html: '<ol class="steps"><li>Mektupta <b>Sayın</b> kelimesinden sonraya, virgülün önüne tıklayın.</li><li><b>⊕ Birleştirme alanı ekle</b> → <b>«Ad»</b>.</li></ol>',
+      html: '<ol class="steps"><li>Mektupta <b>Sayın</b> kelimesinin sonuna (aynı satırın boş yerine) tıklayın.</li><li><b>⊕ Birleştirme alanı ekle</b> → <b>«Ad»</b>.</li></ol>',
       setup: mmOpen,
       check: (c) => fields(c).includes('Ad'),
       on: (ev) => ev.type === 'merge-field' && ev.field === 'Ad',
@@ -185,7 +187,7 @@ export const mektup = {
     },
     {
       title: 'Adres alanını ekleyin',
-      html: '<p><b>Adres:</b> satırının sonuna tıklayın ve aynı yolla <b>«Adres»</b> alanını ekleyin. İsterseniz arkasından <b>«Şehir»</b> de ekleyin.</p>',
+      html: '<p><b>Adres:</b> satırının sonuna (aynı satırın boş yerine) tıklayın ve aynı yolla <b>«Adres»</b> alanını ekleyin. İsterseniz arkasından <b>«Şehir»</b> de ekleyin.</p>',
       setup: mmOpen,
       check: (c) => fields(c).includes('Adres'),
       on: (ev) => ev.type === 'merge-field' && ev.field === 'Adres',
@@ -202,7 +204,7 @@ export const mektup = {
       title: 'Mektupları oluşturun',
       html: '<p><b>✔ Bitir ve birleştir</b> → <b>📄 Tek tek belgeleri düzenle</b>.</p>',
       setup: mmOpen,
-      hint: '“Belgeleri yazdır…” seçeneği hepsini doğrudan yazıcıya gönderir.',
+      hint: '“Belgeleri yazdır…” seçeneği hepsini doğrudan yazdırma penceresine gönderir (yazıcı ya da PDF seçilir).',
       on: (ev) => ev.type === 'merge-finish',
       done: 'Yeni bir belgede 4 mektup, her biri ayrı sayfada. İsterseniz birine özel not ekleyip yazdırabilirsiniz.',
     },
@@ -289,10 +291,10 @@ export const sanalMasaustu = {
     },
     rehberSoru({
       title: 'Sanal masaüstü ne değildir?',
-      html: '<p>Sanal masaüstleri için hangisi <b>yanlıştır</b>?</p>',
-      opts: ['Bilgisayarı daha hızlı yapar', 'Pencereleri işlerine göre ayırmaya yarar', 'Masaüstü kapatılınca pencereler yandaki masaüstüne geçer'],
+      html: '<p>Sanal masaüstleri için hangisi <b>doğrudur</b>?</p>',
+      opts: ['Pencereleri işlerine göre ayırmaya yarar', 'Bilgisayarı daha hızlı yapar', 'Masaüstü kapatılınca içindeki programlar da kapanır'],
       ok: 0,
-      wrong: 'Bu söylenen doğru; derste de gördük. Yanlış olanı arıyoruz.',
+      wrong: 'Bu doğru değil. Derste gördük: sanal masaüstü yalnızca düzen sağlar; masaüstü kapanınca pencereler yandaki masaüstüne geçer.',
       why: 'Sanal masaüstü yalnızca düzen sağlar; programlar arka planda yine çalışır, bellek kullanır. Bilgisayar yavaşsa gereksiz programları kapatmak gerekir.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Sanal masaüstleri:</p>' },
@@ -337,7 +339,7 @@ export const gorevAyrinti = {
     rehberSoru({
       title: 'En çok bellek kullanan uygulama',
       html: '<p><b>Uygulamalar</b> bölümüne bakın. En çok bellek kullanan açık program hangisi?</p>',
-      opts: ['🌐 İnternet (tarayıcı)', '📝 Not Defteri', '📊 Görev Yöneticisi'],
+      opts: ['🌐 İnternet (tarayıcı)', '📘 Kelime İşlemci', '🎨 Paint'],
       ok: 0,
       wrong: 'Bellek sütunundaki sayılara bakın: MB ne kadar büyükse o kadar çok kullanıyor.',
       why: 'Tarayıcılar, özellikle çok sekme açıkken, en çok belleği kullanan programlardır. Bilgisayar yavaşladıysa önce gereksiz sekmeleri kapatın.',
@@ -349,7 +351,7 @@ export const gorevAyrinti = {
       mouse: '🖱 “İşlemci” başlığı',
       setup: (c) => { c.d.settings.toolbar = true; tmOpen(c); },
       on: (ev) => ev.type === 'task-sort' && ev.key === 'cpu',
-      done: '<b>Süper Arama Yardımcısı</b> işlemcinin yaklaşık %34\'ünü kullanıyor. Siz böyle bir program kurmadınız, Windows ile de gelmedi.',
+      done: '<b>Süper Arama Yardımcısı</b> işlemcinin yaklaşık %34\'ünü kullanıyor. Siz böyle bir program kurmadınız; büyük olasılıkla bir program kurarken yanında gelmiş.',
     },
     {
       title: 'İnterneti de kullanıyor mu?',
@@ -527,13 +529,13 @@ export const kelimeHarf = {
     },
     {
       title: 'Satır aralığını açın',
-      html: '<p>Üçüncü paragrafa (<b>Çarşamba günü kazan dairesinin…</b>) tıklayın. Giriş sekmesindeki <b>satır aralığı</b> kutusundan (↕ simgeli açılır liste) <b>1,5</b>\'i seçin.</p>',
+      html: '<p>Üçüncü paragrafa (<b>Çarşamba günü kazan dairesinin…</b>) tıklayın. Giriş sekmesinde girinti düğmelerinin (⇤ ⇥) sağındaki, üzerinde <b>1,15</b> yazan <b>satır aralığı</b> kutusuna tıklayın ve <b>1,5</b>\'i seçin.</p>',
       mouse: '🖱 Paragrafa tıklayın → satır aralığı → 1,5',
       setup: kOpen,
-      hint: 'Kutu yazı boyutu kutusunun yanındadır; üzerinde “1,15” yazar. Tıklayıp 1,5\'i seçin.',
+      hint: 'Kutu, madde işaretleri ve girinti düğmelerinin hemen yanındadır; üzerinde “1,15” yazar. Pencere dar ise alt satırda olabilir.',
       check: (c) => parseFloat(wdK(c)?.api.page.children[2]?.style.lineHeight) > 1.6,
       on: (ev) => ev.type === 'doc-format' && ev.cmd === 'lineHeight' && ev.value >= 1.5,
-      done: 'Satırlar arası açıldı. Uzun yazıları, özellikle ileri yaştakiler ve uzaktan okuyanlar için daha rahat okunur yapar.',
+      done: 'Satırlar arası açıldı. Uzun yazıları, özellikle gözü yorulanlar ve uzaktan okuyanlar için daha rahat okunur yapar.',
     },
     {
       title: 'Cetveli açın',
@@ -599,7 +601,8 @@ export const tarayiciNot = {
     },
     {
       title: 'Sayfayı sık kullanılanlara ekleyin',
-      html: `<p>${K('Ctrl', 'D')} tuşlarına basın ya da adres çubuğundaki <b>☆</b>\'a tıklayın. Sayfanın altında <b>sık kullanılanlar çubuğu</b> çıkar.</p>`,
+      html: `<p>${K('Ctrl', 'D')} tuşlarına basın ya da adres çubuğundaki <b>☆</b>\'a tıklayın. Adres çubuğunun hemen altında <b>sık kullanılanlar çubuğu</b> çıkar.</p>`,
+      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋯ menüsünü kullanın.',
       setup: (c) => { c.d.settings.ext.note = true; brN(c); },
       on: (ev) => ev.type === 'web-bookmark' && !ev.removed,
       done: 'Sayfa sık kullanılanlara eklendi; çubukta ⭐ ile görünür. Tıklayınca o sayfa açılır.',
@@ -608,6 +611,7 @@ export const tarayiciNot = {
       title: 'Çubuğu gizleyin',
       html: `<p>Sık kullanılanlar çubuğu yer kaplıyorsa gizleyebilirsiniz: ${K('Ctrl', 'Shift', 'B')} ya da <b>⋯</b> → <b>Sık kullanılanlar çubuğunu göster/gizle</b>.</p>`,
       mouse: '🖱 ⋯ → Sık kullanılanlar çubuğunu göster/gizle',
+      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋯ menüsünü kullanın.',
       setup: (c) => { c.d.settings.ext.note = true; brN(c); },
       on: (ev) => ev.type === 'web-bmbar' && !ev.on,
       done: 'Çubuk gizlendi. Sık kullanılanlarınız silinmedi; yalnızca görünmüyor.',

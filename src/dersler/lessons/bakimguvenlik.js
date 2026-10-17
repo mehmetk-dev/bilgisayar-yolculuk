@@ -30,7 +30,7 @@ export const bakimGuvenlik = {
       mouse: '🖱 Başlat → Windows Güvenliği',
       check: (c) => !!c.d.find('guvenlik'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'guvenlik',
-      done: 'Soldaki menüde üç bölüm var. Şimdilik “Virüs ve tehdit koruması” açık.',
+      done: 'Soldaki menüde virüs koruması, güvenlik duvarı ve Disk Temizleme bölümleri var. Şimdilik “Virüs ve tehdit koruması” açık.',
     },
     {
       title: 'Hızlı tarama',
@@ -50,7 +50,7 @@ export const bakimGuvenlik = {
     rehberSoru({
       title: 'Kapatalım mı?',
       html: '<p>Bir internet sitesi şöyle diyor: “Programı kurabilmek için önce <b>güvenlik duvarını kapatın</b>.” Ne yaparsınız?</p>',
-      opts: ['Kapatırım, site öyle diyor', 'Kapatmam; böyle isteyen site şüphelidir', 'Bilgisayarı kapatırım'], ok: 1,
+      opts: ['Kapatırım, site öyle diyor', 'Kurulum bitince geri açmak şartıyla kapatırım', 'Kapatmam; böyle isteyen site şüphelidir'], ok: 2,
       wrong: 'Bu pek güvenli değil. Güvenilir programlar duvarı kapatmanızı istemez.',
       why: 'Doğru. Güvenlik duvarını kapatmanızı isteyen program ya da site çoğu zaman zararlıdır. Açık bırakın.',
     }),
@@ -71,7 +71,8 @@ export const bakimGuvenlik = {
     },
     {
       title: 'USB belleği tarayın',
-      html: '<p>Windows Güvenliği\'nde <b>Virüs ve tehdit koruması</b>\'na dönün ve <b>💾 USB belleği tara</b>\'ya tıklayın.</p>',
+      html: `<p>Windows Güvenliği\'nde <b>Virüs ve tehdit koruması</b>\'na dönün ve <b>💾 USB belleği tara</b>\'ya tıklayın.</p>
+        <p class="mut">Bu bir alıştırma penceresidir. Gerçek Windows\'ta USB belleği taramak için Dosya Gezgini\'nde sürücüye sağ tıklayıp <b>Microsoft Defender ile tara</b> seçin.</p>`,
       setup: ws('virus'),
       on: (ev, c) => {
         if (ev.type === 'scan-nousb') c.note('USB bellek takılı değil. Önce önceki adımdaki düğmeyle belleği takın.');
@@ -88,7 +89,8 @@ export const bakimGuvenlik = {
     },
     {
       title: 'Disk Temizleme',
-      html: '<p>Bilgisayarınızın diski neredeyse dolmuş. Soldan <b>🧹 Disk Temizleme</b>\'ye tıklayın; üstteki çubuğa ve boş alana bakın.</p>',
+      html: `<p>Bilgisayarınızın diski neredeyse dolmuş. Soldan <b>🧹 Disk Temizleme</b>\'ye tıklayın; üstteki çubuğa ve boş alana bakın.</p>
+        <p class="mut">Bu bir alıştırma penceresidir. Gerçek Windows\'ta Disk Temizleme ayrı bir programdır: Başlat\'a <b>Disk Temizleme</b> yazıp açın.</p>`,
       setup: ws('virus'),
       on: (ev) => ev.type === 'ws-page' && ev.page === 'disk',
     },
@@ -111,14 +113,14 @@ export const bakimGuvenlik = {
     rehberSoru({
       title: 'Bilgisayar yavaşladı',
       html: '<p>Bir tanıdığınızın bilgisayarının diski dolmuş, yavaşlamış. Önce ne önerirsiniz?</p>',
-      opts: ['Disk Temizleme ile geçici dosyaları silmesini; fotoğraf ve belgelerin yedeğini almasını', 'Hemen yeni bilgisayar almasını', 'Bütün dosyaları silmesini'], ok: 0,
+      opts: ['Hemen yeni bir bilgisayar satın almasını', 'Önce Disk Temizleme yapıp yedek almasını', 'Disk dolu olduğu için bütün dosyaları silmesini'], ok: 1,
       wrong: 'Bu çok büyük bir adım. Daha hafif bir çözüm var.',
       why: 'Doğru. Önce geçici dosyalar temizlenir; yer yine de yetmezse önemli dosyalar USB belleğe ya da buluta yedeklenip gerekmeyenler silinir.',
     }),
     rehberSoru({
       title: 'Sahte uyarı',
       html: '<p>Bir internet sitesinde kırmızı bir pencere çıktı: “<b>Bilgisayarınızda 7 virüs bulundu! Hemen bu programı indirin.</b>” Ne yaparsınız?</p>',
-      opts: ['İndiririm, çok acil', 'Kapatırım; gerçek virüs taramasını Windows Güvenliği ile kendim yaparım', 'Bilgisayarı kapatırım'], ok: 1,
+      opts: ['Pencereyi kapatır, Windows Güvenliği ile kendim tararım', 'Programı hemen indirir, kurarım; çok acil görünüyor', 'Pencerede yazan numarayı ararım'], ok: 0,
       wrong: 'Bu bir tuzak olabilir. Gerçek uyarılar nereden gelir?',
       why: 'Doğru. Bir internet sitesi bilgisayarınızı tarayamaz; bu pencere sahtedir. Gerçek virüs uyarısını Windows Güvenliği verir.',
     }),

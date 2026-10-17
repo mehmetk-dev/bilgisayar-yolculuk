@@ -672,7 +672,12 @@ export class Desktop {
     if (name.endsWith('.mp4')) return this.open('photos', { node: n.id });
     if (name.endsWith('.zip')) return this.extractZip(n, true);
     if (name.endsWith('.exe')) return this.runSetup(n);
-    if (name.endsWith('.pdf')) return this.open('pdf', { node: n.id });
+    if (name.endsWith('.pdf')) {
+      // Aynı PDF zaten açıksa yenisini açmayız, açık olanı öne getiririz (ders olayı yine gelsin diye app-open bildirilir)
+      const ex = this.wins.find((w) => w.app === 'pdf' && w.args?.node === n.id);
+      if (ex) { if (ex.min) this.restore(ex); else this.focus(ex); this.emit('app-open', { app: 'pdf', win: ex.id, args: { node: n.id }, again: true }); return ex; }
+      return this.open('pdf', { node: n.id });
+    }
     if (/\.html?$/.test(name)) return this.open('browser', { file: n.id });
     if (/\.(mp3|m4a|wav)$/.test(name)) return this.open('music', { node: n.id });
     this.toast('Açılamadı', 'Bu dosyayı açacak bir program yok.', '⚠');
@@ -848,7 +853,7 @@ export class Desktop {
     // Görev çubuğuna sağ tık: boş yerde Görev Yöneticisi, uygulama düğmesinde pencereyi kapat
     $('.dk-taskbar').addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      if (e.target.closest('.tb-start')) return;
+      if (e.target.closest('.tb-start, .tb-clock')) return; // başlat ve saatin kendi menüsü var
       const b = e.target.closest('.tb-apps [data-app]');
       if (b) {
         const app = b.dataset.app, list = this.wins.filter((w) => w.app === app);
@@ -904,10 +909,12 @@ export class Desktop {
       const t = q.toLocaleLowerCase('tr').trim();
       const score = (a) => {
         const n = APPS[a].name.toLocaleLowerCase('tr');
+        if (n === t) return 5; // tam ad ("hesap tablosu") anahtar sözcükten önce gelir
         if (n.startsWith(t)) return 4;
         if (n.split(' ').some((w) => w.startsWith(t))) return 3;
         if (n.includes(t)) return 2;
-        return (APPS[a].keywords || []).some((k) => k.includes(t)) ? 1 : 0;
+        const kw = APPS[a].keywords || [];
+        return kw.includes(t) ? 1.5 : kw.some((k) => k.includes(t)) ? 1 : 0; // "excel" gibi tam anahtar sözcük, kısmi eşleşmeden önce
       };
       return all.map((a) => [a, score(a)]).filter(([, s]) => s).sort((x, y) => y[1] - x[1]).map(([a]) => a);
     };
@@ -1078,7 +1085,7 @@ export class Desktop {
     const n = this.wins.length;
     const win = {
       id: 'w' + this.seq++, app, title: def.name, icon: def.icon, vd: this.vd,
-      x: Math.round((W - w) / 2 + (n % 5) * 24 - 40), y: Math.max(6, Math.round((H - h) / 2 + (n % 5) * 22 - 30)), w, h, min: false, max: !!def.max,
+      x: Math.round((W - w) / 2 + (n % 5) * 24 - 40), y: Math.max(6, Math.round((H - h) / 2 + (n % 5) * 22 - 30)), w, h, min: false, max: !!def.max, args,
     };
     win.x = Math.max(4, Math.min(win.x, W - w - 4));
     const el = document.createElement('div');

@@ -46,8 +46,8 @@ export const yaziSorun = {
       title: 'Harfler yutuluyor',
       html: `<p>Not Defteri'ne bir yazı koyduk: <b>Yarın pazar.</b> İmleç en başta.</p>
         <p>Yazının <b>başına</b> şunu ekleyin: <b>Dikkat: </b> (iki noktadan sonra boşluk). Yazının sonu <b>Dikkat: Yarın pazar.</b> olmalı.</p>
-        <p>Dikkat edin: yazıyı ekleyince ne oluyor?</p>`,
-      hint: `Sağ alttaki durum çubuğunda <b>“Üzerine yaz (INS)”</b> yazıyor. ${K('Insert')} tuşu harfleri yutturur. Bir kez ${K('Insert')}'e basarak kapatın, ${K('Ctrl', 'A')} ile hepsini seçip yazıyı baştan yazın.`,
+        <p>Dikkat edin: yazıyı ekleyince ne oluyor? Sonra sorunu çözün. Klavyenizde <b>Insert</b> tuşu yoksa alttaki <b>“Üzerine yaz (INS)”</b> yazısına tıklayın.</p>`,
+      hint: `Sağ alttaki durum çubuğunda <b>“Üzerine yaz (INS)”</b> yazıyor. ${K('Insert')} tuşu harfleri yutturur. Bir kez ${K('Insert')}'e basarak kapatın, ${K('Ctrl', 'A')} ile hepsini seçip yazıyı baştan yazın. Klavyenizde Insert yoksa alttaki <b>“Üzerine yaz (INS)”</b> yazısına tıklayın.`,
       setup: (c) => {
         c.np.setText('Yarın pazar.');
         c.np.setOverwrite(true);
@@ -60,7 +60,7 @@ export const yaziSorun = {
     {
       title: 'HER ŞEY BÜYÜK',
       html: `<p>Şimdi <b>Caps Lock</b> tuşuna bir kez basın (klavyenin sol tarafında, <b>A</b>'nın solunda) ve <b>merhaba</b> yazın.</p>
-        <p>Ne oldu?</p>`,
+        <p>Ne oldu? Harfler büyük çıkmadıysa Caps Lock zaten açıkmış demektir: tuşa bir kez daha basıp yeniden yazın. Caps Lock'u bulamazsanız ${K('Shift')} tuşunu basılı tutarak da yazabilirsiniz.</p>`,
       keys: ['CapsLock'],
       setup: (c) => c.np.setText(''),
       on: (ev, c) => ev.type === 'input' && /MERHABA/.test(c.np.value),
@@ -75,10 +75,10 @@ export const yaziSorun = {
     },
     rehberSoru({
       title: 'Sayılar yazılmıyor',
-      html: '<p>Masaüstü klavyenin sağındaki <b>sayı tuş takımında</b> 7, 8, 9 tuşlarına basıyorsunuz. Rakam yerine imleç hareket ediyor, hiçbir şey yazılmıyor. Neden?</p>',
+      html: '<p><i>(Dizüstünüzde sayı tuş takımı yoksa bu soruyu geçin.)</i></p><p>Masaüstü klavyenin sağındaki <b>sayı tuş takımında</b> 7, 8, 9 tuşlarına basıyorsunuz. Rakam yerine imleç hareket ediyor, hiçbir şey yazılmıyor. Neden?</p>',
       opts: ['Klavye bozuk', '<b>Num Lock</b> kapalı', 'Caps Lock açık'], ok: 1,
       wrong: 'Bu değil. O tuş takımının rakam mı ok mu olacağını belirleyen bir kilit tuşu var.',
-      why: `<b>Num Lock</b> kapalıyken sağdaki tuşlar ok, Home, End gibi çalışır. ${K('Num Lock')}'a bir kez basınca rakam yazarlar. Klavyede ışığı yanıyorsa açıktır. Rakam sırasındaki (harflerin üstündeki) tuşlar her zaman çalışır.`,
+      why: `<b>Num Lock</b> kapalıyken sağdaki tuşlar ok, Home, End gibi çalışır. ${K('Num Lock')}'a bir kez basınca rakam yazarlar. Klavyede ışığı yanıyorsa açıktır. Rakam sırasındaki (harflerin üstündeki) tuşlar her zaman çalışır. Dizüstü bilgisayarınızda sağda ayrı sayı tuş takımı yoksa bu soruyu geçebilirsiniz.`,
     }),
     rehberSoru({
       title: 'ş, ğ, ü çıkmıyor',

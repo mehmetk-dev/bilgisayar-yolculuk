@@ -90,7 +90,8 @@ export function saat({ desk, body, emit }) {
   let tab = 'alarm';
   const render = () => {
     const now = desk.now();
-    const hm = `${pad(now.getHours())}:${pad(now.getMinutes() + 1 > 59 ? 0 : now.getMinutes() + 1)}`;
+    const soon = new Date(now.getTime() + 60000); // bir dakika sonrası (14:59 → 15:00)
+    const hm = `${pad(soon.getHours())}:${pad(soon.getMinutes())}`;
     body.innerHTML = `<div class="sa-tabs"><button type="button" data-tab="alarm" class="${tab === 'alarm' ? 'on' : ''}">⏰ Alarm</button><button type="button" data-tab="timer" class="${tab === 'timer' ? 'on' : ''}">⏳ Zamanlayıcı</button></div>
       <div class="sa-page">${tab === 'alarm' ? `
         <div class="sa-add"><input type="time" class="sa-time" value="${hm}"><input type="text" class="sa-label" placeholder="Alarm adı (ör. İlaç saati)" maxlength="30"><button type="button" class="sa-addbtn primary">＋ Ekle</button></div>

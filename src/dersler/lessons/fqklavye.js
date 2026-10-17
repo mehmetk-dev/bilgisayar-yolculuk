@@ -70,7 +70,7 @@ export const fqKlavye = {
       why: 'Tuşların üstündeki harflere bakmak yeter: üst sıra Q ile başlıyorsa Q, F ile başlıyorsa F klavyedir. Tuşların harfleri silinmişse bir yazı programında “q” tuşuna basıp ne çıktığına da bakabilirsiniz.',
     }),
     sec({
-      title: 'Daktilo bilen komşu', text: '<p>Komşunuz yıllarca <b>F klavyeyle daktilo</b> yazdı. Yeni bilgisayarının klavyesi Q ve her şeyi aramaktan yazamıyor.</p>',
+      title: 'Daktilo bilen komşu', text: '<p>Komşunuz yıllarca <b>F klavyeyle daktilo</b> yazdı. Yeni bilgisayarının klavyesi Q ve harfleri aramaktan yazamıyor.</p>',
       q: 'Ona ne önerirsiniz?', opts: ['Bilgisayarı geri versin', 'Windows\'ta Türkçe F klavyeyi ekleyip kullansın; tuşların üstü Q yazar ama F düzeninde çıkan harfleri ezbere bildiği için sorun olmaz', 'Hepsini yeniden öğrensin, F klavye bilgisayarda çalışmaz'], ok: 1,
       why: 'Windows\'ta Türkçe F düzeni vardır: Ayarlar → Saat ve dil → klavye ekle. Tuşların üstündeki harfler Q olduğu için ya ezbere yazılır, ya da klavyeye F etiketleri yapıştırılır. Bir sonraki derste bunu kendiniz deneyeceksiniz.',
     }),
@@ -117,13 +117,13 @@ export const klavyeDili = {
       title: 'Dil göstergesi',
       html: '<p>Sağ altta saatin yanındaki <b>TUR</b> yazısına <b>tıklayın</b>. Seçenekler listesi açılır: hangileri var?</p>',
       mouse: '🖱 Sağ alt: TUR',
-      hint: 'Saatin hemen solunda, Wi-Fi simgesinin yanında.',
+      hint: 'Saatin solunda, Wi-Fi ve ses simgelerinin yanında.',
       on: (ev) => ev.type === 'context' && ev.kind === 'lang',
       done: 'Listede <b>TUR Türkçe Q klavye</b> ve <b>ENG İngilizce klavye</b> var. Tik işareti şu an kullanılanı gösterir.',
     },
     {
       title: 'ENG\'yi seçin',
-      html: '<p>Listeden <b>ENG İngilizce (ABD) klavye</b>\'yi seçin. Bir yanlışlıkla bu olabilir; bakalım ne olacak.</p>',
+      html: '<p>Listeden <b>ENG İngilizce (ABD) klavye</b>\'yi seçin. Yanlışlıkla bu olabilir; bakalım ne olacak.</p>',
       check: (c) => layoutNow(c) === 'eng',
       on: (ev) => ev.type === 'kb-layout' && ev.layout === 'eng',
       done: 'Sağ alttaki yazı <b>ENG</b> oldu. Şimdi yazı yazalım.',
@@ -141,7 +141,7 @@ export const klavyeDili = {
         <p class="mut">Türkçe klavyede @ için ${K('AltGr')} + <b>Q</b> kullanılır. Aynı işaret için iki ayrı yol: dil değişince alışkanlık da değişir.</p>`,
       hint: 'Shift tuşunu basılı tutup üst sıradaki 2 tuşuna basın.',
       on: (ev, c) => ev.type === 'input' && npText(c).includes('@'),
-      done: 'ENG kipinde Shift + 2 = @. Türkçe Q klavyede ise 2 tuşuyla Shift basınca <b>"</b> (tırnak) çıkar. Şifre ve e-posta yazarken dilin doğru olduğundan emin olun.',
+      done: 'ENG kipinde Shift + 2 = @. Türkçe Q klavyede ise Shift + 2 tuşları <b>\'</b> (kesme işareti) yazar; @ için AltGr + Q gerekir. Şifre ve e-posta yazarken dilin doğru olduğundan emin olun.',
     },
     {
       title: 'Türkçe\'ye dönün: Alt + Shift',
@@ -177,6 +177,10 @@ export const klavyeDili = {
       html: `<p>Not Defteri'ne tıklayıp yazı alanını temizleyin (${K('Ctrl')} + ${K('A')}, sonra ${K('Delete')}). Sonra <b>klavyenizde sırayla F, H, F</b> tuşlarına basın.</p>
         <p class="mut">F klavyede <b>a</b> harfi, Q klavyedeki F tuşunun yerindedir; <b>t</b> ise H tuşunun yerindedir. Hangi kelime çıkacak?</p>`,
       hint: 'Tuşların üstünde F, H, F yazıyor; siz Q klavyedeki harflere basıyorsunuz ama ekrana F düzeninin harfleri çıkıyor.',
+      setup: (c) => {
+        const st = c.d.find('settings'); if (st) c.d.close(st);
+        const np = c.d.find('notepad'); if (np) { if (np.min) c.d.restore(np); c.d.focus(np); }
+      },
       on: (ev, c) => ev.type === 'input' && /ata$/i.test(npText(c).trim()),
       done: '<b>ata</b> çıktı! Klavyedeki F, H, F tuşlarına bastınız ama F düzeninin harfleri yazıldı. Daktilodan F klavyeyi bilenler bu yüzden düzeni seçip tuşlara bakmadan yazabilir.',
     },

@@ -13,7 +13,7 @@ export const donatilar = {
   summary: [
     ['🗒 Yapışkan Notlar', 'Kısa notlar; renkli kâğıtlar, kapatınca silinmez'],
     ['＋ Yeni not', 'Boş bir kâğıt açar'],
-    ['🎙 Ses Kaydedici', 'Kırmızı ● ile başlar, ■ ile durur; kayıt Müzik klasörüne kaydedilir'],
+    ['🎙 Ses Kaydedici', 'Kırmızı ● ile başlar, ■ ile durur; kayıt Belgeler > Ses kayıtları klasörüne kaydedilir (alıştırmada Müzik klasörüne)'],
     ['⏰ Alarm', 'Belirli bir saatte çalar; adını yazın (İlaç saati)'],
     ['⏳ Zamanlayıcı', 'Şu andan belli bir süre sonra çalar (yemek, çay demi)'],
     ['🔊 Ses', 'Alarm ve kayıt için bilgisayarın sesi açık olmalı'],
@@ -23,7 +23,7 @@ export const donatilar = {
       title: 'Küçük yardımcılar',
       html: `<p>Bilgisayarda büyük programların yanında hayatı kolaylaştıran <b>küçük yardımcılar</b> vardır. Bugün üç tanesini öğreneceğiz:</p>
         <ul class="big-list"><li>🗒 <b>Yapışkan Notlar</b>: kâğıt not yerine</li><li>🎙 <b>Ses Kaydedici</b>: yazmak yerine konuşarak not</li><li>⏰ <b>Saat</b>: ilaç, randevu ya da yemek için alarm</li></ul>
-        <p class="mut">Hepsi Başlat menüsünde. Alıştırma bilgisayarında hiçbir şey gerçek bir kayıt yapmaz; kendi sesiniz kaydedilmez.</p>`,
+        <p class="mut">Hepsi Başlat menüsünde. Alıştırma bilgisayarında gerçek ses kaydı yapılmaz: sesiniz saklanmaz. Düğmeleri gerçekmiş gibi deneyeceksiniz.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); c.d.stickies = []; },
     },
     {
@@ -51,8 +51,8 @@ export const donatilar = {
       title: 'İkinci not, sonra silin',
       html: `<p>Bir not daha ekleyin (içine istediğinizi yazın). Sonra <b>ilk notu</b> silin: notun üstündeki <b>🗑</b> simgesine tıklayın.</p>
         <p class="mut">Yapılan işin notunu silmek iyi bir alışkanlıktır; masa dağılmaz.</p>`,
-      hint: '🗑 simgesi her notun sağ üst köşesindedir.',
-      on: (ev, c) => ev.type === 'sticky-delete' && c.d.stickies.length >= 1,
+      hint: '🗑 simgesi her notun sağ üst köşesindedir. Önce ikinci notu ekleyin, sonra ilk notu silin.',
+      on: (ev) => ev.type === 'sticky-delete',
       done: 'Notlarınız bu kadar kolay.',
     },
     {
@@ -63,18 +63,18 @@ export const donatilar = {
     },
     {
       title: 'Kayıt yapın',
-      html: `<ol class="steps"><li>Kırmızı <b>●</b> düğmesine tıklayın.</li><li>Sayaç ilerlerken birkaç saniye <b>konuşun</b> (örneğin “Yarın ilacı almayı unutma”).</li><li>Kırmızı <b>■</b> düğmesine tıklayarak durdurun.</li></ol>`,
+      html: `<ol class="steps"><li>Kırmızı <b>●</b> düğmesine tıklayın.</li><li>Sayaç ilerlerken birkaç saniye bekleyin. Gerçek bilgisayarda bu sırada konuşursunuz (örneğin “Yarın ilacı almayı unutma”).</li><li>Kırmızı <b>■</b> düğmesine tıklayarak durdurun.</li></ol>`,
       hint: 'En az 2 saniye sürsün. Durdurmak için ■ düğmesine basın.',
       on: (ev, c) => {
         if (ev.type !== 'rec-stop') return false;
         if (ev.secs < 2) { c.warn('Kayıt çok kısa oldu. Bir daha deneyin: ● ile başlayın, birkaç saniye bekleyip ■ ile durdurun.'); return false; }
         return true;
       },
-      done: (c) => `Kaydınız <b>Müzik</b> klasörüne “Kayıt (1).m4a” adıyla kaydedildi. Dosya Gezgini'nden de bulabilirsiniz.`,
+      done: (c) => { const r = c.d.fs.children('music').filter((n) => /^Kayıt.*\.m4a$/.test(n.name)).pop(); return `Kaydınız ${r ? `“${r.name}” adıyla ` : ''}<b>Müzik</b> klasörüne kaydedildi. Dosya Gezgini'nden de bulabilirsiniz. (Gerçek Windows'ta kayıtlar <b>Belgeler</b> içindeki <b>Ses kayıtları</b> klasörüne gider.)`; },
     },
     {
       title: 'Kaydı dinleyin',
-      html: '<p>Aşağıdaki <b>Kayıtlarınız</b> listesinde kaydı bulup <b>▶ Dinle</b>\'ye tıklayın.</p>',
+      html: '<p>Aşağıdaki <b>Kayıtlarınız</b> listesinde kaydı bulup <b>▶ Dinle</b>\'ye tıklayın. <small>(Alıştırmada örnek bir ses çalar.)</small></p>',
       mouse: '🖱 ▶ Dinle',
       hint: 'Ses gelmiyorsa sağ alttaki 🔊 simgesine tıklayıp sesi açın.',
       on: (ev, c) => {
@@ -82,7 +82,7 @@ export const donatilar = {
         if (!ev.audible) { c.warn('Ses duyulmuyor: ses kapalı ya da sıfırda. Sağ alttaki 🔊 simgesinden açıp tekrar ▶ Dinle\'ye basın.'); return false; }
         return true;
       },
-      done: 'Sesi dinledik. Torunlarınızdan gelen mesajları kaydedip saklayabilirsiniz.',
+      done: 'Sesi dinledik. (Burada çalan sizin sesiniz değil, örnek bir melodiydi; gerçekte kendi kaydınız çalar.) Torunlarınızdan gelen mesajları kaydedip saklayabilirsiniz.',
     },
     {
       title: 'Saat uygulaması',

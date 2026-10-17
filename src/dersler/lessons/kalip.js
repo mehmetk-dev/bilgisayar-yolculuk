@@ -69,7 +69,7 @@ export function sec({ title, html, kind = 'plain', from, subject, text = '', q, 
 export function rehberSoru({ title, html, opts, ok, why, wrong, hint, setup }) {
   return {
     title, hint,
-    html: `${html}<div class="rs-opts">${opts.map((o, i) => `<button type="button" class="btn" data-i="${i}">${o}</button>`).join('')}</div>`,
+    html: `${html}<div class="rs-opts">${opts.map((o, i) => `<button type="button" class="btn" data-i="${i}"><span>${o}</span></button>`).join('')}</div>`,
     setup: (c) => {
       setup?.(c);
       document.querySelector('#stepBody .rs-opts').onclick = (e) => {

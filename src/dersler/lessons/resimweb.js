@@ -49,9 +49,9 @@ export const resimWeb = {
     },
     {
       title: 'İkisini karşılaştırın',
-      html: '<p>⊞ Başlat → <b>📁 Dosya Gezgini</b> → <b>Resimler</b> klasörüne bakın. <b>çiçek.png</b> ve <b>çiçek.jpg</b> dosyalarının <b>türü</b> ve <b>boyutuna</b> bakın. Hangisi daha küçük?</p><p class="mut">Boyutlar farklı çıkar. Resmi yakınlaştırıp bakarsanız PNG’de çizgi kenarlarının <b>net</b>, JPG’de çevrelerinde hafif <b>bulanıklık</b> olduğunu görürsünüz. <b>Fotoğraflarda</b> ise JPG, PNG’den çok daha küçüktür; bu yüzden telefonla çekilen fotoğraflar hep JPG’dir.</p>',
+      html: '<p>⊞ Başlat → <b>📁 Dosya Gezgini</b> → <b>Resimler</b> klasörüne bakın. Liste ayrıntılı açılır; açılmazsa üstteki <b>☰ Ayrıntılar</b> düğmesine tıklayın. <b>çiçek.png</b> ve <b>çiçek.jpg</b> dosyalarının <b>türü</b> ve <b>boyutuna</b> bakın. Hangisi daha küçük?</p><p class="mut">Boyutlar farklı çıkar. Resmi yakınlaştırıp bakarsanız PNG’de çizgi kenarlarının <b>net</b>, JPG’de çevrelerinde hafif <b>bulanıklık</b> olduğunu görürsünüz. <b>Fotoğraflarda</b> ise JPG, PNG’den çok daha küçüktür; bu yüzden telefonla çekilen fotoğraflar çoğunlukla JPG’dir (bazı iPhone’larda HEIC).</p>',
       manual: 'Baktım ✔',
-      setup: (c) => c.d.ensure('explorer', { folder: 'pictures' }),
+      setup: (c) => { const e = c.d.find('explorer'); if (e) c.d.close(e); c.d.open('explorer', { folder: 'pictures', view: 'details' }); },
       done: 'Dosya türü, ne tür resim sakladığınıza göre seçilir. Boyut farkı, fotoğraf sayısı arttıkça disk dolmasına ve e-postaya ek göndermeye de yansır.',
     },
     rehberSoru({
@@ -59,7 +59,7 @@ export const resimWeb = {
       html: '<p>Torununuza e-postayla <b>20 tatil fotoğrafı</b> göndereceksiniz. E-postaya sığması için hangi türü seçersiniz?</p>',
       opts: ['JPG: fotoğraflar için küçük kalır', 'PNG: kayıpsız olduğu için', 'BMP'], ok: 0,
       wrong: 'Fotoğraf çok renkli ve ayrıntılıdır. Küçük boyut için hangi tür tasarlandı?',
-      why: 'Doğru: JPG. Fotoğraflarda ince renk farkları göze fark ettirmeden sıkıştırılır; boyut PNG’nin onda biri olabilir. Telefon fotoğrafları zaten JPG’dir.',
+      why: 'Doğru: JPG. Fotoğraflarda ince renk farkları göze fark ettirmeden sıkıştırılır; boyut PNG’nin onda biri olabilir. Telefon fotoğrafları çoğunlukla zaten JPG’dir.',
     }),
     rehberSoru({
       title: 'Ekran alıntısı',
@@ -107,6 +107,7 @@ export const resimWeb = {
     {
       title: 'Sayfanın kaynağı',
       html: `<p>Sayfa açıkken ${K('Ctrl')} + ${K('U')} tuşlarına basın (ya da tarayıcının ⋯ menüsünden <b>Sayfa kaynağını görüntüle</b>). Yeni sekmede sayfanın <b>yazı hâli</b> görünür.</p>`,
+      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın.',
       combo: ['Ctrl', 'KeyU'],
       on: (ev) => ev.type === 'web-source',
       done: 'Gördüğünüz, az önce Not Defteri\'nde yazdığınız metin. Her web sayfasının arkasında böyle bir yazı vardır; tarayıcı onu güzel sayfaya çevirir.',

@@ -61,7 +61,7 @@ export const virusAntivirus = {
     }),
     sec({
       title: 'Belgeler kilitlendi', text: '<p>Bir komşunuzun bilgisayarında bütün fotoğraf ve belgeler açılmıyor. Ekranda şöyle yazıyor: <b>“Dosyalarınız şifrelendi! Açmak için 24 saat içinde şu hesaba para gönderin.”</b></p>',
-      q: 'Ona ne önerirsiniz?', opts: ['Hemen parayı göndermesini', 'Para göndermemesini; bilgisayarı internetten ayırıp bir uzmana danışmasını, yedeği varsa oradan geri yüklemesini', 'Bilgisayarı sallamasını'], ok: 1,
+      q: 'Ona ne önerirsiniz?', opts: ['Hemen parayı göndermesini', 'Para göndermemesini; bilgisayarı internetten ayırıp bir uzmana danışmasını, yedeği varsa oradan geri yüklemesini', 'Bilgisayarı kapatıp bir daha açmamasını, dosyaları unutmasını'], ok: 1,
       why: 'Fidye yazılımı. Para ödemek dosyaların geri geleceğini garanti etmez ve suçluları cesaretlendirir. Asıl çare düzenli yedektir: dosyalarınızın bir kopyası harici diskte ya da bulutta duruyorsa kaybınız olmaz.',
     }),
     {
@@ -84,7 +84,7 @@ export const virusAntivirus = {
     sec({
       title: 'Sahte uyarı', kind: 'web', from: '⚠ Güvenli değil | www.haber-sitesi.xyz',
       text: '<div class="fake-pop"><b>⚠ Windows Güvenlik Uyarısı</b><p>Bilgisayarınızda <b>7 VİRÜS</b> bulundu! Hemen <u>0850 000 00 00</u> numarasını arayın!</p></div>',
-      q: 'Ekranınıza bu pencere geldi. Ne yaparsınız?', opts: ['Numarayı ararım', 'Sekmeyi kapatırım; gerçek taramayı Windows Güvenliği\'nden kendim yaparım', 'Bankamı ararım'], ok: 1,
+      q: 'Ekranınıza bu pencere geldi. Ne yaparsınız?', opts: ['Pencerede yazan numarayı ararım', 'Sekmeyi kapatırım; gerçek taramayı Windows Güvenliği\'nden kendim yaparım', 'Pencerenin gösterdiği programı indiririm'], ok: 1,
       why: 'Bir internet sitesi bilgisayarınızı tarayamaz; bu pencere sahtedir. Aranırsanız “teknik destek” dolandırıcıları bilgisayarınıza uzaktan girip para ister. Gerçek virüs uyarısı yalnızca Windows Güvenliği\'nden gelir.',
     }),
     ayir({
@@ -94,7 +94,7 @@ export const virusAntivirus = {
       items: [
         { label: 'Wi-Fi\'yi kapatıp internetle bağlantıyı kesmek', icon: '📶', bin: 'yap', why: 'Zararlının dışarıyla konuşmasını durdurur.' },
         { label: 'Windows Güvenliği ile tam tarama yapmak', icon: '🛡', bin: 'yap', why: 'Bulunanı temizler.' },
-        { label: 'Tanımadığınız programı Programlar ve Özellikler\'den kaldırmak', icon: '🗑', bin: 'yap', why: 'Reklam ve casus yazılımlar genelde böyle temizlenir.' },
+        { label: 'Tanımadığınız programı Ayarlar → Uygulamalar\'dan kaldırmak', icon: '🗑', bin: 'yap', why: 'Ayarlar → Uygulamalar → Yüklü uygulamalar (eski Windows\'ta Denetim Masası → Programlar ve Özellikler). Reklam ve casus yazılımlar genelde böyle temizlenir.' },
         { label: 'Şifreleri temiz bir cihazdan (örn. telefondan) değiştirmek', icon: '🔑', bin: 'yap', why: 'Casus yazılım yazdıklarınızı görmüş olabilir.' },
         { label: 'Fidye isteyenlere para göndermek', icon: '💸', bin: 'yapma', why: 'Garantisi yok; suçluyu destekler.' },
         { label: 'Reklamdaki “virüs temizleyici” programı indirmek', icon: '📥', bin: 'yapma', why: 'Çoğu sahtedir, başka zararlı yükler.' },
@@ -104,7 +104,7 @@ export const virusAntivirus = {
     }),
     sec({
       title: 'En iyi savunma', text: '<p>Bütün fotoğraflarınız ve belgeleriniz bilgisayarınızda, <b>başka hiçbir yerde kopyası yok</b>.</p>',
-      q: 'Bir virüs ya da bozulan disk karşısında en güvenli çözüm hangisi?', opts: ['Hiçbir şey; dua etmek', 'Önemli dosyaların düzenli bir kopyasını (yedek) USB belleğe, harici diske ya da buluta almak', 'Dosyaları masaüstüne taşımak'], ok: 1,
+      q: 'Bir virüs ya da bozulan disk karşısında en güvenli çözüm hangisi?', opts: ['Hiçbir şey yapmadan, sorun çıkmaması için beklemek', 'Önemli dosyaların düzenli bir kopyasını (yedek) USB belleğe, harici diske ya da buluta almak', 'Dosyaları masaüstüne taşımak'], ok: 1,
       why: 'Yedek, her tür felakete (virüs, fidye, bozulan disk, çalınan bilgisayar) karşı en iyi korumadır. Kural: önemli bir dosyanın en az iki yerde kopyası olsun.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Virüslere karşı bilmeniz gerekenler:</p>', scene: info('<div class="sc-big">🛡 🦠 ✖</div>') },

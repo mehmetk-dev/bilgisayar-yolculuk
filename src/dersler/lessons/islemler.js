@@ -46,18 +46,18 @@ export const edevlet = {
     },
     {
       title: 'Giriş yapın',
-      html: `<p><b>Giriş Yap</b>\\'a tıklayın. Kimlik numarasını ve şifreyi yazıp <b>Giriş Yap</b>\\'a basın.</p>${KART}
+      html: `<p><b>Giriş Yap</b>'a tıklayın. Kimlik numarasını ve şifreyi yazıp <b>Giriş Yap</b>'a basın.</p>${KART}
         <p class="mut">Şifre yazarken nokta (•) görünür; başkası görmesin diye. Büyük-küçük harf farklıdır: <b>K</b>urs2026.</p>`,
       hint: 'Kimlik numarasının 11 hane olduğunu kontrol edin.',
       on: (ev, c) => {
         if (ev.type === 'edevlet-login' && !ev.ok) { c.note('Giriş olmadı: kırmızı yazıyı okuyun. Şifrenin ilk harfi büyük K.'); return false; }
         return ev.type === 'edevlet-login' && ev.ok;
       },
-      done: 'Giriş yaptınız; sağ üstte adınız görünüyor. e-Devlet sizi aradığınız hizmete geri getirdi.',
+      done: 'Giriş yaptınız; sağ üstte adınız görünüyor. Artık giriş isteyen hizmetleri kullanabilirsiniz.',
     },
     {
       title: 'Belgeyi oluşturun',
-      html: '<p>“Belge kimin için?” → <b>Kendim</b>. “Belge nereye verilecek?” kutusundan <b>Bankaya verilecek</b>\'yi seçin ve <b>Belge Oluştur</b>\'a basın.</p>',
+      html: '<p>“Belge kimin için?” → <b>Kendim</b>. “Belge nereye verilecek?” kutusundan <b>Bankaya verilecek</b>\'yi seçin ve <b>Belge Oluştur</b>\'a basın.</p><p class="mut">Hizmet sayfasında değilseniz: <b>Hizmet ara</b> kutusuna ikametgâh yazıp hizmeti yeniden açın.</p>',
       mouse: '🖱 Bankaya verilecek → Belge Oluştur',
       on: (ev, c) => {
         if (ev.type === 'edevlet-form-error') c.note('Önce “Belge nereye verilecek?” kutusundan bir seçim yapın.');
@@ -74,15 +74,15 @@ export const edevlet = {
     },
     {
       title: 'Yazdırın',
-      html: `<p>PDF Okuyucu\\'nun üstündeki <b>🖨 Yazdır</b>\\'a basın (ya da ${K('Ctrl', 'P')}) ve yazdırın.</p>`,
+      html: `<p>PDF Okuyucu'nun üstündeki <b>🖨 Yazdır</b>'a basın (ya da ${K('Ctrl', 'P')}) ve yazdırın.</p>`,
       combo: ['Ctrl', 'KeyP'],
       on: (ev) => ev.type === 'pdf-print',
-      done: 'Belgeniz yazıcıya gitti. Bankaya kâğıdı ya da e-postayla PDF\'i verebilirsiniz.',
+      done: 'Yazdır\'a bastınız. Gerçek bir yazıcıda belge kâğıda çıkar; yazıcı yerine “PDF olarak kaydet” seçiliyse belge dosya olarak kaydedilir. Bankaya kâğıdı ya da e-postayla PDF\'i verebilirsiniz.',
     },
     {
       title: 'Barkodla doğrulayın',
-      html: `<p>Size biri bir belge verdiğinde gerçek mi diye bakabilirsiniz. PDF\\'i kapatın; e-Devlet ana sayfasında <b>🔎 Barkodlu Belge Doğrulama</b>\\'ya tıklayın, belgedeki barkod numarasını yazıp <b>Doğrula</b>\\'ya basın.</p>`,
-      hint: 'Barkod numarası “NVI-” ile başlar; e-Devlet\'teki belge sayfasında ve PDF\'in altında yazıyor.',
+      html: `<p>Size biri bir belge verdiğinde gerçek mi diye bakabilirsiniz. PDF'i kapatın; e-Devlet ana sayfasında <b>🔎 Barkodlu Belge Doğrulama</b>'ya tıklayın, belgedeki barkod numarasını yazıp <b>Doğrula</b>'ya basın.</p>`,
+      hint: 'Bu alıştırmada barkod numarası “NVI-” ile başlar; e-Devlet\'teki belge sayfasında ve PDF\'in altında yazıyor. Gerçek belgelerde barkodun biçimi farklı olabilir: belgede ne yazıyorsa onu yazın.',
       on: (ev, c) => {
         if (ev.type === 'edevlet-verify' && !ev.ok) { c.note('Bu numarayla belge bulunamadı. Barkodu harf harf karşılaştırın.'); return false; }
         return ev.type === 'edevlet-verify' && ev.ok;
@@ -118,13 +118,16 @@ export const randevu = {
     ['Seçenek düğmeleri', 'Birini seçersiniz (gün, saat)'],
     ['☐ Onay kutusu', 'Tıklayınca ✔ olur'],
     ['Tab', 'Bir sonraki kutuya geçer'],
-    ['Randevularım → İptal et', 'Gidemeyeceğiniz randevuyu bırakın'],
+    ['⬇ Randevu belgesini indir (PDF)', 'Randevu kodu ve saati elinizde olsun'],
+    ['Randevularım → İptal et', 'Gidemeyeceğiniz randevuyu iptal edin'],
+    ['Gerçek MHRS', 'Önce giriş: T.C. Kimlik No ve e-Devlet ya da MHRS şifresi'],
   ],
   steps: [
     {
       title: 'İnternette form',
       html: `<p>Randevu, başvuru, sipariş… İnternetteki işlerin çoğu bir <b>form</b> doldurmaktır: kutulara yazı yazılır, listelerden seçilir, kutucuklar işaretlenir.</p>
-        <p>Bu derste <b>MHRS</b>\\'den (Merkezi Hekim Randevu Sistemi) göz doktoruna randevu alacağız. Telefonla <b>182</b>\\'yi aramak da olur.</p>`,
+        <p>Bu derste <b>MHRS</b>'den (Merkezi Hekim Randevu Sistemi) göz doktoruna randevu alacağız. Telefonla <b>182</b>'yi aramak da olur.</p>
+        <p class="mut">Gerçek MHRS'de randevu almadan önce <b>giriş yapılır</b>: T.C. Kimlik Numaranız ve e-Devlet (ya da MHRS) şifrenizle. Bu alıştırmada giriş adımı yok; doğrudan randevu formuna geçeceğiz.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); br(c); },
     },
     {
@@ -136,7 +139,7 @@ export const randevu = {
     },
     {
       title: 'Boş göndermeyi deneyin',
-      html: '<p>Hiçbir şey yazmadan en alttaki <b>Randevuyu onayla</b>\'ya basın. Ne oluyor?</p>',
+      html: '<p>Hiçbir şey yazmadan en alttaki <b>Randevuyu onayla</b>\'ya basın. Ne oluyor?</p><p class="mut">Düğme formun en altındadır; görünmüyorsa sayfayı aşağı kaydırın.</p>',
       mouse: '🖱 Randevuyu onayla',
       on: (ev) => ev.type === 'form-submit' && ev.site === 'mhrs' && ev.errors.length > 0,
       done: 'Form gönderilmedi; eksik alanların altında <b>kırmızı yazılar</b> çıktı. Bir form gönderilmeyince hep böyle kırmızı yazılara bakın: ne eksik olduğunu söylerler.',
@@ -144,7 +147,7 @@ export const randevu = {
     {
       title: 'Formu doldurun',
       html: `<ol class="steps"><li><b>T.C. Kimlik No</b>: ${KURS_TC}</li><li><b>Cep telefonu</b>: 0555 123 45 67</li><li><b>Klinik</b>: Göz Hastalıkları · <b>Hastane</b>: bulunduğunuz şehre en yakın olan</li>
-        <li>Bir <b>gün</b> ve boş bir <b>saat</b> seçin (gri olanlar dolu).</li><li><b>Aydınlatma metnini okudum</b> kutusunu işaretleyin.</li><li><b>Randevuyu onayla</b>.</li></ol>`,
+        <li>Bir <b>gün</b> ve boş bir <b>saat</b> seçin (gri olanlar dolu).</li><li><b>Aydınlatma metnini okudum</b> kutusunu işaretleyin.</li><li>Aşağı kaydırıp <b>Randevuyu onayla</b>'ya basın.</li></ol>`,
       hint: `Bir kutudan sonrakine ${'Tab'} tuşuyla geçebilirsiniz. Kırmızı yazı kalırsa o alana tekrar bakın.`,
       on: (ev, c) => {
         if (ev.type === 'form-submit' && ev.errors.length) c.note(`Hâlâ ${ev.errors.length} alanda sorun var. Kırmızı yazıları okuyun.`);
@@ -152,6 +155,14 @@ export const randevu = {
         return ev.type === 'appointment';
       },
       done: 'Randevunuz alındı! Randevu kodunu bir yere not edin. Sağ altta SMS de geldi.',
+    },
+    {
+      title: 'Randevu belgesini indirin',
+      html: '<p>Onay sayfasının altındaki <b>⬇ Randevu belgesini indir (PDF)</b> düğmesine basın. Randevu kodunuz ve saatiniz bu belgede yazar; telefonunuzda ya da kâğıtta yanınızda olsun.</p>',
+      mouse: '🖱 ⬇ Randevu belgesini indir (PDF)',
+      hint: 'Düğme onay sayfasının en altında. Görünmüyorsa aşağı kaydırın.',
+      on: (ev) => ev.type === 'mhrs-pdf',
+      done: 'Randevu belgesi İndirilenler klasörüne kaydedildi. Hastaneye giderken kimliğinizi de unutmayın.',
     },
     rehberSoru({
       title: 'Okuyun',
@@ -166,7 +177,7 @@ export const randevu = {
       html: '<p>Diyelim ki o gün gidemeyeceksiniz. Üstteki <b>Randevularım</b>\'a tıklayın, randevunun yanındaki <b>İptal et</b>\'e basın ve onaylayın.</p>',
       mouse: '🖱 Randevularım → İptal et → Evet',
       on: (ev) => ev.type === 'appointment-cancel',
-      done: 'Randevu iptal edildi. Gitmediğiniz randevuyu iptal etmek, o saati başka bir hastanın kullanmasını sağlar.',
+      done: 'Randevu iptal edildi. Gitmediğiniz randevuyu iptal etmek, o saati başka bir hastanın kullanmasını sağlar. Gidemeyecekseniz mutlaka iptal edin: gitmediğiniz randevular kayda geçer ve üst üste olursa bir süre yeni randevu alamayabilirsiniz.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>İnternette form doldurmak:</p>' },
   ],
@@ -188,8 +199,8 @@ export const alisveris = {
     {
       title: 'İnternetten alışveriş',
       html: `<p>İnternetten alışveriş evden çıkmadan yapılır ama dikkat ister: <b>doğru site</b>, <b>doğru tutar</b> ve <b>kart güvenliği</b>.</p>
-        <p>Bu derste <b>Fırsat Pazarı</b>\\'ndan alışveriş yapacağız. Gerçek para harcanmaz; kart bilgisi de deneme kartıdır.</p>`,
-      setup: (c) => { desktopReady(c); c.d.closeAll(); br(c, 'www.firsat-pazari.com.tr'); },
+        <p>Bu derste <b>Fırsat Pazarı</b>'ndan alışveriş yapacağız. Gerçek para harcanmaz; kart bilgisi de deneme kartıdır.</p>`,
+      setup: (c) => { desktopReady(c); c.d.closeAll(); c.d.alisverisYol = null; br(c, 'www.firsat-pazari.com.tr'); },
     },
     {
       title: 'Bildirim sorusu',
@@ -206,15 +217,21 @@ export const alisveris = {
       title: 'Sepete ekleyin',
       html: '<p><b>Döküm tava</b> ve <b>LED ampul</b>\'ün altındaki <b>Sepete ekle</b>\'ye basın. Sonra sağ üstteki <b>🛒 Sepetim</b>\'e tıklayın.</p>',
       mouse: '🖱 Sepete ekle (iki ürün) → Sepetim',
-      on: (ev, c) => nav('www.firsat-pazari.com.tr', '/sepet')(ev) && (c.d.webState?.['firsat-pazari.com.tr']?.cart || []).length >= 2,
-      done: 'Sepetinizde iki ürün var. Alttaki sarı yazı, kargonun bedava olması için ne kadar daha alışveriş gerektiğini söylüyor.',
+      hint: 'İki ürün de sepette olmalı: Döküm tava ve LED ampul. Ürünler sayfasına dönüp eksik olanı ekleyin, sonra yeniden Sepetim\'e tıklayın.',
+      on: (ev, c) => {
+        if (!nav('www.firsat-pazari.com.tr', '/sepet')(ev)) return false;
+        const n = (c.d.webState?.['firsat-pazari.com.tr']?.cart || []).length;
+        if (n < 2) { c.note(`Sepette şimdilik ${n} ürün var. Ürünler sayfasına dönüp eksik olanı da ekleyin, sonra yeniden Sepetim\'e tıklayın.`); return false; }
+        return true;
+      },
+      done: 'Sepetinizde iki ürün var. Sepetteki sarı yazıya bakın: kargonun bedava olması için ne kadar daha alışveriş gerektiğini söyler.',
     },
     {
       title: 'Adedi değiştirin',
       html: '<p>Ampulden <b>2 paket</b> olsun: ampulün yanındaki <b>+</b>\'ya basın. Toplamın ve kargonun nasıl değiştiğine bakın.</p>',
       mouse: '🖱 +',
       on: (ev) => ev.type === 'shop-cart' && ev.op === 'inc',
-      done: 'Toplam 500 ₺\'yi geçince kargo <b>bedava</b> oldu. Ödemeden önce her zaman sepetteki adetlere ve toplama bakın.',
+      done: 'Toplam değişti. Sepetteki sarı yazıya ve <b>Kargo</b> satırına bakın: belli bir tutarı geçince kargo <b>bedava</b> olur. Ödemeden önce her zaman sepetteki adetlere ve toplama bakın.',
     },
     {
       title: 'Teslimat adresi',
@@ -227,20 +244,34 @@ export const alisveris = {
       title: 'Kartla ödeyin',
       html: `<p><b>Kart ile öde</b> seçili kalsın ve deneme kartını yazın:</p><div class="kurs-kart">💳 Kart no: <b>${TEST_KART}</b><br>Ad: <b>adınız</b> · Son kullanma: <b>12/28</b> · CVV: <b>123</b></div>
         <ol class="steps"><li><b>Kartımı kaydet</b> kutusundaki işareti <b>kaldırın</b> (sık alışveriş yapmadığınız sitelerde kart saklatmayın).</li><li><b>Mesafeli satış sözleşmesini</b> onaylayın.</li><li><b>Siparişi onayla</b>.</li></ol>`,
+      hint: '<b>Kart ile öde</b> seçili kalsın (kapıda ödemede SMS kodu çıkmaz). Kırmızı yazı çıkarsa o alanı düzeltin.',
       on: (ev, c) => {
         if (ev.type === 'form-submit' && ev.site === 'shop-pay' && !ev.errors.length && ev.save) c.note('“Kartımı kaydet” işaretli kaldı. Sorun değil ama genelde kaldırmak daha güvenli.');
-        return ev.type === 'shop-3d' || (ev.type === 'shop-order' && ev.yontem === 'kapida');
+        // Kapıda ödeme seçilirse sipariş hemen verilir, SMS adımı gelmez: sonraki adım kendiliğinden geçilir
+        if (ev.type === 'shop-order' && ev.yontem === 'kapida') { c.s.yol = c.d.alisverisYol = 'kapida'; return true; }
+        if (ev.type === 'shop-3d') { c.s.yol = c.d.alisverisYol = 'kart'; return true; }
+        return false;
       },
-      done: 'Bankanızın <b>3D Secure</b> sayfası açıldı ve telefonunuza (sağ altta) bir SMS geldi.',
+      done: (c) => (c.s.yol === 'kapida'
+        ? 'Kapıda ödemeyi seçtiniz: sipariş verildi ve banka SMS kodu istemedi; parayı paketi getirene ödersiniz (biraz ek ücreti olur). Kartla ödemede ise SMS kodu girilir; sıradaki adım bunu anlatıyor.'
+        : 'Bankanızın <b>3D Secure</b> sayfası açıldı ve telefonunuza (sağ altta) bir SMS geldi.'),
     },
     {
       title: 'SMS kodunu girin',
-      html: '<p>Sağ alttaki <b>SMS · BANKAM</b> mesajındaki 6 haneli kodu okuyun. Mesajda <b>tutarın</b> ve <b>mağazanın adının</b> doğru olduğunu kontrol edin, sonra kodu yazıp <b>Onayla</b>\'ya basın.</p>',
+      html: (c) => (c.d.alisverisYol === 'kapida'
+        ? '<p>Siz kapıda ödemeyi seçtiğiniz için banka SMS kodu göndermedi. Kartla ödemede sağ altta <b>SMS · BANKAM</b> mesajı gelir; içindeki 6 haneli kod sayfaya yazılır.</p>'
+        : '<p>Sağ alttaki <b>SMS · BANKAM</b> mesajındaki 6 haneli kodu okuyun. Mesajda <b>tutarın</b> ve <b>mağazanın adının</b> doğru olduğunu kontrol edin, sonra kodu yazıp <b>Onayla</b>\'ya basın.</p>'),
+      hint: 'SMS kaybolduysa sayfadaki <b>Kodu yeniden gönder</b>\'e basın. Kod 6 rakamdır; mesajdaki rakamları tek tek karşılaştırın.',
+      check: (c) => c.d.alisverisYol === 'kapida',
       on: (ev, c) => {
         if (ev.type === 'shop-3d-wrong') c.note('Kod yanlış. SMS\'teki rakamları tek tek karşılaştırın.');
+        if (ev.type === 'shop-3d-cancel') c.note('Vazgeçtiniz. Ödeme sayfasında deneme kartını yeniden yazıp <b>Siparişi onayla</b>\'ya basın; yeni bir SMS gelir.');
+        if (ev.type === 'shop-3d') c.note('Yeni bir SMS kodu geldi. En son gelen kodu yazın.');
         return ev.type === 'shop-order';
       },
-      done: 'Siparişiniz alındı! SMS kodu, ödemeyi <b>sizin</b> yaptığınızı bankaya kanıtlar.',
+      done: (c) => (c.d.alisverisYol === 'kapida'
+        ? 'Kapıda ödemede banka SMS kodu istemez; ödemeyi kapıda yaparsınız. Kartla ödemede ise bu kod şarttır ve kimseye söylenmez.'
+        : 'Siparişiniz alındı! SMS kodu, ödemeyi <b>sizin</b> yaptığınızı bankaya kanıtlar.'),
     },
     rehberSoru({
       title: 'Soru',
@@ -263,7 +294,7 @@ export const alisveris = {
 
 const permOk = (c) => { const p = c.d.sitePerms?.['bulalim.com']; return p?.camera === 'allow' && p?.mic === 'allow'; };
 const DAVET = { key: 'gorusme', from: 'elif@ornek.com', fromName: 'Elif (torunum)', subject: 'Bu akşam görüntülü görüşelim mi? 📹', url: 'gorusme.bulalim.com/aile', urlText: 'Görüşmeye katılmak için tıklayın',
-  body: 'Merhaba!\n\nBu akşam hep birlikte görüntülü görüşelim. Ahmet amcam da gelecek. Aşağıdaki bağlantıya tıklamanız yeterli; hiçbir şey kurmanıza gerek yok.\n\nSevgiler,\nElif' };
+  body: 'Merhaba!\n\nBu akşam hep birlikte görüntülü görüşelim. Kardeşiniz Ahmet de gelecek. Aşağıdaki bağlantıya tıklamanız yeterli; hiçbir şey kurmanıza gerek yok.\n\nSevgiler,\nElif' };
 
 export const gorusme = {
   id: 'gorusme', icon: '📹', title: 'Görüntülü görüşme', minutes: 30, stage: 'desktop',
@@ -284,7 +315,7 @@ export const gorusme = {
       mouse: '🖱 Başlat → E-posta → posta',
       setup: (c) => { desktopReady(c); c.d.closeAll(); deliverMail(c.d, DAVET); },
       on: (ev) => ev.type === 'mail-open' && ev.key === 'gorusme',
-      done: 'Postanın altında bir bağlantı ve onun <b>adresi</b> var: gorusme.bulalim.com. Tanıdık birinden ve beklediğiniz bir davet.',
+      done: 'Postanın altında bir bağlantı ve onun <b>adresi</b> var: gorusme.bulalim.com. Bu davet tanıdık birinden geldi ve siz onu bekliyordunuz. Beklemediğiniz bir davet gelirse önce gönderene sorun.',
     },
     {
       title: 'Bağlantıya tıklayın',
@@ -364,7 +395,7 @@ export const telefon = {
     ['Kabloyu takınca', 'Telefon önce yalnızca şarj olur'],
     ['Telefonda bildirim → Dosya aktarımı', 'Bilgisayar telefonun içini görür'],
     ['Telefonum › Dahili depolama › DCIM › Kamera', 'Telefonla çekilen fotoğraflar'],
-    ['Ctrl + C → Resimler → Ctrl + V', 'Seçtiğiniz fotoğrafı kopyalar'],
+    ['Fotoğrafı kopyalamak', 'Fotoğrafı seçip Ctrl+C ile kopyalayın, Resimler\'e gidip Ctrl+V ile yapıştırın'],
     ['Fotoğrafları içeri aktar', 'Hepsini tarihli bir klasöre kopyalar'],
   ],
   steps: [
@@ -376,7 +407,7 @@ export const telefon = {
         document.querySelector('#stepBody .usb-btn').onclick = () => c.d.plugPhone();
       },
       on: (ev) => ev.type === 'phone' && ev.on,
-      done: 'Telefon bağlandı (sağ altta). Ama bilgisayarda hiçbir şey çıkmadı! Telefonun ekranına bakın: “Bu cihaz USB ile şarj ediliyor”.',
+      done: 'Telefon bağlandı: ekranda telefonun resmi göründü. Ama bilgisayarda hiçbir şey çıkmadı! Telefonun ekranına bakın: “Bu cihaz USB ile şarj ediliyor”.',
     },
     {
       title: 'Dosya aktarımı',
@@ -393,11 +424,12 @@ export const telefon = {
       mouse: '🖱 Telefonum → Dahili depolama → DCIM → Kamera',
       hint: 'DCIM, “dijital kamera görüntüleri” demektir; bütün telefonlarda fotoğraflar buradadır.',
       on: (ev, c) => ev.type === 'nav' && c.d.fs.get(ev.folder)?.name === 'Kamera' && inPhone(c, ev.folder),
-      done: 'Telefonla çekilen fotoğraflar burada. Adları tarihle başlar: IMG_20261003… 3 Ekim 2026 demektir.',
+      done: 'Telefonla çekilen fotoğraflar burada. Adları IMG_ ile başlar ve tarihi içerir: IMG_20261001… 1 Ekim 2026 demektir.',
     },
     {
       title: 'Bir fotoğrafı kopyalayın',
-      html: `<p>Doğum günü pastalı fotoğrafa (<b>🎂</b>) bir kez tıklayıp ${K('Ctrl', 'C')} ile kopyalayın. Soldan <b>🖼 Resimler</b>\\'e geçip ${K('Ctrl', 'V')} ile yapıştırın.</p>`,
+      html: `<p>Listedeki <b>ilk fotoğrafa</b> (adı <b>IMG_20261001_0912</b>) bir kez tıklayıp ${K('Ctrl', 'C')} ile kopyalayın. Soldan <b>🖼 Resimler</b>'e geçip ${K('Ctrl', 'V')} ile yapıştırın.</p>`,
+      hint: 'Resimler\'e geçince pencerede dosyaların olduğu boş bir yere tıklayın, sonra Ctrl + V\'ye basın.',
       on: (ev) => ev.type === 'file-paste' && ev.to === 'pictures' && /^IMG_/.test(ev.name),
       done: 'Fotoğraf bilgisayarın <b>Resimler</b> klasörüne kopyalandı. Telefondaki de yerinde duruyor (kopyaladık, taşımadık).',
     },

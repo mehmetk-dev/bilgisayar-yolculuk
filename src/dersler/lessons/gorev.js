@@ -107,7 +107,7 @@ export const gorev = {
       mouse: '🖱 Başlangıç uygulamaları → Süper Arama Yardımcısı → Devre dışı bırak',
       setup: (c) => { c.d.settings.toolbar = true; c.d.ensure('taskmgr'); },
       on: (ev) => ev.type === 'startup-toggle' && ev.id === 'toolbar' && !ev.on,
-      done: 'Son açılış süresi kısaldı. Bu program bir kurulumda “ek yazılım” kutucuğu boşaltılmadığı için gelmişti; kalıcı çözüm onu <b>Ayarlar → Uygulamalar</b>\'dan kaldırmaktır.',
+      done: 'Son açılış süresi kısaldı. Bu program, bir program kurarken yanında gelmişti (kurulumda “ek yazılım” kutucuğu boşaltılmamıştı); kalıcı çözüm onu <b>Ayarlar → Uygulamalar</b>\'dan kaldırmaktır.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Görev Yöneticisi:</p>' },
   ],

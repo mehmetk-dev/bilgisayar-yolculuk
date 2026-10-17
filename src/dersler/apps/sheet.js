@@ -88,14 +88,24 @@ const ALIAS = { VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVE
 // Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır)
 function evaluate(src, get) {
   const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+\$?\d*)|(<=|>=|<>|.))/y;
-  const toks = [];
-  let m;
-  re.lastIndex = 0;
-  while (re.lastIndex < src.length && (m = re.exec(src))) {
+  const reInt = /\s*(?:(\d+)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+\$?\d*)|(<=|>=|<>|.))/y; // virgül ondalık değil, ayırıcı
+  // Formülde hiç ; yoksa işlev parantezinin içindeki virgül ayırıcıdır: =DÜŞEYARA(A2,$F$2:$G$7,2,0). Dışında (=2,5*3) ondalık virgüldür.
+  const commaSep = !src.replace(/"[^"]*"/g, '').includes(';');
+  const toks = [], calls = [];
+  let m, pos = 0;
+  while (pos < src.length) {
+    const r = commaSep && calls.at(-1) ? reInt : re;
+    r.lastIndex = pos;
+    if (!(m = r.exec(src))) break;
+    pos = r.lastIndex;
     if (m[1]) toks.push({ t: 'num', v: parseFloat(m[1].replace(',', '.')) });
     else if (m[2] !== undefined) toks.push({ t: 'str', v: m[2] });
     else if (m[3]) toks.push({ t: 'id', v: m[3].toLocaleUpperCase('tr') });
-    else if (m[4].trim()) toks.push({ t: 'op', v: m[4] });
+    else if (m[4].trim()) {
+      if (m[4] === '(') calls.push(toks.at(-1)?.t === 'id');
+      else if (m[4] === ')') calls.pop();
+      toks.push({ t: 'op', v: m[4] });
+    }
   }
   if (src.split('"').length % 2 === 0) throw new FErr('#DEĞER!'); // kapanmamış tırnak
   let i = 0;
@@ -364,7 +374,9 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     validBtn();
   }
 
+  let tabStart = null; // Tab ile hücre hücre yazılan satırın ilk hücresi: Enter'a basınca imleç oraya (bir alt satıra) döner
   function select(r, c, extend = false) {
+    tabStart = null;
     act = { r: Math.max(0, Math.min(ROWS - 1, r)), c: Math.max(0, Math.min(COLS.length - 1, c)) };
     if (!extend) anchor = { ...act };
     paintSel();
@@ -850,7 +862,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const capEm = yatay ? 96 : 66; // bir kâğıda sığan genişlik (yazı boyu birimiyle)
     const scale = pageSet.fit ? Math.min(1, capEm / totalEm) : 1;
     const pages = pageSet.fit ? 1 : Math.max(1, Math.ceil(totalEm / capEm - 1e-9));
-    const k = (yatay ? 24 : 17) / capEm * scale;
+    const W = yatay ? 56 : 50, H = W * (yatay ? 0.707 : 1.414); // kâğıt genişliği ve en çok yüksekliği (em): yazı okunacak kadar büyük, sayfalar alt alta
+    const k = W / capEm * scale;
     const spans = {}, covered = new Set();
     for (const m of merges) { spans[addr(m.r1, m.c1)] = m; for (let r = m.r1; r <= m.r2; r++) for (let c = m.c1; c <= m.c2; c++) if (r !== m.r1 || c !== m.c1) covered.add(addr(r, c)); }
     const rowsHtml = Array.from({ length: lastRow + 1 }, (_, r) => `<tr>${Array.from({ length: lastCol + 1 }, (_, c) => {
@@ -862,7 +875,10 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const info = { pages, orient: pageSet.orient, fit: pageSet.fit, grid: pageSet.grid, totalEm: Math.round(totalEm), capEm };
     const notes = [pages > 1 ? `<span class="bad">⚠ Tablo <b>${pages} sayfaya</b> bölündü: son sütun(lar) ikinci kâğıda taşıyor. <b>Tüm sütunları bir sayfaya sığdır</b>'ı ya da <b>Yatay</b> kâğıdı deneyin.</span>` : '<span class="ok">✔ Tablo <b>tek sayfaya</b> sığıyor.</span>'];
     if (!pageSet.grid) notes.push('<span class="inf">ℹ Tablo çizgileri kâğıtta çıkmayacak. Gerekirse <b>Kılavuz çizgilerini yazdır</b>\'ı açın.</span>');
-    return { info, html: `<div class="dlg-pvbox big ${yatay ? 'yatay' : ''}"><table class="xl-pvt" style="font-size:${k}em">${rowsHtml}</table></div><div class="dlg-pvnote ${pages > 1 ? 'bad' : 'ok'}">${notes.join('<br>')}<br><small>Kâğıt: A4, ${yatay ? 'yatay' : 'dikey'}${pageSet.fit ? ', sayfaya sığdırılmış' : ''}</small></div>` };
+    const table = `<table class="xl-pvt" style="font-size:${k}em">${rowsHtml}</table>`;
+    // Her sayfa ayrı kâğıt: i. kâğıt tablonun i. dilimini gösterir
+    const sheets = Array.from({ length: pages }, (_, i) => `<small>Sayfa ${i + 1} / ${pages}</small><div style="flex:none;width:${W}em;max-height:${H}em;overflow:hidden;background:#fff;border:1px solid #888;box-shadow:0 2px 6px #0003;position:relative"><div style="margin-left:-${i * W}em;width:${pages * W}em">${table}</div></div>`).join('');
+    return { info, html: `<div style="display:flex;flex-direction:column;align-items:center;gap:0.3em;max-height:17em;overflow:auto;width:100%;box-sizing:border-box;padding:0.3em">${sheets}</div><div class="dlg-pvnote ${pages > 1 ? 'bad' : 'ok'}">${notes.join('<br>')}<br><small>Kâğıt: A4, ${yatay ? 'yatay' : 'dikey'}${pageSet.fit ? ', sayfaya sığdırılmış' : ''}</small></div>` };
   }
   async function confirmDiscard() {
     if (!dirty || !Object.keys(cells).length) return true;
@@ -891,7 +907,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (c === 'print') {
       const pv = printPreview();
       emit('xl-print-open', pv.info);
-      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Kitap1', pvHtml: pv.html });
+      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Kitap1', pvHtml: pv.html, pvWide: true });
       if (r) { desk.toast('Yazdırılıyor', `“${esc(fileName || 'Kitap1')}” → ${esc(r.printer)}`, '🖨'); emit('xl-print', { ...r, ...pv.info }); }
     }
   }
@@ -947,8 +963,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   wrap.addEventListener('keydown', (e) => {
     const k = e.key;
     if (editing) {
-      if (k === 'Enter') { e.preventDefault(); commit(e.shiftKey ? -1 : 1, 0); }
-      else if (k === 'Tab') { e.preventDefault(); commit(0, e.shiftKey ? -1 : 1); }
+      if (k === 'Enter') { e.preventDefault(); const t = tabStart; commit(e.shiftKey ? -1 : 1, !e.shiftKey && t && t.r === act.r ? t.c - act.c : 0); }
+      else if (k === 'Tab') { e.preventDefault(); const t = tabStart && tabStart.r === act.r ? tabStart : { r: act.r, c: act.c }; commit(0, e.shiftKey ? -1 : 1); tabStart = t; }
       else if (k === 'Escape') { e.preventDefault(); cancel(); }
       else if (editing.enterMode && /^Arrow/.test(k)) { e.preventDefault(); commit(...{ ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] }[k]); }
       return;

@@ -154,6 +154,14 @@ export function browser({ desk, body, args, emit, setTitle }) {
     renderBm();
     applyZoom();
     setTitle(`${title} - İnternet${priv ? ' (Gizli)' : ''}`);
+    settleFocus();
+  }
+
+  // Gezinme bitince odak (adres çubuğu bırakıldı ya da tıklanan bağlantı kayboldu) boşa düşmesin: sayfaya geçsin ki Ctrl + F, Ctrl + D, Ctrl + H ilk basışta çalışsın.
+  // Yazı yazılan bir yer (adres çubuğu, ders paneli…) odaktaysa dokunulmaz.
+  function settleFocus() {
+    const a = document.activeElement;
+    if ((!a || a === document.body || a.disabled) && desk.active?.api === api && !desk.dialogs.busy) pageEl.focus({ preventScroll: true }); // a.disabled: son sayfaya gelince devre dışı kalan ileri/geri düğmesi
   }
 
   function renderTabs() {
@@ -335,7 +343,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (x.kind === 'search') navigate({ host: SEARCH_HOST, path: '/ara', q: x.text, search: true }, 'suggest');
     else go(x.text, 'suggest');
   }
-  url.addEventListener('input', suggest);
+  url.addEventListener('input', () => { $('.br-info').hidden = true; suggest(); }); // site bilgisi kutusu öneri listesini örtmesin
   url.addEventListener('blur', () => setTimeout(() => { sug.hidden = true; }, 150));
   sug.addEventListener('mousedown', (e) => { e.preventDefault(); const r = e.target.closest('[data-sug]'); if (r) pickSug(+r.dataset.sug); });
   url.addEventListener('keydown', (e) => {
@@ -826,6 +834,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
   const api = {
     onSettings: () => { $('.br-toolbar').hidden = !desk.settings.toolbar; },
     refresh: () => { const y = pageEl.scrollTop; show(); pageEl.scrollTop = y; },
+    // Pencere öne gelince (ya da ders panelinden dönülünce) klavye odağı sayfaya geçer: Ctrl + H, Ctrl + F, Ctrl + D… ilk basışta çalışır
+    focus: () => {
+      if (desk.dialogs.busy) return;
+      const a = document.activeElement;
+      if (a && body.contains(a) && a.matches('input, textarea, select')) return; // yazı yazılan yer odağını korusun
+      pageEl.focus({ preventScroll: true });
+    },
     destroy: () => { if (s.ext.reader) window.speechSynthesis?.cancel(); },
     get private() { return priv; },
     get findCount() { return hits.length; },

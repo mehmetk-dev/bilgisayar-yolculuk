@@ -163,8 +163,19 @@ export function mail({ desk, body, emit, setTitle }) {
     view.initText = o.draftId ? (o.initText ?? '') : view.text;
     render();
     emit('mail-compose', { reply: !!o.replyTo, forward: !!o.forwardOf });
-    setTimeout(() => (view.to ? $('.pm-body') : $('.pm-to'))?.focus(), 0);
+    setTimeout(() => { (view.to ? $('.pm-body') : $('.pm-to'))?.focus(); if (view.to) caretTop(); }, 0);
   }
+  // İmza önceden kutuya konduğu için imleç imzanın altına gitmesin: kutu henüz değişmediyse imleç en başa (imzanın ÜSTÜNE) konur
+  const untouched = (b) => view?.kind === 'compose' && mb.signature && b.value === view.initText;
+  function caretTop() { const b = $('.pm-body'); if (b && untouched(b)) b.setSelectionRange(0, 0); }
+  body.addEventListener('mousedown', (e) => {
+    const b = e.target.closest('.pm-body');
+    if (!b || !untouched(b)) return;
+    e.preventDefault();
+    b.focus();
+    b.setSelectionRange(0, 0);
+    b.scrollTop = 0;
+  });
 
   function openMail(id) {
     const m = get(id);

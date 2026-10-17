@@ -41,7 +41,7 @@ export const tarayicilarBilgi = {
     },
     {
       title: 'Altı tarayıcı',
-      html: '<p>Sağdaki sekmelerde sık görülen altı tarayıcı var. <b>Hepsine sırayla tıklayıp</b> okuyun.</p>',
+      html: '<p>Yukarıdaki sekmelerde sık görülen altı tarayıcı var. <b>Hepsine sırayla tıklayıp</b> okuyun.</p>',
       scene: sekmeler({ tabs: TARAYICILAR.map((t) => ({ id: t.id, label: t.label, icon: t.icon, html: () => fact(t.rows) })), intro: 'Hepsi aynı işi yapar: siteleri açar. Fark, kimin yaptığı ve nerelerde bulunduğudur.' }),
       on: (ev) => ev.type === 'tabs-done',
       done: 'Hepsini okudunuz. Gördüğünüz gibi: biri bilgisayarınızda hazır gelir, ötekileri isterseniz kurarsınız.',
@@ -81,7 +81,7 @@ export const tarayicilarBilgi = {
     sec({
       title: 'İz bırakmayan pencere', text: '<p>Torunun bilgisayarında <b>Microsoft Edge</b> açık. Ortak kullandığınız bir bilgisayarda geçmişe kaydedilmeden bir şeye bakmak istiyorsunuz.</p>',
       q: 'Edge\'de buna ne denir?', opts: ['InPrivate penceresi', 'Hızlı pencere', 'Gizli kasa'], ok: 0,
-      why: 'Edge\'de InPrivate; Chrome ve Firefox\'ta “Gizli pencere”. Üçünde de kısayol Ctrl + Shift + N (Firefox\'ta Ctrl + Shift + P). Unutmayın: bu pencere sizi internette görünmez yapmaz; yalnızca bu bilgisayarda geçmiş bırakmaz.',
+      why: 'Edge\'de InPrivate; Chrome ve Firefox\'ta “Gizli pencere”. Kısayolu: Edge ve Chrome\'da Ctrl + Shift + N, Firefox\'ta Ctrl + Shift + P. Unutmayın: bu pencere sizi internette görünmez yapmaz; yalnızca bu bilgisayarda geçmiş bırakmaz.',
     }),
     {
       title: 'Varsayılan tarayıcı',

@@ -46,6 +46,8 @@ const EDEVLET = {
   name: 'e-Devlet Kapısı', secure: true,
   render(path, q, ctx) {
     const st = ctx.state, head = edHead(st);
+    // En son bakılan hizmet ya da arama: üstteki “Giriş yap”la girilirse oraya dönülür
+    if (path !== '/giris' && path !== '/onay') st.came = /^\/(ara|hizmet\/)/.test(path) ? [path, q] : null;
     if (path === '/onay') {
       if (!st.user || st.back !== 'enabiz') return page('e-Devlet Kapısı', `${head}<div class="ed"><h1>Bekleyen bir istek yok</h1><p>Başka bir uygulamadan gelen bir giriş isteği görünmüyor.</p></div>`);
       return page('e-Devlet Kapısı: Onay', `${head}<div class="ed"><h1>🩺 e-Nabız kimliğinizi öğrenmek istiyor</h1><p>e-Nabız uygulamasına giriş yapabilmeniz için aşağıdaki bilgileriniz <b>e-Devlet</b> tarafından e-Nabız'a aktarılacak:</p>
@@ -108,8 +110,10 @@ const EDEVLET = {
       st.user = true;
       st.userName = ctx.desk.settings.user;
       st.form = {};
-      ctx.go(st.back === 'enabiz' ? '/onay' : st.next || '/');
+      const [np, nq] = st.back === 'enabiz' ? ['/onay', ''] : st.next ? [st.next, ''] : st.came || ['/', ''];
       st.next = null;
+      st.came = null;
+      ctx.go(np, nq);
       return;
     }
     if (a === 'consent' || a === 'consentNo') {
@@ -241,7 +245,7 @@ const URUNLER = [
   { id: 'battaniye', icon: '🛏', name: 'Pamuklu battaniye', price: 549, stars: 4.5 },
   { id: 'termos', icon: '🥤', name: 'Çelik termos', price: 389, stars: 4.3 },
 ];
-const KARGO = 39.9, KAPIDA = 19.9, BEDAVA = 500;
+const KARGO = 39.9, KAPIDA = 19.9, BEDAVA = 900; // 649 ₺ tava + 159 ₺ ampul = 808 ₺ (kargo ücretli, 92 ₺ eksik); ampul 2 paket olunca 967 ₺ (bedava)
 const total = (st) => (st.cart || []).reduce((s, c) => s + URUNLER.find((u) => u.id === c.id).price * c.n, 0);
 const cargo = (st) => (total(st) >= BEDAVA ? 0 : KARGO);
 const count = (st) => (st.cart || []).reduce((s, c) => s + c.n, 0);
@@ -282,7 +286,7 @@ const SHOP = {
     if (path === '/3d') {
       return page('Bankam 3D Secure', `<div class="bk3"><header class="bk-head">🏦 Bankam · Güvenli Ödeme</header><form class="wf" data-act="verify3d"><p>Üye işyeri: <b>Fırsat Pazarı</b></p><p>Tutar: <b>${tl(st.order.tutar)}</b></p><p>Kart: **** **** **** ${st.order.son4}</p>
         <label>Telefonunuza SMS ile gelen <b>6 haneli doğrulama kodunu</b> girin<input name="kod" maxlength="6" inputmode="numeric" autocomplete="off"></label>${errOf(st, 'kod')}
-        <button class="ed-btn">Onayla</button><button type="button" class="ed-btn ghost" data-act="cancel3d">İptal</button>
+        <button class="ed-btn">Onayla</button><button type="button" class="ed-btn ghost" data-act="cancel3d">İptal</button> <button type="button" class="ed-btn ghost" data-act="resend3d">💬 Kodu yeniden gönder</button>
         <p class="ed-small">Bu kod yalnızca bu ödeme içindir. <b>Kodu kimseye söylemeyin</b>; banka sizi arayıp bu kodu sormaz.</p></form></div>`, 'bk3-bg');
     }
     if (path === '/tamam' && st.last) {
@@ -347,7 +351,7 @@ const SHOP = {
       if (v.yontem === 'kapida') return SHOP.finish(ctx);
       st.code = code(6);
       ctx.go('/3d');
-      setTimeout(() => ctx.desk.toast('SMS · BANKAM', `Fırsat Pazarı ${tl(tutar)} harcamanız için doğrulama kodu: <b>${st.code}</b>. Bu kodu kimseyle paylaşmayın.`, '💬', 30000), 900);
+      setTimeout(() => SHOP.sms(ctx), 900);
       ctx.emit('shop-3d', { tutar });
       return;
     }
@@ -356,7 +360,12 @@ const SHOP = {
       SHOP.finish(ctx);
       return;
     }
-    if (a === 'cancel3d') { ctx.emit('shop-3d-cancel'); ctx.go('/odeme'); }
+    if (a === 'cancel3d') { ctx.emit('shop-3d-cancel'); ctx.go('/odeme'); return; }
+    if (a === 'resend3d') { SHOP.sms(ctx); ctx.emit('shop-sms-resend'); } // SMS bildirimi kayboldu ya da kaçırıldı: aynı kod yeniden gösterilir
+  },
+  sms(ctx) {
+    const st = ctx.state;
+    ctx.desk.toast('SMS · BANKAM', `Fırsat Pazarı ${tl(st.order.tutar)} harcamanız için doğrulama kodu: <b>${st.code}</b>. Bu kodu kimseyle paylaşmayın.`, '💬', 30000);
   },
   finish(ctx) {
     const st = ctx.state;
@@ -382,17 +391,17 @@ const MEET = {
     const camP = ctx.perm('camera'), micP = ctx.perm('mic');
     const blocked = camP === 'block' || micP === 'block';
     const micOn = st.mic && micP === 'allow', camOn = st.cam && camP === 'allow';
-    const me = (big) => `<div class="mt-tile me ${big ? 'big' : ''}">${camOn ? '<div class="mt-cam">🙂</div>' : `<div class="mt-av">${esc((st.name || ctx.desk.settings.user || '?')[0])}</div>`}<span>${esc(st.name || 'Siz')} (siz) ${micOn ? '' : '🔇'}</span></div>`;
+    const me = (big) => `<div class="mt-tile me ${big ? 'big' : ''}">${camOn ? '<div class="mt-cam">🙂</div>' : `<div class="mt-av">${esc((st.name || ctx.desk.settings.user || '?')[0])}</div>`}<span>${esc(st.name || 'Siz')} (siz) ${micOn ? '' : '🔇'}</span>${!big && st.hand ? '<div class="mt-handnote" style="font-size:0.8em">✋ Elinizi kaldırdınız</div>' : ''}</div>`;
     const bar = (inCall) => `<div class="mt-bar"><button type="button" data-act="mic" class="${micOn ? '' : 'off'}" title="Mikrofon (sessize al)">${micOn ? '🎤' : '🔇'}<small>${micOn ? 'Sessize al' : 'Sesi aç'}</small></button>
       <button type="button" data-act="cam" class="${camOn ? '' : 'off'}" title="Kamera">${camOn ? '📷' : '🚫'}<small>${camOn ? 'Kamerayı kapat' : 'Kamerayı aç'}</small></button>
-      ${inCall ? `<button type="button" data-act="hand" class="${st.hand ? 'on' : ''}">✋<small>El kaldır</small></button><button type="button" data-act="chatT" class="${st.chatOpen ? 'on' : ''}">💬<small>Sohbet</small></button><button type="button" data-act="leave" class="mt-leave">📞<small>Ayrıl</small></button>` : ''}</div>`;
+      ${inCall ? `<button type="button" data-act="hand" class="${st.hand ? 'on' : ''}">✋<small>${st.hand ? 'Elinizi indirin' : 'El kaldır'}</small></button><button type="button" data-act="chatT" class="${st.chatOpen ? 'on' : ''}">💬<small>Sohbet</small></button><button type="button" data-act="leave" class="mt-leave">📞<small>Ayrıl</small></button>` : ''}</div>`;
     if (st.phase === 'left') return page('Görüşmeden ayrıldınız', `<div class="mt mt-pre"><h1>Görüşmeden ayrıldınız</h1><p>Görüşme bağlantısını kapatmak için sekmeyi kapatabilirsiniz.</p><button type="button" class="ed-btn" data-act="rejoin">Yeniden katıl</button></div>`, 'mt-bg');
     if (st.phase === 'pre') {
       return page('Aile toplantısı - Görüntülü Görüşme', `<div class="mt mt-pre"><h1>📹 Aile toplantısı</h1><p>Elif ve Ahmet görüşmede.</p>
         ${blocked ? '<div class="ed-bad">🚫 Kamera ya da mikrofon <b>engellendi</b>. Adres çubuğundaki 🔒 kilide tıklayın, <b>Kamera</b> ve <b>Mikrofon</b>\'u “İzin ver” yapın, sonra sayfayı yenileyin (⟳).</div>' : !camP || !micP ? '<div class="ed-note">Tarayıcı kamera ve mikrofon için izin soruyor (yukarıda). Görüntülü görüşme için <b>İzin ver</b> deyin.</div>' : ''}
         ${me(true)}${bar(false)}<form class="mt-join" data-act="join"><label>Adınız<input name="ad" value="${esc(st.name || '')}" autocomplete="off" placeholder="Görüşmede görünecek adınız"></label>${errOf(st, 'ad')}<button class="ed-btn">Şimdi katıl</button></form></div>`, 'mt-bg');
     }
-    return page('Aile toplantısı - Görüntülü Görüşme', `<div class="mt mt-in"><div class="mt-main"><div class="mt-grid">${PEOPLE.map(([n, e, w], i) => `<div class="mt-tile ${i === 0 && st.talk ? 'talk' : ''}"><div class="mt-cam">${e}</div><span>${n} · ${w} ${i === 1 ? '🔇' : ''}</span></div>`).join('')}${me(false)}${st.hand ? '<div class="mt-handnote">✋ Elinizi kaldırdınız</div>' : ''}</div>${bar(true)}</div>
+    return page('Aile toplantısı - Görüntülü Görüşme', `<div class="mt mt-in"><div class="mt-main"><div class="mt-grid">${PEOPLE.map(([n, e, w], i) => `<div class="mt-tile ${i === 0 && st.talk ? 'talk' : ''}"><div class="mt-cam">${e}</div><span>${n} · ${w} ${i === 1 ? '🔇' : ''}</span></div>`).join('')}${me(false)}</div>${bar(true)}</div>
       ${st.chatOpen ? `<aside class="mt-chat"><b>Sohbet</b><div class="mt-msgs">${st.chat.map((m) => `<p><b>${esc(m.who)}:</b> ${esc(m.text)}</p>`).join('')}</div><form data-act="send"><input name="msg" placeholder="Mesaj yazın" autocomplete="off"><button>➤</button></form></aside>` : ''}</div>`, 'mt-bg');
   },
   mount(el, ctx) {
