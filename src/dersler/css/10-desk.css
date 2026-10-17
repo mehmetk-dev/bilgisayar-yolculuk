@@ -38,7 +38,27 @@
 .win-bar .wb-close:hover { background: #e81123; color: #fff; }
 .win-body { flex: 1; min-height: 0; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .win-grip { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; background: linear-gradient(135deg, transparent 55%, #9aa4b2 55%, #9aa4b2 62%, transparent 62%, transparent 72%, #9aa4b2 72%, #9aa4b2 79%, transparent 79%); z-index: 3; }
-.win.max .win-grip { display: none; }
+.win.max .win-grip, .win.snap .win-grip { display: none; }
+.win.snap { border-radius: 0; }
+/* Pencereleri yan yana koymak: kenara çarptırınca yerleşeceği yerin gölgesi, yaslama yardımcısı, ☐ üzerindeki yerleşimler */
+.dk-snapprev { position: absolute; top: 6px; bottom: 6px; left: 6px; width: calc(50% - 9px); border-radius: 10px; background: #ffffff55; border: 2px solid #ffffffcc; box-shadow: 0 0 0 1px #0003, 0 8px 30px #0004; backdrop-filter: blur(6px); z-index: 99990; pointer-events: none; }
+.dk-snapprev[data-zone="right"] { left: auto; right: 6px; }
+.dk-snapprev[data-zone="max"] { width: auto; right: 6px; }
+.dk-assist { position: absolute; top: 0; bottom: 0; width: 50%; left: 50%; z-index: 99980; pointer-events: auto; background: #1d2a3fcc; backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1em; padding: 1em; color: #fff; text-align: center; }
+.dk-assist[data-side="left"] { left: 0; }
+.dk-assist p { margin: 0; font-size: 1.1em; font-weight: 600; }
+.dk-assist > div { display: flex; flex-wrap: wrap; gap: 0.8em; justify-content: center; }
+.dk-assist button { width: 11em; min-height: 7em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4em; background: #fff; color: #1b2433; border: 3px solid transparent; border-radius: 10px; box-shadow: 0 6px 20px #0006; }
+.dk-assist button:hover { border-color: var(--dk-acc, #0a5dc2); }
+.dk-assist button span { font-size: 2.2em; }
+.dk-assist button b { font-weight: 500; font-size: 0.92em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.dk-assist small { opacity: 0.8; }
+.dk-layouts { position: absolute; z-index: 99995; pointer-events: auto; display: grid; grid-template-columns: auto auto; gap: 0.2em 0.6em; padding: 0.6em 0.7em 0.4em; background: #fff; border: 1px solid #c9d1dc; border-radius: 10px; box-shadow: 0 8px 24px #0004; text-align: center; color: #333; }
+.dk-layouts button { width: 5em; height: 3.2em; padding: 3px !important; display: flex; gap: 3px; border: 1px solid #9aa4b2; border-radius: 6px; background: #f3f5f8; }
+.dk-layouts button span { display: block; flex: 1; border-radius: 3px; background: #d5dbe4; }
+.dk-layouts button span.on { background: #9cc0ec; }
+.dk-layouts button:hover span.on { background: var(--dk-acc, #0a5dc2); }
+.dk-layouts small { font-size: 0.75em; }
 
 /* Görev çubuğu */
 .dk-taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 3em; background: #eef2f7f0; backdrop-filter: blur(10px); border-top: 1px solid #c9d1dc; display: flex; align-items: center; z-index: 5000; }

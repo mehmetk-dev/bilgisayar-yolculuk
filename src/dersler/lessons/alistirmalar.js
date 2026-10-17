@@ -553,7 +553,7 @@ const parentOf = (c, name) => nodeNamed(c, name)?.parent;
 const explorerAt = (folder) => (c) => { const w = c.d.ensure('explorer'); if (folder && w.api.folder !== folder) w.api.go(folder); };
 
 export const dosyaParkur = {
-  id: 'dosya-parkur', icon: '🗂', title: 'Dağınık klasörü toparlayın', minutes: 25, stage: 'desktop', parkur: true,
+  id: 'dosya-parkur', icon: '🏁', title: 'Dosya parkuru: dağınık klasörü toparlayın', minutes: 25, stage: 'desktop', parkur: true,
   desc: 'Orta seviye: karışık Belgeler klasörünü düzenlemek, USB\'ye yedeklemek.',
   setup: (c) => {
     put(c, 'docs', 'tahlil sonucu.pdf');

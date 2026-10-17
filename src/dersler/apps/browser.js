@@ -3,6 +3,8 @@
 // site bilgileri (kilide tıklayınca: adresin parçaları, sertifika, site izinleri), adres çubuğu önerileri, bildirim izni.
 import { SITES, SEARCH_HOST, resolve, PHOTOS, photoContent, siteName } from './sites.js';
 import { esc, pictureURL } from './util.js';
+import { fileIcon } from '../dialog.js';
+import { online } from './modem.js';
 
 let tabSeq = 1;
 const EXT_HOST = 'uzantilar.bulalim.com';
@@ -43,7 +45,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   pageEl.tabIndex = -1; // sayfaya tıklanınca odak tarayıcıya gelsin; kısayollar (Ctrl + D, Ctrl + +) çalışsın
   const tabs = [];
   let cur = null;
-  const downloads = [];
+  const downloads = (desk.dlList ||= []);
   const priv = !!args.private; // gizli pencere: geçmiş tutulmaz
   const asked = {};
   if (priv) body.classList.add('br-private');
@@ -109,6 +111,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     } else if (!loc) {
       html = `<div class="wp nt"><div class="se-logo">Bulalım</div><form class="se-form big" data-search><input name="q" placeholder="Arama yapın ya da adres yazın" autocomplete="off"><button>🔍 Ara</button></form>
         <div class="nt-tiles">${[['www.gunun-haberleri.com.tr', '📰', 'Haberler'], ['www.hava-durumu.com.tr', '🌤', 'Hava durumu'], ['www.lezzetli-tarifler.com.tr', '🥘', 'Tarifler']].map(([h, i, l]) => `<a data-href="${h}"><span>${i}</span>${l}</a>`).join('')}</div></div>`;
+    } else if (s.netSim && !online(desk)) {
+      // Wi-Fi'ye bağlı ama internet yok (modem sorunu) ya da hiçbir ağa bağlı değil
+      title = 'İnternet yok';
+      html = `<div class="wp err"><div class="err-ic">📡✖</div><h1>İnternete bağlı değilsiniz</h1><p class="mut">ERR_INTERNET_DISCONNECTED</p>
+        <ul><li>Modemin ışıklarına bakın: <b>Internet</b> ışığı yeşil mi?</li><li>Modemi kapatın, <b>10 saniye</b> bekleyin, yeniden açın.</li><li>Wi-Fi ağına yeniden bağlanın.</li></ul>
+        <p><button type="button" class="ed-btn" data-clock="retry">⟳ Yeniden dene</button> <button type="button" class="ed-btn ghost" data-clock="net">📶 Ağ ayarlarını aç</button></p></div>`;
+      setTimeout(() => emit('web-offline', { host: loc.host }), 0);
     } else if (!site) {
       title = loc.host;
       html = `<div class="wp err"><div class="err-ic">😕</div><h1>Bu siteye ulaşılamıyor</h1><p><b>${esc(loc.host)}</b> adresi bulunamadı.</p><ul><li>Adreste yazım hatası olabilir. Harfleri kontrol edin.</li><li>Adresi bilmiyorsanız, adres çubuğuna aradığınız şeyi kelimelerle yazın.</li></ul></div>`;
@@ -237,7 +246,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
 
   function renderDl(open) {
     const p = $('.br-dlpanel');
-    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x">✕</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>${/\.(jpe?g|png)$/i.test(d.name) ? '🖼' : '💿'}</span><div><b>${esc(d.name)}</b><small>Tamamlandı</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="1">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
+    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x">✕</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>${fileIcon(d.name)}</span><div><b>${esc(d.name)}</b><small>${d.when ? esc(d.when) + ' · ' : ''}${desk.fs.get(d.id) && !desk.fs.inRecycle(d.id) ? 'Tamamlandı' : 'Silindi'}</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="${d.id}">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
     if (open) p.hidden = false;
   }
 
@@ -672,7 +681,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const dl = e.target.closest('[data-download]');
     if (dl) { download(dl.dataset.download, dl.dataset.photo); return; }
     const ck = e.target.closest('[data-clock]');
-    if (ck) { if (ck.dataset.clock === 'settings') desk.open('settings', { page: 'time' }); else { show(); emit('web-reload'); } return; }
+    if (ck) { if (ck.dataset.clock === 'settings') desk.open('settings', { page: 'time' }); else if (ck.dataset.clock === 'net') desk.open('settings', { page: 'network' }); else { show(); emit('web-reload'); } return; }
     const sa = e.target.closest('.br-page [data-act]');
     if (sa && sa.tagName !== 'FORM' && !sa.disabled) { e.preventDefault(); siteAct(sa); return; }
     const tab = e.target.closest('[data-tab]');
@@ -681,7 +690,15 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (tab) { cur = tabs.find((t) => t.id === +tab.dataset.tab); show(); emit('web-tab-switch'); return; }
     const op = e.target.closest('[data-open]');
     if (op) { $('.br-dlpanel').hidden = true; const n = desk.fs.get(op.dataset.open); if (n) { emit('download-open', { name: n.name }); desk.openNode(n); } return; }
-    if (e.target.closest('[data-folder]')) { $('.br-dlpanel').hidden = true; desk.open('explorer', { folder: 'downloads' }); emit('download-folder'); return; }
+    const fd = e.target.closest('[data-folder]');
+    if (fd) {
+      $('.br-dlpanel').hidden = true;
+      const n = desk.fs.get(fd.dataset.folder);
+      const folder = n && !desk.fs.inRecycle(n.id) ? n.parent : 'downloads';
+      desk.open('explorer', { folder, select: n?.id });
+      emit('download-folder', { name: n?.name, folder });
+      return;
+    }
     if (e.target.closest('.dl-x')) { $('.br-dlpanel').hidden = true; }
   });
   body.addEventListener('submit', (e) => {

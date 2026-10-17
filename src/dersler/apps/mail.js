@@ -39,13 +39,33 @@ function seed() {
 }
 
 // Posta kutusu masaüstüne bağlıdır: ders başında masaüstü sıfırlanınca o da baştan kurulur
-const box = (desk) => (desk.mail ||= { mails: seed(), contacts: Object.entries(CONTACTS).map(([email, c]) => ({ name: c.name, email })).concat([{ name: 'Mahalle Eczanesi', email: 'bilgi@mahalle-eczanesi.com.tr' }]), signature: '' });
+const box = (desk) => (desk.mail ||= { mails: seed(), contacts: Object.entries(CONTACTS).map(([email, c]) => ({ name: c.name, email })).concat([{ name: 'Mahalle Eczanesi', email: 'bilgi@mahalle-eczanesi.com.tr' }]), signature: '', unsub: [], storageBase: 0 });
+export const mailBox = box;
+export const QUOTA = 15e9; // posta kutusunun alanı (15 GB)
+// Kullanılan alan: storageBase verilmişse (ders “kutu dolmak üzere” diye kurduysa) gösterilir. Çöp Kutusu boşaltılana kadar yer açılmaz.
+const used = (desk, mb) => mb.storageBase + mb.mails.reduce((t, m) => t + 30e3 + m.attachments.reduce((a, x) => a + attSize(desk, x), 0), 0);
+const gb = (b) => (b / 1e9).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const FULL = 0.99; // bu oranın üstünde kutu “dolu” sayılır
+
+// Arama: düz kelimeler konu, gönderen ve yazıda aranır. ek:var / has:attachment → ekli postalar,
+// kimden:ad / from:ad → gönderen, büyük:10mb / larger:10M → ekleri o boyuttan büyük olanlar
+export function searchMail(desk, mails, q) {
+  const words = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
+  return mails.filter((m) => m.folder !== 'trash' && words.every((w) => {
+    let r;
+    if (/^(ek:var|has:attachment)$/.test(w)) return m.attachments.length > 0;
+    if ((r = w.match(/^(?:kimden|from):(.+)$/))) return `${m.fromName} ${m.from}`.toLocaleLowerCase('tr').includes(r[1]);
+    if ((r = w.match(/^(?:büyük|buyuk|larger):(\d+)\s*(mb|m)?$/))) return m.attachments.reduce((t, a) => t + attSize(desk, a), 0) > +r[1] * 1e6;
+    return `${m.subject} ${m.fromName} ${m.from} ${m.body}`.toLocaleLowerCase('tr').includes(w);
+  }));
+}
 export const MAX_ATTACH = 25e6; // e-postayla gönderilebilecek en büyük ek (25 MB)
 
 // Derslerin gelen kutusuna posta koyması için (ör. görüntülü görüşme daveti). url: postadaki bağlantının adresi
 export function deliverMail(desk, o, quiet) {
   const mb = box(desk);
   if (o.key && mb.mails.some((m) => m.key === o.key)) return;
+  if (mb.unsub.includes(o.from)) return; // abonelikten çıkılan gönderen artık posta göndermez
   const m = { id: 'm' + seq++, folder: 'inbox', read: false, attachments: [], date: today(), time: new Date().toTimeString().slice(0, 5), to: ME, ...o };
   mb.mails.unshift(m);
   desk.wins.filter((w) => w.app === 'mail').forEach((w) => w.api.refresh?.());
@@ -75,6 +95,7 @@ export function mail({ desk, body, emit, setTitle }) {
   const mb = box(desk);
   body.classList.add('pm');
   let folder = 'inbox', view = null; // view: { kind: 'read', id } | { kind: 'compose', ... }
+  let query = ''; // folder === 'search' iken arama sorgusu
   const $ = (s) => body.querySelector(s);
   const get = (id) => mb.mails.find((m) => m.id === id);
   const unread = () => mb.mails.filter((m) => m.folder === 'inbox' && !m.read).length;
@@ -82,10 +103,12 @@ export function mail({ desk, body, emit, setTitle }) {
   function render() {
     const n = unread();
     setTitle(`E-posta${n ? ` (${n})` : ''}`);
-    body.innerHTML = `<div class="pm-top"><span class="pm-logo">✉ Postam</span><span class="pm-me">${ME}</span></div>
+    const u = mb.storageBase ? used(desk, mb) : 0;
+    body.innerHTML = `<div class="pm-top"><span class="pm-logo">✉ Postam</span><form class="pm-sform"><input class="pm-search" type="search" placeholder="Postalarda ara (ör. fatura, ek:var)" value="${esc(query)}" autocomplete="off" spellcheck="false"></form><span class="pm-me">${ME}</span></div>
       <div class="pm-main"><nav class="pm-side"><button type="button" class="pm-new">✏ Yeni posta</button>
         ${FOLDERS.map(([id, ic, label]) => `<button type="button" data-folder="${id}" class="${id === folder && !view ? 'on' : ''}">${ic} ${label}${id === 'inbox' && n ? ` <b>${n}</b>` : ''}</button>`).join('')}
-        <hr><button type="button" data-folder="contacts" class="${folder === 'contacts' && !view ? 'on' : ''}">👥 Kişiler</button><button type="button" data-folder="settings" class="${folder === 'settings' && !view ? 'on' : ''}">⚙ Ayarlar</button></nav>
+        <hr><button type="button" data-folder="contacts" class="${folder === 'contacts' && !view ? 'on' : ''}">👥 Kişiler</button><button type="button" data-folder="settings" class="${folder === 'settings' && !view ? 'on' : ''}">⚙ Ayarlar</button>
+        ${u ? `<div class="pm-quota ${u / QUOTA > FULL ? 'full' : ''}" title="Posta kutusunun alanı"><small>Depolama</small><div class="pm-qbar"><i style="width:${Math.min(100, (u / QUOTA) * 100).toFixed(1)}%"></i></div><small><b>${gb(u)} GB</b> / 15 GB kullanıldı</small></div>` : ''}</nav>
       <section class="pm-pane">${view?.kind === 'read' ? readHtml(get(view.id)) : view?.kind === 'compose' ? composeHtml() : folder === 'contacts' ? contactsHtml() : folder === 'settings' ? settingsHtml() : listHtml()}</section></div>
       <datalist id="pm-people">${mb.contacts.map((c) => `<option value="${esc(c.email)}">${esc(c.name)}</option>`).join('')}</datalist>`;
     if (view?.kind === 'compose') {
@@ -104,10 +127,12 @@ export function mail({ desk, body, emit, setTitle }) {
   }
 
   function listHtml() {
-    const list = mb.mails.filter((m) => m.folder === folder);
-    const label = FOLDERS.find((f) => f[0] === folder)[2];
-    return `<h2 class="pm-h">${label}</h2>${folder === 'spam' ? '<p class="pm-hint">⚠ İstenmeyen klasörüne şüpheli postalar kendiliğinden düşer. Ara sıra bakın: bazen gerçek postalar da buraya düşer.</p>' : ''}${list.length ? `<ul class="pm-list">${list.map((m) => `<li><button type="button" data-open="${m.id}" class="${m.read ? '' : 'unread'}">
-      <span class="pm-from">${esc(folder === 'sent' ? 'Kime: ' + m.to : folder === 'drafts' ? '📝 Taslak' + (m.to ? ' · ' + m.to : '') : m.fromName)}</span><span class="pm-subj">${esc(m.subject || '(Konu yok)')}${m.attachments.length ? ' 📎' : ''}</span><span class="pm-time">${esc(m.time)}</span></button></li>`).join('')}</ul>` : '<p class="pm-empty">Bu klasörde posta yok.</p>'}`;
+    const list = folder === 'search' ? searchMail(desk, mb.mails, query) : mb.mails.filter((m) => m.folder === folder);
+    const label = folder === 'search' ? `🔍 Arama: “${esc(query)}” · ${list.length} posta` : FOLDERS.find((f) => f[0] === folder)[2];
+    const big = (m) => m.attachments.reduce((t, a) => t + attSize(desk, a), 0);
+    const full = folder === 'inbox' && mb.storageBase && used(desk, mb) / QUOTA > FULL;
+    return `<h2 class="pm-h">${label}</h2>${full ? '<p class="pm-hint pm-full">⚠ <b>Posta kutunuz dolmak üzere.</b> Yer açmazsanız yeni postalar size ulaşamaz. Büyük ekli postaları silip Çöp Kutusu\'nu boşaltın.</p>' : ''}${folder === 'search' && list.length ? `<p class="pm-bulk"><button type="button" class="pm-delall">🗑 Bulunan ${list.length} postanın hepsini sil</button></p>` : ''}${folder === 'trash' && list.length ? '<p class="pm-hint">🗑 Silinen postalar burada 30 gün durur ve yer kaplamaya devam eder. <button type="button" class="pm-empty-trash">Çöp Kutusunu şimdi boşalt</button></p>' : ''}${folder === 'search' ? '<p class="pm-hint">İpucu: <b>ek:var</b> ekli postaları, <b>kimden:ad</b> bir kişinin postalarını, <b>büyük:10mb</b> 10 MB\'tan büyük ekleri bulur.</p>' : ''}${folder === 'spam' ? '<p class="pm-hint">⚠ İstenmeyen klasörüne şüpheli postalar kendiliğinden düşer. Ara sıra bakın: bazen gerçek postalar da buraya düşer.</p>' : ''}${list.length ? `<ul class="pm-list">${list.map((m) => `<li><button type="button" data-open="${m.id}" class="${m.read ? '' : 'unread'}">
+      <span class="pm-from">${esc(folder === 'sent' ? 'Kime: ' + m.to : folder === 'drafts' ? '📝 Taslak' + (m.to ? ' · ' + m.to : '') : m.fromName)}</span><span class="pm-subj">${esc(m.subject || '(Konu yok)')}${m.attachments.length ? ` 📎${big(m) > 1e6 ? ` <small class="pm-size">${fmtSize(big(m))}</small>` : ''}` : ''}</span><span class="pm-time">${esc(m.time)}${folder === 'search' && m.folder !== 'inbox' ? ` · ${FOLDERS.find((f) => f[0] === m.folder)?.[2] || ''}` : ''}</span></button></li>`).join('')}</ul>` : `<p class="pm-empty">${folder === 'search' ? 'Aramanızla eşleşen posta yok.' : 'Bu klasörde posta yok.'}</p>`}`;
   }
 
   function readHtml(m) {
@@ -117,6 +142,7 @@ export function mail({ desk, body, emit, setTitle }) {
         ${m.folder === 'inbox' ? '<button type="button" class="pm-spam">⚠ İstenmeyen</button>' : ''}${m.folder === 'spam' ? '<button type="button" class="pm-notspam">✔ İstenmeyen değil</button>' : ''}
         ${m.folder !== 'sent' && !mb.contacts.some((c) => c.email === m.from) && !m.danger ? '<button type="button" class="pm-savec">👤 Kişilere ekle</button>' : ''}${m.folder === 'trash' ? '' : '<button type="button" class="pm-del">🗑 Sil</button>'}</div>
       <h2 class="pm-h">${esc(m.subject || '(Konu yok)')}</h2>
+      ${m.list && m.folder !== 'sent' ? `<div class="pm-unsub">${mb.unsub.includes(m.from) ? `✔ <b>${esc(m.fromName)}</b> listesinden çıktınız; bu gönderenden artık posta gelmeyecek.` : `📰 Bu postayı <b>${esc(m.fromName)}</b> bülteninden alıyorsunuz. <button type="button" class="pm-unsub-btn">Abonelikten çık</button>`}</div>` : ''}
       <div class="pm-meta"><b>${esc(m.fromName || 'Ben')}</b> &lt;${esc(m.from)}&gt;<br><span>Kime: ${esc(m.to)}${m.cc ? ` · Bilgi: ${esc(m.cc)}` : ''}${m.bcc ? ` · Gizli: ${esc(m.bcc)}` : ''} · ${esc(m.date)} ${esc(m.time)}</span></div>
       <div class="pm-text">${esc(m.body).replace(/\n/g, '<br>')}</div>
       ${m.link ? `<p><a href="#" class="pm-link" data-danger="1">👉 ${esc(m.link)}</a></p>` : ''}${m.url ? `<p><a href="#" class="pm-url" data-url="${esc(m.url)}" title="${esc(m.url)}">👉 ${esc(m.urlText || m.url)}</a><br><small class="pm-urlnote">Bağlantı adresi: ${esc(m.url)}</small></p>` : ''}${att}`;
@@ -257,6 +283,36 @@ export function mail({ desk, body, emit, setTitle }) {
       return;
     }
     if (t.classList.contains('pm-new')) return compose();
+    if (t.classList.contains('pm-delall')) {
+      const list = searchMail(desk, mb.mails, query);
+      const size = list.reduce((t2, m) => t2 + m.attachments.reduce((a, x) => a + attSize(desk, x), 0), 0);
+      list.forEach((m) => { m.folder = 'trash'; });
+      render();
+      desk.toast('Çöp Kutusu\'na taşındı', `${list.length} posta`, '🗑');
+      emit('mail-delete-many', { count: list.length, size, q: query, keys: list.map((m) => m.key) });
+      return;
+    }
+    if (t.classList.contains('pm-empty-trash')) {
+      desk.dialogs.ask({ title: 'Çöp Kutusu', icon: '🗑', text: 'Çöp Kutusu\'ndaki bütün postalar <b>kalıcı olarak</b> silinsin mi?', buttons: [['yes', 'Evet, boşalt', true], ['no', 'Vazgeç']] }).then((a) => {
+        if (a !== 'yes') return;
+        const n = mb.mails.filter((m) => m.folder === 'trash').length;
+        mb.mails = mb.mails.filter((m) => m.folder !== 'trash');
+        render();
+        emit('mail-empty-trash', { count: n, used: mb.storageBase ? used(desk, mb) : 0 });
+      });
+      return;
+    }
+    if (t.classList.contains('pm-unsub-btn') && view?.kind === 'read') {
+      const m = get(view.id);
+      desk.dialogs.ask({ title: 'Abonelikten çık', icon: '📰', text: `<b>${esc(m.fromName)}</b> (${esc(m.from)}) size bir daha posta göndermesin mi?`, buttons: [['yes', 'Abonelikten çık', true], ['no', 'Vazgeç']] }).then((a) => {
+        if (a !== 'yes') return;
+        if (!mb.unsub.includes(m.from)) mb.unsub.push(m.from);
+        render();
+        desk.toast('Abonelikten çıkıldı', `${esc(m.fromName)} artık size posta göndermeyecek.`, '📰');
+        emit('mail-unsub', { from: m.from, name: m.fromName });
+      });
+      return;
+    }
     if (t.dataset.write) { const c = mb.contacts[+t.dataset.write]; return compose({ to: c.email }); }
     if (t.dataset.cdel) { mb.contacts.splice(+t.dataset.cdel, 1); render(); return; }
     if (t.classList.contains('pm-sigsave')) {
@@ -265,9 +321,9 @@ export function mail({ desk, body, emit, setTitle }) {
       emit('mail-signature', { text: mb.signature });
       return;
     }
-    if (t.dataset.folder) { saveDraft(); folder = t.dataset.folder; view = null; render(); emit('mail-folder', { folder }); return; }
+    if (t.dataset.folder) { saveDraft(); folder = t.dataset.folder; view = null; query = ''; render(); emit('mail-folder', { folder }); return; }
     if (t.dataset.open) return openMail(t.dataset.open);
-    if (t.classList.contains('pm-back')) { view = null; render(); return; }
+    if (t.classList.contains('pm-back')) { view = null; render(); return; } // arama sonuçlarından açıldıysa sonuçlara döner
     if (t.classList.contains('pm-ccbtn')) { keep(); view.showCc = true; render(); emit('mail-cc-show'); setTimeout(() => $('.pm-cc')?.focus(), 0); return; }
     const m = view?.kind === 'read' && get(view.id);
     if (m && t.classList.contains('pm-reply')) return compose({ title: 'Yanıtla', to: m.from, subject: m.subject.startsWith('Ynt:') ? m.subject : 'Ynt: ' + m.subject, text: `\n\n--- ${m.fromName} yazdı ---\n${m.body}`, replyTo: m.id });
@@ -278,7 +334,7 @@ export function mail({ desk, body, emit, setTitle }) {
       view = null;
       render();
       desk.toast(spam ? 'İstenmeyen olarak işaretlendi' : 'Çöp Kutusu\'na taşındı', esc(m.subject), spam ? '⚠' : '🗑');
-      emit(spam ? 'mail-spam' : 'mail-delete', { id: m.id, key: m.key, danger: !!m.danger });
+      emit(spam ? 'mail-spam' : 'mail-delete', { id: m.id, key: m.key, danger: !!m.danger, size: m.attachments.reduce((a, x) => a + attSize(desk, x), 0), used: mb.storageBase ? used(desk, mb) : 0 });
       return;
     }
     if (m && t.classList.contains('pm-notspam')) {
@@ -308,6 +364,18 @@ export function mail({ desk, body, emit, setTitle }) {
       if (t.dataset.unatt) { keep(); view.attachments.splice(+t.dataset.unatt, 1); render(); return; }
       if (t.classList.contains('pm-discard')) { if (view.draftId) mb.mails = mb.mails.filter((x) => x.id !== view.draftId); view = null; render(); emit('mail-discard'); }
     }
+  });
+  // Arama kutusu: Enter'a basınca sonuçlar listelenir
+  body.addEventListener('submit', (e) => {
+    if (!e.target.classList.contains('pm-sform')) return;
+    e.preventDefault();
+    const q = $('.pm-search').value.trim();
+    saveDraft();
+    query = q;
+    folder = q ? 'search' : 'inbox';
+    view = null;
+    render();
+    if (q) emit('mail-search', { q, results: searchMail(desk, mb.mails, q).map((m) => ({ key: m.key, subject: m.subject, folder: m.folder })) });
   });
   // Yeni kişi formu
   body.addEventListener('submit', (e) => {

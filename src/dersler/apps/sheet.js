@@ -55,7 +55,7 @@ function criterion(cr) {
 }
 const FUNCS = {
   TOPLA: (a, num) => numsOf(a, num).reduce((x, y) => x + y, 0),
-  ORTALAMA: (a, num) => { const v = numsOf(a, num); if (!v.length) throw new FErr('#BÖL/0!'); return v.reduce((x, y) => x + y, 0) / v.length; },
+  ORTALAMA: (a, num) => { const v = numsOf(a, num); if (!v.length) throw new FErr('#SAYI/0!'); return v.reduce((x, y) => x + y, 0) / v.length; },
   MAK: (a, num) => { const v = numsOf(a, num); return v.length ? Math.max(...v) : 0; },
   'MİN': (a, num) => { const v = numsOf(a, num); return v.length ? Math.min(...v) : 0; },
   SAY: (a) => a.flatMap((x) => (isRange(x) ? x.vals : [x])).filter((v) => typeof v === 'number').length,
@@ -166,7 +166,7 @@ function evaluate(src, get) {
     let v = power();
     for (;;) {
       if (eat('*')) v = num(v) * num(power());
-      else if (eat('/')) { const d = num(power()); if (d === 0) throw new FErr('#BÖL/0!'); v = num(v) / d; }
+      else if (eat('/')) { const d = num(power()); if (d === 0) throw new FErr('#SAYI/0!'); v = num(v) / d; }
       else return v;
     }
   }
@@ -214,6 +214,14 @@ const BUTCE = (() => {
   delete fmt.B8.f; delete fmt.B3.f;
   return { cells, fmt };
 })();
+// Hata kodlarının sade açıklaması (etkin hücre hatalıysa formül çubuğunun altında görünür)
+const ERRS = {
+  '#DEĞER!': 'Formül, sayı olması gereken yerde <b>yazı</b> buldu (ör. “iki yüz” yazılmış bir hücreyle toplama). Hücreleri rakamla yazın.',
+  '#SAYI/0!': 'Bir sayı <b>sıfıra</b> ya da <b>boş hücreye</b> bölünüyor. Bölen hücreye bir değer yazın.',
+  '#AD?': 'Excel bu <b>işlev adını</b> tanımıyor: harf hatası olabilir (TOPLAM değil TOPLA) ya da yazı tırnak içinde yazılmamış.',
+  '#BAŞV!': 'Formülün kullandığı <b>hücre artık yok</b> ya da geçersiz (silinen satır, tablonun dışına kopyalama).',
+  '#YOK': 'Aranan değer listede <b>bulunamadı</b> (DÜŞEYARA).',
+};
 const PIE = ['#2e7d32', '#1565c0', '#e46c0a', '#7030a0', '#c62828', '#00838f', '#9e9d24', '#6d4c41', '#ad1457', '#455a64'];
 
 export function sheet({ desk, body, args, emit, setTitle }) {
@@ -226,13 +234,14 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="asc" title="Küçükten büyüğe sırala">↑ A→Z</button><button type="button" data-act="desc" title="Büyükten küçüğe sırala">↓ Z→A</button>
       <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Sütun grafiği</button><button type="button" data-act="pie" title="Seçili alandan pasta grafiği: her parçanın bütünün ne kadarı olduğunu gösterir">🥧 Pasta grafiği</button>
-      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri doğrulama: hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button>
+      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri doğrulama: hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button><button type="button" data-act="pivot" title="Özet Tablo: uzun listeyi formülsüz özetler (ör. her kategorinin toplamı)">🧮 Özet Tablo</button>
       <span class="xl-sep"></span><button type="button" data-act="merge" title="Seçili hücreleri tek hücre yapar ve ortalar">⊞ Birleştir ve Ortala</button><button type="button" data-act="wrap" title="Uzun yazıyı hücre içinde alt satıra indirir">↲ Metni Kaydır</button><button type="button" data-act="freeze" title="Aşağı inerken en üst satır ekranda kalır">❄ Üst Satırı Dondur</button>
       <span class="xl-sep"></span><span class="xl-lab">Yazdırma:</span><button type="button" data-act="orient" title="Kâğıdı yatay yapar">▭ Yatay</button><button type="button" data-act="fit" title="Bütün sütunları tek sayfaya sığdırır">⤢ Tüm sütunları bir sayfaya sığdır</button><button type="button" data-act="grid" title="Kâğıtta tablo çizgileri çıksın">▦ Kılavuz çizgilerini yazdır</button>
     </div>
     <div class="xl-pop" hidden></div>
     <div class="xl-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
     <div class="xl-bar"><input class="xl-name" readonly aria-label="Ad kutusu"><span class="xl-fx">fx</span><input class="xl-formula" spellcheck="false" autocomplete="off" aria-label="Formül çubuğu"></div>
+    <div class="xl-errnote" hidden></div>
     <div class="xl-wrap" tabindex="0"><table class="xl-grid"><thead><tr><th class="xl-corner"></th>${[...COLS].map((c, i) => `<th data-col="${i}">${c}<i class="xl-rz" data-col="${i}" title="Sütun genişliği: sürükleyin ya da çift tıklayarak içeriğe sığdırın"></i></th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length: ROWS }, (_, r) => `<tr><th>${r + 1}</th>${[...COLS].map((_, c) => `<td data-a="${addr(r, c)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
       <div class="xl-chart" hidden></div><div class="xl-fh" title="Doldurma tutamacı: aşağı ya da sağa sürükleyin"></div></div>
@@ -358,6 +367,10 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     body.querySelectorAll('thead th')[act.c + 1].classList.add('hl');
     body.querySelectorAll('tbody th')[act.r].classList.add('hl');
     $('.xl-name').value = addr(act.r, act.c);
+    const es = show(addr(act.r, act.c));
+    const en = $('.xl-errnote');
+    en.hidden = !es.err || !!editing;
+    if (es.err) en.innerHTML = `⚠ <b>${esc(es.text)}</b> ${ERRS[es.text] || 'Formülde bir hata var.'}`;
     if (!editing) fbar.value = cells[addr(act.r, act.c)] || '';
     // Seçili sayılar için durum çubuğunda toplam ve ortalama (Excel'deki gibi)
     const nums = [];
@@ -564,6 +577,60 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     b.textContent = '▾';
     b.title = 'Listeden seçin';
     td(addr(act.r, act.c)).append(b);
+  }
+  // ---- Özet Tablo: etkin hücrenin bulunduğu tabloyu bir sütuna göre gruplayıp başka sütunu toplar; sonuç yeni sayfaya ----
+  function tableAround() {
+    const used = (r) => [...COLS].some((_, c) => cells[addr(r, c)]);
+    if (!used(act.r)) return null;
+    let hr = act.r; while (hr > 0 && used(hr - 1)) hr--;
+    // Sütunlar: etkin hücreden sağa ve sola, başlığı dolu bitişik sütunlar (yandaki hesap hücreleri karışmasın)
+    let c1 = act.c, c2 = act.c;
+    while (c1 > 0 && cells[addr(hr, c1 - 1)]) c1--;
+    while (c2 < COLS.length - 1 && cells[addr(hr, c2 + 1)]) c2++;
+    const inRow = (r) => { for (let c = c1; c <= c2; c++) if (cells[addr(r, c)]) return true; return false; };
+    const sumRow = (r) => { for (let c = c1; c <= c2; c++) if (/^=.*[A-H]\$?\d+:/i.test(cells[addr(r, c)] || '')) return true; return false; };
+    let r2 = hr; while (r2 + 1 < ROWS && inRow(r2 + 1) && !sumRow(r2 + 1)) r2++;
+    return r2 > hr ? { hr, r2, c1, c2 } : null;
+  }
+  function pivotDialog() {
+    const t = tableAround();
+    if (!t) { desk.toast('Özet Tablo', 'Önce özetlenecek tablonun içinde bir hücreye tıklayın.', '🧮'); return; }
+    const head = []; for (let c = t.c1; c <= t.c2; c++) head.push([c, show(addr(t.hr, c)).text]);
+    const numeric = head.filter(([c]) => { let n = 0; for (let r = t.hr + 1; r <= t.r2; r++) if (typeof show(addr(r, c)).v === 'number') n++; return n > (t.r2 - t.hr) / 2; });
+    // Önerilen gruplama sütunu: sayı olmayan ve en çok tekrar eden (ör. Kategori)
+    const uniq = (c) => new Set(Array.from({ length: t.r2 - t.hr }, (_, k) => show(addr(t.hr + 1 + k, c)).text)).size;
+    const guess = head.filter(([c]) => !numeric.some(([n]) => n === c)).sort((a, b) => uniq(a[0]) - uniq(b[0]))[0]?.[0];
+    openPop(`<b>🧮 Özet Tablo Oluştur</b><p>Tablo: <b>${addr(t.hr, t.c1)}:${addr(t.r2, t.c2)}</b> (${t.r2 - t.hr} satır)</p>
+      <div class="xl-row">Satırlar (gruplanacak): <select class="xl-prow">${head.map(([c, h]) => `<option value="${c}" ${c === guess ? 'selected' : ''}>${esc(h)}</option>`).join('')}</select></div>
+      <div class="xl-row">Değerler: <select class="xl-pfn"><option value="sum">Toplam</option><option value="count">Sayı (kaç tane)</option><option value="avg">Ortalama</option></select> <select class="xl-pval">${(numeric.length ? numeric : head).map(([c, h]) => `<option value="${c}">${esc(h)}</option>`).join('')}</select></div>
+      <p class="xl-vnote">Sonuç yeni bir çalışma sayfasına yazılır.</p>
+      <div class="xl-row"><button type="button" class="xl-pok primary" data-t="${t.hr},${t.r2}">Oluştur</button><button type="button" class="xl-px">İptal</button></div>`, $('[data-act="pivot"]'));
+  }
+  function makePivot(hr, r2, rc, vc, fn) {
+    const groups = new Map();
+    for (let r = hr + 1; r <= r2; r++) {
+      const k = show(addr(r, rc)).text || '(Boş)', v = show(addr(r, vc)).v;
+      const g = groups.get(k) || { sum: 0, n: 0 };
+      g.n++; if (typeof v === 'number') g.sum += v;
+      groups.set(k, g);
+    }
+    const rowName = show(addr(hr, rc)).text, valName = show(addr(hr, vc)).text;
+    const label = { sum: 'Toplam', count: 'Sayı', avg: 'Ortalama' }[fn];
+    const val = (g) => (fn === 'sum' ? g.sum : fn === 'count' ? g.n : g.sum / g.n);
+    const keys = [...groups.keys()].sort((a, b) => a.localeCompare(b, 'tr'));
+    const out = { A1: rowName, B1: `${label} ${valName}` };
+    const f = { A1: { b: true }, B1: { b: true } };
+    const money = fn !== 'count' && /tutar|fiyat|₺|tl|ücret|para/i.test(valName + (fmt[addr(hr + 1, vc)]?.f || ''));
+    keys.forEach((k, i) => { out['A' + (i + 2)] = k; out['B' + (i + 2)] = String(+val(groups.get(k)).toFixed(2)); if (money) f['B' + (i + 2)] = { f: 'tl' }; });
+    const all = [...groups.values()].reduce((a, g) => ({ sum: a.sum + g.sum, n: a.n + g.n }), { sum: 0, n: 0 });
+    const last = keys.length + 2;
+    out['A' + last] = 'Genel Toplam'; out['B' + last] = String(+val(all).toFixed(2));
+    f['A' + last] = { b: true }; f['B' + last] = { b: true, ...(money ? { f: 'tl' } : {}) };
+    stash();
+    sheets.push({ name: uniqueName('Özet Tablo'), color: '', data: { cells: out, fmt: f, colW: { 0: 14, 1: 14 } } });
+    dirty = true;
+    useSheet(sheets.length - 1, true);
+    emit('xl-pivot', { rowField: rowName, valueField: valName, fn, groups: keys.map((k) => [k, val(groups.get(k))]) });
   }
   function filterToggle() {
     if (filt) { filt = null; render(); emit('xl-filter-off'); return; }
@@ -1003,7 +1070,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   });
   body.addEventListener('mousedown', (e) => {
     if (!e.target.closest('.xl-menu, .xl-file')) $('.xl-menu').hidden = true;
-    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], .xl-fb, .xl-vb')) pop.hidden = true;
+    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], .xl-fb, .xl-vb')) pop.hidden = true;
     if (e.target.closest('.xl-rib button')) e.preventDefault();
   });
   pop.addEventListener('change', (e) => {
@@ -1017,6 +1084,12 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('xl-file')) { $('.xl-menu').hidden = !$('.xl-menu').hidden; return; }
     if (t.dataset.file) return fileCmd(t.dataset.file);
     if (t.classList.contains('xl-px')) { pop.hidden = true; return; }
+    if (t.classList.contains('xl-pok')) {
+      const [hr, r2] = t.dataset.t.split(',').map(Number);
+      pop.hidden = true;
+      makePivot(hr, r2, +pop.querySelector('.xl-prow').value, +pop.querySelector('.xl-pval').value, pop.querySelector('.xl-pfn').value);
+      return;
+    }
     if (t.classList.contains('xl-vok')) {
       const list = pop.querySelector('.xl-vlist').value.split(/[,;]/).map((x) => x.trim()).filter(Boolean);
       if (list.length < 2) { pop.querySelector('.xl-vnote').textContent = 'En az iki seçenek yazın (ör. Ödendi, Ödenmedi).'; pop.querySelector('.xl-vnote').classList.add('bad'); return; }
@@ -1054,6 +1127,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (editing) commit(0, 0);
     if (a === 'cond') return condDialog();
     if (a === 'valid') return validDialog();
+    if (a === 'pivot') return pivotDialog();
     if (a === 'filter') { filterToggle(); wrap.focus({ preventScroll: true }); return; }
     if (a === 'merge') mergeCells();
     else if (a === 'wrap') wrapText();

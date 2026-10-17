@@ -6,6 +6,7 @@ import { Dialogs, esc, fileIcon } from './dialog.js';
 import { APPS, START_APPS } from './apps/index.js';
 import { pictureURL, playTune } from './apps/util.js';
 import { osInstall } from './apps/osinstall.js';
+import { online } from './apps/modem.js';
 
 export const WALLPAPERS = {
   mavi: ['Mavi', 'radial-gradient(ellipse at 30% 120%, #9fd3ff 0%, #3d8fe0 35%, #0b3c8c 75%, #061d4a 100%)', ['#3d8fe0', '#061d4a']],
@@ -118,6 +119,8 @@ export class Desktop {
     this.overEl = $('.dk-over');
     this.dialogs = new Dialogs(this.screen, (ev) => this.emit(ev.type, ev));
     this.fs.onChange((op, node) => {
+      // Kaydedilen dosyalar Dosya Gezgini'nin “Son kullanılan dosyalar” listesine girer
+      if (op === 'write' && node?.type === 'file' && node.parent !== 'downloads') this.touchRecent(node.id);
       this.renderIcons();
       this.emit('fs', { op, node, id: node?.id, name: node?.name, parent: node?.parent });
       this.wins.forEach((w) => w.api?.onFs?.(op, node));
@@ -156,10 +159,12 @@ export class Desktop {
   reset({ power = 'desktop', settings = {} } = {}) {
     this.closeMenus();
     this.root.querySelector('.dk-toasts').innerHTML = '';
-    this.screen.querySelectorAll('.dk-uac, .dk-snip, .dk-switch, .dk-secure, .dk-phone').forEach((x) => x.remove());
+    this.screen.querySelectorAll('.dk-uac, .dk-snip, .dk-switch, .dk-secure, .dk-phone, .dk-modem').forEach((x) => x.remove());
+    this.modem?.remove?.(); this.modem = null; this.hotspot = false;
     this.phoneEl = null;
     this.snipping = false;
     this.dialogs.closeAll();
+    this.closeAssist(); this.hideLayouts(); this.snapPreview(null);
     for (const w of [...this.wins]) this.destroy(w);
     this.fs.reset();
     this.mail = null; // e-posta kutusu ilk açılışta baştan kurulur
@@ -169,6 +174,8 @@ export class Desktop {
     this.lastInput = null;
     this.screen.querySelector('.dk-tv')?.remove();
     this.history = []; // tarayıcı geçmişi
+    this.recent = []; // Dosya Gezgini → Giriş: son kullanılan dosyalar
+    this.dlList = []; // tarayıcının İndirilenler listesi (Ctrl + J)
     this.webState = {}; // sitelerin durumu (giriş yapılmış mı, sepet, görüşme); önceki dersten kalmasın
     this.sitePerms = {}; // sitelere verilen kamera, mikrofon, bildirim izinleri
     this.textClip = null;
@@ -282,7 +289,10 @@ export class Desktop {
     this.root.querySelector('.dk-wall').style.background = this.wallCss();
     this.root.style.setProperty('--dk-scale', s.textScale / 100);
     this.root.querySelector('.dk-dim').style.opacity = (100 - s.brightness) / 140;
-    this.root.querySelector('.tb-wifi').textContent = s.airplane ? '✈' : s.wifi && s.network ? '📶' : '🚫';
+    const noNet = s.netSim && s.wifi && s.network && !online(this); // Wi-Fi'ye bağlı ama internet yok
+    this.root.querySelector('.tb-wifi').textContent = s.airplane ? '✈' : s.wifi && s.network ? (noNet ? '🌐' : '📶') : '🚫';
+    this.root.querySelector('.tb-net').title = noNet ? `${s.network}: İnternet erişimi yok` : 'Ağ ve ses';
+    this.root.querySelector('.tb-net').classList.toggle('nonet', !!noNet);
     this.root.querySelector('.tb-vol').textContent = s.muted || !s.volume ? '🔇' : s.volume < 40 ? '🔈' : '🔊';
     this.root.classList.toggle('dk-dark', !!s.dark);
     this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
@@ -646,10 +656,12 @@ export class Desktop {
 
   pasteFile(target) {
     const c = this.fileClip;
-    if (!c || !this.fs.get(c.id)) return;
-    const name = this.fs.get(c.id).name;
-    if (c.op === 'cut') { this.fs.move(c.id, target); this.fileClip = null; } else this.fs.copy(c.id, target);
-    this.emit('file-paste', { op: c.op, name, to: target, toName: this.fs.label(target) });
+    const ids = (c?.ids || [c?.id]).filter((x) => x && this.fs.get(x));
+    if (!ids.length) return;
+    const names = ids.map((x) => this.fs.get(x).name);
+    for (const id of ids) { if (c.op === 'cut') this.fs.move(id, target); else this.fs.copy(id, target); }
+    if (c.op === 'cut') this.fileClip = null;
+    this.emit('file-paste', { op: c.op, name: names[0], names, count: ids.length, to: target, toName: this.fs.label(target) });
   }
 
   // Masaüstündeki bir öğeyi aç (çift tık)
@@ -659,8 +671,12 @@ export class Desktop {
     return this.openNode(this.fs.get(id));
   }
 
+  // Son açılan / kaydedilen dosyalar (en yenisi başta)
+  touchRecent(id) { this.recent = [id, ...(this.recent || []).filter((x) => x !== id)].slice(0, 20); }
+
   openNode(n) {
     if (!n) return null;
+    if (n.type === 'file') this.touchRecent(n.id);
     if (n.type === 'link') return this.open(n.app, n.args);
     if (n.type === 'folder') return this.open('explorer', { folder: n.id });
     const name = n.name.toLowerCase();
@@ -761,6 +777,17 @@ export class Desktop {
     }
     const folder = target.replace(/^folder:/, '');
     if (!node) { this.emit('drop', { id, name, to: folder, refused: true }); return; }
+    // Birden çok seçili dosya birlikte sürüklendi
+    if (p.ids?.length > 1) {
+      const ids = p.ids.filter((x) => this.fs.get(x) && x !== folder);
+      if (folder === node.parent) { this.emit('drop', { id, name, to: folder, same: true }); return; }
+      if (folder === RECYCLE) { ids.forEach((x) => this.deleteNode(x)); this.emit('drop', { id, name, ids, count: ids.length, to: RECYCLE, toName: 'Geri Dönüşüm Kutusu', op: 'delete' }); return; }
+      const op = this.crossDrive(node.parent, folder) ? 'copy' : 'move';
+      for (const x of ids) { const err = op === 'copy' ? (this.fs.copy(x, folder), '') : this.fs.move(x, folder); if (err) { this.toast('Taşınamadı', err, '⚠'); return; } }
+      if (op === 'copy') this.toast('Kopyalandı', `${ids.length} öğe → ${this.fs.label(folder)}`, '📋');
+      this.emit('drop', { id, name, ids, count: ids.length, names: ids.map((x) => this.fs.get(x)?.name), to: folder, toName: this.fs.label(folder), op });
+      return;
+    }
     if (folder === node.parent) { this.emit('drop', { id, name, to: folder, same: true }); return; }
     if (folder === RECYCLE) { this.deleteNode(id); this.emit('drop', { id, name, to: RECYCLE, toName: 'Geri Dönüşüm Kutusu', op: 'delete' }); return; }
     const op = this.crossDrive(node.parent, folder) ? 'copy' : 'move';
@@ -825,6 +852,8 @@ export class Desktop {
     const $ = (s) => this.root.querySelector(s);
     this.screen.addEventListener('pointerdown', (e) => {
       if (!e.target.closest('.dk-ctx, .dk-start, .tb-start, .tb-search, .dk-winx, .dk-quick, .tb-net, .tb-clock')) this.closeMenus();
+      if (!e.target.closest('.dk-assist')) this.closeAssist();
+      if (!e.target.closest('.dk-layouts, .wb-max')) this.hideLayouts();
     });
     $('.tb-start').onclick = () => this.toggleStart();
     $('.tb-start').oncontextmenu = (e) => { e.preventDefault(); this.winxMenu(); };
@@ -1052,7 +1081,7 @@ export class Desktop {
     this.closeMenus();
     q.classList.remove('qk-cal');
     const s = this.settings;
-    q.innerHTML = `<div class="qk-row"><button type="button" class="qk-wifi ${s.wifi ? 'on' : ''}">📶<span>${s.wifi ? (s.network || 'Bağlı değil') : 'Wi-Fi kapalı'}</span></button>
+    q.innerHTML = `<div class="qk-row"><button type="button" class="qk-wifi ${s.wifi ? 'on' : ''}">📶<span>${s.wifi ? (s.network ? s.network + (s.netSim && !online(this) ? ' · İnternet yok' : '') : 'Bağlı değil') : 'Wi-Fi kapalı'}</span></button>
         <button type="button" class="qk-bt ${s.bluetooth ? 'on' : ''}">🔵<span>${s.bluetooth ? 'Bluetooth açık' : 'Bluetooth kapalı'}</span></button>
         <button type="button" class="qk-air ${s.airplane ? 'on' : ''}">✈<span>Uçak modu</span></button></div>
       <label class="qk-sl">☀ <input type="range" class="qk-bri" min="20" max="100" value="${s.brightness}"></label>
@@ -1118,7 +1147,9 @@ export class Desktop {
     if (APPS[win.app].noFocus) el.addEventListener('pointerdown', (e) => { if (!e.target.closest('input, select')) e.preventDefault(); });
     else el.addEventListener('pointerdown', () => { if (this.active !== win) this.focus(win); }, true);
     el.querySelector('.wb-min').onclick = () => this.minimize(win);
-    el.querySelector('.wb-max').onclick = () => (win.max ? this.restoreSize(win) : this.maximize(win));
+    el.querySelector('.wb-max').onclick = () => { this.hideLayouts(); if (win.max) this.restoreSize(win); else this.maximize(win); };
+    el.querySelector('.wb-max').addEventListener('pointerenter', () => { clearTimeout(this.layoutTimer); this.layoutTimer = setTimeout(() => this.showLayouts(win), 550); });
+    el.querySelector('.wb-max').addEventListener('pointerleave', () => { clearTimeout(this.layoutTimer); this.layoutTimer = setTimeout(() => this.hideLayouts(), 400); });
     el.querySelector('.wb-close').onclick = () => this.close(win);
     const bar = el.querySelector('.win-bar');
     bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) (win.max ? this.restoreSize(win) : this.maximize(win)); });
@@ -1130,7 +1161,7 @@ export class Desktop {
     bar.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || e.target.closest('button')) return;
       const sx = e.clientX, sy = e.clientY, startX = win.x, startY = win.y;
-      let ox = win.x, oy = win.y, moved = false;
+      let ox = win.x, oy = win.y, moved = false, zone = null;
       const scr = this.winsEl.getBoundingClientRect();
       const move = (ev) => {
         const dx = ev.clientX - sx, dy = ev.clientY - sy;
@@ -1138,22 +1169,30 @@ export class Desktop {
           if (Math.hypot(dx, dy) < 4) return;
           moved = true;
           el.classList.add('moving');
-          if (win.max) {
-            // Kaplanmış pencereyi sürükleyince eski boyutuna döner (Windows'taki gibi)
-            win.max = false;
+          this.closeAssist();
+          if (win.max || win.snap) {
+            // Kaplanmış ya da kenara yaslanmış pencereyi sürükleyince eski boyutuna döner (Windows'taki gibi)
+            const was = win.snap;
+            win.max = false; win.snap = null;
             ox = ev.clientX - scr.left - win.w / 2 - dx;
             oy = -dy;
-            this.emit('win-restore', { app: win.app, win: win.id, via: 'drag' });
+            this.emit(was ? 'win-unsnap' : 'win-restore', { app: win.app, win: win.id, via: 'drag', side: was });
           }
         }
         win.x = Math.max(-win.w + 80, Math.min(scr.width - 80, ox + dx));
         win.y = Math.max(0, Math.min(scr.height - 30, oy + dy));
         this.layout(win);
+        // Fare ekranın sol/sağ kenarına ya da en üstüne değince pencerenin yerleşeceği yer gölge olarak görünür
+        const px = ev.clientX - scr.left, py = ev.clientY - scr.top;
+        zone = px <= 6 ? 'left' : px >= scr.width - 6 ? 'right' : py <= 3 ? 'max' : null;
+        this.snapPreview(zone);
       };
       const up = () => {
         document.removeEventListener('pointermove', move);
         document.removeEventListener('pointerup', up);
         el.classList.remove('moving');
+        this.snapPreview(null);
+        if (moved && zone) { if (zone === 'max') this.maximize(win); else this.snapWin(win, zone, 'drag'); return; }
         if (moved) this.emit('win-move', { app: win.app, win: win.id, dx: win.x - startX, dy: win.y - startY, x: win.x, y: win.y });
       };
       document.addEventListener('pointermove', move);
@@ -1182,7 +1221,9 @@ export class Desktop {
     win.el.classList.toggle('max', win.max);
     win.el.querySelector('.wb-max').textContent = win.max ? '❐' : '☐';
     win.el.querySelector('.wb-max').title = win.max ? 'Önceki boyutuna getir' : 'Ekranı kapla';
+    win.el.classList.toggle('snap', !!win.snap && !win.max);
     if (win.max) { s.left = s.top = '0'; s.width = s.height = '100%'; }
+    else if (win.snap) { s.left = win.snap === 'left' ? '0' : '50%'; s.top = '0'; s.width = '50%'; s.height = '100%'; }
     else { s.left = win.x + 'px'; s.top = win.y + 'px'; s.width = win.w + 'px'; s.height = win.h + 'px'; }
     win.api?.onResize?.();
   }
@@ -1220,6 +1261,8 @@ export class Desktop {
 
   maximize(win) {
     win.max = true;
+    win.snap = null;
+    this.closeAssist();
     this.layout(win);
     this.emit('win-max', { app: win.app, win: win.id });
   }
@@ -1229,6 +1272,75 @@ export class Desktop {
     this.layout(win);
     this.emit('win-unmax', { app: win.app, win: win.id });
   }
+
+  // ------------------------------------------------------------------ Pencereleri yan yana koymak (ekranı ikiye bölmek)
+  // side: 'left' | 'right'. via: 'drag' (kenara çarptırma), 'key' (⊞ + ← / →), 'layout' (☐ düğmesinin üzerinde bekleme), 'assist'
+  snapWin(win, side, via) {
+    this.hideLayouts();
+    if (win.min) this.restore(win, true);
+    win.max = false;
+    win.snap = side;
+    this.layout(win);
+    this.focus(win, true);
+    this.emit('win-snap', { app: win.app, win: win.id, side, via });
+    if (via !== 'assist') this.snapAssist(win, side); else this.closeAssist();
+  }
+
+  unsnap(win, via) {
+    const side = win.snap;
+    win.snap = null;
+    this.layout(win);
+    this.emit('win-unsnap', { app: win.app, win: win.id, via, side });
+  }
+
+  snapPreview(zone) {
+    let p = this.winsEl.querySelector('.dk-snapprev');
+    if (!zone) { p?.remove(); return; }
+    if (!p) { p = document.createElement('div'); p.className = 'dk-snapprev'; this.winsEl.append(p); }
+    p.dataset.zone = zone;
+  }
+
+  // Yaslama yardımcısı: bir pencere yarıya yerleşince öbür yarıda diğer açık pencereler listelenir; tıklanan oraya yerleşir
+  snapAssist(win, side) {
+    this.closeAssist();
+    const others = this.wins.filter((w) => w !== win && w.vd === this.vd && !APPS[w.app].noFocus && !(w.snap && w.snap !== side && !w.min));
+    if (!others.length) return;
+    const a = document.createElement('div');
+    a.className = 'dk-assist';
+    a.dataset.side = side === 'left' ? 'right' : 'left';
+    a.innerHTML = `<p>Bu yarıya hangi pencere gelsin?</p><div>${others.map((w) => `<button type="button" data-w="${w.id}"><span>${w.icon}</span><b>${esc(w.title)}</b></button>`).join('')}</div><small>Boş bir yere tıklarsanız bu liste kapanır.</small>`;
+    a.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-w]');
+      const o = b && this.wins.find((w) => w.id === b.dataset.w);
+      this.closeAssist();
+      if (o) this.snapWin(o, a.dataset.side, 'assist');
+    });
+    this.winsEl.append(a);
+    this.assistEl = a;
+    this.emit('snap-assist', { app: win.app, side: a.dataset.side, count: others.length });
+  }
+
+  closeAssist() { this.assistEl?.remove(); this.assistEl = null; }
+
+  // Windows 11: ☐ (Ekranı kapla) düğmesinin üzerinde beklenince yerleşim seçenekleri çıkar
+  showLayouts(win) {
+    this.hideLayouts();
+    if (!this.wins.includes(win) || win.min) return;
+    const b = win.el.querySelector('.wb-max').getBoundingClientRect(), r = this.winsEl.getBoundingClientRect();
+    const f = document.createElement('div');
+    f.className = 'dk-layouts';
+    f.innerHTML = '<button type="button" data-side="left" title="Ekranın sol yarısı"><span class="on"></span><span></span></button><button type="button" data-side="right" title="Ekranın sağ yarısı"><span></span><span class="on"></span></button><small>Sol yarı</small><small>Sağ yarı</small>';
+    f.style.left = Math.max(4, Math.min(r.width - 200, b.left - r.left - 80)) + 'px';
+    f.style.top = (b.bottom - r.top + 4) + 'px';
+    f.addEventListener('pointerenter', () => clearTimeout(this.layoutTimer));
+    f.addEventListener('pointerleave', () => { this.layoutTimer = setTimeout(() => this.hideLayouts(), 400); });
+    f.addEventListener('click', (e) => { const s = e.target.closest('[data-side]')?.dataset.side; if (s) this.snapWin(win, s, 'layout'); });
+    this.winsEl.append(f);
+    this.layoutsEl = f;
+    this.emit('snap-layouts', { app: win.app });
+  }
+
+  hideLayouts() { clearTimeout(this.layoutTimer); this.layoutsEl?.remove(); this.layoutsEl = null; }
 
   async close(win) {
     if (win.hung) {
@@ -1332,6 +1444,21 @@ export class Desktop {
       if (e.metaKey && e.key === 'Tab') { e.preventDefault(); this.taskView(); return; }
       if (e.metaKey && e.ctrlKey && e.code === 'KeyD') { e.preventDefault(); this.newDesk(); return; }
       if (e.metaKey && e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); this.switchDesk(this.vd + (e.key === 'ArrowLeft' ? -1 : 1)); return; }
+      // ⊞ + ← / →: etkin pencereyi ekranın yarısına yaslar; ⊞ + ↑ ekranı kaplar, ⊞ + ↓ eski boyutuna getirir / küçültür
+      if (e.metaKey && !e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && this.active) {
+        e.preventDefault();
+        const side = e.key === 'ArrowLeft' ? 'left' : 'right', w = this.active;
+        if (w.snap && w.snap !== side && !w.max) this.unsnap(w, 'key'); else this.snapWin(w, side, 'key');
+        return;
+      }
+      if (e.metaKey && e.key === 'ArrowUp' && this.active) { e.preventDefault(); this.maximize(this.active); return; }
+      if (e.metaKey && e.key === 'ArrowDown' && this.active) {
+        e.preventDefault();
+        const w = this.active;
+        if (w.max) this.restoreSize(w); else if (w.snap) this.unsnap(w, 'key'); else this.minimize(w);
+        return;
+      }
+      if (e.key === 'Escape' && this.assistEl) { e.preventDefault(); this.closeAssist(); return; }
       if (e.metaKey && (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd')) { e.preventDefault(); this.magnify(1); return; }
       if (e.metaKey && (e.key === '-' || e.code === 'NumpadSubtract')) { e.preventDefault(); this.magnify(-1); return; }
       if (e.metaKey && e.key === 'Escape') { e.preventDefault(); this.magnify(0); return; }

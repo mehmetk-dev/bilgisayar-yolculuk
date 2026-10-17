@@ -4,6 +4,7 @@ import { WALLPAPERS, THEMES, ACCENTS } from '../desktop.js';
 import { APPS } from './index.js';
 import { strength } from '../lessons/scenes.js';
 import { KB } from '../keymap.js';
+import { HOTSPOT, online } from './modem.js';
 
 const PAGES = [
   ['system', '🖥', 'Sistem', 'Ekran, ses'],
@@ -36,6 +37,7 @@ const BUILTIN = ['notepad', 'calc', 'paint', 'browser', 'store', 'photos', 'snip
 export function settings({ desk, body, args, emit, dialogs }) {
   body.classList.add('st');
   const s = desk.settings;
+  const nets = () => [...NETWORKS, ...(desk.hotspot ? [HOTSPOT] : [])]; // telefonun erişim noktası açıksa onun ağı da görünür
   let page = args.page || 'system';
   body.innerHTML = `<nav class="st-nav"><div class="st-me">👤 <b>${esc(s.user)}</b><small>Yerel hesap</small></div>${PAGES.map(([id, ic, l]) => `<button type="button" data-page="${id}">${ic} ${l}</button>`).join('')}</nav><div class="st-page"></div>`;
   const pg = body.querySelector('.st-page');
@@ -77,10 +79,10 @@ export function settings({ desk, body, args, emit, dialogs }) {
     } else if (page === 'network') {
       h += `<section>${toggle('airplane', s.airplane, '✈ Uçak modu')}<p class="st-note">Uçak modu Wi-Fi ve Bluetooth'u birlikte kapatır. Uçakta ya da yanlışlıkla açılırsa internet kesilir.</p>${toggle('wifi', s.wifi, 'Wi-Fi')}`;
       if (s.wifi) {
-        h += `<div class="st-list">${NETWORKS.map((n) => {
+        h += `<div class="st-list">${nets().map((n) => {
           const con = s.network === n.name;
           const open = flow.net === n.name;
-          return `<div class="st-item net ${con ? 'con' : ''}" data-net="${esc(n.name)}"><span>${'📶'}</span><div><b>${esc(n.name)}</b><small>${con ? 'Bağlı, güvenli' : n.lock ? '🔒 Güvenli' : '⚠ Açık ağ (güvenli değil)'}</small></div>
+          return `<div class="st-item net ${con ? 'con' : ''}" data-net="${esc(n.name)}"><span>${n.phone ? '📱' : '📶'}</span><div><b>${esc(n.name)}</b><small>${con ? (s.netSim && !online(desk) ? '⚠ Bağlı, internet yok' : 'Bağlı, güvenli') : n.phone ? '📱 Telefon (mobil veri) · 🔒 Güvenli' : n.lock ? '🔒 Güvenli' : '⚠ Açık ağ (güvenli değil)'}</small></div>
             ${con ? '<button type="button" class="st-btn" data-act="disconnect">Bağlantıyı kes</button>' : open ? '' : '<button type="button" class="st-btn" data-act="pick">Bağlan</button>'}
             ${open && !con ? `<div class="st-pass">${n.lock ? `<label>Ağ güvenlik anahtarını (şifreyi) girin:<input type="password" class="st-pw" autocomplete="off"></label><button type="button" class="st-btn primary" data-act="connect">İleri</button>` : `<p class="st-warn">⚠ Bu ağa bağlanan herkes, gönderdiğiniz bilgileri görebilir. Bankacılık işlemi yapmayın.</p><button type="button" class="st-btn primary" data-act="connect">Yine de bağlan</button>`}<button type="button" class="st-btn" data-act="cancelNet">İptal</button><div class="st-err">${flow.netErr || ''}</div></div>` : ''}</div>`;
         }).join('')}</div>`;
@@ -272,7 +274,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
       case 'pick': flow.net = netEl.dataset.net; flow.netErr = ''; render(); pg.querySelector('.st-pw')?.focus(); emit('wifi-pick', { name: flow.net }); return;
       case 'cancelNet': flow.net = null; render(); return;
       case 'connect': {
-        const n = NETWORKS.find((x) => x.name === flow.net);
+        const n = nets().find((x) => x.name === flow.net);
         const pw = pg.querySelector('.st-pw')?.value ?? '';
         if (n.lock && pw !== n.pass) {
           flow.netErr = pw ? 'Şifre yanlış. Modemin altındaki etiketi kontrol edin.' : 'Lütfen şifreyi yazın.';

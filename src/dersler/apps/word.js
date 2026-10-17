@@ -4,6 +4,7 @@
 // sütunlar; yazım denetimi ve sözcük sayısı; yakınlaştırma; .docx olarak kaydetme, açma, yazdırma ve PDF.
 // İçerik bellekteki dosyada { html } olarak durur.
 import { esc, pictureURL, isImage } from './util.js';
+import { picHtml, pictureTools, WRAPS } from './word-resim.js';
 
 const FONTS = [['Calibri', 'Calibri, Carlito, "Noto Sans", sans-serif'], ['Times New Roman', '"Times New Roman", Tinos, "Noto Serif", serif'], ['Arial', 'Arial, Arimo, "Liberation Sans", sans-serif'], ['Comic Sans MS', '"Comic Sans MS", "Comic Neue", cursive'], ['Courier New', '"Courier New", Cousine, monospace']];
 const SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36, 48];
@@ -51,7 +52,7 @@ export const TEMPLATES = {
 export function word({ desk, body, args, emit, setTitle }) {
   body.classList.add('wd');
   body.innerHTML = `
-    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button></div>
+    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button><button type="button" data-tab="pic" class="wd-tabpic" hidden>Resim Biçimi</button></div>
     <div class="wd-rib" data-tab="home">
       <div class="wd-grp"><button type="button" data-cmd="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-cmd="redo" title="Yinele (Ctrl + Y)">↷</button></div>
       <div class="wd-grp"><button type="button" class="wd-clip" data-clip="cut" title="Kes (Ctrl + X)">✂</button><button type="button" class="wd-clip" data-clip="copy" title="Kopyala (Ctrl + C)">⧉</button><button type="button" class="wd-clip" data-clip="paste" title="Yapıştır (Ctrl + V)">📋</button><button type="button" class="wd-painter" title="Biçim Boyacısı: seçili yazının biçimini kopyalar, sonra başka bir yazıyı seçin">🖌</button></div>
@@ -103,6 +104,10 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp">Hücre içi: <button type="button" data-tb="vTop">⬆ Üst</button><button type="button" data-tb="vMid">↕ Orta</button><button type="button" data-tb="vBot">⬇ Alt</button></div>
       <div class="wd-grp">Çizgiler: <button type="button" data-tb="bThin">İnce</button><button type="button" data-tb="bThick">Kalın</button><button type="button" data-tb="tblDel">🗑 Tabloyu sil</button></div>
     </div>
+    <div class="wd-rib" data-tab="pic" hidden>
+      <div class="wd-grp">Metni kaydır: ${WRAPS.map(([k, l, ic]) => `<button type="button" data-pwrap="${k}">${ic} ${l}</button>`).join('')}</div>
+      <div class="wd-grp"><button type="button" class="wd-pcrop" title="Resmin kenarlarındaki siyah çizgileri içeri çekerek istemediğiniz yerleri kesin">✂ Kırp</button><button type="button" class="wd-preset" title="Kırpmayı ve boyutu geri alır">↺ Resmi sıfırla</button></div>
+    </div>
     <div class="wd-find" hidden><b class="wd-fh">Bul ve Değiştir</b><label>Aranan <input class="wd-fq"></label><label class="wd-rrow">Yeni <input class="wd-rq"></label>
       <span class="wd-fn"></span><button type="button" data-f="next">Sonrakini bul</button><button type="button" data-f="repl" class="wd-rrow">Değiştir</button><button type="button" data-f="all" class="wd-rrow">Tümünü değiştir</button><button type="button" data-f="close" title="Kapat">✕</button></div>
     <div class="wd-spane" hidden></div>
@@ -142,8 +147,10 @@ export function word({ desk, body, args, emit, setTitle }) {
     emit(which === 'h' ? 'doc-header-open' : 'doc-footer-open');
   }
 
+  const pics = pictureTools({ page, body, emit, changed: () => changed() });
   function load(html, name = null, fld = folder, layout = {}, hf = {}) {
     page.innerHTML = html || '<p><br></p>';
+    pics.refresh();
     setLayout(layout, true);
     setHF(hf);
     fileName = name; folder = fld; dirty = false;
@@ -242,6 +249,13 @@ export function word({ desk, body, args, emit, setTitle }) {
 
   function exec(cmd, value = null) {
     restore();
+    // Girinti: paragraf (liste değilse) 1,25 cm içeri alınır / geri çekilir; tarayıcının kendi girintisi alıntıya çevirirdi
+    if ((cmd === 'indent' || cmd === 'outdent') && selectedBlocks().length && !selectedBlocks().some((b) => b.tagName === 'LI')) {
+      selectedBlocks().forEach((b) => { const m = Math.max(0, (parseFloat(b.style.marginLeft) || 0) + (cmd === 'indent' ? 1.25 : -1.25)); b.style.marginLeft = m ? m + 'cm' : ''; });
+      changed();
+      emit('doc-format', { cmd, value });
+      return;
+    }
     document.execCommand('styleWithCSS', false, cmd !== 'fontSize');
     document.execCommand(cmd, false, cmd === 'fontSize' ? '7' : value);
     if (cmd === 'fontSize') {
@@ -351,13 +365,17 @@ export function word({ desk, body, args, emit, setTitle }) {
   async function insertPicture() {
     const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder: 'pictures', ext: '.jpg', typeLabel: 'Resimler (*.jpg; *.png)', accept: /\.(png|jpe?g|bmp)$/i });
     if (!r || !isImage(r.name)) return;
-    insertHtml(`<p><img src="${pictureURL(desk.fs.find(r.folder, r.name)?.content)}" alt="${esc(r.name)}" style="width:45%"></p><p><br></p>`, 'picture');
+    const before = new Set(page.querySelectorAll('.wd-pic'));
+    insertHtml(picHtml(pictureURL(desk.fs.find(r.folder, r.name)?.content), r.name), 'picture');
+    const p = [...page.querySelectorAll('.wd-pic')].find((x) => !before.has(x));
+    if (p) pics.adopt(p);
   }
 
   // Kaydedilen içerik: yazım denetimi ve bul işaretleri dosyaya girmez
   function cleanHtml() {
     const c = page.cloneNode(true);
     c.querySelectorAll('.wd-sp, mark.wd-hit').forEach((s) => s.replaceWith(...s.childNodes));
+    c.querySelectorAll('.wd-pic.on').forEach((x) => x.classList.remove('on'));
     c.querySelectorAll('.wd-field').forEach((x) => { x.textContent = `«${x.dataset.field}»`; x.classList.remove('pv'); }); // önizleme kaydedilmez
     return c.innerHTML;
   }
@@ -428,25 +446,34 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (!el || !page.contains(el)) return;
     const cs = getComputedStyle(el);
     const deco = (k) => { for (let x = el; x && x !== page; x = x.parentElement) if (getComputedStyle(x).textDecorationLine.includes(k)) return true; return false; };
-    painter = { bold: +cs.fontWeight >= 600, italic: cs.fontStyle === 'italic', underline: deco('underline'), size: Math.round(parseFloat(cs.fontSize) * 0.75), color: cs.color, font: FONTS.find(([nm]) => cs.fontFamily.includes(nm))?.[0] };
+    painter = { bold: +cs.fontWeight >= 600, italic: cs.fontStyle === 'italic', underline: deco('underline'), size: Math.round(parseFloat(cs.fontSize) * 0.75), color: cs.color, font: FONTS.find(([nm]) => cs.fontFamily.includes(nm))?.[0], family: cs.fontFamily };
     page.classList.add('painting');
     $('.wd-painter').classList.add('on');
     emit('doc-painter', { stage: 'pick' });
   }
+  // Çift tıklanan boyacı kilitlenir: Esc'ye ya da yeniden 🖌'ya basılana kadar birçok yere sürülür
+  function stopPainter() { painter = null; page.classList.remove('painting'); $('.wd-painter').classList.remove('on', 'lock'); }
   function applyPainter() {
     const p = painter;
-    painter = null;
-    page.classList.remove('painting');
-    $('.wd-painter').classList.remove('on');
+    if (!p.sticky) stopPainter();
     onSel();
     for (const k of ['bold', 'italic', 'underline']) if (document.queryCommandState(k) !== p[k]) document.execCommand(k);
     document.execCommand('styleWithCSS', false, true);
     document.execCommand('foreColor', false, p.color);
-    if (p.font) document.execCommand('fontName', false, p.font);
+    if (p.font) document.execCommand('fontName', false, p.family || p.font); // yazı tipi yedekleriyle birlikte (bilgisayarda yoksa benzeri)
+    onSel(); // önceki komutlar seçimi yeniledi; boyut güncel seçime uygulanmalı
     exec('fontSize', p.size);
-    emit('doc-painter', { stage: 'apply' });
+    emit('doc-painter', { stage: 'apply', sticky: !!p.sticky });
   }
   page.addEventListener('mouseup', () => { if (painter && !getSelection().isCollapsed) setTimeout(applyPainter, 0); });
+  body.addEventListener('dblclick', (e) => {
+    if (!e.target.closest('.wd-painter')) return;
+    if (!painter) pickPainter();
+    if (!painter) return;
+    painter.sticky = true;
+    $('.wd-painter').classList.add('on', 'lock');
+    emit('doc-painter', { stage: 'pick', sticky: true });
+  });
 
   // ---- Bul ve değiştir ----
   const findBox = $('.wd-find'), fq = $('.wd-fq'), rq = $('.wd-rq');
@@ -735,7 +762,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.dataset.case) { t.closest('.wd-mpop').hidden = true; return changeCase(t.dataset.case); }
     if (mergeClick(t)) return;
     if (t.dataset.clip) return clipCmd(t.dataset.clip);
-    if (t.classList.contains('wd-painter')) { if (painter) { painter = null; page.classList.remove('painting'); t.classList.remove('on'); } else pickPainter(); return; }
+    if (t.classList.contains('wd-painter')) { if (painter) { const was = painter.sticky; stopPainter(); if (was) emit('doc-painter', { stage: 'stop' }); } else pickPainter(); return; }
     if (t.dataset.style) return setStyle(t.dataset.style);
     if (t.classList.contains('wd-findbtn')) return openFind(false);
     if (t.classList.contains('wd-replbtn')) return openFind(true);
@@ -828,9 +855,19 @@ export function word({ desk, body, args, emit, setTitle }) {
         const cells = [...td.closest('table').querySelectorAll('td')];
         const nx = cells[cells.indexOf(td) + (e.shiftKey ? -1 : 1)];
         if (nx) { const r = document.createRange(); r.selectNodeContents(nx); r.collapse(false); s.removeAllRanges(); s.addRange(r); emit('doc-cell'); }
-      } else document.execCommand('insertText', false, '    ');
+      } else {
+        // Paragrafın en başında Tab: ilk satır girintisi (paragraf başı); başka yerde boşluk
+        const blk = s.rangeCount && blockOf(s.anchorNode);
+        const r0 = s.rangeCount && s.getRangeAt(0);
+        let atStart = false;
+        if (blk && r0?.collapsed && blk.tagName !== 'LI') { const pre = document.createRange(); pre.selectNodeContents(blk); pre.setEnd(r0.startContainer, r0.startOffset); atStart = !pre.toString().trim(); }
+        if (atStart && !e.shiftKey) { blk.style.textIndent = '1.25cm'; changed(); emit('doc-indent', { kind: 'first', text: blk.innerText.trim().slice(0, 40) }); }
+        else if (atStart && e.shiftKey) { blk.style.textIndent = ''; changed(); emit('doc-indent', { kind: 'first-off' }); }
+        else document.execCommand('insertText', false, '    ');
+      }
       return;
     }
+    if (e.key === 'Escape' && painter) { e.preventDefault(); const was = painter.sticky; stopPainter(); if (was) emit('doc-painter', { stage: 'stop' }); return; }
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
     const map = { KeyB: 'bold', KeyI: 'italic', KeyU: 'underline', KeyL: 'justifyLeft', KeyE: 'justifyCenter', KeyR: 'justifyRight', KeyJ: 'justifyFull' };
     if (map[e.code]) { e.preventDefault(); exec(map[e.code]); emit('doc-shortcut', { cmd: map[e.code] }); return; }
@@ -873,7 +910,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       return {
         pages: pageCount(), shapes: page.querySelectorAll('.wd-shape').length,
         table: (() => { const t = page.querySelector('table'); return t && { rows: t.rows.length, cols: Math.max(...[...t.rows].map((r) => r.cells.length)), merged: [...t.querySelectorAll('td')].some((c) => c.colSpan > 1), thick: t.classList.contains('thick'), valign: [...t.querySelectorAll('td')].some((c) => c.style.verticalAlign === 'middle') }; })(),
-        blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, fileName, dirty,
+        blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, pics: pics.info(), fileName, dirty,
         fields: [...page.querySelectorAll('.wd-field')].map((x) => x.dataset.field), merge: mm && { list: mm.name, count: mm.rows.length, preview: mm.preview },
         ruler: !$('.wd-ruler').hidden, links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,
