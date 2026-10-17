@@ -84,8 +84,8 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 .lcard.done { border-color: #8fd0a6; border-top-color: #1f9d55; background: linear-gradient(180deg, #f1fbf4, #fff 45%); }
 .lcard.link { background: var(--tint); border-style: dashed; border-top-style: solid; }
 .licon { flex: none; width: 2.1em; height: 2.1em; display: flex; align-items: center; justify-content: center; font-size: 1.6em; line-height: 1; border-radius: 0.3em; background: linear-gradient(145deg, var(--tint), hsl(var(--h) 90% 88%)); color: var(--deep); border: 1px solid hsl(var(--h) 60% 80%); }
-.licon .sv { width: 1.05em; height: 1.05em; display: block; }
-.printcard .sv, #printCard .sv { width: 1em; height: 1em; vertical-align: -0.1em; }
+.licon .svi { width: 1.05em; height: 1.05em; display: block; }
+.printcard .svi, #printCard .svi { width: 1em; height: 1em; vertical-align: -0.1em; }
 .lmain { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .lno { font-size: 0.75em; font-weight: 700; color: var(--acc); text-transform: uppercase; letter-spacing: 0.06em; }
 .lcard h3 { font-size: 1.15em; margin: 0.1em 0 0.2em; color: var(--deep); }

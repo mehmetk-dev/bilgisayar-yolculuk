@@ -1,7 +1,7 @@
 // Ders kartlarındaki simgeler. Bazı emojiler eski bilgisayarlarda (Windows 7/8, eski Edge ve Chrome)
 // hiç görünmez ya da kare çıkar; gömülü simge yazı tipinde de yoktur. Bunların yerine burada çizilen
 // düz renkli SVG simgeler kullanılır. Yeni bir emoji eklenince eksikse buraya eklenir.
-const S = (body) => `<svg class="sv" viewBox="0 0 32 32" aria-hidden="true">${body}</svg>`;
+const S = (body) => `<svg class="svi" viewBox="0 0 32 32" aria-hidden="true">${body}</svg>`;
 const person = (x, c) => `<circle cx="${x}" cy="11" r="4.5" fill="${c}"/><path d="M${x - 8} 27a8 8 0 0 1 16 0z" fill="${c}"/>`;
 
 const ICONS = {
