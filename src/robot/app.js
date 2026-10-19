@@ -4,7 +4,7 @@ import { renderStory, renderOrder, renderQuiz } from './acts.js';
 import { renderGrid } from './board.js';
 import { renderScratch } from './sahne/task.js';
 import { renderGuide } from './guide.js';
-import { roboSVG, play, confetti, prefs, save, pload as load, psave, profile, profiles, setProfile, removeProfile, esc } from './robo.js';
+import { roboSVG, play, confetti, prefs, save, pload as load, psave, pdelPrefix, profile, profiles, setProfile, removeProfile, esc } from './robo.js';
 import { startIcons } from '../icons.js';
 
 const $ = (s) => document.querySelector(s);
@@ -74,14 +74,15 @@ function showMap() {
 </ol>
 <section class="tnote">
   <h3>👩‍🏫 Öğretmen için <a class="btn primary gbtn" href="#ogretmen">📘 Öğretmen kılavuzu ve cevap anahtarı</a></h3>
-  <p>Bölümler 8–12 yaş için sırayla tasarlandı: <b>sıralama → yön → dönüş → hata ayıklama → döngü</b>. Her bölüm yaklaşık bir ders saati sürer. Önerilen akış: 5–10 dk bilgisayarsız sınıf oyunu (her bölümün sonunda öneri var), 25 dk ekranda görevler, 5 dk paylaşım.</p>
+  <p>Bölümler 8–12 yaş için sırayla tasarlandı: <b>sıralama → yön → dönüş → hata ayıklama → döngü → Scratch ile animasyon ve oyunlar</b>; hızlı bitirenler için ek bölümler (bulmaca, müzik, oyunlar) var. Her bölüm yaklaşık bir ders saati sürer. Önerilen akış: 5–10 dk bilgisayarsız sınıf oyunu (her bölümün sonunda öneri var), 25 dk ekranda görevler, 5 dk paylaşım.</p>
   <p>Adımlar arasında üstteki numaralı düğmelerle serbestçe geçebilirsiniz. İlerleme yalnızca bu tarayıcıda saklanır. <button type="button" class="link" id="resetAll">İlerlemeyi sıfırla</button></p>
 </section></div>`;
   mapEl.querySelector('.notme')?.addEventListener('click', openPicker);
   $('#resetAll').onclick = () => {
-    if (!confirm('Tüm bölümlerdeki ilerleme silinsin mi?')) return;
+    if (!confirm('Tüm bölümlerdeki ilerleme ve yazdığın kodlar silinsin mi? (Yalnızca seçili öğrencinin kayıtları silinir.)')) return;
     for (const k of Object.keys(progress)) delete progress[k];
     psave(KEY, progress);
+    pdelPrefix('robo-taslak-');
     showMap();
   };
 }
@@ -159,6 +160,9 @@ function showFinish(L) {
 function certHTML() {
   const total = CORE.reduce((n, l) => n + Object.values(rec(l.no).score).reduce((a, b) => a + b, 0), 0);
   const done = CORE.filter((l) => rec(l.no).done).length;
+  if (done < CORE.length) {
+    return `<div class="tnote"><h4>🏅 Sertifika</h4><p>Sertifikayı almak için önce <b>bütün ${CORE.length} bölümü</b> bitirmen gerekiyor. Şimdiye kadar <b>${done}/${CORE.length}</b> bölümü tamamladın. <a href="#">Haritaya dön</a> ve eksik bölümlere bak!</p></div>`;
+  }
   const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   return `<div class="certwrap">
   <label class="cnamebox">Adın soyadın: <input class="cname" type="text" maxlength="40" value="${esc(load('robo-ad', '') || profile.name)}" placeholder="Adını yaz"></label>
@@ -166,7 +170,7 @@ function certHTML() {
     <div class="cert-robo">${roboSVG()}</div>
     <div class="cert-t">🏅 Başarı Sertifikası</div>
     <div class="cert-name"></div>
-    <p><b>Robo ile Kodlama</b> eğitiminin <b>${done}/${CORE.length}</b> bölümünü tamamlayarak algoritma, döngü, fonksiyon, koşul, değişken ve oyun tasarımını öğrenmiştir.</p>
+    <p><b>Robo ile Kodlama</b> eğitiminin <b>${done}/${CORE.length}</b> bölümünü tamamlayarak algoritma, döngü, fonksiyon, koşul, değişken, klon, haber salma, soru-cevap ve oyun tasarımını öğrenmiştir.</p>
     <p class="cert-s">${total ? `Toplam ⭐ ${total} yıldız · ` : ''}${date}</p>
   </div>
   <button type="button" class="primary cprint">🖨 Sertifikayı yazdır</button>
@@ -220,7 +224,7 @@ function openPicker() {
   };
   pick.querySelector('.padd').onsubmit = (e) => {
     e.preventDefault();
-    const n = e.target.querySelector('input').value.trim().replace(/[<>"]/g, '');
+    const n = e.target.querySelector('input').value.trim().replace(/[<>":]/g, '');
     if (n) choose(n);
   };
   pick.querySelector('input').focus();

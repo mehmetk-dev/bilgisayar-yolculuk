@@ -20,6 +20,13 @@ const pkey = (k) => (profile.name ? `robo@${profile.name}:${k}` : k);
 export const pload = (k, d) => load(pkey(k), d);
 export const psave = (k, v) => save(pkey(k), v);
 export const pdel = (k) => { try { localStorage.removeItem(pkey(k)); } catch { /* yok say */ } };
+// Bu profilin (misafirse ortak kayıtların) belirli önekle başlayan anahtarlarını siler
+export const pdelPrefix = (prefix) => {
+  try {
+    const own = pkey(prefix);
+    for (const k of Object.keys(localStorage)) if (k.startsWith(own)) localStorage.removeItem(k);
+  } catch { /* yok say */ }
+};
 export const profiles = () => load('robo-profiller', []);
 export function setProfile(name) {
   profile.name = name;
@@ -27,9 +34,12 @@ export function setProfile(name) {
   if (name && !profiles().includes(name)) save('robo-profiller', [...profiles(), name].sort((a, b) => a.localeCompare(b, 'tr')));
 }
 export function removeProfile(name) {
-  save('robo-profiller', profiles().filter((n) => n !== name));
+  const others = profiles().filter((n) => n !== name);
+  save('robo-profiller', others);
   try {
-    for (const k of Object.keys(localStorage)) if (k.startsWith(`robo@${name}:`)) localStorage.removeItem(k);
+    // Anahtar: robo@AD:robo-... ; ayırıcıdan sonra "robo-" gelmeli, adı bunun uzantısı olan başka profil (Ali / Ali:Veli) kaydı da silinmesin
+    const mine = (k) => k.startsWith(`robo@${name}:robo-`) && !others.some((o) => o.length > name.length && k.startsWith(`robo@${o}:robo-`));
+    for (const k of Object.keys(localStorage)) if (mine(k)) localStorage.removeItem(k);
   } catch { /* yok say */ }
   if (profile.name === name) setProfile('');
 }

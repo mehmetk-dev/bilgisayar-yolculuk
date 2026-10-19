@@ -1,6 +1,9 @@
 // 5. hafta: sonsuz döngü, ses ve müzik, algılama, kalemle çizim
 import { sp, blk, near, shape, played } from './sh.js';
 
+// Bir kuklanın tuş betiklerinin hangi tuşlara bağlı olduğu (aynı tuşa yazılan betikler bir sayılır)
+const keyHats = (a, n) => new Set(a.w.sprite(n).scripts.filter((s) => s[0]?.op === 'key' && s.length > 1).map((s) => s[0].args.key));
+
 const TWINKLE1 = [60, 60, 67, 67, 69, 69, 67];
 const TWINKLE2 = [65, 65, 64, 64, 62, 62, 60];
 const SCALE = [60, 62, 64, 65, 67, 69, 71, 72];
@@ -15,7 +18,7 @@ export const b17 = {
   teacher: '<b>Sonsuz döngü avı:</b> Öğrencilerden hayatta “hiç durmadan tekrar eden” şeyler bulmalarını isteyin: kalp atışı, gece-gündüz, saat, mevsimler. Sonra “bitene kadar tekrar eden” şeylerle (ödev, yemek) karşılaştırın. Ders sonunda oyunlarda neyin sürekli tekrarlandığını konuşun.',
   steps: [
     { type: 'story', anim: 'dance', title: 'Hiç durmayan döngü',
-      text: `<p>Robo ile “10 kez tekrarla”yı öğrenmiştik. Şimdi yeni bir döngü: ${blk('control', 'sürekli tekrarla')}</p><p>İçindeki bloklar <b>hiç durmadan</b> tekrar eder, ta ki sen ⏹ düğmesine basana kadar. Bir vantilatör gibi: düğmeyi kapatana kadar döner! 🌀</p><p>Oyunlardaki hareketlerin neredeyse hepsi bu döngüyle yapılır.</p>`,
+      text: `<p>Robo ile “10 kez tekrarla”yı öğrenmiştik. Şimdi yeni bir döngü: ${blk('control', 'sürekli tekrarla')}</p><p>İçindeki bloklar <b>hiç durmadan</b> tekrar eder, ta ki sen ⏹ düğmesine basana kadar. Bir vantilatör gibi: düğmeyi kapatana kadar döner! 🌀</p><p>Çoğu oyun bu döngüyü kullanır.</p>`,
       pics: ['🌀', '🎡', '⏰', '♾️'] },
     { type: 'scratch', title: 'Hiç durmayan balık',
       text: `<p>Balık akvaryumda sürekli yüzsün: ${blk('control', 'sürekli tekrarla')} içine ${blk('motion', '10 adım git')} ve ${blk('motion', 'kenara geldiyse sek')} koy.</p>`,
@@ -29,7 +32,7 @@ export const b17 = {
       setup: { backdrop: 'beyaz', sprites: [sp('Top', 'top', 0, 0, { rot: 'all' })] },
       blocks: ['flag', 'forever', 'point', 'move', 'bounce', 'turnR'],
       goals: [{ t: 'Top tavana çarpsın', f: (a) => { if (a.sp('Top').y > 140) a.mem.t = 1; return !!a.mem.t; } }, { t: 'Top yere çarpsın', f: (a) => { if (a.sp('Top').y < -140) a.mem.b = 1; return !!a.mem.b; } }, { t: '“kenara geldiyse sek” kullan', use: 'bounce' }],
-      sol: { Top: [[['flag'], ['goto', 0, 0], ['point', 45], ['forever', [['move', 10], ['bounce']]]]] } },
+      sol: { Top: [[['flag'], ['point', 45], ['forever', [['move', 10], ['bounce']]]]] } },
     { type: 'quiz', title: 'Ne zaman durur?',
       q: '“sürekli tekrarla” döngüsü ne zaman durur?',
       opts: ['10 turdan sonra', '⏹ durdur düğmesine basınca', 'Kukla kenara gelince'], a: 1,
@@ -55,7 +58,7 @@ export const b17 = {
       play: [['mouse', 50, 0, 1], ['mouse', 140, -90, 2]] },
     { type: 'quiz', title: 'Oyunlarda sonsuz döngü',
       q: 'Bir oyunda hangisi <b>sürekli tekrarla</b> içinde olmalıdır?',
-      opts: ['Oyunun başında bir kez “Hoş geldin” demek', 'Düşmanın sürekli hareket etmesi', 'Oyun bitince “Kazandın” demek'], a: 1,
+      opts: ['Oyunun başında bir kez “Hoş geldin” demek', 'Oyun bitince “Kazandın” demek', 'Düşmanın sürekli hareket etmesi'], a: 2,
       ok: 'Düşman oyun boyunca hareket eder, bu yüzden sürekli tekrarla içinde olmalı. Diğerleri bir kez olur.' },
     { type: 'scratch', title: '⭐ Akvaryum',
       text: '<p>Kendi akvaryumunu yap! ➕ ile kukla ekle (balık, arı, kuş…). En az <b>iki kukla</b> sürekli hareket etsin. Hazır olunca ✔ Bitirdim.</p>',
@@ -103,7 +106,7 @@ export const b18 = {
       text: `<p>Klavyeni piyanoya çevir! ${blk('events', 'a tuşuna basılınca', 1)} → Do, <b>s</b> → Re, <b>d</b> → Mi. Sonra sahneye tıklayıp a, s, d tuşlarıyla çal!</p>`,
       setup: { backdrop: 'sahne', sprites: [sp('Robo', 'robo', 0, -60, { size: 130 })] },
       blocks: ['key', 'note', 'next', 'sound'], noFlag: true,
-      goals: [{ t: 'Üç tuş için üç betik', f: (a) => a.hats('key') >= 3 }, { t: 'Do, Re ve Mi çalınsın', f: (a) => [60, 62, 64].every((n) => a.notes.includes(n)) }],
+      goals: [{ t: 'a, s ve d tuşları için üç betik', f: (a) => ['a', 's', 'd'].every((k) => keyHats(a, 'Robo').has(k)) }, { t: 'Do, Re ve Mi çalınsın', f: (a) => [60, 62, 64].every((n) => a.notes.includes(n)) }],
       sol: { Robo: [[['key', 'a'], note(60), ['next']], [['key', 's'], note(62), ['next']], [['key', 'd'], note(64), ['next']]] },
       play: [['tap', 'a', 0.5], ['tap', 's', 1.2], ['tap', 'd', 1.9]] },
     { type: 'scratch', title: 'Dans eden Robo',
@@ -129,13 +132,13 @@ export const b19 = {
   steps: [
     { type: 'story', anim: 'think', title: 'Kuklaların gözleri 👀',
       text: `<p>Robo\'nun sensörleri vardı, hatırlıyor musun? Scratch kuklalarının da var!</p><p>Açık mavi ${blk('sensing', 'Algılama')} bloklarıyla kukla şunu sorabilir: <b>“Kenara dokunuyor muyum?”</b>, <b>“Elmaya dokunuyor muyum?”</b>, <b>“Ok tuşuna basılı mı?”</b></p><p>Cevaba göre ${blk('control', 'eğer … ise')} bloğu karar verir. Bu koşulu <b>sürekli</b> kontrol etmek için “eğer”i ${blk('control', 'sürekli tekrarla')} içine koyarız.</p>` },
-    { type: 'scratch', title: 'Ay, duvar!',
-      text: '<p>Kedi sürekli yürüsün. <b>Eğer kenara dokunuyorsa</b> “Ay!” desin ve arkasını dönsün (180 derece).</p><p class="mut">Koşul kutusundan “dokunma”yı seç, sonra “kenar”ı seç.</p>',
+    { type: 'scratch', title: 'Ay, kenar!',
+      text: '<p>Kedi sürekli yürüsün. <b>Eğer kenara dokunuyorsa</b> “Ay!” desin ve arkasını dönsün (180 derece).</p><p class="mut">“eğer” bloğunun koşul kutusunda “kenara dokunuyor mu?” hazır geliyor. Başka bir şeye dokunma sorusu sormak istersen listeden başka bir kukla seçebilirsin.</p>',
       setup: { backdrop: 'cayir', sprites: [sp('Kedi', 'kedi', 0, -60)] },
       blocks: ['flag', 'forever', 'if', 'move', 'turnR', 'sayFor', 'say'], conds: ['touch'], condDefault: { k: 'touch', o: 'kenar' },
       goals: [{ t: '“eğer … ise” kullan', use: 'if' }, { t: 'Kenara değince “Ay!” desin', f: (a) => a.said('ay') }, { t: 'Arkasını dönüp geri yürüsün', f: (a) => a.sp('Kedi').dir < 0 && a.sp('Kedi').x < 150 }],
-      hint: '🏁 → sürekli tekrarla [10 adım git, eğer kenar’a dokunuyor mu? ise (Ay! de 0.5 saniye, ↻ 180 derece dön)]',
-      sol: { Kedi: [[['flag'], ['point', 90], ['forever', [['move', 10], ['if', { k: 'touch', o: 'kenar' }, [['sayFor', 'Ay!', 0.5], ['turnR', 180]]]]]]] } },
+      hint: '🏁 → sürekli tekrarla [10 adım git, eğer kenara dokunuyor mu? ise (Ay! de 0.5 saniye, ↻ 180 derece dön)]',
+      sol: { Kedi: [[['flag'], ['forever', [['move', 10], ['if', { k: 'touch', o: 'kenar' }, [['sayFor', 'Ay!', 0.5], ['turnR', 180]]]]]]] } },
     { type: 'scratch', title: 'Elmayı ye 🍎',
       text: '<p>Kedinin ok tuşlarıyla yürüme kodu hazır. Sen <b>elmanın</b> kodunu yaz: elma sürekli kontrol etsin; <b>eğer kediye dokunuyorsa</b> “pop” sesi çalsın ve gizlensin. Sonra kediyi elmaya götür!</p>',
       setup: { backdrop: 'cayir', sprites: [sp('Elma', 'elma', 100, -60, { scripts: [[['flag'], ['show']]] }), sp('Kedi', 'kedi', -150, -60, { locked: true, scripts: ARROWS })] },
@@ -145,7 +148,7 @@ export const b19 = {
       play: [['hold', 'right', 1, 3.6]] },
     { type: 'quiz', title: 'Neden sürekli?',
       q: '“eğer kediye dokunuyorsa” bloğunu neden <b>sürekli tekrarla</b> içine koyduk?',
-      opts: ['Koşul sadece bir kez kontrol edilsin diye', 'Koşul her an kontrol edilsin, kedi ne zaman gelirse anlasın diye', 'Elma daha hızlı olsun diye'], a: 1,
+      opts: ['Koşul sadece bir kez kontrol edilsin diye', 'Elma daha hızlı olsun diye', 'Koşul her an kontrol edilsin, kedi ne zaman gelirse anlasın diye'], a: 2,
       ok: 'Döngü olmasaydı elma sadece 🏁 anında bakardı; o anda kedi uzakta olduğu için hiçbir şey olmazdı.' },
     { type: 'scratch', title: 'Labirent 🧀',
       text: '<p>Fare ok tuşlarıyla hareket ediyor (hazır). Senin görevin: <b>eğer fare duvara dokunuyorsa</b> başlangıca (x: -200, y: -140) dönsün. Sonra fareyi labirentten geçirip peynire ulaştır!</p>',
@@ -167,11 +170,11 @@ export const b19 = {
       setup: { backdrop: 'uzay', sprites: [sp('Yıldız', 'yildiz', -140, 140), sp('Roket', 'roket', -140, -120, { dir: 0, rot: 'all' })] },
       blocks: ['flag', 'forever', 'if', 'chy', 'chx', 'point'], conds: ['key'], condDefault: { k: 'key', key: 'up' },
       goals: [{ t: '“tuşuna basılı mı?” koşulunu kullan', f: (a) => JSON.stringify(a.w.sprite('Roket').scripts).includes('"k":"key"') }, { t: 'Roket yıldıza ulaşsın 🚀', f: (a) => a.touching('Roket', 'Yıldız') }],
-      sol: { Roket: [[['flag'], ['goto', -140, -120], ['forever', [['if', { k: 'key', key: 'up' }, [['chy', 5]]], ['if', { k: 'key', key: 'down' }, [['chy', -5]]]]]]] },
+      sol: { Roket: [[['flag'], ['forever', [['if', { k: 'key', key: 'up' }, [['chy', 5]]], ['if', { k: 'key', key: 'down' }, [['chy', -5]]]]]]] },
       play: [['hold', 'up', 0.5, 2.5]] },
     { type: 'quiz', title: 'Doğru koşul',
       q: 'Bir oyunda “karakter <b>lava</b> değerse oyun bitsin” istiyoruz. Hangisi doğru?',
-      opts: ['🏁 tıklandığında → eğer lavaya dokunuyor mu? ise → tümünü durdur', '🏁 tıklandığında → sürekli tekrarla [eğer lavaya dokunuyor mu? ise → tümünü durdur]', '🏁 tıklandığında → tümünü durdur'], a: 1,
+      opts: ['🏁 tıklandığında → sürekli tekrarla [eğer lavaya dokunuyor mu? ise → tümünü durdur]', '🏁 tıklandığında → eğer lavaya dokunuyor mu? ise → tümünü durdur', '🏁 tıklandığında → tümünü durdur'], a: 0,
       ok: 'Koşul oyun boyunca her an kontrol edilmeli, bu yüzden sürekli tekrarla içinde olmalı.' },
   ],
 };
@@ -179,7 +182,7 @@ export const b19 = {
 export const b20 = {
   icon: '✏️', color: '#0fbd8c', title: 'Kalemle Çizim', concept: 'Geometri + döngü',
   desc: 'Kukla yürüdükçe iz bıraksın! Kare, üçgen, yıldız ve döngülerle büyüleyici çiçekler çiz.',
-  learned: ['Kalem bastırılınca kukla yürüdüğü yerde çizgi bırakır.', 'Kapalı bir şeklin dönüş açıları toplamı 360 derecedir: kare 4×90, üçgen 3×120.', 'İç içe döngülerle karmaşık desenler kolayca çizilir.'],
+  learned: ['Kalem bastırılınca kukla yürüdüğü yerde çizgi bırakır.', 'Kare ve üçgen gibi şekillerde Robo toplam 360 derece (bir tur) döner: kare 4×90, üçgen 3×120. Yıldızda iki tur döner: 5×144 = 720.', 'İç içe döngülerle karmaşık desenler kolayca çizilir.'],
   teacher: '<b>Kaplumbağa oyunu:</b> Bir öğrenci elinde tebeşirle “kalem” olsun. Sınıf ona “10 adım ileri, sağa 90 derece dön” komutlarıyla tahtada (ya da yerde) kare çizdirsin. Sonra üçgen için açıyı tahmin etsinler. 360 ÷ kenar sayısı kuralını birlikte keşfedin.',
   steps: [
     { type: 'story', anim: 'wave', title: 'Kuklam bir kalem! ✏️',
@@ -192,14 +195,14 @@ export const b20 = {
       goals: [{ t: '“kalemi bastır” kullan', use: 'down' }, { t: 'En az 140 adımlık bir çizgi çiz', f: (a) => shape(a.lines).len >= 140 }],
       sol: { Kalem: [[['flag'], ['clear'], ['goto', -80, 0], ['point', 90], ['down'], ['move', 150]]] } },
     { type: 'scratch', title: 'Kare',
-      text: `<p>Kare için: 4 kez [100 adım git, ↻ 90 derece dön]. Başa dönmek için ${blk('motion', 'x: 0 y: 0 konumuna git')} ve ${blk('motion', '90 yönüne dön')} kullanırsan her 🏁 basışında aynı yerden başlar.</p>`,
+      text: `<p>Kare için: 4 kez [100 adım git, ↻ 90 derece dön]. 🏁 düğmesine her bastığında kalem aynı yerden başlar. İstersen ${blk('motion', 'x: 0 y: 0 konumuna git')} ile başka bir yerden başlayabilirsin.</p>`,
       setup: { backdrop: 'beyaz', sprites: [sp('Kalem', 'kalem', -50, 50, { rot: 'all' })] },
       blocks: ['flag', 'clear', 'down', 'up', 'move', 'turnR', 'turnL', 'repeat', 'goto', 'point', 'pcolor', 'psize', 'wait'],
       goals: [{ t: '“tekrarla” kullan', use: 'repeat' }, { t: 'Kenarı 100 olan bir kare çiz ⬜', f: (a) => { const s = shape(a.lines); return s.closed && Math.abs(s.w - 100) < 8 && Math.abs(s.h - 100) < 8 && s.len >= 390; } }],
       hint: '🏁 → tümünü sil → kalemi bastır → 4 kez tekrarla [100 adım git, ↻ 90 derece dön]',
       sol: { Kalem: [[['flag'], ['clear'], ['goto', -50, 50], ['point', 90], ['down'], ['repeat', 4, [['move', 100], ['turnR', 90], ['wait', 0.2]]]]] } },
     { type: 'quiz', title: 'Üçgenin açısı',
-      q: 'Kalem, kapalı bir şekil çizerken toplam <b>360 derece</b> döner. Üçgenin 3 köşesi var. Her köşede kaç derece dönmeli?',
+      q: 'Kalem, kare ya da üçgen gibi bir şekil çizerken toplam <b>360 derece</b> (bir tam tur) döner. Üçgenin 3 köşesi var. Her köşede kaç derece dönmeli?',
       opts: ['60', '90', '120'], a: 2,
       ok: '360 ÷ 3 = 120. Kare için 360 ÷ 4 = 90 idi!' },
     { type: 'scratch', title: 'Üçgen',
@@ -209,7 +212,7 @@ export const b20 = {
       goals: [{ t: '“tekrarla” kullan', use: 'repeat' }, { t: 'Kapalı bir üçgen çiz 🔺', f: (a) => { const s = shape(a.lines); return s.closed && s.n === 3 && s.len >= 350; } }],
       sol: { Kalem: [[['flag'], ['clear'], ['goto', -60, -50], ['point', 90], ['down'], ['repeat', 3, [['move', 120], ['turnL', 120], ['wait', 0.2]]]]] } },
     { type: 'scratch', title: 'Renkli yıldız ⭐',
-      text: '<p>Beş köşeli yıldız için: 5 kez [150 adım git, ↻ <b>144</b> derece dön]. Kalem rengini ve kalınlığını da değiştir!</p>',
+      text: '<p>Beş köşeli yıldız için: 5 kez [150 adım git, ↻ <b>144</b> derece dön]. Kalem rengini ve kalınlığını da değiştir!</p><p class="mut">Neden 144? Yıldızı çizerken kalem iki tam tur döner: 2 × 360 = 720 derece. 720 ÷ 5 köşe = 144.</p>',
       setup: { backdrop: 'gece', sprites: [sp('Kalem', 'kalem', -75, 20, { rot: 'all' })] },
       blocks: ['flag', 'clear', 'down', 'up', 'move', 'turnR', 'repeat', 'goto', 'point', 'pcolor', 'psize', 'wait'],
       goals: [{ t: 'Kalem rengini değiştir', use: 'pcolor' }, { t: 'Kalem kalınlığını değiştir', use: 'psize' }, { t: 'Beş köşeli yıldız çiz', f: (a) => { const s = shape(a.lines); return s.closed && s.n === 5 && a.sp('Kalem').turned >= 700; } }],

@@ -140,7 +140,8 @@ export function createWorld(setup, progs, opt = {}) {
       case 'cmp': {
         const ra = val(sp, c.a);
         const rb = val(sp, c.b);
-        const isN = (x) => typeof x === 'number' || (String(x).trim() !== '' && Number.isFinite(+String(x).replace(',', '.')));
+        // Yalnızca düz sayılar (5, -2.5, 2,5) sayı sayılır; “0x10”, “1e3” gibi yazılar metin olarak karşılaştırılır
+        const isN = (x) => typeof x === 'number' || /^\s*-?(\d+([.,]\d+)?|[.,]\d+)\s*$/.test(String(x));
         if (isN(ra) && isN(rb)) {
           const a = num(sp, typeof ra === 'number' ? ra : String(ra));
           const b = num(sp, typeof rb === 'number' ? rb : String(rb));

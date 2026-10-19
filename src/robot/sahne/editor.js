@@ -8,6 +8,19 @@ let uid = 5e6;
 export const bid = () => ++uid;
 
 const OPS = { '<': '<', '=': '=', '>': '>' };
+// Türkçe yönelme hâli: Kedi’ye, Raket’e, Top’a, Köpek’e, Fare’ye, kenara, duvara (rakamlar okunuşuna göre)
+const RAKAM = ['sıfır', 'bir', 'iki', 'üç', 'dört', 'beş', 'altı', 'yedi', 'sekiz', 'dokuz'];
+const INCE = ['kalp', 'saat', 'harf', 'hal', 'gol', 'rol', 'alkol']; // son ünlüsü kalın ama ince ek alan sözcükler
+export function yonelme(ad) {
+  if (ad === 'fare imleci') return 'fare imlecine';
+  if (/böceği$/.test(ad)) return ad.slice(0, -1) + 'ine'; // Uğur böceği → Uğur böceğine
+  const oku = ad.replace(/\d/g, (d) => ' ' + RAKAM[d]).toLocaleLowerCase('tr');
+  const unluler = [...oku].filter((c) => 'aeıioöuü'.includes(c));
+  const ince = 'eiöü'.includes(unluler[unluler.length - 1] || 'a') || INCE.includes(oku.split(' ').pop());
+  const unluBitis = 'aeıioöuü'.includes(oku[oku.length - 1]);
+  const ozel = /^\p{Lu}/u.test(ad) || /\d$/.test(ad); // özel isimde kesme işareti
+  return ad + (ozel ? '’' : '') + (unluBitis ? 'y' : '') + (ince ? 'e' : 'a');
+}
 const color = (op) => (CATS[BLOCKS[op].cat] || { color: '#59c059' }).color;
 
 export function createEditor(host, cfg) {
@@ -87,9 +100,10 @@ export function createEditor(host, cfg) {
   const OPN = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 
   function repMenu(path, depth) {
-    if (!cfg.reporters?.length || depth > 1) return '';
+    if (!cfg.reporters?.length || depth > 2) return '';
     const o = [['', '▾']];
     for (const k of cfg.reporters) {
+      if (depth > 1 && ['rand', 'op', 'join'].includes(k)) continue; // en içteki kutuda yeni iç içe blok açılmaz
       if (k === 'var') for (const v of cfg.vars || []) o.push(['var:' + v, v]);
       else o.push([k, REPORTERS[k].label]);
     }
@@ -111,9 +125,9 @@ export function createEditor(host, cfg) {
   }
 
   function touchTargets() {
-    const t = [['kenar', 'kenar'], ...sprites().filter((s) => s.name !== cur).map((s) => [s.name, s.name])];
-    if ((cfg.backdrops || []).some((b) => BACKDROPS[b].walls)) t.push(['duvar', 'duvar']);
-    t.push(['fare', 'fare imleci']);
+    const t = [['kenar', yonelme('kenar')], ...sprites().filter((s) => s.name !== cur).map((s) => [s.name, yonelme(s.name)])];
+    if ((cfg.backdrops || []).some((b) => BACKDROPS[b].walls)) t.push(['duvar', yonelme('duvar')]);
+    t.push(['fare', yonelme('fare imleci')]);
     return t;
   }
 
@@ -124,7 +138,7 @@ export function createEditor(host, cfg) {
     const ksel = sel(path, [...(c ? [] : [['', 'koşul seç ▾']]), ...kinds.map((k) => [k, k === 'cmp' ? 'karşılaştır' : k === 'touch' ? 'dokunma' : k === 'key' ? 'tuş' : 'fare']) ], c ? c.k : '', 'kind');
     if (!c) return `<span class="cnd empty">${ksel}</span>`;
     let body = '';
-    if (c.k === 'touch') body = `${sel(path + '.o', touchTargets(), c.o)} ’a dokunuyor mu?`;
+    if (c.k === 'touch') body = `${sel(path + '.o', touchTargets(), c.o)} dokunuyor mu?`;
     if (c.k === 'key') body = `${sel(path + '.key', Object.entries(KEYS), c.key)} tuşuna basılı mı?`;
     if (c.k === 'mouse') body = 'fare tıklandı mı?';
     if (c.k === 'cmp') {

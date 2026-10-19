@@ -18,7 +18,7 @@ function presetProgs(setup) {
 }
 
 // Görev hedeflerinin denetlediği şeyler (lessons içindeki f(api) fonksiyonları kullanır)
-export function makeApi(w, progs) {
+export function makeApi(w, progs, changed = () => true) {
   return {
     w,
     t: w.t,
@@ -37,6 +37,7 @@ export function makeApi(w, progs) {
     touching: (a, b) => w.touching(w.sprite(a), b),
     touched: (a, b) => w.log.touch.has(a + '>' + b) || w.touching(w.sprite(a), b),
     mem: w.mem,
+    changed,
     count: (op) => { let c = 0; const walk = (l) => l.forEach((b) => { if (b.op === op) c++; ['body', 'body2'].forEach((k) => b[k] && walk(b[k])); }); Object.values(progs).forEach((ss) => ss.forEach(walk)); return c; },
     hats: (op, n) => Object.entries(progs).filter(([k]) => !n || k === n).reduce((c, [, ss]) => c + ss.filter((s) => s[0]?.op === op && s.length > 1).length, 0),
   };
@@ -45,15 +46,23 @@ export function makeApi(w, progs) {
 export function renderScratch(el, step, done, prev, ctx) {
   // Başlangıç: bu adımın taslağı > (keep ise) önceki adımın taslağı > hazır kurulum
   const saved = load(draftKey(ctx, ctx.i), null);
-  let from = saved;
-  if (!from && step.keep) {
-    for (let j = ctx.i - 1; j >= 0 && !from; j--) if (ctx.L.steps[j].type === 'scratch') from = load(draftKey(ctx, j), null);
+  let prevDraft = null;
+  if (step.keep) {
+    for (let j = ctx.i - 1; j >= 0 && !prevDraft; j--) if (ctx.L.steps[j].type === 'scratch') prevDraft = load(draftKey(ctx, j), null);
   }
-  let setup = clone(step.setup);
-  if (from?.setup && step.library) setup = from.setup;
-  const progs = presetProgs(setup);
-  if (from) for (const s of setup.sprites) if (!s.locked && from.progs[s.name]) progs[s.name] = from.progs[s.name];
-  for (const s of setup.sprites) progs[s.name] ||= [];
+  const init = (from) => {
+    let setup = clone(step.setup);
+    if (from?.setup && step.library) setup = from.setup;
+    const progs = presetProgs(setup);
+    if (from) for (const s of setup.sprites) if (!s.locked && from.progs[s.name]) progs[s.name] = from.progs[s.name];
+    for (const s of setup.sprites) progs[s.name] ||= [];
+    return { setup, progs };
+  };
+  // Başlangıç: bu adımın taslağı > (keep ise) önceki adımın taslağı > hazır kurulum
+  const snapOf = (st) => JSON.stringify([st.progs, st.setup.sprites.map((s) => s.name), st.setup.backdrop], (k, v) => (k === 'id' ? undefined : v));
+  // Serbest görevlerde “bir değişiklik yap” hedefi: açılıştaki (devralınan) koda göre fark var mı?
+  let baseSnap = snapOf(init(prevDraft));
+  let { setup, progs } = init(saved || prevDraft);
   // Kayıttan gelen blok kimlikleri yeni kimliklerle çakışmasın
   const fix = (list) => list.forEach((b) => { b.id = bid(); ['body', 'body2'].forEach((k) => b[k] && fix(b[k])); });
   Object.values(progs).forEach((ss) => ss.forEach(fix));
@@ -128,7 +137,7 @@ export function renderScratch(el, step, done, prev, ctx) {
 
   function check() {
     if (!goals.length || !w) return;
-    const api = makeApi(w, progs);
+    const api = makeApi(w, progs, () => snapOf({ progs, setup }) !== baseSnap);
     let changed = false;
     goals.forEach((g, k) => {
       let ok;
@@ -165,23 +174,24 @@ export function renderScratch(el, step, done, prev, ctx) {
     raf = requestAnimationFrame(loop);
   }
 
-  q('.flag').onclick = () => {
+  q('.flag').onclick = (e) => {
+    e.currentTarget.blur(); // Enter tuşu oyun sırasında 🏁'ı yeniden tetiklemesin
     hideToast();
     if (!step.noReset) reset();
     flagged = true;
     w.flag();
     play('click');
   };
-  q('.stopb').onclick = () => { w.stopAll(); play('click'); };
-  q('.resetb').onclick = () => { reset(); play('click'); };
+  q('.stopb').onclick = (e) => { e.currentTarget.blur(); w.stopAll(); play('click'); };
+  q('.resetb').onclick = (e) => { e.currentTarget.blur(); reset(); play('click'); };
   q('.restart').onclick = () => {
     if (!confirm('Bu adımdaki kodun silinip baştan başlansın mı?')) return;
     pdel(draftKey(ctx, ctx.i));
-    setup = clone(step.setup);
-    const p = presetProgs(setup);
+    const fresh = init(null);
+    setup = fresh.setup;
     for (const k of Object.keys(progs)) delete progs[k];
-    Object.assign(progs, p);
-    for (const s of setup.sprites) progs[s.name] ||= [];
+    Object.assign(progs, fresh.progs);
+    baseSnap = snapOf({ progs, setup });
     editor.destroy();
     editor = makeEditor();
     reset();

@@ -14,13 +14,6 @@
 .sinfo .hint { grid-column: 1; }
 .swork { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18em, 25em); gap: 1em; align-items: start; }
 .sside { display: flex; flex-direction: column; gap: 0.5em; position: sticky; top: 0; }
-@media (max-width: 70em) {
-  .swork { grid-template-columns: minmax(0, 1fr); }
-  .sside { order: -1; position: static; max-width: 30em; width: 100%; margin: 0 auto; }
-  .sinfo { grid-template-columns: minmax(0, 1fr); }
-  .goals { grid-row: auto; }
-}
-
 /* sahne kontrolleri */
 .sctrl { display: flex; align-items: center; gap: 0.4em; }
 .sctrl button { font-size: 1.1em; padding: 0.2em 0.7em; }
@@ -116,6 +109,26 @@ select.rep option, .sb select option { color: #2b2340; background: #fff; }
 .cnd.empty { background: #00000033; }
 .sw { width: 0.9em; height: 0.9em; border-radius: 50%; border: 2px solid #fff; display: inline-block; }
 .ghost.sb { position: fixed; z-index: 70; pointer-events: none; opacity: 0.95; box-shadow: 0 12px 24px #0004; margin: 0; }
+/* Dar ekran (1280x720, 1024x768): sahne ve editör yan yana kalır, sahne küçülür ve kaydırırken görünür kalır */
+@media (max-width: 80em) {
+  .swork { grid-template-columns: minmax(0, 1fr) minmax(14em, 17em); }
+  .sed { grid-template-columns: 12em minmax(0, 1fr); }
+  .sinfo { grid-template-columns: minmax(0, 1.5fr) minmax(12em, 1fr); }
+  .goals { font-size: 0.85em; padding: 0.4em 0.6em; }
+  .spal { height: 26em; }
+  .scode { height: 22em; }
+}
+@media (max-width: 80em) and (max-height: 800px) {
+  .spal { height: calc(100vh - 17em); min-height: 16em; }
+  .scode { height: calc(100vh - 21.5em); min-height: 13em; }
+}
+@media (max-width: 56em) {
+  .swork { grid-template-columns: minmax(0, 1fr); }
+  .sside { order: -1; position: static; max-width: 30em; width: 100%; margin: 0 auto; }
+  .sinfo { grid-template-columns: minmax(0, 1fr); }
+  .goals { grid-row: auto; }
+}
+
 @media (max-width: 46em) {
   .sed { grid-template-columns: minmax(0, 1fr); }
   .spal { height: 16em; }

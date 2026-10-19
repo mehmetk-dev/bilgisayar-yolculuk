@@ -4,17 +4,18 @@ import { codePic } from './board.js';
 import { BLOCKS, CATS, KEYS, SOUNDS, NOTES, COLORS } from './sahne/blocks.js';
 import { BACKDROPS } from './sahne/costumes.js';
 import { esc } from './robo.js';
+import { yonelme } from './sahne/editor.js';
 
 const TYPE = { story: ['📖', 'Anlatım'], order: ['🧩', 'Sıralama'], quiz: ['❓', 'Soru'], grid: ['🤖', 'Robo görevi'], scratch: ['🐱', 'Sahne görevi'] };
 const OPS = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 const REP = { x: 'x konumu', y: 'y konumu', dir: 'yön', mx: 'fare x', my: 'fare y', answer: 'cevap', timer: 'zamanlayıcı' };
 
-// Bir değeri okunur yazıya çevirir: (rastgele 1 ile 6 arası), <Kedi'ye dokunuyor mu?> …
+// Bir değeri okunur yazıya çevirir: (rastgele 1 ile 6 arası), <Kedi’ye dokunuyor mu?> …
 function fmt(v) {
   if (v == null) return '…';
   if (typeof v !== 'object') return esc(v);
   if (v.k) {
-    if (v.k === 'touch') return `&lt;${esc(v.o)}’a dokunuyor mu?&gt;`;
+    if (v.k === 'touch') return `&lt;${esc(yonelme(v.o))} dokunuyor mu?&gt;`;
     if (v.k === 'key') return `&lt;${KEYS[v.key]} tuşuna basılı mı?&gt;`;
     if (v.k === 'mouse') return '&lt;fare tıklandı mı?&gt;';
     if (v.k === 'cmp') return `&lt;${fmt(v.a)} ${esc(v.op)} ${fmt(v.b)}&gt;`;

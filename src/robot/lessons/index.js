@@ -10,6 +10,9 @@ import { b29, b30, b31, b32 } from './h8.js';
 import { b33, b34 } from './ek1.js';
 import { b35, b36 } from './ek2.js';
 import { b37, b38 } from './ek3.js';
+import { b39, b40 } from './ek4.js';
+import { b41, b42 } from './ek5.js';
+import { b43, b44 } from './ek6.js';
 
 export const WEEKS = [
   { title: 'Algoritma ve yönler', lessons: [b1, b2, b3, b4] },
@@ -21,7 +24,7 @@ export const WEEKS = [
   { title: 'Oyun projeleri ve kendi projen', lessons: [b25, b26, b27, b28] },
   { title: 'Scratch ustalığı: soru, matematik, klonlar', lessons: [b29, b30, b31, b32] },
   // Ek bölümler: 8 haftalık programın dışında; hızlı bitirenler ve tekrar için (ilerleme numaraları değişmesin diye sona eklenir)
-  { extra: true, title: 'Ek bölümler: bulmaca, müzik ve oyunlar', lessons: [b33, b34, b35, b36, b37, b38] },
+  { extra: true, title: 'Ek bölümler: bulmaca, müzik ve oyunlar', lessons: [b33, b34, b35, b36, b37, b38, b39, b40, b41, b42, b43, b44] },
 ];
 
 // Bölümlere sıra numarası ve hafta bilgisi verilir

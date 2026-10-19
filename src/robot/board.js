@@ -36,7 +36,7 @@ const FAIL = {
   nopick: 'Burada alınacak yıldız yok! ✋ Yıldızın tam üstündeyken “Yıldızı al” demelisin.',
   nostars: 'Pile geldim ama bütün yıldızları toplamadım ⭐',
   nogoal: 'Komutlar bitti ama pile ulaşamadım 🔋',
-  limit: 'Ufff, çok yoruldum! 😵 Program hiç bitmiyor gibi. Döngü bir gün sona eriyor mu?',
+  limit: 'Ufff, çok yoruldum! 😵 Program hiç bitmiyor gibi, bu yüzden Robo\'yu erkenden durdurdum. Döngü bir gün sona eriyor mu?',
 };
 const WIN = ['Harika! Robo pile ulaştı! 🎉', 'Süpersin! Algoritman çalıştı! 🌟', 'Bravo! Tam bir programcı gibi! 🤖', 'Mükemmel! Robo\'nun pili doldu! 🔋'];
 
@@ -480,6 +480,8 @@ export function renderGrid(el, step, done, prev) {
       board.style.setProperty('--dur', ms * 0.8 + 'ms');
       const r = simulate(M[k], dirs[k], prog, { fn, pick: step.pick });
       await sleep(180);
+      // Sonsuz döngüde yalnızca ilk birkaç olayı oynat, uyarıyı hemen göster
+      if (r.result === 'limit') r.ev = r.ev.slice(0, 15);
       if (!(await playEvents(r.ev, my, ms))) return;
       highlight(null);
       const where = M.length > 1 ? `<b>${k + 1}. haritada:</b> ` : '';

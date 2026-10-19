@@ -6,6 +6,8 @@ const X = { r: 'x' };
 
 // --- Top sektir ---
 const PONG_SETUP = (extra = []) => ({ backdrop: 'cayir', vars: { skor: 0, hız: 5 }, sprites: [sp('Top', 'top', 0, 0), sp('Raket', 'sepet', 0, -150), ...extra] });
+// Serbest görev: “can” değişkeni hazır gelir
+const PONG_FREE = () => { const s = PONG_SETUP(); s.vars.can = 3; return s; };
 const PONG_BLOCKS = ['flag', 'forever', 'if', 'move', 'bounce', 'point', 'goto', 'setx', 'chx', 'chy', 'sound', 'sayFor', 'say', 'stop', 'setv', 'chv', 'wait'];
 const PONG_REP = ['mx', 'rand', 'var'];
 const HIT = [['point', R(-40, 40)], ['chy', 10], ['sound', 'pop']];
@@ -36,7 +38,7 @@ export const b37 = {
       sol: { Top: BALL1 } },
     { type: 'quiz', title: 'Hangi blok?',
       q: 'Top ekranın kenarına çarpınca <b>geri dönsün</b> istiyoruz. Hangi blok işe yarar?',
-      opts: ['kenara geldiyse sek', 'sonraki kostüm', 'x\'i 10 değiştir'], a: 0,
+      opts: ['sonraki kostüm', 'kenara geldiyse sek', 'x\'i 10 değiştir'], a: 1,
       ok: 'Bu blok kuklayı kenardan döndürür; yönü de buna göre değiştirir. Scratch\'te pek çok oyun bu bloğu kullanır.' },
     { type: 'scratch', title: '2. adım: Raket fareyi takip etsin',
       text: `<p>Raket: 🏁 → x: 0 y: -150'ye git → sürekli tekrarla [${blk('motion', 'x\'i (fare x) yap')}]. Sayı kutusundaki ▾ düğmesinden <b>fare x</b>'i seç. Fareni sağa sola götür!</p>`,
@@ -63,9 +65,9 @@ export const b37 = {
       hint: 'move bloğunun sayı kutusundan ▾ ile “değişken” → hız seç. Rakete dokununca: hız değişkenini 0.5 değiştir.',
       sol: { Top: topScript(V('hız'), [...HIT, ['chv', 'skor', 1], ['chv', 'hız', 0.5]], [MISS], [['setv', 'skor', 0], ['setv', 'hız', 5]]), Raket: RAKET }, play: chase(1e9, false) },
     { type: 'scratch', title: '⭐ Kendi pinpon oyunun',
-      text: '<p>Oyunu geliştir! İkinci bir top ekle, raketi küçült ya da arka planı değiştir. Zor bir fikir: <b>can</b> ekle; kaçırınca oyun hemen bitmesin, 3 canın olsun! Hazır olunca ✔ Bitirdim.</p>',
-      setup: PONG_SETUP(), blocks: PONG_BLOCKS.concat(['size', 'chsize', 'backdrop', 'show', 'hide']), reporters: PONG_REP, conds: ['touch', 'cmp'], condDefault: cmp(Y, '<', -140), library: true, free: true, keep: true,
-      goals: [{ t: 'Skor tut', use: 'chv' }, { t: 'Top sekebilsin', use: 'bounce' }],
+      text: '<p>Oyunu geliştir! İkinci bir top ekle, raketi küçült ya da arka planı değiştir. Zor bir fikir: hazır gelen <b>can</b> değişkenini (3) kullan; kaçırınca canı 1 azalt (-1 değiştir), can bitince oyun bitsin! Hazır olunca ✔ Bitirdim.</p>',
+      setup: PONG_FREE(), blocks: PONG_BLOCKS.concat(['size', 'chsize', 'backdrop', 'show', 'hide']), reporters: PONG_REP, conds: ['touch', 'cmp'], condDefault: cmp(Y, '<', -140), library: true, free: true, keep: true,
+      goals: [{ t: 'Oyunda bir değişiklik yap (sayı, blok ya da yeni kukla)', f: (a) => a.changed() }, { t: 'Skor tut', use: 'chv' }, { t: 'Top sekebilsin', use: 'bounce' }],
       sol: { Top: topScript(V('hız'), [...HIT, ['chv', 'skor', 1], ['chv', 'hız', 0.5]], [MISS], [['setv', 'skor', 0], ['setv', 'hız', 5]]), Raket: RAKET }, play: chase(1e9, false) },
   ],
 };
@@ -103,7 +105,7 @@ export const b38 = {
       play: [['hold', 'd', 0.5, 7], ['hold', 'right', 0.5, 7]] },
     { type: 'quiz', title: 'Adil mi?',
       q: 'Kedi her basışta <b>8 adım</b>, Köpek her basışta <b>5 adım</b> ilerlerse yarış adil olur mu?',
-      opts: ['Hayır, Kedi hep avantajlı olur', 'Evet, adil olur', 'Fark etmez, kazanan hep Köpek olur'], a: 0,
+      opts: ['Evet, adil olur', 'Fark etmez, kazanan hep Köpek olur', 'Hayır, Kedi hep avantajlı olur'], a: 2,
       ok: 'İki oyuncu için adımlar aynı olmalı ki yarış adil olsun. Bu yüzden ikisine de 8 yazdık.' },
     { type: 'scratch', title: '3. adım: Kim kazandı? 🏆',
       text: `<p>İkisinin de 🏁 betiğine bir bitiş kuralı ekle: 🏁 → konuma git → sürekli tekrarla [<b>eğer x &gt; 150 ise</b> → “kazandın” sesi → <b>“Kedi kazandı!”</b> de → tümünü durdur]. Köpek için de <b>“Köpek kazandı!”</b> yaz.</p>`,
@@ -118,9 +120,9 @@ export const b38 = {
       hint: 'Robo: 🏁 → başla = 0 → (3) de 1 saniye … → (Başla!) de 1 saniye → başla = 1. Kedi ve Köpek: d (ya da sağ ok) tuşuna basılınca → eğer (başla) = 1 ise [x\'i 8 değiştir].',
       sol: { Robo: COUNT, Kedi: kedi(GATE), Köpek: kopek(GATE) }, play: [['hold', 'd', 0.5, 14], ['hold', 'right', 0.5, 9]] },
     { type: 'scratch', title: '⭐ Kendi yarışın',
-      text: '<p>Yarışı değiştir! Yeni bir yarışçı ekle (✚ ile balık, kuş, arı…) ve ona bir tuş ver. Ya da yarışçılara rastgele hız ver: <b>x\'i (rastgele 4 ile 12) değiştir</b>. Şansın payı olsun! Hazır olunca ✔ Bitirdim.</p>',
+      text: '<p>Yarışı değiştir! Yeni bir yarışçı ekle (➕ ile balık, kuş, arı…) ve ona bir tuş ver. Ya da yarışçılara rastgele hız ver: <b>x\'i (rastgele 4 ile 12) değiştir</b>. Şansın payı olsun! Hazır olunca ✔ Bitirdim.</p>',
       setup: RACE_SETUP([sp('Robo', 'robo', 0, 110, { size: 70 })], { başla: 0 }), blocks: RACE_BLOCKS.concat(['gotoRand', 'turnR', 'size']), reporters: ['var', 'rand'], conds: ['cmp', 'key'], condDefault: cmp(X, '>', 150), library: true, free: true, keep: true,
-      goals: [{ t: 'En az iki oyuncu için tuş betiği', f: (a) => a.hats('key') >= 2 }, { t: 'Bir bitiş kuralı olsun', use: 'stop' }],
+      goals: [{ t: 'Yarışta bir değişiklik yap (yeni yarışçı, rastgele hız ya da başka bir şey)', f: (a) => a.changed() }, { t: 'En az iki oyuncu için tuş betiği', f: (a) => a.hats('key') >= 2 }, { t: 'Bir bitiş kuralı olsun', use: 'stop' }],
       sol: { Robo: COUNT, Kedi: kedi(GATE), Köpek: kopek(GATE) }, play: [['hold', 'd', 0.5, 14], ['hold', 'right', 0.5, 9]] },
   ],
 };
