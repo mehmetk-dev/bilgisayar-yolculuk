@@ -15,6 +15,7 @@ import { FOTO_SITES } from './siteler-foto.js';
 import { HARITA_SITES } from './siteler-harita.js';
 import { BANKA_SITES } from './siteler-banka.js';
 import { KAMU_SITES } from './siteler-kamu.js';
+import { SOSYAL_SITES } from './siteler-sosyal.js';
 
 export const SEARCH_HOST = 'www.bulalim.com';
 
@@ -49,6 +50,7 @@ const RESULTS = [
   { keys: ['ilan', 'kiralık', 'kiralik', 'emlak', 'ev', 'daire', 'satılık'], title: 'İlan Pazarı: kiralık ve satılık evler', url: 'www.ilan-pazari.com.tr', snip: 'Kiralık daire ilanlarını il, oda ve fiyata göre arayın.' },
   { keys: ['yapay', 'zeka', 'zekâ', 'yardımcı', 'yardimci', 'sohbet', 'asistan', 'özetle'], title: 'Dijital Yardımcı: yapay zekâ ile yazışın', url: 'yardimci.bulalim.com', snip: 'Yazı özetletin, tarif ve gezi planı isteyin (alıştırma sürümü).' },
   { keys: ['belediye', 'form', 'dilekçe', 'dilekce', 'başvuru', 'basvuru', 'su abonelik', 'abonelik', 'pdf'], title: 'Örnek Belediyesi: form ve dilekçeler', url: 'www.ornek-belediyesi.bel.tr', snip: 'Su abonelik başvuru formu ve diğer formları PDF olarak indirin.' },
+  { keys: ['dostlarım', 'dostlarim', 'sosyal', 'medya', 'arkadaş', 'paylaşım'], title: 'Dostlarım: aileniz ve arkadaşlarınızla bağlantıda kalın', url: 'www.dostlarim.com.tr', snip: 'Fotoğraf ve haber paylaşın, mesajlaşın (alıştırma sitesi).' },
   { keys: ['indirim', 'alışveriş', 'alisveris', 'fırsat', 'firsat', 'kampanya'], title: 'Fırsat Pazarı: günün indirimleri', url: 'www.firsat-pazari.com.tr', snip: 'Mutfak, ev ve elektronikte günün fırsatları.' },
 ];
 const AD = { title: 'Bilgisayarınız YAVAŞ mı? 10 KAT Hızlandırın!', url: 'www.super-hizlandirici.xyz', snip: 'Hemen indirin, ücretsiz tarama yapın!!!' };
@@ -263,7 +265,7 @@ export const SITES = {
   },
 };
 
-Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES, FOTO_SITES, HARITA_SITES, BANKA_SITES, KAMU_SITES);
+Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES, FOTO_SITES, HARITA_SITES, BANKA_SITES, KAMU_SITES, SOSYAL_SITES);
 
 function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 

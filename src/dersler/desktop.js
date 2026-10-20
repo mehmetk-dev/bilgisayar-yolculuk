@@ -677,6 +677,13 @@ export class Desktop {
   openNode(n) {
     if (!n) return null;
     if (n.type === 'file') this.touchRecent(n.id);
+    if (n.type === 'link' && n.target) {
+      // Dosya ya da klasör kısayolu: asıl öğeyi açar. Asıl öğe silinmişse kısayol çalışmaz.
+      const t = this.fs.get(n.target);
+      if (!t || this.fs.inRecycle(t.id)) { this.toast('Kısayol sorunu', `“${esc(n.name)}” kısayolunun gösterdiği öğe silinmiş. Kısayol yalnızca bir yol gösterici; asıl dosya gidince açılmaz.`, '⚠', 7000); this.emit('shortcut-broken', { name: n.name }); return null; }
+      this.emit('shortcut-open', { name: n.name, target: t.name });
+      return this.openNode(t);
+    }
     if (n.type === 'link') return this.open(n.app, n.args);
     if (n.type === 'folder') return this.open('explorer', { folder: n.id });
     const name = n.name.toLowerCase();
@@ -1857,7 +1864,7 @@ function paintText(g, node, cs) {
 
 export function nodeIcon(n) {
   if (n.type === 'folder') return '📁';
-  if (n.type === 'link') return APPS[n.app]?.icon || '📄';
+  if (n.type === 'link') return n.icon || APPS[n.app]?.icon || '📄';
   return fileIcon(n.name);
 }
 

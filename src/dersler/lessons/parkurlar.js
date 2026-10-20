@@ -1,11 +1,13 @@
-// Haftaların eksik parkurları (yönlendirmesiz, süreli uygulama): 9. hafta e-posta, 13. hafta günlük işler
-// (12. hafta sunu parkuru sunu4.js'de). Eğitmen notu: son ekranda her görevin süresi görünür.
+// Haftaların eksik parkurları (yönlendirmesiz, süreli uygulama): 9. hafta e-posta, 13. hafta günlük işler,
+// 15. hafta bilgi güvenliği (12. hafta sunu parkuru sunu4.js'de). Eğitmen notu: son ekranda her görevin süresi görünür.
 import { desktopReady, put } from './common.js';
 import { rehberSoru } from './kalip.js';
 import { mailBox } from '../apps/mail.js';
 import { FATURA } from './gunluk2.js';
 import { HARITA_HOST } from '../apps/siteler-harita.js';
 import { WA_HOST } from '../apps/siteler-mesaj.js';
+import { DOST_HOST, DOST_MAIL, DOST_SIFRE } from '../apps/siteler-sosyal.js';
+import { USB } from '../vfs.js';
 
 const keyOf = (c, id) => mailBox(c.d).mails.find((m) => m.id === id)?.key;
 const lower = (s) => String(s || '').toLocaleLowerCase('tr');
@@ -138,5 +140,70 @@ export const gunlukParkur = {
       on: (ev) => ev.type === 'wa-logout',
     },
     { final: true, title: 'Parkur bitti! 🏁', html: '<p>Günlük işleri yönlendirme olmadan kendiniz yaptınız.</p>' },
+  ],
+};
+
+// 15. hafta: Bilgi güvenliği parkuru
+const usbHas = (c, name) => c.d.fs.usb && Object.values(c.d.fs.nodes).some((n) => n.type === 'file' && lower(n.name) === name && c.d.fs.isInside(n.id, USB));
+
+export const guvenlikParkur = {
+  id: 'guvenlik-parkur', icon: '🏁', title: 'Bilgi güvenliği parkuru', minutes: 25, stage: 'desktop', parkur: true,
+  desc: 'Orta seviye: belgeyi USB\'ye yedeklemek, iki adımlı doğrulamayı açıp yedek kodları indirmek, gizlilik, taklit hesap, çekiliş tuzağı, ortak Wi-Fi. Süreler tutulur.',
+  steps: [
+    {
+      title: 'Bilgi güvenliği parkuru',
+      html: `<p>15. haftada öğrendiklerinizi sırayla yapın. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>
+        <p>Dostlarım: <b>${DOST_HOST}</b> · <b>${DOST_MAIL}</b> · şifre <b>${DOST_SIFRE}</b></p>`,
+      setup: (c) => { desktopReady(c); c.d.closeAll(); c.d.fs.plugUsb(false); },
+    },
+    {
+      title: '1. Yedek',
+      html: '<p>USB belleği takın ve Belgeler\'deki <b>telefon numaraları</b> dosyasını belleğe <b>kopyalayın</b> (aslı Belgeler\'de kalsın).</p><button type="button" class="btn primary usb-btn">💾 USB belleği bilgisayara tak</button>',
+      hint: 'Dosya Gezgini → Belgeler → dosyayı seç → Ctrl + C → USB Bellek (E:) → Ctrl + V.',
+      setup: (c) => { document.querySelector('#stepBody .usb-btn').onclick = () => c.d.plugUsb(); },
+      check: (c) => usbHas(c, 'telefon numaraları.txt') && !!c.d.fs.find('docs', 'telefon numaraları.txt'),
+      on: (ev, c) => {
+        if (ev.type === 'file-paste' && ev.op === 'cut') c.warn('Dosyayı taşıdınız; aslı Belgeler\'de kalmalıydı. Geri kopyalayın.');
+        return usbHas(c, 'telefon numaraları.txt') && !!c.d.fs.find('docs', 'telefon numaraları.txt');
+      },
+    },
+    { title: '2. Belleği çıkarın', html: '<p>USB belleği <b>güvenle</b> çıkarın.</p>', hint: 'Dosya Gezgini\'nde USB\'yi açıp ⏏ Çıkar ya da görev çubuğundaki 💾.', on: (ev) => ev.type === 'usb' && !ev.on },
+    {
+      title: '3. İki adımlı doğrulama', html: '<p>Dostlarım hesabınızda <b>iki adımlı doğrulamayı</b> SMS ile açın.</p>',
+      hint: `İnternet → ${DOST_HOST} → giriş → ⚙ Ayarlar → Güvenlik → Aç → SMS ile kod → SMS'teki kodu yazın.`,
+      on: (ev) => ev.type === 'ds-2fa-on',
+    },
+    { title: '4. Yedek kodlar', html: '<p>Yedek kodları <b>bilgisayara indirin</b>.</p>', hint: 'Açılan sayfadaki ⬇ Yedek kodları indir.', on: (ev) => ev.type === 'ds-backup-dl' },
+    {
+      title: '5. Telefon numarası', html: '<p>Telefon numaranızı <b>yalnızca sizin</b> görebileceğiniz hâle getirin.</p>',
+      hint: '⚙ Ayarlar → Gizlilik → Telefon numaramı kimler görebilir? → 🔒 Yalnızca ben → Kaydet.',
+      on: (ev) => ev.type === 'ds-privacy' && ev.telefon === 'ben',
+    },
+    {
+      title: '6. Taklit hesap', html: '<p>Arkadaşlık istekleri arasındaki <b>taklit hesabı</b> bulun ve bildirin.</p>',
+      hint: '🤝 İstekler: zaten arkadaşınız olan Hasan Demir adına, 0 ortak arkadaşlı yeni hesap → ⚑ Sahte hesap.',
+      on: (ev, c) => {
+        if (ev.type !== 'ds-request') return false;
+        if (ev.id === 'sahte' && ev.action === 'ok') { c.warn('Taklit hesabı onayladınız! Gerçekte hemen arkadaşlıktan çıkarın.'); return false; }
+        if (ev.id === 'fatma' && ev.action === 'report') c.note('Fatma Kaya gerçek bir komşunuzdu (14 ortak arkadaş).');
+        return ev.id === 'sahte' && ev.action === 'report';
+      },
+    },
+    {
+      title: '7. Çekiliş tuzağı', html: '<p>Akıştaki <b>çekiliş tuzağını</b> şikâyet edin. Bağlantısına tıklamayın.</p>',
+      hint: '🏠 Akış → Dostlarım Hediye gönderisi → ⚑ Şikâyet et.',
+      on: (ev, c) => { if (ev.type === 'ds-scam-link') c.warn('Bağlantıya tıkladınız! Gerçekte sahte sayfaya giderdiniz.'); return ev.type === 'ds-report' && ev.id === 'cekilis'; },
+    },
+    {
+      title: '8. Kafe ağı', html: '<p><b>Kafe_Ücretsiz</b> ağına bağlanıp onu <b>Ortak ağ</b> yapın; sonra bağlantıyı kesin.</p>',
+      hint: 'Başlat → Ayarlar → Ağ ve İnternet → Kafe_Ücretsiz → Bağlan → Yine de bağlan → Hayır (Ortak ağ) → Bağlantıyı kes.',
+      on: (ev, c) => {
+        if (ev.type === 'net-profile' && ev.name === 'Kafe_Ücretsiz') c.s.prof = ev.profile;
+        if (ev.type !== 'wifi-disconnect' || ev.name !== 'Kafe_Ücretsiz') return false;
+        if (c.s.prof !== 'ortak') { c.note('Bağlantı kesildi ama ağ “Ortak ağ” yapılmamıştı. Yeniden bağlanıp Ortak ağ seçin, sonra kesin.'); return false; }
+        return true;
+      },
+    },
+    { final: true, title: 'Parkur bitti! 🏁', html: '<p>Bilgi güvenliği işlerini yönlendirme olmadan kendiniz yaptınız.</p>' },
   ],
 };

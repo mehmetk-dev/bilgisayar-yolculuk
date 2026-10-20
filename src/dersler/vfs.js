@@ -1,5 +1,5 @@
 // Benzetim bilgisayarın dosya sistemi. Gerçek diske dokunmaz; her şey bellekte durur.
-// Düğüm: { id, name, type: 'folder'|'file'|'link', parent, content?, app?, deletedFrom? }
+// Düğüm: { id, name, type: 'folder'|'file'|'link', parent, content?, app?, target? (dosya/klasör kısayolu), icon?, deletedFrom? }
 
 export const ROOTS = [
   ['desktop', 'Masaüstü', '🖥'],
@@ -60,6 +60,7 @@ export class VFS {
     this.create(fat.id, { type: 'file', name: 'su faturası.pdf' }, true);
     this.seeding = false;
     this.usb = false;
+    this.usbStash = null;
     this.phone = false;
     this.changed('reset');
   }
@@ -100,10 +101,10 @@ export class VFS {
     return n;
   }
 
-  create(parent, { type, name, content, app, size, mtime }, quiet) {
+  create(parent, { type, name, content, app, size, mtime, target, icon }, quiet) {
     const id = 'n' + this.seq++;
     // Ders başında gelen dosyaların tarihleri geçmişe yayılır (ayrıntılar görünümünde sıralama anlamlı olsun)
-    const node = { id, type, parent, name: this.uniqueName(parent, name), content, app, size, mtime: mtime || (quiet && this.seeding ? Date.now() - (this.seq * 7919 % 90) * 86400e3 - this.seq * 3600e3 : Date.now()) };
+    const node = { id, type, parent, name: this.uniqueName(parent, name), content, app, ...(target ? { target, icon } : {}), size, mtime: mtime || (quiet && this.seeding ? Date.now() - (this.seq * 7919 % 90) * 86400e3 - this.seq * 3600e3 : Date.now()) };
     this.nodes[id] = node;
     if (!quiet) this.changed('create', node);
     return node;
@@ -144,7 +145,7 @@ export class VFS {
 
   copy(id, parent) {
     const src = this.nodes[id];
-    const node = this.create(parent, { type: src.type, name: src.name, content: structuredClone(src.content), app: src.app, size: src.size, mtime: src.mtime }, true);
+    const node = this.create(parent, { type: src.type, name: src.name, content: structuredClone(src.content), app: src.app, target: src.target, icon: src.icon, size: src.size, mtime: src.mtime }, true);
     for (const c of this.children(id)) this.copy(c.id, node.id);
     this.changed('copy', { ...node, src: id });
     return node;
@@ -249,9 +250,13 @@ export class VFS {
     this.usb = on;
     if (on) {
       this.nodes[USB] = { id: USB, name: 'USB Bellek (E:)', type: 'folder', parent: null, root: true, drive: true };
-      this.create(USB, { type: 'file', name: 'okul fotoğrafı.jpg', content: { emoji: '🏫', bg: ['#90caf9', '#e1bee7'] } }, true);
+      // Daha önce takılıp çıkarılan bellek: içindekiler (ör. alınan yedek) yerinde durur
+      if (this.usbStash) { for (const n of this.usbStash) this.nodes[n.id] = n; this.usbStash = null; }
+      else this.create(USB, { type: 'file', name: 'okul fotoğrafı.jpg', content: { emoji: '🏫', bg: ['#90caf9', '#e1bee7'] } }, true);
     } else {
-      this.purge(USB, true);
+      this.usbStash = Object.values(this.nodes).filter((n) => n.id !== USB && this.isInside(n.id, USB));
+      for (const n of this.usbStash) delete this.nodes[n.id];
+      delete this.nodes[USB];
     }
     this.changed('usb', { on });
   }

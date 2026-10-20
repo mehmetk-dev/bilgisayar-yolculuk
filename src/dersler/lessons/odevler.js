@@ -175,4 +175,15 @@ export const odev14 = odev(14, 'e-Devlet, randevu ve internette işlemler', '�
   ['Çıkış yapın', 'Bütün sitelerden <b>Çıkış</b> yapın. Sonra tarayıcıda <b>Ctrl + Shift + Del</b> ile göz atma verilerini temizlemeyi düşünün (ortak bilgisayardaysanız).', 'Oturum açık kalırsa sonraki kişi girebilir.', '🚪'],
 ]);
 
-export const ODEVLER = [odev1, odev2, odev3, odev4, odev5, odev6, odev7, odev8, odev9, odev10, odev11, odev12, odev13, odev14];
+export const odev15 = odev(15, 'bilgi güvenliği', '🛡', [
+  ['Fotoğrafları yedekleyin', 'Bir USB bellek ya da harici disk takın; içinde <b>Yedek</b> klasörü açıp <b>Resimler</b> klasörünüzdeki fotoğrafları oraya <b>kopyalayın</b>. Yedekteki bir fotoğrafı açıp bakın, sonra belleği <b>güvenle çıkarın</b>.', 'Kopyala (Ctrl + C) kullanın, Kes değil: asıllar bilgisayarda kalsın.', '💾'],
+  ['Bir belgeyi buluta koyun', 'Kullandığınız bulut depoya (e-posta hesabınızla gelen) önemli bir belgenizi yükleyin. Telefonunuzdan aynı hesaba girip belgenin göründüğüne bakın.', 'Kimlik, banka belgesi gibi şeyleri “herkese açık bağlantı” ile paylaşmayın.', '☁'],
+  ['İki adımlı doğrulama', 'E-posta hesabınızın <b>Güvenlik</b> ayarlarında iki adımlı (iki aşamalı) doğrulamayı bulun ve açın. Size verilen <b>yedek kodları</b> bir kâğıda yazıp evde güvenli bir yere koyun.', 'Takılırsanız bir yakınınızla birlikte yapın; kodu telefonda kimseye söylemeyin.', '📱'],
+  ['Gizlilik ayarları', 'Kullandığınız sosyal medya hesabında profilinizi <b>“Başkası nasıl görüyor?”</b> gibi bir seçenekle inceleyin. Telefon numaranızı ve doğum tarihinizi yalnızca size görünür yapın; gönderileriniz yalnızca arkadaşlara açık olsun.', 'Ayarlar → Gizlilik bölümüne bakın.', '🔒'],
+  ['Arkadaş listesine bakın', 'Arkadaş listenizde aynı kişiden <b>iki hesap</b> var mı, tanımadığınız biri var mı bakın. Şüphelendiğiniz hesabı arkadaşlıktan çıkarın ya da gerçek kişiye telefonla sorun.', 'Yeni açılmış, ortak arkadaşı olmayan hesaplara dikkat.', '🤝'],
+  ['Oturum açılan cihazlar', 'E-posta ya da sosyal medya hesabınızın güvenlik sayfasında <b>oturum açık cihazlar</b> listesine bakın. Tanımadığınız bir cihaz varsa oturumunu kapatıp şifrenizi değiştirin.', 'Listede kendi telefonunuz ve bilgisayarınız olmalı.', '💻'],
+  ['Ortak Wi-Fi', 'Bir kafede ya da hastanede şifresiz Wi-Fi\'ye bağlanırsanız Windows\'un sorusuna <b>Hayır (Ortak ağ)</b> deyin. O ağda banka ve e-Devlet işlemi yapmayın.', 'Ayarlar → Ağ ve İnternet → Wi-Fi → ağın özellikleri: Ağ profili türü.', '📶'],
+  ['Acil numaraları yazın', 'Bankanızın kartın arkasında yazan numarasını ve acil durum numaralarını (155, 156, 112) telefon rehberinize ve bir kâğıda yazın. Kartınız çalınırsa ilk arayacağınız yer burası.', 'Bankanın numarasını mesajlardan değil, kartın arkasından ya da bankanın kendi sitesinden alın.', '🆘'],
+]);
+
+export const ODEVLER = [odev1, odev2, odev3, odev4, odev5, odev6, odev7, odev8, odev9, odev10, odev11, odev12, odev13, odev14, odev15];

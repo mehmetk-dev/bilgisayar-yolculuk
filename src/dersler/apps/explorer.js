@@ -306,6 +306,13 @@ export function explorer({ desk, body, args, emit, setTitle }) {
         return;
       }
       case 'extract': return desk.extractZip(n);
+      case 'shortcut': {
+        if (!n || n.type === 'link') return;
+        const l = fs.create('desktop', { type: 'link', name: `${n.name} - Kısayol`, target: n.id, icon: nodeIcon(n) });
+        desk.toast('Kısayol oluşturuldu', `Masaüstünde <b>${esc(l.name)}</b> var. Asıl ${n.type === 'folder' ? 'klasör' : 'dosya'} yerinde duruyor.`, '↗', 4000);
+        emit('shortcut', { name: l.name, target: n.name, folder: n.type === 'folder' });
+        return;
+      }
       case 'wallpaper': if (n) { desk.settings.customWall = pictureURL(n.content); desk.setSetting('wallpaper', 'custom'); emit('wallpaper', { name: n.name, custom: true }); } return;
       case 'open': return open(id);
       case 'location': if (n) { go(n.parent); select(id); emit('ex-location', { id, name: n.name, folder: n.parent, path: fs.path(n.parent).map((x) => x.name).join(' › ') }); } return;
@@ -384,6 +391,7 @@ export function explorer({ desk, body, args, emit, setTitle }) {
         ? [{ cmd: 'restore', label: '♻ Geri yükle', bold: true }, '-', { cmd: 'delete', label: 'Kalıcı olarak sil' }, { cmd: 'props', label: 'Özellikler' }]
         : [{ cmd: 'open', label: 'Aç', bold: true }, ...(cur === 'home' || query ? [{ cmd: 'location', label: '📂 Dosya konumunu aç' }] : []), '-', { cmd: 'cut', label: 'Kes', key: 'Ctrl+X' }, { cmd: 'copy', label: 'Kopyala', key: 'Ctrl+C' }, '-',
           { cmd: 'rename', label: 'Yeniden adlandır', key: 'F2' }, { cmd: 'delete', label: 'Sil', key: 'Del' }, '-',
+          { cmd: 'send', label: 'Gönder', sub: [{ cmd: 'shortcut', label: '🖥 Masaüstü (kısayol oluştur)' }] },
           /\.zip$/i.test(fs.get(it.dataset.id)?.name || '') ? { cmd: 'extract', label: '🗜 Tümünü ayıkla…', bold: true } : { cmd: 'compress', label: '🗜 Sıkıştırılmış (zip) klasöre gönder' },
           ...(/\.(png|jpe?g)$/i.test(fs.get(it.dataset.id)?.name || '') ? [{ cmd: 'wallpaper', label: 'Masaüstü arka planı olarak ayarla' }] : []),
           { cmd: 'props', label: 'Özellikler' }];

@@ -1,4 +1,4 @@
-// Kullanım: node sunum/pdf.mjs [ad ...]   (ad verilmezse hafta2..hafta8 ve ek-guvenlik)
+// Kullanım: node sunum/pdf.mjs [ad ...]   (ad verilmezse hafta1..hafta15, ek-guvenlik ve donanım dosyaları)
 // Brave (headless) ile sunum/<ad>.html dosyasını sunum/Bilgisayar-Isletmenligi-<ad>.pdf olarak yazdırır.
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const puppeteer = createRequire(path.join(dir, '..', 'package.json'))('puppeteer-core');
-const names = process.argv.slice(2).length ? process.argv.slice(2) : ['hafta2', 'hafta3', 'hafta4', 'hafta5', 'hafta6', 'hafta7', 'hafta8', 'ek-guvenlik', 'donanim', 'donanim-notlar'];
+const names = process.argv.slice(2).length ? process.argv.slice(2) : [...Array.from({ length: 15 }, (_, i) => `hafta${i + 1}`), 'ek-guvenlik', 'donanim', 'donanim-notlar'];
 
 const browser = await puppeteer.launch({ executablePath: '/usr/bin/brave', headless: 'new', args: ['--no-sandbox'] });
 for (const n of names) {

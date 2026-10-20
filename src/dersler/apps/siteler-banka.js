@@ -1,6 +1,7 @@
 // 14. hafta sitesi (uydurma): Bankam İnternet Şubesi. Giriş (şifre + SMS kodu), hesap ve IBAN (kopyala),
 // para gönderme (IBAN yapıştırma, alıcı adı denetimi, SMS onayı), PDF dekont indirme,
-// kartlar (asıl kartı internet alışverişine kapatma, limitli sanal kart oluşturma).
+// kartlar (asıl kartı internet alışverişine kapatma, limitli sanal kart oluşturma, kartı geçici kapatma),
+// şüpheli harcamaya itiraz (hareket listesinde 4. alanı 'sus' olan satırlar).
 import { esc } from './util.js';
 import { KURS_TC } from './siteler-gunluk.js';
 
@@ -85,11 +86,13 @@ const BANKA = {
           <div class="bn-radio">Geçerlilik: <label><input type="radio" name="ay" value="1" checked> 1 ay</label><label><input type="radio" name="ay" value="6"> 6 ay</label><label><input type="radio" name="ay" value="12"> 1 yıl</label></div>${err}<button class="bn-btn">Oluştur</button></form>`;
       return page('Kartlarım - Bankam', `${head}<div class="bn-main"><h1>💳 Kartlarım</h1><div class="bn-cards"><div><div class="bn-card"><small>BANKAM KART · Banka kartı</small><b class="bn-cno">•••• •••• •••• 4417</b><span>Hesaba bağlı: ${tl(st.bal)}</span></div>
         <label class="bn-sw"><input type="checkbox" class="bn-online" ${st.cardOnline ? 'checked' : ''}><span></span> İnternet alışverişine açık</label>
-        <p class="bn-small">${st.cardOnline ? 'Bu kartla internette alışveriş yapılabilir.' : '🔒 Bu kart internette kullanılamaz: numarası çalınsa bile internetten harcama yapılamaz.'}</p></div><div>${vc}</div></div></div>`);
+        <p class="bn-small">${st.cardOnline ? 'Bu kartla internette alışveriş yapılabilir.' : '🔒 Bu kart internette kullanılamaz: numarası çalınsa bile internetten harcama yapılamaz.'}</p>
+        ${st.cardBlocked ? '<div class="bn-err">🚫 <b>Kart geçici olarak kapalı.</b> Hiçbir yerde (internet, market, ATM) kullanılamaz.</div><button type="button" class="bn-btn ghost small" data-act="unblock">Kartı yeniden aç</button>'
+          : '<button type="button" class="bn-btn ghost small" data-act="block">🚫 Kartı geçici olarak kapat</button><p class="bn-small">Kartınız kaybolduysa ya da bilgileri çalındıysa hemen kapatın.</p>'}</div><div>${vc}</div></div></div>`);
     }
     return page('Hesaplarım - Bankam', `${head}<div class="bn-main"><h1>👋 Hoş geldiniz</h1><div class="bn-acc"><div><small>Vadesiz TL Hesabı</small><b class="bn-bal">${tl(st.bal)}</b></div>
       <div class="bn-ibanrow"><small>IBAN</small><code>${MY_IBAN}</code><button type="button" class="bn-btn ghost small" data-act="copyiban">📋 Kopyala</button></div></div>
-      <h2>Son hareketler</h2><table class="bn-tbl">${st.moves.slice().reverse().map(([d, a, t]) => `<tr><td>${d}</td><td>${esc(a)}</td><td class="${t < 0 ? 'neg' : 'pos'}">${t < 0 ? '' : '+'}${tl(t)}</td></tr>`).join('')}</table></div>`);
+      <h2>Son hareketler</h2><table class="bn-tbl">${st.moves.map((m, i) => [m, i]).reverse().map(([[d, a, t, flag], i]) => `<tr><td>${d}</td><td>${esc(a)}${flag === 'sus' ? `<br><button type="button" class="bn-btn ghost small" data-act="dispute" data-v="${i}">⚠ Bu harcamayı ben yapmadım: itiraz et</button>` : flag === 'itiraz' ? '<br><small class="bn-small">✔ İtirazınız alındı. Banka inceleyip size bilgi verecek.</small>' : ''}</td><td class="${t < 0 ? 'neg' : 'pos'}">${t < 0 ? '' : '+'}${tl(t)}</td></tr>`).join('')}</table></div>`);
   },
   mount(el, ctx) {
     const inp = el.querySelector('.bn-iban');
@@ -101,7 +104,7 @@ const BANKA = {
     el.querySelector('.bn-online')?.addEventListener('change', (e) => { ctx.state.cardOnline = e.target.checked; ctx.emit('bank-card-online', { on: e.target.checked }); ctx.refresh(); });
     return 0;
   },
-  act(a, v, ctx) {
+  act(a, v, ctx, el) {
     const st = ctx.state;
     st.err = '';
     // SMS bildirimi: kod doğru girilince kapanır (sayfadaki düğmelerin üstünü kapatmasın)
@@ -176,7 +179,15 @@ const BANKA = {
     }
     if (a === 'show') { st.show = !st.show; ctx.emit('bank-vcard-show', { on: st.show }); ctx.refresh(); return; }
     if (a === 'copyno') { copyText(st.vcard.no); ctx.desk.toast('Kopyalandı', 'Sanal kart numarası panoya kopyalandı.', '📋', 3000); ctx.emit('bank-vcard-copy'); return; }
-    if (a === 'vdel') { st.vcard = null; ctx.emit('bank-vcard-del'); ctx.refresh(); }
+    if (a === 'vdel') { st.vcard = null; ctx.emit('bank-vcard-del'); ctx.refresh(); return; }
+    if (a === 'block' || a === 'unblock') { st.cardBlocked = a === 'block'; ctx.emit('bank-card-block', { on: st.cardBlocked }); ctx.refresh(); return; }
+    if (a === 'dispute') {
+      const m = st.moves[+el.dataset.v];
+      if (!m) return;
+      m[3] = 'itiraz';
+      ctx.emit('bank-dispute', { what: m[1], tutar: -m[2], blocked: !!st.cardBlocked });
+      ctx.refresh();
+    }
   },
 };
 

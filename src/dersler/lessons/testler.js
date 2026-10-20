@@ -636,7 +636,7 @@ export const test9 = test({
 
 export const test10 = test({
   id: 'test10', no: 10, title: '10. hafta testi',
-  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme, bul ve değiştir üzerine 14 soru.',
+  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme, bul ve değiştir, dipnot ve köprü üzerine 16 soru.',
   qs: [
     { t: 'Başlık', pic: '📢', q: 'Merdivene asılacak duyurunun başlığını uzaktan okunur yapmak için ne yapılır?', opts: ['Küçük ve sola dayalı yazılır', 'Büyük, kalın ve ortalı yazılır', 'Altı çizgili yazılır'], ok: 1, why: 'Büyük, kalın ve ortalı başlık uzaktan okunur. Boyut “punto” ile ayarlanır (24–28).' },
     { t: 'İki yana yasla', pic: '≣', q: 'Resmî yazıların (dilekçe) paragrafları genellikle nasıl hizalanır?', opts: ['Ortalı', 'İki yana yaslı', 'Sağa dayalı'], ok: 1, why: 'İki yana yaslama (Ctrl + J) paragrafın iki kenarını da düz yapar. Tarih ve imza ise sağa hizalanır.' },
@@ -652,12 +652,14 @@ export const test10 = test({
     { t: 'Simge', pic: '₺ ½ ©', q: 'Klavyenizde ₺ ya da ½ işareti bulamıyorsunuz. Ne yaparsınız?', opts: ['İnternetten kopyalarım', 'Ekle → Simge menüsünden seçerim', 'O işareti hiç yazamam'], ok: 1, why: 'Simge menüsünde klavyede olmayan işaretler hazır durur.' },
     { t: 'Kaçan resim', pic: '🖼', q: 'Word\'e eklediğiniz resim yazının arasında sıkışıyor, istediğiniz yere taşınmıyor. Ne yaparsınız?', opts: ['Resmin yanındaki Düzen Seçenekleri\'nden Kare ya da Sıkı\'yı seçerim', 'Resmi silip yeniden eklerim', 'Yazı tipini büyütürüm'], ok: 0, why: 'Kare/Sıkı seçilince yazı resmin çevresinden akar, resim serbestçe sürüklenir.' },
     { t: 'Biçim Boyacısı', pic: '🖌', q: 'Beğendiğiniz bir başlığın rengini ve boyutunu öbür başlıklara kopyalamak için?', opts: ['Biçim Boyacısı (fırça)', 'Kopyala - Yapıştır', 'Satır aralığı'], ok: 0, why: 'Biçim Boyacısı yalnızca biçimi kopyalar, yazıyı değil. Çift tıklarsanız birden çok başlığa sürebilirsiniz.' },
+    { t: 'Dipnot', pic: 'ab¹', q: 'Bir sözcüğe sayfanın altında küçük yazıyla açıklama eklemek için ne kullanılır?', opts: ['Başvurular → Dipnot Ekle', 'Ekle → Üst bilgi', 'Düzen → Sütunlar'], ok: 0, why: 'Dipnot sözcüğün yanına küçük bir sayı koyar; açıklama sayfanın altına yazılır. Kısayolu Alt + Ctrl + F.' },
+    { t: 'Köprü', pic: '🔗', q: 'Belgedeki “Çınar Belediyesi” yazısına tıklayınca belediyenin sitesi açılsın istiyorsunuz. Ne yaparsınız?', opts: ['Yazıyı seçip Ctrl + K ile bağlantı (köprü) eklerim', 'Yazıyı mavi renge boyarım', 'Adresi alt bilgiye yazarım'], ok: 0, why: 'Köprü eklenen yazı mavi ve altı çizili olur; Ctrl basılıyken tıklayınca site açılır.' },
   ],
 });
 
 export const test11 = test({
   id: 'test11', no: 11, title: '11. hafta testi',
-  desc: 'Hesap tablosu: formüller, doldurma, yazdırma üzerine 12 soru.',
+  desc: 'Hesap tablosu: formüller, doldurma, yazı işlevleri, YUVARLA, yazdırma üzerine 14 soru.',
   qs: [
     { t: 'Formül', pic: '=', q: 'B2 ile B5 arasındaki sayıların toplamını bulan formül hangisidir?', opts: ['=TOPLA(B2:B5)', '=B2+B5', 'TOPLA B2 B5'], ok: 0, why: 'Formüller = ile başlar. TOPLA(B2:B5) iki nokta ile aralığı verir: B2, B3, B4 ve B5.' },
     { t: 'Otomatik doldurma', pic: '■ ↓', q: 'A2 hücresine Ocak yazdınız. Aralık\'a kadar devam ettirmenin en hızlı yolu hangisi?', opts: ['Her ayı tek tek yazmak', 'Hücrenin sağ alt köşesindeki kareyi aşağı çekmek', 'Hücreyi silmek'], ok: 1, why: 'Doldurma tutamacı ay, gün ve sayı listelerini kendiliğinden devam ettirir.' },
@@ -671,6 +673,8 @@ export const test11 = test({
     { t: 'Yazdırma', pic: '🖨', q: 'Tablonun son sütunu ikinci kâğıda taşıyor. Hangisi sorunu çözer?', opts: ['Yazdırma ayarında “Tüm sütunları bir sayfaya sığdır”ı seçmek', 'Yazıcının kablosunu değiştirmek', 'Yazıcıyı kapatıp açmak'], ok: 0, why: 'Çözüm yazdırma ayarlarındadır: sütunları bir sayfaya sığdırmak ya da kâğıdı yatay yapmak. Kablonun ya da yazıcıyı kapatıp açmanın alakası yok.' },
     { t: 'DÜŞEYARA', pic: '🔎 =DÜŞEYARA(…)', q: 'Ürün adını yazınca fiyatını fiyat listesinden getiren işlev hangisidir?', opts: ['TOPLA', 'DÜŞEYARA', 'ORTALAMA'], ok: 1, why: 'DÜŞEYARA, bir listede aranan değeri bulup yanındaki bilgiyi getirir. Bulamazsa #YOK çıkar.' },
     { t: 'Excel hataları', pic: '#DEĞER!', q: 'Bir toplamda #DEĞER! hatası çıktı. En olası neden?', opts: ['Bir hücreye sayı yerine yazı yazılmış (ör. “iki yüz”)', 'Sütun dar', 'Dosya kaydedilmemiş'], ok: 0, why: 'Excel yazıyla yazılmış sayıyı toplayamaz; rakamla yazınca düzelir. Dar sütun ##### gösterir.' },
+    { t: 'Ad ve soyadı birleştirmek', pic: '=BİRLEŞTİR(…)', q: 'A2\'de ad, B2\'de soyad var. İkisini araya boşluk koyarak tek hücrede göstermek için hangisi yazılır?', opts: ['=BİRLEŞTİR(A2;" ";B2)', '=TOPLA(A2;B2)', '=A2+B2'], ok: 0, why: 'BİRLEŞTİR yazıları yan yana ekler; " " araya boşluk koyar. =A2&" "&B2 de aynı sonucu verir.' },
+    { t: 'YUVARLA', pic: '1785,714… → 1785,71', q: 'Bir bölmenin sonucunu kuruşa (virgülden sonra 2 basamak) yuvarlamak için?', opts: ['=YUVARLA(B8/B9;2)', '=TOPLA(B8/B9)', 'Sütunu daraltmak'], ok: 0, why: 'YUVARLA sayının kendisini yuvarlar; ikinci sayı virgülden sonra kaç basamak kalacağıdır (0 yazılırsa tam sayı).' },
   ],
 });
 
@@ -733,5 +737,25 @@ export const test14 = test({
     { t: 'IBAN', pic: 'TR…', q: 'Apartman yöneticisi IBAN\'ını mesajla gönderdi. Bankada nasıl yazarsınız?', opts: ['Mesajdan seçip kopyalar, bankadaki kutuya yapıştırırım', 'Bakarak elle yazarım', 'Yalnızca son 4 hanesini yazarım'], ok: 0, why: 'IBAN 26 karakterdir; tek rakam hatası paranın gitmemesine ya da yanlış kişiye gitmesine yol açar. Kopyala-yapıştır en güvenlisidir.' },
     { t: 'Sanal kart', pic: '💳', q: 'İnternet alışverişi için limitli sanal kart kullanmanın faydası nedir?', opts: ['Bilgileri çalınsa bile en fazla limiti kadar harcanabilir', 'Kargo ücretsiz olur', 'Şifre gerekmez'], ok: 0, why: 'Sanal kart asıl kartınızdan ayrı bir numaradır; iş bitince silinebilir.' },
     { t: 'Adıma kayıtlı hat', pic: '📱', q: 'e-Devlet\'te adınıza açılmış, bilmediğiniz bir telefon hattı gördünüz. Ne yaparsınız?', opts: ['Hattı açan operatöre başvurup kapattırırım; gerekirse savcılığa şikâyet ederim', 'Önemsemem', 'Hattı ben de kullanırım'], ok: 0, why: 'Dolandırıcılar kopyalanan kimlikle hat açabilir; hemen kapattırın.' },
+  ],
+});
+
+export const test15 = test({
+  id: 'test15', no: 15, title: '15. hafta testi',
+  desc: 'Bilgi güvenliği: yedekleme, iki adımlı doğrulama, sosyal medya, kişisel veriler, ortak Wi-Fi ve dolandırılınca yapılacaklar üzerine 13 soru.',
+  qs: [
+    { t: 'Yedek', pic: '💾', q: 'Yedek nedir?', opts: ['Önemli dosyaların başka bir yerde (USB bellek, harici disk, bulut) duran kopyası', 'Dosyanın adını değiştirmek', 'Dosyayı masaüstüne taşımak'], ok: 0, why: 'Yedek, asıl dosya kaybolunca işe yarayan kopyadır. Aynı bilgisayardaki ikinci klasör yedek sayılmaz.' },
+    { t: 'Yedeği denemek', pic: '💾 👁', q: 'Yedek aldıktan sonra ne yapmak iyi olur?', opts: ['Yedekteki bir iki dosyayı açıp çalıştığına bakmak', 'Asıl dosyaları hemen silmek', 'Belleği hep takılı bırakmak'], ok: 0, why: 'Açılmayan yedek, yedek değildir. Bakıp kontrol edin, sonra belleği güvenle çıkarıp saklayın.' },
+    { t: 'Üç kopya', pic: '💻 💾 ☁', q: '“Üç kopya” kuralına hangisi uyar?', opts: ['Bilgisayarda + USB bellekte + bulutta', 'Bilgisayarda üç ayrı klasörde', 'Yalnızca telefonda'], ok: 0, why: 'Kopyalardan biri başka bir cihazda, biri de evin dışında (bulutta) olsun; yangın ve hırsızlıkta da kurtulur.' },
+    { t: 'Fidye yazılımı', pic: '🔒💸', q: 'Bilgisayarda “Dosyalarınız şifrelendi, açmak için para gönderin” yazısı çıktı. Ne yaparsınız?', opts: ['Ödemem; bilgisayarı internetten ayırıp temizletir, yedekten geri yüklerim', 'Hemen öderim', 'Bilgisayarı satarım'], ok: 0, why: 'Ödemek dosyaların açılacağını garanti etmez. Asıl çare önceden alınmış yedektir.' },
+    { t: 'İki adımlı doğrulama', pic: '🔑 + 📱', q: 'İki adımlı doğrulama açıkken şifrenizi öğrenen biri hesabınıza girebilir mi?', opts: ['Telefonunuza gelen kod olmadan giremez', 'Hemen girer', 'Yalnızca gece girebilir'], ok: 0, why: 'Şifreden sonra telefonunuza gelen kod da istenir. Bu yüzden kodu kimseye söylemeyin.' },
+    { t: 'Yedek kodlar', pic: '🗝', q: 'İki adımlı doğrulamanın yedek kodları ne işe yarar?', opts: ['Telefonunuz kaybolunca ya da bozulunca hesaba girmeye', 'Şifreyi daha kısa yapmaya', 'Arkadaşlarla paylaşmaya'], ok: 0, why: 'Her yedek kod bir kez kullanılır. Kâğıda yazıp evde güvenli bir yerde saklayın.' },
+    { t: 'Kod isteyen arama', pic: '📞', q: '“Güvenlik ekibinden arıyoruz, telefonunuza gelen kodu söyleyin” diyen biri için ne düşünürsünüz?', opts: ['Dolandırıcıdır; kodu söylemem, kapatırım', 'Gerçekten güvenlik ekibidir', 'Kodun yarısını söylerim'], ok: 0, why: 'Hiçbir banka ya da site kodu telefonla istemez.' },
+    { t: 'Tatil paylaşımı', pic: '🏖', q: 'Tatile giderken sosyal medyada hangisi güvenlidir?', opts: ['Döndükten sonra, yalnızca arkadaşlara paylaşmak', 'Giderken “2 hafta ev boş” yazmak', 'Evin konumunu ekleyip herkese açık paylaşmak'], ok: 0, why: 'Evden uzakta olduğunuzu ve evinizin yerini aynı anda söylemek hırsıza davetiyedir.' },
+    { t: 'Taklit hesap', pic: '👥 👥', q: 'Zaten arkadaşınız olan birinin adıyla yeni bir arkadaşlık isteği geldi; ortak arkadaş yok, hesap yeni açılmış. Ne yaparsınız?', opts: ['Onaylamam; sahte hesap olarak bildiririm, gerekirse kişiye telefonla sorarım', 'Onaylarım', 'Ona şifremi gönderirim'], ok: 0, why: 'Dolandırıcılar tanıdığınızın adını ve fotoğrafını kopyalayıp sizden para ister.' },
+    { t: 'Acil para mesajı', pic: '💬 💸', q: 'Bir arkadaşınızın hesabından “Çok acil para lazım, kimseye söyleme” mesajı geldi. Ne yaparsınız?', opts: ['Para göndermem; arkadaşımı bildiğim numarasından ararım', 'Hemen gönderirim', 'Mesajdaki IBAN\'a yarısını gönderirim'], ok: 0, why: 'Hesaplar ele geçirilebilir. Acele ve gizlilik isteği dolandırıcılığın işaretidir.' },
+    { t: 'Anne kızlık soyadı', pic: '☎', q: 'Telefonda bir “kargo görevlisi” anne kızlık soyadınızı soruyor. Ne yaparsınız?', opts: ['Söylemem; kurumu kendi numarasından ben ararım', 'Söylerim', 'Yalnızca ilk harfini söylerim'], ok: 0, why: 'Anne kızlık soyadı bankalarda güvenlik sorusudur; kargo için gerekmez.' },
+    { t: 'Ortak Wi-Fi', pic: '📶 ☕', q: 'Kafedeki şifresiz Wi-Fi\'ye bağlısınız. Hangisini yapmazsınız?', opts: ['İnternet bankacılığı ve e-Devlet işlemi', 'Hava durumuna bakmak', 'Haber okumak'], ok: 0, why: 'Şifresiz ağda gönderdikleriniz başkalarınca görülebilir. Banka işi için ev ağınızı ya da mobil interneti kullanın; Windows sorarsa “Ortak ağ” seçin.' },
+    { t: 'Dolandırıldım', pic: '🆘', q: 'Kartınızdan tanımadığınız harcama yapıldı. İlk ne yaparsınız?', opts: ['Kartı hemen kapatırım (internet şubesi ya da kartın arkasındaki numara), sonra harcamaya itiraz ederim', 'Birkaç gün beklerim', 'Sosyal medyada herkese yazarım'], ok: 0, why: 'Sonra şifreleri değiştirin, ekran görüntüleriyle delil saklayın ve karakola ya da savcılığa şikâyette bulunun.' },
   ],
 });

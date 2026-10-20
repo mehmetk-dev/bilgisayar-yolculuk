@@ -430,7 +430,7 @@ function printCert() {
   const sc = testScore(lesson);
   const d = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   $('#printCard').innerHTML = `<div class="cert"><div class="cert-ic">🎓</div><h1>Kurs Bitirme Belgesi</h1><p class="cert-name">${esc(who || 'Kursiyer')}</p>
-    <p>14 haftalık <b>Temel Bilgisayar Kullanımı</b> kursunu tamamlamış ve kurs bitirme sınavında <b>${sc.right} / ${sc.total}</b> soruyu ilk denemede doğru cevaplamıştır.</p>
+    <p>15 haftalık <b>Temel Bilgisayar Kullanımı</b> kursunu tamamlamış ve kurs bitirme sınavında <b>${sc.right} / ${sc.total}</b> soruyu ilk denemede doğru cevaplamıştır.</p>
     <p class="cert-date">${d}</p><div class="cert-sign"><span>Eğitmen</span><span>İmza</span></div></div>`;
   print();
 }

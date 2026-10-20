@@ -1,7 +1,7 @@
 // Kelime İşlemci: Word benzeri, sayfa görünümlü yazı programı. Biçimlendirme (kalın, italik, altı çizili, üstü çizili,
 // alt/üst simge, yazı tipi, boyut, renk, vurgu), biçim boyacısı, stiller (başlıklar), hizalama, girinti, satır aralığı,
 // madde işaretleri, bul ve değiştir; tablo, resim, tarih, simge, bağlantı, sayfa sonu; kenar boşlukları, yönlendirme,
-// sütunlar; yazım denetimi ve sözcük sayısı; yakınlaştırma; .docx olarak kaydetme, açma, yazdırma ve PDF.
+// sütunlar; dipnot (Başvurular → Dipnot Ekle, Alt + Ctrl + F); yazım denetimi ve sözcük sayısı; yakınlaştırma; .docx olarak kaydetme, açma, yazdırma ve PDF.
 // İçerik bellekteki dosyada { html } olarak durur.
 import { esc, pictureURL, isImage } from './util.js';
 import { picHtml, pictureTools, WRAPS } from './word-resim.js';
@@ -52,7 +52,7 @@ export const TEMPLATES = {
 export function word({ desk, body, args, emit, setTitle }) {
   body.classList.add('wd');
   body.innerHTML = `
-    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button><button type="button" data-tab="pic" class="wd-tabpic" hidden>Resim Biçimi</button></div>
+    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="refs">Başvurular</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button><button type="button" data-tab="pic" class="wd-tabpic" hidden>Resim Biçimi</button></div>
     <div class="wd-rib" data-tab="home">
       <div class="wd-grp"><button type="button" data-cmd="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-cmd="redo" title="Yinele (Ctrl + Y)">↷</button></div>
       <div class="wd-grp"><button type="button" class="wd-clip" data-clip="cut" title="Kes (Ctrl + X)">✂</button><button type="button" class="wd-clip" data-clip="copy" title="Kopyala (Ctrl + C)">⧉</button><button type="button" class="wd-clip" data-clip="paste" title="Yapıştır (Ctrl + V)">📋</button><button type="button" class="wd-painter" title="Biçim Boyacısı: seçili yazının biçimini kopyalar, sonra başka bir yazıyı seçin">🖌</button></div>
@@ -85,6 +85,10 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp">Sayfa kenarlığı: <button type="button" data-border="yok">Yok</button><button type="button" data-border="kutu" title="Sayfanın çevresine çerçeve">▣ Kutu</button><button type="button" data-border="cift" title="Çift çizgili çerçeve">▨ Çift çizgi</button></div>
       <div class="wd-grp">Filigran (arka plana silik yazı): <button type="button" data-wm="ÖRNEKTİR">ÖRNEKTİR</button><button type="button" data-wm="ACİL">ACİL</button><button type="button" data-wm="TASLAK">TASLAK</button><button type="button" data-wm="">Yok</button></div>
     </div>
+    <div class="wd-rib" data-tab="refs" hidden>
+      <div class="wd-grp"><button type="button" class="wd-fnbtn" title="Dipnot ekle (Alt + Ctrl + F): imlecin olduğu yere küçük bir sayı koyar; açıklamasını sayfanın altına yazarsınız">ab¹ Dipnot Ekle</button></div>
+      <div class="wd-grp"><small class="wd-vnote">Dipnot: bir sözcüğe eklenen açıklama ya da kaynak. Sayfanın en altında küçük yazıyla, numarasıyla görünür; numaralar kendiliğinden sıralanır.</small></div>
+    </div>
     <div class="wd-rib" data-tab="mail" hidden>
       <div class="wd-grp"><button type="button" data-mm="list" title="Mektubun gideceği kişilerin listesi (hesap tablosu dosyası)">👥 Alıcıları seç…</button><span class="wd-mmcount"></span></div>
       <div class="wd-grp wd-mmwrap"><button type="button" class="wd-fieldbtn" disabled title="Listedeki bir sütunu (Ad, Adres…) mektuba yer tutucu olarak ekler">⊕ Birleştirme alanı ekle ▾</button><span class="wd-mpop wd-fields" hidden></span></div>
@@ -112,7 +116,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       <span class="wd-fn"></span><button type="button" data-f="next">Sonrakini bul</button><button type="button" data-f="repl" class="wd-rrow">Değiştir</button><button type="button" data-f="all" class="wd-rrow">Tümünü değiştir</button><button type="button" data-f="close" title="Kapat">✕</button></div>
     <div class="wd-spane" hidden></div>
     <div class="wd-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="pdf">📕 PDF olarak kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button><button type="button" data-file="close">✕ Kapat</button></div>
-    <div class="wd-scroll"><div class="wd-ruler" hidden><span></span></div><div class="wd-hf wd-hdr" contenteditable="true" spellcheck="false" data-ph="Üst bilgi" hidden></div><div class="wd-page" contenteditable="true" spellcheck="false"><p><br></p></div><div class="wd-hf wd-ftr" hidden><span class="wd-ftxt" contenteditable="true" spellcheck="false" data-ph="Alt bilgi"></span><span class="wd-pn" hidden></span></div></div>
+    <div class="wd-scroll"><div class="wd-ruler" hidden><span></span></div><div class="wd-hf wd-hdr" contenteditable="true" spellcheck="false" data-ph="Üst bilgi" hidden></div><div class="wd-page" contenteditable="true" spellcheck="false"><p><br></p></div><div class="wd-fns" hidden><ol></ol></div><div class="wd-hf wd-ftr" hidden><span class="wd-ftxt" contenteditable="true" spellcheck="false" data-ph="Alt bilgi"></span><span class="wd-pn" hidden></span></div></div>
     <div class="wd-status"><span class="wd-words"></span><span class="wd-lang">Türkçe (Türkiye)</span><span class="wd-zoom"><button type="button" data-zoom="-10" title="Uzaklaştır">−</button><input type="range" class="wd-zr" min="50" max="200" step="10" value="100" aria-label="Yakınlaştırma"><button type="button" data-zoom="10" title="Yakınlaştır">+</button><b>%100</b></span></div>`;
   const $ = (s) => body.querySelector(s);
   const page = $('.wd-page');
@@ -129,6 +133,24 @@ export function word({ desk, body, args, emit, setTitle }) {
     return Math.max(page.querySelectorAll('hr.wd-pb').length + 1, Math.ceil(h / (page.offsetWidth * (page.classList.contains('yatay') ? 0.707 : 1.414) || 1)));
   };
   const hdr = $('.wd-hdr'), ftr = $('.wd-ftr'), ftxt = $('.wd-ftxt'), pn = $('.wd-pn');
+  // Dipnotlar: metinde <sup class="wd-fnref" data-fn="f1">1</sup>, sayfanın altında aynı data-fn'li madde.
+  // Numaralar metindeki sıraya göre verilir; metinden silinen dipnotun açıklaması da kalkar.
+  const fns = $('.wd-fns'), fnList = fns.querySelector('ol');
+  let fnSeq = 1;
+  function renumberFn() {
+    const refs = [...page.querySelectorAll('sup.wd-fnref')];
+    const lis = new Map([...fnList.children].map((li) => [li.dataset.fn, li]));
+    refs.forEach((r, i) => { r.textContent = i + 1; });
+    const keep = refs.map((r) => lis.get(r.dataset.fn)).filter(Boolean);
+    if (keep.length !== fnList.children.length || keep.some((li, i) => fnList.children[i] !== li)) fnList.replaceChildren(...keep);
+    fns.hidden = !keep.length;
+  }
+  function setFn(list = []) {
+    fnList.innerHTML = list.map((f) => `<li data-fn="${esc(f.id)}"><span class="wd-fnt" contenteditable="true" spellcheck="false">${f.html || ''}</span></li>`).join('');
+    fnSeq = list.reduce((m, f) => Math.max(m, +String(f.id).slice(1) || 0), 0) + 1;
+    renumberFn();
+  }
+  const fnInfo = () => [...fnList.children].map((li, i) => ({ n: i + 1, text: li.innerText.trim() }));
   const words = () => {
     const pc = pageCount();
     $('.wd-words').textContent = `Sayfa 1 / ${pc} · ${countWords()} sözcük`;
@@ -153,6 +175,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     pics.refresh();
     setLayout(layout, true);
     setHF(hf);
+    setFn(hf.footnotes);
     fileName = name; folder = fld; dirty = false;
     title(); words();
   }
@@ -245,7 +268,19 @@ export function word({ desk, body, args, emit, setTitle }) {
     }
   }
 
-  function changed() { dirty = true; title(); words(); }
+  function changed() { dirty = true; renumberFn(); title(); words(); }
+  function addFootnote() {
+    const id = 'f' + fnSeq++;
+    insertHtml(`<sup class="wd-fnref" contenteditable="false" data-fn="${id}" title="Dipnot">*</sup>`, 'footnote');
+    const li = document.createElement('li');
+    li.dataset.fn = id;
+    li.innerHTML = '<span class="wd-fnt" contenteditable="true" spellcheck="false"></span>';
+    fnList.append(li);
+    renumberFn();
+    if (!page.querySelector(`sup[data-fn="${id}"]`)) { li.remove(); renumberFn(); return; }
+    li.querySelector('.wd-fnt').focus();
+    emit('doc-footnote', { count: fnList.children.length, n: [...fnList.children].indexOf(li) + 1 });
+  }
 
   function exec(cmd, value = null) {
     restore();
@@ -322,7 +357,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (c === 'print') {
       const pages = pageCount();
       emit('doc-print-open', { pages });
-      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Belge1', preview: { html: cleanHtml(), pages, orient: layout.orient, border: layout.border, wm: layout.wm, padding: MARGINS[layout.margin][2] } });
+      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Belge1', preview: { html: cleanHtml() + (fnList.children.length ? `<hr style="width:30%;margin:1.5em 0 0.3em"><ol style="font-size:8pt;padding-left:1.4em;margin:0">${[...fnList.children].map((li) => `<li>${li.querySelector('.wd-fnt').innerHTML}</li>`).join('')}</ol>` : ''), pages, orient: layout.orient, border: layout.border, wm: layout.wm, padding: MARGINS[layout.margin][2] } });
       if (r) { desk.toast('Yazdırılıyor', `“${esc(fileName || 'Belge1')}” → ${esc(r.printer)}`, '🖨'); emit('doc-print', { ...r, doc: fileName, pages }); }
       return;
     }
@@ -379,7 +414,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     c.querySelectorAll('.wd-field').forEach((x) => { x.textContent = `«${x.dataset.field}»`; x.classList.remove('pv'); }); // önizleme kaydedilmez
     return c.innerHTML;
   }
-  const content = () => ({ html: cleanHtml(), layout: { ...layout }, header: hdr.hidden ? '' : hdr.innerHTML, footer: ftr.hidden ? '' : ftxt.innerHTML, pageNum: !pn.hidden });
+  const content = () => ({ html: cleanHtml(), layout: { ...layout }, header: hdr.hidden ? '' : hdr.innerHTML, footer: ftr.hidden ? '' : ftxt.innerHTML, pageNum: !pn.hidden, footnotes: [...fnList.children].map((li) => ({ id: li.dataset.fn, html: li.querySelector('.wd-fnt').innerHTML })) });
 
   // ---- Paragraf: stiller ve satır aralığı ----
   const BLOCKS = /^(P|H1|H2|H3|DIV|LI|BLOCKQUOTE)$/;
@@ -780,15 +815,19 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.dataset.hilite) { $('.wd-hpal').hidden = true; if (t.dataset.hilite !== 'transparent') $('.wd-hilite i').style.background = t.dataset.hilite; return exec('hiliteColor', t.dataset.hilite); }
     if (t.classList.contains('wd-sym')) return pal('.wd-spal');
     if (t.dataset.sym) { $('.wd-spal').hidden = true; return insertHtml(esc(t.dataset.sym), 'symbol'); }
-    if (t.classList.contains('wd-link')) { pal('.wd-lpop'); setTimeout(() => $('.wd-lurl').focus(), 0); return; }
+    if (t.classList.contains('wd-link')) { if (t.closest('.wd-rib').hidden) $('.wd-tabs [data-tab="insert"]').click(); pal('.wd-lpop'); // Ctrl + K başka sekmedeyken de çalışsın
+      setTimeout(() => $('.wd-lurl').focus(), 0); return; }
     if (t.classList.contains('wd-lok')) {
       const u = $('.wd-lurl').value.trim();
       $('.wd-lpop').hidden = true;
       if (!u) return;
       const sel = range && !range.collapsed ? range.toString() : u;
       $('.wd-lurl').value = '';
-      return insertHtml(`<a href="https://${esc(u.replace(/^https?:\/\//, ''))}" title="Ctrl + tık: bağlantıyı aç">${esc(sel)}</a>&nbsp;`, 'link');
+      insertHtml(`<a href="https://${esc(u.replace(/^https?:\/\//, ''))}" title="Ctrl + tık: bağlantıyı aç">${esc(sel)}</a>&nbsp;`, 'link');
+      emit('doc-link', { url: u.replace(/^https?:\/\//, ''), text: sel });
+      return;
     }
+    if (t.classList.contains('wd-fnbtn')) return addFootnote();
     if (t.classList.contains('wd-pb')) return insertHtml('<hr class="wd-pb"><p><br></p>', 'pagebreak');
     if (t.classList.contains('wd-hdrbtn')) return showHF('h');
     if (t.classList.contains('wd-ftrbtn')) return showHF('f');
@@ -836,6 +875,12 @@ export function word({ desk, body, args, emit, setTitle }) {
   });
 
   page.addEventListener('input', () => { changed(); emit('doc-input', { text: page.innerText }); });
+  fns.addEventListener('input', (e) => {
+    const li = e.target.closest('li');
+    changed();
+    if (li) emit('doc-fn-text', { n: [...fnList.children].indexOf(li) + 1, text: li.innerText.trim() });
+  });
+  fns.addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || ''); });
   for (const [el, k] of [[hdr, 'header'], [ftxt, 'footer']]) {
     el.addEventListener('input', () => { changed(); emit('doc-hf', { which: k, text: el.innerText.trim() }); });
     el.addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || ''); });
@@ -868,6 +913,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (e.key === 'Escape' && painter) { e.preventDefault(); const was = painter.sticky; stopPainter(); if (was) emit('doc-painter', { stage: 'stop' }); return; }
+    if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyF') { e.preventDefault(); addFootnote(); return; }
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
     const map = { KeyB: 'bold', KeyI: 'italic', KeyU: 'underline', KeyL: 'justifyLeft', KeyE: 'justifyCenter', KeyR: 'justifyRight', KeyJ: 'justifyFull' };
     if (map[e.code]) { e.preventDefault(); exec(map[e.code]); emit('doc-shortcut', { cmd: map[e.code] }); return; }
@@ -914,7 +960,8 @@ export function word({ desk, body, args, emit, setTitle }) {
         fields: [...page.querySelectorAll('.wd-field')].map((x) => x.dataset.field), merge: mm && { list: mm.name, count: mm.rows.length, preview: mm.preview },
         ruler: !$('.wd-ruler').hidden, links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,
-        header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: !pn.hidden,
+        header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: !pn.hidden, footnotes: fnInfo(),
+        linkList: [...page.querySelectorAll('a[href]')].map((a) => ({ url: a.getAttribute('href').replace(/^https?:\/\//, ''), text: a.innerText.trim() })),
       };
     },
     confirmClose: confirmDiscard,

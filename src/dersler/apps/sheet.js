@@ -1,6 +1,7 @@
 // Hesap Tablosu: Excel benzeri çalışma sayfası. Hücre seçme ve yazma; formüller (+ − * / ^ & ve karşılaştırma,
-// TOPLA, ORTALAMA, MAK, MİN, SAY, EĞER, EĞERSAY, ETOPLA, YUVARLA); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
-// doldurma tutamacı; otomatik toplam; kalın, para ve yüzde biçimi; koşullu biçimlendirme; sıralama; filtre; sütun grafiği.
+// TOPLA, ORTALAMA, MAK, MİN, SAY, EĞER, EĞERSAY, ETOPLA, YUVARLA, BİRLEŞTİR, BÜYÜKHARF, KÜÇÜKHARF, YAZIM.DÜZENİ); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
+// doldurma tutamacı; otomatik toplam; kalın, para ve yüzde biçimi; koşullu biçimlendirme; sıralama; filtre; sütun grafiği;
+// sayfa koruması (kilidi açılan hücreler dışında değişiklik yapılamaz, isteğe bağlı parola).
 // Türkçe Excel gibi: ondalık ayırıcı virgül, işlev bağımsız değişkenleri noktalı virgülle ayrılır.
 import { esc } from './util.js';
 
@@ -68,6 +69,13 @@ const FUNCS = {
     return a[0].vals.reduce((s, v, i) => (t(v) && typeof sum[i] === 'number' ? s + sum[i] : s), 0);
   },
 };
+// Yazı işlevleri: sayı yazıya Türkçe biçimde (virgüllü, binlik ayırıcısız) çevrilir; harfler Türkçe kurallarla büyür/küçülür (i ↔ İ, ı ↔ I)
+const txt = (v) => (typeof v === 'number' ? v.toLocaleString('tr-TR', { maximumFractionDigits: 10, useGrouping: false }) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v ?? ''));
+const one = (a) => { if (a.length !== 1 || isRange(a[0])) throw new FErr('#DEĞER!'); return txt(a[0]); };
+FUNCS['BİRLEŞTİR'] = (a) => { if (!a.length) throw new FErr('#DEĞER!'); return a.flatMap((x) => (isRange(x) ? x.vals : [x])).map(txt).join(''); };
+FUNCS['BÜYÜKHARF'] = (a) => one(a).toLocaleUpperCase('tr');
+FUNCS['KÜÇÜKHARF'] = (a) => one(a).toLocaleLowerCase('tr');
+FUNCS['YAZIM.DÜZENİ'] = (a) => one(a).toLocaleLowerCase('tr').replace(/(^|[^\p{L}])(\p{L})/gu, (m, b, c) => b + c.toLocaleUpperCase('tr'));
 // DÜŞEYARA(aranan; tablo; sütun_no; yanlış): tablonun ilk sütununda aranan değeri bulur, aynı satırdaki sütun_no. sütunun değerini verir
 FUNCS['DÜŞEYARA'] = (a, num) => {
   if (a.length < 3 || !isRange(a[1])) throw new FErr('#DEĞER!');
@@ -83,12 +91,13 @@ FUNCS['DÜŞEYARA'] = (a, num) => {
   if (hit < 0) throw new FErr('#YOK');
   return t.vals[hit * t.cols + n - 1];
 };
-const ALIAS = { VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', COUNT: 'SAY', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA' };
+const ALIAS = { VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', COUNT: 'SAY', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA',
+  BIRLESTIR: 'BİRLEŞTİR', CONCATENATE: 'BİRLEŞTİR', CONCAT: 'BİRLEŞTİR', BUYUKHARF: 'BÜYÜKHARF', UPPER: 'BÜYÜKHARF', KUCUKHARF: 'KÜÇÜKHARF', LOWER: 'KÜÇÜKHARF', 'YAZIM.DUZENI': 'YAZIM.DÜZENİ', PROPER: 'YAZIM.DÜZENİ' };
 
 // Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır)
 function evaluate(src, get) {
-  const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+\$?\d*)|(<=|>=|<>|.))/y;
-  const reInt = /\s*(?:(\d+)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+\$?\d*)|(<=|>=|<>|.))/y; // virgül ondalık değil, ayırıcı
+  const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü]+)*\$?\d*)|(<=|>=|<>|.))/y;
+  const reInt = /\s*(?:(\d+)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü]+)*\$?\d*)|(<=|>=|<>|.))/y; // virgül ondalık değil, ayırıcı
   // Formülde hiç ; yoksa işlev parantezinin içindeki virgül ayırıcıdır: =DÜŞEYARA(A2,$F$2:$G$7,2,0). Dışında (=2,5*3) ondalık virgüldür.
   const commaSep = !src.replace(/"[^"]*"/g, '').includes(';');
   const toks = [], calls = [];
@@ -236,6 +245,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Sütun grafiği</button><button type="button" data-act="pie" title="Seçili alandan pasta grafiği: her parçanın bütünün ne kadarı olduğunu gösterir">🥧 Pasta grafiği</button>
       <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri doğrulama: hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button><button type="button" data-act="pivot" title="Özet Tablo: uzun listeyi formülsüz özetler (ör. her kategorinin toplamı)">🧮 Özet Tablo</button>
       <span class="xl-sep"></span><button type="button" data-act="merge" title="Seçili hücreleri tek hücre yapar ve ortalar">⊞ Birleştir ve Ortala</button><button type="button" data-act="wrap" title="Uzun yazıyı hücre içinde alt satıra indirir">↲ Metni Kaydır</button><button type="button" data-act="freeze" title="Aşağı inerken en üst satır ekranda kalır">❄ Üst Satırı Dondur</button>
+      <span class="xl-sep"></span><button type="button" data-act="unlock" title="Hücre kilidini aç: sayfa korunsa da seçili hücrelere yazılabilsin">🔓 Hücre Kilidini Aç</button><button type="button" data-act="protect" class="xl-protbtn" title="Sayfayı Koru: kilidi açılmamış hücreler değiştirilemez">🔒 Sayfayı Koru</button>
       <span class="xl-sep"></span><span class="xl-lab">Yazdırma:</span><button type="button" data-act="orient" title="Kâğıdı yatay yapar">▭ Yatay</button><button type="button" data-act="fit" title="Bütün sütunları tek sayfaya sığdırır">⤢ Tüm sütunları bir sayfaya sığdır</button><button type="button" data-act="grid" title="Kâğıtta tablo çizgileri çıksın">▦ Kılavuz çizgilerini yazdır</button>
     </div>
     <div class="xl-pop" hidden></div>
@@ -262,6 +272,24 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   let colW = {}; // sütun genişlikleri (em): { 0: 12 }
   let merges = []; // birleştirilmiş hücreler: { r1, c1, r2, c2 }
   let frozen = false; // üst satır dondurulmuş mu
+  let prot = null; // sayfa koruması: { pass } (pass boşsa parolasız); kilidi açık hücreler fmt[a].open
+  const locked = (a) => !!prot && !fmt[a]?.open;
+  // Korunan hücreye yazılmak istenince Excel'deki uyarı
+  function lockedWarn(a) {
+    emit('xl-locked', { addr: a });
+    desk.dialogs.ask({ title: 'Hesap Tablosu', icon: '🔒', text: '<b>Değiştirmeye çalıştığınız hücre korunan bir sayfada.</b><br>Değişiklik yapmak için önce <b>🔒 Sayfa Korumasını Kaldır</b> düğmesine basın. Parola istenebilir.', buttons: [['ok', 'Tamam', true]] });
+    return true;
+  }
+  const guard = (ids) => { const hit = ids.find(locked); return hit ? lockedWarn(hit) : false; };
+  function protectDialog() {
+    const b = $('[data-act="protect"]');
+    openPop(prot ? `<b>🔓 Sayfa Korumasını Kaldır</b>${prot.pass ? '<p>Korurken verdiğiniz parolayı yazın:</p><div class="xl-row"><input type="password" class="xl-ppass" size="14" autocomplete="off"></div>' : '<p>Bu sayfa parolasız korunuyor.</p>'}<p class="xl-vnote"></p>
+      <div class="xl-row"><button type="button" class="xl-unprot primary">Korumayı kaldır</button><button type="button" class="xl-px">İptal</button></div>`
+      : `<b>🔒 Sayfayı Koru</b><p>Kilidi açılmamış bütün hücreler değiştirilemez. ${Object.values(fmt).some((f) => f?.open) ? 'Kilidini açtığınız hücrelere yine yazılabilir.' : 'Bazı hücrelere yazılabilsin istiyorsanız önce onları seçip <b>🔓 Hücre Kilidini Aç</b>\'a basın.'}</p>
+      <div class="xl-row">Parola (isteğe bağlı): <input type="password" class="xl-ppass" size="12" autocomplete="off"></div><p class="xl-vnote">Parolayı unutursanız korumayı kaldıramazsınız; bir yere yazın.</p>
+      <div class="xl-row"><button type="button" class="xl-prot primary">Koru</button><button type="button" class="xl-px">İptal</button></div>`, b);
+    pop.querySelector('.xl-ppass')?.focus();
+  }
   let pageSet = { orient: 'dikey', fit: false, grid: false }; // yazdırma ayarları
   let sheets = [{ name: 'Sayfa1', color: '' }]; // çalışma sayfaları; geçerli olanın verisi yukarıdaki değişkenlerde durur
   let curSheet = 0;
@@ -348,12 +376,15 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       el.classList.toggle('wrap', !!fmt[a]?.wrap);
       el.classList.toggle('err', !!s.err);
       el.classList.toggle('b', !!fmt[a]?.b);
+      el.classList.toggle('xl-open', !!prot && !!fmt[a]?.open);
       const col = condColor(a, r, c, s.v);
       el.dataset.cond = col || '';
     }
     wrap.classList.toggle('frozen', frozen);
     wrap.style.setProperty('--xl-th', body.querySelector('thead').offsetHeight + 'px');
-    for (const [k, on] of [['orient', pageSet.orient === 'yatay'], ['fit', pageSet.fit], ['grid', pageSet.grid], ['freeze', frozen]]) $(`[data-act="${k}"]`)?.classList.toggle('on', on);
+    for (const [k, on] of [['orient', pageSet.orient === 'yatay'], ['fit', pageSet.fit], ['grid', pageSet.grid], ['freeze', frozen], ['protect', !!prot]]) $(`[data-act="${k}"]`)?.classList.toggle('on', on);
+    $('.xl-protbtn').textContent = prot ? '🔓 Sayfa Korumasını Kaldır' : '🔒 Sayfayı Koru';
+    wrap.classList.toggle('prot', !!prot);
     renderFilter();
     renderSheets();
     paintSel();
@@ -397,6 +428,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   }
 
   function setCell(a, raw) {
+    if (locked(a)) { lockedWarn(a); return; }
     raw = raw.trim();
     if (raw) cells[a] = raw; else delete cells[a];
     if (/%/.test(raw) && !raw.startsWith('=') && parseNumber(raw) !== null) (fmt[a] ||= {}).f = 'pct';
@@ -411,6 +443,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   function startEdit(initial = null, enterMode = true) {
     if (editing) return;
     const a = addr(act.r, act.c), el = td(a);
+    if (locked(a)) { lockedWarn(a); return; }
     const inp = document.createElement('input');
     inp.className = 'xl-in';
     inp.spellcheck = false;
@@ -794,7 +827,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
 
   // ---- Dosya ----
   const fsApi = desk.fs.dialogApi();
-  const snap = () => ({ cells: { ...cells }, fmt: structuredClone(fmt), rules: structuredClone(rules), valids: structuredClone(valids), colW: { ...colW }, merges: structuredClone(merges), frozen, pageSet: { ...pageSet } });
+  const snap = () => ({ cells: { ...cells }, fmt: structuredClone(fmt), rules: structuredClone(rules), valids: structuredClone(valids), colW: { ...colW }, merges: structuredClone(merges), frozen, pageSet: { ...pageSet }, prot: prot && { ...prot } });
   const content = () => {
     const cur = snap();
     if (sheets.length === 1) return cur;
@@ -812,7 +845,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (!skipStash) stash();
     curSheet = i;
     const d = sheets[i].data || {};
-    cells = { ...(d.cells || {}) }; fmt = d.fmt || {}; rules = d.rules || []; valids = d.valids || []; colW = { ...(d.colW || {}) }; merges = d.merges || []; frozen = !!d.frozen; pageSet = { orient: 'dikey', fit: false, grid: false, ...(d.pageSet || {}) };
+    cells = { ...(d.cells || {}) }; fmt = d.fmt || {}; rules = d.rules || []; valids = d.valids || []; colW = { ...(d.colW || {}) }; merges = d.merges || []; frozen = !!d.frozen; pageSet = { orient: 'dikey', fit: false, grid: false, ...(d.pageSet || {}) }; prot = d.prot || null;
     filt = null; chart = null; clip = null; $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
     render();
@@ -895,12 +928,12 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   function load(data, name = null, fld = folder) {
     cells = { ...(data?.cells || {}) }; fmt = structuredClone(data?.fmt || {}); rules = structuredClone(data?.rules || []); valids = structuredClone(data?.valids || []); filt = null; clip = null;
     if (data?.sheets?.length) {
-      sheets = data.sheets.map((x) => ({ name: x.name, color: x.color || '', data: structuredClone({ cells: x.cells, fmt: x.fmt, rules: x.rules, valids: x.valids, colW: x.colW, merges: x.merges, frozen: x.frozen, pageSet: x.pageSet }) }));
+      sheets = data.sheets.map((x) => ({ name: x.name, color: x.color || '', data: structuredClone({ cells: x.cells, fmt: x.fmt, rules: x.rules, valids: x.valids, colW: x.colW, merges: x.merges, frozen: x.frozen, pageSet: x.pageSet, prot: x.prot }) }));
       curSheet = Math.min(data.cur || 0, sheets.length - 1);
       const d = sheets[curSheet].data;
       cells = { ...(d.cells || {}) }; fmt = d.fmt || {}; rules = d.rules || []; valids = d.valids || []; data = d;
     } else { sheets = [{ name: 'Sayfa1', color: '' }]; curSheet = 0; }
-    colW = { ...(data?.colW || {}) }; merges = structuredClone(data?.merges || []); frozen = !!data?.frozen; pageSet = { orient: 'dikey', fit: false, grid: false, ...(data?.pageSet || {}) };
+    colW = { ...(data?.colW || {}) }; merges = structuredClone(data?.merges || []); frozen = !!data?.frozen; prot = data?.prot ? { ...data.prot } : null; pageSet = { orient: 'dikey', fit: false, grid: false, ...(data?.pageSet || {}) };
     fileName = name; folder = fld; dirty = false; chart = null;
     $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
@@ -983,7 +1016,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   let dragging = false;
   wrap.addEventListener('mousedown', (e) => {
     if (e.target.closest('.xl-fb')) { e.preventDefault(); filterDialog(+e.target.closest('.xl-fb').dataset.col); return; }
-    if (e.target.closest('.xl-fh')) { e.preventDefault(); if (editing) commit(0, 0); fill = { s: sel(), dir: null, to: null }; return; }
+    if (e.target.closest('.xl-fh')) { e.preventDefault(); if (editing) commit(0, 0); if (prot) { lockedWarn(addr(act.r, act.c)); return; } fill = { s: sel(), dir: null, to: null }; return; }
     if (e.target.closest('.xl-vb')) {
       e.preventDefault();
       const v = validAt(act.r, act.c);
@@ -1037,6 +1070,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (e.ctrlKey || e.metaKey) {
+      if (prot && ['KeyX', 'KeyV', 'KeyD', 'KeyB'].includes(e.code)) { const ids = []; eachSel((a) => ids.push(a)); if (guard(ids)) { e.preventDefault(); return; } }
       if (e.code === 'KeyC') { e.preventDefault(); copy(false); }
       if (e.code === 'KeyX') { e.preventDefault(); copy(true); }
       if (e.code === 'KeyV') { e.preventDefault(); paste(); }
@@ -1052,6 +1086,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (k === 'Delete' || k === 'Backspace') {
       e.preventDefault();
       if (k === 'Backspace') { startEdit(''); return; }
+      const ids = []; eachSel((a) => ids.push(a));
+      if (guard(ids)) return;
       eachSel((a) => { delete cells[a]; });
       dirty = true; render();
       emit('xl-edit', { addr: addr(act.r, act.c), raw: '', value: '', text: '', cleared: selAddr() });
@@ -1070,14 +1106,14 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   });
   body.addEventListener('mousedown', (e) => {
     if (!e.target.closest('.xl-menu, .xl-file')) $('.xl-menu').hidden = true;
-    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], .xl-fb, .xl-vb')) pop.hidden = true;
+    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], [data-act="protect"], .xl-fb, .xl-vb')) pop.hidden = true;
     if (e.target.closest('.xl-rib button')) e.preventDefault();
   });
   pop.addEventListener('change', (e) => {
     if (e.target.classList.contains('xl-fa')) pop.querySelectorAll('.xl-flist input').forEach((b) => { b.checked = e.target.checked; });
     else if (e.target.closest('.xl-flist')) pop.querySelector('.xl-fa').checked = [...pop.querySelectorAll('.xl-flist input')].every((b) => b.checked);
   });
-  pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); pop.querySelector('.xl-cok, .xl-fok')?.click(); } e.stopPropagation(); });
+  pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); pop.querySelector('.xl-cok, .xl-fok, .xl-prot, .xl-unprot')?.click(); } e.stopPropagation(); });
   body.addEventListener('click', (e) => {
     const t = e.target.closest('button');
     if (!t) return;
@@ -1122,9 +1158,37 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (t.classList.contains('xl-ch-x')) { chart = null; $('.xl-chart').hidden = true; emit('xl-chart-remove'); return; }
+    if (t.classList.contains('xl-prot')) {
+      prot = { pass: pop.querySelector('.xl-ppass').value };
+      pop.hidden = true; dirty = true; render();
+      const open = Object.entries(fmt).filter(([, f]) => f?.open).map(([k]) => k);
+      emit('xl-protect', { on: true, pass: !!prot.pass, open });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
+    if (t.classList.contains('xl-unprot')) {
+      const pw = pop.querySelector('.xl-ppass')?.value ?? '';
+      if (prot.pass && pw !== prot.pass) { const n = pop.querySelector('.xl-vnote'); n.textContent = 'Parola yanlış.'; n.classList.add('bad'); emit('xl-protect-err'); return; }
+      prot = null; pop.hidden = true; dirty = true; render();
+      emit('xl-protect', { on: false });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
     const a = t.dataset.act;
     if (!a) return;
     if (editing) commit(0, 0);
+    if (a === 'protect') return protectDialog();
+    if (prot && a !== 'chart' && a !== 'pie' && a !== 'filter') { lockedWarn(addr(act.r, act.c)); return; }
+    if (a === 'unlock') {
+      let all = true;
+      eachSel((x) => { if (!fmt[x]?.open) all = false; });
+      eachSel((x) => { (fmt[x] ||= {}).open = !all; });
+      dirty = true; render();
+      desk.toast('Hücre kilidi', all ? 'Seçili hücreler yeniden kilitlendi.' : `${selAddr()} hücrelerinin kilidi açıldı. Sayfayı korusanız da bu hücrelere yazılabilir.`, '🔓', 4000);
+      emit('xl-unlock', { range: selAddr(), open: !all });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
     if (a === 'cond') return condDialog();
     if (a === 'valid') return validDialog();
     if (a === 'pivot') return pivotDialog();
@@ -1163,6 +1227,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     get sheetIndex() { return curSheet; },
     sheetCell: (i, a) => (i === curSheet ? cells[a] : sheets[i]?.data?.cells?.[a]) || '',
     get frozen() { return frozen; },
+    get protected() { return !!prot; },
+    unlocked: (a) => !!fmt[a]?.open,
     get pageSet() { return { ...pageSet }; },
     get hashes() { return body.querySelectorAll('td[data-hash="1"]').length; },
     hash: (a) => td(a).dataset.hash === '1',

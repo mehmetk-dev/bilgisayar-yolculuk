@@ -1,4 +1,4 @@
-// Ek bölüm: Kurs bitirme sınavı (14 haftanın tamamından 25 soru; %70 ve üstünde belge yazdırılır)
+// Ek bölüm: Kurs bitirme sınavı (15 haftanın tamamından 28 soru; %70 ve üstünde belge yazdırılır)
 // ve Büyük parkur (torunun doğum günü: klasör, davetiye, harcama tablosu, e-posta, harita, sanal kart).
 import { desktopReady, norm } from './common.js';
 import { test } from './testler.js';
@@ -8,9 +8,9 @@ import { KURS_TC } from '../apps/siteler-gunluk.js';
 
 export const kursSinavi = {
   ...test({
-    id: 'kurs-sinavi', icon: '🎓', title: 'Kurs bitirme sınavı (14 haftanın özeti)',
-    desc: '14 haftanın tamamından 25 soru. Soruların en az %70\'ini ilk denemede bilirseniz kurs bitirme belgenizi yazdırabilirsiniz.',
-    intro: '14 hafta boyunca öğrendiklerimizi',
+    id: 'kurs-sinavi', icon: '🎓', title: 'Kurs bitirme sınavı (15 haftanın özeti)',
+    desc: '15 haftanın tamamından 28 soru. Soruların en az %70\'ini ilk denemede bilirseniz kurs bitirme belgenizi yazdırabilirsiniz.',
+    intro: '15 hafta boyunca öğrendiklerimizi',
     scene: '<div class="sc-big">🎓</div><p>Kurs bitirme sınavı</p>',
     qs: [
       { t: '1. Dosya açmak', pic: '🖱🖱', q: 'Masaüstündeki bir dosyayı açmak için ne yaparız?', opts: ['Bir kez sağ tıklarız', 'Sol tuşla hızlıca iki kez tıklarız (çift tık)', 'Fareyi sallarız'], ok: 1, why: 'Çift tık dosyayı açar. Tek tık yalnızca seçer, sağ tık menüyü açar.' },
@@ -38,6 +38,9 @@ export const kursSinavi = {
       { t: '23. Sanal kart', pic: '💳', q: 'İnternet alışverişi için neden limitli sanal kart kullanılır?', opts: ['Bilgileri çalınsa bile en fazla limiti kadar harcanabilir', 'Daha çok puan kazandırır', 'Faizi yoktur'], ok: 0, why: 'Sanal kart asıl kartınızdan ayrıdır; iş bitince silinebilir.' },
       { t: '24. Bilmediğiniz hat', pic: '📱', q: 'e-Devlet\'te adınıza açılmış, tanımadığınız bir telefon hattı gördünüz. Ne yaparsınız?', opts: ['Hattı açan operatöre başvurup kapattırırım', 'Önemsemem', 'Hattı kullanırım'], ok: 0, why: 'Adınıza açılan hat dolandırıcılıkta kullanılabilir; hemen kapattırın, gerekirse savcılığa başvurun.' },
       { t: '25. Yapay zekâ', pic: '🤖', q: 'Yapay zekâ sohbet aracı size bir ilacın dozunu söyledi. Ne yaparsınız?', opts: ['Doktoruma ya da eczacıma sorarım', 'Hemen uygularım', 'Herkese tavsiye ederim'], ok: 0, why: 'Yapay zekâ yanılabilir; sağlık, para ve hukuk konularında mutlaka uzmana danışın.' },
+      { t: '26. Yedek', pic: '💻 💾 ☁', q: 'Torunların fotoğraflarını kaybetmemek için en güvenli yol hangisi?', opts: ['Bilgisayarda + USB bellekte + bulutta kopyası olsun; yedekten bir dosyayı açıp denerim', 'Yalnızca bilgisayarda dursun', 'Masaüstünde ikinci bir klasöre kopyalarım'], ok: 0, why: 'Üç kopya: biri başka bir cihazda, biri evin dışında. Fidye yazılımına karşı da en iyi çare yedektir.' },
+      { t: '27. İki adımlı doğrulama', pic: '🔑 + 📱', q: 'E-posta hesabınızda iki adımlı doğrulama açıksa şifrenizi öğrenen biri ne yapabilir?', opts: ['Telefonunuza gelen kod olmadan giremez', 'Hemen girer', 'Bütün postaları siler'], ok: 0, why: 'Kodu kimseye söylemeyin; telefon kaybolursa yedek kodlarla girersiniz.' },
+      { t: '28. Acil para mesajı', pic: '💬 💸', q: 'Komşunuzun sosyal medya hesabından “Acil para lazım, kimseye söyleme” mesajı geldi. Ne yaparsınız?', opts: ['Para göndermem; komşumu bildiğim numarasından arar, mesajı şikâyet ederim', 'Hemen gönderirim', 'IBAN\'ı başkalarına da iletirim'], ok: 0, why: 'Ele geçirilen hesaptan herkese aynı mesaj atılır. Dolandırıldıysanız kartı kapatın, delil saklayın, karakola ya da savcılığa başvurun.' },
     ],
   }),
   sertifika: true,

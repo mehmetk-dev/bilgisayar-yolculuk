@@ -1,0 +1,92 @@
+/* MEB programına göre eklenenler: 15. hafta Dostlarım sosyal ağ sitesi (ds-), Wi-Fi ağ profili, Kelime İşlemci dipnotları,
+   Hesap Tablosu sayfa koruması, Ayarlar ekran ölçeği/çözünürlüğü, Denetim Masası Kurtarma ve Dosya Geçmişi */
+.ds { background: #eef1f6; min-height: 100%; color: #1c2430; text-align: left; }
+.ds-head { background: #3b5bab; color: #fff; padding: 0.6em 1.2em; display: flex; align-items: center; gap: 0.8em; flex-wrap: wrap; }
+.ds-logo { font-size: 1.25em; font-weight: 800; }
+.ds-head nav { margin-left: auto; display: flex; gap: 0.2em; flex-wrap: wrap; align-items: center; font-size: 0.92em; }
+.ds-head nav a { color: #fff !important; padding: 0.3em 0.6em; border-radius: 6px; cursor: pointer; text-decoration: none !important; }
+.ds-head nav a:hover { background: #ffffff22; }
+.ds-head nav i, .ds-conv i { font-style: normal; background: #e53935; color: #fff; border-radius: 1em; padding: 0 0.45em; font-size: 0.8em; font-weight: 700; }
+.ds-head nav button { background: #ffffff22; color: #fff; border: 0 !important; border-radius: 6px !important; padding: 0.3em 0.7em !important; font: inherit; cursor: pointer; }
+.ds-welcome { display: flex; gap: 2em; align-items: center; justify-content: center; flex-wrap: wrap; padding: 2em 1em; }
+.ds-welcome h1 { color: #3b5bab; font-size: 1.6em; margin: 0 0 0.3em; max-width: 12em; }
+.ds-box, .ds-main { background: #fff; border-radius: 10px; box-shadow: 0 1px 5px #0002; padding: 1.1em 1.4em; margin: 1.1em auto; }
+.ds-box { max-width: 24em; display: flex; flex-direction: column; gap: 0.5em; }
+.ds-main { max-width: 42em; }
+.ds h1 { font-size: 1.3em; margin: 0 0 0.6em; } .ds h2 { font-size: 1.05em; margin: 0.2em 0 0.5em; }
+.ds label { display: flex; flex-direction: column; gap: 0.2em; font-weight: 600; }
+.ds input:not([type="radio"]):not([type="checkbox"]), .ds select, .ds textarea { font: inherit; font-weight: 400; padding: 0.4em 0.6em; border: 1px solid #b8c1d1; border-radius: 6px; }
+.ds-btn { background: #3b5bab; color: #fff !important; border: 0 !important; border-radius: 6px !important; padding: 0.45em 1.2em !important; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none !important; display: inline-block; align-self: flex-start; }
+.ds-btn.ghost { background: #fff; color: #3b5bab !important; border: 1px solid #3b5bab !important; }
+.ds-btn.small { padding: 0.2em 0.7em !important; font-size: 0.88em; }
+.ds-err { color: #b71c1c; background: #ffebee; border: 1px solid #ef9a9a; padding: 0.4em 0.7em; border-radius: 6px; font-size: 0.92em; }
+.ds-ok { color: #1b5e20; font-weight: 700; margin-left: 0.6em; }
+div.ds-ok { background: #e8f5e9; padding: 0.4em 0.7em; border-radius: 6px; margin: 0.4em 0; }
+.ds-note { background: #e8eefb; padding: 0.5em 0.8em; border-radius: 6px; font-size: 0.9em; }
+.ds-small { font-size: 0.88em; color: #556; margin: 0.2em 0; }
+.ds-av { display: inline-grid; place-items: center; width: 2.2em; height: 2.2em; border-radius: 50%; background: #dfe6f3; font-size: 1.1em; flex: none; }
+.ds-av.big { width: 3.4em; height: 3.4em; font-size: 1.7em; }
+.ds-compose { display: grid; grid-template-columns: auto 1fr; gap: 0.5em; border-bottom: 1px solid #e3e8ef; padding-bottom: 0.8em; margin-bottom: 0.8em; }
+.ds-compose textarea { resize: vertical; }
+.ds-crow { grid-column: 1 / -1; display: flex; gap: 0.8em; align-items: center; flex-wrap: wrap; }
+.ds .ds-chk { flex-direction: row; align-items: center; gap: 0.4em; font-weight: 400; }
+.ds-post { border: 1px solid #e0e5ee; border-radius: 10px; padding: 0.7em 0.9em; margin: 0.7em 0; background: #fff; }
+.ds-post.mine { background: #f6f8fd; }
+.ds-post.scam { border-color: #ffcc80; }
+.ds-post header { display: flex; gap: 0.6em; align-items: center; }
+.ds-post header > div { flex: 1; }
+.ds-post header small, .ds-req small, .ds-dev small { display: block; color: #667; font-size: 0.82em; font-weight: 400; }
+.ds-post p { margin: 0.5em 0; }
+.ds-post a { color: #1a4fbf; text-decoration: underline; cursor: pointer; }
+.ds-pic { font-size: 3em; text-align: center; background: linear-gradient(135deg, #fff3e0, #e3f2fd); border-radius: 8px; padding: 0.3em; }
+.ds-post footer { display: flex; gap: 0.4em; border-top: 1px solid #eef1f6; padding-top: 0.4em; margin-top: 0.4em; }
+.ds-post footer button { background: none; border: 0 !important; color: #445; font: inherit; cursor: pointer; padding: 0.2em 0.6em !important; border-radius: 6px !important; }
+.ds-post footer button:hover { background: #eef1f6; }
+.ds-prof { display: flex; gap: 0.9em; align-items: center; flex-wrap: wrap; margin-bottom: 0.8em; }
+.ds-prof > div { flex: 1; } .ds-prof h1 { margin: 0; }
+.ds-info { display: grid; grid-template-columns: auto 1fr; gap: 0.3em 1em; margin: 0 0 0.8em; }
+.ds-info dt { font-weight: 600; } .ds-info dd { margin: 0; }
+.ds-locked { background: #fff8e1; padding: 0.7em 0.9em; border-radius: 8px; }
+.ds-sec { border-top: 1px solid #e3e8ef; padding-top: 0.8em; margin-top: 0.8em; display: flex; flex-direction: column; gap: 0.5em; }
+.ds .ds-row { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 0.8em; flex-wrap: wrap; font-weight: 600; }
+.ds-on { color: #2e7d32; } .ds-off { color: #b71c1c; }
+.ds-dev { border: 1px solid #e3e8ef; border-radius: 8px; padding: 0.4em 0.7em; }
+.ds-dev.bad { border-color: #ef9a9a; background: #fff5f5; }
+.ds .ds-opt { flex-direction: row; align-items: flex-start; gap: 0.5em; border: 1px solid #d6dde9; border-radius: 8px; padding: 0.5em 0.7em; font-weight: 400; cursor: pointer; }
+.ds-opt span { display: flex; flex-direction: column; } .ds-opt small { color: #667; }
+.ds-codes { background: #fffde7; border: 1px dashed #c9b44a; border-radius: 8px; padding: 0.7em 1em; }
+.ds-codes ol { columns: 2; font-family: ui-monospace, "DejaVu Sans Mono", monospace; font-size: 1.05em; margin: 0.4em 0 0.7em; }
+.ds-codes li.used { text-decoration: line-through; color: #999; }
+.ds-req { display: flex; gap: 0.7em; align-items: center; border-bottom: 1px solid #eef1f6; padding: 0.6em 0; flex-wrap: wrap; }
+.ds-req > div:not(.ds-acts) { flex: 1; min-width: 12em; }
+.ds-acts { display: flex; gap: 0.3em; flex-wrap: wrap; }
+.ds-mbox { display: grid; grid-template-columns: 13em 1fr; gap: 0.8em; max-width: 50em; }
+.ds-convs { display: flex; flex-direction: column; gap: 0.2em; border-right: 1px solid #e3e8ef; padding-right: 0.6em; }
+.ds-conv { display: flex; gap: 0.5em; align-items: center; padding: 0.4em; border-radius: 8px; cursor: pointer; color: inherit !important; text-decoration: none !important; }
+.ds-conv.on, .ds-conv:hover { background: #e8eefb; }
+.ds-chat { display: flex; flex-direction: column; gap: 0.5em; min-width: 0; }
+.ds-chead { display: flex; gap: 0.5em; align-items: center; } .ds-chead b { flex: 1; }
+.ds-msgs { display: flex; flex-direction: column; gap: 0.4em; background: #f6f8fd; border-radius: 8px; padding: 0.6em; }
+.ds-msg { background: #fff; border-radius: 10px; padding: 0.4em 0.7em; max-width: 85%; align-self: flex-start; box-shadow: 0 1px 2px #0001; }
+.ds-msg.me { align-self: flex-end; background: #dbe6ff; }
+.ds-msg small { display: block; font-size: 0.75em; color: #778; text-align: right; }
+.ds-send { display: flex; gap: 0.4em; } .ds-send input { flex: 1; }
+/* Ayarlar → Wi-Fi: ağ profili (Ortak / Özel) */
+.st-item > .st-prof { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; gap: 0.4em; align-items: center; padding: 0.3em 0 0 2.2em; }
+.st-item > .st-prof p { flex-basis: 100%; margin: 0; }
+/* Kelime İşlemci: dipnotlar (sayfanın altında, alt bilginin üstünde) */
+.wd-fnref { color: #1f4e9c; font-weight: 700; padding: 0 0.1em; cursor: default; }
+.wd-fns { width: min(42em, 100%); margin: 0 auto; background: #fff; padding: 0 3em 0.8em; font-family: Calibri, Carlito, "Noto Sans", sans-serif; font-size: 9pt; color: #222; box-shadow: 0 1px 6px #0003; clip-path: inset(0 -10px -10px -10px); }
+.wd-fns[hidden] { display: none; }
+.wd-fns::before { content: ''; display: block; width: 35%; border-top: 1px solid #888; }
+.wd-fns ol { margin: 0; padding: 0.4em 0 0 1.4em; }
+.wd-fnt { outline: none; display: inline-block; min-width: 10em; }
+.wd-fnt:empty::before { content: 'Dipnot açıklamasını yazın'; color: #aab; }
+/* Üst/alt bilgi ve dipnot alanı 9 punto yazıyla ölçülür; sayfayla (11 punto, 42em) aynı genişlikte dursun */
+.wd-hf, .wd-fns { width: min(calc(42em * 11 / 9), 100%); }
+.wd-scroll.yatay .wd-hf, .wd-scroll.yatay .wd-fns { width: min(calc(60em * 11 / 9), 100%); }
+/* Hesap Tablosu: korunan sayfa (kilidi açık hücreler açık yeşil) */
+.xl-wrap.prot td.xl-open:not(.sel) { background: #eef7e4; }
+.xl-wrap.prot .xl-grid thead th { background: #f3eee2; }
+.xl-rib [data-act="protect"].on { background: #fff3cd; }
+@media (max-width: 640px) { .ds-mbox { grid-template-columns: 1fr; } .ds-convs { border-right: 0; } }

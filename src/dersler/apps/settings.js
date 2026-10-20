@@ -43,6 +43,16 @@ export function settings({ desk, body, args, emit, dialogs }) {
   const pg = body.querySelector('.st-page');
   const flow = {}; // sayfa içi akışların durumu (yazıcı arama vb.)
 
+  // Ağ profili: Özel (ev) ağda bilgisayar öteki cihazlara görünür; Ortak (kafe, hastane) ağda gizlenir.
+  // İlk kez bağlanılan ağda soru sorulur (Windows 10'daki gibi); bağlıyken profil değiştirilebilir.
+  const profs = () => (s.netProfiles ||= { EvAğı: 'ozel' });
+  const profHtml = (n) => {
+    const p = profs()[n.name];
+    if (!p) return `<div class="st-pass st-prof"><p><b>Bu ağdaki başka cihazlar bilgisayarınızı görebilsin mi?</b></p><p class="st-note">Evinizde güvendiğiniz ağda <b>Evet</b>, kafe, hastane, otogar gibi herkese açık yerlerde <b>Hayır</b> deyin.</p>
+      <button type="button" class="st-btn" data-act="prof" data-v="ozel">Evet (Özel ağ)</button><button type="button" class="st-btn primary" data-act="prof" data-v="ortak">Hayır (Ortak ağ)</button></div>`;
+    return `<div class="st-prof"><small>Ağ profili:</small> ${[['ortak', 'Ortak ağ (önerilen)', 'Bilgisayarınız bu ağdaki öteki cihazlardan gizlenir'], ['ozel', 'Özel ağ', 'Yalnızca evdeki gibi güvendiğiniz ağlar için']].map(([k, l, d]) => `<button type="button" class="st-btn${p === k ? ' primary' : ''}" data-act="prof" data-v="${k}" title="${d}">${p === k ? '● ' : '○ '}${l}</button>`).join('')}</div>`;
+  };
+
   const toggle = (key, on, label) => `<label class="st-tog"><span>${label}</span><input type="checkbox" data-key="${key}" ${on ? 'checked' : ''}><i></i><b>${on ? 'Açık' : 'Kapalı'}</b></label>`;
 
   function render() {
@@ -82,9 +92,10 @@ export function settings({ desk, body, args, emit, dialogs }) {
         h += `<div class="st-list">${nets().map((n) => {
           const con = s.network === n.name;
           const open = flow.net === n.name;
-          return `<div class="st-item net ${con ? 'con' : ''}" data-net="${esc(n.name)}"><span>${n.phone ? '📱' : '📶'}</span><div><b>${esc(n.name)}</b><small>${con ? (s.netSim && !online(desk) ? '⚠ Bağlı, internet yok' : 'Bağlı, güvenli') : n.phone ? '📱 Telefon (mobil veri) · 🔒 Güvenli' : n.lock ? '🔒 Güvenli' : '⚠ Açık ağ (güvenli değil)'}</small></div>
+          return `<div class="st-item net ${con ? 'con' : ''}" data-net="${esc(n.name)}"><span>${n.phone ? '📱' : '📶'}</span><div><b>${esc(n.name)}</b><small>${con ? (s.netSim && !online(desk) ? '⚠ Bağlı, internet yok' : n.lock || n.phone ? 'Bağlı, güvenli' : 'Bağlı · ⚠ Açık ağ (şifresiz)') : n.phone ? '📱 Telefon (mobil veri) · 🔒 Güvenli' : n.lock ? '🔒 Güvenli' : '⚠ Açık ağ (güvenli değil)'}</small></div>
             ${con ? '<button type="button" class="st-btn" data-act="disconnect">Bağlantıyı kes</button>' : open ? '' : '<button type="button" class="st-btn" data-act="pick">Bağlan</button>'}
-            ${open && !con ? `<div class="st-pass">${n.lock ? `<label>Ağ güvenlik anahtarını (şifreyi) girin:<input type="password" class="st-pw" autocomplete="off"></label><button type="button" class="st-btn primary" data-act="connect">İleri</button>` : `<p class="st-warn">⚠ Bu ağa bağlanan herkes, gönderdiğiniz bilgileri görebilir. Bankacılık işlemi yapmayın.</p><button type="button" class="st-btn primary" data-act="connect">Yine de bağlan</button>`}<button type="button" class="st-btn" data-act="cancelNet">İptal</button><div class="st-err">${flow.netErr || ''}</div></div>` : ''}</div>`;
+            ${open && !con ? `<div class="st-pass">${n.lock ? `<label>Ağ güvenlik anahtarını (şifreyi) girin:<input type="password" class="st-pw" autocomplete="off"></label><button type="button" class="st-btn primary" data-act="connect">İleri</button>` : `<p class="st-warn">⚠ Bu ağa bağlanan herkes, gönderdiğiniz bilgileri görebilir. Bankacılık işlemi yapmayın.</p><button type="button" class="st-btn primary" data-act="connect">Yine de bağlan</button>`}<button type="button" class="st-btn" data-act="cancelNet">İptal</button><div class="st-err">${flow.netErr || ''}</div></div>` : ''}
+            ${con ? profHtml(n) : ''}</div>`;
         }).join('')}</div>`;
       }
       h += '</section>';
@@ -291,6 +302,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
         emit('wifi-connect', { name: n.name, ok: true, open: !n.lock });
         return;
       }
+      case 'prof': { const name = s.network; if (!name) return; profs()[name] = b.dataset.v; render(); emit('net-profile', { name, profile: b.dataset.v, open: !nets().find((x) => x.name === name)?.lock }); return; }
       case 'disconnect': { const name = s.network; s.network = null; desk.applySettings(); render(); emit('wifi-disconnect', { name }); return; }
       case 'browseWall': {
         const api = desk.fs.dialogApi();
