@@ -1,5 +1,5 @@
 // Hesap Tablosu: Excel benzeri çalışma sayfası. Hücre seçme ve yazma; formüller (+ − * / ^ & ve karşılaştırma,
-// TOPLA, ORTALAMA, MAK, MİN, SAY, EĞER, EĞERSAY, ETOPLA, YUVARLA, BİRLEŞTİR, BÜYÜKHARF, KÜÇÜKHARF, YAZIM.DÜZENİ); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
+// TOPLA, ORTALAMA, MAK, MİN, BAĞ_DEĞ_SAY, BAĞ_DEĞ_DOLU_SAY, BOŞLUKSAY, EĞER, EĞERSAY, ETOPLA, YUVARLA, BİRLEŞTİR, BÜYÜKHARF, KÜÇÜKHARF, YAZIM.DÜZENİ, BUGÜN, TARİH, YIL, AY, GÜN, ETARİHLİ; gg.aa.yyyy tarih hücreleri); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
 // doldurma tutamacı; otomatik toplam; kalın, para ve yüzde biçimi; koşullu biçimlendirme; sıralama; filtre; sütun grafiği;
 // sayfa koruması (kilidi açılan hücreler dışında değişiklik yapılamaz, isteğe bağlı parola).
 // Türkçe Excel gibi: ondalık ayırıcı virgül, işlev bağımsız değişkenleri noktalı virgülle ayrılır.
@@ -26,6 +26,22 @@ export function parseNumber(s) {
   const n = parseFloat(t);
   return isFinite(n) ? (pct ? n / 100 : n) : null;
 }
+
+// "15.03.1958", "1/2/2025" → Excel tarih seri numarası (1 = 1 Ocak 1900; 30.12.1899'dan bu yana gün); değilse null
+const DAY = 86400000, EPOCH = Date.UTC(1899, 11, 30);
+export function parseDate(s) {
+  const m = /^(\d{1,2})[./](\d{1,2})[./](\d{4})$/.exec(String(s).trim());
+  if (!m) return null;
+  const t = Date.UTC(+m[3], +m[2] - 1, +m[1]), d = new Date(t);
+  if (d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[1]) return null; // 31.02 gibi olmayan günler
+  return Math.round((t - EPOCH) / DAY);
+}
+const ofSerial = (n) => new Date(EPOCH + Math.floor(n) * DAY);
+const fmtDate = (n) => { const d = ofSerial(n); return `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}.${d.getUTCFullYear()}`; };
+export const todaySerial = () => { const d = new Date(); return Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - EPOCH) / DAY); };
+// Biçim verilmemiş hücre tarih mi gösterilsin? Elle yazılmış tarih ya da tarih veren işlevle başlayan formül
+const DATE_FN = /^=\s*(BUGÜN|BUGUN|TODAY|TARİH|TARIH|DATE)\s*\(/i;
+const autoDate = (raw) => !!raw && (DATE_FN.test(raw) || (!raw.startsWith('=') && parseDate(raw) !== null));
 
 // Formülü (dr, dc) kadar kaydırılmış bir hücreye kopyalarken başvuruları kaydırır; $ olan kısım sabit kalır
 export function shiftFormula(f, dr, dc) {
@@ -59,7 +75,9 @@ const FUNCS = {
   ORTALAMA: (a, num) => { const v = numsOf(a, num); if (!v.length) throw new FErr('#SAYI/0!'); return v.reduce((x, y) => x + y, 0) / v.length; },
   MAK: (a, num) => { const v = numsOf(a, num); return v.length ? Math.max(...v) : 0; },
   'MİN': (a, num) => { const v = numsOf(a, num); return v.length ? Math.min(...v) : 0; },
-  SAY: (a) => a.flatMap((x) => (isRange(x) ? x.vals : [x])).filter((v) => typeof v === 'number').length,
+  'BAĞ_DEĞ_SAY': (a) => a.flatMap((x) => (isRange(x) ? x.vals : [x])).filter((v) => typeof v === 'number').length,
+  'BAĞ_DEĞ_DOLU_SAY': (a) => a.flatMap((x) => (isRange(x) ? x.vals : [x])).filter((v) => v !== '' && v != null).length,
+  'BOŞLUKSAY': (a) => { if (!isRange(a[0])) throw new FErr('#DEĞER!'); return a[0].vals.filter((v) => v === '' || v == null).length; },
   'EĞER': (a) => { if (a.length < 2) throw new FErr('#DEĞER!'); const c = a[0]; return (typeof c === 'string' ? c !== '' : !!c) ? a[1] : (a.length > 2 ? a[2] : false); },
   YUVARLA: (a, num) => { const k = 10 ** Math.round(num(a[1] ?? 0)); return Math.round(num(a[0]) * k) / k; },
   'EĞERSAY': (a) => { if (!isRange(a[0])) throw new FErr('#DEĞER!'); const t = criterion(a[1] ?? ''); return a[0].vals.filter(t).length; },
@@ -68,6 +86,26 @@ const FUNCS = {
     const t = criterion(a[1] ?? ''), sum = isRange(a[2]) ? a[2].vals : a[0].vals;
     return a[0].vals.reduce((s, v, i) => (t(v) && typeof sum[i] === 'number' ? s + sum[i] : s), 0);
   },
+};
+// Tarih işlevleri: tarih bir sayıdır (gün); iki tarihin farkı gün sayısını verir
+const dateArg = (x, num) => { const n = typeof x === 'string' ? parseDate(x) ?? num(x) : num(x); if (n < 1) throw new FErr('#SAYI!'); return n; };
+FUNCS['BUGÜN'] = (a) => { if (a.length) throw new FErr('#DEĞER!'); return todaySerial(); };
+FUNCS['TARİH'] = (a, num) => { if (a.length !== 3) throw new FErr('#DEĞER!'); return Math.round((Date.UTC(num(a[0]), num(a[1]) - 1, num(a[2])) - EPOCH) / DAY); };
+FUNCS.YIL = (a, num) => ofSerial(dateArg(a[0], num)).getUTCFullYear();
+FUNCS.AY = (a, num) => ofSerial(dateArg(a[0], num)).getUTCMonth() + 1;
+FUNCS['GÜN'] = (a, num) => ofSerial(dateArg(a[0], num)).getUTCDate();
+// ETARİHLİ(başlangıç; bitiş; "Y"): aradaki tam yıl ("M": tam ay, "D": gün). Yaş ve kıdem hesabında kullanılır.
+FUNCS['ETARİHLİ'] = (a, num) => {
+  if (a.length !== 3) throw new FErr('#DEĞER!');
+  const s = dateArg(a[0], num), e = dateArg(a[1], num), u = String(a[2]).toUpperCase();
+  if (e < s) throw new FErr('#SAYI!');
+  if (u === 'D') return Math.floor(e) - Math.floor(s);
+  const p = ofSerial(s), q = ofSerial(e);
+  let months = (q.getUTCFullYear() - p.getUTCFullYear()) * 12 + q.getUTCMonth() - p.getUTCMonth();
+  if (q.getUTCDate() < p.getUTCDate()) months--;
+  if (u === 'M') return months;
+  if (u === 'Y') return Math.floor(months / 12);
+  throw new FErr('#SAYI!');
 };
 // Yazı işlevleri: sayı yazıya Türkçe biçimde (virgüllü, binlik ayırıcısız) çevrilir; harfler Türkçe kurallarla büyür/küçülür (i ↔ İ, ı ↔ I)
 const txt = (v) => (typeof v === 'number' ? v.toLocaleString('tr-TR', { maximumFractionDigits: 10, useGrouping: false }) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v ?? ''));
@@ -91,13 +129,15 @@ FUNCS['DÜŞEYARA'] = (a, num) => {
   if (hit < 0) throw new FErr('#YOK');
   return t.vals[hit * t.cols + n - 1];
 };
-const ALIAS = { VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', COUNT: 'SAY', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA',
+const ALIAS = { SAY: 'BAĞ_DEĞ_SAY', COUNT: 'BAĞ_DEĞ_SAY', BAG_DEG_SAY: 'BAĞ_DEĞ_SAY', COUNTA: 'BAĞ_DEĞ_DOLU_SAY', BAG_DEG_DOLU_SAY: 'BAĞ_DEĞ_DOLU_SAY', COUNTBLANK: 'BOŞLUKSAY', BOSLUKSAY: 'BOŞLUKSAY',
+  BUGUN: 'BUGÜN', TODAY: 'BUGÜN', TARIH: 'TARİH', DATE: 'TARİH', YEAR: 'YIL', MONTH: 'AY', GUN: 'GÜN', DAY: 'GÜN', ETARIHLI: 'ETARİHLİ', DATEDIF: 'ETARİHLİ',
+  VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA',
   BIRLESTIR: 'BİRLEŞTİR', CONCATENATE: 'BİRLEŞTİR', CONCAT: 'BİRLEŞTİR', BUYUKHARF: 'BÜYÜKHARF', UPPER: 'BÜYÜKHARF', KUCUKHARF: 'KÜÇÜKHARF', LOWER: 'KÜÇÜKHARF', 'YAZIM.DUZENI': 'YAZIM.DÜZENİ', PROPER: 'YAZIM.DÜZENİ' };
 
 // Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır)
 function evaluate(src, get) {
-  const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü]+)*\$?\d*)|(<=|>=|<>|.))/y;
-  const reInt = /\s*(?:(\d+)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü]+)*\$?\d*)|(<=|>=|<>|.))/y; // virgül ondalık değil, ayırıcı
+  const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü_]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü_]+)*\$?\d*)|(<=|>=|<>|.))/y;
+  const reInt = /\s*(?:(\d+)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü_]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü_]+)*\$?\d*)|(<=|>=|<>|.))/y; // virgül ondalık değil, ayırıcı
   // Formülde hiç ; yoksa işlev parantezinin içindeki virgül ayırıcıdır: =DÜŞEYARA(A2,$F$2:$G$7,2,0). Dışında (=2,5*3) ondalık virgüldür.
   const commaSep = !src.replace(/"[^"]*"/g, '').includes(';');
   const toks = [], calls = [];
@@ -208,6 +248,7 @@ function evaluate(src, get) {
 
 const fmtNum = (n, f) => {
   if (f === 'tl') return n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+  if (f === 'date') return n >= 1 && n < 2958466 ? fmtDate(n) : '#####';
   if (f === 'pct') return (n * 100).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + '%';
   return n.toLocaleString('tr-TR', { maximumFractionDigits: 6, useGrouping: Math.abs(n) >= 10000 });
 };
@@ -239,7 +280,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     <div class="xl-tabs"><button type="button" class="xl-file">Dosya</button><span>Giriş</span></div>
     <div class="xl-rib">
       <button type="button" data-act="bold" title="Kalın (Ctrl + B)"><b>K</b></button>
-      <button type="button" data-act="tl" title="Para birimi biçimi">₺</button><button type="button" data-act="pct" title="Yüzde biçimi">%</button><button type="button" data-act="plain" title="Genel biçim (biçimi kaldır)">123</button>
+      <button type="button" data-act="tl" title="Para birimi biçimi">₺</button><button type="button" data-act="pct" title="Yüzde biçimi">%</button><button type="button" data-act="date" title="Tarih biçimi (gg.aa.yyyy)">📅</button><button type="button" data-act="plain" title="Genel biçim (biçimi kaldır)">123</button>
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="asc" title="Küçükten büyüğe sırala">↑ A→Z</button><button type="button" data-act="desc" title="Büyükten küçüğe sırala">↓ Z→A</button>
       <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Sütun grafiği</button><button type="button" data-act="pie" title="Seçili alandan pasta grafiği: her parçanın bütünün ne kadarı olduğunu gösterir">🥧 Pasta grafiği</button>
@@ -308,13 +349,21 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   function value(a, seen = new Set()) {
     const raw = cells[a];
     if (raw == null || raw === '') return '';
-    if (!raw.startsWith('=')) { const n = parseNumber(raw); return n === null ? raw : n; }
+    if (!raw.startsWith('=')) { const n = parseNumber(raw) ?? parseDate(raw); return n === null ? raw : n; }
     if (seen.has(a)) throw new FErr('#BAŞV!');
     seen.add(a);
     try { return evaluate(raw.slice(1), (b) => value(b, seen)); } finally { seen.delete(a); }
   }
+  // Biçim verilmemiş hücre tarih gibi mi görünsün? Excel gibi: yazılmış tarih, BUGÜN()/TARİH() ya da “tarih ± gün” (=D2+30)
+  function isDate(a, depth = 0) {
+    if (fmt[a]?.f) return fmt[a].f === 'date';
+    const raw = cells[a];
+    if (autoDate(raw)) return true;
+    const m = depth < 5 && /^=\s*\$?([A-H])\$?(\d{1,2})\s*[+-]\s*\d+(,\d+)?\s*$/i.exec(raw || '');
+    return !!m && isDate(m[1].toUpperCase() + m[2], depth + 1);
+  }
   function show(a) {
-    try { const v = value(a); return { v, text: typeof v === 'number' ? fmtNum(v, fmt[a]?.f) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v) }; }
+    try { const v = value(a); return { v, text: typeof v === 'number' ? fmtNum(v, fmt[a]?.f ?? (isDate(a) ? 'date' : undefined)) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v) }; }
     catch (e) { return { v: null, err: true, text: e instanceof FErr ? e.message : '#DEĞER!' }; }
   }
 
@@ -688,7 +737,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
 
   function format(kind) {
     if (kind === 'bold') { let all = true; eachSel((a) => { if (!fmt[a]?.b) all = false; }); eachSel((a) => { (fmt[a] ||= {}).b = !all; }); }
-    else eachSel((a) => { (fmt[a] ||= {}).f = kind === 'plain' ? undefined : kind; });
+    // 'gen' (Genel): biçim yok; tarih bile seri numarası olarak görünür
+    else eachSel((a) => { (fmt[a] ||= {}).f = kind === 'plain' ? 'gen' : kind; });
     dirty = true;
     render();
     emit('xl-format', { kind, range: selAddr() });

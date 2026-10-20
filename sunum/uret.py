@@ -1419,10 +1419,10 @@ write('hafta10', '10. Hafta', 'Bilgisayar İşletmenliği – 10. Hafta Alışt�
 # ================================================================ HAFTA 11
 S = []
 S.append(cover('11. Hafta: Hesap tablosu (Excel)', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On dört ders', plan([
+S.append(slide('Bu hafta', 'On beş ders', plan([
     ('Hücreler ve formüller', 40), ('Biçim, sıralama, grafik', 35), ('Birleştir ve Ortala, #####', 30),
     ('EĞER ve formül kopyalama', 40), ('Sabit başvuru, ETOPLA, filtre', 35), ('DÜŞEYARA', 35),
-    ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35), ('Otomatik doldurma, dondurma', 30), ('Açılır liste ve aidat takibi', 35),
+    ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35), ('Tarihler, yaş, sayma işlevleri', 35), ('Otomatik doldurma, dondurma', 30), ('Açılır liste ve aidat takibi', 35),
     ('Çalışma sayfaları', 30), ('Excel’de yazdırma', 30), ('Ev bütçesi ve pasta grafiği', 35), ('Tablo parkuru', 25)],
     'sekiz küçük görev', 12)))
 S.append(slide('Ders 1 · Hesap tablosu', 'Satır, sütun, hücre', split(
@@ -1476,7 +1476,18 @@ S.append(slide('Ders 8 · Yazı işlevleri ve koruma', 'Dağınık listeyi düze
            ['🔓 Hücre Kilidini Aç', 'Koruma açıkken de yazılabilecek hücreler (Ödendi mi?)'],
            ['🔒 Sayfayı Koru', 'Öteki hücreler değiştirilemez; parolayı bir yere yazın'],
            ['Koruma ne değildir?', 'Dosyayı şifrelemez: açan herkes içini görür']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 9–11 · Pratik araçlar', 'Doldurma, açılır liste, sayfalar', split(
+S.append(slide('Ders 9 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son ödeme, kaç kişi?', split(
+    table([['12.04.1958', 'Tarih gün.ay.yıl, <b>noktayla</b> yazılır; Excel tanırsa sağa yaslar'],
+           ['📅 · 123', 'Tarih aslında sayıdır: 1900’den bu yana geçen gün (21287)'],
+           ['=BUGÜN()', 'Bugünün tarihi; her gün kendiliğinden yenilenir'],
+           ['=ETARİHLİ(B2;$H$2;"Y")', 'Tam yaş: doğum günü gelmediyse onu da hesaba katar'],
+           ['=D2+30', 'Kayıttan 30 gün sonrası: son ödeme günü']], 'kv tight'),
+    table([['=BAĞ_DEĞ_DOLU_SAY(A2:A7)', 'Dolu hücreleri sayar: kaç kişi kayıtlı?'],
+           ['=BAĞ_DEĞ_SAY(F2:F7)', 'Yalnızca <b>sayıları</b> sayar: kaç kişi sınava girdi?'],
+           ['=BOŞLUKSAY(G2:G7)', 'Boş hücreleri sayar: kimin telefonu eksik?'],
+           ['=YIL(MİN(B2:B7))', 'En eski tarihin yılı; AY() ayı, GÜN() günü verir'],
+           ['_ (alt çizgi)', K('Shift', '-') + ': BAĞ_DEĞ_SAY yazarken']], 'kv tight'), 1, 1)))
+S.append(slide('Ders 10–12 · Pratik araçlar', 'Doldurma, açılır liste, sayfalar', split(
     table([['Doldurma tutamacı', 'Ocak → Şubat → Mart; 1, 2 seçip çekince 3, 4, 5…'],
            ['❄ Üst Satırı Dondur', 'Aşağı inerken başlık satırı yerinde kalır'],
            ['✔ Açılır Liste', 'Yalnızca belirlenen seçenekler: <b>Ödendi, Ödenmedi, Kısmen</b> (virgülle)'],
@@ -1485,7 +1496,7 @@ S.append(slide('Ders 9–11 · Pratik araçlar', 'Doldurma, açılır liste, say
     table([['＋ (alttaki sekmeler)', 'Yeni çalışma sayfası'], ['Sekmeye çift tık', 'Adını değiştirir'],
            ['Sekmeye sağ tık', 'Yeniden adlandır, Sekme rengi, Taşı veya Kopyala, Sil'],
            ['Taşı veya Kopyala → Kopya oluştur', 'Ocak tablosunu Şubat’a çoğaltır; asıl sayfa bozulmaz']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 12–13 · Yazdırma ve bütçe', 'Tek kâğıda sığdırmak, pasta grafiği', split(
+S.append(slide('Ders 13–14 · Yazdırma ve bütçe', 'Tek kâğıda sığdırmak, pasta grafiği', split(
     table([[K('Ctrl', 'P'), 'Önizleme: kaç sayfa olacak?'],
            ['Tüm sütunları bir sayfaya sığdır', 'Tabloyu küçültüp tek kâğıda alır'],
            ['Yatay', 'Geniş tablolar için'],
@@ -1494,7 +1505,7 @@ S.append(slide('Ders 12–13 · Yazdırma ve bütçe', 'Tek kâğıda sığdırm
            ['Rakamı değiştirmek', 'Toplam ve kalan kendiliğinden hesaplanır'],
            ['🥧 Pasta grafiği', 'Her kalem bütünün yüzde kaçı?'],
            ['📊 Sütun grafiği', 'Kalemleri karşılaştırır']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 14 · Tekrar', 'Tablo parkuru: pazar alışverişi', split(
+S.append(slide('Ders 15 · Tekrar', 'Tablo parkuru: pazar alışverişi', split(
     table([['Domates', '45'], ['Peynir', '120,50'], ['Zeytin', '85'], ['Ekmek', '15'], ['Süt', '38,75'], ['Toplam (B6)', '<b>304,25</b>']], 'tight'),
     ul(['Ürünleri A1–A5’e, fiyatları B1–B5’e yazın.', 'B6’da toplamı hesaplatın, kalın yapın.',
         'B1:B6’yı ₺ biçiminde gösterin.', 'A1:B5’i fiyata göre büyükten küçüğe sıralayın; toplam yerinde kalsın.',
@@ -1506,6 +1517,7 @@ S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Doldurma tutamacı', 'Formülü ve listeyi çoğaltır'], ['=EĞER · =EĞERSAY', 'Koşul · koşula uyanları say'],
     ['$B$1', 'Kopyalanınca değişmeyen adres'], ['=ETOPLA · 🔽 Filtre', 'Koşullu toplam · satırları süz'],
     ['=DÜŞEYARA', 'Listeden fiyat getir'], ['#DEĞER! · #AD? · #SAYI/0!', 'Yazı · yanlış ad · sıfıra bölme'],
+    ['=BUGÜN · =ETARİHLİ', 'Bugünün tarihi · yaş hesabı'], ['=BAĞ_DEĞ_SAY · =BOŞLUKSAY', 'Sayıları say · boşları say'],
     ['❄ Dondur · ✔ Açılır Liste', 'Başlık sabit · seçenekli hücre'], ['Ctrl + P', 'Tek sayfaya sığdır, kılavuz çizgileri']],
     'sekiz küçük görev', 12)))
 write('hafta11', '11. Hafta', 'Bilgisayar İşletmenliği – 11. Hafta Alıştırmaları', S)
