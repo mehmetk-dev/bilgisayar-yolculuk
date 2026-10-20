@@ -6,7 +6,7 @@
 //   --mutate   sol'ün son bloğu atılınca hâlâ geçen görevleri listeler (bilgi amaçlı, hata sayılmaz)
 //   --only=NO  yalnız o bölüm (13 ya da b13)
 //   -v         geçen görevleri de tek tek yazar
-// Izgara: sol bütün haritalarda kazanır mı, max/tools/conds sınırına uyar mı, preset kendiliğinden kazanıyor mu.
+// Izgara: sol bütün haritalarda kazanır mı, max/tools/conds sınırına uyar mı, preset kendiliğinden kazanıyor mu (watch hariç), tut tarifi sol ile uyuşuyor mu.
 // Sahne: sol hedefleri testTime (yoksa 20 sn) içinde sağlıyor mu; sol palette (blocks/reporters/conds) olmayan blok
 //   kullanıyor mu (PALET); boş programla hedefler sağlanıyor mu (BOŞ, uyarı). Quiz: a geçerli şık mı + dağılım.
 // Çıktı sonunda özet satırı; başarısız varsa çıkış kodu 1. Geçici paket node_modules/.cache/robo-test/ altına yazılır.
@@ -48,7 +48,7 @@ const stubs = {
 fs.mkdirSync(CACHE, { recursive: true });
 const entry = `${files.map((f, i) => `import * as m${i} from './lessons/${f}.js';`).join('\n')}
 export const mods = { ${files.map((f, i) => `'${f}': m${i}`).join(', ')} };
-export { simulate, parseMap, parseProg, countBlocks } from './sim.js';
+export { simulate, parseMap, parseProg, serProg, countBlocks } from './sim.js';
 export { createWorld } from './sahne/runtime.js';
 export { makeApi } from './sahne/task.js';
 export { mk, BLOCKS } from './sahne/blocks.js';`;
@@ -58,7 +58,7 @@ try {
 } catch (e) { console.error('Paket derlenemedi (bir ders dosyası bozuk olabilir):', e.message); process.exit(1); }
 globalThis.document = new Proxy({}, { get: () => () => ({}) });
 const B = await import(pathToFileURL(outfile).href + '?' + Date.now());
-const { simulate, parseMap, parseProg, countBlocks, createWorld, makeApi, mk, mods, BLOCKS } = B;
+const { simulate, parseMap, parseProg, serProg, countBlocks, createWorld, makeApi, mk, mods, BLOCKS } = B;
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 let uid = 0;
@@ -97,8 +97,17 @@ function testGrid(st) {
   if (st.preset || st.fnPreset) {
     const pp = parseProg(st.preset || '');
     const pf = parseProg(st.fnPreset || '');
-    if (pp.length && M.every((m, k) => simulate(m, dirs[k], pp, { fn: pf, pick: st.pick }).result === 'win')) bad.push('preset kendiliğinden kazanıyor');
+    if (!st.watch && pp.length && M.every((m, k) => simulate(m, dirs[k], pp, { fn: pf, pick: st.pick }).result === 'win')) bad.push('preset kendiliğinden kazanıyor');
+    if (st.watch && st.preset !== st.sol) bad.push('izleme adımında preset ile sol aynı olmalı');
     if (st.max && countBlocks(pp) + countBlocks(pf) > st.max) bad.push('preset max\'ı aşıyor');
+  }
+  // Adım adım tarif: tarifin son şartı örnek çözümle uyuşmalı (imleç programın en dışında sayılır)
+  if (st.tut) {
+    const w = st.tut.filter((x) => x.want != null).at(-1)?.want;
+    const ser = serProg(prog);
+    const ok = typeof w === 'function' ? w(ser, 0) : w instanceof RegExp ? w.test(ser) : w === ser;
+    if (!ok) bad.push(`tarifin son şartı sol ile uyuşmuyor (${ser})`);
+    if (st.tut.at(-1).want != null) bad.push('tarifin son adımı ▶ Çalıştır olmalı (want olmadan)');
   }
   return { bad };
 }

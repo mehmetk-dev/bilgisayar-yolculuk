@@ -16,7 +16,9 @@ const HINT_DELAY = 40000;
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* yoksay */ } };
 const PROF_KEY = 'bilgisayar-dersleri.ogrenci', LIST_KEY = 'bilgisayar-dersleri.ogrenciler', ASKED_KEY = 'bilgisayar-dersleri.secildi';
-const who = lsGet(PROF_KEY, '');
+// Ortak anahtar: dersler ve Robo aynı "şu anki öğrenci" adını kullanır (yoksa null, misafirse '')
+const SHARED_KEY = 'ogrenci-ortak', SESSION_KEY = 'ogrenci-ortak-oturum', ROBO_LIST_KEY = 'robo-profiller';
+const who = lsGet(SHARED_KEY, null) ?? lsGet(PROF_KEY, '');
 const profiles = () => lsGet(LIST_KEY, []);
 // Misafir eski anahtarı kullanır; profiller öncesinden kalan ilerleme kaybolmaz
 const storeKey = (name) => 'bilgisayar-dersleri.v2' + (name ? '@' + name : '');
@@ -596,12 +598,18 @@ $('#who').textContent = who ? who : 'Öğrenci seç';
 $('#who').onclick = () => openPicker();
 if (who) $('.hero h1').textContent = `Hoş geldiniz, ${who}!`;
 
-function choose(name) {
+function choose(name, dest) {
   saveProgress();
   lsSet(PROF_KEY, name);
-  if (name && !profiles().includes(name)) lsSet(LIST_KEY, [...profiles(), name].sort((a, b) => a.localeCompare(b, 'tr')));
-  try { sessionStorage.setItem(ASKED_KEY, '1'); } catch { /* yoksay */ }
+  lsSet(SHARED_KEY, name);
+  const sorted = (l) => [...l, name].sort((a, b) => a.localeCompare(b, 'tr'));
+  if (name && !profiles().includes(name)) lsSet(LIST_KEY, sorted(profiles()));
+  // Robo'nun listesine de eklenir; orada seçme penceresi açılmaz
+  const rl = lsGet(ROBO_LIST_KEY, []);
+  if (name && !rl.includes(name)) lsSet(ROBO_LIST_KEY, sorted(rl));
+  try { sessionStorage.setItem(ASKED_KEY, '1'); sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* yoksay */ }
   leaving = true;
+  if (dest) { location.href = dest; return; }
   // Açılışta sorulduysa (ör. 3B dersten gelen test bağlantısı) istenen ders açık kalsın
   if (!pickFirst) location.hash = '';
   location.reload();
@@ -612,16 +620,29 @@ function openPicker(first = false) {
   pickFirst = first;
   pick.hidden = false;
   pick.innerHTML = `<div class="pickbox" role="dialog" aria-label="Öğrenci seçimi">
-  <h2>Bu bilgisayarı kim kullanıyor?</h2>
+  <h2>${first ? 'Merhaba! Adını yaz ya da listeden seç' : 'Bu bilgisayarı kim kullanıyor?'}</h2>
   <div class="plist">${profiles().map((n) => `<span class="pone"><button type="button" class="pname${n === who ? ' cur' : ''}" data-n="${esc(n)}">${esc(n)}</button><button type="button" class="pdel" data-n="${esc(n)}" title="${esc(n)} kaydını sil">🗑</button></span>`).join('') || '<p class="mut">Henüz kayıtlı kimse yok. Adınızı yazıp ekleyin.</p>'}</div>
-  <form class="padd"><input type="text" maxlength="30" placeholder="Adınız soyadınız" aria-label="Adınız"><button type="submit" class="primary">➕ Ekle ve başla</button></form>
+  <form class="padd"><input type="text" maxlength="30" placeholder="Adınız soyadınız" aria-label="Adınız"><button type="submit" class="primary">${first ? '💻 Başla' : '➕ Ekle ve başla'}</button></form>
+  ${first ? '<h3 class="pwhere">Nereye gireceksin?</h3><div class="pdest"><button type="button" class="pgo" data-d="">💻<b>Bilgisayar Dersleri</b><small>Yetişkinler için</small></button><button type="button" class="pgo" data-d="robot.html">🤖<b>Robo ile Kodlama</b><small>8–12 yaş</small></button></div>' : ''}
   <div class="pfoot"><button type="button" class="link pguest">Misafir olarak devam et</button>${first ? '' : '<button type="button" class="link pclose">Kapat</button>'}</div>
   <p class="mut">Her öğrencinin ilerlemesi ve test puanları bu bilgisayarda ayrı saklanır. Listede adınız varsa üzerine tıklayın.</p>
 </div>`;
+  const inp = pick.querySelector('input');
+  const nameOf = () => inp.value.trim().replace(/\s+/g, ' ').replace(/[<>":]/g, '');
+  if (first && who) inp.value = who;
   pick.onclick = (e) => {
     const t = e.target;
     if ((t === pick && !first) || t.classList.contains('pclose')) { pick.hidden = true; return; }
-    if (t.classList.contains('pname')) choose(t.dataset.n);
+    const go = t.closest('.pgo');
+    if (go) {
+      const n = nameOf();
+      if (!n) { inp.focus(); return; }
+      choose(n, go.dataset.d);
+      return;
+    }
+    if (t.classList.contains('pname')) {
+      if (first) { inp.value = t.dataset.n; pick.querySelectorAll('.pname').forEach((b) => b.classList.toggle('cur', b === t)); } else choose(t.dataset.n);
+    }
     if (t.classList.contains('pguest')) choose('');
     if (t.classList.contains('pdel') && confirm(`“${t.dataset.n}” adlı öğrencinin bütün ilerlemesi ve puanları silinsin mi?`)) {
       lsSet(LIST_KEY, profiles().filter((n) => n !== t.dataset.n));
@@ -631,7 +652,7 @@ function openPicker(first = false) {
   };
   pick.querySelector('.padd').onsubmit = (e) => {
     e.preventDefault();
-    const n = e.target.querySelector('input').value.trim().replace(/\s+/g, ' ');
+    const n = nameOf();
     if (n) choose(n);
   };
   pick.querySelector('input').focus();

@@ -264,3 +264,10 @@ body:not(.with-kb) .under { display: none; }
   #top a[href="robot.html"], #top a[href="bilgisayar.html"] { display: none; }
   #crumb { flex-basis: 100%; order: 9; }
 }
+.pwhere { font-size: 1.1em; margin-top: 0.2em; }
+.pdest { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7em; }
+.pgo { display: flex; flex-direction: column; align-items: center; gap: 0.2em; padding: 0.9em 0.5em; font-size: 2em; border: 2px solid var(--line, #cbd5e1); border-radius: 16px; background: var(--card); cursor: pointer; line-height: 1.1; }
+.pgo b { font-size: 0.5em; }
+.pgo small { font-size: 0.4em; opacity: 0.7; }
+.pgo:hover, .pgo:focus-visible { border-color: var(--accent, #2563eb); }
+@media (max-width: 480px) { .pdest { grid-template-columns: 1fr; } }

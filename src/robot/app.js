@@ -4,7 +4,7 @@ import { renderStory, renderOrder, renderQuiz } from './acts.js';
 import { renderGrid } from './board.js';
 import { renderScratch } from './sahne/task.js';
 import { renderGuide } from './guide.js';
-import { roboSVG, play, confetti, prefs, save, pload as load, psave, pdelPrefix, profile, profiles, setProfile, removeProfile, esc } from './robo.js';
+import { fromHome, roboSVG, play, confetti, prefs, save, pload as load, psave, pdelPrefix, profile, profiles, setProfile, removeProfile, esc } from './robo.js';
 import { startIcons } from '../icons.js';
 
 const $ = (s) => document.querySelector(s);
@@ -196,7 +196,7 @@ whoBtn.onclick = openPicker;
 
 function choose(name) {
   setProfile(name);
-  try { sessionStorage.setItem('robo-secildi', '1'); } catch { /* yok say */ }
+  try { sessionStorage.setItem('robo-secildi', '1'); sessionStorage.setItem('ogrenci-ortak-oturum', '1'); } catch { /* yok say */ }
   location.hash = '';
   location.reload();
 }
@@ -233,8 +233,8 @@ function openPicker() {
 addEventListener('hashchange', route);
 route();
 // Bu oturumda henüz kimse seçilmediyse öğrenci seçimi sorulur
-let asked = false;
-try { asked = !!sessionStorage.getItem('robo-secildi'); } catch { /* yok say */ }
+let asked = fromHome;
+try { asked = asked || !!sessionStorage.getItem('robo-secildi'); } catch { /* yok say */ }
 if (!asked) { pick.dataset.first = '1'; openPicker(); }
 
 startIcons();

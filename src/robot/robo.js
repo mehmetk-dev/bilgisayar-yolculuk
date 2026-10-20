@@ -15,6 +15,8 @@ export function save(key, val) {
 }
 
 // Öğrenci profilleri: aynı bilgisayarı kullanan çocukların ilerlemesi ve kodları ayrı saklanır
+// Ortak anahtar: ana sayfa ve Robo aynı "şu anki öğrenci" adını kullanır (yoksa null)
+const SHARED_KEY = 'ogrenci-ortak';
 export const profile = { name: load('robo-profil', '') };
 const pkey = (k) => (profile.name ? `robo@${profile.name}:${k}` : k);
 export const pload = (k, d) => load(pkey(k), d);
@@ -31,8 +33,24 @@ export const profiles = () => load('robo-profiller', []);
 export function setProfile(name) {
   profile.name = name;
   save('robo-profil', name);
+  save(SHARED_KEY, name);
+  if (name) {
+    // Ders sayfasının listesine de eklenir
+    const dl = load('bilgisayar-dersleri.ogrenciler', []);
+    if (!dl.includes(name)) save('bilgisayar-dersleri.ogrenciler', [...dl, name].sort((a, b) => a.localeCompare(b, 'tr')));
+  }
   if (name && !profiles().includes(name)) save('robo-profiller', [...profiles(), name].sort((a, b) => a.localeCompare(b, 'tr')));
 }
+// Ana sayfadan bu oturumda ad seçilerek geldiyse o ad kullanılır; true dönerse öğrenci seçme penceresi gerekmez
+export const fromHome = (() => {
+  let flag = false;
+  try { flag = !!sessionStorage.getItem('ogrenci-ortak-oturum'); } catch { /* yok say */ }
+  const shared = load(SHARED_KEY, null);
+  if (!flag || typeof shared !== 'string') return false;
+  const name = shared.replace(/[<>":]/g, '').trim();
+  if (name !== profile.name || name !== shared) setProfile(name);
+  return true;
+})();
 export function removeProfile(name) {
   const others = profiles().filter((n) => n !== name);
   save('robo-profiller', others);

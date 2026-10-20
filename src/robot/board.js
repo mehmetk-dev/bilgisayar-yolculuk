@@ -1,5 +1,5 @@
 // Izgara görevi: harita, komut düğmeleri, program alanı ve Robo'nun adım adım oynatılması
-import { parseMap, parseProg, simulate, countBlocks, newId, DIR, SLOTS, isBox } from './sim.js';
+import { parseMap, parseProg, serProg, simulate, countBlocks, newId, DIR, SLOTS, isBox } from './sim.js';
 import { robotHTML, play, confetti, sleep, prefs, toast, hideToast } from './robo.js';
 
 export const CMDS = {
@@ -106,6 +106,19 @@ export function codePic(str, fnStr, fnName = 'Fonksiyon') {
   return `<div class="codepic two">${main}<div><div class="fnhead">🧩 ${fnName} =</div><div class="prog ro fnprog">${listHTML(parseProg(fnStr), ctx)}</div></div></div>`;
 }
 
+// Döngünün “açılmış” hali: her tur bir satır; iç döngü çerçeveli bir grup olarak gösterilir
+const unBody = (list) => list.map((b) => (b.c === 'loop' ? `<span class="ugrp">${Array(b.n).fill(unBody(b.body)).join(' ')}</span>` : chips(b.c))).join(' ');
+export function unrollPic(str) {
+  const [L] = parseProg(str);
+  return `<div class="unroll">${Array.from({ length: L.n }, (_, k) => `<div class="urow"><span class="utur">${k + 1}. tur</span>${unBody(L.body)}</div>`).join('')}</div>`;
+}
+// Program ve yanında açılmış hali: “bilgisayar bunu böyle okur”
+export const loopPic = (str) => `<div class="uwrap">${codePic(str)}<span class="uarr">➜</span>${unrollPic(str)}</div>`;
+
+// Adım adım görevde bir adımın şartı: tam yazım, düzenli ifade ya da (yazım, imlecin derinliği) işlevi
+const fits = (w, s, d) => (w == null ? false : typeof w === 'function' ? w(s, d) : w instanceof RegExp ? w.test(s) : w === s);
+const HUES = ['#ff5d8f', '#2f8cff', '#ffb000', '#16b364', '#a259ff', '#ff7a1a', '#00b8d9', '#e0457b', '#7cb518'];
+
 const within = (root, list) => root === list || root.some((b) => (SLOTS[b.c] || []).some((s) => within(b[s], list)));
 
 export function renderGrid(el, step, done, prev) {
@@ -113,8 +126,12 @@ export function renderGrid(el, step, done, prev) {
   const M = rows.map(parseMap);
   const dirs = rows.map((_, k) => DIR[(step.dirs && step.dirs[k]) || step.dir || 'E']);
   const max = step.max || 0;
+  // watch: hazır programı yavaşça izleme; tut: ne yapılacağını adım adım gösteren tarif; narrate: çalışırken döngü turlarını anlatma
+  const watch = !!step.watch;
+  const T = step.tut || null;
+  const narrOn = watch || !!T || !!step.narrate;
   // ⭐⭐⭐ hedefi: örnek çözümün blok sayısı
-  const best = step.best ?? (step.sol ? countBlocks(parseProg(step.sol)) + countBlocks(parseProg(step.fnSol || step.fnPreset || '')) : 0);
+  const best = watch ? 0 : step.best ?? (step.sol ? countBlocks(parseProg(step.sol)) + countBlocks(parseProg(step.fnSol || step.fnPreset || '')) : 0);
   const hasFn = step.tools.includes('fn');
   const fnName = step.fnName || 'Fonksiyon';
   const conds = step.conds || ['open', 'blocked', 'star', 'goal'];
@@ -129,24 +146,27 @@ export function renderGrid(el, step, done, prev) {
   const stars = (n) => '⭐'.repeat(n) + '<span class="dim">⭐</span>'.repeat(3 - n);
 
   const tabs = M.length > 1 ? `<div class="mtabs">${M.map((_, k) => `<button type="button" class="mtab${k ? '' : ' cur'}" data-k="${k}">🗺 Harita ${k + 1}</button>`).join('')}</div>` : '';
-  el.innerHTML = `<div class="gridact">
+  el.innerHTML = `<div class="gridact${narrOn ? ' talk' : ''}">
   <div class="gleft">
     <div class="ginfo"><h3>${step.title}${best ? ` <span class="bestline" title="En az ${best} blokla çözersen 3 yıldız">${prev ? stars(prev) : ''} <small>⭐⭐⭐ hedefi: ${best} blok</small></span>` : ''}</h3>${step.text}</div>
+    ${T ? `<div class="tut"><h4>👣 Adım adım yap</h4><ol>${T.map((x) => `<li>${x.t}</li>`).join('')}</ol><p class="toff" hidden>🤔 Program tarife uymadı. Son eklediğin bloğu <b>✖</b> ile sil ya da <b>🗑 Temizle</b>'ye basıp baştan başla.</p></div>` : ''}
     ${tabs}
+    ${narrOn ? '<div class="narr" aria-live="polite"></div>' : ''}
     <div class="gboard"><div class="board"></div></div>
     <div class="hint" hidden></div>
   </div>
   <div class="gcode">
-    <h4>Komutlar</h4>
-    <div class="tools">${step.tools.map((c) => `<button type="button" class="tool ${CMDS[c].cls}" data-c="${c}"><span class="bi">${CMDS[c].icon}</span>${c === 'fn' ? fnName : CMDS[c].label}</button>`).join('')}</div>
+    <h4${watch ? ' hidden' : ''}>Komutlar</h4>
+    <div class="tools"${watch ? ' hidden' : ''}>${step.tools.map((c) => `<button type="button" class="tool ${CMDS[c].cls}" data-c="${c}"><span class="bi">${CMDS[c].icon}</span>${c === 'fn' ? fnName : CMDS[c].label}</button>`).join('')}</div>
     <h4>Programım <span class="cnt"></span></h4>
     <div class="prog" data-root="main" tabindex="-1"></div>
     ${hasFn ? `<h4 class="fnhead">🧩 ${fnName} fonksiyonum</h4><div class="prog fnprog" data-root="fn" tabindex="-1"></div>` : ''}
-    <p class="ptip">✋ Blokları <b>sürükleyerek</b> yerini değiştirebilir, içine ya da dışına taşıyabilirsin.</p>
+    <p class="ptip"${watch || T ? ' hidden' : ''}>✋ Blokları <b>sürükleyerek</b> yerini değiştirebilir, içine ya da dışına taşıyabilirsin.</p>
     <div class="ctrl">
-      <button type="button" class="primary run">▶ Çalıştır</button>
-      <button type="button" class="reset">↺ Başa al</button>
-      <button type="button" class="clear">${step.preset || step.fnPreset ? '↺ İlk program' : '🗑 Temizle'}</button>
+      <button type="button" class="primary run">${watch ? '▶ İzle' : '▶ Çalıştır'}</button>
+      ${watch ? '' : `<button type="button" class="reset">↺ Başa al</button>
+      <button type="button" class="clear">${step.preset || step.fnPreset ? '↺ İlk program' : '🗑 Temizle'}</button>`}
+      ${step.pathHint && step.sol ? '<button type="button" class="vhint">💡 Yolu renklerle göster</button>' : ''}
     </div>
   </div>
 </div>`;
@@ -158,6 +178,8 @@ export function renderGrid(el, step, done, prev) {
   const cnt = q('.cnt');
   const hintEl = q('.hint');
   const runBtn = q('.run');
+  const narrEl = q('.narr');
+  let hintOn = false;
   let rb;
   let arrow;
   let trail;
@@ -171,6 +193,7 @@ export function renderGrid(el, step, done, prev) {
     rb = q('.rb');
     arrow = q('.rarrow');
     trail = q('.path');
+    if (hintOn) paintHint();
     el.querySelectorAll('.mtab').forEach((t) => t.classList.toggle('cur', +t.dataset.k === k));
     fit();
   }
@@ -181,8 +204,9 @@ export function renderGrid(el, step, done, prev) {
     const t = Math.max(34, Math.min(80, Math.floor(w / M[mi].w)));
     board.style.setProperty('--t', t + 'px');
   }
-  const ro = new ResizeObserver(fit);
+  const ro = new ResizeObserver(() => { fit(); pointAt(); });
   ro.observe(q('.gboard'));
+  ro.observe(el);
 
   const say = (kind, html, ms) => toast(kind, html, ms);
 
@@ -199,6 +223,7 @@ export function renderGrid(el, step, done, prev) {
     tok++;
     showMap(mi);
     highlight(null);
+    narrIdle();
     el.querySelectorAll('.blk.extra').forEach((b) => b.classList.remove('extra'));
     setRunning(false);
   }
@@ -206,7 +231,9 @@ export function renderGrid(el, step, done, prev) {
   function setRunning(on) {
     running = on;
     el.classList.toggle('running', on);
-    runBtn.textContent = on ? '⏹ Durdur' : '▶ Çalıştır';
+    runBtn.textContent = on ? '⏹ Durdur' : watch ? '▶ Bir daha izle' : '▶ Çalıştır';
+    if (watch && !on && !q('.rb.happy')) runBtn.textContent = '▶ İzle';
+    pointAt();
   }
 
   // --- program alanı ---
@@ -223,7 +250,7 @@ export function renderGrid(el, step, done, prev) {
   const slotList = (ref) => { const [id, s] = ref.split(':'); return find(+id).b[s]; };
 
   function draw(newId) {
-    const ctx = { caret, conds, fnName, root: prog, emptyText: 'Komutlara tıkla, buraya eklensin 👆' };
+    const ctx = { caret, conds, fnName, root: prog, ro: watch, emptyText: 'Komutlara tıkla, buraya eklensin 👆' };
     progEl.innerHTML = listHTML(prog, ctx);
     if (fnEl) fnEl.innerHTML = listHTML(fn, { ...ctx, root: fn, emptyText: `${fnName} fonksiyonunun adımlarını buraya yaz` });
     const n = total();
@@ -239,11 +266,113 @@ export function renderGrid(el, step, done, prev) {
       if (cr.bottom > pr.bottom) box.scrollTop += cr.bottom - pr.bottom + 10;
       else if (cr.top < pr.top) box.scrollTop -= pr.top - cr.top + 10;
     }
+    updateTut();
   }
 
   function changed() {
     resetRobot();
     hideToast();
+    updateTut();
+  }
+
+  // --- adım adım tarif: sıradaki işi işaretler, basılacak yeri parmakla gösterir ---
+  let tutAt = null;
+  const listDepth = (list, L = prog, d = 0) => {
+    if (L === list) return d;
+    for (const b of L) for (const s of SLOTS[b.c] || []) { const r = listDepth(list, b[s], d + 1); if (r >= 0) return r; }
+    return -1;
+  };
+  function tutStage() {
+    const s = serProg(prog);
+    const d = listDepth(caret.list);
+    if (!s) return 0;
+    for (let k = T.length - 1; k >= 0; k--) {
+      if (fits(T[k].want, s, d)) return Math.min(k + 1, T.length - 1);
+      if (fits(T[k].wip, s, d)) return k;
+    }
+    return -1;
+  }
+  function updateTut() {
+    if (!T) return;
+    const won = !!q('.rb.happy');
+    const k = won ? T.length : tutStage();
+    el.querySelectorAll('.tut li').forEach((li, j) => { li.className = j < k || won ? 'ok' : j === k ? 'cur' : ''; });
+    q('.toff').hidden = k >= 0;
+    let at = k < 0 ? '.clear' : T[k]?.at;
+    if (typeof at === 'function') at = at(serProg(prog));
+    tutAt = at ? (CMDS[at] ? `.tool[data-c="${at}"]` : at) : null;
+    pointAt();
+  }
+  function pointAt() {
+    if (!T) return;
+    el.querySelectorAll('.tgo').forEach((x) => x.classList.remove('tgo'));
+    let f = q('.finger');
+    const t = !running && tutAt && [...el.querySelectorAll(tutAt)].pop();
+    if (!t || !t.offsetParent) { f?.remove(); return; }
+    t.classList.add('tgo');
+    if (!f) { f = document.createElement('div'); f.className = 'finger'; f.textContent = '👇'; q('.gridact').appendChild(f); }
+    const g = q('.gridact').getBoundingClientRect();
+    const r = t.getBoundingClientRect();
+    f.style.left = r.left - g.left + Math.min(r.width / 2, 40) + 'px';
+    f.style.top = r.top - g.top + 'px';
+  }
+
+  // --- anlatım: çalışırken hangi döngünün kaçıncı turunda olunduğu ---
+  const loopIds = (loops) => Object.keys(loops || {}).filter((id) => find(+id)?.b.c === 'loop');
+  const nested = () => { const deep = (L, d) => L.some((b) => (b.c === 'loop' && d > 0) || (SLOTS[b.c] || []).some((s) => deep(b[s], d + (b.c === 'loop')))); return deep(prog, 0); };
+  function loopName(id) {
+    if (!nested()) return 'Döngü';
+    // Bu döngünün dışında kaç döngü var?
+    const above = (L, d) => { for (const b of L) { if (b.id === +id) return d; for (const s of SLOTS[b.c] || []) { const r = above(b[s], d + (b.c === 'loop')); if (r >= 0) return r; } } return -1; };
+    const n = above(prog, 0);
+    return n === 0 ? 'Dış döngü' : n === 1 ? 'İç döngü' : 'En içteki döngü';
+  }
+  function narrIdle() {
+    if (!narrEl) return;
+    narrEl.innerHTML = watch ? '<div class="nsay">▶ <b>İzle</b> düğmesine bas. Robo programı yavaş yavaş çalıştıracak; çalışan blok <b>sarı çerçeveyle</b> parlar.</div>' : '';
+    narrEl.hidden = !watch;
+  }
+  function showNarr(e) {
+    if (!narrEl) return;
+    const rows = loopIds(e.loops).map((id) => {
+      const k = e.loops[id];
+      const n = find(+id).b.n;
+      return `<div class="nlp"><b>🔁 ${loopName(id)}</b><span class="beads">${Array.from({ length: n }, (_, j) => `<i class="${j + 1 < k ? 'd' : j + 1 === k ? 'c' : ''}"></i>`).join('')}</span><span class="nk">${k}. tur / ${n}</span></div>`;
+    }).join('');
+    let say = e.html;
+    if (!say) {
+      const b = e.id && find(e.id)?.b;
+      const c = b && CMDS[b.c];
+      if (e.t === 'win') say = '🎉 Pile ulaştım!';
+      else if (c) say = `Şimdi: <span class="chipb ${c.cls}">${c.icon} ${b.c === 'fn' ? fnName : c.label}</span>`;
+    }
+    narrEl.hidden = false;
+    narrEl.innerHTML = `${rows ? `<div class="nloops">${rows}</div>` : ''}${say ? `<div class="nsay${e.html ? ' cap' : ''}">${say}</div>` : ''}`;
+  }
+  // Olayların arasına “döngü başlıyor / başa dönüyorum / döngü bitti” anlatımlarını ekler
+  function withCaptions(ev) {
+    const out = [];
+    let prev = {};
+    for (const e of ev) {
+      const cur = e.loops || {};
+      const ended = loopIds(prev).filter((id) => !(id in cur) || cur[id] < prev[id]).reverse();
+      for (const [j, id] of ended.entries()) {
+        const n = find(+id).b.n;
+        const outer = loopIds(cur).some((x) => !ended.includes(x)) || j < ended.length - 1;
+        out.push({ t: 'cap', loops: prev, html: `✅ <b>${loopName(id)} bitti:</b> ${n} turun hepsini yaptım. ${outer ? 'Dıştaki döngüye dönüyorum.' : 'Döngüden çıkıyorum, sıradaki bloğa geçiyorum.'}` });
+        prev = Object.fromEntries(Object.entries(prev).filter(([x]) => x !== id));
+      }
+      for (const id of loopIds(cur)) {
+        const n = find(+id).b.n;
+        const part = Object.fromEntries(Object.entries(cur).slice(0, Object.keys(cur).indexOf(id) + 1));
+        if (!(id in prev)) out.push({ t: 'cap', loops: part, html: `🔁 <b>${loopName(id)} başlıyor:</b> içindeki blokları <b>${n} kez</b> yapacağım.` });
+        else if (cur[id] > prev[id]) out.push({ t: 'cap', loops: part, html: `↩ ${loopName(id)}nün sonuna geldim, <b>başa dönüyorum: ${cur[id]}. tur</b>` });
+        prev = { ...prev, [id]: cur[id] };
+      }
+      out.push(e);
+      prev = cur;
+    }
+    return out;
   }
 
   function add(c) {
@@ -293,7 +422,7 @@ export function renderGrid(el, step, done, prev) {
 
   for (const box of roots) {
     box.addEventListener('click', (e) => {
-      if (running) return;
+      if (running || watch) return;
       const t = e.target;
       const del = t.closest('.del');
       if (del) return remove(+del.closest('.blk').dataset.id);
@@ -324,7 +453,7 @@ export function renderGrid(el, step, done, prev) {
   let dragged = false;
   for (const box of roots) {
     box.addEventListener('pointerdown', (e) => {
-      if (running || e.button > 0 || e.target.closest('.del, select')) return;
+      if (running || watch || e.button > 0 || e.target.closest('.del, select')) return;
       const blk = e.target.closest('.blk');
       if (blk) drag = { el: blk, id: +blk.dataset.id, x0: e.clientX, y0: e.clientY, on: false };
     });
@@ -397,14 +526,44 @@ export function renderGrid(el, step, done, prev) {
     changed();
   });
 
-  q('.reset').onclick = () => { changed(); play('click'); };
-  q('.clear').onclick = () => {
+  if (step.pathHint && step.sol) {
+    q('.vhint').onclick = (e) => {
+      hintOn = !hintOn;
+      e.currentTarget.textContent = hintOn ? '🙈 Renkleri gizle' : '💡 Yolu renklerle göster';
+      play('click');
+      showMap(mi);
+      placeAfterRun();
+    };
+  }
+  // Renkli yol ipucu: örnek çözümde Robo'nun gittiği kareler, her tur ayrı renkte ve tur numarasıyla
+  function paintHint() {
+    const sol = parseProg(step.sol);
+    const r = simulate(M[mi], dirs[mi], sol, { fn: parseProg(step.fnSol || step.fnPreset || ''), pick: step.pick });
+    const top = sol.find((b) => b.c === 'loop');
+    const seen = [];
+    const dots = r.ev.filter((e) => e.t === 'move').map((e) => {
+      const ks = Object.keys(e.loops || {});
+      if (!ks.length) return `<i class="hd" style="--x:${e.x};--y:${e.y};--hc:#8a8a8a"></i>`;
+      const tag = ks[0] + ':' + e.loops[ks[0]];
+      if (!seen.includes(tag)) seen.push(tag);
+      return `<i class="hd" style="--x:${e.x};--y:${e.y};--hc:${HUES[seen.indexOf(tag) % HUES.length]}">${e.loops[ks[0]]}</i>`;
+    });
+    board.insertAdjacentHTML('beforeend', `<div class="hpath">${dots.join('')}</div>`);
+    hintEl.hidden = false;
+    hintEl.innerHTML = `💡 <b>Aynı renkli kareler aynı turda gidiliyor</b>, üstlerindeki sayı turun numarası.${top ? `<div class="hbody"><span>${sol.filter((b) => b.c === 'loop').length > 1 ? 'İlk döngünün bir turunda' : 'Bir turda'} Robo şunları yapıyor:</span>${codePic(serProg(top.body))}</div>` : ''}${step.hint ? `<p>${step.hint}</p>` : ''}`;
+  }
+  function placeAfterRun() {
+    if (!hintOn) { hintEl.hidden = !(step.hint && fails >= 2); if (!hintEl.hidden) hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
+  }
+
+  q('.reset') && (q('.reset').onclick = () => { changed(); play('click'); });
+  q('.clear') && (q('.clear').onclick = () => {
     ({ prog, fn } = fresh());
     caret = { list: prog, i: prog.length };
     play('del');
     changed();
     draw();
-  };
+  });
 
   // --- çalıştırma ---
   function highlight(e) {
@@ -425,6 +584,8 @@ export function renderGrid(el, step, done, prev) {
   async function playEvents(ev, my, ms) {
     for (const e of ev) {
       if (my !== tok) return false;
+      if (narrOn) showNarr(e);
+      if (e.t === 'cap') { highlight(e.loops ? { loops: e.loops } : null); await sleep(ms * (watch ? 2.2 : 1.1)); continue; }
       highlight(e);
       let wait = ms;
       if (e.t === 'turn') { place(e); play('turn'); }
@@ -470,7 +631,7 @@ export function renderGrid(el, step, done, prev) {
     if (running) { resetRobot(); return; }
     hideToast();
     const my = ++tok;
-    const ms = prefs.fast ? 260 : 540;
+    const ms = watch ? 900 : prefs.fast ? 260 : 540;
     for (let k = 0; k < M.length; k++) {
       mi = k;
       showMap(k);
@@ -482,7 +643,7 @@ export function renderGrid(el, step, done, prev) {
       await sleep(180);
       // Sonsuz döngüde yalnızca ilk birkaç olayı oynat, uyarıyı hemen göster
       if (r.result === 'limit') r.ev = r.ev.slice(0, 15);
-      if (!(await playEvents(r.ev, my, ms))) return;
+      if (!(await playEvents(narrOn ? withCaptions(r.ev) : r.ev, my, ms))) return;
       highlight(null);
       const where = M.length > 1 ? `<b>${k + 1}. haritada:</b> ` : '';
       if (r.result === 'extra') {
@@ -500,7 +661,8 @@ export function renderGrid(el, step, done, prev) {
         if (!['tree', 'edge', 'water', 'door'].includes(r.result)) play('wrong');
         const multi = M.length > 1 && k > 0 ? '<br><small>Unutma: aynı program <b>bütün haritalarda</b> çalışmalı.</small>' : '<br><small>Programını düzelt ve tekrar ▶ Çalıştır\'a bas.</small>';
         say('bad', `${where}<b>${FAIL[r.result]}</b>${multi}`);
-        if (step.hint && fails >= 2) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
+        if (step.hint && fails >= 2 && !hintOn) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
+        if (fails >= 2) q('.vhint')?.classList.add('tgo');
         return;
       }
       rb.classList.add('happy');
@@ -518,14 +680,18 @@ export function renderGrid(el, step, done, prev) {
     const n = total();
     const s = best ? (n <= best ? 3 : n <= best + 2 ? 2 : 1) : 0;
     const rate = s ? `<div class="rate">${stars(s)}</div>${s < 3 ? `<small>${best} blokla çözebilir misin? Denemek zorunda değilsin.</small><br>` : ''}` : '';
-    say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b>${rate}<br>${n} blokla çözdün. <b>Devam ▶</b> düğmesine basabilirsin.`, 7000);
-    hintEl.hidden = true;
+    if (watch) say('ok', `<b>${step.win || 'Döngünün nasıl çalıştığını gördün! 👀'}</b><br>İstersen bir daha izle, ya da <b>Devam ▶</b> düğmesine bas.`, 7000);
+    else say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b>${rate}<br>${n} blokla çözdün. <b>Devam ▶</b> düğmesine basabilirsin.`, 7000);
+    if (!hintOn) hintEl.hidden = true;
+    updateTut();
     done(s);
   }
   runBtn.onclick = run;
 
   showMap(0);
   draw();
+  narrIdle();
+  progEl.addEventListener('scroll', pointAt);
   return () => {
     tok++;
     ro.disconnect();

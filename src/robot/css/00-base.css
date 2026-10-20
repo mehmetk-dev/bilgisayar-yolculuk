@@ -37,6 +37,7 @@ button:disabled { cursor: default; }
 .primary:hover { filter: brightness(1.08); }
 .big { font-size: 1.15em; padding: 0.55em 1.2em; border-radius: 16px; }
 button.link { background: none; border: 0; box-shadow: none; color: var(--acc); text-decoration: underline; padding: 0.1em; font-weight: 600; }
+.hero button.link { color: #fff; }
 .shake { animation: shake 0.4s; }
 .pop { animation: pop 0.35s; }
 @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }

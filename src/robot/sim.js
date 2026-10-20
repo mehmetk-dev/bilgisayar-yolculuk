@@ -66,7 +66,10 @@ export function parseProg(s) {
   return list();
 }
 
-export const countBlocks = (prog) => prog.reduce((n, b) => n + 1 + (SLOTS[b.c] || []).reduce((k, s) => k + countBlocks(b[s]), 0), 0);
+// parseProg'un tersi (adım adım görevlerde programın tarife uyup uymadığına bakmak için): 3(FR)F
+export const serProg = (list) => list.map((b) => (b.c === 'loop' ? `${b.n}(${serProg(b.body)})` : b.c === 'fn' ? 'f' : isBox(b) ? '?' : b.c)).join('');
+
+export const countBlocks =(prog) => prog.reduce((n, b) => n + 1 + (SLOTS[b.c] || []).reduce((k, s) => k + countBlocks(b[s]), 0), 0);
 
 export function usesBlock(prog, c) {
   return prog.some((b) => b.c === c || (SLOTS[b.c] || []).some((s) => usesBlock(b[s], c)));
