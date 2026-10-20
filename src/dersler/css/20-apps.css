@@ -866,6 +866,31 @@ mark.br-hit.on { background: #ff9632; }
 .wd-spal { flex-wrap: wrap; width: 13em; }
 .wd-spal button { width: 1.9em; height: 1.9em; min-width: 0; border: 1px solid #ddd !important; font-size: 1.05em; }
 .wd-hpal button { font-size: 0.8em; }
+.wd-bpal { flex-direction: column; gap: 0.1em; }
+.wd-bpal button { width: auto; height: auto; min-width: 0; border: 0 !important; justify-content: flex-start; padding: 0.3em 0.6em !important; white-space: nowrap; font-size: 0.9em; }
+.wd-gpal button { font-size: 0.8em; }
+.wd-shadebtn { flex-direction: column; gap: 0 !important; line-height: 1; }
+.wd-shadebtn i { display: block; width: 1.1em; height: 0.25em; }
+.wd-tabpop { gap: 0.35em; padding: 0.6em 0.7em !important; }
+.wd-tabpop label { display: flex; justify-content: space-between; align-items: center; gap: 0.6em; }
+.wd-tabpop select { height: 1.8em; }
+.wd-tabpop input { width: 4em; }
+.wd-tabrow { display: flex; gap: 0.4em; justify-content: flex-end; }
+.wd-tabrow button { border: 1px solid #c8c8c8 !important; background: #f6f6f6; }
+.wd-tabrow .wd-tabok { background: #1f5fbf; color: #fff; border-color: #1f5fbf !important; }
+.wd-page .wd-tab { display: inline-block; height: 0.9em; vertical-align: baseline; }
+.wd-page .wd-tab.wd-tl-dot { border-bottom: 2px dotted #333; }
+.wd-page .wd-tab.wd-tl-dash { border-bottom: 1.5px dashed #333; }
+.wd-page .wd-tab.wd-tl-line { border-bottom: 1px solid #333; }
+.wd-page .wd-cols { column-gap: 1.6em; margin: 0.3em 0; }
+.wd-page .wd-cols > :first-child { margin-top: 0; }
+.wd-page .wd-toc { margin: 0.2em 0 0.8em; padding: 0.2em 0.3em; border-radius: 3px; user-select: none; }
+.wd-page .wd-toc:hover { background: #eef1f6; }
+.wd-page .wd-toch { font-size: 16pt; color: #1f4e9c; font-weight: 600; margin: 0 0 0.3em; }
+.wd-page .wd-tocl { display: flex; align-items: baseline; gap: 0.3em; margin: 0 0 0.2em; cursor: pointer; }
+.wd-page .wd-tocl i { flex: 1; border-bottom: 2px dotted #666; min-width: 1em; }
+.wd-page .wd-toc2 { padding-left: 1.2em; }
+.wd-page .wd-toc3 { padding-left: 2.4em; }
 .wd-lpop { flex-direction: row; align-items: center; gap: 0.4em; }
 .wd-lpop input { width: 13em; }
 .wd-find { position: absolute; top: 5.4em; right: 1.2em; z-index: 6; background: #fff; border: 1px solid #c8c8c8; border-radius: 8px; box-shadow: 0 8px 20px #0003; padding: 0.6em 0.8em; display: grid; grid-template-columns: auto auto auto; gap: 0.4em 0.5em; align-items: center; font-size: 0.9em; }

@@ -1,0 +1,120 @@
+/* Sunu (PowerPoint) ekleri: şekiller, WordArt, video, köprü, eylem düğmeleri, üst bilgi ve alt bilgi,
+   Not Sayfası, Okuma Görünümü, prova çubuğu, gösteride kalem / vurgulayıcı, dinleyici notu yazdırma */
+
+/* Şekiller: slayda göre yüzde konumlu kutular; dolgu ::before ile çizilir (yıldız, ok kırpılsa da çerçeve görünsün) */
+.pp-shp { position: absolute; z-index: 2; isolation: isolate; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; font-size: 3cqw; font-weight: 700; line-height: 1.15; padding: 0 1.5cqw; box-sizing: border-box; }
+.pp-shp::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--fill); box-shadow: 0 0.4cqw 1cqw #0003; }
+.pp-shp-round::before { border-radius: 2.5cqw; }
+.pp-shp-oval::before { border-radius: 50%; }
+.pp-shp-arrow::before { clip-path: polygon(0 28%, 68% 28%, 68% 0, 100% 50%, 68% 100%, 68% 72%, 0 72%); box-shadow: none; }
+.pp-shp-arrow { padding-right: 10cqw; }
+.pp-shp-star::before { clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); box-shadow: none; }
+.pp-shp-star { font-size: 2.4cqw; padding: 0 4cqw; }
+.pp-shp-callout::before { border-radius: 2cqw; }
+.pp-shp-callout::after { content: ""; position: absolute; z-index: -1; left: 18%; bottom: -3.4cqw; border: 1.8cqw solid transparent; border-top: 2.2cqw solid var(--fill); border-left-width: 0; }
+.pp-shp-act::before { border-radius: 0.8cqw; background: linear-gradient(#fff3, #0002), var(--fill); box-shadow: inset 0 0 0 0.3cqw #fff6, 0 0.4cqw 1cqw #0004; }
+.pp-shp-act { font-size: 4cqw; padding: 0; }
+.pp-shp-wordart { color: #ed7d31; font-size: 7cqw; font-weight: 800; padding: 0; }
+.pp-shp-wordart::before { content: none; }
+.pp-wa1 { color: #ed7d31; text-shadow: 0.35cqw 0.35cqw 0 #7f3f00aa; }
+.pp-wa2 { color: #deebf7; -webkit-text-stroke: 0.25cqw #2f5597; paint-order: stroke fill; }
+.pp-wa3 { color: #bf9000; text-shadow: 0 0 1.2cqw #ffd96680, 0.2cqw 0.3cqw 0 #7f6000; }
+.pp-shtx { position: relative; outline: none; min-width: 1em; max-width: 100%; overflow-wrap: anywhere; }
+.pp-slide .pp-shp { cursor: move; }
+.pp-slide .pp-shtx[contenteditable] { cursor: text; }
+.pp-slide .pp-shp.sel { outline: 0.3cqw dashed #555; outline-offset: 0.5cqw; }
+.pp-show .pp-shp[data-link], .pp-show a[href] { cursor: pointer; }
+.pp-sl a[href] { color: inherit; text-decoration: underline; text-decoration-color: var(--acc); text-decoration-thickness: 0.3cqw; }
+.pp-mini a[href] { pointer-events: none; }
+/* Video: kapak resmi, ortada oynat düğmesi; gösteride tıklayınca ilerleme çubuğu dolar */
+.pp-video { background: #000; padding: 0; overflow: hidden; border-radius: 0.6cqw; box-shadow: 0 0.6cqw 1.6cqw #0005; }
+.pp-video::before { content: none; }
+.pp-video img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; pointer-events: none; }
+.pp-vplay { position: absolute; width: 9cqw; height: 9cqw; border-radius: 50%; background: #000a; color: #fff; display: grid; place-items: center; font-size: 4cqw; }
+.pp-vname { position: absolute; left: 0; right: 0; top: 0; padding: 0.6cqw 1cqw; background: linear-gradient(#000a, #0000); font-size: 1.8cqw; font-weight: 400; text-align: left; }
+.pp-vbar { position: absolute; left: 0; bottom: 0; height: 0.8cqw; width: 0; background: #e53935; }
+.pp-vplaying .pp-vplay { opacity: 0; }
+.pp-vplaying .pp-vbar { animation: ppVbar 6s linear forwards; }
+@keyframes ppVbar { to { width: 100%; } }
+/* Üst Bilgi ve Alt Bilgi: tarih sol altta */
+.pp-date { position: absolute; left: 3cqw; bottom: 1.6cqw; font-size: 2.2cqw; opacity: 0.75; }
+
+/* Şerit: açılır listedeki ara başlık, eylem simgesi, WordArt örneği */
+.pp-laysub { font-size: 0.8em; color: #8a2a12; padding: 0.4em 0.7em 0.1em; border-top: 1px solid #e3e3e3; margin-top: 0.2em; }
+.pp-actic { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; background: #4472c4; color: #fff; border-radius: 3px; font-size: 0.85em; }
+.pp-wa-s { font-weight: 800; font-size: 1.15em; width: 1.8em; display: inline-block; }
+.pp-wa-s.pp-wa2 { -webkit-text-stroke: 1px #2f5597; }
+.pp-tabs .pp-stab { background: #fbd5c9; color: #8a2a12; font-weight: 700; }
+.pp-tabs .pp-stab.on { background: #f3f3f3; }
+
+/* Pencereler: Köprü Ekle, Eylem Ayarları, Üst Bilgi ve Alt Bilgi */
+.pp-dlg { width: min(38em, 100%); }
+.pp-lk { display: flex; gap: 0.8em; padding: 0.8em 1em 0; }
+.pp-lk-side { flex: none; width: 11em; display: flex; flex-direction: column; gap: 0.3em; font-size: 0.92em; }
+.pp-lk-side button { text-align: left; border: 1px solid #ccc; background: #f7f7f7; border-radius: 6px; padding: 0.5em 0.6em; line-height: 1.25; }
+.pp-lk-side button.on { background: #fbe3dc; border-color: #c43e1c; font-weight: 700; }
+.pp-lk-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.4em; }
+.pp-lk-main .dlg-row { padding: 0; }
+.pp-lk-doc > span { font-size: 0.9em; color: #555; }
+.pp-lk-list { display: flex; flex-direction: column; border: 1px solid #ccc; border-radius: 6px; max-height: 12em; overflow: auto; margin-top: 0.3em; }
+.pp-lk-list button { text-align: left; border: 0; background: none; padding: 0.35em 0.6em; border-bottom: 1px solid #eee; }
+.pp-lk-list button:hover { background: #fbe3dc; }
+.pp-lk-list button.on { background: #c43e1c; color: #fff; }
+.pp-ea-tabs { display: flex; gap: 0.3em; padding: 0.6em 1em 0; border-bottom: 1px solid #ddd; }
+.pp-ea-tabs > * { padding: 0.3em 0.8em; border: 1px solid #ddd; border-bottom: 0; border-radius: 6px 6px 0 0; font-size: 0.9em; }
+.pp-ea-tabs > span { color: #888; }
+.pp-ea, .pp-hfd { display: flex; flex-direction: column; gap: 0.45em; }
+.pp-ea label, .pp-hfd label { display: flex; align-items: center; gap: 0.4em; }
+.pp-ea select { margin-left: 1.6em; padding: 0.3em; font: inherit; border: 1px solid #bbb; border-radius: 4px; }
+.pp-hf-sub { margin-left: 1.8em; display: flex; flex-direction: column; gap: 0.3em; }
+.pp-hf-sub .dlg-name { flex: 1; min-width: 0; }
+.pp-hfd input[type="checkbox"], .pp-hfd input[type="radio"], .pp-ea input[type="radio"] { width: 1.15em; height: 1.15em; flex: none; }
+
+/* Not Sayfası: kâğıt gibi; üstte slayt, altta konuşmacı notu */
+.pp-npage { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5em; padding: 0.6em; overflow: auto; background: #e6e6e6; min-height: 0; }
+.pp-np-nav { display: flex; align-items: center; gap: 0.6em; font-size: 0.9em; }
+.pp-np-nav button { border: 1px solid #bbb; background: #fff; border-radius: 6px; padding: 0.2em 0.7em; }
+.pp-np-paper { background: #fff; box-shadow: 0 2px 10px #0003; width: min(100%, 30em); padding: 1.2em 1.5em; display: flex; flex-direction: column; gap: 0.8em; flex: none; }
+.pp-np-sl { flex: none; }
+.pp-npt { width: 100%; height: 8em; resize: vertical; font: inherit; font-size: 0.95em; border: 1px dashed #aaa; border-radius: 4px; padding: 0.4em 0.5em; box-sizing: border-box; }
+
+/* Okuma Görünümü: şerit gizlenir, sunu pencerenin içinde oynar */
+.pp-read { position: absolute; inset: 0; z-index: 19; background: #3b3b3b; display: flex; flex-direction: column; outline: none; }
+.pp-rd-st { flex: 1; min-height: 0; display: grid; place-items: center; container-type: size; cursor: pointer; }
+.pp-rd-bar { display: flex; align-items: center; gap: 1em; padding: 0.3em 0.8em; background: #262626; color: #eee; font-size: 0.85em; }
+.pp-rd-nav { display: flex; gap: 0.3em; margin-left: auto; }
+.pp-rd-bar button { border: 1px solid #666; background: #3a3a3a; color: #fff; border-radius: 4px; padding: 0.15em 0.7em; }
+.pp-rd-bar button:hover { background: #555; }
+
+/* Gösteri: mürekkep katmanı, kalem imleci, sağ tık menüsü, prova çubuğu */
+.pp-sh-in { position: relative; }
+.pp-ink { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
+.pp-ink polyline { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pp-ink-pen { stroke: #e00000; stroke-width: 5; }
+.pp-ink-hl { stroke: #ffeb3b; stroke-width: 26; opacity: 0.45; stroke-linecap: square; }
+.pp-show.pp-pen, .pp-show.pp-pen * { cursor: crosshair; }
+.pp-show.pp-hl, .pp-show.pp-hl * { cursor: cell; }
+.pp-shmenu { position: absolute; z-index: 30; background: #fff; color: #222; border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 8px 24px #0006; padding: 0.3em; display: flex; flex-direction: column; min-width: 15em; font-size: 0.9em; cursor: default; }
+.pp-shmenu button { border: 0; background: none; text-align: left; padding: 0.35em 0.7em; border-radius: 4px; cursor: pointer; }
+.pp-shmenu button:hover { background: #fbe3dc; }
+.pp-shmenu button.on { font-weight: 700; background: #f8d0c4; }
+.pp-shmenu b { font-size: 0.85em; color: #8a2a12; padding: 0.4em 0.7em 0.1em; border-top: 1px solid #e3e3e3; margin-top: 0.2em; }
+.pp-shmenu hr { border: 0; border-top: 1px solid #e3e3e3; margin: 0.2em 0; width: 100%; }
+.pp-rhbar { position: absolute; z-index: 22; left: 0.6em; top: 0.6em; display: flex; align-items: center; gap: 0.6em; background: #fff; color: #222; border: 1px solid #999; border-radius: 6px; padding: 0.3em 0.6em; font-size: 0.85em; box-shadow: 0 4px 12px #0006; }
+.pp-rhbar b { color: #c43e1c; }
+.pp-rh-t { font-variant-numeric: tabular-nums; }
+.pp-rhbar button { border: 1px solid #bbb; background: #f5f5f5; border-radius: 4px; padding: 0.15em 0.6em; }
+.pp-stime { font-style: normal; float: right; color: #666; }
+
+/* Yazdırma önizlemesi: 6 slayt, dinleyici notları (3 slayt + çizgiler), not sayfası */
+.pp-pv6 { grid-template-columns: 1fr 1fr; }
+.pp-pv3 { grid-template-columns: 1fr; gap: 0.8em; padding: 0.8em 0.6em; }
+.pp-pvh { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; align-items: center; }
+.pp-pvlines i { display: block; height: 1.1em; border-bottom: 1px solid #999; }
+.pp-pvn { grid-template-columns: 1fr; padding: 1em 0.8em; gap: 0.8em; }
+.pp-pvnote { font-size: 0.6em; line-height: 1.4; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pp-sorter { outline: none; }
+.pp-lk-main .dlg-row { flex-direction: column; align-items: stretch; gap: 0.2em; }
+.pp-lk-main .dlg-row > span:first-child { width: auto; font-size: 0.9em; color: #444; }
+.pp-dlg .dlg-pr.pp-ea, .pp-dlg .dlg-pr.pp-hfd { padding: 0.7em 1.2em; }
+.pp-dlg .dlg-err { padding-top: 0.4em; }

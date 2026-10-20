@@ -1,7 +1,9 @@
 // Kelime İşlemci: Word benzeri, sayfa görünümlü yazı programı. Biçimlendirme (kalın, italik, altı çizili, üstü çizili,
 // alt/üst simge, yazı tipi, boyut, renk, vurgu), biçim boyacısı, stiller (başlıklar), hizalama, girinti, satır aralığı,
-// madde işaretleri, bul ve değiştir; tablo, resim, tarih, simge, bağlantı, sayfa sonu; kenar boşlukları, yönlendirme,
-// sütunlar; dipnot (Başvurular → Dipnot Ekle, Alt + Ctrl + F); yazım denetimi ve sözcük sayısı; yakınlaştırma; .docx olarak kaydetme, açma, yazdırma ve PDF.
+// madde işaretleri, sekme durakları (öncülü), paragraf kenarlığı ve gölgelendirme, bul ve değiştir; tablo, resim, tarih, simge,
+// bağlantı, sayfa sonu; kenar boşlukları, yönlendirme, sütunlar (bütün belge ya da yalnızca seçili paragraflar);
+// dipnot (Başvurular → Dipnot Ekle, Alt + Ctrl + F), içindekiler tablosu (Başlık 1–3'ten, Tabloyu Güncelleştir, Ctrl + tık);
+// yazım denetimi ve sözcük sayısı; yakınlaştırma; .docx olarak kaydetme, açma, yazdırma ve PDF.
 // İçerik bellekteki dosyada { html } olarak durur.
 import { esc, pictureURL, isImage } from './util.js';
 import { picHtml, pictureTools, WRAPS } from './word-resim.js';
@@ -22,6 +24,11 @@ const CASES = {
   title: ['Her Sözcüğün İlk Harfi Büyük', (t) => trLow(t).replace(/(^|\s)(\p{L})/gu, (m, a, b) => a + trUp(b))],
 };
 const SPACING = ['1,0', '1,15', '1,5', '2,0'];
+// Paragraf kenarlığı (Giriş → Kenarlıklar) ve gölgelendirme (Giriş → Gölgelendirme)
+const PBORDERS = [['box', '▢ Dış Kenarlıklar'], ['top', '▔ Üst Kenarlık'], ['bottom', '▁ Alt Kenarlık'], ['none', '✕ Kenarlık Yok']];
+const SHADES = [['Açık mavi', '#dbe5f1'], ['Açık gri', '#e7e6e6'], ['Açık sarı', '#fff2cc'], ['Açık yeşil', '#e2efd9'], ['Renk Yok', 'transparent']];
+// Sekme öncüsü: sekmenin bıraktığı boşluğu dolduran çizgi (1 Yok, 2 ……, 3 ----, 4 ____)
+const LEADERS = [['', '1 Yok'], ['dot', '2 ..........'], ['dash', '3 ----------'], ['line', '4 _______']];
 const SYMBOLS = ['₺', '€', '$', '©', '®', '™', '°', '±', '×', '÷', '½', '¼', '²', '³', '✓', '✗', '★', '☎', '✉', '→', '•', '…', '«', '»'];
 const MARGINS = { normal: ['Normal', '2,5 cm', '2.5em 3em'], dar: ['Dar', '1,27 cm', '1.3em 1.5em'], genis: ['Geniş', '5 cm (yanlar)', '2.5em 5.5em'] };
 // Yazım denetimi: yetişkinlerin en sık karıştırdığı yazımlar (yanlış → doğru)
@@ -66,6 +73,13 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp">${Object.entries(ALIGN).map(([c, t], i) => `<button type="button" data-cmd="${c}" title="${t} (Ctrl + ${'LERJ'[i]})" class="wd-al wd-${c}"><span></span><span></span><span></span></button>`).join('')}</div>
       <div class="wd-grp"><button type="button" data-cmd="insertUnorderedList" title="Madde işaretleri">• ≡</button><button type="button" data-cmd="insertOrderedList" title="Numaralandırma">1. ≡</button><button type="button" data-cmd="outdent" title="Girintiyi azalt">⇤</button><button type="button" data-cmd="indent" title="Girintiyi artır">⇥</button>
         <select class="wd-lh" title="Satır ve paragraf aralığı">${SPACING.map((v) => `<option${v === '1,15' ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
+      <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-tabsbtn" title="Sekmeler: Tab tuşunun gideceği yer (sekme durağı), hizası ve öncüsü (noktalı çizgi). Gerçek Word'de: Paragraf bölümünün sağ altındaki küçük ok → Sekmeler…">↹ Sekmeler…</button><span class="wd-tpop wd-tabpop" hidden><b>Sekmeler</b>
+          <label>Sekme durağı konumu <span><input type="number" class="wd-tabpos" min="1" max="16" step="0.5" value="15"> cm</span></label>
+          <label>Hizalama <select class="wd-tabal"><option value="left">Sol</option><option value="center">Orta</option><option value="right">Sağ</option></select></label>
+          <label>Öncü (doldurma) <select class="wd-tablead">${LEADERS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label>
+          <span class="wd-tabrow"><button type="button" class="wd-tabok">Tamam</button><button type="button" class="wd-tabclr" title="Seçili paragraflardaki sekme duraklarını kaldırır">Tümünü Temizle</button></span></span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-bordbtn" title="Kenarlıklar: seçili paragrafın çevresine, üstüne ya da altına çizgi">▢ Kenarlık ▾</button><span class="wd-pal wd-bpal" hidden>${PBORDERS.map(([k, l]) => `<button type="button" data-pborder="${k}">${l}</button>`).join('')}</span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-shadebtn" title="Gölgelendirme: paragrafın arkasını boyar"><span>🪣</span><i style="background:#dbe5f1"></i></button><span class="wd-pal wd-gpal" hidden>${SHADES.map(([n, c]) => `<button type="button" data-shade="${c}" title="${n}" style="background:${c}">${c === 'transparent' ? '∅' : ''}</button>`).join('')}</span></span></div>
       <div class="wd-grp wd-styles">${STYLES.map(([k, n]) => `<button type="button" data-style="${k}" class="wd-st-${k}" title="Stil: ${n}">${n}</button>`).join('')}</div>
       <div class="wd-grp"><button type="button" class="wd-findbtn" title="Bul (Ctrl + F)">🔎 Bul</button><button type="button" class="wd-replbtn" title="Değiştir (Ctrl + H)">⇄ Değiştir</button></div>
     </div>
@@ -86,6 +100,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp">Filigran (arka plana silik yazı): <button type="button" data-wm="ÖRNEKTİR">ÖRNEKTİR</button><button type="button" data-wm="ACİL">ACİL</button><button type="button" data-wm="TASLAK">TASLAK</button><button type="button" data-wm="">Yok</button></div>
     </div>
     <div class="wd-rib" data-tab="refs" hidden>
+      <div class="wd-grp"><button type="button" class="wd-tocbtn" title="İçindekiler Tablosu: Başlık 1, Başlık 2, Başlık 3 stilli satırlardan sayfa numaralarıyla bir liste yapar">📑 İçindekiler Tablosu</button><button type="button" class="wd-tocupd" title="Tabloyu Güncelleştir: başlık eklendiyse ya da sayfalar kaydıysa içindekiler tablosunu yeniler">⟳ Tabloyu Güncelleştir</button></div>
       <div class="wd-grp"><button type="button" class="wd-fnbtn" title="Dipnot ekle (Alt + Ctrl + F): imlecin olduğu yere küçük bir sayı koyar; açıklamasını sayfanın altına yazarsınız">ab¹ Dipnot Ekle</button></div>
       <div class="wd-grp"><small class="wd-vnote">Dipnot: bir sözcüğe eklenen açıklama ya da kaynak. Sayfanın en altında küçük yazıyla, numarasıyla görünür; numaralar kendiliğinden sıralanır.</small></div>
     </div>
@@ -178,6 +193,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     setFn(hf.footnotes);
     fileName = name; folder = fld; dirty = false;
     title(); words();
+    setTimeout(() => layoutTabs(), 0);
   }
   const n = args.node && desk.fs.get(args.node);
   if (n) load(n.content?.html, n.name, n.parent, n.content?.layout, n.content);
@@ -268,7 +284,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     }
   }
 
-  function changed() { dirty = true; renumberFn(); title(); words(); }
+  function changed() { dirty = true; renumberFn(); title(); words(); layoutTabs(); }
   function addFootnote() {
     const id = 'f' + fnSeq++;
     insertHtml(`<sup class="wd-fnref" contenteditable="false" data-fn="${id}" title="Dipnot">*</sup>`, 'footnote');
@@ -419,13 +435,13 @@ export function word({ desk, body, args, emit, setTitle }) {
   // ---- Paragraf: stiller ve satır aralığı ----
   const BLOCKS = /^(P|H1|H2|H3|DIV|LI|BLOCKQUOTE)$/;
   function blockOf(node) {
-    for (let x = node && (node.nodeType === 1 ? node : node.parentElement); x && x !== page; x = x.parentElement) if (BLOCKS.test(x.tagName) && x.parentElement === page || x.tagName === 'LI') return x;
+    for (let x = node && (node.nodeType === 1 ? node : node.parentElement); x && x !== page; x = x.parentElement) if (BLOCKS.test(x.tagName) && (x.parentElement === page || x.parentElement?.classList.contains('wd-cols')) || x.tagName === 'LI') return x;
     return null;
   }
   function selectedBlocks() {
     const r = range;
     if (!r) return [];
-    const all = [...page.querySelectorAll('p, h1, h2, h3, li, blockquote, div')].filter((b) => (b.parentElement === page || b.tagName === 'LI') && r.intersectsNode(b));
+    const all = [...page.querySelectorAll('p, h1, h2, h3, li, blockquote, div')].filter((b) => (b.parentElement === page || b.parentElement?.classList.contains('wd-cols') || b.tagName === 'LI') && !b.matches('.wd-cols, .wd-toc') && r.intersectsNode(b));
     return all.length ? all : [blockOf(r.startContainer)].filter(Boolean);
   }
   function setStyle(k) {
@@ -453,6 +469,173 @@ export function word({ desk, body, args, emit, setTitle }) {
     emit('doc-format', { cmd: 'lineHeight', value: lh });
     restore();
   }
+
+  // ---- Paragraf: kenarlık, gölgelendirme ve sekme durakları ----
+  function paraBorder(kind) {
+    const blks = selectedBlocks();
+    blks.forEach((b) => {
+      b.style.border = ''; b.style.padding = '';
+      delete b.dataset.pborder;
+      const line = '1px solid #000';
+      if (kind === 'box') { b.style.border = line; b.style.padding = '0.15em 0.4em'; }
+      if (kind === 'top') { b.style.borderTop = line; b.style.paddingTop = '0.2em'; }
+      if (kind === 'bottom') { b.style.borderBottom = line; b.style.paddingBottom = '0.2em'; }
+      if (kind !== 'none') b.dataset.pborder = kind;
+    });
+    restore();
+    changed();
+    emit('doc-para', { kind: 'border', value: kind, count: blks.length });
+    emit('doc-format', { cmd: 'border', value: kind });
+  }
+  function paraShade(color) {
+    const blks = selectedBlocks();
+    blks.forEach((b) => { b.style.backgroundColor = color === 'transparent' ? '' : color; });
+    restore();
+    changed();
+    emit('doc-para', { kind: 'shade', value: color, count: blks.length });
+    emit('doc-format', { cmd: 'shade', value: color });
+  }
+  // Sekme durağı paragrafta data-tabs="15|left|dot" (cm | hizalama | öncü) olarak durur; paragrafta bir durak olur.
+  // Tab'a basınca <span class="wd-tab"> konur; genişliği durağa göre hesaplanır.
+  function setTabStop(clear) {
+    const blks = selectedBlocks();
+    const pos = Math.min(16, Math.max(0.5, parseFloat(String($('.wd-tabpos').value).replace(',', '.')) || 15));
+    const align = $('.wd-tabal').value, leader = $('.wd-tablead').value;
+    blks.forEach((b) => { if (clear) delete b.dataset.tabs; else b.dataset.tabs = `${pos}|${align}|${leader}`; });
+    $('.wd-tabpop').hidden = true;
+    restore();
+    changed();
+    emit('doc-tabstop', { pos, align, leader, count: blks.length, clear: !!clear });
+    emit('doc-format', { cmd: 'tabstop' });
+  }
+  function insertTab() {
+    const s = getSelection();
+    if (!s.rangeCount) return;
+    const r = s.getRangeAt(0);
+    r.deleteContents();
+    const t = document.createElement('span');
+    t.className = 'wd-tab';
+    t.contentEditable = 'false';
+    r.insertNode(t);
+    r.setStartAfter(t);
+    r.collapse(true);
+    s.removeAllRanges();
+    s.addRange(r);
+    changed();
+    const blk = blockOf(t);
+    emit('doc-tab', { count: blk?.querySelectorAll('.wd-tab').length || 0, text: blk?.innerText.trim().slice(0, 40) || '' });
+  }
+  // Sekmelerin genişliği: kâğıdın sol kenar boşluğundan durağa kadar (sağ ve orta durakta sonraki yazının eni düşülür).
+  // Durağı olmayan paragrafta her 1,25 cm'de bir varsayılan durak vardır.
+  function layoutTabs() {
+    const tabs = page.querySelectorAll('.wd-tab');
+    if (!tabs.length || !page.isConnected) return;
+    const pr = page.getBoundingClientRect(), k = pr.width / (page.offsetWidth || pr.width || 1) || 1; // yakınlaştırma oranı
+    const cs = getComputedStyle(page), cm = (page.offsetWidth / 21) * k; // A4 kâğıdın eni 21 cm
+    const left0 = pr.left + (parseFloat(cs.paddingLeft) || 0) * k, right0 = pr.right - (parseFloat(cs.paddingRight) || 0) * k;
+    for (const t of tabs) {
+      const blk = blockOf(t);
+      const [pos, al = 'left', lead = ''] = (blk?.dataset.tabs || '').split('|');
+      t.className = 'wd-tab' + (pos && lead ? ' wd-tl-' + lead : '');
+      t.style.width = '0px';
+      const x = t.getBoundingClientRect().left;
+      const target = pos ? Math.min(right0, left0 + parseFloat(pos) * cm) : left0 + (Math.floor((x - left0) / (1.25 * cm)) + 1) * 1.25 * cm;
+      let follow = 0;
+      if (pos && al !== 'left' && blk) {
+        const r = document.createRange();
+        r.setStartAfter(t);
+        const nx = [...blk.querySelectorAll('.wd-tab')].find((o) => t.compareDocumentPosition(o) & Node.DOCUMENT_POSITION_FOLLOWING);
+        if (nx) r.setEndBefore(nx); else r.setEnd(blk, blk.childNodes.length);
+        follow = r.getBoundingClientRect().width * (al === 'center' ? 0.5 : 1);
+      }
+      t.style.width = Math.max(4, (target - x - follow) / k) + 'px';
+    }
+  }
+  new ResizeObserver(() => layoutTabs()).observe(page);
+
+  // ---- Sütunlar ----
+  // Yazı seçiliyse yalnızca seçili paragraflar sütunlara bölünür (Word araya “bölüm sonu” koyar); seçim yoksa bütün belge
+  function setCols(n) {
+    const sel = range && !range.collapsed && page.contains(range.commonAncestorContainer) ? [...page.children].filter((b) => range.intersectsNode(b) && !b.classList.contains('wd-toc')) : [];
+    if (!sel.length) return setLayout({ cols: n });
+    const inner = sel.flatMap((b) => (b.classList.contains('wd-cols') ? [...b.children] : [b]));
+    sel.filter((b) => b.classList.contains('wd-cols')).forEach((d) => d.replaceWith(...d.children));
+    let d = null;
+    if (n > 1) {
+      d = document.createElement('div');
+      d.className = 'wd-cols';
+      d.style.columnCount = n;
+      inner[0].before(d);
+      d.append(...inner);
+    }
+    const r = document.createRange();
+    r.setStartBefore(inner[0]); r.setEndAfter(inner[inner.length - 1]);
+    range = r;
+    restore();
+    changed();
+    emit('doc-cols', { cols: n, part: true, count: inner.length });
+    emit('doc-format', { cmd: 'columns', value: n });
+  }
+
+  // ---- İçindekiler tablosu ----
+  // Başlık 1–3 stilli satırlardan yapılır (Konu Başlığı girmez). Word'deki gibi kendiliğinden yenilenmez: “Tabloyu Güncelleştir”.
+  const headings = () => [...page.querySelectorAll('h1, h2, h3')].filter((h) => !h.classList.contains('wd-title') && !h.closest('.wd-toc') && h.innerText.trim());
+  // Bir öğenin kaçıncı sayfada olduğu: önündeki sayfa sonları + son sayfa sonundan bu yana taşan yükseklik
+  function pageOf(el) {
+    const pr = page.getBoundingClientRect(), H = pr.width * (page.classList.contains('yatay') ? 0.707 : 1.414);
+    let n = 1, from = pr.top;
+    for (const pb of page.querySelectorAll('hr.wd-pb')) {
+      if (!(pb.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING)) break;
+      n++; from = pb.getBoundingClientRect().bottom;
+    }
+    return n + Math.max(0, Math.floor((el.getBoundingClientRect().top - from) / (H || 1)));
+  }
+  const tocHtml = () => {
+    const hs = headings();
+    return '<p class="wd-toch">İçindekiler</p>' + (hs.length
+      ? hs.map((h) => `<p class="wd-tocl wd-toc${h.tagName[1]}" title="Başlığa gitmek için Ctrl + tık"><span>${esc(h.innerText.trim())}</span><i></i><b>${pageOf(h)}</b></p>`).join('')
+      : '<p class="wd-tocl">İçindekiler girdisi bulunamadı. Başlıklara Giriş → Stiller → Başlık 1 verin.</p>');
+  };
+  const tocInfo = () => [...(page.querySelector('.wd-toc')?.querySelectorAll('.wd-tocl') || [])].filter((p) => p.querySelector('b')).map((p) => ({ text: p.querySelector('span').innerText.trim(), page: +p.querySelector('b').textContent }));
+  function fillToc(d) { d.innerHTML = tocHtml(); d.innerHTML = tocHtml(); } // ikinci kez: tablonun kendi boyu sayfaları kaydırmış olabilir
+  function insertToc() {
+    const old = page.querySelector('.wd-toc');
+    if (old) return updateToc();
+    let top = range && (range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement);
+    while (top && top.parentElement !== page) top = top.parentElement;
+    const d = document.createElement('div');
+    d.className = 'wd-toc';
+    d.contentEditable = 'false';
+    if (top && page.contains(top)) top.before(d); else page.prepend(d);
+    if (!d.nextElementSibling) d.after(Object.assign(document.createElement('p'), { innerHTML: '<br>' }));
+    fillToc(d);
+    changed();
+    emit('doc-toc', { op: 'insert', entries: tocInfo() });
+  }
+  function updateToc() {
+    const d = page.querySelector('.wd-toc');
+    if (!d) { desk.toast('İçindekiler tablosu yok', 'Önce Başvurular → <b>İçindekiler Tablosu</b> ile bir tablo ekleyin.', '📑', 4000); return; }
+    fillToc(d);
+    changed();
+    desk.toast('Tabloyu Güncelleştir', `İçindekiler tablosu yenilendi: ${tocInfo().length} başlık.`, '📑', 2500);
+    emit('doc-toc', { op: 'update', entries: tocInfo() });
+  }
+  // İçindekiler satırına Ctrl + tık: o başlığa gider
+  page.addEventListener('click', (e) => {
+    const tl = e.target.closest('.wd-tocl');
+    if (!tl || !tl.querySelector('span')) return;
+    if (!(e.ctrlKey || e.metaKey)) { desk.toast('İçindekiler', 'Başlığa gitmek için ' + 'Ctrl tuşuna basılı tutup tıklayın.', '📑', 3000); return; }
+    const txt = tl.querySelector('span').innerText.trim();
+    const h = headings().find((x) => x.innerText.trim() === txt);
+    if (h) {
+      h.scrollIntoView({ block: 'center' });
+      const r = document.createRange();
+      r.selectNodeContents(h); r.collapse(true);
+      range = r;
+      restore();
+    } else desk.toast('Başlık bulunamadı', `“${esc(txt)}” başlığı belgede yok. Başlığın adı değiştiyse Tabloyu Güncelleştir'e basın.`, '📑', 4500);
+    emit('doc-toc-go', { text: txt, found: !!h });
+  });
 
   // ---- Kes, kopyala, yapıştır ve biçim boyacısı ----
   let clip = '';
@@ -705,6 +888,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     $('.wd-ruler').style.zoom = zoom / 100;
     $('.wd-zr').value = zoom;
     $('.wd-zoom b').textContent = `%${zoom}`;
+    layoutTabs();
     emit('doc-zoom', { zoom });
   }
   $('.wd-zr').addEventListener('input', (e) => setZoom(+e.target.value));
@@ -780,6 +964,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (!e.target.closest('.wd-colorwrap')) body.querySelectorAll('.wd-pal, .wd-lpop').forEach((x) => { x.hidden = true; });
     if (!e.target.closest('.wd-tpop, .wd-table')) $('.wd-tpop').hidden = true;
     if (!e.target.closest('.wd-mmwrap')) body.querySelectorAll('.wd-mpop').forEach((x) => { x.hidden = true; });
+    if (!e.target.closest('.wd-tabpop, .wd-tabsbtn')) $('.wd-tabpop').hidden = true;
   });
   body.addEventListener('click', (e) => {
     const t = e.target.closest('button');
@@ -804,7 +989,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.dataset.tb) return tableOp(t.dataset.tb);
     if (t.dataset.margin) return setLayout({ margin: t.dataset.margin });
     if (t.dataset.orient) return setLayout({ orient: t.dataset.orient });
-    if (t.dataset.cols) return setLayout({ cols: +t.dataset.cols });
+    if (t.dataset.cols) return setCols(+t.dataset.cols);
     if (t.dataset.border) return setLayout({ border: t.dataset.border });
     if (t.dataset.wm !== undefined) return setLayout({ wm: t.dataset.wm });
     if (t.classList.contains('wd-spell')) return spellCheck();
@@ -828,6 +1013,15 @@ export function word({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (t.classList.contains('wd-fnbtn')) return addFootnote();
+    if (t.classList.contains('wd-tocbtn')) return insertToc();
+    if (t.classList.contains('wd-tocupd')) return updateToc();
+    if (t.classList.contains('wd-tabsbtn')) { body.querySelectorAll('.wd-pal, .wd-lpop').forEach((x) => { x.hidden = true; }); $('.wd-tabpop').hidden = !$('.wd-tabpop').hidden; return; }
+    if (t.classList.contains('wd-tabok')) return setTabStop(false);
+    if (t.classList.contains('wd-tabclr')) return setTabStop(true);
+    if (t.classList.contains('wd-bordbtn')) return pal('.wd-bpal');
+    if (t.dataset.pborder) { $('.wd-bpal').hidden = true; return paraBorder(t.dataset.pborder); }
+    if (t.classList.contains('wd-shadebtn')) return pal('.wd-gpal');
+    if (t.dataset.shade) { $('.wd-gpal').hidden = true; if (t.dataset.shade !== 'transparent') $('.wd-shadebtn i').style.background = t.dataset.shade; return paraShade(t.dataset.shade); }
     if (t.classList.contains('wd-pb')) return insertHtml('<hr class="wd-pb"><p><br></p>', 'pagebreak');
     if (t.classList.contains('wd-hdrbtn')) return showHF('h');
     if (t.classList.contains('wd-ftrbtn')) return showHF('f');
@@ -900,6 +1094,8 @@ export function word({ desk, body, args, emit, setTitle }) {
         const cells = [...td.closest('table').querySelectorAll('td')];
         const nx = cells[cells.indexOf(td) + (e.shiftKey ? -1 : 1)];
         if (nx) { const r = document.createRange(); r.selectNodeContents(nx); r.collapse(false); s.removeAllRanges(); s.addRange(r); emit('doc-cell'); }
+      } else if (s.rangeCount && blockOf(s.anchorNode)?.dataset.tabs) {
+        insertTab(); // sekme durağı olan paragrafta Tab, durağa kadar boşluk (ya da öncü çizgisi) bırakır
       } else {
         // Paragrafın en başında Tab: ilk satır girintisi (paragraf başı); başka yerde boşluk
         const blk = s.rangeCount && blockOf(s.anchorNode);
@@ -935,7 +1131,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     info() {
       // Tarayıcı bazen listeyi paragrafın içine koyar (<p><ul>…</ul></p>); öyle bir paragraf yerine içindeki liste sayılır
       const isList = (x) => x.tagName === 'UL' || x.tagName === 'OL';
-      const tops = [...page.children].flatMap((b) => (!isList(b) && [...b.children].some(isList) ? [...b.children].filter(isList) : [b]));
+      const tops = [...page.children].flatMap((b) => (b.classList.contains('wd-cols') ? [...b.children] : [b])).flatMap((b) => (!isList(b) && [...b.children].some(isList) ? [...b.children].filter(isList) : [b]));
       const blocks = tops.map((b) => {
         const texts = [];
         const walk = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
@@ -951,6 +1147,8 @@ export function word({ desk, body, args, emit, setTitle }) {
           size: texts.length ? Math.max(...texts.map((el) => Math.round(parseFloat(cs(el).fontSize) * 0.75))) : 0,
           colors: [...new Set(texts.map((el) => cs(el).color))],
           items: b.tagName === 'UL' || b.tagName === 'OL' ? [...b.querySelectorAll('li')].map((li) => li.innerText.trim()) : null,
+          cols: b.parentElement?.classList.contains('wd-cols') ? +b.parentElement.style.columnCount : 0,
+          border: b.dataset?.pborder || '', shade: b.style?.backgroundColor || '', tabStop: b.dataset?.tabs || '', tabs: b.querySelectorAll('.wd-tab').length,
         };
       });
       return {
@@ -961,6 +1159,7 @@ export function word({ desk, body, args, emit, setTitle }) {
         ruler: !$('.wd-ruler').hidden, links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,
         header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: !pn.hidden, footnotes: fnInfo(),
+        toc: page.querySelector('.wd-toc') ? tocInfo() : null, headings: headings().map((h) => ({ text: h.innerText.trim(), page: pageOf(h) })),
         linkList: [...page.querySelectorAll('a[href]')].map((a) => ({ url: a.getAttribute('href').replace(/^https?:\/\//, ''), text: a.innerText.trim() })),
       };
     },
