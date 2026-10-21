@@ -1314,7 +1314,7 @@ S.append(slide('Bu hafta', 'On sekiz ders', plan([
     ('Büyük/küçük harf, stiller, cetvel', 30), ('Şablondan özgeçmiş', 40), ('Üst/alt bilgi, dipnot, köprü', 35),
     ('Numaralandırma ve içindekiler', 35), ('Bülten: sütun, kenarlık, sekme', 30),
     ('Tutanak: izle, açıklama, parola', 40), ('İlan: Metin Kutusu, WordArt', 30), ('Dilekçe parkuru', 25)],
-    'sekiz küçük görev', 14)))
+    'on küçük görev', 19)))
 S.append(slide('Ders 1 · Dilekçe', 'Kelime işlemci nedir?', split(
     ul(['Not Defteri düz yazı yazar; <b>kelime işlemci</b> (en bilineni Microsoft Word) yazıyı <b>biçimlendirir</b>.',
         'Kalın, büyük, ortalı başlıklar; renkler, listeler, tablolar, resimler.',
@@ -1454,7 +1454,7 @@ S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Aa▾ · PDF', 'BÜYÜK / küçük harf · gönderme'],
     ['Başlık 1 → İçindekiler Tablosu', 'Tabloyu Güncelleştir’i unutmayın'], ['Sütunlar · Sekmeler', 'Seçili yazı iki sütun · noktalı satırlar'],
     ['Değişiklikleri İzle', 'Kabul Et / Reddet · parola']],
-    'sekiz küçük görev', 14)))
+    'on küçük görev', 19)))
 write('hafta10', '10. Hafta', 'Bilgisayar İşletmenliği – 10. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 11
@@ -1465,7 +1465,7 @@ S.append(slide('Bu hafta', 'On altı ders', plan([
     ('EĞER ve formül kopyalama', 40), ('Sabit başvuru, ETOPLA, filtre', 35), ('DÜŞEYARA', 35),
     ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35), ('Tarihler, yaş, sayma işlevleri', 35), ('Alt Toplam', 35), ('Otomatik doldurma, dondurma', 30), ('Açılır liste ve aidat takibi', 35),
     ('Çalışma sayfaları', 30), ('Excel’de yazdırma', 30), ('Ev bütçesi ve pasta grafiği', 35), ('Tablo parkuru', 25)],
-    'sekiz küçük görev', 12)))
+    'on küçük görev', 17)))
 S.append(slide('Ders 1 · Hesap tablosu', 'Satır, sütun, hücre', split(
     table([['Sütun', 'Yukarıdan aşağı: <b>A, B, C</b>…'], ['Satır', 'Soldan sağa uzanır; numarası <b>1, 2, 3</b>…'],
            ['Hücre adresi', 'Sütun harfi + satır numarası: <b>C4</b>'],
@@ -1572,7 +1572,7 @@ S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['=BUGÜN · =ETARİHLİ', 'Bugünün tarihi · yaş hesabı'], ['=BAĞ_DEĞ_SAY · =BOŞLUKSAY', 'Sayıları say · boşları say'],
     ['🔢 Alt Toplam · 1 2 3', 'Sırala, grupla, özeti göster'],
     ['❄ Dondur · ✔ Açılır Liste', 'Başlık sabit · seçenekli hücre'], ['Ctrl + P', 'Tek sayfaya sığdır, kılavuz çizgileri']],
-    'sekiz küçük görev', 12)))
+    'on küçük görev', 17)))
 write('hafta11', '11. Hafta', 'Bilgisayar İşletmenliği – 11. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 12
@@ -1582,7 +1582,7 @@ S.append(slide('Bu hafta', 'On iki ders', plan([
     ('Sunu hazırlayalım', 40), ('İyi bir sunu nasıl olur?', 25), ('Slayt düzenleri ve Slayt Sıralayıcı', 30),
     ('SmartArt: şema ve soy ağacı', 25), ('Asıl Slayt; tablo ve grafik', 30), ('Şekil, WordArt, video, köprü', 40), ('Animasyon ve süre ayarı', 30),
     ('Vurgu, çıkış, Animasyon Bölmesi', 40),     ('Sunum anı: notlar, kısayollar', 30), ('Sunuya hazırlık: prova, kalem', 40), ('Aile ve anı albümü', 40), ('Sunu parkuru', 25)],
-    'sekiz küçük görev', 14)))
+    'on küçük görev', 17)))
 S.append(slide('Ders 1 · Sunu hazırlayalım', 'Slaytlar ve slayt gösterisi', split(
     table([['Slayt', 'Sununun her bir sayfası'],
            ['Giriş → Yeni Slayt', 'Düzen seçerek slayt ekler: Başlık ve içerik…'],
@@ -1683,7 +1683,7 @@ S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Konuşmacı notları', 'Yalnızca siz görürsünüz'],
     ['B · W · 3 + Enter', 'Karart · beyaz · 3. slayda git'], ['PDF · Video olarak kaydet', 'Göndermek için'],
     ['Ctrl + K · Eylem düğmesi', 'Köprü: siteye ya da slayda git'], ['Prova · Ctrl + P (gösteride)', 'Süreyi ölç · kalemle göster']],
-    'sekiz küçük görev', 14)))
+    'on küçük görev', 17)))
 write('hafta12', '12. Hafta', 'Bilgisayar İşletmenliği – 12. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 13
