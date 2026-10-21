@@ -919,6 +919,53 @@ mark.br-hit.on { background: #ff9632; }
 .wd-hf:empty::before, .wd-ftxt:empty::before { content: attr(data-ph); color: #aab; }
 .wd-scroll.yatay .wd-hf { width: min(60em, 100%); }
 .wd-scroll:has(.wd-hdr:not([hidden])) .wd-page { min-height: calc(100% - 2.4em); }
+/* Kelime İşlemci: Gözden Geçir (izlenen değişiklikler, açıklama balonları), Bilgi → Belgeyi Koru, Metin Kutusu, WordArt */
+.wd-scroll { position: relative; }
+.wd-page ins.wd-ins { text-decoration: underline; text-decoration-thickness: 1.5px; color: #c00000; }
+.wd-page del.wd-del { text-decoration: line-through; text-decoration-thickness: 1.5px; color: #c00000; }
+.wd-page :is(ins, del).wd-a1 { color: #1f4e9c; } .wd-page :is(ins, del).wd-a2 { color: #2e7d32; } .wd-page :is(ins, del).wd-a3 { color: #7030a0; }
+.wd-page .wd-cmt { background: #fbe7c1; border-bottom: 2px solid #e2a03f; }
+.wd-page .wd-cmt.on { background: #f7cf86; }
+.wd-scroll.has-cmt { padding-right: 17.5em; }
+.wd-cmts { position: absolute; top: 0; left: 0; width: 15.5em; }
+.wd-cmts:empty { display: none; }
+.wd-cbal { position: absolute; left: 0; width: 100%; background: #fff; border: 1px solid #e2a03f; border-left: 4px solid #e2a03f; border-radius: 6px; box-shadow: 0 2px 8px #0002; padding: 0.35em 0.55em; font-size: 0.85em; }
+.wd-cbal.on { border-color: #c77700; box-shadow: 0 3px 12px #c7770055; }
+.wd-cbh { display: flex; align-items: center; justify-content: space-between; gap: 0.4em; color: #6b4a00; }
+.wd-cbh button { border: 0 !important; background: none; padding: 0 0.2em !important; min-width: 0; cursor: pointer; }
+.wd-cbt { outline: none; min-height: 1.4em; margin-top: 0.2em; color: #222; line-height: 1.35; word-break: break-word; }
+.wd-cbt:empty::before { content: attr(data-ph); color: #999; }
+.wd-trk, .wd-lock { font-weight: 700; }
+.wd-accpal, .wd-rejpal, .wd-tbpal, .wd-protpal { flex-direction: column; gap: 0.1em; }
+.wd-accpal button, .wd-rejpal button, .wd-tbpal button, .wd-protpal button { width: auto; height: auto; min-width: 0; border: 0 !important; justify-content: flex-start; padding: 0.35em 0.7em !important; white-space: nowrap; font-size: 0.9em; }
+.wd-protpal button:disabled { color: #999; }
+.wd-acc, .wd-rej { padding-right: 0.2em !important; }
+.wd-accm, .wd-rejm { min-width: 1.2em !important; padding: 0 0.15em !important; }
+.wd-wapal button { width: 2.6em; height: 2.4em; background: #fff; }
+.wd-wapal .wd-wa, .wd-wabtn .wd-wa { font-size: 1.3em; }
+.wd-info { position: absolute; top: 2.1em; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; background: #fff; }
+.wd-info[hidden] { display: none; }
+.wd-infol { width: 12em; background: #1f5fbf; display: flex; flex-direction: column; padding: 0.6em 0; }
+.wd-infol button { border: 0 !important; background: none; color: #fff; justify-content: flex-start; padding: 0.6em 1.1em !important; font-size: 0.95em; }
+.wd-infol button:hover { background: #ffffff26; }
+.wd-infol .wd-infocur { background: #ffffff38; font-weight: 700; }
+.wd-infor { flex: 1; padding: 1em 2em; overflow: auto; color: #222; }
+.wd-infor h2 { font-weight: 400; font-size: 1.8em; margin: 0 0 0.3em; }
+.wd-prot { display: flex; gap: 1em; align-items: flex-start; max-width: 40em; padding: 0.9em 0; border-top: 1px solid #e3e3e3; }
+.wd-prot.on { background: #fff4ce; border-top-color: #e2c26b; padding-left: 0.6em; }
+.wd-prot p { margin: 0.25em 0 0; font-size: 0.9em; color: #444; }
+.wd-protbtn { flex-direction: column; width: 7.5em; height: auto !important; padding: 0.5em 0.3em !important; border: 1px solid #c8c8c8 !important; border-radius: 6px !important; background: #fff; font-size: 0.85em; line-height: 1.3; }
+.wd-protbtn span { font-size: 1.8em; }
+.wd-protbtn:hover { background: #e6eef9; }
+.wd-protic { width: 3.2em; text-align: center; font-size: 1.8em; }
+.wd-page .wd-tbox { display: inline-block; width: 16em; max-width: 100%; min-height: 2.6em; padding: 0.45em 0.7em; border: 1px solid #333; background: #fff; vertical-align: middle; outline: none; text-align: left; }
+.wd-page .wd-tb-sag { float: right; width: 38%; margin: 0.1em 0 0.4em 1em; background: #eef4fb; border: 0; border-left: 4px solid #1f4e9c; }
+.wd-page .wd-tbox:focus, .wd-page .wd-wa:focus { box-shadow: 0 0 0 1px #8fb0e0; }
+.wd-wa { font-weight: 800; font-size: 28pt; line-height: 1.2; outline: none; letter-spacing: 0.5px; }
+.wd-wa-mavi { color: #2f6fd0; text-shadow: 2px 2px 0 #0f2f6b55, 3px 3px 5px #0004; }
+.wd-wa-altin { color: #b8860b; background: linear-gradient(180deg, #ffe082 0%, #f0b400 50%, #a86b00 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; caret-color: #a86b00; filter: drop-shadow(1px 1px 0 #6b4a0066); }
+.wd-wa-kontur { color: #fff; -webkit-text-stroke: 1.5px #e46c0a; paint-order: stroke fill; text-shadow: 2px 2px 0 #e46c0a44; caret-color: #e46c0a; }
+.wd-wa-kirmizi { color: #c00000; text-shadow: 3px 3px 0 #00000040, 0 0 1px #600; font-style: italic; }
 
 /* Hesap Tablosu */
 .xl { background: #fff; }
@@ -1054,6 +1101,16 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .xl-pop .primary { background: #1e7145 !important; border-color: #1e7145 !important; color: #fff; }
 .xl-flist { max-height: 10em; overflow-y: auto; display: flex; flex-direction: column; gap: 0.15em; border: 1px solid #e0e0e0; border-radius: 4px; padding: 0.3em; }
 .xl-fall { font-weight: 700; }
+/* Hesap tablosu: Alt Toplam penceresi ve anahat düzeyi düğmeleri (1 2 3) */
+.xl-slist { max-height: 8em; overflow-y: auto; display: flex; flex-direction: column; gap: 0.15em; border: 1px solid #e0e0e0; border-radius: 4px; padding: 0.3em; }
+.xl-pop button:disabled { opacity: 0.5; cursor: default; }
+.xl-ol { display: flex; align-items: center; gap: 0.3em; padding: 0.2em 0.5em; background: #f7f7f7; border-bottom: 1px solid #d6d6d6; font-size: 0.85em; }
+.xl-ol[hidden] { display: none; }
+.xl-ol button { min-width: 1.9em; height: 1.7em; padding: 0 0.4em !important; border: 1px solid #9a9a9a !important; border-radius: 3px !important; background: #fff; font-weight: 700; }
+.xl-ol button:hover { background: #dcefe3; }
+.xl-ol button.on { background: #1e7145; border-color: #1e7145 !important; color: #fff; }
+.xl-olnote { color: #555; margin-left: 0.4em; }
+.xl-grid tbody th.xl-olrow { box-shadow: inset 3px 0 0 #1e7145; font-weight: 700; }
 /* Hesap tablosu: pasta grafiği */
 .xl-pie { display: flex; gap: 1em; align-items: center; padding: 0.4em; }
 .xl-pie svg { width: 11em; height: 11em; flex: none; }

@@ -4,6 +4,8 @@
 // bağlantı, sayfa sonu; kenar boşlukları, yönlendirme, sütunlar (bütün belge ya da yalnızca seçili paragraflar);
 // dipnot (Başvurular → Dipnot Ekle, Alt + Ctrl + F), içindekiler tablosu (Başlık 1–3'ten, Tabloyu Güncelleştir, Ctrl + tık);
 // yazım denetimi ve sözcük sayısı; yakınlaştırma; .docx olarak kaydetme, açma, yazdırma ve PDF.
+// Gözden Geçir: Değişiklikleri İzle (Ctrl + Shift + E), Kabul Et / Reddet, Yeni Açıklama (sağ kenarda balon);
+// Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele (açılışta parola sorulur); Ekle → Metin Kutusu ve WordArt.
 // İçerik bellekteki dosyada { html } olarak durur.
 import { esc, pictureURL, isImage } from './util.js';
 import { picHtml, pictureTools, WRAPS } from './word-resim.js';
@@ -29,6 +31,10 @@ const PBORDERS = [['box', '▢ Dış Kenarlıklar'], ['top', '▔ Üst Kenarlık
 const SHADES = [['Açık mavi', '#dbe5f1'], ['Açık gri', '#e7e6e6'], ['Açık sarı', '#fff2cc'], ['Açık yeşil', '#e2efd9'], ['Renk Yok', 'transparent']];
 // Sekme öncüsü: sekmenin bıraktığı boşluğu dolduran çizgi (1 Yok, 2 ……, 3 ----, 4 ____)
 const LEADERS = [['', '1 Yok'], ['dot', '2 ..........'], ['dash', '3 ----------'], ['line', '4 _______']];
+// WordArt biçimleri (Ekle → WordArt) ve metin kutusu türleri (Ekle → Metin Kutusu)
+const WORDART = [['mavi', 'Mavi dolgu, gölgeli'], ['altin', 'Altın dolgu'], ['kontur', 'Turuncu çerçeveli'], ['kirmizi', 'Kırmızı, kalın gölgeli']];
+const TBOXES = [['basit', '▭ Basit Metin Kutusu'], ['sag', '▯ Sağa yaslı kutu (yazı yanından akar)']];
+const PH = 'Metninizi buraya yazın';
 const SYMBOLS = ['₺', '€', '$', '©', '®', '™', '°', '±', '×', '÷', '½', '¼', '²', '³', '✓', '✗', '★', '☎', '✉', '→', '•', '…', '«', '»'];
 const MARGINS = { normal: ['Normal', '2,5 cm', '2.5em 3em'], dar: ['Dar', '1,27 cm', '1.3em 1.5em'], genis: ['Geniş', '5 cm (yanlar)', '2.5em 5.5em'] };
 // Yazım denetimi: yetişkinlerin en sık karıştırdığı yazımlar (yanlış → doğru)
@@ -90,6 +96,8 @@ export function word({ desk, body, args, emit, setTitle }) {
         <span class="wd-colorwrap"><button type="button" class="wd-link" title="Bağlantı (Ctrl + K)">🔗 Bağlantı</button><span class="wd-tpop wd-lpop" hidden><label>Adres <input class="wd-lurl" placeholder="www.ornek.com.tr"></label><button type="button" class="wd-lok">Ekle</button></span></span>
         <button type="button" class="wd-pb" title="Sayfa sonu (Ctrl + Enter): yazının kalanı yeni sayfadan başlar">⤓ Sayfa sonu</button>
         <span class="wd-colorwrap"><button type="button" class="wd-shbtn" title="Şekil: içine yazı yazılabilen kutu ve oklar">◇ Şekil</button><span class="wd-pal wd-shpal" hidden><button type="button" data-shape="kutu">▭ Kutu</button><button type="button" data-shape="yuvarlak">▢ Yuvarlak kutu</button><button type="button" data-shape="ok">➜ Ok</button></span></span></div>
+      <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-tbbtn" title="Metin Kutusu: çerçeveli, ayrı bir yazı kutusu (duyurudaki “önemli not” gibi)">▭ Metin Kutusu ▾</button><span class="wd-pal wd-tbpal" hidden>${TBOXES.map(([k, l]) => `<button type="button" data-tbox="${k}">${l}</button>`).join('')}</span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-wabtn" title="WordArt: süslü, gölgeli, renkli büyük başlık yazısı"><b class="wd-wa wd-wa-mavi">A</b> WordArt ▾</button><span class="wd-pal wd-wapal" hidden>${WORDART.map(([k, l]) => `<button type="button" data-wa="${k}" title="${l}"><b class="wd-wa wd-wa-${k}">A</b></button>`).join('')}</span></span></div>
       <div class="wd-grp"><button type="button" class="wd-hdrbtn" title="Her sayfanın en üstünde tekrarlanan yazı">▔ Üst bilgi</button><button type="button" class="wd-ftrbtn" title="Her sayfanın en altında tekrarlanan yazı">▁ Alt bilgi</button><button type="button" class="wd-pnbtn" title="Alt bilgiye sayfa numarası ekler">#️ Sayfa numarası</button></div>
     </div>
     <div class="wd-rib" data-tab="layout" hidden>
@@ -112,6 +120,11 @@ export function word({ desk, body, args, emit, setTitle }) {
     </div>
     <div class="wd-rib" data-tab="review" hidden>
       <div class="wd-grp"><button type="button" class="wd-spell" title="Yazım denetimi (F7)">ABC✓ Yazım denetimi</button><button type="button" class="wd-count" title="Sözcük sayısı">123 Sözcük sayısı</button></div>
+      <div class="wd-grp"><button type="button" class="wd-cmtbtn" title="Yeni Açıklama: seçili yazıya sağ kenarda bir not balonu ekler (yazının kendisi değişmez)">💬 Yeni Açıklama</button><button type="button" class="wd-cmtdel" title="Sil: imlecin olduğu ya da tıkladığınız açıklamayı siler">🗑 Sil</button></div>
+      <div class="wd-grp"><button type="button" class="wd-trackbtn" title="Değişiklikleri İzle (Ctrl + Shift + E): açıkken eklediğiniz yazı altı çizili renkli, sildiğiniz yazı üstü çizili görünür; belge sahibi her birini kabul eder ya da reddeder">📝 Değişiklikleri İzle</button></div>
+      <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-acc" title="Kabul Et ve Sonrakine Geç: değişikliği belgeye işler, sonrakini seçer">✔ Kabul Et</button><button type="button" class="wd-accm" title="Kabul Et seçenekleri">▾</button><span class="wd-pal wd-accpal" hidden><button type="button" data-rv="accept">✔ Kabul Et ve Sonrakine Geç</button><button type="button" data-rv="acceptAll">✔ Tüm Değişiklikleri Kabul Et</button></span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-rej" title="Reddet ve Sonrakine Geç: değişikliği geri alır, sonrakini seçer">✖ Reddet</button><button type="button" class="wd-rejm" title="Reddet seçenekleri">▾</button><span class="wd-pal wd-rejpal" hidden><button type="button" data-rv="reject">✖ Reddet ve Sonrakine Geç</button><button type="button" data-rv="rejectAll">✖ Tüm Değişiklikleri Reddet</button></span></span>
+        <button type="button" data-rv="prev" title="Önceki değişiklik">◀ Önceki</button><button type="button" data-rv="next" title="Sonraki değişiklik">Sonraki ▶</button></div>
     </div>
     <div class="wd-rib" data-tab="view" hidden>
       <div class="wd-grp"><label class="wd-chk"><input type="checkbox" class="wd-rulerchk"> Cetvel</label><small class="wd-vnote">Yakınlaştırma: sağ alttaki çubuk ya da Ctrl + fare tekerleği</small></div>
@@ -130,14 +143,22 @@ export function word({ desk, body, args, emit, setTitle }) {
     <div class="wd-find" hidden><b class="wd-fh">Bul ve Değiştir</b><label>Aranan <input class="wd-fq"></label><label class="wd-rrow">Yeni <input class="wd-rq"></label>
       <span class="wd-fn"></span><button type="button" data-f="next">Sonrakini bul</button><button type="button" data-f="repl" class="wd-rrow">Değiştir</button><button type="button" data-f="all" class="wd-rrow">Tümünü değiştir</button><button type="button" data-f="close" title="Kapat">✕</button></div>
     <div class="wd-spane" hidden></div>
-    <div class="wd-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="pdf">📕 PDF olarak kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button><button type="button" data-file="close">✕ Kapat</button></div>
-    <div class="wd-scroll"><div class="wd-ruler" hidden><span></span></div><div class="wd-hf wd-hdr" contenteditable="true" spellcheck="false" data-ph="Üst bilgi" hidden></div><div class="wd-page" contenteditable="true" spellcheck="false"><p><br></p></div><div class="wd-fns" hidden><ol></ol></div><div class="wd-hf wd-ftr" hidden><span class="wd-ftxt" contenteditable="true" spellcheck="false" data-ph="Alt bilgi"></span><span class="wd-pn" hidden></span></div></div>
-    <div class="wd-status"><span class="wd-words"></span><span class="wd-lang">Türkçe (Türkiye)</span><span class="wd-zoom"><button type="button" data-zoom="-10" title="Uzaklaştır">−</button><input type="range" class="wd-zr" min="50" max="200" step="10" value="100" aria-label="Yakınlaştırma"><button type="button" data-zoom="10" title="Yakınlaştır">+</button><b>%100</b></span></div>`;
+    <div class="wd-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="info">ℹ Bilgi <small>Belgeyi Koru</small></button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="pdf">📕 PDF olarak kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button><button type="button" data-file="close">✕ Kapat</button></div>
+    <div class="wd-info" hidden><div class="wd-infol"><button type="button" class="wd-infoback" title="Belgeye dön (Esc)">⬅ Geri</button><button type="button" class="wd-infocur">ℹ Bilgi</button><button type="button" data-file="save">💾 Kaydet</button><button type="button" data-file="saveas">💾 Farklı Kaydet</button><button type="button" data-file="close">✕ Kapat</button></div>
+      <div class="wd-infor"><h2>Bilgi</h2><p class="wd-infon"></p>
+        <div class="wd-prot"><span class="wd-colorwrap"><button type="button" class="wd-protbtn"><span>🔒</span>Belgeyi Koru ▾</button><span class="wd-pal wd-protpal" hidden><button type="button" disabled title="Bu kursta yok">📖 Her Zaman Salt Okunur Olarak Aç</button><button type="button" class="wd-encrypt">🔑 Parola ile Şifrele</button><button type="button" disabled title="Bu kursta yok">✋ Düzenlemeyi Kısıtla</button><button type="button" disabled title="Bu kursta yok">🏁 Son Olarak İşaretle</button></span></span>
+          <div><b>Belgeyi Koru</b><p class="wd-protd"></p></div></div>
+        <div class="wd-prot wd-protx"><span class="wd-protic">🔍</span><div><b>Belgeyi İncele</b><p class="wd-revd"></p></div></div></div></div>
+    <div class="wd-scroll"><div class="wd-cmts"></div><div class="wd-ruler" hidden><span></span></div><div class="wd-hf wd-hdr" contenteditable="true" spellcheck="false" data-ph="Üst bilgi" hidden></div><div class="wd-page" contenteditable="true" spellcheck="false"><p><br></p></div><div class="wd-fns" hidden><ol></ol></div><div class="wd-hf wd-ftr" hidden><span class="wd-ftxt" contenteditable="true" spellcheck="false" data-ph="Alt bilgi"></span><span class="wd-pn" hidden></span></div></div>
+    <div class="wd-status"><span class="wd-words"></span><span class="wd-trk" hidden>📝 Değişiklikleri İzle: Açık</span><span class="wd-lock" hidden title="Bu belge parolayla şifreli">🔒 Parolalı</span><span class="wd-lang">Türkçe (Türkiye)</span><span class="wd-zoom"><button type="button" data-zoom="-10" title="Uzaklaştır">−</button><input type="range" class="wd-zr" min="50" max="200" step="10" value="100" aria-label="Yakınlaştırma"><button type="button" data-zoom="10" title="Yakınlaştır">+</button><b>%100</b></span></div>`;
   const $ = (s) => body.querySelector(s);
   const page = $('.wd-page');
   let fileName = null, folder = 'docs', dirty = false, range = null;
   const DEF_LAYOUT = { margin: 'normal', orient: 'dikey', cols: 1, border: 'yok', wm: '' };
   const layout = { ...DEF_LAYOUT };
+  // Gözden Geçir ve Belgeyi Koru: izleme açık mı, açıklama balonları, belgenin parolası (dosyada { track, comments, pass })
+  let track = false, docPass = '', locked = false, cmtSeq = 1, cmtOn = null;
+  const cmtBox = $('.wd-cmts');
 
   const title = () => setTitle(`${dirty ? '*' : ''}${fileName || 'Belge1'} - Kelime İşlemci`);
   const countWords = () => { const t = page.innerText.trim(); return t ? t.split(/\s+/).length : 0; };
@@ -191,12 +212,15 @@ export function word({ desk, body, args, emit, setTitle }) {
     setLayout(layout, true);
     setHF(hf);
     setFn(hf.footnotes);
+    setComments(hf.comments);
+    docPass = hf.pass || ''; track = !!hf.track; syncTrack(); syncProt();
     fileName = name; folder = fld; dirty = false;
     title(); words();
     setTimeout(() => layoutTabs(), 0);
   }
   const n = args.node && desk.fs.get(args.node);
-  if (n) load(n.content?.html, n.name, n.parent, n.content?.layout, n.content);
+  if (n?.content?.pass) openLocked(n); // parolalı belge: önce parola sorulur
+  else if (n) load(n.content?.html, n.name, n.parent, n.content?.layout, n.content);
   else if (args.merged) { load(args.merged.html, null, folder, args.merged.layout, args.merged); dirty = true; setTitle('*Mektuplar1 - Kelime İşlemci'); } // adres mektup birleştirmenin sonucu
   else load();
 
@@ -284,7 +308,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     }
   }
 
-  function changed() { dirty = true; renumberFn(); title(); words(); layoutTabs(); }
+  function changed() { dirty = true; renumberFn(); title(); words(); layoutTabs(); syncMarks(); }
   function addFootnote() {
     const id = 'f' + fnSeq++;
     insertHtml(`<sup class="wd-fnref" contenteditable="false" data-fn="${id}" title="Dipnot">*</sup>`, 'footnote');
@@ -361,11 +385,13 @@ export function word({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (c === 'close') return desk.close(desk.wins.find((w) => w.el.contains(body)));
+    if (c === 'info') return showInfo(true);
     if (c === 'open') {
       if (!(await confirmDiscard())) return;
       const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder, ext: '.docx', typeLabel: 'Word Belgeleri (*.docx)' });
       if (!r) return;
       const c = desk.fs.find(r.folder, r.name)?.content;
+      if (c?.pass && !(await askOpenPass(c, r.name))) return;
       load(c?.html, r.name, r.folder, c?.layout, c);
       emit('doc-open', { name: r.name });
       return;
@@ -428,9 +454,12 @@ export function word({ desk, body, args, emit, setTitle }) {
     c.querySelectorAll('.wd-sp, mark.wd-hit').forEach((s) => s.replaceWith(...s.childNodes));
     c.querySelectorAll('.wd-pic.on').forEach((x) => x.classList.remove('on'));
     c.querySelectorAll('.wd-field').forEach((x) => { x.textContent = `«${x.dataset.field}»`; x.classList.remove('pv'); }); // önizleme kaydedilmez
+    c.querySelectorAll('.wd-cmt.on').forEach((x) => x.classList.remove('on'));
     return c.innerHTML;
   }
-  const content = () => ({ html: cleanHtml(), layout: { ...layout }, header: hdr.hidden ? '' : hdr.innerHTML, footer: ftr.hidden ? '' : ftxt.innerHTML, pageNum: !pn.hidden, footnotes: [...fnList.children].map((li) => ({ id: li.dataset.fn, html: li.querySelector('.wd-fnt').innerHTML })) });
+  const content = () => ({ html: cleanHtml(), layout: { ...layout }, header: hdr.hidden ? '' : hdr.innerHTML, footer: ftr.hidden ? '' : ftxt.innerHTML, pageNum: !pn.hidden, footnotes: [...fnList.children].map((li) => ({ id: li.dataset.fn, html: li.querySelector('.wd-fnt').innerHTML })),
+    ...(cmtBox.children.length ? { comments: [...cmtBox.children].map((b) => ({ id: b.dataset.cmt, author: b.dataset.author, html: b.querySelector('.wd-cbt').innerHTML })) } : {}),
+    ...(track ? { track: true } : {}), ...(docPass ? { pass: docPass } : {}) });
 
   // ---- Paragraf: stiller ve satır aralığı ----
   const BLOCKS = /^(P|H1|H2|H3|DIV|LI|BLOCKQUOTE)$/;
@@ -551,7 +580,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       t.style.width = Math.max(4, (target - x - follow) / k) + 'px';
     }
   }
-  new ResizeObserver(() => layoutTabs()).observe(page);
+  new ResizeObserver(() => { layoutTabs(); placeComments(); }).observe(page);
 
   // ---- Sütunlar ----
   // Yazı seçiliyse yalnızca seçili paragraflar sütunlara bölünür (Word araya “bölüm sonu” koyar); seçim yoksa bütün belge
@@ -889,6 +918,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     $('.wd-zr').value = zoom;
     $('.wd-zoom b').textContent = `%${zoom}`;
     layoutTabs();
+    placeComments();
     emit('doc-zoom', { zoom });
   }
   $('.wd-zr').addEventListener('input', (e) => setZoom(+e.target.value));
@@ -954,6 +984,327 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (k === 'prev' || k === 'next') { mm.preview = true; mm.idx = (mm.idx + (k === 'next' ? 1 : -1) + mm.rows.length) % mm.rows.length; renderMM(); emit('merge-preview', { on: true, index: mm.idx }); }
     if (k === 'edit' || k === 'print') { $('.wd-fin').hidden = true; finishMerge(k); }
     return true;
+  }
+
+  // ---- Gözden Geçir: Değişiklikleri İzle ----
+  // İzleme açıkken yazılanlar <ins class="wd-ins">, silinenler <del class="wd-del"> içine girer (silinen yazı üstü çizili kalır).
+  // data-author: değişikliği yapanın adı. Kabul Et değişikliği belgeye işler, Reddet geri alır.
+  function me() { return desk.settings?.user || 'Kullanıcı'; }
+  function revs() { return [...page.querySelectorAll('ins.wd-ins, del.wd-del')]; }
+  // Her kişinin değişiklikleri ayrı renkte; üzerine gelince kimin yaptığı görünür
+  function syncMarks() {
+    const authors = [];
+    for (const x of revs()) {
+      const a = x.dataset.author || '';
+      if (!authors.includes(a)) authors.push(a);
+      x.className = `${x.tagName === 'INS' ? 'wd-ins' : 'wd-del'} wd-a${authors.indexOf(a) % 4}`;
+      x.title = `${a}: ${x.tagName === 'INS' ? 'Eklendi' : 'Silindi'}`;
+    }
+    syncComments();
+  }
+  function syncTrack() { $('.wd-trackbtn').classList.toggle('on', track); $('.wd-trk').hidden = !track; }
+  function setTrack(on) {
+    track = !!on;
+    syncTrack();
+    changed();
+    desk.toast('Değişiklikleri İzle', track ? 'Açık: bundan sonra eklediğiniz yazı <u>altı çizili</u>, sildiğiniz yazı <s>üstü çizili</s> görünür.' : 'Kapalı: yaptığınız değişiklikler artık işaretlenmiyor.', '📝', 3000);
+    emit('doc-track', { on: track });
+    restore();
+  }
+  function trackInsert(txt) {
+    const s = getSelection();
+    if (!txt || !s.rangeCount || !page.contains(s.anchorNode)) return;
+    if (!s.isCollapsed) trackDelete(s.getRangeAt(0).cloneRange(), 'fwd'); // seçili yazının üstüne yazmak: önce silinir, sonra eklenir
+    const r = s.getRangeAt(0).cloneRange();
+    const del = (r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentElement).closest('del.wd-del');
+    if (del && page.contains(del)) { r.setStartAfter(del); r.collapse(true); } // silinmiş yazının içine yazılmaz
+    const own = r.startContainer.nodeType === 3 ? r.startContainer.parentElement.closest('ins.wd-ins') : null;
+    let tn, at = 0;
+    if (own && own.dataset.author === me()) { tn = r.startContainer; at = r.startOffset; tn.insertData(at, txt); }
+    else {
+      const ins = document.createElement('ins');
+      ins.className = 'wd-ins';
+      ins.dataset.author = me();
+      tn = document.createTextNode(txt);
+      ins.append(tn);
+      r.insertNode(ins);
+    }
+    // Sondaki boşluk görünmez kalırdı: sonda bölünmez boşluk, arkasından harf gelince yeniden düz boşluk
+    tn.data = tn.data.replace(/ (?=\S)/g, ' ').replace(/ $/, ' ');
+    const c = document.createRange();
+    c.setStart(tn, at + txt.length);
+    c.collapse(true);
+    s.removeAllRanges();
+    s.addRange(c);
+    range = c.cloneRange();
+    changed();
+    emit('doc-input', { text: page.innerText });
+    emit('doc-revision', { type: 'ins', text: tn.parentElement.textContent });
+  }
+  // dir: 'back' (Backspace) imleç silinenin önüne, 'fwd' (Delete, üstüne yazma) arkasına geçer
+  function trackDelete(r, dir) {
+    if (r.collapsed || !page.contains(r.commonAncestorContainer)) return;
+    const m1 = document.createElement('i'), m2 = document.createElement('i'); // geçici işaretler: imlecin yeri
+    const b = r.cloneRange(); b.collapse(false); b.insertNode(m2);
+    const a = r.cloneRange(); a.collapse(true); a.insertNode(m1);
+    const span = document.createRange();
+    span.setStartAfter(m1); span.setEndBefore(m2);
+    let gone = '';
+    for (const n of textNodes().filter((x) => x.length && span.intersectsNode(x))) {
+      const p = n.parentElement;
+      if (p.closest('.wd-fnref, .wd-field, .wd-toc')) continue;
+      if (p.closest('ins.wd-ins')) { n.remove(); continue; } // henüz kabul edilmemiş eklemeyi silmek: iz bırakmaz
+      if (p.closest('del.wd-del')) continue;
+      gone += n.data;
+      const d = document.createElement('del');
+      d.className = 'wd-del';
+      d.dataset.author = me();
+      n.replaceWith(d);
+      d.append(n);
+    }
+    const c = document.createRange();
+    if (dir === 'back') c.setStartBefore(m1); else c.setStartAfter(m2);
+    c.collapse(true);
+    m1.remove(); m2.remove();
+    revs().forEach((x) => { if (!x.textContent) x.remove(); });
+    const s = getSelection();
+    s.removeAllRanges();
+    s.addRange(c);
+    range = c.cloneRange();
+    changed();
+    emit('doc-input', { text: page.innerText });
+    if (gone) emit('doc-revision', { type: 'del', text: gone });
+  }
+  page.addEventListener('beforeinput', (e) => {
+    if (!track) return;
+    const t = e.inputType || '';
+    if (t === 'insertText' || t === 'insertReplacementText') { e.preventDefault(); trackInsert(e.data ?? e.dataTransfer?.getData('text/plain') ?? ''); return; }
+    if (!t.startsWith('delete')) return; // Enter (yeni paragraf) izlenmez
+    e.preventDefault();
+    const sr = e.getTargetRanges?.()[0];
+    let r = null;
+    if (sr) { r = document.createRange(); r.setStart(sr.startContainer, sr.startOffset); r.setEnd(sr.endContainer, sr.endOffset); }
+    else if (getSelection().rangeCount) r = getSelection().getRangeAt(0).cloneRange();
+    if (r && !r.collapsed) trackDelete(r, /Backward/.test(t) ? 'back' : 'fwd');
+  });
+  // Bir değişiklik: yan yana duran aynı kişinin işaretleri (ör. “100” silindi + “150” eklendi) birlikte kabul edilir ya da reddedilir
+  function units() {
+    const out = [];
+    for (const x of revs()) {
+      const last = out[out.length - 1], prev = last?.[last.length - 1];
+      if (prev && prev.nextSibling === x && prev.dataset.author === x.dataset.author) last.push(x); else out.push([x]);
+    }
+    return out;
+  }
+  function unitRange(u) { const r = document.createRange(); r.setStartBefore(u[0]); r.setEndAfter(u[u.length - 1]); return r; }
+  const unitText = (u) => u.map((x) => (x.tagName === 'INS' ? '+' : '−') + x.textContent).join(' ');
+  function curUnit() {
+    if (!range || !page.contains(range.commonAncestorContainer)) return null;
+    return units().find((u) => u.some((x) => range.intersectsNode(x))) || null;
+  }
+  // İmleçten sonraki (back: önceki) değişiklik; sona gelince baştan
+  function nearUnit(back) {
+    const us = units();
+    if (!us.length) return null;
+    const pos = range && page.contains(range.commonAncestorContainer) ? range : null;
+    if (!pos) return back ? us[us.length - 1] : us[0];
+    if (back) { for (let i = us.length - 1; i >= 0; i--) if (unitRange(us[i]).compareBoundaryPoints(Range.END_TO_START, pos) <= 0) return us[i]; return us[us.length - 1]; }
+    return us.find((u) => unitRange(u).compareBoundaryPoints(Range.START_TO_END, pos) >= 0) || us[0];
+  }
+  function selectUnit(u) { range = unitRange(u); restore(); u[0].parentElement.scrollIntoView({ block: 'nearest' }); }
+  function goChange(back) {
+    const u = nearUnit(back);
+    if (!u) { desk.toast('Değişiklik yok', 'Belgede izlenen değişiklik kalmadı.', '📝', 2500); emit('doc-review', { op: back ? 'prev' : 'next', count: 0, left: 0 }); return; }
+    selectUnit(u);
+    emit('doc-review', { op: back ? 'prev' : 'next', count: 0, left: units().length, text: unitText(u), author: u[0].dataset.author || '' });
+  }
+  // op: 'accept' | 'reject'; all: Tüm Değişiklikleri Kabul Et / Reddet. Tek değişiklikten sonra sonrakine geçer.
+  function review(op, all) {
+    const list = all ? units() : [curUnit() || nearUnit(false)].filter(Boolean);
+    if (!list.length) { desk.toast('Değişiklik yok', 'Belgede kabul edilecek ya da reddedilecek değişiklik yok.', '📝', 2500); emit('doc-review', { op, all: !!all, count: 0, left: 0 }); return; }
+    const texts = list.map(unitText), authors = list.map((u) => u[0].dataset.author || '');
+    const mk = document.createElement('i');
+    list[list.length - 1].at(-1).after(mk);
+    for (const u of list) for (const x of u) { if ((x.tagName === 'INS') === (op === 'accept')) x.replaceWith(...x.childNodes); else x.remove(); }
+    const r = document.createRange();
+    r.setStartBefore(mk); r.collapse(true);
+    mk.remove();
+    page.normalize();
+    range = r;
+    changed();
+    const left = units().length;
+    if (!all && left) selectUnit(nearUnit(false)); else restore();
+    if (all) desk.toast(op === 'accept' ? 'Tüm Değişiklikleri Kabul Et' : 'Tüm Değişiklikleri Reddet', `${list.length} değişiklik ${op === 'accept' ? 'belgeye işlendi' : 'geri alındı'}.`, op === 'accept' ? '✔' : '✖', 3000);
+    emit('doc-review', { op, all: !!all, count: list.length, left, texts, authors });
+  }
+
+  // ---- Gözden Geçir: açıklamalar ----
+  // Metinde <span class="wd-cmt" data-cmt="c1">, sağ kenarda aynı data-cmt'li balon (yazanın adı ve not). Yazı değişmez.
+  function balloonHtml(id, author, html = '') {
+    return `<div class="wd-cbal" data-cmt="${esc(id)}" data-author="${esc(author)}"><div class="wd-cbh"><b>👤 ${esc(author)}</b><button type="button" class="wd-cbdel" title="Açıklamayı sil">🗑</button></div><div class="wd-cbt" contenteditable="true" spellcheck="false" data-ph="Açıklamanızı yazın…">${html}</div></div>`;
+  }
+  function setComments(list) {
+    cmtBox.innerHTML = (list || []).map((c) => balloonHtml(c.id, c.author || '', c.html)).join('');
+    cmtSeq = (list || []).reduce((m, c) => Math.max(m, +String(c.id).slice(1) || 0), 0) + 1;
+    cmtOn = null;
+    syncComments();
+  }
+  function syncComments() {
+    for (const b of [...cmtBox.children]) if (!page.querySelector(`.wd-cmt[data-cmt="${b.dataset.cmt}"]`)) b.remove(); // yazısı silinen açıklama da kalkar
+    $('.wd-scroll').classList.toggle('has-cmt', cmtBox.children.length > 0);
+    placeComments();
+  }
+  // Balonlar açıklama yapılan satırın hizasında, birbirinin üstüne binmeden
+  function placeComments() {
+    if (!cmtBox.children.length || !page.isConnected) return;
+    const sc = $('.wd-scroll'), sr = sc.getBoundingClientRect(), pr = page.getBoundingClientRect();
+    cmtBox.style.left = (pr.right - sr.left + sc.scrollLeft + 12) + 'px';
+    const at = (b) => { const a = page.querySelector(`.wd-cmt[data-cmt="${b.dataset.cmt}"]`); return a ? a.getBoundingClientRect().top - sr.top + sc.scrollTop - 6 : 0; };
+    let y = 0;
+    for (const [b, top] of [...cmtBox.children].map((b) => [b, at(b)]).sort((p, q) => p[1] - q[1])) {
+      const t = Math.max(top, y);
+      b.style.top = t + 'px';
+      y = t + b.offsetHeight + 8;
+    }
+  }
+  function activeCmt(id) {
+    cmtOn = id;
+    page.querySelectorAll('.wd-cmt').forEach((x) => x.classList.toggle('on', x.dataset.cmt === id));
+    [...cmtBox.children].forEach((x) => x.classList.toggle('on', x.dataset.cmt === id));
+  }
+  function addComment() {
+    restore();
+    const s = getSelection();
+    if (!s.rangeCount || !page.contains(s.anchorNode)) { desk.toast('Önce seçin', 'Açıklama eklemek istediğiniz yazıyı seçin.', '💬', 3500); return; }
+    if (s.isCollapsed) { s.modify('move', 'backward', 'word'); s.modify('extend', 'forward', 'word'); } // seçim yoksa imlecin olduğu sözcük
+    const r = s.getRangeAt(0).cloneRange();
+    if (!r.toString().trim()) { desk.toast('Önce seçin', 'Açıklama eklemek istediğiniz yazıyı seçin.', '💬', 3500); emit('doc-comment', { op: 'add', ok: false }); return; }
+    if (blockOf(r.startContainer) !== blockOf(r.endContainer) || (r.startContainer.nodeType === 1 ? r.startContainer : r.startContainer.parentElement).closest('.wd-cmt')) {
+      desk.toast('Tek paragraf', 'Açıklamayı tek bir paragraftaki yazıya ekleyin: bir iki sözcük seçmeniz yeter.', '💬', 4000);
+      emit('doc-comment', { op: 'add', ok: false });
+      return;
+    }
+    const id = 'c' + cmtSeq++;
+    const sp = document.createElement('span');
+    sp.className = 'wd-cmt';
+    sp.dataset.cmt = id;
+    sp.append(r.extractContents());
+    r.insertNode(sp);
+    cmtBox.insertAdjacentHTML('beforeend', balloonHtml(id, me()));
+    changed();
+    activeCmt(id);
+    cmtBox.lastElementChild.querySelector('.wd-cbt').focus();
+    emit('doc-comment', { op: 'add', ok: true, id, anchor: sp.innerText.trim(), count: cmtBox.children.length });
+  }
+  function delComment(id) {
+    const at = range && (range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement)?.closest('.wd-cmt');
+    id = id || document.activeElement?.closest?.('.wd-cbal')?.dataset.cmt || (at && page.contains(at) ? at.dataset.cmt : null) || cmtOn || (cmtBox.children.length === 1 ? cmtBox.firstElementChild.dataset.cmt : null);
+    if (!id || !cmtBox.querySelector(`[data-cmt="${id}"]`)) { desk.toast('Hangi açıklama?', 'Silmek istediğiniz açıklamanın balonuna ya da işaretli yazısına tıklayın, sonra <b>Sil</b>\'e basın.', '💬', 4000); return; }
+    const a = page.querySelector(`.wd-cmt[data-cmt="${id}"]`);
+    if (a) a.replaceWith(...a.childNodes);
+    cmtBox.querySelector(`[data-cmt="${id}"]`)?.remove();
+    cmtOn = null;
+    page.normalize();
+    changed();
+    page.focus({ preventScroll: true });
+    emit('doc-comment', { op: 'delete', id, count: cmtBox.children.length });
+  }
+  cmtBox.addEventListener('input', (e) => {
+    const b = e.target.closest('.wd-cbal');
+    changed();
+    if (b) emit('doc-comment-text', { id: b.dataset.cmt, text: b.querySelector('.wd-cbt').innerText.trim() });
+  });
+  cmtBox.addEventListener('click', (e) => {
+    const b = e.target.closest('.wd-cbal');
+    if (!b) return;
+    if (e.target.closest('.wd-cbdel')) { delComment(b.dataset.cmt); return; }
+    activeCmt(b.dataset.cmt);
+  });
+  cmtBox.addEventListener('focusin', (e) => { const b = e.target.closest('.wd-cbal'); if (b) activeCmt(b.dataset.cmt); });
+  cmtBox.addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || ''); });
+  page.addEventListener('click', (e) => { const a = e.target.closest('.wd-cmt'); if (a) activeCmt(a.dataset.cmt); });
+
+  // ---- Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele ----
+  function showInfo(on) {
+    $('.wd-menu').hidden = true;
+    $('.wd-info').hidden = !on;
+    if (on) {
+      $('.wd-infon').innerHTML = `📄 <b>${esc(fileName || 'Belge1')}</b>${fileName ? '' : ' · henüz kaydedilmedi'}`;
+      syncProt();
+      $('.wd-protbtn').focus();
+    } else restore();
+    emit('doc-info', { open: !!on });
+  }
+  function syncProt() {
+    $('.wd-lock').hidden = !docPass;
+    $('.wd-prot').classList.toggle('on', !!docPass);
+    $('.wd-protd').innerHTML = docPass ? '<b>Bu belgeyi açmak için parola gerekir.</b><br>Parolayı kaldırmak için yeniden Parola ile Şifrele\'yi seçip kutuyu boş bırakın.' : 'Bu belgede başkalarının neler yapabileceğini denetleyin. Parola koyarsanız parolayı bilmeyen kişi belgeyi açamaz.';
+    $('.wd-revd').textContent = `Belgede ${units().length} izlenen değişiklik ve ${cmtBox.children.length} açıklama var. Belgeyi başkasına göndermeden önce değişiklikleri kabul edin ya da reddedin, açıklamaları silin.`;
+  }
+  // Ortak metin kutulu pencerede yazılan parola görünmesin (•••)
+  function pwInputs() { desk.dialogs._last?.querySelectorAll('input[data-f]').forEach((i) => { i.type = 'password'; }); }
+  async function encrypt() {
+    if (desk.dialogs.busy) return;
+    const f1 = desk.dialogs.form({ title: 'Belgeyi Şifrele', icon: '🔑', text: `<b>Bu dosyanın içeriğini şifreleyin</b><br><small>Dikkat: Parolayı unutursanız belge <b>kurtarılamaz</b>. Parolayı güvenli bir yere yazın. Büyük ve küçük harf fark eder.${docPass ? '<br>Parolayı kaldırmak için kutuyu boş bırakıp Tamam\'a basın.' : ''}</small>`, fields: [{ name: 'p', label: 'Parola:' }] });
+    pwInputs();
+    const a = await f1;
+    if (!a) return;
+    if (!a.p) {
+      if (docPass) { docPass = ''; syncProt(); changed(); desk.toast('Parola kaldırıldı', 'Belge artık parolasız açılır. Kaydetmeyi unutmayın.', '🔓', 3500); emit('doc-protect', { on: false }); }
+      return;
+    }
+    const f2 = desk.dialogs.form({ title: 'Parolayı Onayla', icon: '🔑', text: 'Parolayı <b>yeniden</b> girin:', fields: [{ name: 'p', label: 'Parola:' }],
+      check: (v) => { if (v.p === a.p) return ''; emit('doc-protect', { on: false, mismatch: true }); return 'Onay parolası aynı değil. Aynı parolayı yeniden yazın.'; } });
+    pwInputs();
+    const b = await f2;
+    if (!b) return;
+    docPass = a.p;
+    syncProt();
+    changed();
+    desk.toast('Belge şifrelendi', 'Kaydettiğinizde belge parolalı olur: açılırken parola sorulur.', '🔒', 4000);
+    emit('doc-protect', { on: true, length: a.p.length });
+  }
+  async function askOpenPass(c, name) {
+    const f = desk.dialogs.form({ title: 'Parola', icon: '🔒', text: `<b>${esc(name)}</b> parolayla korunuyor.<br>Dosyayı açmak için parolayı girin.`, fields: [{ name: 'p', label: 'Parola:' }] });
+    pwInputs();
+    const v = await f;
+    if (v && v.p === c.pass) { emit('doc-open-pass', { name, ok: true }); return true; }
+    if (v) await desk.dialogs.ask({ title: 'Kelime İşlemci', icon: '⛔', text: `<b>Girdiğiniz parola yanlış.</b><br>Kelime İşlemci belgeyi açamıyor.<br><small>${esc(name)}</small>`, buttons: [['ok', 'Tamam', true]] });
+    emit('doc-open-pass', { name, ok: false, cancel: !v });
+    return false;
+  }
+  // Masaüstünden ya da klasörden açılan parolalı belge: parola doğruysa açılır, yanlışsa ya da İptal'de pencere kapanır
+  async function openLocked(nd) {
+    locked = true;
+    page.contentEditable = 'false';
+    load('');
+    setTimeout(() => { if (locked) setTitle(`🔒 ${nd.name} - Kelime İşlemci`); }, 0); // pencere kurulduktan sonra
+    const ok = await askOpenPass(nd.content, nd.name);
+    locked = false;
+    page.contentEditable = 'true';
+    if (ok) { load(nd.content.html, nd.name, nd.parent, nd.content.layout, nd.content); page.focus({ preventScroll: true }); emit('doc-open', { name: nd.name }); return; }
+    const w = desk.wins.find((x) => x.el.contains(body));
+    if (w) desk.close(w);
+  }
+
+  // ---- Ekle: Metin Kutusu ve WordArt ----
+  function insertBox(kind, k) {
+    const before = new Set(page.querySelectorAll('.wd-tbox, .wd-wa'));
+    // İmleç bir kutunun içindeyse yeni kutu onun içine değil, arkasına eklenir
+    const cur = range && (range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement)?.closest('.wd-tbox, .wd-wa, .wd-shape');
+    if (cur && page.contains(cur)) { range = document.createRange(); range.setStartAfter(cur); range.collapse(true); }
+    insertHtml(kind === 'wa' ? `<span class="wd-wa wd-wa-${k}" data-wa="${k}" contenteditable="true">${PH}</span>&nbsp;` : `<span class="wd-tbox wd-tb-${k}" data-tbox="${k}" contenteditable="true">${PH}</span>&nbsp;`, kind === 'wa' ? 'wordart' : 'textbox');
+    const el = [...page.querySelectorAll('.wd-tbox, .wd-wa')].find((x) => !before.has(x));
+    if (!el) return;
+    // Sağa yaslı kutu yazının yanında durur: arkasındaki boşluk paragrafın başında fazladan girinti gibi görünmesin
+    const nx = el.nextSibling;
+    if (k === 'sag' && nx?.nodeType === 3 && nx.data.startsWith('\u00a0') && nx.data.length > 1) nx.deleteData(0, 1);
+    // Yer tutucu yazı seçili gelir: yazmaya başlayınca yerine geçer
+    const r = document.createRange();
+    r.selectNodeContents(el.firstChild || el);
+    range = r;
+    restore();
+    emit(kind === 'wa' ? 'doc-wordart' : 'doc-textbox', { style: k, count: page.querySelectorAll(kind === 'wa' ? '.wd-wa' : '.wd-tbox').length });
   }
 
   // ---- Olaylar ----
@@ -1041,6 +1392,21 @@ export function word({ desk, body, args, emit, setTitle }) {
       const cur = range && (range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement)?.closest('.wd-shape');
       if (cur && page.contains(cur)) { range = document.createRange(); range.setStartAfter(cur); range.collapse(true); }
       return insertHtml(`<span class="wd-shape wd-sh-${t.dataset.shape}" contenteditable="true">Yazınız</span>&nbsp;`, 'shape'); }
+    if (t.classList.contains('wd-tbbtn')) return pal('.wd-tbpal');
+    if (t.dataset.tbox) { $('.wd-tbpal').hidden = true; return insertBox('tbox', t.dataset.tbox); }
+    if (t.classList.contains('wd-wabtn')) return pal('.wd-wapal');
+    if (t.dataset.wa) { $('.wd-wapal').hidden = true; return insertBox('wa', t.dataset.wa); }
+    if (t.classList.contains('wd-trackbtn')) return setTrack(!track);
+    if (t.classList.contains('wd-cmtbtn')) return addComment();
+    if (t.classList.contains('wd-cmtdel')) return delComment();
+    if (t.classList.contains('wd-accm')) return pal('.wd-accpal');
+    if (t.classList.contains('wd-rejm')) return pal('.wd-rejpal');
+    if (t.classList.contains('wd-acc')) return review('accept');
+    if (t.classList.contains('wd-rej')) return review('reject');
+    if (t.dataset.rv) { body.querySelectorAll('.wd-accpal, .wd-rejpal').forEach((x) => { x.hidden = true; }); return t.dataset.rv === 'next' || t.dataset.rv === 'prev' ? goChange(t.dataset.rv === 'prev') : review(t.dataset.rv.replace('All', ''), t.dataset.rv.endsWith('All')); }
+    if (t.classList.contains('wd-infoback')) return showInfo(false);
+    if (t.classList.contains('wd-protbtn')) return pal('.wd-protpal');
+    if (t.classList.contains('wd-encrypt')) { $('.wd-protpal').hidden = true; return encrypt(); }
     if (t.classList.contains('wd-pic')) return insertPicture();
     if (t.classList.contains('wd-date')) return insertHtml(esc(today()), 'date');
   });
@@ -1082,6 +1448,7 @@ export function word({ desk, body, args, emit, setTitle }) {
   page.addEventListener('paste', (e) => {
     // Başka yerden gelen biçimler karışmasın: yalnızca düz yazı yapıştırılır
     e.preventDefault();
+    if (track) { trackInsert(e.clipboardData?.getData('text/plain') || ''); return; }
     document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || '');
   });
   page.addEventListener('keydown', (e) => {
@@ -1111,6 +1478,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (e.key === 'Escape' && painter) { e.preventDefault(); const was = painter.sticky; stopPainter(); if (was) emit('doc-painter', { stage: 'stop' }); return; }
     if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyF') { e.preventDefault(); addFootnote(); return; }
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    if (e.shiftKey && e.code === 'KeyE') { e.preventDefault(); setTrack(!track); emit('doc-shortcut', { cmd: 'track' }); return; }
     const map = { KeyB: 'bold', KeyI: 'italic', KeyU: 'underline', KeyL: 'justifyLeft', KeyE: 'justifyCenter', KeyR: 'justifyRight', KeyJ: 'justifyFull' };
     if (map[e.code]) { e.preventDefault(); exec(map[e.code]); emit('doc-shortcut', { cmd: map[e.code] }); return; }
     if (e.code === 'KeyS') { e.preventDefault(); save(e.shiftKey); }
@@ -1121,7 +1489,12 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (e.code === 'KeyK') { e.preventDefault(); $('.wd-link').click(); }
     if (e.key === 'Enter') { e.preventDefault(); insertHtml('<hr class="wd-pb"><p><br></p>', 'pagebreak'); }
   });
-  body.addEventListener('keydown', (e) => { if (e.key === 'F7') { e.preventDefault(); spellCheck(); } });
+  body.addEventListener('keydown', (e) => {
+    if (e.key === 'F7') { e.preventDefault(); spellCheck(); }
+    if (e.key === 'Escape' && !$('.wd-info').hidden && !desk.dialogs.busy) { e.preventDefault(); showInfo(false); }
+    // Ctrl + S açıklama balonunda, üst/alt bilgide ya da Bilgi ekranındayken de kaydeder (sayfanın içindekini sayfa kendisi yakalar)
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && e.code === 'KeyS' && !page.contains(e.target)) { e.preventDefault(); save(e.shiftKey); }
+  });
   document.execCommand('defaultParagraphSeparator', false, 'p');
   title();
 
@@ -1161,6 +1534,11 @@ export function word({ desk, body, args, emit, setTitle }) {
         header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: !pn.hidden, footnotes: fnInfo(),
         toc: page.querySelector('.wd-toc') ? tocInfo() : null, headings: headings().map((h) => ({ text: h.innerText.trim(), page: pageOf(h) })),
         linkList: [...page.querySelectorAll('a[href]')].map((a) => ({ url: a.getAttribute('href').replace(/^https?:\/\//, ''), text: a.innerText.trim() })),
+        track, revisions: revs().map((x) => ({ type: x.tagName === 'INS' ? 'ins' : 'del', text: x.textContent, author: x.dataset.author || '' })),
+        comments: [...cmtBox.children].map((b) => ({ id: b.dataset.cmt, author: b.dataset.author, text: b.querySelector('.wd-cbt').innerText.trim(), anchor: page.querySelector(`.wd-cmt[data-cmt="${b.dataset.cmt}"]`)?.innerText.trim() || '' })),
+        protected: !!docPass, locked, info: !$('.wd-info').hidden,
+        textBoxes: [...page.querySelectorAll('.wd-tbox')].map((x) => ({ text: x.innerText.trim(), kind: x.dataset.tbox })),
+        wordArt: [...page.querySelectorAll('.wd-wa')].map((x) => ({ text: x.innerText.trim(), style: x.dataset.wa })),
       };
     },
     confirmClose: confirmDiscard,

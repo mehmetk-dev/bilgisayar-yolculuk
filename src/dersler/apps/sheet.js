@@ -1,6 +1,7 @@
 // Hesap Tablosu: Excel benzeri çalışma sayfası. Hücre seçme ve yazma; formüller (+ − * / ^ & ve karşılaştırma,
-// TOPLA, ORTALAMA, MAK, MİN, BAĞ_DEĞ_SAY, BAĞ_DEĞ_DOLU_SAY, BOŞLUKSAY, EĞER, EĞERSAY, ETOPLA, YUVARLA, BİRLEŞTİR, BÜYÜKHARF, KÜÇÜKHARF, YAZIM.DÜZENİ, BUGÜN, TARİH, YIL, AY, GÜN, ETARİHLİ; gg.aa.yyyy tarih hücreleri); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
+// TOPLA, ORTALAMA, MAK, MİN, BAĞ_DEĞ_SAY, BAĞ_DEĞ_DOLU_SAY, BOŞLUKSAY, EĞER, EĞERSAY, ETOPLA, YUVARLA, BİRLEŞTİR, BÜYÜKHARF, KÜÇÜKHARF, YAZIM.DÜZENİ, BUGÜN, TARİH, YIL, AY, GÜN, ETARİHLİ, ALTTOPLAM, ÇARPIM; gg.aa.yyyy tarih hücreleri); göreli ve $ ile sabit başvuru; kopyala-yapıştır ve
 // doldurma tutamacı; otomatik toplam; kalın, para ve yüzde biçimi; koşullu biçimlendirme; sıralama; filtre; sütun grafiği;
+// Alt Toplam (gruplar arasına “… Toplam” satırları, 1/2/3 anahat düzeyleri, Tümünü Kaldır);
 // sayfa koruması (kilidi açılan hücreler dışında değişiklik yapılamaz, isteğe bağlı parola).
 // Türkçe Excel gibi: ondalık ayırıcı virgül, işlev bağımsız değişkenleri noktalı virgülle ayrılır.
 import { esc } from './util.js';
@@ -51,6 +52,21 @@ export function shiftFormula(f, dr, dc) {
     const r = d2 ? +row : +row + dr;
     if (c < 0 || c >= COLS.length || r < 1 || r > ROWS) return '#BAŞV!';
     return `${d1}${COLS[c]}${d2}${r}`;
+  }))).join('');
+}
+// Satır eklenip silinince formüllerdeki başvuruları yeni yerlerine taşır. newOf[eski satır] = yeni satır (0'dan), silinen satır için null.
+// Excel gibi $ olan başvurular da kayar; aralığın silinen ucu içerideki ilk/son kalan satıra çekilir, tamamı silinmişse #BAŞV!
+export function remapRefs(f, newOf) {
+  if (!f.startsWith('=')) return f;
+  const ok = (n) => n != null && n < ROWS;
+  return f.split(/("[^"]*")/).map((part, i) => (i % 2 ? part : part.replace(/(?<![A-Za-zÇĞİÖŞÜçğıöşü$_])(\$?)([A-Ha-h])(\$?)(\d{1,2})(?::(\$?)([A-Ha-h])(\$?)(\d{1,2}))?(?![\d(A-Za-zÇĞİÖŞÜçğıöşü_])/g, (all, d1, c1, d2, r1, d3, c2, d4, r2) => {
+    if (+r1 > ROWS || (r2 && +r2 > ROWS)) return all;
+    if (!r2) { const n = newOf[+r1 - 1]; return ok(n) ? `${d1}${c1}${d2}${n + 1}` : '#BAŞV!'; }
+    const s = Math.min(+r1, +r2) - 1, e = Math.max(+r1, +r2) - 1;
+    let a = s; while (a <= e && newOf[a] == null) a++;
+    let b = e; while (b >= s && newOf[b] == null) b--;
+    if (a > e || !ok(newOf[a]) || !ok(newOf[b])) return '#BAŞV!';
+    return `${d1}${c1}${d2}${newOf[a] + 1}:${d3}${c2}${d4}${newOf[b] + 1}`;
   }))).join('');
 }
 
@@ -129,13 +145,24 @@ FUNCS['DÜŞEYARA'] = (a, num) => {
   if (hit < 0) throw new FErr('#YOK');
   return t.vals[hit * t.cols + n - 1];
 };
-const ALIAS = { SAY: 'BAĞ_DEĞ_SAY', COUNT: 'BAĞ_DEĞ_SAY', BAG_DEG_SAY: 'BAĞ_DEĞ_SAY', COUNTA: 'BAĞ_DEĞ_DOLU_SAY', BAG_DEG_DOLU_SAY: 'BAĞ_DEĞ_DOLU_SAY', COUNTBLANK: 'BOŞLUKSAY', BOSLUKSAY: 'BOŞLUKSAY',
+FUNCS['ÇARPIM'] = (a, num) => numsOf(a, num).reduce((x, y) => x * y, 1);
+// ALTTOPLAM(işlev_no; aralık): 9 topla, 1 ortalama, 2 sayı say, 3 dolu say, 4 mak, 5 min, 6 çarpım (101–106, 109 da aynı).
+// Gerçek Excel gibi aralıktaki başka ALTTOPLAM hücrelerini saymaz: genel toplam, alt toplamları iki kez toplamaz.
+const SUBFN = { 1: 'ORTALAMA', 2: 'BAĞ_DEĞ_SAY', 3: 'BAĞ_DEĞ_DOLU_SAY', 4: 'MAK', 5: 'MİN', 6: 'ÇARPIM', 9: 'TOPLA' };
+FUNCS.ALTTOPLAM = (a, num) => {
+  if (a.length < 2 || isRange(a[0])) throw new FErr('#DEĞER!');
+  const k = Math.trunc(num(a[0])), fn = SUBFN[k > 100 ? k - 100 : k];
+  if (!fn) throw new FErr('#DEĞER!');
+  return FUNCS[fn](a.slice(1).map((x) => (isRange(x) && x.skip ? { ...x, vals: x.vals.filter((_, i) => !x.skip[i]) } : x)), num);
+};
+const ALIAS = { SUBTOTAL: 'ALTTOPLAM', PRODUCT: 'ÇARPIM', CARPIM: 'ÇARPIM', SAY: 'BAĞ_DEĞ_SAY', COUNT: 'BAĞ_DEĞ_SAY', BAG_DEG_SAY: 'BAĞ_DEĞ_SAY', COUNTA: 'BAĞ_DEĞ_DOLU_SAY', BAG_DEG_DOLU_SAY: 'BAĞ_DEĞ_DOLU_SAY', COUNTBLANK: 'BOŞLUKSAY', BOSLUKSAY: 'BOŞLUKSAY',
   BUGUN: 'BUGÜN', TODAY: 'BUGÜN', TARIH: 'TARİH', DATE: 'TARİH', YEAR: 'YIL', MONTH: 'AY', GUN: 'GÜN', DAY: 'GÜN', ETARIHLI: 'ETARİHLİ', DATEDIF: 'ETARİHLİ',
   VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA',
   BIRLESTIR: 'BİRLEŞTİR', CONCATENATE: 'BİRLEŞTİR', CONCAT: 'BİRLEŞTİR', BUYUKHARF: 'BÜYÜKHARF', UPPER: 'BÜYÜKHARF', KUCUKHARF: 'KÜÇÜKHARF', LOWER: 'KÜÇÜKHARF', 'YAZIM.DUZENI': 'YAZIM.DÜZENİ', PROPER: 'YAZIM.DÜZENİ' };
 
-// Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır)
-function evaluate(src, get) {
+// Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır);
+// isSub(addr): hücrede ALTTOPLAM formülü var mı (ALTTOPLAM aralıktaki bu hücreleri atlar)
+function evaluate(src, get, isSub) {
   const re = /\s*(?:(\d+(?:,\d+)?)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü_]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü_]+)*\$?\d*)|(<=|>=|<>|.))/y;
   const reInt = /\s*(?:(\d+)|"([^"]*)"|(\$?[A-Za-zÇĞİÖŞÜçğıöşü_]+(?:\.[A-Za-zÇĞİÖŞÜçğıöşü_]+)*\$?\d*)|(<=|>=|<>|.))/y; // virgül ondalık değil, ayırıcı
   // Formülde hiç ; yoksa işlev parantezinin içindeki virgül ayırıcıdır: =DÜŞEYARA(A2,$F$2:$G$7,2,0). Dışında (=2,5*3) ondalık virgüldür.
@@ -171,9 +198,9 @@ function evaluate(src, get) {
   function range(a, b) {
     const p = parseAddr(a), q = parseAddr(b);
     if (!p || !q) throw new FErr('#BAŞV!');
-    const vals = [];
-    for (let r = Math.min(p.r, q.r); r <= Math.max(p.r, q.r); r++) for (let c = Math.min(p.c, q.c); c <= Math.max(p.c, q.c); c++) vals.push(get(addr(r, c)));
-    return { range: true, vals, cols: Math.abs(q.c - p.c) + 1, rows: Math.abs(q.r - p.r) + 1 };
+    const vals = [], skip = [];
+    for (let r = Math.min(p.r, q.r); r <= Math.max(p.r, q.r); r++) for (let c = Math.min(p.c, q.c); c <= Math.max(p.c, q.c); c++) { vals.push(get(addr(r, c))); skip.push(!!isSub?.(addr(r, c))); }
+    return { range: true, vals, skip, cols: Math.abs(q.c - p.c) + 1, rows: Math.abs(q.r - p.r) + 1 };
   }
   function primary() {
     const t = toks[i++];
@@ -284,7 +311,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="asc" title="Küçükten büyüğe sırala">↑ A→Z</button><button type="button" data-act="desc" title="Büyükten küçüğe sırala">↓ Z→A</button>
       <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Sütun grafiği</button><button type="button" data-act="pie" title="Seçili alandan pasta grafiği: her parçanın bütünün ne kadarı olduğunu gösterir">🥧 Pasta grafiği</button>
-      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri doğrulama: hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button><button type="button" data-act="pivot" title="Özet Tablo: uzun listeyi formülsüz özetler (ör. her kategorinin toplamı)">🧮 Özet Tablo</button>
+      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri doğrulama: hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button><button type="button" data-act="pivot" title="Özet Tablo: uzun listeyi formülsüz özetler (ör. her kategorinin toplamı)">🧮 Özet Tablo</button><button type="button" data-act="subtotal" title="Alt Toplam: sıralı listede her grubun altına toplam satırı ekler (Excel'de Veri sekmesi → Anahat)">🔢 Alt Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="merge" title="Seçili hücreleri tek hücre yapar ve ortalar">⊞ Birleştir ve Ortala</button><button type="button" data-act="wrap" title="Uzun yazıyı hücre içinde alt satıra indirir">↲ Metni Kaydır</button><button type="button" data-act="freeze" title="Aşağı inerken en üst satır ekranda kalır">❄ Üst Satırı Dondur</button>
       <span class="xl-sep"></span><button type="button" data-act="unlock" title="Hücre kilidini aç: sayfa korunsa da seçili hücrelere yazılabilsin">🔓 Hücre Kilidini Aç</button><button type="button" data-act="protect" class="xl-protbtn" title="Sayfayı Koru: kilidi açılmamış hücreler değiştirilemez">🔒 Sayfayı Koru</button>
       <span class="xl-sep"></span><span class="xl-lab">Yazdırma:</span><button type="button" data-act="orient" title="Kâğıdı yatay yapar">▭ Yatay</button><button type="button" data-act="fit" title="Bütün sütunları tek sayfaya sığdırır">⤢ Tüm sütunları bir sayfaya sığdır</button><button type="button" data-act="grid" title="Kâğıtta tablo çizgileri çıksın">▦ Kılavuz çizgilerini yazdır</button>
@@ -293,6 +320,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     <div class="xl-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
     <div class="xl-bar"><input class="xl-name" readonly aria-label="Ad kutusu"><span class="xl-fx">fx</span><input class="xl-formula" spellcheck="false" autocomplete="off" aria-label="Formül çubuğu"></div>
     <div class="xl-errnote" hidden></div>
+    <div class="xl-ol" hidden><span>Anahat düzeyi:</span>${[1, 2, 3].map((n) => `<button type="button" data-ol="${n}" title="${['Yalnızca genel toplam', 'Alt toplamlar ve genel toplam', 'Bütün satırlar'][n - 1]}">${n}</button>`).join('')}<small class="xl-olnote"></small></div>
     <div class="xl-wrap" tabindex="0"><table class="xl-grid"><thead><tr><th class="xl-corner"></th>${[...COLS].map((c, i) => `<th data-col="${i}">${c}<i class="xl-rz" data-col="${i}" title="Sütun genişliği: sürükleyin ya da çift tıklayarak içeriğe sığdırın"></i></th>`).join('')}</tr></thead>
       <tbody>${Array.from({ length: ROWS }, (_, r) => `<tr><th>${r + 1}</th>${[...COLS].map((_, c) => `<td data-a="${addr(r, c)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
       <div class="xl-chart" hidden></div><div class="xl-fh" title="Doldurma tutamacı: aşağı ya da sağa sürükleyin"></div></div>
@@ -308,6 +336,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   let valids = []; // veri doğrulama (açılır liste): { r1, c1, r2, c2, list: ['Ödendi', 'Ödenmedi'] }
   const validAt = (r, c) => valids.find((v) => r >= v.r1 && r <= v.r2 && c >= v.c1 && c <= v.c2);
   let filt = null; // filtre: { hr: başlık satırı, r2, c2, allow: { sütun: Set(gösterilecek yazılar) } }
+  let subt = null; // alt toplam: { hr: başlık satırı, by: gruplanan sütun, fn: 9/1/3/4/5, cols, rows: alt toplam satırları, grand: genel toplam satırı, end: son satır, level: 1/2/3 }
   let clip = null; // kopyalanan hücreler: { r1, c1, r2, c2, data, cut }
   let fill = null; // doldurma tutamacıyla sürükleme
   let colW = {}; // sütun genişlikleri (em): { 0: 12 }
@@ -345,6 +374,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   const selAddr = () => { const s = sel(); return s.r1 === s.r2 && s.c1 === s.c2 ? addr(s.r1, s.c1) : `${addr(s.r1, s.c1)}:${addr(s.r2, s.c2)}`; };
   const td = (a) => body.querySelector(`td[data-a="${a}"]`);
 
+  const isSubCell = (a) => /^=.*\b(ALTTOPLAM|SUBTOTAL)\s*\(/i.test(cells[a] || '');
   // Hücre değeri: formüllerde döngüye karşı korumalı
   function value(a, seen = new Set()) {
     const raw = cells[a];
@@ -352,7 +382,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (!raw.startsWith('=')) { const n = parseNumber(raw) ?? parseDate(raw); return n === null ? raw : n; }
     if (seen.has(a)) throw new FErr('#BAŞV!');
     seen.add(a);
-    try { return evaluate(raw.slice(1), (b) => value(b, seen)); } finally { seen.delete(a); }
+    try { return evaluate(raw.slice(1), (b) => value(b, seen), isSubCell); } finally { seen.delete(a); }
   }
   // Biçim verilmemiş hücre tarih gibi mi görünsün? Excel gibi: yazılmış tarih, BUGÜN()/TARİH() ya da “tarih ± gün” (=D2+30)
   function isDate(a, depth = 0) {
@@ -376,7 +406,13 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     return col;
   }
   const rowsEl = () => body.querySelectorAll('tbody tr');
+  // Anahat düzeyi: 2'de yalnızca alt toplam ve genel toplam satırları, 1'de yalnızca genel toplam görünür
+  function outlineHidden(r) {
+    if (!subt || subt.level === 3 || r <= subt.hr || r > subt.end) return false;
+    return r !== subt.grand && (subt.level === 1 || !subt.rows.includes(r));
+  }
   function hiddenRow(r) {
+    if (outlineHidden(r)) return true;
     if (!filt || r <= filt.hr || r > filt.r2) return false;
     return Object.entries(filt.allow).some(([c, set]) => !set.has(show(addr(r, +c)).text));
   }
@@ -434,6 +470,13 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     for (const [k, on] of [['orient', pageSet.orient === 'yatay'], ['fit', pageSet.fit], ['grid', pageSet.grid], ['freeze', frozen], ['protect', !!prot]]) $(`[data-act="${k}"]`)?.classList.toggle('on', on);
     $('.xl-protbtn').textContent = prot ? '🔓 Sayfa Korumasını Kaldır' : '🔒 Sayfayı Koru';
     wrap.classList.toggle('prot', !!prot);
+    // Alt toplam varsa anahat düğmeleri (1 2 3) görünür; alt toplam satırlarının numarası işaretlenir
+    $('.xl-ol').hidden = !subt;
+    if (subt) {
+      $('.xl-ol').querySelectorAll('[data-ol]').forEach((b) => b.classList.toggle('on', +b.dataset.ol === subt.level));
+      $('.xl-olnote').textContent = ['Yalnızca genel toplam görünüyor', 'Yalnızca alt toplamlar ve genel toplam görünüyor', 'Bütün satırlar görünüyor'][subt.level - 1];
+    }
+    body.querySelectorAll('tbody th').forEach((th, r) => th.classList.toggle('xl-olrow', !!subt && (subt.rows.includes(r) || r === subt.grand)));
     renderFilter();
     renderSheets();
     paintSel();
@@ -714,6 +757,128 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     useSheet(sheets.length - 1, true);
     emit('xl-pivot', { rowField: rowName, valueField: valName, fn, groups: keys.map((k) => [k, val(groups.get(k))]) });
   }
+  // ---- Alt Toplam (Excel'de Veri → Anahat → Alt Toplam): sıralı listede grup her değiştiğinde “… Toplam” satırı, en sonda Genel Toplam ----
+  const SUBNAME = { 9: ['Topla', 'Toplam'], 3: ['Say', 'Say'], 1: ['Ortalama', 'Ortalama'], 4: ['Maks', 'Maks'], 5: ['Min', 'Min'] };
+  // Etkin hücrenin (alt toplam varsa onun) bulunduğu listede ALTTOPLAM formülü olan satırlar
+  function subRowsAround() {
+    const used = (r) => [...COLS].some((_, c) => cells[addr(r, c)]);
+    const r0 = subt ? subt.hr : act.r;
+    if (!used(r0)) return { hr: r0, rows: [] };
+    let hr = r0; while (hr > 0 && used(hr - 1)) hr--;
+    const rows = [];
+    for (let r = hr + 1; r < ROWS && used(r); r++) if ([...COLS].some((_, c) => isSubCell(addr(r, c)))) rows.push(r);
+    return { hr, rows };
+  }
+  function subtotalDialog() {
+    const ex = subRowsAround(), existing = ex.rows.length > 0;
+    let t = tableAround();
+    // Alt toplam satırı listenin ilk satırındaysa (özet üstte) tableAround listeyi bulamaz: başlık satırından sütunları al
+    if (!t && existing) {
+      let c1 = act.c, c2 = act.c;
+      while (c1 > 0 && cells[addr(ex.hr, c1 - 1)]) c1--;
+      while (c2 < COLS.length - 1 && cells[addr(ex.hr, c2 + 1)]) c2++;
+      t = { hr: ex.hr, r2: ex.hr + 1, c1, c2 };
+    }
+    if (!t) { desk.toast('Alt Toplam', 'Önce listenin içinde bir hücreye tıklayın.', '🔢'); return; }
+    const head = []; for (let c = t.c1; c <= t.c2; c++) head.push([c, show(addr(t.hr, c)).text]);
+    // Excel gibi: gruplama ilk sütun, alt toplam son sayı sütunu önerilir
+    const numeric = head.filter(([c]) => typeof show(addr(t.hr + 1, c)).v === 'number' && !isDate(addr(t.hr + 1, c)));
+    const lastNum = numeric.at(-1)?.[0] ?? t.c2;
+    openPop(`<b>🔢 Alt Toplam</b>
+      <div class="xl-row">Her değişiklikte: <select class="xl-sby">${head.map(([c, h]) => `<option value="${c}">${esc(h)}</option>`).join('')}</select></div>
+      <div class="xl-row">Kullanılacak işlev: <select class="xl-sfn">${[9, 3, 1, 4, 5].map((k) => `<option value="${k}">${SUBNAME[k][0]}</option>`).join('')}</select></div>
+      <div>Alt toplam ekle:</div><div class="xl-slist">${head.map(([c, h]) => `<label><input type="checkbox" value="${c}" ${c === lastNum ? 'checked' : ''}> ${esc(h)}</label>`).join('')}</div>
+      <label><input type="checkbox" class="xl-srep" checked> Geçerli alt toplamları değiştir</label>
+      <label><input type="checkbox" class="xl-sbelow" checked> Verinin altında özet</label>
+      <p class="xl-vnote">Liste önce gruplanacak sütuna göre <b>sıralanmış</b> olmalı.</p>
+      <div class="xl-row"><button type="button" class="xl-sclr" ${existing ? '' : 'disabled'}>Tümünü Kaldır</button><button type="button" class="xl-sok primary" data-hr="${t.hr}">Tamam</button><button type="button" class="xl-px">İptal</button></div>`, $('[data-act="subtotal"]'));
+    emit('xl-subtotal-open', { existing });
+  }
+  // Satırları yeni yerlerine taşır: hücreler, biçimler, formül başvuruları, koşullu biçim, açılır liste, birleştirme, filtre, grafik
+  function relayout(newOf) {
+    const nc = {}, nf = {};
+    for (const [a, raw] of Object.entries(cells)) { const p = parseAddr(a), n = p && newOf[p.r]; if (n != null && n < ROWS) nc[addr(n, p.c)] = remapRefs(raw, newOf); }
+    for (const [a, f] of Object.entries(fmt)) { const p = parseAddr(a), n = p && newOf[p.r]; if (n != null && n < ROWS) nf[addr(n, p.c)] = f; }
+    cells = nc; fmt = nf;
+    const span = (o) => {
+      let a = o.r1; while (a <= o.r2 && newOf[a] == null) a++;
+      let b = o.r2; while (b >= o.r1 && newOf[b] == null) b--;
+      return a > b ? null : { ...o, r1: Math.min(ROWS - 1, newOf[a]), r2: Math.min(ROWS - 1, newOf[b]) };
+    };
+    rules = rules.map(span).filter(Boolean);
+    valids = valids.map(span).filter(Boolean);
+    merges = merges.filter((m) => { for (let r = m.r1; r <= m.r2; r++) if (newOf[r] == null) return false; return true; }).map(span);
+    if (filt) { const s = newOf[filt.hr] != null && span({ r1: filt.hr, r2: filt.r2 }); filt = s ? { ...filt, hr: s.r1, r2: s.r2 } : null; }
+    if (chart) { chart = span(chart); if (!chart) $('.xl-chart').hidden = true; }
+    clip = null;
+    const near = (r) => { for (let k = r; k >= 0; k--) if (newOf[k] != null) return Math.min(ROWS - 1, newOf[k]); return 0; };
+    act = { r: near(act.r), c: act.c }; anchor = { ...act };
+  }
+  function removeSubtotals() {
+    const { hr, rows } = subRowsAround();
+    if (!rows.length) { subt = null; render(); return 0; }
+    const del = new Set(rows), newOf = [];
+    let off = 0;
+    for (let r = 0; r < ROWS; r++) { if (del.has(r)) { newOf[r] = null; off++; } else newOf[r] = r - off; }
+    relayout(newOf);
+    subt = null;
+    act = { r: hr, c: act.c }; anchor = { ...act };
+    return rows.length;
+  }
+  function applySubtotal(hr, by, fn, cols, below, replace) {
+    const note = (m) => { const n = pop.querySelector('.xl-vnote'); n.textContent = m; n.classList.add('bad'); emit('xl-subtotal-err', { reason: m }); };
+    cols = cols.filter((c) => c !== by);
+    if (!cols.length) return note('“Alt toplam ekle” listesinden, gruplanan sütundan başka en az bir sütun işaretleyin (ör. Tutar).');
+    const old = subRowsAround();
+    if (old.rows.length && !replace) return note('Bu benzetimde iç içe alt toplam yapılamaz. “Geçerli alt toplamları değiştir” kutusunu işaretli bırakın.');
+    const backup = { cells: { ...cells }, fmt: structuredClone(fmt), rules, valids, merges, filt, chart, subt, act, anchor };
+    const restore = () => { ({ cells, fmt, rules, valids, merges, filt, chart, subt, act, anchor } = backup); render(); };
+    if (old.rows.length) removeSubtotals();
+    act = { r: hr, c: by }; anchor = { ...act };
+    const t = tableAround();
+    if (!t) { restore(); return note('Liste bulunamadı. Listenin içinde bir hücreye tıklayıp yeniden deneyin.'); }
+    // Gruplar: gruplanan sütunda yan yana duran aynı değerler. Liste sıralı değilse aynı kategori birkaç gruba bölünür (Excel'de de böyle).
+    const groups = [];
+    for (let r = t.hr + 1; r <= t.r2; r++) { const k = show(addr(r, by)).text, g = groups.at(-1); if (g && g.key === k) g.e = r; else groups.push({ key: k, s: r, e: r }); }
+    const ins = below ? [...groups.map((g) => ({ before: g.e + 1, g })), { before: t.r2 + 1, grand: true }] : [{ before: t.hr + 1, grand: true }, ...groups.map((g) => ({ before: g.s, g }))];
+    const newOf = [];
+    let off = 0, k = 0;
+    for (let r = 0; r <= ROWS; r++) {
+      while (k < ins.length && ins[k].before === r) { ins[k].row = r + off; off++; k++; }
+      if (r < ROWS) newOf[r] = r + off;
+    }
+    let maxUsed = 0;
+    for (const a of Object.keys(cells)) { const p = parseAddr(a); if (p) maxUsed = Math.max(maxUsed, p.r); }
+    if (Math.max(newOf[maxUsed], ...ins.map((x) => x.row)) >= ROWS) {
+      pop.hidden = true;
+      restore();
+      emit('xl-subtotal-err', { reason: 'rows', need: ins.length });
+      desk.dialogs.ask({ title: 'Hesap Tablosu', icon: '⚠', text: `<b>Alt toplam satırları sayfaya sığmıyor.</b><br>${ins.length} satır eklenecekti ama bu çalışma sayfası ${ROWS} satırdır. Listeyi kısaltın ya da daha az grubu olan bir sütunu seçin.`, buttons: [['ok', 'Tamam', true]] });
+      return;
+    }
+    relayout(newOf);
+    const lab = SUBNAME[fn][1], first = newOf[t.hr + 1];
+    for (const it of ins) {
+      const R = it.row;
+      cells[addr(R, by)] = it.grand ? `Genel ${lab}` : `${it.g.key} ${lab}`;
+      fmt[addr(R, by)] = { b: true };
+      const [a, b] = it.grand ? (below ? [first, R - 1] : [R + 1, newOf[t.r2]]) : [newOf[it.g.s], newOf[it.g.e]];
+      for (const c of cols) {
+        cells[addr(R, c)] = `=ALTTOPLAM(${fn};${COLS[c]}${a + 1}:${COLS[c]}${b + 1})`;
+        const f = fn === 3 ? null : fmt[addr(first, c)]?.f;
+        fmt[addr(R, c)] = { b: true, ...(f && f !== 'date' ? { f } : {}) };
+      }
+    }
+    const grand = ins.find((x) => x.grand).row;
+    subt = { hr: t.hr, by, fn, cols, rows: ins.filter((x) => !x.grand).map((x) => x.row), grand, end: below ? grand : newOf[t.r2], level: 3 };
+    act = { r: t.hr, c: by }; anchor = { ...act };
+    pop.hidden = true;
+    dirty = true;
+    render();
+    if (chart) drawChart();
+    emit('xl-subtotal', { op: 'add', by: show(addr(t.hr, by)).text, col: COLS[by], fn, fnName: SUBNAME[fn][0], cols: cols.map((c) => COLS[c]), below, replaced: old.rows.length > 0,
+      groups: groups.map((g) => g.key), rows: subt.rows.map((r) => r + 1), grand: grand + 1 });
+  }
   function filterToggle() {
     if (filt) { filt = null; render(); emit('xl-filter-off'); return; }
     // Etkin hücrenin bulunduğu tablonun başlık satırı: yukarı doğru boş olmayan son satır
@@ -877,7 +1042,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
 
   // ---- Dosya ----
   const fsApi = desk.fs.dialogApi();
-  const snap = () => ({ cells: { ...cells }, fmt: structuredClone(fmt), rules: structuredClone(rules), valids: structuredClone(valids), colW: { ...colW }, merges: structuredClone(merges), frozen, pageSet: { ...pageSet }, prot: prot && { ...prot } });
+  const snap = () => ({ cells: { ...cells }, fmt: structuredClone(fmt), rules: structuredClone(rules), valids: structuredClone(valids), colW: { ...colW }, merges: structuredClone(merges), frozen, pageSet: { ...pageSet }, prot: prot && { ...prot }, ...(subt ? { subt: structuredClone(subt) } : {}) });
   const content = () => {
     const cur = snap();
     if (sheets.length === 1) return cur;
@@ -895,7 +1060,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (!skipStash) stash();
     curSheet = i;
     const d = sheets[i].data || {};
-    cells = { ...(d.cells || {}) }; fmt = d.fmt || {}; rules = d.rules || []; valids = d.valids || []; colW = { ...(d.colW || {}) }; merges = d.merges || []; frozen = !!d.frozen; pageSet = { orient: 'dikey', fit: false, grid: false, ...(d.pageSet || {}) }; prot = d.prot || null;
+    cells = { ...(d.cells || {}) }; fmt = d.fmt || {}; rules = d.rules || []; valids = d.valids || []; colW = { ...(d.colW || {}) }; merges = d.merges || []; frozen = !!d.frozen; pageSet = { orient: 'dikey', fit: false, grid: false, ...(d.pageSet || {}) }; prot = d.prot || null; subt = d.subt || null;
     filt = null; chart = null; clip = null; $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
     render();
@@ -978,12 +1143,12 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   function load(data, name = null, fld = folder) {
     cells = { ...(data?.cells || {}) }; fmt = structuredClone(data?.fmt || {}); rules = structuredClone(data?.rules || []); valids = structuredClone(data?.valids || []); filt = null; clip = null;
     if (data?.sheets?.length) {
-      sheets = data.sheets.map((x) => ({ name: x.name, color: x.color || '', data: structuredClone({ cells: x.cells, fmt: x.fmt, rules: x.rules, valids: x.valids, colW: x.colW, merges: x.merges, frozen: x.frozen, pageSet: x.pageSet, prot: x.prot }) }));
+      sheets = data.sheets.map((x) => ({ name: x.name, color: x.color || '', data: structuredClone({ cells: x.cells, fmt: x.fmt, rules: x.rules, valids: x.valids, colW: x.colW, merges: x.merges, frozen: x.frozen, pageSet: x.pageSet, prot: x.prot, subt: x.subt }) }));
       curSheet = Math.min(data.cur || 0, sheets.length - 1);
       const d = sheets[curSheet].data;
       cells = { ...(d.cells || {}) }; fmt = d.fmt || {}; rules = d.rules || []; valids = d.valids || []; data = d;
     } else { sheets = [{ name: 'Sayfa1', color: '' }]; curSheet = 0; }
-    colW = { ...(data?.colW || {}) }; merges = structuredClone(data?.merges || []); frozen = !!data?.frozen; prot = data?.prot ? { ...data.prot } : null; pageSet = { orient: 'dikey', fit: false, grid: false, ...(data?.pageSet || {}) };
+    colW = { ...(data?.colW || {}) }; merges = structuredClone(data?.merges || []); frozen = !!data?.frozen; prot = data?.prot ? { ...data.prot } : null; subt = data?.subt ? structuredClone(data.subt) : null; pageSet = { orient: 'dikey', fit: false, grid: false, ...(data?.pageSet || {}) };
     fileName = name; folder = fld; dirty = false; chart = null;
     $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
@@ -1156,20 +1321,43 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   });
   body.addEventListener('mousedown', (e) => {
     if (!e.target.closest('.xl-menu, .xl-file')) $('.xl-menu').hidden = true;
-    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], [data-act="protect"], .xl-fb, .xl-vb')) pop.hidden = true;
+    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], [data-act="subtotal"], [data-act="protect"], .xl-fb, .xl-vb')) pop.hidden = true;
     if (e.target.closest('.xl-rib button')) e.preventDefault();
   });
   pop.addEventListener('change', (e) => {
     if (e.target.classList.contains('xl-fa')) pop.querySelectorAll('.xl-flist input').forEach((b) => { b.checked = e.target.checked; });
     else if (e.target.closest('.xl-flist')) pop.querySelector('.xl-fa').checked = [...pop.querySelectorAll('.xl-flist input')].every((b) => b.checked);
   });
-  pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); pop.querySelector('.xl-cok, .xl-fok, .xl-prot, .xl-unprot')?.click(); } e.stopPropagation(); });
+  pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); pop.querySelector('.xl-cok, .xl-fok, .xl-prot, .xl-unprot, .xl-sok')?.click(); } e.stopPropagation(); });
   body.addEventListener('click', (e) => {
     const t = e.target.closest('button');
     if (!t) return;
     if (t.classList.contains('xl-file')) { $('.xl-menu').hidden = !$('.xl-menu').hidden; return; }
     if (t.dataset.file) return fileCmd(t.dataset.file);
     if (t.classList.contains('xl-px')) { pop.hidden = true; return; }
+    if (t.classList.contains('xl-sok')) {
+      applySubtotal(+t.dataset.hr, +pop.querySelector('.xl-sby').value, +pop.querySelector('.xl-sfn').value, [...pop.querySelectorAll('.xl-slist input:checked')].map((b) => +b.value),
+        pop.querySelector('.xl-sbelow').checked, pop.querySelector('.xl-srep').checked);
+      wrap.focus({ preventScroll: true });
+      return;
+    }
+    if (t.classList.contains('xl-sclr')) {
+      pop.hidden = true;
+      const n = removeSubtotals();
+      dirty = true; render();
+      if (chart) drawChart();
+      emit('xl-subtotal', { op: 'remove', removed: n });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
+    if (t.dataset.ol) {
+      if (!subt) return;
+      subt.level = +t.dataset.ol;
+      render();
+      emit('xl-outline', { level: subt.level });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
     if (t.classList.contains('xl-pok')) {
       const [hr, r2] = t.dataset.t.split(',').map(Number);
       pop.hidden = true;
@@ -1242,6 +1430,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (a === 'cond') return condDialog();
     if (a === 'valid') return validDialog();
     if (a === 'pivot') return pivotDialog();
+    if (a === 'subtotal') return subtotalDialog();
     if (a === 'filter') { filterToggle(); wrap.focus({ preventScroll: true }); return; }
     if (a === 'merge') mergeCells();
     else if (a === 'wrap') wrapText();
@@ -1270,6 +1459,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     // Derslerin kontrolü için
     cell: (a) => { const s = show(a), p = parseAddr(a); return { raw: cells[a] || '', value: s.v, text: s.text, bold: !!fmt[a]?.b, f: fmt[a]?.f || null, color: condColor(a, p.r, p.c, s.v), hidden: hiddenRow(p.r) }; },
     get filter() { return filt && { header: filt.hr + 1, cols: Object.keys(filt.allow).map((c) => COLS[c]) }; },
+    get subtotal() { return subt && { header: subt.hr + 1, by: COLS[subt.by], fn: subt.fn, cols: subt.cols.map((c) => COLS[c]), rows: subt.rows.map((r) => r + 1), grand: subt.grand + 1, level: subt.level }; },
     get rules() { return rules.length; },
     get valids() { return valids.map((v) => ({ ...v })); },
     get merges() { return merges.map((m) => ({ ...m })); },

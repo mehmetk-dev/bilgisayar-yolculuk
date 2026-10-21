@@ -1,5 +1,5 @@
 // Her haftanın sonunda “Gerçek bilgisayarda deneyin” ödevi: alıştırma bilgisayarı yerine kursiyerin kendi (ya da kurstaki gerçek) bilgisayarında
-// yapacağı 6–8 küçük görev. Her görev “Yaptım” ile işaretlenir; son ekran yazdırılabilir ödev kâğıdıdır (takıldığım yerler için boşluklu).
+// yapacağı 6–10 küçük görev. Her görev “Yaptım” ile işaretlenir; son ekran yazdırılabilir ödev kâğıdıdır (takıldığım yerler için boşluklu).
 import { info } from './kalip.js';
 
 const KURAL = '<p class="mut">Gerçek bilgisayarda çalışırken <b>şifrelerinizi ve kimlik bilgilerinizi</b> yalnızca bildiğiniz, güvendiğiniz sitelere yazın. Takıldığınız yeri not alın, derste sorun: hata yapmak öğrenmenin parçasıdır.</p>';
@@ -128,7 +128,9 @@ export const odev10 = odev(10, 'kelime işlemci (Word)', '📘', [
   ['Tablo ekleyin', 'Yeni bir belgede <b>3 sütun × 4 satırlık</b> bir tablo ekleyin (Ekle → Tablo) ve içine aidat bilgilerini yazın.', 'Tab tuşu bir sonraki hücreye geçirir.', '▦'],
   ['Resmi yerleştirin', 'Word\'e bir fotoğraf ekleyin. Fotoğrafa tıklayıp yanındaki <b>Düzen Seçenekleri</b> simgesinden <b>Kare</b>\'yi seçin; resmi sürükleyerek yazının yanına taşıyın, köşesinden küçültün.', 'Resim yazıyı dağıtırsa Ctrl + Z ile geri alın.', '🖼'],
   ['Biçim Boyacısı', 'Bir başlığı renkli ve büyük yapın. Başlığa tıklayıp <b>Biçim Boyacısı</b>\'na (fırça) basın, sonra başka bir başlığı fareyle boyayın. Satırları <b>1,5 satır aralığı</b> ile ferahlatın.', 'Fırçaya çift tıklarsanız birden çok başlığa sürebilirsiniz; Esc ile bırakılır.', '🖌'],
-  ['Kaydedin', 'Her ikisini de <b>Belgeler</b> klasörüne anlaşılır adlarla kaydedin: <b>dilekçe</b> ve <b>aidat tablosu</b>. Dosya Gezgini\'nde görün.', 'Ad olarak tarih eklemek bulmayı kolaylaştırır.', '💾'],
+  ['İçindekiler tablosu', 'Yeni bir belgeye üç bölüm yazın (ör. <b>Ailem</b>, <b>Memleketim</b>, <b>Hobilerim</b>), her birinin altına birkaç satır. Her bölüm adına tıklayıp <b>Giriş → Stiller → Başlık 1</b> verin. Belgenin başına tıklayıp <b>Başvurular → İçindekiler Tablosu → Otomatik Tablo 1</b>\'i seçin. Tablonun altına <b>Ctrl + Enter</b> ile sayfa sonu koyup <b>Tabloyu Güncelleştir</b>\'e basın.', 'Kalın ve büyük yapılan ama Başlık 1 verilmeyen satır tabloda çıkmaz. Ctrl basılıyken tablodaki bir başlığa tıklayınca o bölüme atlarsınız.', '📑'],
+  ['Noktalı form', 'Belgenin sonuna alt alta <b>Adı Soyadı:</b>, <b>Telefon:</b>, <b>İmza:</b> yazın ve üç satırı seçin. <b>Giriş</b> sekmesinde <b>Paragraf</b> bölümünün sağ altındaki küçük oka, sonra <b>Sekmeler…</b>\'e basın: konum <b>15 cm</b>, öncü <b>2 (.....)</b>; önce <b>Ayarla</b>, sonra <b>Tamam</b>. Her satırın sonunda <b>Tab</b>\'a basın.', 'Noktaları nokta tuşuna basarak yazmayın; satırlar aynı yerde bitmez.', '✂'],
+  ['Kaydedin', 'Belgelerin hepsini <b>Belgeler</b> klasörüne anlaşılır adlarla kaydedin: <b>dilekçe</b>, <b>aidat tablosu</b> ve <b>el kitabım</b>. Dosya Gezgini\'nde görün.', 'Ad olarak tarih eklemek bulmayı kolaylaştırır.', '💾'],
 ]);
 
 export const odev11 = odev(11, 'hesap tablosu (Excel)', '📗', [
@@ -139,6 +141,8 @@ export const odev11 = odev(11, 'hesap tablosu (Excel)', '📗', [
   ['Başlığı donatın', 'Tablonun üstüne yeni bir satır ekleyin (1. satır numarasına sağ tık → Ekle). <b>A1</b>\'e <b>HAFTALIK HARCAMA</b> yazıp A1 ile B1\'i seçin ve <b>Birleştir ve Ortala</b> ile tek başlık yapın.', 'Başlığı kalın yapmak okunurluğu artırır.', '🏷'],
   ['Hatayı düzeltin', 'Bir sayının yerine yazıyla “<b>iki yüz</b>” yazın ve toplamın <b>#DEĞER!</b> verdiğini görün. Rakamla <b>200</b> yazarak düzeltin.', 'Hata kodları: #DEĞER! yazı var, #AD? işlev adı yanlış, #SAYI/0! sıfıra bölme.', '⚠'],
   ['Özet Tablo', 'Harcamalarınıza bir <b>Kategori</b> sütunu ekleyin (Market, Fatura…). Tabloya tıklayıp <b>Ekle → Özet Tablo</b> ile her kategorinin toplamını çıkarın.', 'Özet Tablo\'da Satırlar: Kategori, Değerler: Tutar toplamı.', '🧮'],
+  ['Yaş hesabı', 'Alttaki <b>＋</b> ile yeni bir sayfa açın. 1. satıra <b>Ad</b>, <b>Doğum tarihi</b>, <b>Yaş</b> yazın; 2. satırdan başlayarak aile üyelerinizin adlarını ve doğum tarihlerini (ör. <b>12.04.1958</b>) girin. <b>E1</b>\'e <b>=BUGÜN()</b>, <b>C2</b>\'ye <b>=ETARİHLİ(B2;$E$1;"Y")</b> yazıp aşağı doldurun.', 'Tarih sağa yaslanmalı; sola yaslandıysa Excel onu yazı sanmıştır. Excel ETARİHLİ\'yi yazarken önermez, harf harf yazın.', '🎂'],
+  ['Sayın ve gün ekleyin', 'Aynı sayfada <b>D1</b>\'e <b>Telefon</b> yazıp altına telefonları girin, birini boş bırakın. Altına <b>=BAĞ_DEĞ_DOLU_SAY(A2:A6)</b> ile kaç kişi olduğunu, <b>=BOŞLUKSAY(D2:D6)</b> ile kaç telefonun eksik olduğunu bulun. Boş bir hücreye <b>=E1+30</b> yazıp 30 gün sonrasının tarihini görün.', 'Kaç kişi yazdıysanız aralığı ona göre değiştirin (ör. 8 kişi için A2:A9).', '🔢'],
   ['Kaydedin', '<b>Ctrl + S</b> ile <b>harcamalar</b> adıyla <b>Belgeler</b> klasörüne kaydedin. Kapatıp yeniden açarak toplamın durduğunu görün.', 'Haftaya yeni bir sayfa sekmesiyle devam edin.', '💾'],
 ]);
 
@@ -150,7 +154,9 @@ export const odev12 = odev(12, 'sunu (PowerPoint)', '📙', [
   ['PDF yapın', 'Sunuyu <b>PDF olarak kaydedin</b> ve açıp bakın: herkesin telefonunda açılır.', 'WhatsApp\'tan göndermek için PDF idealdir.', '📕'],
   ['Asıl Slayt', 'Görünüm → <b>Asıl Slayt</b>\'ı açın; alt bilgiye adınızı yazın ya da köşeye küçük bir resim koyun. Asıl görünümü kapatıp bütün slaytlarda göründüğüne bakın.', 'PowerPoint\'te Görünüm → Asıl Slayt; çıkmak için Asıl Görünümü Kapat.', '🎨'],
   ['Tablo ya da grafik', 'Bir slayda <b>Ekle → Tablo</b> ile küçük bir tablo (ör. haftalık yürüyüş süreleri) ya da <b>Ekle → Grafik</b> ile sütun grafiği ekleyin.', 'Tabloda Tab sonraki hücreye geçer; son hücrede yeni satır açar.', '📊'],
-  ['Birine gösterin', 'Sununuzu bir yakınınıza gösterin ve bir <b>iyi</b>, bir de <b>geliştirilecek</b> yanını sorun. Kâğıda not alın.', 'Eleştiri öğrenmenin en hızlı yoludur.', '👥'],
+  ['Konuşmacı notları', '“Ailem” sunusunun üç slaydına da konuşmacı notu yazın: slaydın altındaki <b>Notlar</b> kutusuna (görünmüyorsa alttaki durum çubuğunda <b>Notlar</b>\'a tıklayın) ne söyleyeceğinizi bir iki cümleyle yazın. Sonra <b>Görünüm → Not Sayfası</b>\'nda nasıl göründüğüne bakın.', 'Notları dinleyiciler görmez; gösteride yalnızca siz görürsünüz.', '📝'],
+  ['Prova ve dinleyici notları', '<b>Slayt Gösterisi → Zamanlamaları Prova Et</b> ile sunuyu konuşur gibi baştan sona geçin; kaç dakika sürdüğünü not alın. Bir gösteride <b>Ctrl + P</b> ile kaleme geçip bir yeri daire içine alın, <b>E</b> ile silin. Son olarak <b>Dosya → Yazdır</b>\'da <b>Tam Sayfa Slaytlar</b>\'a basıp <b>Dinleyici Notları → 3 Slayt</b>\'ı seçin ve önizlemeye bakın.', 'Yazdırmanız gerekmez. Süreleri kaydedip kaydetmeyeceğiniz sorulur: sunu kendiliğinden ilerlemesin istiyorsanız Hayır deyin.', '⏱'],
+  ['Birine gösterin','Sununuzu bir yakınınıza gösterin ve bir <b>iyi</b>, bir de <b>geliştirilecek</b> yanını sorun. Kâğıda not alın.', 'Eleştiri öğrenmenin en hızlı yoludur.', '👥'],
 ]);
 
 export const odev13 = odev(13, 'günlük işler: bilgisayarda ve tarayıcıda', '📑', [

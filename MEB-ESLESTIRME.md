@@ -10,16 +10,16 @@ Bu tablo, sitedeki haftaların MEB Bilgisayar İşletmenliği kurs programının
 | Bilgisayara Giriş (Windows) | 52 | 1–7. hafta tamamı; 8. haftadan Program kurma, Yazıcı ve sürücüler, İnternet kesildi, İşletim sistemleri, İşletim sistemi kurulumu | 2124 dk ≈ 53 saat |
 | İnternet ve E-posta Yönetimi | 22 | 8. hafta (güvenlik ve Windows dersleri dışında), 9. hafta, 13. hafta (Çerezler dışında), 14. hafta | 1303 dk ≈ 33 saat |
 | Bilgi Güvenliği Bilinçlendirme | 17 | 15. hafta tamamı; 8. haftadan URL okuma, İnternetteki tuzaklar, Virüs taraması, Virüsler ve antivirüs; 13. haftadan Çerezler; Ek: İnternette güvenlik | 415 dk ≈ 10 saat |
-| Kelime İşlemci (Word) | 22 | 10. hafta | 579 dk ≈ 14 saat |
-| Elektronik Tablolama (Excel) | 35 | 11. hafta | 551 dk ≈ 14 saat |
-| Sunu Hazırlama (PowerPoint) | 15 | 12. hafta | 401 dk ≈ 10 saat |
+| Kelime İşlemci (Word) | 22 | 10. hafta | 649 dk ≈ 16 saat |
+| Elektronik Tablolama (Excel) | 35 | 11. hafta | 586 dk ≈ 15 saat |
+| Sunu Hazırlama (PowerPoint) | 15 | 12. hafta | 441 dk ≈ 11 saat |
 | Genel (modül dışı) | – | Ek: Yapay zekâ, Yazma hızı, Büyük parkur, Kurs bitirme sınavı | 122 dk ≈ 3 saat |
-| **Toplam** | **163** | | **5495 dk ≈ 137 saat** |
+| **Toplam** | **163** | | **5640 dk ≈ 141 saat** |
 
 ## Ne anlama geliyor?
 
 - **Windows** ve **İnternet/E-posta** konuları MEB saatini karşılıyor ya da aşıyor.
-- **Excel** (35 saatin 14'ü), **Word** (22'nin 14'ü) ve **PowerPoint** (15'in 10'u) sitede MEB saatinin altında kalıyor. Bu modüllerde fark, gerçek Office programında yapılacak ödev ve uygulamalarla kapatılmalı. Haftalık ödevler (`odevler.js`) ve MEB uygulama sınavına benzeyen görevler (ör. "dilekçe yaz, sayfa numarası koy, PDF kaydet") bu iş için kullanılabilir.
+- **Excel** (35 saatin 15'i), **Word** (22'nin 16'sı) ve **PowerPoint** (15'in 11'i) sitede MEB saatinin altında kalıyor. Bu modüllerde fark, gerçek Office programında yapılacak ödev ve uygulamalarla kapatılmalı. Haftalık ödevler (`odevler.js`) ve MEB uygulama sınavına benzeyen görevler (ör. "dilekçe yaz, sayfa numarası koy, PDF kaydet") bu iş için kullanılabilir.
 - **Bilgi güvenliği** 15. hafta eklenince 17 saatin 10'una çıktı. Kalan süre sınıfta tartışma ve örnek olaylarla doldurulabilir.
 
 ## Modüllerin alt konuları ve karşılığı
@@ -38,6 +38,6 @@ Bu tablo, sitedeki haftaların MEB Bilgisayar İşletmenliği kurs programının
 | E-posta | 9. hafta |
 | Parola, zararlı yazılım, güvenli internet | URL okuma, Virüsler (8), İnternette güvenlik (Ek), 15. hafta |
 | Yedekleme, iki adımlı doğrulama, sosyal medya, kişisel veriler | 15. hafta |
-| Word: biçimlendirme, numaralandırma, sekme durakları, kenarlık ve gölgelendirme, stiller ve içindekiler tablosu, sütunlar, tablo, resim, sayfa düzeni, üst/alt bilgi, sayfa numarası, dipnot, köprü, adres mektup birleştirme | 10. hafta |
-| Excel: formüller, işlevler (TOPLA, ORTALAMA, EĞER, DÜŞEYARA, ETOPLA, YUVARLA, metin işlevleri, BAĞ_DEĞ_SAY, BAĞ_DEĞ_DOLU_SAY, BOŞLUKSAY), tarih işlevleri (BUGÜN, ETARİHLİ, YIL), grafik, sıralama, filtre, koruma, yazdırma | 11. hafta |
-| PowerPoint: slayt, tasarım, geçiş, animasyon, Asıl Slayt, tablo, grafik, şekil, WordArt, video, köprü ve eylem düğmesi, üst/alt bilgi (tarih, slayt numarası), konuşmacı notları, görünümler (Not Sayfası, Okuma, Slayt Sıralayıcı), gösteride kalem ve vurgulayıcı, Zamanlamaları Prova Et, dinleyici notları yazdırma, sunum | 12. hafta |
+| Word: biçimlendirme, numaralandırma, sekme durakları, kenarlık ve gölgelendirme, stiller ve içindekiler tablosu, sütunlar, tablo, resim, metin kutusu ve WordArt, sayfa düzeni, üst/alt bilgi, sayfa numarası, dipnot, köprü, adres mektup birleştirme, değişiklikleri izleme ve açıklama (kabul et / reddet), belgeyi parolayla koruma | 10. hafta |
+| Excel: formüller, işlevler (TOPLA, ORTALAMA, EĞER, DÜŞEYARA, ETOPLA, YUVARLA, metin işlevleri, BAĞ_DEĞ_SAY, BAĞ_DEĞ_DOLU_SAY, BOŞLUKSAY), tarih işlevleri (BUGÜN, ETARİHLİ, YIL), grafik, sıralama, filtre, alt toplam (ALTTOPLAM), koruma, yazdırma | 11. hafta |
+| PowerPoint: slayt, tasarım, geçiş, animasyon (giriş, vurgu, çıkış; Animasyon Bölmesi, Başlangıç / Süre / Gecikme), Asıl Slayt, tablo, grafik, şekil, WordArt, video, köprü ve eylem düğmesi, üst/alt bilgi (tarih, slayt numarası), konuşmacı notları, görünümler (Not Sayfası, Okuma, Slayt Sıralayıcı), gösteride kalem ve vurgulayıcı, Zamanlamaları Prova Et, dinleyici notları yazdırma, sunum | 12. hafta |

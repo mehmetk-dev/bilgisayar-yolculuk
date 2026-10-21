@@ -118,3 +118,54 @@
 .pp-lk-main .dlg-row > span:first-child { width: auto; font-size: 0.9em; color: #444; }
 .pp-dlg .dlg-pr.pp-ea, .pp-dlg .dlg-pr.pp-hfd { padding: 0.7em 1.2em; }
 .pp-dlg .dlg-err { padding-top: 0.4em; }
+
+/* Nesne animasyonları: vurgu ve çıkış efektleri (giriş efektleri 20-apps.css'teki ppIn / ppLeft / ppZoom) */
+@keyframes ppPulse { 0%, 100% { transform: none; } 50% { transform: scale(1.12); } }
+@keyframes ppSpin { from { transform: none; } to { transform: rotate(360deg); } }
+@keyframes ppGrow { from { transform: none; } to { transform: scale(1.25); } }
+@keyframes ppOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ppFlyOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(40cqw); } }
+.pp-sl .pp-body li { transform-origin: left center; }
+/* Şerit: Giriş / Vurgu / Çıkış öbekleri, süre ve gecikme kutuları */
+.pp-fxg { display: inline-flex; align-items: center; gap: 0.15em; }
+.pp-fxg > b { font-size: 0.75em; font-weight: 700; padding: 0.1em 0.45em; border-radius: 3px; color: #fff; }
+.pp-fxg-in > b { background: #2e7d32; }
+.pp-fxg-em > b { background: #bf9000; }
+.pp-fxg-out > b { background: #c00000; }
+.pp-atime { display: contents; }
+.pp-atime[hidden] { display: none; }
+.pp-rib .pp-spin { width: 1.9em; padding: 0 !important; font-weight: 700; border: 1px solid #ccc !important; }
+.pp-aval { display: inline-block; min-width: 3.2em; text-align: center; font-variant-numeric: tabular-nums; border: 1px solid #bbb; border-radius: 3px; background: #fff; color: #222; padding: 0.1em 0.2em; }
+.pp-rib button:disabled { opacity: 0.4; cursor: default; }
+.pp-anote b { color: #8a2a12; }
+.pp-ap-star { font-style: normal; }
+/* Düzenleme ekranında: seçili nesnenin çerçevesi ve animasyon numaraları */
+.pp-slide .pp-osel { border: 1px dashed var(--acc) !important; box-shadow: 0 0 0 0.25cqw #c43e1c55; }
+.pp-abadge { position: absolute; z-index: 5; display: flex; gap: 2px; transform: translate(-105%, 0); pointer-events: none; }
+.pp-abadge i { font-style: normal; font: 700 11px/1 system-ui, sans-serif; background: #f2f2f2; color: #333; border: 1px solid #999; padding: 2px 4px; border-radius: 2px; }
+.pp-abadge i.on { background: #c43e1c; color: #fff; border-color: #c43e1c; }
+/* Animasyon Bölmesi: sağda liste */
+.pp-apane { position: absolute; right: 0.6em; top: 0.6em; bottom: 0.6em; z-index: 7; width: 16em; background: #fff; border: 1px solid #c43e1c; border-radius: 8px; box-shadow: 0 8px 24px #0004; font-size: 0.85em; display: flex; flex-direction: column; overflow: hidden; }
+.pp-apane[hidden] { display: none; }
+.pp-main.ap-open .pp-stage { padding-right: 14.5em; }
+.pp-ap-h { background: #c43e1c; color: #fff; padding: 0.35em 0.6em; display: flex; align-items: center; font-weight: 700; }
+.pp-ap-x { margin-left: auto; border: 0; background: none; color: #fff; cursor: pointer; }
+.pp-ap-bar { display: flex; align-items: center; gap: 0.4em; padding: 0.4em 0.5em; border-bottom: 1px solid #e3e3e3; }
+.pp-ap-bar button, .pp-ap-foot button { border: 1px solid #bbb; background: #f7f7f7; border-radius: 4px; padding: 0.2em 0.6em; cursor: pointer; }
+.pp-ap-bar button:hover:not(:disabled), .pp-ap-foot button:hover:not(:disabled) { background: #fbe3dc; }
+.pp-ap-bar button:disabled, .pp-ap-foot button:disabled { opacity: 0.4; cursor: default; }
+.pp-ap-mv { margin-left: auto; display: flex; gap: 0.2em; }
+.pp-ap-mv button { width: 2.2em; padding: 0.2em 0; }
+.pp-ap-list { flex: 1; min-height: 0; overflow: auto; padding: 0.2em 0; }
+.pp-ap-row { display: grid; grid-template-columns: 2.2em 1.4em 1.1em 1fr; grid-template-areas: "no st star nm" "no st star fx"; align-items: center; column-gap: 0.2em; padding: 0.3em 0.4em; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+.pp-ap-row:hover { background: #fbe3dc; }
+.pp-ap-row.on { background: #f8d0c4; outline: 1px solid #c43e1c; }
+.pp-ap-no { grid-area: no; text-align: right; font-weight: 700; color: #555; }
+.pp-ap-st { grid-area: st; text-align: center; }
+.pp-ap-row .pp-ap-star { grid-area: star; }
+.pp-ap-nm { grid-area: nm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-ap-fx { grid-area: fx; font-size: 0.85em; color: #666; }
+.pp-ap-empty { padding: 1em; color: #666; line-height: 1.4; }
+.pp-ap-foot { display: flex; align-items: center; gap: 0.5em; padding: 0.4em 0.5em; border-top: 1px solid #e3e3e3; }
+.pp-ap-foot button { white-space: nowrap; }
+.pp-ap-foot small { color: #777; font-size: 0.8em; line-height: 1.3; }

@@ -636,7 +636,7 @@ export const test9 = test({
 
 export const test10 = test({
   id: 'test10', no: 10, title: '10. hafta testi',
-  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme, bul ve değiştir, dipnot ve köprü üzerine 16 soru.',
+  desc: 'Kelime işlemci: biçimlendirme, tablo, kaydetme, bul ve değiştir, dipnot, köprü, içindekiler tablosu ve sekmeler üzerine 19 soru.',
   qs: [
     { t: 'Başlık', pic: '📢', q: 'Merdivene asılacak duyurunun başlığını uzaktan okunur yapmak için ne yapılır?', opts: ['Küçük ve sola dayalı yazılır', 'Büyük, kalın ve ortalı yazılır', 'Altı çizgili yazılır'], ok: 1, why: 'Büyük, kalın ve ortalı başlık uzaktan okunur. Boyut “punto” ile ayarlanır (24–28).' },
     { t: 'İki yana yasla', pic: '≣', q: 'Resmî yazıların (dilekçe) paragrafları genellikle nasıl hizalanır?', opts: ['Ortalı', 'İki yana yaslı', 'Sağa dayalı'], ok: 1, why: 'İki yana yaslama (Ctrl + J) paragrafın iki kenarını da düz yapar. Tarih ve imza ise sağa hizalanır.' },
@@ -654,12 +654,15 @@ export const test10 = test({
     { t: 'Biçim Boyacısı', pic: '🖌', q: 'Beğendiğiniz bir başlığın rengini ve boyutunu öbür başlıklara kopyalamak için?', opts: ['Biçim Boyacısı (fırça)', 'Kopyala - Yapıştır', 'Satır aralığı'], ok: 0, why: 'Biçim Boyacısı yalnızca biçimi kopyalar, yazıyı değil. Çift tıklarsanız birden çok başlığa sürebilirsiniz.' },
     { t: 'Dipnot', pic: 'ab¹', q: 'Bir sözcüğe sayfanın altında küçük yazıyla açıklama eklemek için ne kullanılır?', opts: ['Başvurular → Dipnot Ekle', 'Ekle → Üst bilgi', 'Düzen → Sütunlar'], ok: 0, why: 'Dipnot sözcüğün yanına küçük bir sayı koyar; açıklama sayfanın altına yazılır. Kısayolu Alt + Ctrl + F.' },
     { t: 'Köprü', pic: '🔗', q: 'Belgedeki “Çınar Belediyesi” yazısına tıklayınca belediyenin sitesi açılsın istiyorsunuz. Ne yaparsınız?', opts: ['Yazıyı seçip Ctrl + K ile bağlantı (köprü) eklerim', 'Yazıyı mavi renge boyarım', 'Adresi alt bilgiye yazarım'], ok: 0, why: 'Köprü eklenen yazı mavi ve altı çizili olur; Ctrl basılıyken tıklayınca site açılır.' },
+    { t: 'İçindekiler tablosu', pic: '📑', q: 'Word\'ün içindekiler tablosunda bir bölüm adının çıkması için o satıra ne yapılmalıdır?', opts: ['Kalın ve 16 punto yapılmalı', 'Giriş → Stiller\'den Başlık 1 verilmeli', 'Altı çizilmeli'], ok: 1, why: 'İçindekiler tablosu yalnızca Başlık 1, Başlık 2… stilli satırları toplar. Kalın ve büyük ama Normal stilli bir satır ona sıradan yazıdır.' },
+    { t: 'Tabloyu Güncelleştir', pic: '⟳', q: 'İçindekiler tablosunu ekledikten sonra yeni bir başlık yazdınız; tabloda görünmüyor. Ne yaparsınız?', opts: ['Tabloyu silip başlıkları elle yazarım', 'Belgeyi kapatıp açarım', 'Başvurular → Tabloyu Güncelleştir → Tüm tabloyu'], ok: 2, why: 'Tablo kendiliğinden yenilenmez. Başlık eklediyseniz ya da sayfalar kaydıysa Tabloyu Güncelleştir\'e basın; yazdırmadan önce de bir kez yapın.' },
+    { t: 'Noktalı satır', pic: 'Adı Soyadı: ........', q: 'Formdaki “Adı Soyadı: ......” satırlarının noktaları hep aynı yerde bitsin istiyorsunuz. Ne kullanırsınız?', opts: ['Nokta tuşuna basıp durmak', 'Boşluk tuşuyla hizalamak', 'Sekme durağı ve noktalı öncü, sonra Tab'], ok: 2, why: 'Sekmeler… penceresinde konum (ör. 15 cm) ve öncü 2 (.....) seçilir; Tab\'a basınca noktalar o konuma kadar uzar. Elle yazılan noktalar aynı hizada bitmez.' },
   ],
 });
 
 export const test11 = test({
   id: 'test11', no: 11, title: '11. hafta testi',
-  desc: 'Hesap tablosu: formüller, doldurma, yazı işlevleri, YUVARLA, yazdırma üzerine 14 soru.',
+  desc: 'Hesap tablosu: formüller, doldurma, yazı işlevleri, YUVARLA, yazdırma, tarihler ve sayma işlevleri üzerine 17 soru.',
   qs: [
     { t: 'Formül', pic: '=', q: 'B2 ile B5 arasındaki sayıların toplamını bulan formül hangisidir?', opts: ['=TOPLA(B2:B5)', '=B2+B5', 'TOPLA B2 B5'], ok: 0, why: 'Formüller = ile başlar. TOPLA(B2:B5) iki nokta ile aralığı verir: B2, B3, B4 ve B5.' },
     { t: 'Otomatik doldurma', pic: '■ ↓', q: 'A2 hücresine Ocak yazdınız. Aralık\'a kadar devam ettirmenin en hızlı yolu hangisi?', opts: ['Her ayı tek tek yazmak', 'Hücrenin sağ alt köşesindeki kareyi aşağı çekmek', 'Hücreyi silmek'], ok: 1, why: 'Doldurma tutamacı ay, gün ve sayı listelerini kendiliğinden devam ettirir.' },
@@ -675,12 +678,15 @@ export const test11 = test({
     { t: 'Excel hataları', pic: '#DEĞER!', q: 'Bir toplamda #DEĞER! hatası çıktı. En olası neden?', opts: ['Bir hücreye sayı yerine yazı yazılmış (ör. “iki yüz”)', 'Sütun dar', 'Dosya kaydedilmemiş'], ok: 0, why: 'Excel yazıyla yazılmış sayıyı toplayamaz; rakamla yazınca düzelir. Dar sütun ##### gösterir.' },
     { t: 'Ad ve soyadı birleştirmek', pic: '=BİRLEŞTİR(…)', q: 'A2\'de ad, B2\'de soyad var. İkisini araya boşluk koyarak tek hücrede göstermek için hangisi yazılır?', opts: ['=BİRLEŞTİR(A2;" ";B2)', '=TOPLA(A2;B2)', '=A2+B2'], ok: 0, why: 'BİRLEŞTİR yazıları yan yana ekler; " " araya boşluk koyar. =A2&" "&B2 de aynı sonucu verir.' },
     { t: 'YUVARLA', pic: '1785,714… → 1785,71', q: 'Bir bölmenin sonucunu kuruşa (virgülden sonra 2 basamak) yuvarlamak için?', opts: ['=YUVARLA(B8/B9;2)', '=TOPLA(B8/B9)', 'Sütunu daraltmak'], ok: 0, why: 'YUVARLA sayının kendisini yuvarlar; ikinci sayı virgülden sonra kaç basamak kalacağıdır (0 yazılırsa tam sayı).' },
+    { t: 'Yaş hesabı', pic: '🎂 =ETARİHLİ(…)', q: 'B2\'de doğum tarihi, H2\'de =BUGÜN() var. Yaşı, doğum gününün geçip geçmediğine de bakarak bulan formül hangisi?', opts: ['=H2+B2', '=ETARİHLİ(B2;H2;"Y")', '=TOPLA(B2;H2)'], ok: 1, why: 'ETARİHLİ iki tarih arasındaki tam yılı verir; "Y" yıl demektir. Doğum günü bu yıl henüz gelmediyse onu da hesaba katar.' },
+    { t: 'Tarihe gün eklemek', pic: '📅 + 30', q: 'D2\'de kayıt tarihi var. Ödeme günü kayıttan 30 gün sonra. E2\'ye ne yazarsınız?', opts: ['=D2+30', '=D2*30', '30 gün sonra'], ok: 0, why: 'Excel tarihleri gün sayısı olarak saklar; tarihe 30 eklemek 30 gün sonrasını verir. Ay sonunu Excel kendisi hesaplar.' },
+    { t: 'Sayma işlevleri', pic: '85 · 70 · girmedi · boş', q: 'Not sütununda kimi hücrede not, kimi “girmedi” yazısı var, kimi boş. Notu olanları (sınava girenleri) saymak için hangisi?', opts: ['=BAĞ_DEĞ_DOLU_SAY(F2:F7)', '=BOŞLUKSAY(F2:F7)', '=BAĞ_DEĞ_SAY(F2:F7)'], ok: 2, why: 'BAĞ_DEĞ_SAY yalnızca sayıları sayar. BAĞ_DEĞ_DOLU_SAY “girmedi” yazısını da sayardı; BOŞLUKSAY ise boş hücreleri sayar.' },
   ],
 });
 
 export const test12 = test({
   id: 'test12', no: 12, title: '12. hafta testi',
-  desc: 'Sunu: slayt düzenleri, SmartArt, Asıl Slayt, tablo, geçiş ve animasyon üzerine 14 soru.',
+  desc: 'Sunu: slayt düzenleri, SmartArt, Asıl Slayt, tablo, geçiş, animasyon, prova ve gösteride kalem üzerine 17 soru.',
   qs: [
     { t: 'Slayt nedir?', pic: '📙', q: 'Bir sunudaki her bir sayfaya ne denir?', opts: ['Slayt', 'Hücre', 'Paragraf'], ok: 0, why: 'Sununun her sayfasına slayt denir. Kısa başlık, birkaç madde ve resim koyulur.' },
     { t: 'Az yazı', pic: '✍', q: 'Slaytlara yazı nasıl yazılmalıdır?', opts: ['Kısa maddelerle, az yazıyla', 'Uzun paragraflarla, bütün bilgiyi sığdırarak', 'En küçük punto ile'], ok: 0, why: 'Dinleyiciler okumaya değil sizi dinlemeye bakmalı. Slayta kısa maddeler ve resim koyulur.' },
@@ -696,6 +702,9 @@ export const test12 = test({
     { t: 'Yazı miktarı', pic: '📄', q: 'İyi bir slaytta yazı nasıl olmalıdır?', opts: ['Bütün cümleler küçük puntoyla yazılı', 'Az, kısa maddeler ve büyük punto', 'Sadece resim, hiç yazı yok'], ok: 1, why: 'Slayt dinleyiciye yardım eder, sizin yerinize konuşmaz: 3–5 kısa madde, büyük yazı.' },
     { t: 'Asıl Slayt', pic: '🎨', q: 'Sununun bütün slaytlarına aynı logoyu ve alt bilgiyi tek seferde eklemek için?', opts: ['Görünüm → Asıl Slayt', 'Her slayda tek tek eklemek', 'Slayt Sıralayıcı'], ok: 0, why: 'Asıl Slayt bütün slaytların ortak kalıbıdır; burada yapılan her değişiklik bütün slaytlara geçer.' },
     { t: 'Tabloda Tab', pic: '▦ Tab', q: 'Slayttaki tablonun son hücresindeyken Tab tuşuna basarsanız ne olur?', opts: ['Tabloya yeni bir satır eklenir', 'Tablo silinir', 'Slayt gösterisi başlar'], ok: 0, why: 'Tab sonraki hücreye geçer; son hücrede yeni satır açar.' },
+    { t: 'Gösteride kalem', pic: '▶ 🖊', q: 'Slayt gösterisi sırasında bir yazının çevresine daire çizmek istiyorsunuz. Hangi tuşlara basarsınız?', opts: ['F5', 'Ctrl + P', 'Ctrl + S'], ok: 1, why: 'Gösteride Ctrl + P fareyi kalem yapar. E harfi o slayttaki çizimleri siler, Ctrl + A fareyi yeniden ok yapar.' },
+    { t: 'Sunum süresi', pic: '⏱', q: 'Konuşmanızın kaç dakika süreceğini ölçmek için ne kullanırsınız?', opts: ['Slayt Gösterisi → Zamanlamaları Prova Et', 'Görünüm → Okuma Görünümü', 'Görünüm → Not Sayfası'], ok: 0, why: 'Zamanlamaları Prova Et gösteriyi başlatır ve her slaytta geçen süreyi sayar. Süreler Slayt Sıralayıcı\'da görünür.' },
+    { t: 'Slayt numarası', pic: '1 · 2 · 3', q: 'Bütün slaytlarda slayt numarası olsun ama kapak slaydında görünmesin istiyorsunuz. Ne yaparsınız?', opts: ['Numaraları her slayda elle yazarım', 'Kapak slaydını silerim', 'Ekle → Üst Bilgi ve Alt Bilgi\'de “Başlık slaydında gösterme”yi işaretlerim'], ok: 2, why: 'Üst Bilgi ve Alt Bilgi penceresinde Slayt numarası ve Başlık slaydında gösterme işaretlenip Tümüne Uygula denir.' },
   ],
 });
 

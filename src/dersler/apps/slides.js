@@ -3,6 +3,7 @@
 // Asıl Slayt (yazı tipi, başlık rengi, logo, alt bilgi bütün slaytlara birden), slayda tablo ve grafik (sütun / pasta).
 // Not Sayfası ve Okuma Görünümü, Zamanlamaları Prova Et, gösteride kalem / vurgulayıcı (Ctrl + P, E, sağ tık menüsü),
 // dinleyici notları ve not sayfası yazdırma; şekiller, WordArt, video, köprü (Ctrl + K), eylem düğmeleri, Üst Bilgi ve Alt Bilgi.
+// Nesne animasyonları: giriş, vurgu, çıkış; Animasyon Ekle, Animasyon Bölmesi (sıra, Oynat), Başlangıç / Süre / Gecikme.
 import { esc, pictureURL, playTune, wait, isImage } from './util.js';
 
 const THEMES = [
@@ -13,6 +14,15 @@ const THEMES = [
 ];
 const LAYOUTS = { title: 'Başlık slaytı', content: 'Başlık ve içerik', two: 'İki içerik', only: 'Yalnızca başlık', photo: 'Fotoğraf ve yazı', blank: 'Boş' };
 const ANIMS = [['none', 'Yok'], ['fade', 'Belirme'], ['left', 'Soldan gel'], ['zoom', 'Büyüme']];
+// Nesne animasyonu efektleri: [kimlik, ad, tür] (in: giriş, em: vurgu, out: çıkış); girişler eski slayt animasyonuyla aynıdır
+const FX = [['fade', 'Belirme', 'in'], ['left', 'Soldan gel', 'in'], ['zoom', 'Büyüme', 'in'], ['pulse', 'Darbe', 'em'], ['spin', 'Döndür', 'em'], ['grow', 'Büyüt/Küçült', 'em'], ['vanish', 'Kaybolma', 'out'], ['flyout', 'Uçarak Çıkma', 'out']];
+const FX_KIND = { in: ['Giriş', '#2e7d32'], em: ['Vurgu', '#bf9000'], out: ['Çıkış', '#c00000'] };
+const FX_DUR = { fade: 0.5, left: 0.5, zoom: 0.5, pulse: 0.5, spin: 1, grow: 1, vanish: 0.5, flyout: 0.5 };
+const FX_KEY = { fade: 'ppIn', left: 'ppLeft', zoom: 'ppZoom', pulse: 'ppPulse', spin: 'ppSpin', grow: 'ppGrow', vanish: 'ppOut', flyout: 'ppFlyOut' };
+const STARTS = [['click', 'Tıklatıldığında', '🖱'], ['with', 'Öncekiyle', ''], ['after', 'Öncekinden Sonra', '🕒']];
+const fxOf = (id) => FX.find((f) => f[0] === id);
+// Süre ve gecikme: 00,50 biçiminde (saniye)
+const fmtS = (v) => (v || 0).toFixed(2).padStart(5, '0').replace('.', ',');
 const ARTS = { liste: 'Liste (renkli kutular)', surec: 'Süreç (oklu adımlar)', agac: 'Soy ağacı / şema' };
 const SIZES = [['S', 'Küçük'], ['M', 'Orta'], ['L', 'Büyük']];
 const ART_COLORS = ['#2e7d32', '#1565c0', '#e46c0a', '#7030a0', '#c62828', '#00838f'];
@@ -58,7 +68,17 @@ export function slides({ desk, body, args, emit, setTitle }) {
       <button type="button" class="pp-link">🔗 Bağlantı</button><button type="button" class="pp-act">⚡ Eylem</button><button type="button" class="pp-shdel">🗑 Şekli sil</button><span class="pp-tnote">Şekli sürükleyerek yerini değiştirebilirsiniz</span></div>
     <div class="pp-rib" data-tab="design" hidden>${THEMES.map(([id, n, bg, fg]) => `<button type="button" class="pp-theme" data-theme="${id}" title="${n}" style="background:${bg};color:${fg}">Aa<small>${n}</small></button>`).join('')}</div>
     <div class="pp-rib" data-tab="trans" hidden>${TRANS.map(([id, n]) => `<button type="button" data-trans="${id}">${n}</button>`).join('')}<span class="pp-tnote">Seçili slayda uygulanır</span><span class="pp-autos">Kendiliğinden ilerle: ${[[0, 'Yok (tıklayınca)'], [3, '3 sn'], [5, '5 sn']].map(([k, n]) => `<button type="button" data-auto="${k}">${n}</button>`).join('')}<button type="button" data-autoall title="Seçili slaydın süresini bütün slaytlara uygular">Tüm slaytlara uygula</button></span></div>
-    <div class="pp-rib" data-tab="anim" hidden>${ANIMS.map(([id, n]) => `<button type="button" data-anim="${id}">${n}</button>`).join('')}<span class="pp-sep"></span><span class="pp-autos">Başlangıç: <button type="button" data-astart="click">Tıklayınca</button><button type="button" data-astart="auto">Kendiliğinden</button></span><button type="button" class="pp-aprev" title="Animasyonu bu slaytta oynat">▶ Önizleme</button><span class="pp-tnote">Maddelere ve resme uygulanır; geçişten farklıdır</span></div>
+    <div class="pp-rib" data-tab="anim" hidden><button type="button" class="pp-aprev" title="Animasyonu bu slaytta oynat">▶ Önizleme</button><span class="pp-sep"></span>
+      <span class="pp-fxg pp-fxg-in"><b>Giriş</b>${ANIMS.map(([id, n]) => `<button type="button" data-anim="${id}">${n}</button>`).join('')}</span>
+      ${['em', 'out'].map((k) => `<span class="pp-fxg pp-fxg-${k}"><b>${FX_KIND[k][0]}</b>${FX.filter((f) => f[2] === k).map(([id, n]) => `<button type="button" data-fx="${id}">${n}</button>`).join('')}</span>`).join('')}<span class="pp-sep"></span>
+      <span class="pp-newwrap"><button type="button" class="pp-aadd" title="Seçili nesneye ikinci bir animasyon ekler">✚ Animasyon Ekle ▾</button><span class="pp-lay pp-aaddlist" hidden>${['in', 'em', 'out'].map((k) => `<b class="pp-laysub">${FX_KIND[k][0]}</b>${FX.filter((f) => f[2] === k).map(([id, n]) => `<button type="button" data-addfx="${id}"><i class="pp-ap-star" style="color:${FX_KIND[k][1]}">★</i> ${n}</button>`).join('')}`).join('')}</span></span>
+      <button type="button" class="pp-apbtn" title="Slayttaki bütün animasyonları sırasıyla listeler">☰ Animasyon Bölmesi</button><span class="pp-sep"></span>
+      <span class="pp-autos pp-aold">Başlangıç: <button type="button" data-astart="click">Tıklayınca</button><button type="button" data-astart="auto">Kendiliğinden</button></span>
+      <span class="pp-atime" hidden><span class="pp-autos">Başlangıç: ${STARTS.map(([k, n]) => `<button type="button" data-ast="${k}">${n}</button>`).join('')}</span>
+        <span class="pp-autos">Süre: <button type="button" class="pp-spin" data-adur="-1" title="Kısalt">−</button><output class="pp-aval pp-adur">00,50</output><button type="button" class="pp-spin" data-adur="1" title="Uzat">+</button></span>
+        <span class="pp-autos">Gecikme: <button type="button" class="pp-spin" data-adel="-1" title="Azalt">−</button><output class="pp-aval pp-adel">00,00</output><button type="button" class="pp-spin" data-adel="1" title="Artır">+</button></span>
+        <span class="pp-autos" title="Animasyonu Yeniden Sırala"><button type="button" data-amove="-1">▲ Önceye Taşı</button><button type="button" data-amove="1">▼ Sonraya Taşı</button></span></span>
+      <span class="pp-tnote pp-anote">Maddelere ve resme uygulanır; geçişten farklıdır</span></div>
     <div class="pp-rib" data-tab="view" hidden><button type="button" data-view="normal">▭ Normal</button><button type="button" data-view="sorter">▦ Slayt Sıralayıcı</button><button type="button" data-view="notes" title="Slayt ve altında konuşmacı notu, kâğıt gibi">📄 Not Sayfası</button><button type="button" data-view="reading" title="Sunuyu pencerenin içinde, gösteri gibi okur">📖 Okuma Görünümü</button><button type="button" data-view="master" title="Bütün slaytların ortak görünüşü: yazı tipi, renk, logo, alt bilgi">🎨 Asıl Slayt</button><span class="pp-tnote">Sıralayıcıda slaytları sürükleyerek yerlerini değiştirin; çift tıklayınca slayt açılır</span></div>
     <div class="pp-rib" data-tab="master" hidden><span class="pp-autos">Yazı tipi: ${FONTS.map(([k, n, f]) => `<button type="button" data-mfont="${k}" style="font-family:${esc(f)}">${n}</button>`).join('')}</span><span class="pp-sep"></span>
       <span class="pp-autos">Başlık rengi: ${MCOLORS.map(([k, n]) => `<button type="button" class="pp-mcol" data-mcolor="${k}" title="${n}">${k ? `<i style="background:${k}"></i>` : 'Tema'}</button>`).join('')}</span><span class="pp-sep"></span>
@@ -74,7 +94,11 @@ export function slides({ desk, body, args, emit, setTitle }) {
       <div class="pp-cdata" hidden><div class="pp-cd-h">📊 Grafik verileri<button type="button" class="pp-cd-x" title="Kapat">✖</button></div>
         <table><thead><tr><th></th><th>Kategori</th><th>Değer</th></tr></thead><tbody></tbody></table>
         <div class="pp-cd-type">Grafik türü: ${CHARTS.map(([k, n]) => `<button type="button" data-ctype="${k}">${n.replace(' grafiği', '')}</button>`).join('')}</div>
-        <small class="pp-cd-n">Yazdıkça slayttaki grafik değişir. Bir satırı kullanmamak için kategorisini silin.</small></div></div>
+        <small class="pp-cd-n">Yazdıkça slayttaki grafik değişir. Bir satırı kullanmamak için kategorisini silin.</small></div>
+      <div class="pp-apane" hidden><div class="pp-ap-h">Animasyon Bölmesi<button type="button" class="pp-ap-x" title="Kapat">✖</button></div>
+        <div class="pp-ap-bar"><button type="button" class="pp-ap-play" title="Slaydın bütün animasyonlarını sırayla oynatır">▶ Oynat</button><span class="pp-ap-mv"><button type="button" data-amove="-1" title="Önceye Taşı">▲</button><button type="button" data-amove="1" title="Sonraya Taşı">▼</button></span></div>
+        <div class="pp-ap-list"></div>
+        <div class="pp-ap-foot"><button type="button" class="pp-ap-del" title="Seçili animasyonu kaldırır">🗑 Kaldır</button><small>🖱 Tıklatıldığında<br>🕒 Öncekinden Sonra</small></div></div></div>
     <div class="pp-notes"><label>📝 Konuşmacı notları <small>(yalnızca siz görürsünüz; izleyiciye gösterilmez)</small></label><textarea class="pp-nt" placeholder="Bu slaytta söylemek istediklerinizi buraya yazın" spellcheck="false"></textarea></div>
     <div class="pp-status"><span class="pp-st"></span><span>Türkçe (Türkiye)</span></div>
     <div class="pp-show" hidden tabindex="0"></div>
@@ -82,9 +106,12 @@ export function slides({ desk, body, args, emit, setTitle }) {
     <div class="pp-read" hidden tabindex="0"><div class="pp-rd-st"></div><div class="pp-rd-bar"><span class="pp-rd-no"></span><span class="pp-rd-nav"><button type="button" class="pp-rd-prev" title="Önceki">◀</button><button type="button" class="pp-rd-next" title="Sonraki">▶</button></span><button type="button" class="pp-rd-normal">▭ Normal</button></div></div>`;
   const $ = (s) => body.querySelector(s);
   let deck, cur = 0, fileName = null, folder = 'docs', dirty = false;
-  const blank = (layout) => ({ layout, title: '', sub: '', body: '', body2: '', img: null, trans: 'none', art: null, anim: { effect: 'none', start: 'click' }, auto: 0, imgSize: 'M', notes: '', shapes: [], ink: [] });
+  // anim: eski slayt animasyonu (bütün maddeler ve resim); anims: nesne animasyonları [{ t, effect, start, dur, delay }]
+  const blank = (layout) => ({ layout, title: '', sub: '', body: '', body2: '', img: null, trans: 'none', art: null, anim: { effect: 'none', start: 'click' }, anims: [], auto: 0, imgSize: 'M', notes: '', shapes: [], ink: [] });
   let view = 'normal';
   let selShape = -1; // seçili şeklin sırası (-1: yok)
+  // Animasyon: seçili nesne ('title', 'sub', 'body', 'body2', 'img', 'shp:2' …), Animasyon Bölmesi'nde seçili satır, bölme açık mı
+  let selObj = null, selAnim = -1, paneOpen = false;
 
   // Şekil, WordArt, eylem düğmesi ya da video: slayda göre yüzde konumlu kutu
   function shapeHtml(o, i, edit) {
@@ -128,7 +155,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     const font = FONTS.find((f) => f[0] === m.font && f[0] !== 'calibri');
     const ce = edit ? 'contenteditable="true"' : '';
     const box = (k, cls) => `<div class="pp-box ${cls}${s[k] ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}">${s[k] || ''}</div>`;
-    const list = (k) => (edit ? `<ul class="pp-box pp-body${plain(s[k]) ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}">${s[k] || '<li><br></li>'}</ul>` : `<ul class="pp-body">${s[k]}</ul>`);
+    const list = (k) => (edit ? `<ul class="pp-box pp-body${plain(s[k]) ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}">${s[k] || '<li><br></li>'}</ul>` : `<ul class="pp-body" data-k="${k}">${s[k]}</ul>`);
     const img = (cls = '') => (s.img ? `<img class="pp-img pp-s${s.imgSize || 'M'} ${cls}" src="${pictureURL(s.img)}" alt="">` : '');
     const items = () => [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean);
     let inner = s.layout === 'blank' ? '' : box('title', s.layout === 'title' ? 'pp-t-big' : 'pp-t');
@@ -178,11 +205,11 @@ export function slides({ desk, body, args, emit, setTitle }) {
     }
     renderChartData();
     $('.pp-sorter').hidden = view !== 'sorter';
-    if (view === 'sorter') $('.pp-sorter').innerHTML = deck.slides.map((s, i) => `<div class="pp-sth${i === cur ? ' on' : ''}" data-i="${i}" draggable="true"><span>${i + 1}${s.trans !== 'none' ? ' ★' : ''}${s.anim?.effect !== 'none' ? ' ✦' : ''}${s.auto > 0 ? `<em class="pp-stime">${fmtT(s.auto).slice(2)}</em>` : ''}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
+    if (view === 'sorter') $('.pp-sorter').innerHTML = deck.slides.map((s, i) => `<div class="pp-sth${i === cur ? ' on' : ''}" data-i="${i}" draggable="true"><span>${i + 1}${s.trans !== 'none' ? ' ★' : ''}${s.anim?.effect !== 'none' || s.anims?.length ? ' ✦' : ''}${s.auto > 0 ? `<em class="pp-stime">${fmtT(s.auto).slice(2)}</em>` : ''}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
     body.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === view));
     body.querySelectorAll('[data-size]').forEach((b) => b.classList.toggle('on', b.dataset.size === (deck.slides[cur].imgSize || 'M')));
-    body.querySelectorAll('[data-anim]').forEach((b) => b.classList.toggle('on', b.dataset.anim === deck.slides[cur].anim?.effect));
     body.querySelectorAll('[data-astart]').forEach((b) => b.classList.toggle('on', b.dataset.astart === deck.slides[cur].anim?.start));
+    animUi();
     body.querySelectorAll('[data-auto]').forEach((b) => b.classList.toggle('on', +b.dataset.auto === (deck.slides[cur].auto || 0)));
     $('.pp-musicname').textContent = deck.music ? `🔊 ${deck.music}` : '';
     $('.pp-st').textContent = `Slayt ${cur + 1} / ${deck.slides.length}`;
@@ -229,7 +256,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
   function setTable(sl, c, r) {
     sl.table = Array.from({ length: r }, () => Array(c).fill(''));
   }
-  function go(i) { pull(); cur = Math.max(0, Math.min(deck.slides.length - 1, i)); selShape = -1; render(); emit('ppt-select', { index: cur }); }
+  function go(i) { pull(); cur = Math.max(0, Math.min(deck.slides.length - 1, i)); selShape = -1; selObj = null; selAnim = -1; render(); emit('ppt-select', { index: cur }); }
   // Seçili şeklin çerçevesi ve bağlamsal “Şekil Biçimi” sekmesi
   function markSel() {
     $('.pp-slide').querySelectorAll('.pp-shp').forEach((el) => el.classList.toggle('sel', +el.dataset.si === selShape));
@@ -239,11 +266,210 @@ export function slides({ desk, body, args, emit, setTitle }) {
     body.querySelectorAll('[data-fill]').forEach((b) => b.classList.toggle('on', !!o && b.dataset.fill === o.fill));
   }
 
+  // ---- Nesne animasyonları (Animasyonlar sekmesi, Animasyon Bölmesi) ----
+  // Nesnenin slayttaki öğeleri; maddeler paragraf paragraf (SmartArt'ta kutu kutu) döner
+  function objEls(root, t) {
+    if (t.startsWith('shp:')) return [...root.querySelectorAll(`.pp-shp[data-si="${t.slice(4)}"]`)];
+    if (t === 'img') return [...root.querySelectorAll('.pp-img')];
+    if (t === 'body' || t === 'body2') {
+      const ul = root.querySelector(`.pp-body[data-k="${t}"]`);
+      if (ul) return [...ul.children];
+      return t === 'body' ? [...root.querySelectorAll('.pp-ab')] : [];
+    }
+    return [...root.querySelectorAll(`.pp-box[data-k="${t}"]`)];
+  }
+  // Nesnenin bütünü (çerçeve ve numara için)
+  const objBox = (root, t) => (t === 'body' || t === 'body2' ? root.querySelector(`.pp-body[data-k="${t}"]`) || (t === 'body' ? root.querySelector('.pp-art') : null) : objEls(root, t)[0]);
+  // Animasyon Bölmesi'ndeki ad: “Başlık: Kermes”, “Yıldız: 50 TL” …
+  function objName(s, t) {
+    const cut = (x) => (x.length > 24 ? x.slice(0, 23) + '…' : x);
+    if (t.startsWith('shp:')) {
+      const o = s.shapes?.[+t.slice(4)];
+      if (!o) return 'Şekil';
+      const nm = o.kind === 'video' ? 'Video' : o.kind === 'wordart' ? 'WordArt' : (SHAPES.find((x) => x[0] === o.kind) || ACTS.find((x) => x[0] === o.kind))?.[2] || 'Şekil';
+      return o.text ? `${nm}: ${cut(o.text)}` : nm;
+    }
+    if (t === 'img') return 'Resim';
+    if (t === 'body' || t === 'body2') return `Maddeler: ${cut((new DOMParser().parseFromString(`<ul>${s[t]}</ul>`, 'text/html').querySelector('li')?.textContent || '').trim())}`;
+    return `${t === 'title' ? 'Başlık' : 'Alt başlık'}: ${cut(plain(s[t]))}`;
+  }
+  const anItems = (s, t) => [...new DOMParser().parseFromString(`<ul>${s[t]}</ul>`, 'text/html').querySelectorAll('li')].filter((li) => li.textContent.trim()).length;
+  // Eski (bütün slayda verilen) animasyonu nesne animasyonlarına çevirir: ikisi aynı slaytta karışmasın
+  function toList(s) {
+    if (!s.anims) s.anims = [];
+    const eff = s.anim?.effect;
+    if (!eff || eff === 'none') return;
+    const auto = s.anim.start === 'auto';
+    const add = [s.art ? 'body' : plain(s.body) && 'body', plain(s.body2) && s.layout === 'two' && 'body2', s.img && 'img'].filter(Boolean);
+    s.anims.unshift(...add.map((t, k) => ({ t, effect: eff, start: auto ? 'after' : 'click', dur: FX_DUR[eff], delay: auto ? (k ? 0.5 : 0.7) : 0 })));
+    s.anim = { ...s.anim, effect: 'none' };
+  }
+  // Sıra: her “Tıklatıldığında” yeni bir tıklama adımı açar; “Öncekiyle” öncekiyle aynı anda, “Öncekinden Sonra” önceki
+  // bitince başlar. İlk animasyon tıklama beklemiyorsa slayt açılır açılmaz kendiliğinden oynar (click: false olan adım).
+  function animSeq(s, root) {
+    const groups = [];
+    let g = null, prevAt = 0, prevEnd = 0;
+    (s.anims || []).forEach((a, ai) => {
+      const els = objEls(root, a.t);
+      const parts = a.t === 'body' || a.t === 'body2' ? els.map((el) => [el]) : [els];
+      parts.forEach((part) => {
+        if (!g || a.start === 'click') { g = { click: a.start === 'click', acts: [], len: 0 }; groups.push(g); prevAt = prevEnd = 0; }
+        const at = (a.start === 'after' ? prevEnd : prevAt) + (a.delay || 0) * 1000, dur = (a.dur || FX_DUR[a.effect] || 0.5) * 1000;
+        g.acts.push({ els: part, a, ai, at, dur, kind: fxOf(a.effect)?.[2] || 'in' });
+        prevAt = at; prevEnd = at + dur;
+        g.len = Math.max(g.len, prevEnd);
+      });
+    });
+    // İlk animasyonu giriş olan öğeler başta görünmez
+    const seen = new Set();
+    groups.forEach((x) => x.acts.forEach((act) => act.els.forEach((el) => { if (!seen.has(el)) { seen.add(el); if (act.kind === 'in') el.classList.add('pp-anim-hide'); } })));
+    return groups;
+  }
+  // Bir animasyonu oynatır (fin: hemen sonuna atlar). Çıkışta öğe, animasyon bitince gizlenir.
+  function playAct(act, list, fin) {
+    const key = FX_KEY[act.a.effect];
+    act.els.forEach((el) => {
+      el.classList.remove('pp-anim-hide');
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = key ? `${key} ${fin ? 1 : act.dur}ms ${act.kind === 'em' ? 'ease-in-out' : 'ease-out'} both` : '';
+    });
+    if (act.kind === 'out') list.push(setTimeout(() => act.els.forEach((el) => { el.classList.add('pp-anim-hide'); el.style.animation = ''; }), fin ? 1 : act.dur));
+  }
+  // Seçili nesneyi değiştirir (slayttaki nesneye tıklayınca ya da bölmede bir satıra tıklayınca)
+  function pickObj(t, ai) {
+    const an = deck.slides[cur].anims || [];
+    selObj = t || null;
+    selAnim = ai ?? (t ? an.findIndex((a) => a.t === t) : -1);
+    animUi();
+  }
+  // Şerit, Animasyon Bölmesi ve slayttaki animasyon numaraları
+  function animUi() {
+    const s = deck.slides[cur];
+    const an = s.anims || [];
+    if (selAnim >= an.length || (selAnim >= 0 && selObj && an[selAnim].t !== selObj)) selAnim = -1;
+    const a = an[selAnim];
+    const ctx = !!(a || selObj);
+    body.querySelectorAll('[data-anim]').forEach((b) => b.classList.toggle('on', a ? b.dataset.anim === a.effect : ctx ? b.dataset.anim === 'none' : !an.length && b.dataset.anim === s.anim?.effect));
+    body.querySelectorAll('[data-fx]').forEach((b) => b.classList.toggle('on', !!a && b.dataset.fx === a.effect));
+    $('.pp-aold').hidden = ctx || an.length > 0;
+    $('.pp-atime').hidden = !$('.pp-aold').hidden;
+    $('.pp-atime').querySelectorAll('button').forEach((b) => { b.disabled = !a; });
+    body.querySelectorAll('[data-ast]').forEach((b) => b.classList.toggle('on', !!a && b.dataset.ast === a.start));
+    $('.pp-adur').textContent = fmtS(a ? a.dur : 0);
+    $('.pp-adel').textContent = fmtS(a ? a.delay : 0);
+    const who = selObj || a?.t;
+    $('.pp-anote').innerHTML = who ? `Seçili: <b>${esc(objName(s, who))}</b>` : an.length ? 'Önce slayttaki bir nesneye ya da bölmedeki bir satıra tıklayın' : 'Nesne seçili değilse giriş efekti maddelere ve resme uygulanır';
+    // Animasyon Bölmesi
+    const pane = $('.pp-apane');
+    pane.hidden = !(paneOpen && view === 'normal' && $('.pp-cdata').hidden);
+    $('.pp-main').classList.toggle('ap-open', !pane.hidden);
+    body.querySelectorAll('.pp-apbtn').forEach((b) => b.classList.toggle('on', paneOpen));
+    // Numara: kaçıncı tıklamada oynadığı (0: slayt açılınca kendiliğinden); maddeler her paragrafta bir tıklama sayılır
+    let n = 0;
+    const nums = an.map((x) => {
+      const k = x.t === 'body' || x.t === 'body2' ? Math.max(1, anItems(s, x.t)) : 1;
+      if (x.start !== 'click') return String(n);
+      const from = n + 1;
+      n += k;
+      return k > 1 ? `${from}–${n}` : String(from);
+    });
+    if (!pane.hidden) {
+      pane.querySelector('.pp-ap-list').innerHTML = an.length ? an.map((x, i) => {
+        const f = fxOf(x.effect) || FX[0], st = STARTS.find((y) => y[0] === x.start) || STARTS[0];
+        return `<div class="pp-ap-row${i === selAnim ? ' on' : ''}" data-ai="${i}" title="${esc(f[1])} · ${st[1]} · Süre ${fmtS(x.dur)} sn"><span class="pp-ap-no">${x.start === 'click' ? nums[i] : ''}</span><span class="pp-ap-st">${st[2]}</span><i class="pp-ap-star" style="color:${FX_KIND[f[2]][1]}">★</i><span class="pp-ap-nm">${esc(objName(s, x.t))}</span><span class="pp-ap-fx">${esc(f[1])}</span></div>`;
+      }).join('') : '<div class="pp-ap-empty">Bu slaytta nesne animasyonu yok.<br>Slayttaki bir nesneye tıklayıp Animasyonlar sekmesinden bir efekt seçin.</div>';
+      pane.querySelectorAll('[data-amove], .pp-ap-del').forEach((b) => { b.disabled = !a; });
+    }
+    // Slaytta: seçili nesnenin çerçevesi ve animasyon numaraları (gösteride görünmez)
+    const sl = $('.pp-slide .pp-sl');
+    if (!sl) return;
+    sl.querySelectorAll('.pp-abadge').forEach((x) => x.remove());
+    sl.querySelectorAll('.pp-osel').forEach((x) => x.classList.remove('pp-osel'));
+    if (selObj && !selObj.startsWith('shp:')) objBox(sl, selObj)?.classList.add('pp-osel');
+    if (!an.length || $('.pp-stage').hidden) return;
+    const r0 = sl.getBoundingClientRect(), tags = new Map();
+    an.forEach((x, i) => { if (!tags.has(x.t)) tags.set(x.t, []); tags.get(x.t).push([nums[i], i === selAnim]); });
+    tags.forEach((list, t) => {
+      const el = objBox(sl, t);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const b = document.createElement('span');
+      b.className = 'pp-abadge';
+      b.innerHTML = list.map(([v, on]) => `<i${on ? ' class="on"' : ''}>${v}</i>`).join('');
+      b.style.left = Math.max(0, r.left - r0.left) + 'px';
+      b.style.top = Math.max(0, r.top - r0.top) + 'px';
+      sl.append(b);
+    });
+  }
+  // Efekt seçmek: seçili animasyonun efekti değişir; “Animasyon Ekle” ile (ya da nesnede animasyon yoksa) yenisi eklenir
+  function setFx(effect, add) {
+    const s = deck.slides[cur];
+    const t = selObj || s.anims?.[selAnim]?.t;
+    if (!t) { desk.toast('Animasyon', 'Önce slayttaki nesneye (başlık, maddeler, şekil, resim) tıklayın, sonra efekti seçin.', '✦', 5000); emit('ppt-oanim', { op: 'none', index: cur }); return; }
+    pull();
+    const had = s.anims?.length || 0;
+    toList(s);
+    // Eski animasyon listeye çevrildiyse seçili satır kaymış olabilir: nesnenin ilk animasyonunu seç
+    if (s.anims.length !== had) selAnim = s.anims.findIndex((x) => x.t === t);
+    const a = s.anims[selAnim];
+    if (effect === 'none') { if (a) removeAnim(); return; }
+    let op;
+    if (a && !add) { a.effect = effect; a.dur = FX_DUR[effect]; op = 'change'; }
+    else { s.anims.push({ t, effect, start: 'click', dur: FX_DUR[effect], delay: 0 }); selAnim = s.anims.length - 1; op = 'add'; }
+    selObj = t;
+    changed(); animUi();
+    const x = s.anims[selAnim];
+    emit('ppt-oanim', { op, t, kind: fxOf(effect)[2], effect, start: x.start, at: selAnim, index: cur, count: s.anims.length, sameObj: s.anims.filter((y) => y.t === t).length });
+  }
+  function removeAnim() {
+    const s = deck.slides[cur];
+    const [a] = s.anims.splice(selAnim, 1);
+    if (!a) return;
+    selAnim = -1;
+    changed(); animUi();
+    emit('ppt-oanim', { op: 'remove', t: a.t, effect: a.effect, index: cur, count: s.anims.length });
+  }
+  // Bölmede seçili animasyonu bir üste (-1) ya da alta (+1) taşır
+  function moveAnim(d) {
+    const an = deck.slides[cur].anims || [];
+    const to = selAnim + d;
+    if (selAnim < 0 || to < 0 || to >= an.length) return;
+    [an[selAnim], an[to]] = [an[to], an[selAnim]];
+    selAnim = to; selObj = an[to].t;
+    changed(); animUi();
+    emit('ppt-oanim', { op: 'move', t: an[to].t, effect: an[to].effect, at: to, dir: d, index: cur, count: an.length });
+  }
+  // Başlangıç, süre (0,25–5 sn) ve gecikme (0–10 sn); süre ve gecikme 0,25 saniyelik adımlarla değişir
+  function setTiming(what, v) {
+    const a = deck.slides[cur].anims?.[selAnim];
+    if (!a) return;
+    if (what === 'start') a.start = v;
+    else a[what] = Math.round(Math.max(what === 'dur' ? 0.25 : 0, Math.min(what === 'dur' ? 5 : 10, (a[what] || 0) + v * 0.25)) * 100) / 100;
+    changed(); animUi();
+    emit('ppt-oanim', { op: what, t: a.t, effect: a.effect, start: a.start, dur: a.dur, delay: a.delay, at: selAnim, index: cur });
+  }
+  // Düzenleme ekranında önizleme: tıklama beklemeden bütün animasyonlar sırayla oynar, sonra slayt eski hâline döner
+  let pvTimers = [];
+  function previewAnims() {
+    pvTimers.forEach(clearTimeout); pvTimers = [];
+    const root = $('.pp-slide');
+    root.querySelectorAll('.pp-abadge').forEach((x) => { x.hidden = true; });
+    const groups = animSeq(deck.slides[cur], root);
+    let off = 300;
+    groups.forEach((g) => { const at0 = off; g.acts.forEach((act) => pvTimers.push(setTimeout(() => playAct(act, pvTimers), at0 + act.at))); off += g.len + 400; });
+    pvTimers.push(setTimeout(() => {
+      groups.forEach((g) => g.acts.forEach((act) => act.els.forEach((el) => { el.classList.remove('pp-anim-hide'); el.style.animation = ''; })));
+      root.querySelectorAll('.pp-abadge').forEach((x) => { x.hidden = false; });
+    }, off + 300));
+    return groups.length;
+  }
+
   function load(data, name = null, fld = folder) {
     deck = data ? structuredClone(data) : { theme: 'beyaz', slides: [blank('title')] };
     deck.slides = deck.slides.map((x) => ({ ...blank(x.layout), ...x }));
     deck.master = { font: 'calibri', color: '', logo: null, footer: '', ...deck.master };
-    view = 'normal'; chartOpen = false; selShape = -1;
+    view = 'normal'; chartOpen = false; selShape = -1; selObj = null; selAnim = -1;
     cur = 0; fileName = name; folder = fld; dirty = false;
     render();
   }
@@ -279,19 +505,55 @@ export function slides({ desk, body, args, emit, setTitle }) {
     emit('ppt-anim-step', { n: revealed, total: t.length, index: showAt });
     return true;
   }
-  function advance() { if (showAt >= deck.slides.length) return endShow(); const sh = $('.pp-show'); if (!revealNext(sh)) showSlide(showAt + 1); }
+  // Nesne animasyonları gösteride: seq.groups sırayla; seq.run o an oynayan adım, seq.clicks bu slaytta harcanan tıklama
+  let seq = null;
+  function playGroup(gi, by) {
+    const g = seq.groups[gi], my = seq, run = { g, tms: [] };
+    seq.run = run;
+    g.acts.forEach((act) => run.tms.push(setTimeout(() => { playAct(act, timers); emit('ppt-anim-play', { index: showAt, t: act.a.t, kind: act.kind, effect: act.a.effect, start: act.a.start, by }); }, act.at)));
+    run.tms.push(setTimeout(() => endGroup(my, run), g.len + 30));
+    timers.push(...run.tms);
+  }
+  function endGroup(my, run, fin) {
+    if (seq !== my || my.run !== run) return;
+    if (fin) { run.tms.forEach(clearTimeout); run.g.acts.forEach((act) => playAct(act, timers, true)); }
+    my.run = null;
+    if (my.next >= my.groups.length) emit('ppt-anim-done', { index: showAt, clicks: my.clicks, steps: my.groups.filter((x) => x.click).length });
+  }
+  // Tıklama: oynayan adım varsa sonuna atlar, yoksa sonraki tıklama adımını başlatır
+  function stepAnims() {
+    if (seq.run) { seq.clicks++; endGroup(seq, seq.run, true); return true; }
+    if (seq.next >= seq.groups.length) return false;
+    seq.clicks++;
+    playGroup(seq.next++, 'click');
+    emit('ppt-anim-step', { n: seq.next - (seq.groups[0].click ? 0 : 1), total: seq.groups.filter((x) => x.click).length, index: showAt, clicks: seq.clicks });
+    return true;
+  }
+  function advance() { if (showAt >= deck.slides.length) return endShow(); const sh = $('.pp-show'); if (!(seq ? stepAnims() : revealNext(sh))) showSlide(showAt + 1); }
   function showSlide(i, dir = 1) {
     const sh = $('.pp-show');
     clearTimers();
     lap();
     if (i >= deck.slides.length) {
       sh.innerHTML = '<div class="pp-end">Slayt gösterisinin sonu. Çıkmak için tıklayın ya da Esc.</div>';
-      showAt = deck.slides.length;
+      showAt = deck.slides.length; seq = null;
       emit('ppt-show-end', { seen: true });
       return;
     }
     showAt = Math.max(0, i);
     const s = deck.slides[showAt];
+    seq = null;
+    if (s.anims?.length) {
+      // Nesne animasyonları: önce kendiliğinden oynayanlar, sonra her tıklamada bir adım
+      sh.innerHTML = `<div class="pp-sh-in pp-tr-${dir > 0 ? s.trans : 'none'}">${slideHtml(s, false, true)}${inkSvg(ink[showAt], true)}</div>`;
+      revealed = revealTotal = 0;
+      seq = { groups: animSeq(s, sh.firstElementChild), next: 0, run: null, clicks: 0 };
+      const g0 = seq.groups[0] && !seq.groups[0].click ? seq.groups[0] : null;
+      if (g0) playGroup(seq.next++, 'auto');
+      if (s.auto > 0 && !rehearse) timers.push(setTimeout(() => { if (!$('.pp-show').hidden && showAt === i) { emit('ppt-auto-advance', { index: i, secs: s.auto }); showSlide(i + 1); } }, s.auto * 1000 + (g0 ? g0.len : 0)));
+      emit('ppt-show-slide', { index: showAt, total: deck.slides.length, anim: 'nesne', auto: s.auto, steps: seq.groups.filter((x) => x.click).length });
+      return;
+    }
     const eff = s.anim?.effect && s.anim.effect !== 'none' ? s.anim.effect : null;
     sh.innerHTML = `<div class="pp-sh-in pp-tr-${dir > 0 ? s.trans : 'none'}${eff ? ' pp-anim-' + eff : ''}">${slideHtml(s, false, true)}${inkSvg(ink[showAt], true)}</div>`;
     revealed = 0;
@@ -331,7 +593,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     clearTimers();
     clearInterval(musicTimer);
     emit('ppt-show-exit', { at: showAt, finished: showAt >= deck.slides.length });
-    showAt = -1;
+    showAt = -1; seq = null;
     $('.pp-thumbs').focus();
     afterShow(rh);
   }
@@ -738,7 +1000,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
 
   // ---- Olaylar ----
   body.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.pp-rib button, .pp-tabs button, .pp-rhbar button')) e.preventDefault();
+    if (e.target.closest('.pp-rib button, .pp-tabs button, .pp-rhbar button, .pp-apane button, .pp-ap-row')) e.preventDefault();
     if (!e.target.closest('.pp-menu, .pp-file')) $('.pp-menu').hidden = true;
     if (!e.target.closest('.pp-newwrap')) body.querySelectorAll('.pp-lay').forEach((x) => { x.hidden = true; });
   });
@@ -747,6 +1009,9 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (e.target.closest('a[href]') && !e.target.closest('.pp-show, .pp-read')) e.preventDefault();
     const th = e.target.closest('.pp-th');
     if (th) { go(+th.dataset.i); $('.pp-thumbs').focus(); return; }
+    // Animasyon Bölmesi'nde bir satır: o animasyon ve nesnesi seçilir
+    const ar = e.target.closest('.pp-ap-row');
+    if (ar) { const a = deck.slides[cur].anims[+ar.dataset.ai]; pickObj(a.t, +ar.dataset.ai); emit('ppt-anim-pick', { t: a.t, at: +ar.dataset.ai, index: cur }); return; }
     const t = e.target.closest('button');
     if (!t) return;
     if (t.dataset.tab) { showTab(t.dataset.tab); emit('ppt-tab', { tab: t.dataset.tab }); return; }
@@ -858,7 +1123,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('pp-shdel')) {
       const s = deck.slides[cur];
       if (!s.shapes?.[selShape]) return;
-      pull(); const [o] = s.shapes.splice(selShape, 1); selShape = -1; changed(); render();
+      pull(); const [o] = s.shapes.splice(selShape, 1);
+      // Silinen şeklin animasyonları da gider; sonraki şekillerin sıra numarası bir azalır
+      s.anims = (s.anims || []).filter((a) => a.t !== 'shp:' + selShape).map((a) => (a.t.startsWith('shp:') && +a.t.slice(4) > selShape ? { ...a, t: 'shp:' + (+a.t.slice(4) - 1) } : a));
+      selShape = -1; selObj = null; selAnim = -1; changed(); render();
       emit('ppt-shape-delete', { kind: o.kind, index: cur });
       return;
     }
@@ -920,12 +1188,36 @@ export function slides({ desk, body, args, emit, setTitle }) {
     }
     if (t.classList.contains('pp-cd-x')) { chartOpen = false; render(); return; }
     if (t.dataset.ctype) { const ch = deck.slides[cur].chart; if (!ch) return; ch.type = t.dataset.ctype; changed(); refreshSlide(); renderChartData(); emit('ppt-chart', { kind: ch.type, change: true, index: cur, ok: true }); return; }
+    // Nesne seçiliyse (ya da slaytta nesne animasyonları varsa) efekt yalnız o nesneye; değilse eski yol: bütün maddeler ve resim
+    if (t.dataset.anim && (selObj || selAnim >= 0 || deck.slides[cur].anims?.length)) return setFx(t.dataset.anim, false);
+    if (t.dataset.fx) return setFx(t.dataset.fx, false);
+    if (t.classList.contains('pp-aadd')) { $('.pp-aaddlist').hidden = !$('.pp-aaddlist').hidden; return; }
+    if (t.dataset.addfx) { $('.pp-aaddlist').hidden = true; return setFx(t.dataset.addfx, true); }
+    if (t.classList.contains('pp-apbtn') || t.classList.contains('pp-ap-x')) {
+      paneOpen = t.classList.contains('pp-apbtn') ? !paneOpen : false;
+      if (paneOpen) chartOpen = false;
+      renderChartData(); animUi();
+      emit('ppt-anim-pane', { open: paneOpen });
+      return;
+    }
+    if (t.dataset.ast) return setTiming('start', t.dataset.ast);
+    if (t.dataset.adur) return setTiming('dur', +t.dataset.adur);
+    if (t.dataset.adel) return setTiming('delay', +t.dataset.adel);
+    if (t.dataset.amove) return moveAnim(+t.dataset.amove);
+    if (t.classList.contains('pp-ap-del')) return removeAnim();
+    if (t.classList.contains('pp-ap-play')) {
+      if (!deck.slides[cur].anims?.length) { desk.toast('Animasyon yok', 'Bu slaytta oynatılacak nesne animasyonu yok.', '✦'); return; }
+      pull(); previewAnims();
+      emit('ppt-anim-preview', { effect: 'nesne', pane: true, count: deck.slides[cur].anims.length });
+      return;
+    }
     if (t.dataset.anim) { pull(); deck.slides[cur].anim = { ...(deck.slides[cur].anim || { start: 'click' }), effect: t.dataset.anim }; changed(); render(); emit('ppt-anim', { effect: t.dataset.anim, start: deck.slides[cur].anim.start, index: cur }); return; }
     if (t.dataset.astart) { pull(); deck.slides[cur].anim = { ...(deck.slides[cur].anim || { effect: 'none' }), start: t.dataset.astart }; changed(); render(); emit('ppt-anim', { effect: deck.slides[cur].anim.effect, start: t.dataset.astart, index: cur }); return; }
     if ('autoall' in t.dataset) { pull(); const v = deck.slides[cur].auto || 0; deck.slides.forEach((x) => { x.auto = v; }); changed(); render(); emit('ppt-autotime', { secs: v, index: cur, all: true }); return; }
     if (t.dataset.auto) { pull(); deck.slides[cur].auto = +t.dataset.auto; changed(); render(); emit('ppt-autotime', { secs: +t.dataset.auto, index: cur }); return; }
     if (t.classList.contains('pp-aprev')) {
       const el = $('.pp-slide');
+      if (deck.slides[cur].anims?.length) { pull(); previewAnims(); emit('ppt-anim-preview', { effect: 'nesne', count: deck.slides[cur].anims.length }); return; }
       const eff = deck.slides[cur].anim?.effect;
       if (!eff || eff === 'none') { desk.toast('Animasyon yok', 'Önce bir animasyon seçin.', '✦'); return; }
       el.querySelectorAll('.pp-body li, .pp-ab, .pp-img').forEach((x, k) => { x.classList.remove('pp-anim-run'); void x.offsetWidth; x.style.animationDelay = k * 0.5 + 's'; x.classList.add('pp-anim-' + eff, 'pp-anim-run'); });
@@ -1053,6 +1345,9 @@ export function slides({ desk, body, args, emit, setTitle }) {
     const sp = e.target.closest('.pp-shp');
     const i = sp ? +sp.dataset.si : -1;
     if (i !== selShape) { selShape = i; markSel(); }
+    // Animasyon verilecek nesne: şekil, resim, yazı kutusu ya da SmartArt (boş yere tıklayınca seçim kalkar)
+    const t = sp ? 'shp:' + i : e.target.closest('.pp-img') ? 'img' : e.target.closest('.pp-box')?.dataset.k || (e.target.closest('.pp-art') ? 'body' : null);
+    if (t !== selObj) { pickObj(t); emit('ppt-anim-pick', { t, index: cur }); }
     if (sp && e.button === 0) drag = { i, el: sp, x: e.clientX, y: e.clientY, r: $('.pp-slide').getBoundingClientRect(), moved: false };
   });
   $('.pp-slide').addEventListener('pointermove', (e) => {
@@ -1088,8 +1383,9 @@ export function slides({ desk, body, args, emit, setTitle }) {
       pull();
       return {
         theme: deck.theme, showing: !$('.pp-show').hidden, fileName, slideNum: !!deck.slideNum, notes: deck.slides.map((x) => x.notes || ''),
-        music: deck.music || null, view, master: { ...deck.master, logo: !!deck.master.logo }, hf: { ...deck.hf },
-        slides: deck.slides.map((s) => ({ layout: s.layout, title: plain(s.title), sub: plain(s.sub), items: [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean), img: !!s.img, trans: s.trans, art: s.art, anim: s.anim?.effect || 'none', animStart: s.anim?.start, auto: s.auto || 0, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
+        music: deck.music || null, view, animPane: paneOpen, animSel: { t: selObj, at: selAnim }, master: { ...deck.master, logo: !!deck.master.logo }, hf: { ...deck.hf },
+        slides: deck.slides.map((s) => ({ layout: s.layout, title: plain(s.title), sub: plain(s.sub), items: [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean), img: !!s.img, trans: s.trans, art: s.art, anim: s.anim?.effect || 'none', animStart: s.anim?.start,
+          anims: (s.anims || []).map((a) => ({ t: a.t, name: objName(s, a.t), kind: fxOf(a.effect)?.[2], effect: a.effect, start: a.start, dur: a.dur, delay: a.delay })), auto: s.auto || 0, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
           shapes: (s.shapes || []).map((o) => ({ kind: o.kind, text: o.text || '', fill: o.fill || null, style: o.style || null, link: o.link || null, name: o.name || null })),
           links: [...new DOMParser().parseFromString(`${s.title}${s.sub}<ul>${s.body}</ul><ul>${s.body2}</ul>`, 'text/html').querySelectorAll('a[href]')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
           ink: (s.ink || []).length })),
