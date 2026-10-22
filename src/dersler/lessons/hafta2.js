@@ -5,7 +5,7 @@ const hasCI = (c, word) => norm(c.np.value).split(/\s+/).includes(norm(word));
 
 export const klavye = {
   id: 'klavye', icon: '⌨', title: 'Klavyeyi tanıyalım', minutes: 25, stage: 'notepad',
-  desc: 'Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, ok tuşları.',
+  desc: 'Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, ok tuşları, Tab ve Esc.',
   summary: [
     ['Boşluk', 'Kelimeler arasına boşluk'],
     ['Enter', 'Alt satıra geç'],
@@ -18,6 +18,9 @@ export const klavye = {
     ['AltGr + Q', '@ işareti (e-posta)'],
     ['↑ ↓ ← →', 'İmleci hareket ettirir'],
     ['Home / End', 'Satırın başına / sonuna'],
+    ['Tab', 'Formda sonraki kutuya geçer'],
+    ['Esc', 'Vazgeç, menüyü kapat'],
+    ['⊞ Windows', 'Başlat menüsünü açar'],
   ],
   steps: [
     {
@@ -150,6 +153,20 @@ export const klavye = {
         return !!(c.s.h && c.s.e);
       },
       done: 'Uzun bir satırda bu iki tuş çok zaman kazandırır.',
+    },
+    {
+      title: 'Tab ve Esc',
+      html: `<p>İki tuş daha: ${K('Tab')} (Q'nun solunda) ve ${K('Esc')} (sol üst köşede).</p>
+        <ul class="big-list"><li>${K('Tab')}: formlarda <b>bir sonraki kutuya</b> geçirir. Yazıda biraz ileri boşluk bırakır.</li><li>${K('Esc')}: <b>vazgeç</b> demektir. Açılan menüyü ya da pencereyi kapatır.</li></ul>
+        <p>İkisine de bir kez basın.</p>`,
+      keys: ['Tab'],
+      on: (ev, c) => {
+        if (ev.type !== 'key') return false;
+        if (ev.e.key === 'Tab') { ev.e.preventDefault(); document.execCommand('insertText', false, '\t'); c.s.t = true; }
+        if (ev.e.key === 'Escape') c.s.esc = true;
+        return !!(c.s.t && c.s.esc);
+      },
+      done: 'Bir de ⊞ <b>Windows</b> tuşu var (Ctrl ile Alt arasında, pencere resimli). Başlat menüsünü açar; 5. haftada kullanacağız.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Klavyenin önemli tuşlarını öğrendiniz:</p>' },
   ],

@@ -322,7 +322,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     <div class="xl-errnote" hidden></div>
     <div class="xl-ol" hidden><span>Anahat düzeyi:</span>${[1, 2, 3].map((n) => `<button type="button" data-ol="${n}" title="${['Yalnızca genel toplam', 'Alt toplamlar ve genel toplam', 'Bütün satırlar'][n - 1]}">${n}</button>`).join('')}<small class="xl-olnote"></small></div>
     <div class="xl-wrap" tabindex="0"><table class="xl-grid"><thead><tr><th class="xl-corner"></th>${[...COLS].map((c, i) => `<th data-col="${i}">${c}<i class="xl-rz" data-col="${i}" title="Sütun genişliği: sürükleyin ya da çift tıklayarak içeriğe sığdırın"></i></th>`).join('')}</tr></thead>
-      <tbody>${Array.from({ length: ROWS }, (_, r) => `<tr><th>${r + 1}</th>${[...COLS].map((_, c) => `<td data-a="${addr(r, c)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
+      <tbody>${Array.from({ length: ROWS }, (_, r) => `<tr><th data-row="${r}">${r + 1}</th>${[...COLS].map((_, c) => `<td data-a="${addr(r, c)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
       <div class="xl-chart" hidden></div><div class="xl-fh" title="Doldurma tutamacı: aşağı ya da sağa sürükleyin"></div></div>
     <div class="xl-sheetbar"><div class="xl-shtabs"></div><button type="button" class="xl-shadd" title="Yeni çalışma sayfası">＋</button></div>
     <div class="xl-status"><span class="xl-stat"></span><span>Hazır</span></div>`;
@@ -1275,6 +1275,29 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (dragging) { dragging = false; emit('xl-select', { addr: addr(act.r, act.c), range: selAddr() }); }
   });
   wrap.addEventListener('dblclick', (e) => { if (e.target.closest('td[data-a]')) startEdit(null, false); });
+  // Satır numarasına sağ tık: satır ekle (üstüne boş satır) ya da sil; formüller ve biçimler yeni yerlerine kayar
+  wrap.addEventListener('contextmenu', (e) => {
+    const h = e.target.closest('tbody th[data-row]');
+    if (!h) return;
+    e.preventDefault();
+    if (editing) commit();
+    const r = +h.dataset.row;
+    select(r, 0); select(r, COLS.length - 1, true);
+    desk.menu(e.clientX, e.clientY, [{ cmd: 'ins', label: '➕ Ekle' }, { cmd: 'del', label: '🗑 Sil' }], (cmd) => {
+      if (prot) { lockedWarn(addr(r, 0)); return; }
+      const newOf = [];
+      if (cmd === 'ins') {
+        if ([...COLS].some((_, c) => (cells[addr(ROWS - 1, c)] ?? '') !== '')) { desk.toast('Satır eklenemedi', 'Sayfanın son satırı dolu; yeni satır için yer yok.', '⚠'); return; }
+        for (let k = 0; k < ROWS; k++) newOf[k] = k < r ? k : k + 1;
+      } else {
+        for (let k = 0; k < ROWS; k++) newOf[k] = k === r ? null : k < r ? k : k - 1;
+      }
+      relayout(newOf);
+      act = { r, c: 0 }; anchor = { ...act };
+      dirty = true; render();
+      emit('xl-row', { op: cmd === 'ins' ? 'insert' : 'delete', row: r + 1 });
+    }, 'xlrow');
+  });
   wrap.addEventListener('keydown', (e) => {
     const k = e.key;
     if (editing) {

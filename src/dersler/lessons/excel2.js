@@ -7,7 +7,7 @@ const X = (c) => c.d.find('sheet')?.api;
 const cell = (c, a) => X(c)?.cell(a) || { raw: '', value: '', text: '' };
 const sheetOpen = (c, data) => maxed(c, 'sheet', data ? { data } : {});
 const near = (v, n) => typeof v === 'number' && Math.abs(v - n) < 0.01;
-const editEvents = ['xl-edit', 'xl-autosum', 'xl-format', 'xl-sort', 'xl-select', 'xl-paste', 'xl-fill', 'xl-merge', 'xl-wrap', 'xl-colw', 'xl-freeze', 'xl-page', 'xl-sheet'];
+const editEvents = ['xl-row', 'xl-edit', 'xl-autosum', 'xl-format', 'xl-sort', 'xl-select', 'xl-paste', 'xl-fill', 'xl-merge', 'xl-wrap', 'xl-colw', 'xl-freeze', 'xl-page', 'xl-sheet'];
 const when = (test) => (ev, c) => editEvents.includes(ev.type) && !!test(c);
 
 // Başlangıç tabloları
@@ -34,13 +34,15 @@ const GENIS = () => ({
 
 export const hucreInce = {
   id: 'hucre-ince', icon: '📐', title: 'Hücre incelikleri: Birleştir ve Ortala, Metni Kaydır, #####', minutes: 30, stage: 'desktop',
-  desc: 'Birleştir ve Ortala, Metni Kaydır, ##### işaretini düzeltmek.',
+  desc: 'Birleştir ve Ortala, Metni Kaydır, ##### işaretini düzeltmek, satır eklemek ve silmek.',
   summary: [
     ['Birleştir ve Ortala', 'Yan yana hücreleri seçin; başlığı tek hücre yapar ve ortalar'],
     ['Metni Kaydır', 'Uzun yazıyı hücre içinde alt satıra indirir; satır yükselir'],
     ['#####', 'Hata değil: sütun dar. Sütun başlığındaki çizgiye çift tıklayın'],
     ['Sütun çizgisini sürükleyin', 'Sütunu elle genişletir'],
     ['Çift tıkla sığdır', 'Sütun, en uzun yazıya göre genişler'],
+    ['Satır numarasına sağ tık → Ekle', 'Üstüne boş bir satır ekler; alttakiler aşağı kayar'],
+    ['Satır numarasına sağ tık → Sil', 'Bütün satırı siler; alttakiler yukarı kayar'],
   ],
   steps: [
     {
@@ -86,6 +88,29 @@ export const hucreInce = {
       hint: 'Fareyi C harfinin sağ kenarına götürüp basılı tutarak sağa çekin.',
       on: (ev, c) => ev.type === 'xl-colw' && ev.col === 'C' && !ev.auto,
       done: 'Sürükleyerek genişlik ayarı da olur; çift tıklama ise tam uyar.',
+    },
+    {
+      title: 'Araya satır ekleyin',
+      html: '<p>Doğalgazı unutmuşsunuz; <b>Elektrik</b> ile <b>Su</b> arasına girmeli. Soldaki satır numaralarından <b>6</b>\'ya (Su satırı) <b>sağ tıklayın</b> ve <b>➕ Ekle</b>\'yi seçin.</p>',
+      hint: 'Hücreye değil, en soldaki gri sütunda yazan <b>6</b> rakamına sağ tıklayın.',
+      on: (ev, c) => {
+        if (ev.type === 'xl-row' && ev.op === 'insert' && ev.row !== 6) c.note(`Boş satır ${ev.row}. satıra eklendi. O satıra sağ tık → Sil, sonra 6\'ya sağ tık → Ekle.`);
+        return ev.type === 'xl-row' && ev.op === 'insert' && ev.row === 6;
+      },
+      done: 'Boş bir satır açıldı; Su ve Market birer satır aşağı kaydı.',
+    },
+    {
+      title: 'Yeni satırı doldurun',
+      html: '<p><b>A6</b>\'ya <b>Doğalgaz</b>, <b>B6</b>\'ya <b>2100</b> yazın.</p>',
+      on: when((c) => norm(cell(c, 'A6').raw) === 'doğalgaz' && near(cell(c, 'B6').value, 2100)),
+      done: 'Satır eklemek, tabloyu baştan yazmadan araya bilgi sokmanın yoludur.',
+    },
+    {
+      title: 'Boş satırı silin',
+      html: '<p>Başlıkla tablo arasındaki <b>2. satır</b> boş. Satır numarası <b>2</b>\'ye sağ tıklayıp <b>🗑 Sil</b>\'i seçin.</p>',
+      hint: 'Silmek, satırın içini boşaltmaktan farklıdır: satır tamamen kalkar, alttakiler yukarı çıkar.',
+      on: (ev) => ev.type === 'xl-row' && ev.op === 'delete' && ev.row === 2,
+      done: 'Tablo bir satır yukarı çıktı. Silmeden önce doğru satırı seçtiğinize bakın: silinen satırı yeniden ekleyip yazmanız gerekir.',
     },
     rehberSoru({
       title: 'Bu işaret ne?',

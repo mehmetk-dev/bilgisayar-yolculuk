@@ -169,3 +169,4 @@
 .pp-ap-foot { display: flex; align-items: center; gap: 0.5em; padding: 0.4em 0.5em; border-top: 1px solid #e3e3e3; }
 .pp-ap-foot button { white-space: nowrap; }
 .pp-ap-foot small { color: #777; font-size: 0.8em; line-height: 1.3; }
+.pp-fsz { display: inline-flex; align-items: center; gap: 0.3em; font-size: 0.9em; margin: 0 0.4em; }

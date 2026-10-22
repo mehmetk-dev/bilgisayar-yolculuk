@@ -88,20 +88,21 @@ export const gunlukPc = {
 };
 
 export const gunlukWeb = {
-  id: 'gunluk-web', icon: '🌐', title: 'Günlük işler: tarayıcıda', minutes: 35, stage: 'desktop',
-  desc: 'Tarayıcıda fotoğraf indirmek, yazı kopyalamak, yakınlaştırmak.',
+  id: 'gunluk-web', icon: '🌐', title: 'Günlük işler: tarayıcıda', minutes: 40, stage: 'desktop',
+  desc: 'Tarayıcıda fotoğraf indirmek, yazı kopyalamak, ekranın resmini almak (PrtSc), yakınlaştırmak.',
   summary: [
     ['Resme sağ tık → Resmi farklı kaydet', 'Fotoğrafı istediğiniz klasöre kaydeder'],
     ['İndir düğmesi', 'Dosya İndirilenler klasörüne gider'],
     ['Yazıyı seç → Ctrl + C', 'Sayfadaki yazıyı kopyalar; Not Defteri\'nde Ctrl + V'],
     ['Ctrl + Shift + S / ✂', 'Web yakalama: yalnızca sayfanın resmi'],
+    ['PrtSc (Print Screen)', 'Bütün ekranın resmini panoya alır; Paint\'te Ctrl + V'],
     ['Ctrl + / Ctrl − / Ctrl + 0', 'Sayfayı büyüt / küçült / eski haline getir'],
     ['☆ / Ctrl + D', 'Sayfayı sık kullanılanlara ekler'],
   ],
   steps: [
     {
       title: 'Bu derste',
-      html: `<p>Geçen derste ekran görüntüsü, fotoğraf ve kopyalamayı <b>bilgisayarda</b> yaptık. Tarayıcıda bunların <b>kendine özgü yolları</b> vardır:</p>
+      html: `<p>Ekran görüntüsü, fotoğraf kaydetme ve kopyalamayı önceki haftalarda <b>bilgisayarda</b> yaptık. Tarayıcıda bunların <b>kendine özgü yolları</b> vardır:</p>
         <table class="sum"><tr><th></th><th>Bilgisayarda</th><th>Tarayıcıda</th></tr><tr><td>Ekran resmi</td><td>PrtSc: bütün ekran</td><td>✂ Web yakalama: yalnızca sayfa</td></tr><tr><td>Fotoğraf</td><td>Dosya Gezgini</td><td>Sağ tık → Resmi farklı kaydet</td></tr><tr><td>Kopyalama</td><td>Dosyayı kopyalar</td><td>Seçili yazıyı kopyalar</td></tr></table>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); br(c); },
     },
@@ -156,11 +157,30 @@ export const gunlukWeb = {
       combo: ['Ctrl', 'Shift', 'KeyS'],
       setup: (c) => { const w = c.d.find('browser'); if (w) c.d.focus(w); },
       on: (ev) => ev.type === 'web-capture',
-      done: 'PrtSc bütün ekranı alırdı; web yakalama <b>yalnızca sayfayı</b> alır, görev çubuğu ve diğer pencereler girmez.',
+      done: 'Web yakalama <b>yalnızca sayfayı</b> alır; görev çubuğu ve diğer pencereler girmez.',
+    },
+    {
+      title: 'Bütün ekranın resmi: PrtSc',
+      html: `<p>Bazen <b>bütün ekranın</b> resmi gerekir (ör. bir hata mesajını göstermek için). Klavyenin sağ üst tarafında <b>PrtSc</b> (Print Screen, “ekranı yazdır”) tuşu vardır. Bir kez basın: o anda ekranda ne varsa resmi <b>panoya</b> alınır.</p>
+        <p>Şimdi ${K('PrtSc')} tuşuna basın.</p>
+        <p class="mut">Dizüstünde ${K('Fn', 'PrtSc')} gerekebilir. Bazı bilgisayarlarda bu tuşa Windows'un kendi aracı yanıt verir ve buraya ulaşmaz; öyle olursa alttaki düğmeyi kullanın.</p>`,
+      manual: '📸 Tuş çalışmadı, düğmeyle al',
+      on: (ev) => ev.type === 'printscreen',
+      leave: (c) => { if (!c.d.imageClip) c.d.printScreen(); },
+      done: 'Ekranın resmi panoda. Görmek için bir yere <b>yapıştırmak</b> gerekir.',
+    },
+    {
+      title: 'Paint\'e yapıştırın',
+      html: `<p>⊞ Başlat'tan <b>Paint</b>\'i açın ve ${K('Ctrl', 'V')}\'ye basın.</p>`,
+      combo: ['Ctrl', 'KeyV'],
+      setup: (c) => { if (!c.d.imageClip) c.d.printScreen(); },
+      on: (ev) => ev.type === 'paint-paste',
+      done: 'Bütün ekranın resmi Paint\'te; tarayıcı da, görev çubuğu da içinde. İsterseniz Ctrl + S ile kaydedip e-postaya ekleyebilirsiniz. Sadece bir bölüm gerekiyorsa ⊞ + Shift + S (Ekran Alıntısı) kullanılır.',
     },
     {
       title: 'Yazıları büyütün',
       html: `<p>Yazılar küçük geliyorsa: ${K('Ctrl')} basılıyken ${K('+')} tuşuna iki kez basın (ya da Ctrl basılıyken fare tekerleğini ileri çevirin). Sonra ${K('Ctrl', '0')} ile eski haline getirin.</p>`,
+      setup: (c) => { const w = c.d.find('browser'); if (w) c.d.focus(w); },
       hint: 'Sağdaki sayı tuşlarındaki + da olur. Adres çubuğunda büyütme oranı görünür; ona tıklamak da sıfırlar.',
       on: (ev, c) => {
         if (ev.type !== 'web-zoom') return false;

@@ -7,7 +7,7 @@ const explorerAt = (folder) => (c) => { const w = c.d.ensure('explorer'); if (fo
 
 export const dosyaTurleri = {
   id: 'dosya-turleri', icon: '🏷', title: 'Dosya türleri ve uzantılar', minutes: 20, stage: 'scene',
-  desc: '.txt, .pdf, .docx, .jpg, .zip ne demek? Tehlikeli uzantılar.',
+  desc: '.txt, .pdf, .docx, .jpg, .zip ne demek? Uzantıları görünür yapmak, tehlikeli uzantılar.',
   summary: [
     ['.txt', 'Düz yazı (Not Defteri)'],
     ['.docx', 'Word belgesi'],
@@ -16,6 +16,7 @@ export const dosyaTurleri = {
     ['.mp3 / .mp4', 'Müzik / video'],
     ['.zip', 'Sıkıştırılmış paket: içinde birçok dosya'],
     ['.exe', 'Program! Tanımadığınız yerden geldiyse açmayın'],
+    ['Uzantıları göstermek', 'Dosya Gezgini → Görünüm → Göster → Dosya adı uzantıları'],
   ],
   steps: [
     {
@@ -25,6 +26,15 @@ export const dosyaTurleri = {
         <table class="tbl"><tr><th>.txt .docx .pdf</th><td>Yazı ve belge</td></tr><tr><th>.jpg .png</th><td>Fotoğraf ve resim</td></tr><tr><th>.mp3 .mp4</th><td>Müzik ve video</td></tr><tr><th>.zip</th><td>Sıkıştırılmış paket</td></tr><tr><th>.exe</th><td>Program: çalışır, bilgisayarda değişiklik yapabilir</td></tr></table>`,
       scene: info('<div class="sc-big">📄 🖼 🎵 🎬 📦 ⚙</div><p>ad<b>.uzantı</b></p>'),
     },
+    {
+      title: 'Uzantılar görünmüyorsa',
+      html: `<p>Windows uzantıları çoğu zaman <b>gizler</b>: <b>tatil.jpg</b> yalnızca <b>tatil</b> diye görünür. Bu tehlikelidir; <b>fatura.pdf.exe</b> gibi kılık değiştirmiş bir program <b>fatura.pdf</b> gibi görünür.</p>
+        <p>Gerçek bilgisayarda uzantıları bir kez görünür yapın, hep öyle kalır:</p>
+        <ol class="steps"><li>Dosya Gezgini'ni açın.</li><li>Üstteki <b>Görünüm</b> menüsüne tıklayın.</li><li><b>Göster</b> → <b>Dosya adı uzantıları</b>'nı işaretleyin.</li></ol>
+        <p class="mut">Windows 10'da: üstteki <b>Görünüm</b> sekmesinde <b>Dosya adı uzantıları</b> kutusunu işaretleyin.</p>`,
+      scene: info('<div class="sc-big">tatil ➜ tatil<b>.jpg</b></div><p>Görünüm → Göster → Dosya adı uzantıları</p>'),
+    },
+    sec({ title: 'Uzantıyı görmek', text: '<div class="qz-pic">📄 fatura</div>', q: 'Dosya Gezgini\'nde dosyalar uzantısız görünüyor: “fatura”, “tatil”. Türlerini görmek için ne yaparsınız?', opts: ['Görünüm → Göster → Dosya adı uzantıları\'nı işaretlerim', 'Dosyaları tek tek açıp bakarım', 'Adlarının sonuna kendim .pdf yazarım'], ok: 0, why: 'Bu ayar açıkken her dosyanın gerçek türü görünür. Adın sonuna elle uzantı yazmak türü değiştirmez, dosyayı bozabilir.' }),
     ayir({
       title: 'Türlerine ayırın',
       html: '<p>Dosyaları türlerine göre doğru kutuya sürükleyin.</p>',

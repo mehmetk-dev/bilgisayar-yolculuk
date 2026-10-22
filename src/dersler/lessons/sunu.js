@@ -5,16 +5,17 @@ import { K, desktopReady, maxed, norm } from './common.js';
 const P = (c) => c.d.find('slides')?.api;
 const info = (c) => P(c)?.info() || { slides: [], theme: 'beyaz' };
 const has = (t, w) => norm(t).includes(norm(w));
-const ev = ['ppt-input', 'ppt-new-slide', 'ppt-theme', 'ppt-trans', 'ppt-insert', 'ppt-move', 'ppt-delete', 'ppt-select', 'ppt-format'];
+const ev = ['ppt-input', 'ppt-new-slide', 'ppt-theme', 'ppt-trans', 'ppt-insert', 'ppt-move', 'ppt-delete', 'ppt-select', 'ppt-format', 'ppt-fontsize'];
 const when = (test) => (e, c) => ev.includes(e.type) && !!test(c);
 const open = (c) => maxed(c, 'slides');
 
 export const sunu = {
   id: 'sunu', icon: '📙', title: 'Sunu hazırlayalım', minutes: 40, stage: 'desktop',
-  desc: 'Başlık slaytı, yeni slayt, resim, tema, F5 ile slayt gösterisi, kaydetme.',
+  desc: 'Başlık slaytı, yeni slayt, yazı boyutu, resim, tema, F5 ile slayt gösterisi, kaydetme.',
   summary: [
     ['Slayt', 'Sununun her bir sayfası'],
     ['Giriş → Yeni Slayt', 'Düzen seçerek slayt ekler (Başlık ve içerik…)'],
+    ['Giriş → Yazı boyutu', 'Seçili kutunun puntosu; slaytta en az 24 punto'],
     ['Tasarım', 'Bütün slaytların renk ve arka planı'],
     ['Geçişler', 'Bir slayttan ötekine geçerkenki hareket'],
     ['▲ / ▼', 'Seçili slaytın sırasını değiştirir'],
@@ -58,6 +59,13 @@ export const sunu = {
       hint: 'Madde işaretleri kendiliğinden gelir. Slaytlara uzun cümleler değil, kısa maddeler yazılır.',
       on: when((c) => info(c).slides.some((s) => has(s.title, 'yetiştiriyoruz') && s.items.length >= 3)),
       done: 'Sunularda az yazı, çok resim kuralı vardır: dinleyenler okumaya değil, size bakmalı.',
+    },
+    {
+      title: 'Yazıyı büyütün',
+      html: '<p>Arkadaki sıralardan da okunsun: maddelerin yazdığı kutuya (Domates, Biber, Çilek) bir kez tıklayın. Sonra <b>Giriş</b> sekmesindeki <b>Yazı boyutu</b> listesinden <b>40</b>\'ı seçin.</p>',
+      hint: 'Önce yazı kutusuna tıklamak gerekir; liste, en son tıkladığınız kutunun boyutunu değiştirir.',
+      on: when((c) => info(c).slides.some((s) => has(s.title, 'yetiştiriyoruz') && (s.fs?.body || 0) >= 36)),
+      done: 'Yazı büyüdü. Yazı boyutu <b>punto</b> ile ölçülür; slaytta en az <b>24 punto</b> kullanın, başlıklar daha büyük olsun.',
     },
     {
       title: 'Resimli slayt',

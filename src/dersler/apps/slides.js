@@ -45,6 +45,10 @@ const bugun = () => { const t = new Date(); return `${String(t.getDate()).padSta
 // Mürekkep (kalem / vurgulayıcı çizgileri): 1000 × 562 birimlik slayt üzerinde nokta listeleri
 const inkSvg = (strokes, live) => `<svg class="pp-ink${live ? ' pp-ink-live' : ''}" viewBox="0 0 1000 562" preserveAspectRatio="none">${(strokes || []).map((st) => `<polyline class="pp-ink-${st.t}" points="${st.p.map((q) => q.join(',')).join(' ')}"/>`).join('')}</svg>`;
 const PH = { title: 'Başlık eklemek için tıklayın', sub: 'Alt başlık eklemek için tıklayın', body: 'Metin eklemek için tıklayın', body2: 'Metin eklemek için tıklayın', cap: 'Tarih ve kısa bir not yazın' };
+// Yazı boyutu (punto): slayt 960 pt genişliğinde sayılır, 1cqw = 9,6 pt. Boyut verilmemiş kutular CSS'teki varsayılanla çizilir.
+const FSIZES = [18, 20, 24, 28, 32, 36, 40, 44, 50, 54, 66];
+const fsDef = (s, k) => (k === 'title' ? (s.layout === 'title' ? 66 : 50) : 32);
+const fsStyle = (s, k) => (s.fs?.[k] ? ` style="font-size:${(s.fs[k] / 9.6).toFixed(2)}cqw"` : '');
 const plain = (html) => { const d = document.createElement('div'); d.innerHTML = html || ''; return d.innerText.trim(); };
 
 export function slides({ desk, body, args, emit, setTitle }) {
@@ -52,7 +56,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
   body.innerHTML = `
     <div class="pp-tabs"><button type="button" class="pp-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="design">Tasarım</button><button type="button" data-tab="trans">Geçişler</button><button type="button" data-tab="anim">Animasyonlar</button><button type="button" data-tab="show">Slayt Gösterisi</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="master" class="pp-mtab" hidden>Asıl Slayt</button><button type="button" data-tab="shape" class="pp-stab" hidden>Şekil Biçimi</button></div>
     <div class="pp-rib" data-tab="home"><span class="pp-newwrap"><button type="button" class="pp-new">➕ Yeni Slayt ▾</button><span class="pp-lay" hidden>${Object.entries(LAYOUTS).map(([k, v]) => `<button type="button" data-layout="${k}">${v}</button>`).join('')}</span></span>
-      <button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button>
+      <button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button><label class="pp-fsz" title="Yazı boyutu (punto): önce yazı kutusuna tıklayın">Yazı boyutu <select class="pp-fs">${FSIZES.map((n) => `<option>${n}</option>`).join('')}</select></label>
       <button type="button" class="pp-dup" title="Seçili slaydın bir kopyasını hemen altına ekler">⧉ Slaytı Çoğalt</button><button type="button" class="pp-up" title="Slaytı yukarı taşı">▲ Yukarı</button><button type="button" class="pp-down" title="Slaytı aşağı taşı">▼ Aşağı</button><button type="button" class="pp-del" title="Slaytı sil">🗑 Sil</button></div>
     <div class="pp-rib" data-tab="insert" hidden><button type="button" class="pp-pic">🖼 Resim</button>
       <span class="pp-sizes">Resim boyutu: ${SIZES.map(([k, n]) => `<button type="button" data-size="${k}">${n}</button>`).join('')}</span>
@@ -109,6 +113,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
   // anim: eski slayt animasyonu (bütün maddeler ve resim); anims: nesne animasyonları [{ t, effect, start, dur, delay }]
   const blank = (layout) => ({ layout, title: '', sub: '', body: '', body2: '', img: null, trans: 'none', art: null, anim: { effect: 'none', start: 'click' }, anims: [], auto: 0, imgSize: 'M', notes: '', shapes: [], ink: [] });
   let view = 'normal';
+  let lastK = null; // en son tıklanan yazı kutusu (Yazı boyutu bunu değiştirir)
   let selShape = -1; // seçili şeklin sırası (-1: yok)
   // Animasyon: seçili nesne ('title', 'sub', 'body', 'body2', 'img', 'shp:2' …), Animasyon Bölmesi'nde seçili satır, bölme açık mı
   let selObj = null, selAnim = -1, paneOpen = false;
@@ -154,8 +159,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
     const acc = m.color || thAcc;
     const font = FONTS.find((f) => f[0] === m.font && f[0] !== 'calibri');
     const ce = edit ? 'contenteditable="true"' : '';
-    const box = (k, cls) => `<div class="pp-box ${cls}${s[k] ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}">${s[k] || ''}</div>`;
-    const list = (k) => (edit ? `<ul class="pp-box pp-body${plain(s[k]) ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}">${s[k] || '<li><br></li>'}</ul>` : `<ul class="pp-body" data-k="${k}">${s[k]}</ul>`);
+    const box = (k, cls) => `<div class="pp-box ${cls}${s[k] ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}"${fsStyle(s, k)}>${s[k] || ''}</div>`;
+    const list = (k) => (edit ? `<ul class="pp-box pp-body${plain(s[k]) ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}"${fsStyle(s, k)}>${s[k] || '<li><br></li>'}</ul>` : `<ul class="pp-body" data-k="${k}"${fsStyle(s, k)}>${s[k]}</ul>`);
     const img = (cls = '') => (s.img ? `<img class="pp-img pp-s${s.imgSize || 'M'} ${cls}" src="${pictureURL(s.img)}" alt="">` : '');
     const items = () => [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean);
     let inner = s.layout === 'blank' ? '' : box('title', s.layout === 'title' ? 'pp-t-big' : 'pp-t');
@@ -1301,6 +1306,14 @@ export function slides({ desk, body, args, emit, setTitle }) {
     changed(); render();
     emit('ppt-delete', { index: cur });
   }
+  $('.pp-fs').addEventListener('change', (e) => {
+    if (!lastK) { desk.toast('Yazı boyutu', 'Önce boyutunu değiştireceğiniz yazı kutusuna tıklayın.', 'ℹ'); return; }
+    pull();
+    const s = deck.slides[cur], n = +e.target.value;
+    s.fs = { ...(s.fs || {}), [lastK]: n };
+    changed(); render();
+    emit('ppt-fontsize', { index: cur, box: lastK, size: n });
+  });
   $('.pp-slide').addEventListener('input', () => { pull(); changed(); emit('ppt-input', { index: cur }); });
   $('.pp-nt').addEventListener('input', (e) => { deck.slides[cur].notes = e.target.value; changed(); emit('ppt-notes', { index: cur, text: e.target.value, length: e.target.value.trim().length }); });
   $('.pp-slide').addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || ''); });
@@ -1308,6 +1321,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
   $('.pp-slide').addEventListener('focusin', (e) => {
     const b = e.target.closest('.pp-box');
     if (!b) return;
+    lastK = b.dataset.k;
+    $('.pp-fs').value = String(deck.slides[cur].fs?.[lastK] || fsDef(deck.slides[cur], lastK));
     if (b.dataset.k === 'body' && !plain(b.innerHTML)) b.innerHTML = '<li><br></li>';
     const s = getSelection();
     if (!s.rangeCount || !b.contains(s.anchorNode)) {
@@ -1385,7 +1400,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
         theme: deck.theme, showing: !$('.pp-show').hidden, fileName, slideNum: !!deck.slideNum, notes: deck.slides.map((x) => x.notes || ''),
         music: deck.music || null, view, animPane: paneOpen, animSel: { t: selObj, at: selAnim }, master: { ...deck.master, logo: !!deck.master.logo }, hf: { ...deck.hf },
         slides: deck.slides.map((s) => ({ layout: s.layout, title: plain(s.title), sub: plain(s.sub), items: [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean), img: !!s.img, trans: s.trans, art: s.art, anim: s.anim?.effect || 'none', animStart: s.anim?.start,
-          anims: (s.anims || []).map((a) => ({ t: a.t, name: objName(s, a.t), kind: fxOf(a.effect)?.[2], effect: a.effect, start: a.start, dur: a.dur, delay: a.delay })), auto: s.auto || 0, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
+          anims: (s.anims || []).map((a) => ({ t: a.t, name: objName(s, a.t), kind: fxOf(a.effect)?.[2], effect: a.effect, start: a.start, dur: a.dur, delay: a.delay })), auto: s.auto || 0, fs: { ...(s.fs || {}) }, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
           shapes: (s.shapes || []).map((o) => ({ kind: o.kind, text: o.text || '', fill: o.fill || null, style: o.style || null, link: o.link || null, name: o.name || null })),
           links: [...new DOMParser().parseFromString(`${s.title}${s.sub}<ul>${s.body}</ul><ul>${s.body2}</ul>`, 'text/html').querySelectorAll('a[href]')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
           ink: (s.ink || []).length })),

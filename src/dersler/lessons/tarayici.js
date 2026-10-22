@@ -86,8 +86,9 @@ export const tarayici = {
     },
     {
       title: 'Göz atma verilerini temizleyin',
-      html: '<p>Ortak kullanılan bir bilgisayarda (kütüphane, iş yeri) işiniz bitince izlerinizi silin: <b>🧹 Göz atma verilerini temizle</b> → <b>Şimdi temizle</b>.</p>',
-      mouse: '🖱 Göz atma verilerini temizle → Şimdi temizle',
+      html: `<p>Ortak kullanılan bir bilgisayarda (kütüphane, iş yeri) işiniz bitince izlerinizi silin. Kısayolu bütün tarayıcılarda aynıdır: ${K('Ctrl', 'Shift', 'Delete')}. Açılan pencerede <b>Şimdi temizle</b>.</p>`,
+      combo: ['Ctrl', 'Shift', 'Delete'],
+      hint: 'Kısayol çalışmazsa önce sayfaya bir kez tıklayın. Geçmiş sayfasındaki <b>🧹 Göz atma verilerini temizle</b> düğmesi de aynı pencereyi açar.',
       on: (ev) => ev.type === 'web-clear',
       done: 'Geçmiş ve çerezler silindi; sitelerdeki oturumlarınız da kapandı. İndirilen dosyalar ve sık kullanılanlar yerinde durur.',
     },

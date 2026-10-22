@@ -96,7 +96,7 @@ export const internet = {
       title: 'İndirilenler klasörü',
       html: '<p>İndirdiğiniz her şey <b>İndirilenler</b> klasörüne gider. İndirme kutusundaki <b>Klasörde göster</b>\'e tıklayın.</p><p class="mut">Kutu kapandıysa tarayıcının sağ üstündeki ⬇ simgesine tıklayın.</p>',
       on: (ev) => ev.type === 'download-folder' || (ev.type === 'nav' && ev.folder === 'downloads') || (ev.type === 'app-open' && ev.app === 'explorer' && ev.args?.folder === 'downloads'),
-      done: 'İndirdiğiniz dosya burada: <b>ResimGosterici_Kurulum.exe</b>. Kurulumunu sonraki derste yapacağız.',
+      done: 'İndirdiğiniz dosya burada: <b>ResimGosterici_Kurulum.exe</b>. Kurulumunu bu haftanın program kurma dersinde yapacağız.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>İnternette gezinmeyi ve güvenle indirmeyi öğrendiniz.</p>' },
   ],

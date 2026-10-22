@@ -64,14 +64,14 @@ export const odev4 = odev(4, 'donanım ve yazılım', '🧰', [
   ['Bağlantıları sayın', 'Bilgisayarınızın (ya da dizüstünün) kenarlarına ve arkasına bakıp <b>USB</b>, <b>kulaklık</b>, <b>şarj</b> ve (varsa) <b>HDMI</b> girişlerini sayın. Kâğıda yazın.', 'USB: dikdörtgen küçük delik; kulaklık: yuvarlak delik.', '🔌'],
   ['Marka ve model', 'Bilgisayarın üzerinde ya da <b>altındaki etiketten</b> markasını ve modelini bulup yazın.', 'Etiket yoksa Başlat → Ayarlar → Sistem → Hakkında\'da yazar.', '🏷'],
   ['İşlemci ve RAM', '<b>Başlat → Ayarlar → Sistem → Hakkında</b> sayfasını açın ve <b>işlemci</b> ile <b>yüklü RAM</b> bilgisini kâğıda yazın.', 'RAM, “8,00 GB” gibi yazar. Hız (GHz) işlemcinin adının sonundadır.', '🧠'],
-  ['Görev Yöneticisi', '<b>Ctrl + Shift + Esc</b> tuşlarına basın. <b>Performans</b> sekmesinde bellek (RAM) ve işlemci kullanım yüzdesine bakın. Sonra kapatın.', 'Yüzde sürekli %90\'ın üzerindeyse bilgisayar yoruluyor demektir.', '📊'],
+  ['Bakım ve oturuş', 'Bilgisayar <b>kapalıyken</b> ekranı kuru, yumuşak bir bezle silin. Sonra oturuşunuza bakın: ekran bir kol boyu uzakta mı, sırtınız destekli, ayaklarınız yerde mi? Kablolar yürüme yolunda mı? Düzeltmeniz gerekenleri kâğıda yazın.', 'Ekrana cam sil püskürtmeyin; kasayı kendiniz açmayın.', '🧹'],
   ['Disk doluluğu', '<b>Dosya Gezgini → Bu bilgisayar</b>\'a gidip <b>C:</b> sürücüsünün ne kadar dolu olduğuna bakın (mavi çubuk).', 'Kırmızıya dönmüşse yer açmak gerekir.', '💽'],
   ['Pil ve şarj', 'Dizüstüyseniz sağ alttaki <b>pil simgesine</b> bakın: yüzde kaç? Şarj aleti takılı mı (⚡)? Masaüstüyseniz güç kablolarının sağlam takıldığını kontrol edin.', 'Pili %20\'nin altına düşürmemeye çalışın.', '🔋'],
 ]);
 
 export const odev5 = odev(5, 'masaüstü, Başlat menüsü ve pencereler', '🪟', [
   ['Başlat ve arama', '<b>Başlat</b> düğmesine tıklayın, arama kutusuna <b>hesap</b> yazın ve <b>Hesap Makinesi</b>\'ni açıp bir toplama yapın.', 'Başlat menüsünü kapatmak için Esc ya da boş bir yere tıklayın.', '🔍'],
-  ['Pencere boyutu', 'Hesap Makinesi\'nde (ya da başka bir pencerede) sağ üstteki <b>—</b> (küçült), <b>☐</b> (büyüt) ve <b>✕</b> (kapat) düğmelerini sırayla deneyin; küçülen pencereyi görev çubuğundan geri getirin.', 'Küçültülen pencere kapanmaz, görev çubuğunda bekler.', '➖'],
+  ['Görev Yöneticisi', '<b>Ctrl + Shift + Esc</b> tuşlarına basın. <b>Performans</b> sekmesinde bellek (RAM) ve işlemci kullanım yüzdesine bakın. Sonra kapatın.', 'Yüzde sürekli %90\'ın üzerindeyse bilgisayar yoruluyor demektir.', '📊'],
   ['Yan yana yerleştirin', 'İki pencere açın. <b>⊞ Windows + ←</b> ile birini sola, <b>⊞ + →</b> ile ötekini sağa yapıştırın.', 'Kısayol çalışmazsa pencereyi başlık çubuğundan tutup ekranın sol ya da sağ kenarına sürükleyin; yarım ekran olur.', '↔'],
   ['Klasör oluşturun', 'Masaüstünün boş yerine <b>sağ tık → Yeni → Klasör</b> deyin ve adını <b>Ödevlerim</b> yapıp Enter\'a basın.', 'Adı değiştirmek için klasörü seçip F2 tuşuna basın.', '📁'],
   ['Arka planı değiştirin', '<b>Başlat → Ayarlar → Kişiselleştirme → Arka plan</b> bölümünden bir resim seçin. Sonra tekrar eskisine döndürün.', 'Ortak bilgisayarda değiştirdiğiniz ayarı eski hâline getirin.', '🖼'],
@@ -101,7 +101,7 @@ export const odev7 = odev(7, 'Paint, ekran alıntısı ve ayarlar', '🎨', [
 export const odev8 = odev(8, 'internet, güvenlik ve bakım', '🌐', [
   ['Arama yapın', 'Tarayıcıyı açın ve <b>bugünün hava durumu</b> diye aratın. İlk sonuç <b>reklam</b> mı (“Reklam” yazıyor mu)? Hangi siteye girdiniz? Adresi okuyun.', 'Adres çubuğundaki adrese bakın: .com.tr, .gov.tr…', '🔎'],
   ['Kilidi kontrol edin', 'Adres çubuğunun solundaki <b>🔒 kilide</b> tıklayın. “Bağlantı güvenli” yazıyor mu? Sitenin asıl adını bulun.', 'Kilit, sitenin dürüst olduğunu göstermez; yalnızca bağlantının şifreli olduğunu.', '🔒'],
-  ['Sık kullanılanlara ekleyin', 'Sık girdiğiniz bir siteyi açıp <b>Ctrl + D</b> ile sık kullanılanlara ekleyin; sonra tarayıcının üst çubuğundan bulun.', 'Ad olarak anlaşılır bir şey yazın.', '⭐'],
+  ['Yüklü programlar', '<b>Ayarlar → Uygulamalar → Yüklü uygulamalar</b>\'ı açın (Windows 10\'da <b>Ayarlar → Uygulamalar</b>). Listede tanımadığınız ya da hiç kullanmadığınız programları kâğıda yazın; <b>kaldırmadan önce</b> güvendiğiniz birine sorun.', 'Bazı programlar bilgisayarın çalışması için gereklidir; tanımadığınızı hemen silmeyin.', '📦'],
   ['Resim indirin', 'Güvendiğiniz bir siteden bir fotoğraf indirin (sağ tık → Resmi farklı kaydet). Kaydet penceresinde klasör olarak <b>İndirilenler</b>\'i seçin. Sonra Dosya Gezgini\'nde <b>İndirilenler</b> klasöründe bulun.', 'İndirdiğiniz dosyayı hemen kendi klasörünüze taşıyın.', '⬇'],
   ['Virüs taraması', '<b>Başlat → Windows Güvenliği → Virüs ve tehdit koruması → Hızlı tarama</b> deyin ve bitmesini bekleyin. Sonucu kâğıda yazın.', 'Tarama sırasında bilgisayarı kullanabilirsiniz.', '🛡'],
   ['Güncellemeye bakın', '<b>Ayarlar → Windows Update</b>\'e (Windows 10\'da <b>Ayarlar → Güncelleştirme ve Güvenlik → Windows Update</b>) girin: “Güncelsiniz” mi yazıyor, yoksa bekleyen güncelleme var mı? Varsa işinizi kaydedip güncelleyin.', 'Güncelleme sırasında bilgisayarı kapatmayın.', '🔄'],

@@ -106,15 +106,14 @@ def plan(rows, odev, soru):
 # (ilk sürüm elle yazılmıştı; burada aynı slaytlar ve sonradan eklenen dersler)
 S = []
 S.append(cover('1. Hafta: Açma-kapama, fare ve pencereler', 'Alıştırmalar ve oyunlar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'Sekiz ders', table([
+S.append(slide('Bu hafta', 'Yedi ders', table([
     ['<span class="num">1</span>&nbsp; Açma ve kapatma', '15 dk', 'Bilgisayarı aç, şifre gir; Uyku, Yeniden başlat, Kapat'],
     ['<span class="num">2</span>&nbsp; Fareyi tutma, tek tık', '15 dk', 'Dört köşe, Hedef oyunu'],
     ['<span class="num">3</span>&nbsp; Çift tık, sağ tık, tekerlek', '20 dk', 'Balon oyunu, Karışık hedef, Tarif kaydırma, Mayın Tarlası'],
     ['<span class="num">4</span>&nbsp; Sürükle-bırak', '15 dk', 'Simge taşıma, Kart dizme, Klasöre ve çöpe atma'],
     ['<span class="num">5</span>&nbsp; Pencereler', '20 dk', 'Hesap Makinesi ile küçült, büyüt, taşı'],
     ['<span class="num">6</span>&nbsp; Dizüstü ve touchpad', '30 dk', 'Touchpad hareketleri, pil ve şarj, kapak, Fn tuşları'],
-    ['<span class="num">7</span>&nbsp; Fare parkuru', '15 dk', '11 görevlik tekrar, süre tutulur'],
-    ['<span class="num">8</span>&nbsp; Eşleştirme oyunları', '15 dk', 'Hangi iş hangi fare hareketiyle? Kartları ayırın']], 'tight', head=['Ders', 'Süre', 'Alıştırma ve oyunlar']) +
+    ['<span class="num">7</span>&nbsp; Fare parkuru', '15 dk', '11 görevlik tekrar, süre tutulur']], 'tight', head=['Ders', 'Süre', 'Alıştırma ve oyunlar']) +
     hafta_sonu('altı küçük görev', 10)))
 # 3
 S.append(slide('Başlamadan önce', 'Alıştırmalar nasıl işliyor?', '''
@@ -390,10 +389,10 @@ write('hafta1', '1. Hafta', 'Bilgisayar İşletmenliği – 1. Hafta Alıştırm
 # ================================================================ HAFTA 2
 S = []
 S.append(cover('2. Hafta: Klavye', 'Alıştırmalar ve oyunlar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On bir ders', plan([
+S.append(slide('Bu hafta', 'On ders', plan([
     ('Klavyeyi tanıyalım', 25), ('F klavye ve Q klavye', 20), ('Harf bulma alıştırması', 20), ('On parmak: temel sıra', 25),
     ('Rakamlar ve sayılar', 25), ('İşaretler: ( ) / = " # €', 20), ('Yazı yazarken başıma gelenler', 25),
-    ('Klavye dili: TUR, ENG, Q, F', 30), ('Tuş avı', 20), ('Bayram kartı yazalım', 25), ('Klavye eşleştirme oyunu', 15)],
+    ('Klavye dili: TUR, ENG, Q, F', 30), ('Tuş avı', 20), ('Bayram kartı yazalım', 25)],
     'altı küçük görev', 12)))
 S.append(slide('Ders 1 · Klavyeyi tanıyalım', 'Klavyeyi tanıyalım (25 dk)', split(
     ul(['Gerçek klavyenizde <b>hangi tuşa basarsanız</b> ekrandaki klavyede o tuş <b>mavi</b> yanar.',
@@ -429,7 +428,8 @@ S.append(slide('Ders 1 · Alıştırma 5', 'İşaretler: ! ? @', split(
 S.append(slide('Ders 1 · Alıştırma 6', 'Ok tuşları, Home ve End', table([
     [K('↑') + ' ' + K('↓') + ' ' + K('←') + ' ' + K('→'), 'İmleci harf harf, satır satır hareket ettirir. Dördüne de basın.'],
     [K('Home'), 'İmleci satırın <b>başına</b> götürür.'],
-    [K('End'), 'İmleci satırın <b>sonuna</b> götürür.']], 'kv') +
+    [K('End'), 'İmleci satırın <b>sonuna</b> götürür.'],
+    [K('Tab') + ' · ' + K('Esc'), 'Formda sonraki kutuya geç · vazgeç, menüyü kapat. ' + K('⊞') + ' Windows tuşu Başlat’ı açar.']], 'kv') +
     note('Fareye gerek kalmadan imleci istediğiniz yere götürebilirsiniz. Uzun satırlarda Home ve End çok zaman kazandırır.')))
 S.append(slide('Ders 2 · F klavye ve Q klavye', 'Hangi klavyeyi kullanıyorsunuz?', table([
     ['Q klavye', 'Üst sıra <b>Q W E R T Y</b>… Bilgisayarların çoğunda böyledir.'],
@@ -472,15 +472,14 @@ S.append(slide('Ders 8 · Klavye dili ve düzeni', 'TUR mu, ENG mi?', split(
         'ENG’de ş, ğ, ü, ö, ç, ı yazılmaz; <b>ş</b> tuşu <b>;</b> yazar.',
         f'Dili değiştirmek: {K("Alt", "Shift")} (aynı iş: {K("⊞", "Boşluk")}) ya da TUR yazısına tıklayıp seçmek.',
         f'@ işareti: Türkçe Q’da {K("AltGr", "Q")}, İngilizcede {K("Shift", "2")}.'], 'small'),
-    '<h2>F klavye eklemek</h2>' + adim(['⊞ Başlat → ⚙ Ayarlar → <b>Saat ve dil</b>',
+    '<h2>F klavye eklemek</h2>' + adim(['⊞ Başlat → ⚙ Ayarlar → <b>Saat ve dil</b> → <b>Dil ve bölge</b>',
           '<b>Klavye ekle</b> kutusundan Türkçe F klavye',
           'Sağ alttaki TUR’a tıklayıp düzeni seçin',
           'İşiniz bitince <b>Türkçe Q</b>’ya dönün']) +
     note('F düzeninde Q klavyenin tuşlarıyla F harfleri yazılır: F tuşu a, H tuşu t yazar.'), 1, 1)))
-S.append(slide('Ders 9–11 · Tekrar', 'Alıştırmalar ve oyun', table([
+S.append(slide('Ders 9–10 · Tekrar', 'Alıştırmalar', table([
     ['Tuş avı', 'İpucu yanmadan, tarif edilen tuşu gerçek klavyede bulup basın: Enter, Esc, Home, End, AltGr…'],
-    ['Bayram kartı', 'Kısa bir mesaj yazın: cümle büyük harfle başlar, nokta ya da ünlemle biter. Kesme işareti: <b>Shift + 2</b> (İzmir’e). Hataları düzeltip <b>bayram kartı</b> adıyla kaydedin.'],
-    ['Eşleştirme oyunu', 'Hangi tuş ne yapar? Silme, hareket, büyük harf, onay / vazgeç kutularına ayırın.']], 'kv') +
+    ['Bayram kartı', 'Kısa bir mesaj yazın: cümle büyük harfle başlar, nokta ya da ünlemle biter. Kesme işareti: <b>Shift + 2</b> (İzmir’e). Hataları düzeltip <b>bayram kartı</b> adıyla kaydedin.']], 'kv') +
     note('Dizüstünde Home ve End yoksa: ' + K('Fn') + ' basılıyken ← →. Klavyedeki küçük ışıklar Caps Lock ve Num Lock’ı gösterir.')))
 S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', table([
     ['Boşluk · Enter', 'Kelimeler arasına boşluk · alt satıra geç'],
@@ -489,16 +488,16 @@ S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', table([
     ['Shift+1 · Shift+* · AltGr+Q', '! · ? · @'], ['↑ ↓ ← →  ·  Home / End', 'İmleci hareket ettirir · satır başı / sonu'],
     ['A S D F – J K L Ş', 'Temel sıra; F ve J’de çıkıntı var'],
     ['Insert · Num Lock', 'Harfler siliniyorsa · sayı tuşları yazmıyorsa'],
-    ['TUR / ENG', 'Klavye dili: Alt + Shift ile değişir'], ['Q / F', 'Klavye düzeni: Ayarlar → Saat ve dil']], 'kv tight') +
+    ['TUR / ENG', 'Klavye dili: Alt + Shift ile değişir'], ['Q / F', 'Klavye düzeni: Ayarlar → Saat ve dil → Dil ve bölge']], 'kv tight') +
     odev_test('altı küçük görev', 12)))
 write('hafta2', '2. Hafta', 'Bilgisayar İşletmenliği – 2. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 3
 S = []
 S.append(cover('3. Hafta: Metin seçme ve kısayollar', 'Alıştırmalar ve oyunlar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'Yedi ders', plan([
+S.append(slide('Bu hafta', 'Beş ders', plan([
     ('Not Defteri ve kısayollar', 25), ('Seçmenin incelikleri', 25), ('Kaydetme, farklı kaydetme, açma', 25),
-    ('Alışveriş listesini düzenleyin', 25), ('Tarifi düzene sokun', 25), ('Kısayol yarışı', 15), ('Kısayol eşleştirme', 15)],
+    ('Alışveriş listesini düzenleyin', 25), ('Kısayol yarışı', 15)],
     'altı küçük görev', 10)))
 S.append(slide('Ders 1 · Not Defteri', 'Not Defteri nedir? (25 dk)', split(
     ul(['Bilgisayardaki <b>en basit yazı programı</b>: alışveriş listesi, telefon numarası, kısa notlar.',
@@ -537,6 +536,7 @@ S.append(slide('Ders 1 · Alıştırma 5', 'Kaydetmek ve yeniden açmak', split(
     fig('nd_kaydet.jpg', 'Kaydet penceresi: Belgeler klasörü.'), .95, 1.05)))
 S.append(slide('Ders 2 · Seçmenin incelikleri', 'Bir parçayı, bir satırı seçmek', table([
     ['Sürüklemek', 'Sol tuş basılı, yazının üzerinden geçin: <b>hava çok güzel</b>'],
+    ['Tık, sonra ' + K('Shift') + ' + tık', 'Uzun yazıyı seçer: başına tıklayın, Shift basılıyken sonuna tıklayın'],
     [K('Shift', '→') + ' / ' + K('Shift', '←'), 'Harf harf seçer. Klavyeyle seçmek daha hassastır.'],
     [K('Shift', 'End') + ' / ' + K('Shift', 'Home'), 'İmleçten satırın sonuna / başına kadar seçer'],
     ['Üç kez tıklama', 'Bütün satırı seçer'],
@@ -553,11 +553,9 @@ S.append(slide('Ders 3 · Kaydetme', 'Kaydet mi, farklı kaydet mi?', split(
           'Bir satır ekleyin, yine ' + K('Ctrl', 'S') + ': bu sefer bir şey sorulmaz.',
           'Farklı kaydet ile <b>Masaüstü</b>’ne <b>randevu kopyası</b>.',
           K('Ctrl', 'O') + ' ile Belgeler’deki asıl dosyayı açın.'], 'small'), 1.1, .9)))
-S.append(slide('Ders 4–7 · Tekrar', 'Alıştırmalar ve oyun', table([
+S.append(slide('Ders 4–5 · Tekrar', 'Alıştırmalar', table([
     ['Alışveriş listesi', 'Satırı taşıyın (' + K('Ctrl', 'X') + ' → ' + K('Ctrl', 'V') + '), ekleyin, silin, ' + K('Ctrl', 'Z') + ' ile geri getirin, listeyi çoğaltın. Başlığı <b>seçip üzerine yazın</b>.'],
-    ['Karışık tarif', 'Mercimek çorbası adımlarını sıraya koyun, malzemeleri ekleyin, tarifi kopyalayıp başlığı EZOGELİN yapın, kaydedin.'],
-    ['Kısayol yarışı', '9 görev, yalnızca kısayollarla; süre tutulur. Son görev: ' + K('Ctrl') + ' + fare tekerleği ile yazıyı büyütmek.'],
-    ['Eşleştirme oyunu', 'Hangi durumda Ctrl + C, X, V, Z? Kaydet, Aç, Yazdır hangi menüde?']], 'kv') +
+    ['Kısayol yarışı', '9 görev, yalnızca kısayollarla; süre tutulur. Son görev: ' + K('Ctrl') + ' + fare tekerleği ile yazıyı büyütmek.']], 'kv') +
     note('Pano’da tek bir şey durur: en son kopyalanan. Kestiğiniz yazıyı hemen yapıştırın; bilgisayar kapanınca Pano boşalır.')))
 S.append(slide('Özet', 'Kısayollar', ozet([
     ['Çift tıklama', 'Bir kelimeyi seç'], ['Ctrl + A', 'Hepsini seç'], ['Ctrl + C', 'Kopyala (yazı yerinde kalır)'],
@@ -570,10 +568,10 @@ write('hafta3', '3. Hafta', 'Bilgisayar İşletmenliği – 3. Hafta Alıştırm
 # ================================================================ HAFTA 4
 S = []
 S.append(cover('4. Hafta: Donanım ve yazılım', 'Alıştırmalar ve oyunlar', 'Ayırma oyunları ve 3B uygulama'))
-S.append(slide('Bu hafta', 'Dokuz ders', plan([
+S.append(slide('Bu hafta', 'Sekiz ders', plan([
     ('Bilgisayarın İçine Yolculuk', None), ('Donanım dersi: kasanın içi', None), ('Donanım mı, yazılım mı?', 15),
     ('Kasanın içi: parçalar', 25), ('Portlar ve kablolar', 20), ('Bilgisayar ilanını okuyalım', 20),
-    ('Bakım ve sağlıklı kullanım', 20), ('Sağlıklı ve güvenli çalışma', 20), ('Bir şey çalışmıyor! İlk kontroller', 20)],
+    ('Bakım, sağlıklı ve güvenli kullanım', 25), ('Bir şey çalışmıyor! İlk kontroller', 20)],
     'altı küçük görev', '<b>10 soruluk test</b> ile <b>15 soruluk donanım testi</b>')))
 S.append(slide('Ders 3 · Donanım ve yazılım', 'Donanım mı, yazılım mı? (15 dk)', split(
     ul(['<b>Donanım:</b> elle tutabildiğimiz parçalar. Klavye, fare, ekran, kasa…',
@@ -653,15 +651,15 @@ S.append(slide('Ders 7 · Bakım', 'Bilgisayarın sağlığı', table([
     ['Elektrik', 'Akım korumalı priz; şimşekli fırtınada kapatıp fişi çekin'],
     ['Sıvı döküldüyse', 'Hemen kapatıp fişi çekin, ters çevirip en az bir gün kurutun']], 'kv') +
     note('Kapatırken fişi çekmeyin: Başlat’tan kapatın. Önemli dosyaları yedekleyin.')))
-S.append(slide('Ders 8 · Sağlıklı ve güvenli çalışma', 'Oturuş, mola, elektrik', table([
+S.append(slide('Ders 7 · Sağlıklı ve güvenli çalışma', 'Oturuş, mola, elektrik', table([
     ['Ekran', 'Bir kol boyu (50–70 cm) uzakta; üst kenarı göz hizasında ya da biraz altında'],
     ['Oturuş', 'Sırt dik ve desteklenmiş, ayaklar yerde, dirsekler 90 derece, bilekler düz'],
     ['Mola', 'Her saat 5–10 dakika kalkın. <b>20-20-20:</b> 20 dakikada bir, 20 saniye uzağa bakın'],
     ['Kablolar', 'Yürüme yolunda olmasın; prizi aşırı yüklemeyin'],
-    ['Kasa açmadan önce', 'Kapatın, fişi çekin, metal bir yere dokunup statik elektriği boşaltın'],
+    ['Kasa', 'Kendiniz açmayın; parça takılacaksa servise götürün'],
     ['Elektrik yangını', '<b>Su dökülmez!</b> Fişi çekin; karbondioksitli ya da kuru kimyevi tozlu söndürücü. Büyürse 112']], 'kv') +
     note('Yangın alarmında eşyalarla uğraşmadan en yakın acil çıkıştan çıkın; asansör kullanmayın.')))
-S.append(slide('Ders 9 · Sorun giderme', 'Bir şey çalışmıyor! İlk kontroller', split(
+S.append(slide('Ders 8 · Sorun giderme', 'Bir şey çalışmıyor! İlk kontroller', split(
     adim(['<b>Kablo ve düğme:</b> takılı mı, açık mı?', '<b>Ses:</b> sessizde mi, kulaklık takılı mı?',
           '<b>Pil:</b> kablosuz fare ve klavyede', '<b>Modem:</b> kapatıp 10 saniye sonra açın',
           '<b>Yeniden başlat:</b> çoğu sorunu çözer', '<b>Danışın:</b> ekranın resmini çekip (Ekran Alıntısı) güvendiğiniz birine gösterin']),
@@ -686,14 +684,14 @@ write('hafta4', '4. Hafta', 'Bilgisayar İşletmenliği – 4. Hafta Alıştırm
 # ================================================================ HAFTA 5
 S = []
 S.append(cover('5. Hafta: Masaüstü, Başlat menüsü ve pencereler', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On altı ders', plan([
-    ('Masaüstü, Başlat ve görev çubuğu', 20), ('Başlat menüsünü keşfedin', 20), ('Masaüstünü düzenleyin', 20),
+S.append(slide('Bu hafta', 'On üç ders', plan([
+    ('Masaüstü, Başlat ve görev çubuğu', 25), ('Masaüstünü düzenleyin', 20),
     ('Hesap Makinesi ile günlük hesaplar', 25), ('Yapışkan Notlar, Ses Kaydedici, Alarm', 30), ('Takvim: randevu ve hatırlatıcı', 25),
     ('Fareyi kendinize göre ayarlayın', 25), ('Büyüteç ve okuma kolaylıkları', 20), ('Ekran Klavyesi', 20),
-    ('Oyunlarla pratik', 25), ('Program dondu! Görev Yöneticisi', 30), ('Görev Yöneticisi: kim yoruyor?', 25),
-    ('İki pencereyi yan yana koymak', 20), ('Sanal masaüstleri', 25), ('Masaüstü parkuru', 20), ('Masaüstü haritası', 15)],
+    ('Program dondu! Görev Yöneticisi', 30), ('Görev Yöneticisi: kim yoruyor?', 25),
+    ('İki pencereyi yan yana koymak', 20), ('Sanal masaüstleri', 25), ('Masaüstü parkuru', 20)],
     'altı küçük görev', 11)))
-S.append(slide('Ders 1 · Masaüstü', 'Masaüstünün parçaları (20 dk)', split(
+S.append(slide('Ders 1 · Masaüstü', 'Masaüstünün parçaları (25 dk)', split(
     ul(['<b>Simgeler:</b> sol taraftaki küçük resimler.',
         '<b>Görev çubuğu:</b> en alttaki şerit.',
         '<b>Başlat:</b> görev çubuğunun ortasında; bütün programlar burada.',
@@ -715,7 +713,7 @@ S.append(slide('Ders 1 · Alıştırma 3', 'Alt + Tab ve ses düzeyi', split(
            ['Ses simgesi', 'Sağ alttaki simgeye tıklayın, ses çubuğunu sürükleyin.']], 'kv') +
     note('Hoparlörden ses gelmiyorsa ilk bakılacak yer ses düzeyidir.'),
     fig('ms_ses.jpg', 'Hızlı ayarlar: Wi-Fi, Bluetooth, parlaklık, ses.'))))
-S.append(slide('Ders 2–3 · Başlat ve masaüstü', 'Başlat menüsü ve derli toplu masaüstü', split(
+S.append(slide('Ders 1–2 · Başlat ve masaüstü', 'Başlat menüsü ve derli toplu masaüstü', split(
     table([[K('Esc'), 'Başlat’ı kapatır'], ['Başlat açıkken yazmak', 'Arama yapar: <b>dosya</b> → Dosya Gezgini'],
            ['🔍 Ara', 'Görev çubuğundan doğrudan arama'], ['⏻ Güç', 'Uyku, Kapat, Yeniden başlat'],
            [K('⊞', 'E') + ' · ' + K('⊞', 'I'), 'Dosya Gezgini · Ayarlar'],
@@ -726,47 +724,47 @@ S.append(slide('Ders 2–3 · Başlat ve masaüstü', 'Başlat menüsü ve derli
         'Sağ tık → <b>Görünüm → Büyük simgeler</b>',
         'Sağ tık → <b>Kişiselleştir</b>: arka plan',
         'Geri Dönüşüm Kutusu’na sağ tık → <b>Geri Dönüşüm Kutusunu boşalt</b>'], 'small'), 1, 1)))
-S.append(slide('Ders 4 · Hesap Makinesi', 'Günlük hesaplar', split(
+S.append(slide('Ders 3 · Hesap Makinesi', 'Günlük hesaplar', split(
     table([['Market', '45 + 32,50 + 18 = <b>95,50 TL</b>'], ['Faturalar', '412,50 + 187,30 = <b>599,80 TL</b>'],
            ['Kişi başı', '1.200 ÷ 4 = <b>300 TL</b>'], ['Bir yıl', '750 × 12 = <b>9.000 TL</b>'],
            ['%20 indirim', '2000 − 20 % = → <b>1.600 TL</b>'], ['Para üstü', '200 − 137,50 = <b>62,50 TL</b>']], 'kv'),
     ul([', (virgül) kuruş için: <b>32,50</b>.',
         '<b>⌫</b> son yazılan rakamı siler, <b>C</b> her şeyi sıfırlar.',
         f'Klavyeyle de olur: rakamlar, {K("*")} çarpma, {K("/")} bölme, {K("Enter")} eşittir.'], 'small'), 1.05, .95)))
-S.append(slide('Ders 5 · Küçük yardımcılar', 'Yapışkan Notlar, Ses Kaydedici, Alarm', table([
+S.append(slide('Ders 4 · Küçük yardımcılar', 'Yapışkan Notlar, Ses Kaydedici, Alarm', table([
     ['🗒 Yapışkan Notlar', 'Renkli kısa notlar; kapatınca silinmez. <b>＋ Yeni not</b>, rengi üstteki noktalardan, silmek için 🗑'],
     ['🎙 Ses Kaydedici', 'Kırmızı <b>●</b> ile başlar, <b>■</b> ile durur. Kayıt Belgeler › Ses kayıtları klasörüne gider'],
     ['⏰ Saat → Alarm', 'Belirli bir saatte çalar; adını yazın: <b>İlaç saati</b> → ＋ Ekle. Çalınca 💤 <b>Ertele (5 dk)</b>'],
     ['⏳ Zamanlayıcı', 'Şu andan belli bir süre sonra çalar: çay demi, fırındaki yemek']], 'kv') +
     note('Hepsi Başlat menüsündedir. Alarm için bilgisayar <b>açık</b>, sesi <b>açık</b> olmalı; sessizdeyse çalmaz.')))
-S.append(slide('Ders 6 · Takvim', 'Randevu ve hatırlatıcı', split(
+S.append(slide('Ders 5 · Takvim', 'Randevu ve hatırlatıcı', split(
     adim(['⊞ Başlat’tan 📅 <b>Takvim</b>’i açın (Başlat’ta <b>takvim</b> yazmak da olur).',
           'Bir güne tıklayın; altta <b>＋ Randevu ekle</b>: <b>Doktor randevusu</b>, saat 10:30, hatırlatma <b>15 dk önce</b> → Ekle.',
           'Randevudan 15 dakika önce sağ altta bildirim çıkar.',
           'İptal olan randevunun yanındaki <b>✕</b> ile silin.']),
     ul(['Günün altındaki küçük nokta: o gün randevu ya da not var demektir.',
         'Hatırlatma, bilgisayar <b>açıkken</b> ve sesi açıkken gelir; kapalıyken gelmez.'], 'small'), 1.25, .75)))
-S.append(slide('Ders 7 · Fare ayarı', 'Fareyi kendinize göre ayarlayın', split(
+S.append(slide('Ders 6 · Fare ayarı', 'Fareyi kendinize göre ayarlayın', split(
     table([['Çift tıklama hızı', 'Çift tık zorsa çubuğu <b>yavaş</b> tarafa çekin (3 ya da daha az)'],
            ['Birincil düğme', 'Sol elini kullananlar için <b>Sağ</b>; ortak bilgisayarda yine Sol yapın'],
            ['Fare işaretçisi', 'İmleci bulamıyorsanız boyutu <b>Çok büyük</b>, rengi <b>Sarı</b>']], 'kv') +
     note('Ayarlar → <b>Bluetooth ve cihazlar</b> → Fare. İmleç: Ayarlar → <b>Erişilebilirlik</b> → Fare işaretçisi.'),
     fig('fa_fare.jpg', 'Bluetooth ve cihazlar: Fare bölümü, çift tıklama hızı.'), 1, 1)))
-S.append(slide('Ders 8–9 · Erişilebilirlik', 'Büyüteç, okuma kolaylığı, Ekran Klavyesi', split(
+S.append(slide('Ders 7–8 · Erişilebilirlik', 'Büyüteç, okuma kolaylığı, Ekran Klavyesi', split(
     table([[K('Ctrl') + ' + tekerlek', 'Penceredeki yazıyı büyütür / küçültür (' + K('Ctrl', '+') + ' / ' + K('Ctrl', '−') + ')'],
            [K('⊞', '+') + ' · ' + K('⊞', 'Esc'), '<b>Büyüteç</b>: bütün ekranı yakınlaştırır · kapatır'],
            ['Metin boyutu', 'Bütün yazıları büyütür'],
            ['Ekran klavyesi', 'Önce yazılacak yere tıklayın, sonra ekrandaki tuşlara. Tuş bozuksa işe yarar']], 'kv') +
     note('Hepsi Ayarlar → <b>Erişilebilirlik</b> sayfasında. Ekran klavyesi için Başlat’a <b>ekran klavyesi</b> yazmak da olur.'),
     fig('fa_erisim.jpg', 'Erişilebilirlik: metin boyutu, fare işaretçisi, Büyüteç, Ekran klavyesi.'), 1, 1)))
-S.append(slide('Ders 11 · Görev Yöneticisi', 'Program dondu!', split(
+S.append(slide('Ders 9 · Görev Yöneticisi', 'Program dondu!', split(
     adim(['Önce biraz <b>bekleyin</b>: program çoğu zaman ağır bir işi bitirince kendine gelir.',
           'Görev çubuğuna sağ tık → <b>Görev Yöneticisi</b> (' + K('Ctrl', 'Shift', 'Esc') + ').',
           '<b>Yanıt vermiyor</b> yazan satıra tıklayın.',
           '⊘ <b>Görevi sonlandır</b>. Kaydedilmemiş iş kaybolur.'], 'small') +
     note('Bilgisayar tamamen kilitlendiyse ' + K('Ctrl', 'Alt', 'Delete') + '. <b>Başlangıç uygulamaları</b>: açılışı yavaşlatan gereksizleri devre dışı bırakın.'),
     fig('gy_dondu.jpg', 'İşlemler: Kelime İşlemci “Yanıt vermiyor”.'), 1, 1)))
-S.append(slide('Ders 12 · Görev Yöneticisi', 'Bilgisayarı kim yoruyor?', split(
+S.append(slide('Ders 10 · Görev Yöneticisi', 'Bilgisayarı kim yoruyor?', split(
     table([['Sütun başlığı', 'Tıklayınca sıralar: en çok kullanan en üste çıkar'],
            ['İşlemci', 'Çalışma yükü; sürekli yüksekse bilgisayar ağırlaşır'],
            ['Bellek', 'Tuttuğu hafıza (MB); tarayıcılar çok tutar'],
@@ -774,7 +772,7 @@ S.append(slide('Ders 12 · Görev Yöneticisi', 'Bilgisayarı kim yoruyor?', spl
            ['▶ Yeni görev çalıştır', '<b>notepad</b>, <b>calc</b>, <b>mspaint</b> yazarak program açar']], 'kv tight') +
     note('Tanımadığınız program: adını internette aratın, güvenli değilse açılışta çalışmasını kapatın.'),
     fig('gy_ayrinti.jpg', 'İşlemciye göre sıralı: en üstte tanınmayan “Süper Arama Yardımcısı”.'), 1, 1)))
-S.append(slide('Ders 13–14 · Pencereler', 'Yan yana pencere, sanal masaüstü', split(
+S.append(slide('Ders 11–12 · Pencereler', 'Yan yana pencere, sanal masaüstü', split(
     '<h2>İki pencere yan yana</h2>' + table([
         ['Başlık çubuğunu kenara sürükleyin', 'Gölge çıkınca bırakın: pencere o yarıya yerleşir; öbür yarıda çıkan listeden ikinci pencereyi seçin'],
         ['☐ üzerinde bekleyin', 'Küçük yerleşim kutusu: sol yarı ya da sağ yarı'],
@@ -786,10 +784,8 @@ S.append(slide('Ders 13–14 · Pencereler', 'Yan yana pencere, sanal masaüstü
         [K('⊞', 'Ctrl', '←') + ' / ' + K('→'), 'Masaüstleri arasında geçiş'],
         ['Pencereye sağ tık', '<b>Şuraya taşı</b> → Masaüstü 2'],
         ['Masaüstündeki ✕', 'Kapatır; pencereler yandakine geçer']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 10, 15–16 · Tekrar', 'Oyunlar, parkur ve harita', table([
-    ['Oyunlarla pratik', '<b>Mayın Tarlası</b> (sol tık açar, sağ tık bayrak) ve <b>Kart Dizme</b>; küçültüp görev çubuğundan geri getirin.'],
-    ['Masaüstü parkuru', '10 görev, yönlendirme yok: arayarak aç, hesap yap (1250 − 375), Alt + Tab, masaüstünü göster, sesi kapat-aç.'],
-    ['Masaüstü haritası', 'Neyi nerede bulurum? Görev çubuğu, Başlat menüsü, pencerenin üstü.']], 'kv') +
+S.append(slide('Ders 13 · Tekrar', 'Masaüstü parkuru', table([
+    ['Masaüstü parkuru', '10 görev, yönlendirme yok: arayarak aç, hesap yap (1250 − 375), Alt + Tab, masaüstünü göster, sesi kapat-aç.']], 'kv') +
     note('Masaüstündeki program simgesi yalnızca <b>kısayoldur</b>; silinse de program Başlat menüsünde durur.')))
 S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Başlat', 'Bütün programlar; açınca hemen yazarak arayın'],
@@ -858,7 +854,7 @@ S.append(slide('Ders 2 · Dosya türleri', 'Dosyanın soyadı: uzantı', split(
     ul(['<b>tatil.jpg</b> → adı tatil, türü jpg (fotoğraf).',
         '<b>kargo_bilgisi.pdf.exe</b>: gerçek tür en sondaki uzantıdır. PDF gibi görünen bir program; <b>açmayın</b>.',
         'Ad değiştirirken (F2) yalnızca noktadan önceki kısmı değiştirin; uzantıya dokunmayın.',
-        'Genellikle en çok yeri videolar kaplar.'], 'small'), 1, 1)))
+        'Uzantılar görünmüyorsa: Dosya Gezgini → <b>Görünüm → Göster → Dosya adı uzantıları</b>.'], 'small'), 1, 1)))
 S.append(slide('Ders 3 · Resim ve web dosyaları', 'PNG mi, JPG mi? Web sayfası da bir dosya', split(
     table([['JPG (JPEG)', 'Fotoğraflar için: küçük boyutlu, çok renkli'],
            ['PNG', 'Çizim, logo, ekran alıntısı, yazılı görsel: net kenarlı, kayıpsız'],
@@ -926,11 +922,11 @@ write('hafta6', '6. Hafta', 'Bilgisayar İşletmenliği – 6. Hafta Alıştırm
 # ================================================================ HAFTA 7
 S = []
 S.append(cover('7. Hafta: Paint, Ekran Alıntısı ve Ayarlar', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On dört ders', plan([
-    ('Paint ile resim', 25), ('Paint ile ev çizelim', 25), ('Paint ile tebrik kartı', 25), ('Ekran Alıntısı', 15),
-    ('Ekran alıntısıyla yardım istemek', 20), ('Ayarlar', 25), ('Saati ve tarihi değiştirmek', 30), ('Denetim Masası', 35),
+S.append(slide('Bu hafta', 'On bir ders', plan([
+    ('Paint ile resim', 25), ('Paint ile tebrik kartı', 25), ('Ekran Alıntısı', 20),
+    ('Ayarlar', 30), ('Saati ve tarihi değiştirmek', 30), ('Denetim Masası', 35),
     ('Kısayol, ekran ayarı ve geri yükleme', 30),
-    ('Temalar ve Mağaza', 35), ('Renkler ve saydamlık', 20), ('Bluetooth: kulaklık, hoparlör', 25),
+    ('Temalar ve Mağaza', 35), ('Bluetooth: kulaklık, hoparlör', 25),
     ('Şifre, PIN, ekranı kilitlemek', 25), ('Ayarlar parkuru', 25)],
     'altı küçük görev', 12)))
 S.append(slide('Ders 1 · Paint (25 dk)', 'Çizmek: kalem, renk, fırça', split(
@@ -945,53 +941,54 @@ S.append(slide('Ders 1 · Paint', 'Şekil, doldurma, yazı, silgi, kaydetme', ta
     ['A Metin · Silgi', 'Metin: resme yazı ekler. Silgi: bir yeri siler.'],
     [K('Ctrl', 'Z'), 'Son yaptığınızı geri alır.'],
     [K('Ctrl', 'S'), 'Resimler klasörüne <b>ilk resmim</b> adıyla kaydedin. Sonra resme sağ tıklayıp <b>Masaüstü arka planı olarak ayarla</b>.']], 'kv')))
-S.append(slide('Ders 2–3 · Paint alıştırmaları', 'Ev resmi ve tebrik kartı', split(
-    table([['▭ Dikdörtgen', 'Bir köşeden karşı köşeye sürükleyin: evin gövdesi, kapı, pencereler'],
-           ['╱ Çizgi', 'Başlangıçtan bitişe: üçgen çatı için iki çizgi'],
+S.append(slide('Ders 2 · Paint alıştırması', 'Tebrik kartı', split(
+    table([['▭ Dikdörtgen', 'Bir köşeden karşı köşeye sürükleyin: kartın çerçevesi'],
+           ['╱ Çizgi', 'Başlangıçtan bitişe: süs, şerit'],
            ['◯ Elips', 'Güneş, balon. Shift basılıyken tam daire'],
            ['🪣 Doldur', 'Kapalı şeklin içine tıklayın; boş tuvale tıklarsanız bütün arka plan boyanır'],
            ['A Metin', 'Tıklayın, yazın: <b>İyi ki doğdun!</b>']], 'kv tight'),
-    ul(['Ev resmini <b>evim</b>, kartı <b>doğum günü kartı</b> adıyla ' + K('Ctrl', 'S') + ' ile kaydedin.',
+    ul(['Kartı <b>doğum günü kartı</b> adıyla ' + K('Ctrl', 'S') + ' ile kaydedin.',
         'Beğenmediğinizi ' + K('Ctrl', 'Z') + ' ile geri alın.',
         'Kartı masaüstüne koymak: Resimler’de karta sağ tık → <b>Masaüstü arka planı olarak ayarla</b>.'], 'small'), 1.1, .9)))
-S.append(slide('Ders 4 · Ekran Alıntısı (15 dk)', 'Ekranın fotoğrafını çekmek', two(
+S.append(slide('Ders 3 · Ekran Alıntısı (20 dk)', 'Ekranın fotoğrafını çekmek', two(
     'al_once.jpg', '1. Ekran Alıntısı’nı açıp <b>＋ Yeni</b>’ye tıklayın.', 'al_sonra.jpg', '2. İstediğiniz yeri çerçeveleyin: resim panoya kopyalanır.')))
-S.append(slide('Ders 4 · Ekran Alıntısı', 'Alıntıyı kullanmak', table([
+S.append(slide('Ders 3 · Ekran Alıntısı', 'Alıntıyı kullanmak', table([
     ['Paint’e yapıştır', f'Paint’i açıp {K("Ctrl", "V")}. Üzerine çizebilir, yazı ekleyebilirsiniz.'],
     ['Kaydet', f'{K("Ctrl", "S")} ile Resimler klasörüne <b>hava durumu</b> adıyla.'],
     ['Gerçek bilgisayarda', f'{K("⊞", "Shift", "S")}, ekran kararınca yeri çerçeveleyin. Sonra WhatsApp’ta, e-postada ya da Paint’te {K("Ctrl", "V")}.'],
     ['Print Screen (PrtSc)', 'Bütün ekranı panoya alır.']], 'kv') +
     note('Bir hata mesajını, tarifi ya da adresi resim olarak saklayıp birine gönderebilirsiniz.')))
-S.append(slide('Ders 5 · Ekran alıntısıyla yardım istemek', 'Anlatmak yerine resmini gönderin', split(
+S.append(slide('Ders 3 · Ekran alıntısıyla yardım istemek', 'Anlatmak yerine resmini gönderin', split(
     adim(['Başlat’tan arayarak <b>Ekran Alıntısı</b>’nı açın, <b>＋ Yeni</b>.',
-          'Hata yazısının olduğu bölgeyi çapraz sürükleyerek seçin.',
-          'Paint’i açıp ' + K('Ctrl', 'V') + '; kırmızı ◯ Elips ile sorunlu yeri işaretleyin.',
-          '<b>hata mesajı</b> adıyla kaydedin.']),
+          'Göstermek istediğiniz bölgeyi (ör. bir hata yazısını) çapraz sürükleyerek seçin.',
+          'Paint’i açıp ' + K('Ctrl', 'V') + '; kırmızı ◯ Elips ile önemli yeri işaretleyin.',
+          'Kaydedin; e-postaya ya da mesaja ekleyin.']),
     ul(['Gerçekte: ' + K('⊞', 'Shift', 'S') + ' ile alanı seçin; WhatsApp Web’de ya da e-postada ' + K('Ctrl', 'V') + '.',
         'Altına kısaca ne yapmaya çalıştığınızı yazın.'], 'small') +
     note('Ekranda şifre, kart numarası ya da kimlik bilgisi görünüyorsa o resmi <b>kimseyle paylaşmayın</b>.'), 1.1, .9)))
-S.append(slide('Ders 6 · Ayarlar (25 dk)', 'Arka plan, ses, yazı boyutu', split(
+S.append(slide('Ders 4 · Ayarlar (30 dk)', 'Arka plan, ses, parlaklık, güncelleme', split(
     table([['Kişiselleştirme', 'Arka plan: Orman’ı seçin; kendi fotoğrafınızı da seçebilirsiniz'],
-           ['Sistem', 'Ses düzeyini 30’a çekin; “Sesi kapat (sessiz)”i açıp kapatın'],
+           ['Sistem', 'Ses düzeyini 30’a çekin; “Sesi kapat (sessiz)”i açıp kapatın; parlaklığı 60–80 yapın'],
+           ['Windows Update', '<b>Güncelleştirmeleri denetle</b>; ertelemeyin'],
            ['Gerçekte', f'Ayarlar’ı {K("⊞", "I")} ile açın']], 'kv'),
     fig('ay_kisisel.jpg', 'Kişiselleştirme sayfası.'), 1.05, .95)))
-S.append(slide('Ders 6 · Ayarlar', 'Wi-Fi: internete bağlanmak', split(
+S.append(slide('Ders 4 · Ayarlar', 'Wi-Fi: internete bağlanmak', split(
     ul(['<b>Ağ ve İnternet</b> → Wi-Fi anahtarını açın.',
         '<b>EvAğı</b> → Bağlan → şifre <b>evagi2024</b>.',
         'Gerçekte Wi-Fi şifresi çoğunlukla <b>modemin altındaki etikette</b> yazar.'], 'small') +
     note('<b>Kafe_Ücretsiz</b> gibi şifresiz ağlarda bankacılık işlemi yapmayın, şifre girmeyin: aynı ağdaki başkaları görebilir.'),
     fig('ay_ag.jpg', 'Üç ağ: ikisi güvenli, biri açık (güvensiz).'))))
-S.append(slide('Ders 6 · Ayarlar', 'Saat ve yazı boyutu', two(
-    'ay_saat.jpg', '<b>Saat ve dil:</b> “Saati otomatik olarak ayarla”yı açın. Saat yanlışsa bazı siteler açılmaz.',
+S.append(slide('Ders 4 · Ayarlar', 'Saat ve yazı boyutu', two(
+    'ay_saat.jpg', '<b>Saat ve dil:</b> “Saati otomatik olarak ayarla”yı açın; saat dilimi <b>İstanbul</b> olsun. Saat yanlışsa bazı siteler açılmaz.',
     'ay_yazi.jpg', '<b>Erişilebilirlik:</b> metin boyutunu %130’a getirip Uygula’ya tıklayın.')))
-S.append(slide('Ders 7 · Saat ve tarih', 'Saat yanlışsa site açılmaz', split(
+S.append(slide('Ders 5 · Saat ve tarih', 'Saat yanlışsa site açılmaz', split(
     table([['Sağ alttaki saat', 'Tıklayınca takvim açılır; <b>sağ tık</b> → Tarih ve saati ayarla'],
            ['Saati otomatik olarak ayarla', '<b>Açık</b> kalsın: saat internetten düzelir'],
            ['Elle ayarlamak', 'İnternet yoksa: otomatiği kapatın → <b>Değiştir</b> → saati yazın. Sonra otomatiğe dönün'],
            ['Saat dilimi · 24 saatlik biçim', 'İstanbul (UTC+3) · 14.05 ya da 2.05 ÖS']], 'kv tight') +
     note('“Bağlantınız gizli değil” diyen sitede önce <b>tarih ve saate</b> bakın. Saat hep sıfırlanıyorsa anakartın düğme pili bitmiştir; teknisyen değiştirir.'),
     fig('st_hata.jpg', 'Bilgisayarın tarihi yanlış: site açılmıyor.'), 1.05, .95)))
-S.append(slide('Ders 8 · Denetim Masası', 'Windows’un eski ayar paneli', split(
+S.append(slide('Ders 6 · Denetim Masası', 'Windows’un eski ayar paneli', split(
     table([['Açmak', 'Başlat’a <b>denetim</b> yazın. Başka yol: ' + K('⊞', 'R') + ', <b>control</b>, Enter'],
            ['Görüntüleme ölçütü', 'Sağ üstte: <b>Büyük simgeler</b> daha hızlı bulunur'],
            ['Arama kutusu', '<b>fare</b>, <b>yazıcı</b>, <b>saat</b> yazın'],
@@ -1000,28 +997,26 @@ S.append(slide('Ders 8 · Denetim Masası', 'Windows’un eski ayar paneli', spl
            ['Güç Seçenekleri', 'Ekranı kapat, uyku süresi']], 'kv tight') +
     note('Yeni Windows’ta çoğu ayar Ayarlar’a taşındı; bazı öğeler sizi oraya götürür. Windows 7’de yazıcı: Denetim Masası → Aygıtlar ve Yazıcılar.'),
     fig('dm_kategori.jpg', 'Denetim Masası: kategori görünümü.'), 1.05, .95)))
-S.append(slide('Ders 9 · Kısayol, ekran ayarı, geri yükleme (30 dk)', 'Masaüstüne kısayol koymak', split(
+S.append(slide('Ders 7 · Kısayol, ekran ayarı, geri yükleme (30 dk)', 'Masaüstüne kısayol koymak', split(
     adim(['Dosya Gezgini’nde klasöre ya da dosyaya <b>sağ tıklayın</b>.',
           '<b>Gönder</b> → <b>Masaüstü (kısayol oluştur)</b>.',
           'Masaüstündeki simgeye <b>çift tıklayın</b>: asıl klasör açılır.']),
     ul(['Kısayol simgesinde küçük bir <b>ok ↗</b> vardır.',
         'Kısayolu silmek asıl dosyayı <b>silmez</b>.',
         'Asıl dosya silinirse kısayol <b>açılmaz</b>.']))))
-S.append(slide('Ders 9 · Kısayol, ekran ayarı, geri yükleme', 'Ekran ayarı ve bilgisayarı eski güne döndürmek', table([
+S.append(slide('Ders 7 · Kısayol, ekran ayarı, geri yükleme', 'Ekran ayarı ve bilgisayarı eski güne döndürmek', table([
     ['Çözünürlük', 'Ayarlar → Sistem → Ekran. <b>(Önerilen)</b> yazan kalsın; düşürmek her şeyi bulanıklaştırır'],
     ['Ölçek', 'Yazılar küçükse <b>%125</b> ya da <b>%150</b> yapın'],
     ['Sistem Geri Yükleme', 'Programları ve ayarları sorun başlamadan önceki güne döndürür; <b>belgeler ve fotoğraflar değişmez</b>'],
     ['Geri yükleme noktası', 'Büyük bir program ya da sürücü kurmadan önce oluşturun (Sistem Koruması → Oluştur)'],
     ['Dosya Geçmişi', 'Belgelerin ve fotoğrafların kopyasını USB diske saatte bir alır; silinen dosyanın eski hâli geri gelir']], 'kv')))
-S.append(slide('Ders 10–11 · Görünüm', 'Temalar, Mağaza, renkler', split(
+S.append(slide('Ders 8 · Görünüm', 'Temalar, Mağaza, renkler', split(
     table([['Temalar', 'Arka plan, renk ve koyu modu birlikte değiştirir. Windows (koyu) akşamları gözü yormaz'],
            ['Vurgu rengi', 'Başlat düğmesi, seçili düğmeler, görev çubuğundaki çizgi'],
-           ['Renkler', '“Vurgu rengini görev çubuğunda / başlık çubuklarında göster”'],
-           ['Saydamlık efektleri', 'Kapatınca menüler düz renk olur; yazılar kolay okunur'],
            ['🛍 Mağaza', 'Uygulama ve temaları güvenle indirme yeri']], 'kv tight') +
     note('Yüklemeden önce yayımcıya, puana, yorumlara ve istenen izinlere bakın. Yazı programı rehber ve mikrofon istiyorsa yüklemeyin.'),
     fig('tm_kisisel.jpg', 'Ayarlar → Kişiselleştirme: temalar, arka plan, renkler.'), 1.05, .95)))
-S.append(slide('Ders 12 · Bluetooth', 'Kablosuz kulaklık ve hoparlör', split(
+S.append(slide('Ders 9 · Bluetooth', 'Kablosuz kulaklık ve hoparlör', split(
     adim(['⊞ Başlat → ⚙ Ayarlar → <b>Bluetooth ve cihazlar</b>.', 'Bluetooth düğmesini <b>Açık</b> yapın.',
           '<b>＋ Cihaz ekle</b>: kulaklık da açık ve eşleştirme kipinde olsun.',
           'Kendi cihazınızın yanındaki <b>Bağlan</b>. Bir kez eşleşince sonra kendiliğinden bağlanır.']),
@@ -1029,14 +1024,14 @@ S.append(slide('Ders 12 · Bluetooth', 'Kablosuz kulaklık ve hoparlör', split(
            ['Hızlı ayarlar', 'Sağ alttaki simgeler: Wi-Fi, Bluetooth, uçak modu'],
            ['✈ Uçak modu', 'Wi-Fi ve Bluetooth’u birlikte kapatır; internet yoksa buna bakın'],
            ['Kulaklık ses vermiyor', 'Bluetooth açık mı, kulaklık şarjlı ve açık mı, bağlı mı?']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 13 · Hesaplar', 'Şifre, PIN ve ekranı kilitlemek', split(
+S.append(slide('Ders 10 · Hesaplar', 'Şifre, PIN ve ekranı kilitlemek', split(
     table([['Ayarlar → Hesaplar', 'Şifre değiştirme, PIN ekleme'],
            ['Şifre', '8+ karakter, büyük-küçük harf ve rakam; ad, doğum yılı olmasın'],
            ['PIN', '4–6 rakam; 1234, 1111 olmasın'],
            [K('⊞', 'L'), 'Ekranı kilitler; işler yerinde kalır. Ya da Başlat → hesap adı → 🔒 Kilitle'],
            ['Ayrı hesap', 'Bilgisayarı başkası da kullanıyorsa ona ayrı hesap']], 'kv'),
     note('Şifreyi monitöre yapıştırmayın. Evde güvenli bir yerdeki deftere, ne için olduğunu açıkça yazmadan.'), 1.3, .7)))
-S.append(slide('Ders 14 · Tekrar', 'Ayarlar parkuru: 11 görev', ul([
+S.append(slide('Ders 11 · Tekrar', 'Ayarlar parkuru: 11 görev', ul([
     'Ayarlar’ı açın', 'Koyu modu açın, sonra kapatın', 'Arka planı Orman yapın', 'Parlaklığı 60–80 arasına getirin',
     'Metin boyutu %130, sonra yine %100', 'Kafe_Ücretsiz ağına bağlanın', 'EvAğı’na dönün (şifre: evagi2024)',
     'Saat dilimini Londra yapıp yine İstanbul’a alın', 'Güncelleştirmeleri denetleyin'], 'task2') +
@@ -1055,9 +1050,9 @@ write('hafta7', '7. Hafta', 'Bilgisayar İşletmenliği – 7. Hafta Alıştırm
 # ================================================================ HAFTA 8
 S = []
 S.append(cover('8. Hafta: İnternet, program kurma, yazıcı ve işletim sistemi', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On yedi ders', plan([
+S.append(slide('Bu hafta', 'On altı ders', plan([
     ('İnternette gezinme ve indirme', 25), ('Tarayıcılar: Edge, Chrome, Firefox', 25), ('İnternet adresini (URL) okumak', 40),
-    ('İnternette bilgi bulmak', 25), ('Arama motorları', 35), ('Video, radyo ve gazete', 35), ('Video kalitesi ve Hz', 30),
+    ('Arama motorları', 35), ('Video, radyo ve gazete', 35), ('Video kalitesi ve Hz', 30),
     ('Ekrandaki İngilizce kelimeler', 25), ('İnternetteki tuzaklar', 20), ('Program kurma ve kaldırma', 20),
     ('Yazıcı ve sürücüler', 20), ('Virüs taraması, Disk Temizleme', 30), ('Virüsler ve antivirüs', 30),
     ('İnternet kesildi!', 25), ('İşletim sistemleri', 40), ('İşletim sistemi kurulumu', 20), ('İnternet parkuru', 25)],
@@ -1084,7 +1079,7 @@ S.append(slide('Ders 2 · Tarayıcılar', 'Tarayıcı mı, arama motoru mu?', sp
         'Bağlantılar hep <b>varsayılan tarayıcıda</b> açılır: Ayarlar → Uygulamalar → Varsayılan uygulamalar.',
         'Menü → Ayarlar → <b>Hakkında</b>: güncel tarayıcı daha güvenlidir.'], 'small'), 1.1, .9)))
 S.append(slide('Ders 3 · Adres (URL) okumak', 'Sitenin asıl adı nerede yazar?', split(
-    table([['Alan adı', '“www.”dan sonra, ilk “/”a kadar: <b>turkiye.gov.tr</b>'],
+    table([['Alan adı', 'Sitenin asıl adı: <b>turkiye.gov.tr</b>. “www.” bunun parçası değildir'],
            ['Sağdan sola okuyun', 'bankam.com.tr.<b>hesap-dogrulama.xyz</b> → site hesap-dogrulama.xyz’nindir'],
            ['.gov.tr · .edu.tr · .bel.tr', 'Yalnızca devlet · üniversite · belediye alabilir'],
            ['.com, .xyz', 'Herkes alabilir'],
@@ -1092,7 +1087,7 @@ S.append(slide('Ders 3 · Adres (URL) okumak', 'Sitenin asıl adı nerede yazar?
            ['⚠ Güvenli değil', 'Şifre ve kart bilgisi girmeyin']], 'kv tight') +
     note('Bildirim izni isteyen tanımadığınız siteye <b>Engelle</b>. Adresi paylaşmak: adres çubuğuna tıklayıp ' + K('Ctrl', 'C') + '.'),
     fig('in_sahte.jpg', 'Kilidi var ama adres turkiye-gov-giris.com: sahte e-Devlet.'), 1.05, .95)))
-S.append(slide('Ders 4–5 · Aramak', 'İyi arama, doğru sonuç', split(
+S.append(slide('Ders 4 · Aramak', 'İyi arama, doğru sonuç', split(
     table([['Kısa arama', '<b>izmir hava durumu</b>, <b>mercimek çorbası tarifi</b>: birkaç kelime yeter'],
            ['Sonuç satırı', 'Mavi başlık: bağlantı · gri: sitenin adresi · kısa açıklama'],
            ['Reklam', '“Reklam” yazan sonuçlar parayla yukarı çıkar; atlayın'],
@@ -1102,7 +1097,7 @@ S.append(slide('Ders 4–5 · Aramak', 'İyi arama, doğru sonuç', split(
         'Tıklamadan önce adrese bakın: .gov.tr, .bel.tr, hastane sitesi.',
         '＋ ile yeni sekme açın; açık sayfa kaybolmaz. ← bir önceki sayfa.',
         'Arama kutusuna T.C. kimlik no, kart numarası, şifre <b>yazılmaz</b>.'], 'small'), 1.05, .95)))
-S.append(slide('Ders 6–7 · Video, radyo, gazete', 'İzlemek, dinlemek, okumak', split(
+S.append(slide('Ders 5–6 · Video, radyo, gazete', 'İzlemek, dinlemek, okumak', split(
     table([['Reklamı atla ▶', 'Birkaç saniye sonra çıkar; reklamın kendisine tıklamayın'],
            ['⛶ Tam ekran', 'Çıkmak için ' + K('Esc')],
            ['CC', 'Altyazı açar / kapatır'], ['⚙ Hız', '0,75x ya da 0,5x: konuşma rahat anlaşılır'],
@@ -1112,7 +1107,7 @@ S.append(slide('Ders 6–7 · Video, radyo, gazete', 'İzlemek, dinlemek, okumak
            ['Kotalı internet', 'Telefonda 360p ya da 480p; 4K bir saatte ≈ 7 GB'],
            ['60 Hz', 'Ekran saniyede 60 kez yenilenir; ofis ve internet için yeterli'],
            ['Çözünürlük', '“Önerilen” yazanı seçin; yazıyı büyütmek için Ölçek ya da Metin boyutu']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 8 · İngilizce kelimeler', 'OK, Cancel, Allow, Skip…', split(
+S.append(slide('Ders 7 · İngilizce kelimeler', 'OK, Cancel, Allow, Skip…', split(
     table([['OK · Yes · Next · Continue', 'Tamam · Evet · İleri · Devam'],
            ['Cancel · No · Back · Close', 'İptal · Hayır · Geri · Kapat'],
            ['Skip · Later · Remind me later', 'Atla · Sonra · Sonra hatırlat'],
@@ -1123,34 +1118,34 @@ S.append(slide('Ders 8 · İngilizce kelimeler', 'OK, Cancel, Allow, Skip…', s
            ['Sign in · Sign up · Sign out', 'Giriş yap · Kayıt ol · Çıkış yap']], 'tight'),
     note('Emin değilseniz <b>Cancel</b> ya da ✕: hiçbir şey değiştirmeden kapatır.') +
     ul(['Tarayıcıda sayfaya sağ tık → <b>Türkçe’ye çevir</b>.', 'Telefonda çeviri uygulamasının kamerasını ekrana tutun.'], 'small'), 1.25, .75)))
-S.append(slide('Ders 9 · Tuzaklar', 'İnternetteki tuzakları tanıyalım', table([
+S.append(slide('Ders 8 · Tuzaklar', 'İnternetteki tuzakları tanıyalım', table([
     ['Büyük renkli İNDİR', 'Genellikle reklam; programın adının yazdığı sade bağlantıyı kullanın'],
     ['“Kazandınız!”', 'Kapatın; kimse bedava telefon vermez. Geri sayım acele ettirmek içindir'],
     ['“Bildirim göstermek istiyor”', '<b>Engelle</b>'],
     ['“Programınız eski, güncelleyin”', 'Siteden değil; Windows Update’ten ya da programın kendisinden'],
     ['Çerez penceresi', 'Kabul ya da Reddet; ikisi de güvenli'],
     ['Benzer adres', 'Harf harf okuyun: bankam / <b>bankarn</b>']], 'kv')))
-S.append(slide('Ders 10 · Program kurma', 'Kurulum adım adım', two(
+S.append(slide('Ders 9 · Program kurma', 'Kurulum adım adım', two(
     'kr_uac.jpg', '<b>İzin penceresi:</b> programı siz indirdiyseniz Evet; tanımıyorsanız Hayır.',
     'kr_ek.jpg', '<b>Ek bileşenler tuzağı:</b> iki kutucuğun da işaretini kaldırın.')))
-S.append(slide('Ders 10 · Program kurma', 'Kurulum sırası ve kaldırma', table([
+S.append(slide('Ders 9 · Program kurma', 'Kurulum sırası ve kaldırma', table([
     ['1', '<b>…Kurulum.exe</b> dosyasına çift tıklayın, izin sorusuna <b>Evet</b> deyin.'],
     ['2', 'Hoş geldiniz → <b>İleri</b>. Lisansı <b>kabul ediyorum</b> seçmeden İleri çalışmaz.'],
     ['3', 'Kurulum yeri → İleri. “Önerilen” ek yazılımların <b>işaretini kaldırın</b>. Sonra <b>Kur</b>, <b>Son</b>.'],
     ['4', 'Kaldırmak için: Başlat → Ayarlar → <b>Uygulamalar</b> → programın yanındaki <b>Kaldır</b>.']], 'kv') +
     note('Yalnızca güvendiğiniz yerden indirdiğiniz programları kurun.')))
-S.append(slide('Ders 11 · Yazıcı ve sürücüler', 'Yazıcı eklemek', split(
+S.append(slide('Ders 10 · Yazıcı ve sürücüler', 'Yazıcı eklemek', split(
     ul(['<b>Sürücü</b> (driver): parçanın bilgisayarla “konuşmasını” sağlayan küçük program. Bir <b>tercüman</b> gibi.',
         'Ayarlar → <b>Bluetooth ve cihazlar</b> → <b>Cihaz ekle</b>: yazıcı bulunur, sürücüsü kendiliğinden yüklenir.',
         'Test sayfası yazdırın. Not Defteri’nden yazdırmak için ' + K('Ctrl', 'P') + '.'], 'small'),
     fig('yz_ekle.jpg', 'Renkli Yazıcı R-200 bulundu.'))))
-S.append(slide('Ders 11 · Yazıcı ve sürücüler', 'Aygıt Yöneticisi', split(
+S.append(slide('Ders 10 · Yazıcı ve sürücüler', 'Aygıt Yöneticisi', split(
     ul(['Bir parça çalışmıyorsa: <b>Başlat’a sağ tıklayın</b> → Aygıt Yöneticisi.',
         'Sarı ünlemli aygıt, sürücüsünün <b>eksik</b> olduğunu gösterir.',
         'Sağ tık → <b>Sürücüyü güncelleştir</b> → Sürücüleri otomatik olarak ara.',
         'Başka yerler: Windows Update; üreticinin resmî sitesi. “Sürücü güncelleyici” programlarından uzak durun.'], 'small'),
     fig('yz_aygit.jpg', '“Bilinmeyen aygıt”: sürücü eksik.'))))
-S.append(slide('Ders 12 · Bakım', 'Virüs taraması ve Disk Temizleme', split(
+S.append(slide('Ders 11 · Bakım', 'Virüs taraması ve Disk Temizleme', split(
     table([['🛡 Windows Güvenliği', 'Windows’un kendi virüs programı; ek program gerekmez'],
            ['⚡ Hızlı tarama', 'Birkaç dakikada tarar'],
            ['USB belleği tara', 'Başkasından aldığınız belleği açmadan önce'],
@@ -1158,7 +1153,7 @@ S.append(slide('Ders 12 · Bakım', 'Virüs taraması ve Disk Temizleme', split(
            ['🧹 Disk Temizleme', 'Geçici dosyaları siler, yer açar. <b>İndirilenler</b>’i işaretlemeyin']], 'kv tight') +
     note('Siteden çıkan “7 virüs bulundu” yazısına inanmayın; kendiniz Windows Güvenliği ile tarayın.'),
     fig('bg_disk.jpg', 'Disk Temizleme: İndirilenler klasörü sarı, işaretli değil.'), 1.05, .95)))
-S.append(slide('Ders 13 · Virüsler', 'Virüs nedir, nasıl korunuruz?', split(
+S.append(slide('Ders 12 · Virüsler', 'Virüs nedir, nasıl korunuruz?', split(
     table([['Nasıl bulaşır?', 'Tanımadığınız e-posta eki, “bedava” programlar, başkasının USB’si, sahte “güncelle” düğmeleri'],
            ['Belirtiler', 'Birden yavaşlama, açılır reklamlar, değişen ana sayfa, tanımadığınız programlar'],
            ['Antivirüs', 'Windows Güvenliği hazır gelir. <b>İki antivirüs</b> birbirini bozar'],
@@ -1166,14 +1161,14 @@ S.append(slide('Ders 13 · Virüsler', 'Virüs nedir, nasıl korunuruz?', split(
     '<h2>Bulaştıysa</h2>' + adim(['İnterneti kesin (Wi-Fi’yi kapatın).', 'Windows Güvenliği ile tam tarama.',
                                   'Tanımadığınız programı Ayarlar → Uygulamalar’dan kaldırın.', 'Şifreleri başka bir cihazdan değiştirin.'], 'small') +
     note('En iyi savunma: önemli dosyaların düzenli <b>yedeği</b>.'), 1, 1)))
-S.append(slide('Ders 14 · İnternet kesildi!', 'Wi-Fi bağlı ama internet yok', split(
+S.append(slide('Ders 13 · İnternet kesildi!', 'Wi-Fi bağlı ama internet yok', split(
     table([['Power · DSL · Internet', 'Elektrik var mı · hat geliyor mu · internete bağlandı mı'],
            ['Internet ışığı sönük / kırmızı', 'Modemi kapatın, <b>10 saniye</b> bekleyin, açın; ışıklar için 2–3 dakika bekleyin'],
            ['DSL ışığı hiç yanmıyor', 'Hat gelmiyor: kabloları kontrol edin, düzelmezse internet şirketini arayın'],
            ['Kişisel Erişim Noktası', 'Telefonun internetini bilgisayara paylaşır; mobil veriden harcar'],
            ['Hız testi', 'Görüntülü görüşmeye 3 Mbps, film için 5 Mbps yeter']], 'kv tight'),
     fig('ik_modem.jpg', '“İnternete bağlı değilsiniz”; sol altta modemin ışıkları.'), 1.05, .95)))
-S.append(slide('Ders 15 · İşletim sistemleri', 'Windows 7’den Pardus’a', split(
+S.append(slide('Ders 14 · İşletim sistemleri', 'Windows 7’den Pardus’a', split(
     table([['Windows 7 (2009)', 'Yuvarlak Başlat düğmesi; desteği 2020’de bitti'],
            ['Windows 8 (2012)', 'Kutucuklu Başlat ekranı; destek 2023’te bitti'],
            ['Windows 10 (2015)', 'Başlat menüsü geri geldi; ücretsiz destek Ekim 2025’te bitti'],
@@ -1184,19 +1179,19 @@ S.append(slide('Ders 15 · İşletim sistemleri', 'Windows 7’den Pardus’a', 
         'Hangisi bende? Başlat → Ayarlar → Sistem → <b>Hakkında</b>; ya da ' + K('⊞', 'R') + ', <b>winver</b>, Enter.',
         '<b>Destek bitti</b>: yeni güvenlik açıkları kapatılmaz; bankacılığı güncel sistemde yapın.',
         'Windows programları Linux’ta doğrudan çalışmaz; LibreOffice gibi benzerleri Word ve Excel dosyalarını açar.'], 'small'), 1, 1)))
-S.append(slide('Ders 16 · İşletim sistemi (gösterim)', 'Windows’u sıfırdan kurmak', split(
+S.append(slide('Ders 15 · İşletim sistemi (gösterim)', 'Windows’u sıfırdan kurmak', split(
     ul(['Kurulum diskteki fotoğrafları ve belgeleri <b>silebilir</b>. Önce mutlaka <b>yedek</b> alınır.',
         'Gerekenler: Windows kurulum USB’si; açılışta USB’den başlatmak (F12, F11 ya da Esc).',
         'Gerçekte kopyalama 15–30 dakika sürer; bilgisayar birkaç kez yeniden başlar. <b>Kapatmayın!</b>',
         'PIN: doğum yılınız ya da 1234 olmasın.'], 'small'),
     fig('os_disk_k.jpg', 'Disk seçimi: biçimlendirme her şeyi siler.'), 1, 1)))
-S.append(slide('Ders 16 · İşletim sistemi (gösterim)', 'Kurulum ekranları', table([
+S.append(slide('Ders 15 · İşletim sistemi (gösterim)', 'Kurulum ekranları', table([
     ['Dil ve klavye', 'Türkçe, Türkçe Q → İleri'], ['Şimdi yükle', '“Bilgisayarınızı onarın” bozuk Windows’u onarmak içindir'],
     ['Ürün anahtarı', 'Daha önce etkinleştirilmişse <b>Ürün anahtarım yok</b>'],
     ['Yükleme türü', '<b>Özel: Yalnızca Windows’u yükle</b> (temiz kurulum)'],
     ['Disk', 'Biçimlendirme her şeyi siler: uyarıyı okuyun'],
     ['İlk ayarlar', 'Bölge, klavye, internet (EvAğı), ad, PIN, gizlilik']], 'kv')))
-S.append(slide('Ders 17 · Tekrar', 'İnternet parkuru: 11 görev', ul([
+S.append(slide('Ders 16 · Tekrar', 'İnternet parkuru: 11 görev', ul([
     'Tarayıcıyı Başlat’tan arayarak açın', '<b>börek tarifi</b> arayın, ıspanaklı börek tarifini açın',
     'Sayfanın sonundaki gizli kelimeyi bulun', 'Yeni sekmede <b>www.program-indir.com.tr</b>',
     'Resim Gösterici’yi reklamlara tıklamadan indirin', 'İndirilenler klasörünü açın',
@@ -1217,9 +1212,9 @@ write('hafta8', '8. Hafta', 'Bilgisayar İşletmenliği – 8. Hafta Alıştırm
 # ================================================================ HAFTA 9
 S = []
 S.append(cover('9. Hafta: E-posta', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'Dokuz ders', plan([
-    ('E-posta: okuma, yanıtlama, ek', 35), ('Gmail ve Hotmail (Outlook)', 25), ('Yanıtla, ilet, Bilgi (Cc), Gizli (Bcc)', 30),
-    ('Kişiler, imza ve istenmeyenler', 30), ('Gelen belgeyi klasöre taşımak', 25), ('Büyük dosyayı buluttan paylaşmak', 35),
+S.append(slide('Bu hafta', 'Sekiz ders', plan([
+    ('E-posta: okuma, yanıtlama, ek', 40), ('Gmail ve Hotmail (Outlook)', 25), ('Yanıtla, ilet, Bilgi (Cc), Gizli (Bcc)', 30),
+    ('Kişiler, imza ve istenmeyenler', 30), ('Büyük dosyayı buluttan paylaşmak', 35),
     ('“Şifremi unuttum!”', 25), ('E-posta kutusu doldu!', 20), ('E-posta parkuru', 20)],
     'sekiz küçük görev', 12)))
 S.append(slide('Ders 1 · E-posta', 'İnternetten giden mektup', split(
@@ -1231,6 +1226,7 @@ S.append(slide('Ders 1 · E-posta', 'İnternetten giden mektup', split(
 S.append(slide('Ders 1 · E-posta', 'Okumak, yanıtlamak, göndermek', table([
     ['Okumak', 'Gelen Kutusu’nda postaya tıklayın: Elif’ten “Bayram fotoğrafı”'],
     ['⬇ İndir', 'Eki bilgisayara kaydeder (İndirilenler klasörü)'],
+    ['Kendi klasörüne taşı', 'İndirilenler’de bayram.jpg → ' + K('Ctrl', 'X') + ' → Resimler → ' + K('Ctrl', 'V')],
     ['↩ Yanıtla', 'Gönderene cevap; Kime ve Konu kendiliğinden dolar. Yazıp <b>➤ Gönder</b>'],
     ['✏ Yeni posta', 'Kime: <b>elif@ornek.com</b>, Konu: <b>Bahçemiz</b>, 📎 Dosya ekle → Resimler’den çiçekler.jpg → Aç → Gönder'],
     ['⚠ İstenmeyen', '“ACİL: Hesabınız askıya alındı!” gibi sahte postayı buraya. Bağlantısına tıklamayın']], 'kv') +
@@ -1258,7 +1254,7 @@ S.append(slide('Ders 4 · Kişiler, imza, istenmeyenler', 'E-postada düzen', ta
     ['Kime: ilk harfler', '<b>fat</b> yazınca kayıtlı adres önerilir'],
     ['⚙ Ayarlar → İmza', 'Her postanın sonuna kendiliğinden eklenen yazı: ad, telefon']], 'kv') +
     note('Gönderen adresine bakın: <b>.bel.tr</b> belediyelere verilir. Perşembe günkü su kesintisi postası gerçekti.')))
-S.append(slide('Ders 5–6 · Belgeler ve büyük dosyalar', 'İndir, taşı; sığmayanı buluttan paylaş', split(
+S.append(slide('Ders 1 ve 5 · Belgeler ve büyük dosyalar', 'İndir, taşı; sığmayanı buluttan paylaş', split(
     '<h2>Gelen belgeyi saklamak</h2>' + adim([
         'Postadaki eki <b>⬇ İndir</b>: önce İndirilenler’e düşer.',
         'Belgeler’de <b>Sağlık</b> klasörü açın (sağ tık → Yeni → Klasör).',
@@ -1271,7 +1267,7 @@ S.append(slide('Ders 5–6 · Belgeler ve büyük dosyalar', 'İndir, taşı; s�
         ['🔗 Paylaş', '👥 <b>Yalnızca eklediğim kişiler</b> + elif@ornek.com → Bağlantı oluştur'],
         ['⧉ Bağlantıyı kopyala', 'Postaya ' + K('Ctrl', 'V') + ' ile yapıştırıp gönderin'],
         ['🌐 Bağlantıya sahip herkes', 'Kişisel belgeler için kullanmayın']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 7 · Şifre sıfırlama', '“Şifremi unuttum!” Şimdi ne olacak?', split(
+S.append(slide('Ders 6 · Şifre sıfırlama', '“Şifremi unuttum!” Şimdi ne olacak?', split(
     adim(['Giriş sayfasında şifre kutusunun altındaki <b>Şifremi unuttum</b>.',
           'E-posta adresinizi yazıp <b>Kod gönder</b>.',
           'SMS’le gelen 6 haneli kodu yalnızca bu sayfaya yazın → <b>Doğrula</b>.',
@@ -1279,7 +1275,7 @@ S.append(slide('Ders 7 · Şifre sıfırlama', '“Şifremi unuttum!” Şimdi n
           'Yeni şifreyle giriş yapın.'], 'small'),
     note('Telefonla arayıp “size gelen kodu söyleyin” diyen <b>dolandırıcıdır</b>. Kodu kimseye söylemeyin.') +
     ul(['Şifre defteri evde güvenli bir yerde; her hesap için <b>farklı</b> şifre.'], 'small'), 1.15, .85)))
-S.append(slide('Ders 8 · E-posta kutusu doldu', 'Aramak, abonelikten çıkmak, yer açmak', split(
+S.append(slide('Ders 7 · E-posta kutusu doldu', 'Aramak, abonelikten çıkmak, yer açmak', split(
     table([['Arama kutusu', 'Konudaki, gönderendeki ya da yazıdaki bir kelime: <b>elektrik</b>'],
            ['ek:var', 'Yalnızca ekli postalar (Gmail’de: has:attachment)'],
            ['kimden:market', 'Bir kişinin ya da firmanın postaları (Gmail’de: from:)'],
@@ -1288,7 +1284,7 @@ S.append(slide('Ders 8 · E-posta kutusu doldu', 'Aramak, abonelikten çıkmak, 
     ul(['Ücretsiz kutular çoğunlukla 15 GB; dolarsa yeni postalar <b>ulaşmaz</b>.',
         'Silinen postalar Çöp Kutusu’nda 30 gün bekler: <b>Çöp Kutusunu şimdi boşalt</b>.',
         'Şüpheli postadaki “abonelikten çık” bağlantısına tıklamayın; İstenmeyen’e taşıyın.'], 'small'), 1.1, .9)))
-S.append(slide('Ders 9 · Tekrar', 'E-posta parkuru', ul([
+S.append(slide('Ders 8 · Tekrar', 'E-posta parkuru', ul([
     'Elif’in <b>Bayram fotoğrafı</b> postasını açın', 'Fotoğrafı indirin, <b>Resimler</b>’e taşıyın',
     'Hocanın postasını <b>yanıtlayın</b>', 'Eczanenin postasını Ahmet’e <b>iletin</b>; Elif <b>Bilgi (Cc)</b>',
     'Sahte postayı bulup <b>silin</b>', 'Su kesintisi duyurusunu Gelen Kutusu’na alın',
@@ -1461,9 +1457,9 @@ write('hafta10', '10. Hafta', 'Bilgisayar İşletmenliği – 10. Hafta Alışt�
 S = []
 S.append(cover('11. Hafta: Hesap tablosu (Excel)', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
 S.append(slide('Bu hafta', 'On altı ders', plan([
-    ('Hücreler ve formüller', 40), ('Biçim, sıralama, grafik', 35), ('Birleştir ve Ortala, #####', 30),
-    ('EĞER ve formül kopyalama', 40), ('Sabit başvuru, ETOPLA, filtre', 35), ('DÜŞEYARA', 35),
-    ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35), ('Tarihler, yaş, sayma işlevleri', 35), ('Alt Toplam', 35), ('Otomatik doldurma, dondurma', 30), ('Açılır liste ve aidat takibi', 35),
+    ('Hücreler ve formüller', 40), ('Biçim, sıralama, grafik', 35), ('Birleştir ve Ortala, #####, satır ekleme', 30),
+    ('Otomatik doldurma, dondurma', 30), ('EĞER ve formül kopyalama', 40), ('Sabit başvuru, ETOPLA, filtre', 35), ('DÜŞEYARA', 35),
+    ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35), ('Tarihler, yaş, sayma işlevleri', 35), ('Alt Toplam', 35), ('Açılır liste ve aidat takibi', 35),
     ('Çalışma sayfaları', 30), ('Excel’de yazdırma', 30), ('Ev bütçesi ve pasta grafiği', 35), ('Tablo parkuru', 25)],
     'on küçük görev', 17)))
 S.append(slide('Ders 1 · Hesap tablosu', 'Satır, sütun, hücre', split(
@@ -1482,8 +1478,9 @@ S.append(slide('Ders 2–3 · Biçim ve hücreler', 'Biçimlendirmek, sıralamak
     table([['Birleştir ve Ortala', 'Yan yana hücreleri tek hücre yapar, başlığı ortalar'],
            ['Metni Kaydır', 'Uzun yazı hücre içinde alt satıra iner'],
            ['#####', '<b>Hata değil</b>: sütun dar. Sütun başlığındaki çizgiye çift tıklayın'],
-           ['Sütun çizgisini sürükleyin', 'Sütunu elle genişletir']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 4 · EĞER ve kopyalama', 'Not çizelgesi: Geçti mi, kaldı mı?', table([
+           ['Sütun çizgisini sürükleyin', 'Sütunu elle genişletir'],
+           ['Satır numarasına sağ tık', '<b>Ekle</b>: üstüne boş satır · <b>Sil</b>: satırı kaldırır']], 'kv tight'), 1, 1)))
+S.append(slide('Ders 5 · EĞER ve kopyalama', 'Not çizelgesi: Geçti mi, kaldı mı?', table([
     ['Doldurma tutamacı', 'Seçili hücrenin sağ altındaki küçük kare: aşağı sürükleyince formülü kopyalar'],
     ['Göreli başvuru', 'Bir alt satıra kopyalanınca B2 → B3 olur'],
     ['=EĞER(D2>=50;"Geçti";"Kaldı")', 'Koşul doğruysa ilki, değilse ikincisi'],
@@ -1491,7 +1488,7 @@ S.append(slide('Ders 4 · EĞER ve kopyalama', 'Not çizelgesi: Geçti mi, kald�
     ['=EĞERSAY(E2:E7;"Geçti")', 'Koşula uyan hücreleri sayar'],
     ['=MAK(…) / =MİN(…)', 'En büyük / en küçük değer'],
     ['🎨 Koşullu Biçim', 'Belli değerdeki hücreleri kendiliğinden renklendirir']], 'kv tight')))
-S.append(slide('Ders 5–6 · Sabit başvuru ve DÜŞEYARA', 'Fatura listesi ve fiyat listesi', split(
+S.append(slide('Ders 6–7 · Sabit başvuru ve DÜŞEYARA', 'Fatura listesi ve fiyat listesi', split(
     table([['%20', 'Hücreye %20 yazılır, hesapta 0,2'],
            ['$B$1', 'Sabit başvuru: kopyalanınca B1 değişmez (gerçek Excel’de ' + K('F4') + ')'],
            ['=ETOPLA(B4:B9;"Market";D4:D9)', 'Kategorisi Market olanların toplamı'],
@@ -1500,7 +1497,7 @@ S.append(slide('Ders 5–6 · Sabit başvuru ve DÜŞEYARA', 'Fatura listesi ve 
         ['A2', 'Aranan ürün'], ['$F$2:$G$7', 'Fiyat listesi; aranan değer <b>ilk sütunda</b>'],
         ['2', 'Getirilecek değer 2. sütunda (fiyat)'], ['YANLIŞ', 'Tam eşleşme'],
         ['#YOK', 'Ürün listede yok ya da yanlış yazılmış']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 7 · Hatalar ve Özet Tablo', 'Hücrede hata kodu çıkınca', split(
+S.append(slide('Ders 8 · Hatalar ve Özet Tablo', 'Hücrede hata kodu çıkınca', split(
     table([['#DEĞER!', 'Sayı yerine yazı var (“iki yüz”): rakamla yazın'],
            ['#AD?', 'İşlevin adı yanlış: TOPLAM değil <b>TOPLA</b>'],
            ['#SAYI/0!', 'Sıfıra ya da boş hücreye bölünüyor: bölen hücreyi doldurun'],
@@ -1508,7 +1505,7 @@ S.append(slide('Ders 7 · Hatalar ve Özet Tablo', 'Hücrede hata kodu çıkınc
     table([['Ekle → 🧮 Özet Tablo', 'Uzun listeyi formülsüz özetler'],
            ['Satırlar', 'Neye göre gruplanacak'], ['Değerler', 'Neyin toplamı'],
            ['Ana liste değişirse', 'Özet tabloyu yeniden oluşturun']], 'kv'), 1, 1)))
-S.append(slide('Ders 8 · Yazı işlevleri ve koruma', 'Dağınık listeyi düzeltmek, sayfayı korumak', split(
+S.append(slide('Ders 9 · Yazı işlevleri ve koruma', 'Dağınık listeyi düzeltmek, sayfayı korumak', split(
     table([['=YAZIM.DÜZENİ(A2)', '“fatma nur” → “Fatma Nur”'], ['=BÜYÜKHARF(B2)', '“yılmaz” → “YILMAZ”'],
            ['=KÜÇÜKHARF(C2)', 'Hepsi küçük: e-posta adresleri için'],
            ['=BİRLEŞTİR(D2;" ";E2)', 'Ad ve soyadı yan yana; " " araya boşluk'],
@@ -1517,7 +1514,7 @@ S.append(slide('Ders 8 · Yazı işlevleri ve koruma', 'Dağınık listeyi düze
            ['🔓 Hücre Kilidini Aç', 'Koruma açıkken de yazılabilecek hücreler (Ödendi mi?)'],
            ['🔒 Sayfayı Koru', 'Öteki hücreler değiştirilemez; parolayı bir yere yazın'],
            ['Koruma ne değildir?', 'Dosyayı şifrelemez: açan herkes içini görür']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 9 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son ödeme, kaç kişi?', split(
+S.append(slide('Ders 10 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son ödeme, kaç kişi?', split(
     table([['12.04.1958', 'Tarih gün.ay.yıl, <b>noktayla</b> yazılır; Excel tanırsa sağa yaslar'],
            ['📅 · 123', 'Tarih aslında sayıdır: 1900’den bu yana geçen gün (21287)'],
            ['=BUGÜN()', 'Bugünün tarihi; her gün kendiliğinden yenilenir'],
@@ -1528,7 +1525,7 @@ S.append(slide('Ders 9 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son ö
            ['=BOŞLUKSAY(G2:G7)', 'Boş hücreleri sayar: kimin telefonu eksik?'],
            ['=YIL(MİN(B2:B7))', 'En eski tarihin yılı; AY() ayı, GÜN() günü verir'],
            ['_ (alt çizgi)', K('Shift', '-') + ': BAĞ_DEĞ_SAY yazarken']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 10 · Alt Toplam', 'Dernek harcamaları: her kalemin altına toplam', split(
+S.append(slide('Ders 11 · Alt Toplam', 'Dernek harcamaları: her kalemin altına toplam', split(
     table([['1. ↑ A→Z', 'Önce <b>Kategori</b> sütununa göre sıralayın: aynı kalemler alt alta'],
            ['2. 🔢 Alt Toplam', 'Excel’de: Veri sekmesi → Anahat → Alt Toplam'],
            ['Her değişiklikte', '<b>Kategori</b>: kalem değişince yeni grup başlar'],
@@ -1539,7 +1536,7 @@ S.append(slide('Ders 10 · Alt Toplam', 'Dernek harcamaları: her kalemin altın
                              ['Temizlik Toplam', '695 ₺'], ['Genel Toplam', '<b>5.785 ₺</b>']], 'tight') +
     note('Sol üstteki <b>1 2 3</b>: 1 yalnız genel toplam, 2 alt toplamlar, 3 bütün satırlar. '
          '<b>=ALTTOPLAM(9;D2:D4)</b>: 9 = topla. Başka alt toplamları saymaz; TOPLA ise iki kez toplar.'), 1, 1)))
-S.append(slide('Ders 11–13 · Pratik araçlar', 'Doldurma, açılır liste, sayfalar', split(
+S.append(slide('Ders 4, 12–13 · Pratik araçlar', 'Doldurma, açılır liste, sayfalar', split(
     table([['Doldurma tutamacı', 'Ocak → Şubat → Mart; 1, 2 seçip çekince 3, 4, 5…'],
            ['❄ Üst Satırı Dondur', 'Aşağı inerken başlık satırı yerinde kalır'],
            ['✔ Açılır Liste', 'Yalnızca belirlenen seçenekler: <b>Ödendi, Ödenmedi, Kısmen</b> (virgülle)'],
@@ -1586,6 +1583,7 @@ S.append(slide('Bu hafta', 'On iki ders', plan([
 S.append(slide('Ders 1 · Sunu hazırlayalım', 'Slaytlar ve slayt gösterisi', split(
     table([['Slayt', 'Sununun her bir sayfası'],
            ['Giriş → Yeni Slayt', 'Düzen seçerek slayt ekler: Başlık ve içerik…'],
+           ['Giriş → Yazı boyutu', 'Önce yazı kutusuna tıklayın, sonra punto seçin'],
            ['Tasarım', 'Bütün slaytların renk ve arka planı'],
            ['Geçişler', 'Bir slayttan ötekine geçerkenki hareket'],
            ['▲ / ▼', 'Seçili slaydın sırasını değiştirir']], 'kv'),
@@ -1594,7 +1592,7 @@ S.append(slide('Ders 1 · Sunu hazırlayalım', 'Slaytlar ve slayt gösterisi', 
     note('Sunuyu ' + K('Ctrl', 'S') + ' ile kaydedin.'), 1.2, .8)))
 S.append(slide('Ders 2 · İyi bir sunu', 'Az yazı, büyük yazı, zıt renk', table([
     ['Az yazı', 'Slayt başına en çok 3–5 kısa madde; konuşurken siz anlatın'],
-    ['Büyük yazı', 'Metin en az 24 punto, başlık 32–44 punto: arka sıradan okunmalı'],
+    ['Büyük yazı', 'Metin en az 24 punto, başlık 32–44 punto: arka sıradan okunmalı. Giriş → <b>Yazı boyutu</b>'],
     ['Zıt renk', 'Açık zemin + koyu yazı ya da tersi; sarı yazı beyaz zeminde okunmaz'],
     ['Tek fikir', 'Her slayt tek bir şey anlatsın'],
     ['Resim', 'Konuyla ilgili ve net olsun'],
@@ -1689,13 +1687,13 @@ write('hafta12', '12. Hafta', 'Bilgisayar İşletmenliği – 12. Hafta Alışt�
 # ================================================================ HAFTA 13
 S = []
 S.append(cover('13. Hafta: Günlük işler: bilgisayarda ve tarayıcıda', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On iki ders', plan([
-    ('Günlük işler: bilgisayarda', 35), ('Telefondan bilgisayara fotoğraf', 30), ('Günlük işler: tarayıcıda', 35),
+S.append(slide('Bu hafta', 'On bir ders', plan([
+    ('Günlük işler: tarayıcıda', 40), ('Telefondan bilgisayara fotoğraf', 30),
     ('Uzantılar, geçmiş, gizli pencere', 40), ('Sayfaya not, sık kullanılanlar', 25), ('Çerezler', 35),
     ('PDF dosyalarıyla çalışmak', 30), ('PDF formu doldurmak, yazdırmak', 40), ('Fotoğrafı küçültmek ve kırpmak', 25),
     ('Haritalar ve yol tarifi', 25), ('WhatsApp Web (Mesajlaş Web)', 35), ('Günlük işler parkuru', 25)],
     'sekiz küçük görev', 14)))
-S.append(slide('Ders 1–2 · Bilgisayarda', 'Ekran resmi, kopyalama, telefondan fotoğraf', split(
+S.append(slide('Ders 1–2 · Ekran resmi ve telefon', 'Ekran resmi, kopyalama, telefondan fotoğraf', split(
     table([['PrtSc (Print Screen)', 'Bütün ekranın resmi panoya; Paint’te ' + K('Ctrl', 'V')],
            [K('⊞', 'Shift', 'S'), 'İstediğiniz bölümün resmi (Ekran Alıntısı)'],
            [K('Ctrl', 'C') + ' → ' + K('Ctrl', 'V'), 'Kopyalar: aslı yerinde kalır'],
@@ -1706,14 +1704,14 @@ S.append(slide('Ders 1–2 · Bilgisayarda', 'Ekran resmi, kopyalama, telefondan
         'Telefondaki bildirimde <b>Dosya aktarımı</b>’nı seçin.',
         '<b>Telefonum › Dahili depolama › DCIM › Kamera</b>',
         'Fotoğrafı seçip ' + K('Ctrl', 'C') + ', Resimler’de ' + K('Ctrl', 'V') + '. Ya da <b>Fotoğrafları içeri aktar</b>.'], 'small'), 1, 1)))
-S.append(slide('Ders 3 · Tarayıcıda', 'İndirmek, kopyalamak, büyütmek', table([
+S.append(slide('Ders 1 · Tarayıcıda', 'İndirmek, kopyalamak, büyütmek', table([
     ['Resme sağ tık → Resmi farklı kaydet', 'Fotoğrafı istediğiniz klasöre kaydeder'],
     ['İndir düğmesi', 'Dosya İndirilenler klasörüne gider'],
     ['Yazıyı seç → ' + K('Ctrl', 'C'), 'Not Defteri’nde ' + K('Ctrl', 'V')],
     [K('Ctrl', 'Shift', 'S') + ' / ✂', 'Web yakalama: yalnızca sayfanın resmi'],
     [K('Ctrl', '+') + ' · ' + K('Ctrl', '−') + ' · ' + K('Ctrl', '0'), 'Büyüt · küçült · eski hâline getir'],
     ['☆ / ' + K('Ctrl', 'D'), 'Sayfayı sık kullanılanlara ekler']], 'kv')))
-S.append(slide('Ders 4–5 · Tarayıcı ayarları', 'Uzantılar, geçmiş, gizli pencere, not', split(
+S.append(slide('Ders 3–4 · Tarayıcı ayarları', 'Uzantılar, geçmiş, gizli pencere, not', split(
     table([['🧩 → Yeni uzantılar bul', 'Uzantı mağazası'],
            ['Eklemeden önce', 'Doğrulanmış yayımcı ✔, kullanıcı sayısı, puan, izinler'],
            ['⋯ → Uzantılar', 'Kapatmak ve kaldırmak'],
@@ -1723,14 +1721,14 @@ S.append(slide('Ders 4–5 · Tarayıcı ayarları', 'Uzantılar, geçmiş, gizl
            [K('Ctrl', 'F'), 'Sayfada bul: uzun sayfada bir kelime'],
            ['🗒 Yapışkan Not uzantısı', 'Sayfaya kendinize not; not sayfaya göre saklanır'],
            [K('Ctrl', 'Shift', 'B'), 'Sık kullanılanlar çubuğunu göster / gizle']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 6 · Çerezler', 'Sizi hatırlayan küçük notlar', table([
+S.append(slide('Ders 5 · Çerezler', 'Sizi hatırlayan küçük notlar', table([
     ['Çerez', 'Sitenin tarayıcınıza bıraktığı küçük not: giriş, sepet, tercihler'],
     ['Birinci taraf', 'Gezdiğiniz sitenin kendi çerezi: çoğu zaman yararlı'],
     ['Üçüncü taraf', 'Sayfaya gömülü reklam şirketinin çerezi: sizi siteden siteye izler'],
     ['Çerez penceresi', '“Yalnızca gerekli olanlar” en güvenlisi; “Tümünü kabul et” izlemeye de izin verir'],
     ['Görmek, silmek', '⋯ → Ayarlar → Çerezler. Silince siteler sizi unutur: girişler, sepetler gider'],
     ['Ortak bilgisayar', 'Çıkış yapın; gerekirse verileri silin ya da gizli pencere kullanın']], 'kv')))
-S.append(slide('Ders 7–8 · PDF', 'Okumak, doldurmak, yazdırmak', split(
+S.append(slide('Ders 6–7 · PDF', 'Okumak, doldurmak, yazdırmak', split(
     table([['PDF', 'Fatura, tahlil, resmî yazı: her bilgisayarda aynı görünür; yazısı değiştirilemez'],
            ['◀ ▶ · 🔍 (' + K('Ctrl', 'F') + ')', 'Sayfalar arasında gezinmek · kelime aramak'],
            ['⟳ Döndür', 'Yan taranmış sayfayı düzeltir'],
@@ -1740,14 +1738,14 @@ S.append(slide('Ders 7–8 · PDF', 'Okumak, doldurmak, yazdırmak', split(
            ['💾 Kaydet', 'Doldurulmuş hâli yeni dosya; asıl form bozulmaz'],
            ['Yazdırma → Sayfalar', 'Yalnızca gereken sayfa: kâğıt ve mürekkep tasarrufu'],
            ['Kopya, iki yüz, renk', 'Kopya sayısı, iki yüze yazdırma, siyah-beyaz']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 9 · Fotoğrafı küçültmek', '“2 MB’den büyük olamaz” hatası', split(
+S.append(slide('Ders 8 · Fotoğrafı küçültmek', '“2 MB’den büyük olamaz” hatası', split(
     adim(['Paint’te fotoğrafı açın.', '<b>⤡ Yeniden boyutlandır</b> → Yüzde: <b>50</b>; “En boy oranını koru” açık kalsın.',
           'Vesikalık için <b>⬚ Seç</b> ile yüzün çevresine dik bir dikdörtgen → <b>✂ Kırp</b>.',
           '<b>Farklı kaydet</b>: küçük kopya yeni adla; asıl fotoğraf bozulmasın.']),
     ul(['Telefon fotoğrafı 4000 × 3000 = 12 milyon nokta; yarıya inince dosya yaklaşık <b>dörtte birine</b> iner.',
         'Paint’in altında piksel boyutu ve MB yazar.', 'Yanlış kırptıysanız ' + K('Ctrl', 'Z') + '.',
         'Fotoğraflar uygulamasında: ⋯ → Resmi yeniden boyutlandır.'], 'small'), 1.1, .9)))
-S.append(slide('Ders 10–11 · Harita ve mesajlaşma', 'Yol tarifi ve bilgisayarda WhatsApp', split(
+S.append(slide('Ders 9–10 · Harita ve mesajlaşma', 'Yol tarifi ve bilgisayarda WhatsApp', split(
     table([['Arama kutusu', '“hastane”, “Menekşe Sokak 8”'], ['＋ / －', 'Yakınlaştır / uzaklaştır'],
            ['🛰 Uydu · 🗺 Harita', 'Yukarıdan fotoğraf · haritaya dönüş'],
            ['➜ Yol tarifi', 'Nereden – Nereye; 🚶 yürüyerek, 🚌 toplu taşıma, 🚗 arabayla'],
@@ -1759,7 +1757,7 @@ S.append(slide('Ders 10–11 · Harita ve mesajlaşma', 'Yol tarifi ve bilgisaya
            ['⋮ → Oturumu kapat', 'Ortak bilgisayarda iş bitince <b>mutlaka</b>'],
            ['Tanımadığınız numara + bağlantı', 'Tıklamayın; doğrulama istemek dolandırıcılıktır']], 'kv tight') +
     note('Alıştırmadaki site: <b>Mesajlaş Web</b>.'), 1, 1)))
-S.append(slide('Ders 12 · Tekrar', 'Günlük işler parkuru', ul([
+S.append(slide('Ders 11 · Tekrar', 'Günlük işler parkuru', ul([
     'Haritalar’da evinizden <b>Kültür Merkezi</b>’ne otobüsle yol tarifi', 'Ekranın resmini alın',
     'Paint’e yapıştırıp Resimler’e <b>yol tarifi</b> adıyla kaydedin', '<b>elektrik faturası.pdf</b>: son ödeme tarihini bulun',
     'Yalnızca o sayfayı yazdırın', 'Mesajlaş Web’i açıp telefonla bağlanın', 'Faturayı Ahmet’e gönderin',

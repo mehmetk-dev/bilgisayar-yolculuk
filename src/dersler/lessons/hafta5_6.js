@@ -3,14 +3,17 @@
 import { K, desktopReady, put, PIC } from './common.js';
 
 export const masaustu = {
-  id: 'masaustu', icon: '🖥', title: 'Masaüstü, Başlat ve görev çubuğu', minutes: 20, stage: 'desktop',
-  desc: 'Programları açmak, görev çubuğu, Alt+Tab, ses simgesi.',
+  id: 'masaustu', icon: '🖥', title: 'Masaüstü, Başlat ve görev çubuğu', minutes: 25, stage: 'desktop',
+  desc: 'Programları açmak, Başlat\'ta ve görev çubuğunda arama, Alt+Tab, ses simgesi.',
   summary: [
     ['⊞ Başlat', 'Bütün programlar; açınca hemen yazarak arayabilirsiniz'],
+    ['Esc', 'Başlat\'ı ve açılan menüleri kapatır'],
+    ['🔍 Ara', 'Görev çubuğundan doğrudan arama'],
     ['Görev çubuğu', 'Açık programlar: tıklayınca öne gelir ya da küçülür'],
     ['Sağ alt köşe', 'Masaüstünü göster'],
     ['Alt + Tab', 'Açık pencereler arasında geç'],
     ['🔊 / 📶 simgeleri', 'Ses düzeyi ve Wi-Fi'],
+    ['⊞ + E / ⊞ + D', 'Gerçek bilgisayarda Dosya Gezgini / masaüstünü göster'],
   ],
   steps: [
     {
@@ -26,6 +29,15 @@ export const masaustu = {
       done: 'Masaüstünde simgesi olmayan programları da Başlat menüsünde bulursunuz.',
     },
     {
+      title: 'Açıp Esc ile kapatmak',
+      html: `<p>⊞ <b>Başlat</b>'ı açın, sonra klavyedeki ${K('Esc')} tuşuyla kapatın.</p>`,
+      on: (ev, c) => {
+        if (ev.type === 'start' && ev.open) { c.s.o = true; c.note('Açıldı. Şimdi Esc.'); }
+        return !!c.s.o && ev.type === 'start' && !ev.open;
+      },
+      done: 'Esc, açılan menüleri kapatmanın en kolay yoludur. Başlat\'a bir kez daha tıklamak da kapatır.',
+    },
+    {
       title: 'Yazarak arayın',
       html: `<p>Programı aramanın en kolay yolu: <b>Başlat'ı açın ve hemen yazın</b>.</p><ol class="steps"><li>⊞ Başlat'a tıklayın.</li><li>Klavyeden <b>hesap</b> yazın.</li><li>${K('Enter')}'a basın.</li></ol>`,
       on: (ev, c) => {
@@ -35,8 +47,14 @@ export const masaustu = {
       done: 'Gerçek bilgisayarda da ⊞ tuşuna basıp yazmaya başlamak en hızlı yoldur.',
     },
     {
+      title: 'Görev çubuğundan arama',
+      html: '<p>Başlat\'ın yanındaki <b>🔍 Ara</b> kutusuna tıklayın, <b>fotoğraf</b> yazıp <b>Fotoğraflar</b> uygulamasını açın.</p>',
+      on: (ev) => ev.type === 'start-open' && ev.app === 'photos',
+      done: 'Arama kutusu Başlat\'la aynı işi yapar. Programın tam adını bilmeseniz de ne işe yaradığını yazarak bulabilirsiniz.',
+    },
+    {
       title: 'Görev çubuğu',
-      html: '<p>Şimdi iki program açık. Görev çubuğunda simgelerinin altında küçük bir çizgi var. <b>🎨 Paint</b> simgesine tıklayın: Paint öne gelir.</p>',
+      html: '<p>Şimdi birkaç program açık. Görev çubuğunda simgelerinin altında küçük bir çizgi var. <b>🎨 Paint</b> simgesine tıklayın: Paint öne gelir.</p>',
       setup: (c) => { c.d.ensure('paint'); c.d.ensure('calc'); },
       on: (ev) => ev.type === 'taskbar-click' && ev.app === 'paint',
       done: 'Öndeki programın simgesine bir daha tıklarsanız o program küçülür.',
@@ -77,6 +95,11 @@ export const masaustu = {
       setup: (c) => c.d.closeMenus(),
       check: (c) => !c.d.wins.length,
       on: (ev, c) => ev.type === 'win-close' && !c.d.wins.length,
+    },
+    {
+      title: 'Gerçek bilgisayarda: ⊞ Windows tuşu',
+      html: `<p>Gerçek Windows'ta Başlat'ı açmanın en kısa yolu klavyedeki ${K('⊞ Windows')} tuşudur (Ctrl ile Alt arasında). Birkaç kısayol daha:</p>
+        <ul class="big-list"><li>${K('⊞', 'E')}: Dosya Gezgini</li><li>${K('⊞', 'I')}: Ayarlar</li><li>${K('⊞', 'D')}: Masaüstünü göster</li><li>${K('⊞', 'L')}: Bilgisayarı kilitle (kalkarken)</li></ul>`,
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Masaüstünü, Başlat menüsünü ve görev çubuğunu öğrendiniz.</p>' },
   ],

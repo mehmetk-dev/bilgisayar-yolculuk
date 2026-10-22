@@ -11,10 +11,11 @@ const GUNLUK = 'Bugün hava çok güzel.\nParkta uzun bir yürüyüş yaptık.\n
 
 export const secme = {
   id: 'secme', icon: '🖍', title: 'Seçmenin incelikleri', minutes: 25, stage: 'notepad',
-  desc: 'Sürükleyerek seçme, Shift + ok, üç kez tıklama, Ctrl + ok.',
+  desc: 'Sürükleyerek seçme, Shift + tık, Shift + ok, üç kez tıklama, Ctrl + ok.',
   setup: preload(GUNLUK),
   summary: [
     ['Sürüklemek', 'Sol tuş basılı, yazının üzerinden geçin'],
+    ['Tık, sonra Shift + tık', 'Uzun bir yazıyı baştan sona seçer'],
     ['Shift + → / ←', 'Harf harf seçer'],
     ['Shift + End / Home', 'İmleçten satır sonuna / başına kadar seçer'],
     ['Üç kez tıklama', 'Bütün satırı seçer'],
@@ -34,6 +35,15 @@ export const secme = {
       hint: 'Fazla ya da eksik seçerseniz boş bir yere tıklayıp yeniden deneyin. Noktayı seçmeseniz de olur.',
       on: (ev) => ev.type === 'select' && norm(ev.text) === 'hava çok güzel',
       done: 'İstediğiniz kadarını seçebiliyorsunuz.',
+    },
+    {
+      title: 'Shift + tık',
+      html: `<p>Uzun bir yazıyı sürüklemek zordur; el kayar. Daha kolay yolu:</p><ol class="steps"><li>Seçimin <b>başına</b> tıklayın: <b>Bugün</b>'ün önü.</li><li>${K('Shift')} tuşunu <b>basılı tutun</b>.</li><li>Seçimin <b>sonuna</b> tıklayın: 2. satırdaki <b>yaptık.</b>'ın sonu.</li></ol><p>Aradaki her şey seçilir.</p>`,
+      mouse: '🖱 Tık · Shift basılı · tık',
+      combo: ['Shift'],
+      hint: 'Yanlış seçerseniz boş bir yere tıklayıp baştan başlayın. Noktayı seçmeseniz de olur.',
+      on: (ev) => ev.type === 'select' && /^bugün/i.test(ev.text.trim()) && /yaptık\.?$/i.test(ev.text.trim()) && !ev.text.includes('Akşam'),
+      done: 'İki satır birden seçildi. Sayfalarca yazıda da aynı yol işe yarar: başa tık, sona Shift + tık.',
     },
     {
       title: 'Shift + ok',

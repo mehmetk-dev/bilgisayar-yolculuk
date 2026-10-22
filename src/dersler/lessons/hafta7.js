@@ -114,12 +114,14 @@ export const paint = {
 };
 
 export const alinti = {
-  id: 'alinti', icon: '✂', title: 'Ekran Alıntısı', minutes: 15, stage: 'desktop',
-  desc: 'Ekranın bir bölümünü resim olarak almak, Paint\'e yapıştırmak ve kaydetmek.',
+  id: 'alinti', icon: '✂', title: 'Ekran Alıntısı', minutes: 20, stage: 'desktop',
+  desc: 'Ekranın bir bölümünü resim olarak almak, Paint\'e yapıştırıp işaretlemek, kaydetmek ve yardım isterken göndermek.',
   summary: [
     ['⊞ + Shift + S', 'Gerçek bilgisayarda Ekran Alıntısı kısayolu'],
     ['Print Screen (PrtSc)', 'Bütün ekranı panoya alır'],
     ['Ctrl + V', 'Alınan resmi Paint\'e, WhatsApp\'a, e-postaya yapıştırır'],
+    ['Kırmızı daire', 'Paint\'te sorunlu yeri gösterir'],
+    ['Dikkat', 'Şifre, kart numarası görünen ekranların resmini paylaşmayın'],
   ],
   steps: [
     {
@@ -147,7 +149,17 @@ export const alinti = {
       html: `<p>Paint\'i açın ve ${K('Ctrl', 'V')}'ye basın (ya da 📋 düğmesi).</p>`,
       combo: ['Ctrl', 'KeyV'],
       on: (ev) => ev.type === 'paint-paste',
-      done: 'Alıntı Paint\'te! İsterseniz üzerine çizebilir, yazı ekleyebilirsiniz.',
+      done: 'Alıntı Paint\'te!',
+    },
+    {
+      title: 'Önemli yeri işaretleyin',
+      html: '<p>Resmi birine gösterirken önemli yeri işaretlemek işi kolaylaştırır. <b>Kırmızı</b> rengi ve <b>◯ Elips</b> aracını seçip bugünkü sıcaklığın çevresine bir daire çizin.</p>',
+      on: (ev, c) => {
+        if (ev.type !== 'paint-shape' || ev.shape !== 'ellipse') return false;
+        if (ev.colorName !== 'Kırmızı') { c.note(`Daire ${ev.colorName.toLowerCase()} oldu. Kırmızı daha dikkat çeker: Ctrl + Z, kırmızıyı seçip yeniden çizin.`); return false; }
+        return true;
+      },
+      done: 'Bakan kişi neyi göstermek istediğinizi hemen görür. Bir hata mesajının resmini torununuza gönderirken de böyle yapabilirsiniz.',
     },
     {
       title: 'Kaydedin',
@@ -157,7 +169,8 @@ export const alinti = {
     },
     {
       title: 'Gerçek bilgisayarda',
-      html: `<ol class="steps"><li>${K('⊞', 'Shift', 'S')}'ye birlikte basın.</li><li>Ekran kararınca istediğiniz yeri çerçeveleyin.</li><li>Sonra WhatsApp\'ta, e-postada ya da Paint\'te ${K('Ctrl', 'V')} yapın.</li></ol>`,
+      html: `<ol class="steps"><li>${K('⊞', 'Shift', 'S')}'ye birlikte basın.</li><li>Ekran kararınca istediğiniz yeri çerçeveleyin.</li><li>Sonra WhatsApp\'ta, e-postada ya da Paint\'te ${K('Ctrl', 'V')} yapın.</li><li>Yardım istiyorsanız altına kısaca ne yapmaya çalıştığınızı yazın.</li></ol>
+        <div class="box">⚠ Ekranda şifre, kart numarası ya da kimlik bilgisi görünüyorsa o resmi kimseyle paylaşmayın.</div>`,
       manual: '✔ Anladım',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Ekran alıntısı almayı öğrendiniz.</p>' },
@@ -165,8 +178,8 @@ export const alinti = {
 };
 
 export const ayarlar = {
-  id: 'ayarlar', icon: '⚙', title: 'Ayarlar', minutes: 25, stage: 'desktop',
-  desc: 'Arka plan, ses, Wi-Fi\'ye bağlanma, saati düzeltme ve yazı boyutunu büyütme.',
+  id: 'ayarlar', icon: '⚙', title: 'Ayarlar', minutes: 30, stage: 'desktop',
+  desc: 'Arka plan, ses, parlaklık, Wi-Fi\'ye bağlanma, saati ve saat dilimini düzeltme, yazı boyutu, güncelleştirmeler.',
   desktop: { settings: { wifi: false, network: null, autoTime: false, timeOffset: -(2 * 3600e3 + 17 * 60e3) } },
   summary: [
     ['Ayarlar → Kişiselleştirme', 'Arka plan, açık/koyu mod'],
@@ -174,6 +187,7 @@ export const ayarlar = {
     ['Ayarlar → Ağ ve İnternet', 'Wi-Fi açma, ağa bağlanma (şifre modemin altında)'],
     ['Ayarlar → Saat ve dil', '“Saati otomatik olarak ayarla” açık olmalı'],
     ['Ayarlar → Erişilebilirlik', 'Metin boyutu: yazıları büyütür'],
+    ['Ayarlar → Windows Update', 'Güncelleştirmeleri denetle; ertelemeyin'],
     ['⊞ + I', 'Gerçek bilgisayarda Ayarlar\'ı açar'],
   ],
   steps: [
@@ -226,6 +240,13 @@ export const ayarlar = {
       done: 'Bilgisayardan ses gelmediğinde önce “sessiz”in açık olup olmadığına bakın.',
     },
     {
+      title: 'Ekran parlaklığı',
+      html: '<p>Aynı sayfada <b>Ekran</b> bölümündeki <b>☀ Parlaklık</b> çubuğunu <b>60 ile 80 arasına</b> getirin.</p>',
+      setup: (c) => { const w = c.d.ensure('settings'); w.api.go('system'); },
+      on: (ev, c) => ev.type === 'setting' && ev.key === 'brightness' && c.d.settings.brightness >= 60 && c.d.settings.brightness <= 80,
+      done: 'Parlaklık odaya uygun olmalı: karanlık odada çok parlak ekran gözü yorar. Dizüstünde klavyedeki ☀ tuşları da (çoğu zaman Fn ile) aynı işi yapar.',
+    },
+    {
       title: 'Wi-Fi\'yi açın',
       html: '<p>Soldan <b>📶 Ağ ve İnternet</b>\'e gidin. <b>Wi-Fi</b> anahtarı kapalı: tıklayıp açın.</p>',
       setup: (c) => c.d.ensure('settings'),
@@ -259,11 +280,28 @@ export const ayarlar = {
       done: 'Saat düzeldi. Saat yanlışsa bazı internet siteleri açılmayabilir; bu ayar hep açık kalsın.',
     },
     {
+      title: 'Saat dilimi',
+      html: '<p>Londra\'daki yakınınızın saatini merak ettiniz. Aynı sayfadaki <b>Saat dilimi</b> listesinden <b>Londra</b>\'yı seçin, sağ alttaki saatin değiştiğini görün, sonra yeniden <b>İstanbul</b> yapın.</p>',
+      setup: (c) => { const w = c.d.ensure('settings'); w.api.go('time'); },
+      on: (ev, c) => {
+        if (ev.type === 'tz' && /Londra/.test(ev.tz)) { c.s.l = true; c.note('Sağ alttaki saat geri gitti. Şimdi yeniden İstanbul.'); }
+        return !!c.s.l && ev.type === 'tz' && /İstanbul/.test(ev.tz);
+      },
+      done: 'Saat yanlış gösteriyorsa bir sebebi de yanlış saat dilimidir. Türkiye için <b>İstanbul</b> seçili olmalı.',
+    },
+    {
       title: 'Yazıları büyütün',
       html: '<p>Soldan <b>♿ Erişilebilirlik</b>\'e gidin. <b>Metin boyutu</b> çubuğunu <b>%130</b>\'a getirip <b>Uygula</b>\'ya tıklayın.</p>',
       setup: (c) => c.d.ensure('settings'),
       on: (ev) => ev.type === 'text-scale' && ev.value >= 120,
       done: 'Bütün yazılar büyüdü. Gözünüzü yormayan boyutu seçebilirsiniz.',
+    },
+    {
+      title: 'Güncelleştirmeler',
+      html: '<p>Soldan <b>🔄 Windows Update</b>\'e gidin ve <b>Güncelleştirmeleri denetle</b>\'ye tıklayın.</p>',
+      setup: (c) => c.d.ensure('settings'),
+      on: (ev) => ev.type === 'update-check',
+      done: 'Güncelleştirmeler güvenlik açıklarını kapatır; ertelemeyin. Bilgisayar “yeniden başlatılması gerekiyor” derse işiniz bitince yeniden başlatın.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Ayarlar\'ı kullanmayı öğrendiniz.</p>' },
   ],

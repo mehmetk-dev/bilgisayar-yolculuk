@@ -7,13 +7,14 @@ const mailOpen = (c) => maxed(c, 'mail');
 const ownText = (body) => body.split(/\n--- /)[0].trim();
 
 export const eposta = {
-  id: 'eposta', icon: '✉', title: 'E-posta: okuma, yanıtlama, ek', minutes: 35, stage: 'desktop',
-  desc: 'Postayı okumak, yanıtlamak, eki indirmek, yeni posta göndermek.',
+  id: 'eposta', icon: '✉', title: 'E-posta: okuma, yanıtlama, ek', minutes: 40, stage: 'desktop',
+  desc: 'Postayı okumak, yanıtlamak, eki indirip kendi klasörünüze taşımak, yeni posta göndermek.',
   summary: [
     ['E-posta adresi', 'ad@ornek.com: Türkçe harf ve boşluk olmaz; @ için AltGr + Q'],
     ['Kalın yazılı posta', 'Henüz okunmamış'],
     ['📎', 'Postada ek (dosya) var'],
     ['⬇ İndir', 'Eki bilgisayara kaydeder (İndirilenler klasörü)'],
+    ['İndirilenler', 'Her indirme önce buraya düşer; önemli belgeyi kendi klasörünüze taşıyın'],
     ['↩ Yanıtla', 'Gönderene cevap; Kime kutusu kendiliğinden dolar'],
     ['↪ İlet', 'Postayı başka birine gönder'],
     ['📎 Dosya ekle', 'Postaya fotoğraf ya da belge ekler'],
@@ -54,10 +55,26 @@ export const eposta = {
       html: '<p>Postanın altındaki fotoğrafın yanında <b>⬇ İndir</b> düğmesine tıklayın. Fotoğraf bilgisayarınıza kaydedilir.</p>',
       mouse: '🖱 ⬇ İndir',
       on: (ev) => ev.type === 'mail-download',
-      done: 'Fotoğraf <b>İndirilenler</b> klasörüne kaydedildi. Dosya Gezgini\'nden açabilirsiniz.',
+      done: 'Fotoğraf <b>İndirilenler</b> klasörüne kaydedildi.',
+    },
+    {
+      title: 'Kendi klasörünüze taşıyın',
+      html: `<p>İndirdiğiniz her dosya önce <b>İndirilenler</b> klasörüne düşer. Zamanla orası dolar, aradığınızı bulamazsınız. Önemli dosyayı hemen <b>kendi klasörüne</b> taşıyın.</p>
+        <p>Açılan Dosya Gezgini'nde <b>bayram.jpg</b>'ye tıklayın, ${K('Ctrl', 'X')} (kes). Soldan <b>Resimler</b>'e girip ${K('Ctrl', 'V')} (yapıştır). Ya da dosyayı fareyle soldaki <b>Resimler</b>'in üzerine sürükleyin.</p>`,
+      hint: 'Kopyala (Ctrl + C) değil Kes (Ctrl + X): taşıyınca dosya İndirilenler\'de kalmaz.',
+      setup: (c) => { const w = c.d.ensure('explorer', { folder: 'downloads' }); w.api?.go?.('downloads'); },
+      on: (ev, c) => {
+        if (!['fs', 'file-paste', 'drop'].includes(ev.type)) return false;
+        const inPics = c.d.fs.children('pictures').some((f) => /^bayram/i.test(f.name));
+        const inDownloads = c.d.fs.children('downloads').some((f) => /^bayram/i.test(f.name));
+        if (inPics && inDownloads) c.note('Dosya iki yerde duruyor: kopyaladınız. İndirilenler\'deki asıl dosyayı silin ya da baştan Kes (Ctrl + X) ile deneyin.');
+        return inPics && !inDownloads;
+      },
+      done: 'Fotoğraf artık <b>Resimler</b>\'de. Faturalar, tahlil sonuçları için de <b>Faturalar</b>, <b>Sağlık</b> gibi klasörler açıp aynı şekilde taşıyabilirsiniz. Dosya Gezgini\'ni kapatın.',
     },
     {
       title: 'Yanıtlayın',
+      setup: mailOpen,
       html: `<ol class="steps"><li>Üstteki <b>↩ Yanıtla</b> düğmesine tıklayın. <b>Kime</b> ve <b>Konu</b> kendiliğinden dolar.</li>
         <li>Büyük beyaz alanın <b>en üstüne</b> kısa bir cevap yazın, örneğin: <b>Teşekkürler Elif, fotoğraf çok güzel!</b></li>
         <li><b>➤ Gönder</b>'e tıklayın.</li></ol>`,

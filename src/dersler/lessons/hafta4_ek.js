@@ -117,8 +117,8 @@ export const portlar = {
 };
 
 export const bakim = {
-  id: 'bakim', icon: '🧹', title: 'Bakım ve sağlıklı kullanım', minutes: 20, stage: 'scene',
-  desc: 'Bilgisayarı temiz tutmak, doğru oturuş ve göz sağlığı (20-20-20).',
+  id: 'bakim', icon: '🧹', title: 'Bakım, sağlıklı ve güvenli kullanım', minutes: 25, stage: 'scene',
+  desc: 'Bilgisayarı temiz tutmak, doğru oturuş ve göz sağlığı (20-20-20), kablolar, priz ve acil durum.',
   summary: [
     ['Ekran temizliği', 'Kapalıyken, kuru ya da hafif nemli yumuşak bezle'],
     ['Havalandırma', 'Deliklerin önü açık; dizüstü sert yüzeyde'],
@@ -127,6 +127,9 @@ export const bakim = {
     ['Oturuş', 'Ekran bir kol boyu uzakta, göz hizasının biraz altında'],
     ['20-20-20', '20 dakikada bir, 20 saniye, uzağa bakın'],
     ['Sıvı döküldüyse', 'Hemen kapatıp fişi çekin, ters çevirip kurutun'],
+    ['Kablolar', 'Yürüme yolunda olmasın; prizi aşırı yüklemeyin'],
+    ['Kasa', 'Kendiniz açmayın; parça takılacaksa servise götürün'],
+    ['Elektrik yangını', 'Su dökülmez! Elektriği kesin; söndürülemiyorsa çıkın, 112'],
   ],
   steps: [
     {
@@ -163,6 +166,30 @@ export const bakim = {
     sec({ title: 'Dökülen çay', text: '<div class="qz-pic">🍵 ➜ ⌨</div>', q: 'Dizüstü bilgisayarın klavyesine çay döküldü. Ne yaparsınız?', opts: ['Kuruması için saç kurutma makinesinin en sıcak ayarıyla kuruturum', 'Hemen kapatıp fişini çekerim, ters çevirip en az bir gün kurumaya bırakırım', 'Silip kullanmaya devam ederim'], ok: 1, why: 'Elektrik varken sıvı kısa devre yapar. Kapatıp kurutun; sıcak hava parçalara zarar verebilir. Şüphedeyseniz servise götürün.' }),
     sec({ title: 'Isınan dizüstü', text: '<div class="qz-pic">💻 🔥</div>', q: 'Dizüstü bilgisayar çok ısınıyor, fan sürekli yüksek sesle dönüyor. İlk ne yaparsınız?', opts: ['Masa gibi sert bir yüzeye koyar, havalandırmanın önünü açarım', 'Buzdolabına koyarım', 'Fanın deliğini bantla kapatırım'], ok: 0, why: 'Yumuşak yüzeyler havalandırmayı kapatır. Sorun sürerse içindeki tozun temizletilmesi gerekebilir.' }),
     sec({ title: 'Fırtına', text: '<div class="qz-pic">⛈ ⚡</div>', q: 'Şimşekli bir fırtına var, elektrik gidip geliyor. Ne yaparsınız?', opts: ['Bilgisayarı kapatıp fişini çekerim', 'Çalışmaya devam ederim', 'Ekranı kapatırım, kasa açık kalabilir'], ok: 0, why: 'Elektrik dalgalanmaları parçaları bozabilir. Akım korumalı priz (uzatma) de koruma sağlar.' }),
+    sec({
+      title: 'Kablolar', text: '<div class="qz-pic">🔌〰️🚶</div>',
+      q: 'Bilgisayarın kabloları yürüme yolunun ortasından geçiyor. Ne yapmalı?',
+      opts: ['Önemli değil, dikkat ederim', 'Kabloları kenardan, masanın arkasından geçiririm; gerekiyorsa kablo kanalı kullanırım', 'Üzerine halı sererim'], ok: 1,
+      why: 'Kabloya takılan biri hem düşer hem de bilgisayarı devirebilir. Halının altındaki kablo ezilip ısınabilir. Tek prize çoklu uzatmalarla çok cihaz takmayın.',
+    }),
+    sec({
+      title: 'Kasayı açmak', text: '<div class="qz-pic">🖥 🔧</div>',
+      q: 'Bilgisayara yeni bir parça (ör. bellek) taktırmak istiyorsunuz. Ne yaparsınız?',
+      opts: ['Kasayı kendim açarım, fişi takılı kalabilir', 'Bilgisayarı bir servise ya da bilen birine götürürüm; kasayı kendim açmam', 'İçini ıslak bezle silip parçayı takarım'], ok: 1,
+      why: 'Kasanın içi elektrik ve hassas parçalarla doludur; yanlış dokunuş parçayı bozabilir. Açacak kişi de önce bilgisayarı kapatır, fişini çeker ve metal bir yere dokunup statik elektriğini boşaltır.',
+    }),
+    sec({
+      title: 'Prizden duman', text: '<div class="qz-pic">🔌💨🔥</div>',
+      q: 'Bilgisayarın prizinden duman ve küçük bir alev çıkıyor. Ne yaparsınız?',
+      opts: ['Hemen üzerine su dökerim', 'Güvenliyse sigortayı kapatır ya da fişi çekerim; karbondioksitli ya da kuru kimyevi tozlu yangın söndürücü kullanırım; büyürse 112\'yi ararım', 'Bilgisayarı kaydedip kapatmaya çalışırım'], ok: 1,
+      why: 'Elektrik yangınına <b>asla su dökülmez</b>: elektrik çarpar. Önce elektriği kesin. Söndürülemiyorsa ortamı terk edip 112\'yi arayın.',
+    }),
+    sec({
+      title: 'Acil durum', text: '<div class="qz-pic">🚨🏃🚪</div>',
+      q: 'Kurstayken yangın alarmı çaldı. Ne yaparsınız?',
+      opts: ['Çalışmamı kaydetmeden çıkmam', 'Eşyalarla uğraşmadan, sakin şekilde en yakın acil çıkıştan çıkıp toplanma alanına giderim; asansör kullanmam', 'Asansörle hızlıca inerim'], ok: 1,
+      why: 'Dosya yeniden yazılır, can geri gelmez. Acil çıkış ve toplanma alanının yerini her ortamda önceden öğrenin.',
+    }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Hem bilgisayarınıza hem kendinize iyi bakacaksınız:</p>', scene: info('<div class="sc-big">🧹🧘</div>') },
   ],
 };
