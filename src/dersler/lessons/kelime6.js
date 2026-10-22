@@ -9,7 +9,7 @@ const HTML = `<p style="text-align:center"><span style="font-size:20pt"><b>ÇINA
 <p style="text-align:center">Kasım 2026 · Sayı 14</p>
 <p><b>Bahar gezisi için kayıtlar başladı.</b> Nisan ayında Bursa'ya iki günlük bir gezi düzenliyoruz. Otobüs, otel ve kahvaltı ücrete dahildir. Ayrıntılar dernek panosunda.</p>
 <p><b>Bilgisayar kursu sürüyor.</b> Halk eğitim merkeziyle birlikte açtığımız kursun ikinci dönemi ocak ayında başlıyor. e-Devlet, e-posta ve görüntülü görüşme işleniyor.</p>
-<p><b>Sağlık taraması.</b> Aile sağlığı merkezinden gelen ekip 20 Kasım Perşembe günü dernek salonunda tansiyon ve şeker ölçümü yapacak. Ölçüm ücretsizdir.</p>
+<p><b>Sağlık taraması.</b> Aile sağlığı merkezinden gelen ekip 20 Kasım Cuma günü dernek salonunda tansiyon ve şeker ölçümü yapacak. Ölçüm ücretsizdir.</p>
 <p><b>Yeni üyelerimize hoş geldiniz.</b> Bu ay derneğimize on iki yeni üye katıldı. Çay sohbetlerimizde her çarşamba sizi de bekliyoruz.</p>
 <p>✂ Gezi kayıt formu: doldurup kesin ve dernek sekreterliğine verin.</p>
 <p>Adı Soyadı:</p>

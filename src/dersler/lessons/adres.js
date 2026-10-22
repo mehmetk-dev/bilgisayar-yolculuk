@@ -14,7 +14,7 @@ export const adres = {
   id: 'adres', icon: '🔗', title: 'İnternet adresini (URL) okumak', minutes: 40, stage: 'desktop',
   desc: 'Adresin parçaları, kilit simgesi, sahte siteler ve “Güvenli değil” uyarısı.',
   summary: [
-    ['Alan adı', 'Adreste “www.”dan sonra, ilk “/” işaretine kadar olan kısım: sitenin asıl adı (turkiye.gov.tr)'],
+    ['Alan adı', 'Sitenin asıl adı (turkiye.gov.tr). “www.” alan adının parçası değildir; çoğu adresin başına eklenen bir ön ektir'],
     ['Sağdan sola okuyun', 'bankam.com.tr.hesap-dogrulama.xyz → site hesap-dogrulama.xyz\'nindir'],
     ['.gov.tr / .edu.tr / .bel.tr', 'Yalnızca devlet / üniversite / belediye alabilir'],
     ['.com, .xyz', 'Herkes alabilir'],
@@ -51,7 +51,7 @@ export const adres = {
       html: '<p><b>https://www.bankam.com.tr/kredi-karti/basvuru</b> adresinde sitenin asıl adı (alan adı) hangisi?</p>',
       opts: ['bankam.com.tr', 'https', 'kredi-karti/basvuru'],
       ok: 0,
-      wrong: 'Alan adı, “www.”dan sonra başlar ve ilk tek “/” işaretine kadar sürer.',
+      wrong: 'Alan adı sitenin asıl adıdır. “www.” ön ektir, alan adının parçası değildir; “/” işaretinden sonrası da değildir.',
       why: 'Doğru. “/” işaretinden sonrası sitenin içindeki sayfalardır; sitenin sahibini <b>alan adı</b> söyler.',
     }),
     rehberSoru({

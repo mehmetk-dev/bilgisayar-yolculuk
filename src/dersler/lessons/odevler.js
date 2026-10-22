@@ -149,7 +149,7 @@ export const odev11 = odev(11, 'hesap tablosu (Excel)', '📗', [
 export const odev12 = odev(12, 'sunu (PowerPoint)', '📙', [
   ['Üç slayt', 'Sunu programında <b>“Ailem”</b> konulu üç slaytlık bir sunu hazırlayın: kapak, bir aile üyesinin tanıtımı, bir anı.', 'Slayt başına en çok 3–5 kısa madde yazın.', '📙'],
   ['Fotoğraf ekleyin', 'Bilgisayarınızdaki bir fotoğrafı slayda ekleyin (Ekle → Resim) ve boyutunu ayarlayın.', 'Fotoğrafın köşelerinden tutup büyütebilirsiniz.', '🖼'],
-  ['Geçiş seçin', 'Slaytlara bir <b>geçiş</b> (Soldurma (Fade) ya da İtme) verin. Fazla çeşit kullanmayın; hepsine aynısını verin.', 'Geçiş, slayttan slayda geçerkenki hareket.', '✨'],
+  ['Geçiş seçin', 'Slaytlara bir <b>geçiş</b> (Solma (Fade) ya da İtme) verin. Fazla çeşit kullanmayın; hepsine aynısını verin.', 'Geçiş, slayttan slayda geçerkenki hareket.', '✨'],
   ['Gösterin', '<b>F5</b> ile sunuyu baştan izleyin; ok tuşları ya da tıklamayla ilerleyin; <b>Esc</b> ile çıkın.', 'B tuşu ekranı karartır.', '▶'],
   ['PDF yapın', 'Sunuyu <b>PDF olarak kaydedin</b> ve açıp bakın: herkesin telefonunda açılır.', 'WhatsApp\'tan göndermek için PDF idealdir.', '📕'],
   ['Asıl Slayt', 'Görünüm → <b>Asıl Slayt</b>\'ı açın; alt bilgiye adınızı yazın ya da köşeye küçük bir resim koyun. Asıl görünümü kapatıp bütün slaytlarda göründüğüne bakın.', 'PowerPoint\'te Görünüm → Asıl Slayt; çıkmak için Asıl Görünümü Kapat.', '🎨'],

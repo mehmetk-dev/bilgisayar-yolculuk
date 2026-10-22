@@ -15,7 +15,7 @@ export const kamuHizmet = {
     ['SGK Emekli Aylık Bilgileri', 'Her ay yatan aylık ve kesintiler; tanımadığınız kesintiyi ALO 170\'e sorun'],
     ['Mobil Hat Sorgulama', 'Adınıza açılmış bütün hatlar; bilmediğiniz hat = operatöre ve savcılığa başvuru'],
     ['Şirket Ortaklık Bilgileri', 'Adınıza kurulmuş şirket var mı; yılda bir bakın'],
-    ['Belediye → Çözüm Merkezi (153)', 'Lamba, çukur, çöp… Fotoğraf ve açık adres ekleyin, başvuru numarasını not edin'],
+    ['Belediye → çözüm merkezi (belediyenizin internet sitesi ya da çağrı hattı)', 'Lamba, çukur, çöp… Fotoğraf ve açık adres ekleyin, başvuru numarasını not edin'],
     ['CİMER', 'Kurumdan sonuç alamazsanız; önceki başvuru numarasını yazın. Cevap 30 gün içinde'],
     ['⏻ Çıkış', 'e-Devlet\'ten her zaman çıkış yapın'],
   ],

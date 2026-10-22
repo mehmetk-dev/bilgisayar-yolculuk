@@ -1,4 +1,4 @@
-// Ek bölüm: Kurs bitirme sınavı (15 haftanın tamamından 28 soru; %70 ve üstünde belge yazdırılır)
+// Ek bölüm: Kurs bitirme sınavı (15 haftanın özetinden 28 soru; %70 ve üstünde belge yazdırılır)
 // ve Büyük parkur (torunun doğum günü: klasör, davetiye, harcama tablosu, e-posta, harita, sanal kart).
 import { desktopReady, norm } from './common.js';
 import { test } from './testler.js';
@@ -9,8 +9,9 @@ import { KURS_TC } from '../apps/siteler-gunluk.js';
 export const kursSinavi = {
   ...test({
     id: 'kurs-sinavi', icon: '🎓', title: 'Kurs bitirme sınavı (15 haftanın özeti)',
-    desc: '15 haftanın tamamından 28 soru. Soruların en az %70\'ini ilk denemede bilirseniz kurs bitirme belgenizi yazdırabilirsiniz.',
+    desc: '15 haftanın özetinden 28 soru. Soruların en az %70\'ini ilk denemede bilirseniz kurs bitirme belgenizi yazdırabilirsiniz.',
     intro: '15 hafta boyunca öğrendiklerimizi',
+    not: 'Soruların en az %70\'ini ilk denemede bilirseniz belgenizi yazdırabilirsiniz. Acele etmeyin.',
     scene: '<div class="sc-big">🎓</div><p>Kurs bitirme sınavı</p>',
     qs: [
       { t: '1. Dosya açmak', pic: '🖱🖱', q: 'Masaüstündeki bir dosyayı açmak için ne yaparız?', opts: ['Bir kez sağ tıklarız', 'Sol tuşla hızlıca iki kez tıklarız (çift tık)', 'Fareyi sallarız'], ok: 1, why: 'Çift tık dosyayı açar. Tek tık yalnızca seçer, sağ tık menüyü açar.' },

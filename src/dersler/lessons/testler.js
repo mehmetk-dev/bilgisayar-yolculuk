@@ -26,7 +26,7 @@ function soru({ t, pic, q, opts, ok, why }) {
 }
 
 // intro / scene / icon verilirse haftalık test yerine başka bir sınav olur (ör. kurs bitirme sınavı)
-export function test({ id, no, title, desc, qs, intro, scene, icon = '✅' }) {
+export function test({ id, no, title, desc, qs, intro, scene, icon = '✅', not }) {
   return {
     id, icon, title, desc, stage: 'scene', test: true, minutes: Math.round(qs.length * 1.5),
     steps: [
@@ -34,7 +34,7 @@ export function test({ id, no, title, desc, qs, intro, scene, icon = '✅' }) {
         title: 'Nasıl çözülür?',
         html: `<p>${intro || `${no}. haftada öğrendiklerimizi`} <b>${qs.length} soruyla</b> tekrar edeceğiz.</p>
           <ul class="big-list"><li>Her soruda doğru cevaba tıklayın.</li><li>Yanlış seçerseniz açıklama çıkar; okuyup yeniden deneyin.</li><li>Sonunda kaç soruyu <b>ilk denemede</b> bildiğinizi göreceksiniz.</li></ul>
-          <p class="mut">Not değil, tekrar içindir. Acele etmeyin.</p>`,
+          <p class="mut">${not || 'Not değil, tekrar içindir. Acele etmeyin.'}</p>`,
         scene: info(scene || `<div class="sc-big">✅ ❓ ✅</div><p>${no}. hafta tekrar testi</p>`),
       },
       ...qs.map(soru),

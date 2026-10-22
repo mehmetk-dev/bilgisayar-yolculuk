@@ -78,7 +78,7 @@ export const eNabiz = {
       title: 'PDF olarak indirin',
       html: '<p>Sonuç sayfasındaki <b>⬇ PDF olarak indir</b> düğmesine tıklayın. Belge <b>İndirilenler</b> klasörüne kaydedilir.</p>',
       on: (ev) => ev.type === 'nabiz-pdf',
-      done: 'Sonuç PDF olarak bilgisayara kaydoldu. Doktora götürmek ya da göndermek için kullanılır.',
+      done: 'Sonuç PDF olarak bilgisayara kaydedildi. Doktora götürmek ya da göndermek için kullanılır.',
     },
     {
       title: 'İndirileni açın',

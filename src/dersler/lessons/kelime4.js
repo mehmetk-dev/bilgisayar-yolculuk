@@ -6,7 +6,7 @@ import { BELEDIYE_HOST } from '../apps/siteler-kamu.js';
 
 const DOSYA = 'gezi bilgi notu.docx';
 const HTML = `<h1>Kültür gezisi bilgi notu</h1>
-<p>Derneğimiz 8 Kasım Cumartesi günü Çınar Kent Müzesi'ne gezi düzenliyor. Otobüs saat 09.00'da dernek binasının önünden kalkacak.</p>
+<p>Derneğimiz 8 Kasım Pazar günü Çınar Kent Müzesi'ne gezi düzenliyor. Otobüs saat 09.00'da dernek binasının önünden kalkacak.</p>
 <p>Müze girişi 65 yaş ve üstü için ücretsizdir.</p>
 <p>Gezi programı ve müzenin ziyaret saatleri Çınar Belediyesi sitesinde yayımlanmıştır.</p>
 <p>Öğle yemeği müzenin bahçesindeki lokantada yenecek; yemek ücreti kişi başı 250 TL'dir.</p>

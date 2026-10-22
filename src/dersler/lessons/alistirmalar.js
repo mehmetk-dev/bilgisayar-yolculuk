@@ -126,7 +126,7 @@ export const tusavi = {
   steps: [
     {
       title: 'Tuş avı',
-      html: `<p>Geçen hafta klavyenin önemli tuşlarını tanıdık. Bu sefer işin zor kısmı sizde: <b>ekrandaki klavyede sarı ışık yanmayacak.</b></p>
+      html: `<p>Bir önceki derste klavyenin önemli tuşlarını tanıdık. Bu sefer işin zor kısmı sizde: <b>ekrandaki klavyede sarı ışık yanmayacak.</b></p>
         <p>Her adımda bir tuş tarif edilecek. O tuşu gerçek klavyenizde bulup basacaksınız. Bastığınız tuş, aşağıdaki resimde mavi yanar.</p>
         <p>Takılırsanız <b>💡 İpucu</b> düğmesine basın.</p>`,
     },
@@ -152,7 +152,7 @@ export const tusavi = {
       title: 'E-posta adresi',
       html: '<p>Yeni bir satıra şu e-posta adresini <b>hatasız</b> yazın. E-posta adreslerinde Türkçe harf ve boşluk olmaz.</p>',
       target: 'ayse.kaya@ornek.com',
-      hint: `@ için ${K('AltGr', 'Q')}. Nokta, sağ alttaki <kbd>.</kbd> tuşudur. Adreste noktasız ı yok: <b>i</b> değil, <b>y</b> ile <b>s</b> arasında <b>e</b> var.`,
+      hint: `@ için ${K('AltGr', 'Q')}. Nokta, sağ alttaki <kbd>.</kbd> tuşudur. Adreste Türkçe harf yok: <b>ş</b> değil <b>s</b>, <b>ö</b> değil <b>o</b> yazın.`,
       on: (ev, c) => ev.type === 'input' && lines(c.np.value).some((l) => l.toLowerCase() === 'ayse.kaya@ornek.com'),
       done: 'Kusursuz! E-posta adresinde tek harf hatası bile mesajın gitmemesine yol açar.',
     },
@@ -277,7 +277,7 @@ export const liste = {
   steps: [
     {
       title: 'Görevler',
-      html: `<p>Yandaki Not Defteri'nde hazır bir alışveriş listesi var. Geçen hafta öğrendiğiniz kısayollarla onu düzenleyeceksiniz.</p>
+      html: `<p>Yandaki Not Defteri'nde hazır bir alışveriş listesi var. Bu hafta öğrendiğiniz kısayollarla onu düzenleyeceksiniz.</p>
         <p>Bu derste <b>nasıl yapılacağı yazmıyor</b>; yalnızca ne yapılacağı yazıyor. Takılırsanız <b>💡 İpucu</b>'na bakın.</p>
         <p class="mut">Liste bozulursa telaşlanmayın: ${K('Ctrl', 'Z')} her zaman yanınızda.</p>`,
     },
@@ -565,7 +565,7 @@ export const dosyaParkur = {
     {
       title: 'Belgeler karışmış',
       html: `<p>Belgeler klasöründe sağlık kâğıtları, faturalar ve eski notlar birbirine karışmış. <b>10 görevle</b> toparlayacağız.</p>
-        <p>Nasıl yapılacağı yazmıyor; geçen haftaki dersi hatırlayın. Takılırsanız <b>💡 İpucu</b>.</p>`,
+        <p>Nasıl yapılacağı yazmıyor; derste öğrendiklerinizi hatırlayın. Takılırsanız <b>💡 İpucu</b>.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); explorerAt('docs')(c); },
     },
     {

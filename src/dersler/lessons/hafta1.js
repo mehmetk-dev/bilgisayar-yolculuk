@@ -145,7 +145,7 @@ export const ackapa = {
     },
     {
       title: 'Neden fişten çekilmez?',
-      html: `<p>Bilgisayar kapanırken açık dosyaları kaydeder, işlerini toparlar. Fişi çekerseniz:</p>
+      html: `<p>Bilgisayar kapanırken açık programlar, kaydetmek isteyip istemediğinizi sorar. Fişi çekerseniz bu soruya fırsat kalmaz:</p>
         <ul><li>Kaydedilmemiş yazılarınız <b>kaybolur</b>.</li><li>Güncelleme yarım kalırsa bilgisayar <b>bir daha açılmayabilir</b>.</li><li>Disk zarar görebilir.</li></ul>
         <div class="box"><b>Bilgisayar tamamen donduysa?</b> Fare de klavye de çalışmıyorsa, kasadaki ⏻ düğmesini <b>5–10 saniye basılı tutun</b>. Bu son çaredir.</div>`,
     },

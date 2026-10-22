@@ -138,7 +138,7 @@ const TUTANAK = `<h1>Apartman Toplantı Tutanağı</h1>
 <p style="line-height:1">Aidatlar Ocak ayından itibaren 750 TL olacak. Ödemeler ayın 10'una kadar yönetim hesabına yapılacak.</p>
 <p>4. Diğer konular</p>
 <p style="line-height:1">Bahçeye iki bank konulacak. Çocuk parkının kum havuzu yenilenecek.</p>
-<p style="line-height:1">Not: Bir sonraki toplantı 15 Aralık Pazartesi saat 19.00'da yapılacak.</p>`;
+<p style="line-height:1">Not: Bir sonraki toplantı 15 Aralık Salı saat 19.00'da yapılacak.</p>`;
 
 const bloklar = (c) => W(c)?.info().blocks || [];
 // Başlık, ilk başlıkla aynı biçimde mi (kalın, büyük, aynı renk)?

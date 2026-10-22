@@ -36,7 +36,7 @@ export const fqKlavye = {
     ['F klavye', 'Üst sıra FGĞIOD…; 1955\'te Türkçenin harf sıklığına göre tasarlanmış; sesli harfler sol elin altında'],
     ['Hangisi bende?', 'Üst harf sırasının ilk tuşuna bakın: Q mu F mi?'],
     ['Daktilo bilenler', 'Çoğu daktilo kursu F klavyeyle öğretti; bilgisayarda F düzeni eklenebilir'],
-    ['Windows\'ta F eklemek', 'Ayarlar → Saat ve dil → Klavye ekle → Türkçe F'],
+    ['Windows\'ta F eklemek', 'Ayarlar → Saat ve dil → Dil ve bölge → klavye ekle → Türkçe F'],
     ['Ortak bilgisayar', 'Düzeni değiştirdiyseniz işiniz bitince eski hâline getirin'],
   ],
   steps: [
@@ -70,9 +70,9 @@ export const fqKlavye = {
       why: 'Tuşların üstündeki harflere bakmak yeter: üst sıra Q ile başlıyorsa Q, F ile başlıyorsa F klavyedir. Tuşların harfleri silinmişse bir yazı programında “q” tuşuna basıp ne çıktığına da bakabilirsiniz.',
     }),
     sec({
-      title: 'Daktilo bilen komşu', text: '<p>Komşunuz yıllarca <b>F klavyeyle daktilo</b> yazdı. Yeni bilgisayarının klavyesi Q ve harfleri aramaktan yazamıyor.</p>',
+      title: 'Daktilo bilen komşu', text: '<p>Komşunuz yıllarca <b>F klavyeyle daktilo</b> yazdı. Yeni bilgisayarının klavyesi Q düzeninde; harfleri aramaktan yazamıyor.</p>',
       q: 'Ona ne önerirsiniz?', opts: ['Bilgisayarı geri versin', 'Windows\'ta Türkçe F klavyeyi ekleyip kullansın; tuşların üstü Q yazar ama F düzeninde çıkan harfleri ezbere bildiği için sorun olmaz', 'Hepsini yeniden öğrensin, F klavye bilgisayarda çalışmaz'], ok: 1,
-      why: 'Windows\'ta Türkçe F düzeni vardır: Ayarlar → Saat ve dil → klavye ekle. Tuşların üstündeki harfler Q olduğu için ya ezbere yazılır, ya da klavyeye F etiketleri yapıştırılır. Bir sonraki derste bunu kendiniz deneyeceksiniz.',
+      why: 'Windows\'ta Türkçe F düzeni vardır: Ayarlar → Saat ve dil → Dil ve bölge → klavye ekle. Tuşların üstündeki harfler Q olduğu için ya ezbere yazılır, ya da klavyeye F etiketleri yapıştırılır. Bir sonraki derste bunu kendiniz deneyeceksiniz.',
     }),
     sec({
       title: 'Ortak bilgisayar', text: '<p>Kurstaki ortak bilgisayarda klavye düzenini <b>F</b> yaptınız ve işiniz bitti.</p>',
@@ -95,7 +95,7 @@ export const klavyeDili = {
     ['Alt + Shift', 'Klavye dilini değiştirir (aynı iş: ⊞ Windows + Boşluk)'],
     ['ENG\'de ş tuşu', '; (noktalı virgül) yazar'],
     ['@ işareti', 'Türkçe Q: AltGr + Q. İngilizce: Shift + 2'],
-    ['Ayarlar → Saat ve dil', 'Klavye ekle: Türkçe F ya da İngilizce'],
+    ['Ayarlar → Saat ve dil → Dil ve bölge', 'Klavye ekle: Türkçe F ya da İngilizce'],
     ['F düzeni', 'Q klavyenin tuşlarıyla F harfleri yazılır: F tuşu a, H tuşu t…'],
     ['Eski hâline getirin', 'Ortak bilgisayarda işiniz bitince TUR Q\'ya dönün'],
   ],
@@ -133,7 +133,7 @@ export const klavyeDili = {
       html: `<p>Not Defteri'ne tıklayın ve klavyede <b>L</b> harfinin sağındaki <b>ş</b> tuşuna basın. Ekrana ne çıktı?</p>`,
       hint: 'L tuşunun hemen sağındaki tuş. Üzerinde ş ve Ş yazar.',
       on: (ev, c) => ev.type === 'input' && npText(c).includes(';'),
-      done: 'ş yerine <b>;</b> çıktı! ENG kipinde Türkçe harf tuşları işaret yazar: ş tuşu ;, ğ tuşu [, ü tuşu ], i tuşu \' (kesme işareti). Bilgisayar bozuk değil, dil değişmiş.',
+      done: 'ş yerine <b>;</b> çıktı! ENG kipinde Türkçe harf tuşları işaret yazar: ş tuşu ;, ğ tuşu [, ü tuşu ], i tuşu kesme işareti. Bilgisayar bozuk değil, dil değişmiş.',
     },
     {
       title: '@ işareti',

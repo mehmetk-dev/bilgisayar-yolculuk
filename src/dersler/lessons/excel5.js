@@ -114,7 +114,7 @@ export const excelYazi = {
     },
     {
       title: 'Sayfayı koruyun',
-      html: '<p><b>🔒 Sayfayı Koru</b>\'ya basın. Parola kutusuna <b>1234</b> yazıp <b>Koru</b>.</p>',
+      html: '<p><b>🔒 Sayfayı Koru</b>\'ya basın. Parola kutusuna <b>Kermes2026</b> yazıp <b>Koru</b>.</p>',
       hint: 'Gerçek hayatta parolayı unutmamak için bir yere yazın; unutursanız korumayı kaldıramazsınız.',
       on: (ev) => ev.type === 'xl-protect' && ev.on,
       done: 'Sayfa korunuyor. Açık yeşil hücreler dışında hiçbir şey değiştirilemez.',
@@ -133,15 +133,15 @@ export const excelYazi = {
     },
     {
       title: 'Korumayı kaldırın',
-      html: '<p>Listeyi yeniden düzenlemek için <b>🔓 Sayfa Korumasını Kaldır</b>\'a basın, parolayı (<b>1234</b>) yazıp <b>Korumayı kaldır</b>.</p>',
+      html: '<p>Listeyi yeniden düzenlemek için <b>🔓 Sayfa Korumasını Kaldır</b>\'a basın, parolayı (<b>Kermes2026</b>) yazıp <b>Korumayı kaldır</b>.</p>',
       on: (ev, c) => {
-        if (ev.type === 'xl-protect-err') c.note('Parola yanlış. Korurken yazdığınız parolayı yazın: 1234');
+        if (ev.type === 'xl-protect-err') c.note('Parola yanlış. Korurken yazdığınız parolayı yazın: Kermes2026');
         return ev.type === 'xl-protect' && !ev.on;
       },
       done: 'Koruma kalktı; artık bütün hücreler yeniden düzenlenebilir.',
     },
     rehberSoru({
-      title: 'Koruma ne değildir?',
+      title: 'Sayfa koruması ne işe yarar?',
       html: '<p>Sayfa koruması için hangisi doğrudur?</p>',
       opts: ['Hücrelerin yanlışlıkla değiştirilmesini önler; dosyayı açan herkes yine de içini görebilir', 'Dosyayı şifreler, kimse açıp okuyamaz', 'Virüslere karşı korur'], ok: 0,
       wrong: 'Sayfa koruması yalnızca değiştirmeyi engeller; dosyayı gizlemez.',
