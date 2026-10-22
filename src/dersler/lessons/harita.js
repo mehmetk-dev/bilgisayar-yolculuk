@@ -109,6 +109,19 @@ export const harita = {
       on: (ev) => ev.type === 'sv-move' && ev.facing === 'hastane',
       done: 'Acil girişi karşınızda! Yarın gittiğinizde burayı tanıyacaksınız.',
     },
+    {
+      title: 'Gerçek haritada evinizi bulun',
+      html: `<p>Şimdi aynısını gerçek haritada deneyin. Kendi bilgisayarınızda ya da telefonunuzda:</p>
+        <ol class="steps"><li>Tarayıcıda <b>maps.google.com</b> adresini açın (telefonda <b>Haritalar</b> uygulaması da olur).</li>
+        <li>Arama kutusuna <b>kendi adresinizi</b> yazın: mahalle, sokak, kapı numarası, ilçe. Örnek: <i>Lale Sokak 8, Çankaya</i>.</li>
+        <li>Çıkan kırmızı işareti <b>yakınlaştırın</b>; <b>Uydu</b> görünümüne geçip evinizin çatısını bulun.</li>
+        <li>Sarı insanı evinizin önündeki sokağa bırakın: <b>Sokak Görünümü</b>'nde kapınızı görün.</li>
+        <li>Son olarak <b>Yol tarifi</b> ile evinizden en yakın sağlık ocağına ya da eczaneye yürüyerek kaç dakika olduğuna bakın.</li></ol>
+        <p class="mut">Bazı küçük sokaklarda Sokak Görünümü olmayabilir; o zaman uydu görünümü yeter.</p>
+        <div class="box">⚠ Ev adresinizi ve evinizin harita ekran görüntüsünü tanımadığınız kişilerle paylaşmayın.</div>`,
+      manual: '✔ Evimi buldum',
+      done: 'Harika! Gideceğiniz her yeri artık evden çıkmadan önce haritada görebilirsiniz.',
+    },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Haritayla yer bulmayı, yol tarifi almayı ve sokağı ekranda gezmeyi öğrendiniz:</p>' },
   ],
 };

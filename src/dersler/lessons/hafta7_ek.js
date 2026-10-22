@@ -112,7 +112,7 @@ export const tebrikKarti = {
   steps: [
     {
       title: 'Doğum günü kartı',
-      html: '<p>Bir yakınınız için doğum günü kartı hazırlayacağız. Bu sefer adımlar kısa; araçları önceki derslerden hatırlayın. Takılırsanız 💡 İpucu.</p>',
+      html: '<p>Bir yakınınız için doğum günü kartı hazırlayacağız: renkli bir arka plan, bir <b>balon</b>, mumlu bir <b>pasta</b> ve <b>İyi ki doğdun!</b> yazısı.</p><div class="sc-big" style="text-align:center">🎈 🎂</div><p>Bu sefer adımlar kısa; araçları önceki dersten hatırlayın. Takılırsanız 💡 İpucu.</p>',
       setup: paintReady,
     },
     {
@@ -127,7 +127,7 @@ export const tebrikKarti = {
     },
     {
       title: 'Bir balon',
-      html: '<p>Kartın üstüne büyükçe bir <b>balon</b> çizin (elips) ve içini başka bir renge boyayın.</p>',
+      html: '<p>Kartın <b>sol üst</b> tarafına büyükçe bir <b>balon</b> çizin: boyu eninden biraz uzun bir elips. Sonra içini kırmızı ya da mavi boyayın.</p>',
       hint: '◯ Elips ile sürükleyin, sonra renk seçip Doldur ile içine tıklayın.',
       setup: paintOpen,
       on: (ev, c) => {
@@ -141,6 +141,20 @@ export const tebrikKarti = {
       hint: 'Kalem ya da Çizgi aracı. Kalınlık seçenekleri araçların yanında.',
       setup: paintOpen,
       on: (ev) => shape('line')(ev) || (ev.type === 'paint-draw' && ev.len > 40),
+    },
+    {
+      title: 'Pasta',
+      html: '<p>Kartın <b>alt kısmına</b> bir doğum günü pastası çizin: <b>kahverengi</b> bir dikdörtgen (pasta) ve üstüne dik <b>3 mum</b> (kısa çizgiler). İsterseniz pastanın içini Doldur ile boyayın.</p>',
+      hint: '▭ Dikdörtgen ile pastayı çizin. Sonra ╱ Çizgi aracıyla pastanın üst kenarından yukarı doğru üç kısa çizgi çekin.',
+      setup: paintOpen,
+      on: (ev, c) => {
+        if (shape('rect', (e) => e.w > 60)(ev)) { c.s.pasta = true; c.note('Pasta hazır. Şimdi üstüne üç mum.'); return false; }
+        if (!c.s.pasta || !(shape('line')(ev) || (ev.type === 'paint-draw' && ev.len > 15))) return false;
+        c.s.mum = (c.s.mum || 0) + 1;
+        if (c.s.mum < 3) c.note(`Mum: ${c.s.mum} / 3`);
+        return c.s.mum >= 3;
+      },
+      done: 'Pasta mumlarıyla hazır! İsterseniz mumların ucuna sarı küçük alevler çizin.',
     },
     {
       title: 'Yazı',

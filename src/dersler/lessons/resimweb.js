@@ -1,21 +1,22 @@
 // 6. hafta ek dersi: resim dosyası türleri (PNG, JPG, GIF) ve web sayfası dosyası (HTML). Paint'ten iki türde kaydetmek,
-// Not Defteri'nde bir HTML sayfası yazıp tarayıcıda açmak, sayfa kaynağını görmek.
+// hazır bir HTML sayfasını tarayıcıda açmak, kaynağını görmek, Not Defteri'nde bir kelimesini değiştirmek.
 import { K, desktopReady, maxed } from './common.js';
 import { rehberSoru } from './kalip.js';
 
-const npText = (c) => c.d.find('notepad')?.api.np?.value || '';
+const PAGE = '<h1>Merhaba</h1>\n<p>Bu benim ilk web sayfam.</p>';
 const pageFile = (c) => ['docs', 'desktop', 'downloads'].map((f) => c.d.fs.find(f, 'sayfam.html')).find(Boolean);
 
 export const resimWeb = {
   id: 'resim-web-dosyalari', icon: '🖼', title: 'Resim ve web dosyaları: PNG, JPG, HTML', minutes: 40, stage: 'desktop',
-  desc: 'PNG ve JPG farkı; web sayfasının aslında bir yazı dosyası olduğunu görmek.',
+  desc: 'PNG ve JPG farkı; web sayfasının aslında bir yazı dosyası olduğunu görmek ve içindeki bir kelimeyi değiştirmek.',
   summary: [
     ['JPG (JPEG)', 'Fotoğraflar için: küçük boyutlu, çok renkli; her kaydedişte hafif kalite kaybı'],
     ['PNG', 'Çizim, logo, ekran alıntısı ve yazılı görseller için: net kenarlı, kayıpsız; saydam alan destekler'],
     ['GIF', 'Kısa hareketli resimler; renk sayısı azdır'],
     ['BMP', 'Eski ve çok yer kaplayan biçim; artık kullanmayın'],
-    ['Kayıt türü', 'Kaydet penceresinde “Kayıt türü” uzantıyı belirler: PNG, JPEG, Tüm Dosyalar'],
-    ['HTML (.html)', 'Web sayfasını anlatan yazı dosyası; tarayıcı bu yazıyı okuyup sayfayı çizer'],
+    ['Kayıt türü', 'Kaydet penceresinde “Kayıt türü” uzantıyı belirler: PNG, JPEG'],
+    ['HTML (.html)', 'Web sayfasını anlatan yazı dosyası; tarayıcı bu yazıyı okuyup sayfayı çizer (tarif ve yemek gibi)'],
+    ['< > işaretleri', 'Tarayıcıya talimat: h1 büyük başlık demek. Ekranda görünmez'],
     ['Ctrl + U', 'Sayfa kaynağını gösterir: sayfanın yazıldığı metin'],
   ],
   steps: [
@@ -23,14 +24,20 @@ export const resimWeb = {
       title: 'Aynı resim, farklı türler',
       html: `<p>Resimler farklı <b>dosya türlerinde</b> saklanabilir: <b>.png</b>, <b>.jpg</b>, <b>.gif</b>… Hepsi resimdir ama özellikleri farklıdır:</p>
         <ul class="big-list"><li><b>JPG</b>: fotoğraf için, küçük boyutlu</li><li><b>PNG</b>: çizim, yazılı görsel ve ekran görüntüsü için, net</li><li><b>GIF</b>: kısa hareketli resim</li></ul>
-        <p>Önce Paint'te bir resmi iki türde kaydedeceğiz. Sonra web sayfalarının da <b>.html</b> adlı bir dosya olduğunu kendiniz göreceğiz.</p>`,
+        <p>Önce Paint'te bir resmi iki türde kaydedeceğiz. Sonra web sayfalarının da <b>.html</b> uzantılı bir dosya olduğunu göreceğiz.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     {
       title: 'Paint\'i açın ve çizin',
-      html: '<p>⊞ Başlat → <b>🎨 Paint</b>. Beyaz alana <b>fareyi basılı tutarak</b> birkaç çizgi çizin: bir ev, bir çiçek, ne isterseniz.</p>',
+      html: '<p>⊞ Başlat → <b>🎨 Paint</b>. Kalemle basit bir <b>çiçek</b> çizin: önce <b>yeşil</b> renkle aşağı doğru bir sap, sonra <b>kırmızı</b> ya da <b>mor</b> renkle sapın tepesine yuvarlak yapraklar.</p>',
+      hint: 'Rengi üstteki renk kutularından seçin, sonra beyaz alanda sol tuşu basılı tutarak çizin.',
       setup: (c) => maxed(c, 'paint'),
-      on: (ev) => ev.type === 'paint-draw',
+      on: (ev, c) => {
+        if (ev.type !== 'paint-draw') return false;
+        (c.s.renk ||= new Set()).add(ev.colorName);
+        if (c.s.renk.size < 2) c.note('Sap tamam gibi. Şimdi başka bir renkle yaprakları çizin.');
+        return c.s.renk.size >= 2;
+      },
       done: 'Resim hazır. Şimdi kaydedelim.',
     },
     {
@@ -70,54 +77,59 @@ export const resimWeb = {
     }),
     {
       title: 'Web sayfası da bir dosya',
-      html: `<p>İnternette gördüğünüz her sayfa aslında <b>.html</b> uzantılı bir <b>yazı dosyasıdır</b>. İçinde “şurası başlık, şurası paragraf” gibi işaretler vardır; tarayıcı bunu okuyup sayfayı <b>çizer</b>.</p>
-        <p>Şimdi kendi sayfanızı yazacağız. ⊞ Başlat → <b>📝 Not Defteri</b>'ni açın.</p>`,
-      setup: (c) => c.d.closeAll(),
-      check: (c) => !!c.d.find('notepad'),
-      on: (ev) => ev.type === 'app-open' && ev.app === 'notepad',
+      html: `<p>İnternette gördüğünüz her sayfa aslında bir <b>yazıdır</b>. Bu yazı, tarayıcıya sayfayı nasıl göstereceğini anlatır. Böyle dosyaların adı <b>.html</b> ile biter.</p>
+        <p>Yemek tarifine benzer: <b>tarif</b> kâğıttaki yazıdır, <b>aşçı</b> tarifi okuyup <b>yemeği</b> yapar. Burada da tarif <b>.html dosyası</b>, aşçı <b>tarayıcı</b>, yemek de ekranda gördüğünüz <b>sayfa</b>.</p>
+        <div class="box"><p><b>Dosyada yazan:</b> <code>&lt;h1&gt;Merhaba&lt;/h1&gt;</code></p><p><b>Tarayıcının gösterdiği:</b> <span style="font-size:1.6em;font-weight:700">Merhaba</span></p></div>
+        <p class="mut">Köşeli işaretler (&lt; &gt;) tarayıcıya verilen talimatlardır: <b>h1</b> “büyük başlık yap” demektir. Tarayıcı bu işaretleri ekranda göstermez. Bunları ezberlemeniz gerekmiyor; bu derste sadece web sayfasının da bir dosya olduğunu göreceğiz.</p>`,
+      setup: (c) => { c.d.closeAll(); c.d.fs.write('docs', 'sayfam.html', PAGE); },
     },
     {
-      title: 'Sayfayı yazın',
-      html: `<p>Not Defteri'ne şu iki satırı <b>aynen</b> yazın:</p><div class="target">&lt;h1&gt;Merhaba&lt;/h1&gt;</div><div class="target">&lt;p&gt;Bu benim ilk web sayfam.&lt;/p&gt;</div>
-        <p class="mut"><b>&lt;</b> ve <b>&gt;</b> işaretleri: Türkçe klavyede <b>Z</b> tuşunun solundaki tuştur (<b>&gt;</b> için Shift ile birlikte). <b>/</b> işareti ${K('Shift')} + <b>7</b>.</p>`,
-      hint: '<h1> başlık, <p> paragraf demektir; kapatırken önüne / konur: </h1>, </p>. Sınır işaretlerini yanlış yazarsanız sayfa bozuk görünür.',
-      setup: (c) => maxed(c, 'notepad'),
-      on: (ev, c) => { const t = npText(c); return ev.type === 'input' && /<h1>\s*Merhaba\s*<\/h1>/i.test(t) && /<p>[^<]*<\/p>/i.test(t); },
-      done: 'Bu bir “web sayfası kodu”: <b>HTML</b>. Henüz yalnızca yazıdan ibaret.',
-    },
-    {
-      title: 'sayfam.html olarak kaydedin',
-      html: `<p>${K('Ctrl')} + ${K('S')} ile kaydedin. <b>Kayıt türü</b>'nü <b>Tüm Dosyalar</b> yapın (yoksa Not Defteri adın sonuna .txt ekler!). Dosya adı: <b>sayfam.html</b>. <b>Belgeler</b> klasöründe olsun.</p>`,
-      hint: 'Kayıt türü kutusundan “Tüm Dosyalar (*.*)” seçip adı sayfam.html yazın.',
-      on: (ev, c) => {
-        if (ev.type !== 'save') return false;
-        if (/\.html\.txt$/i.test(ev.name)) { c.warn(`Dosya “${ev.name}” adıyla kaydedildi: sonuna .txt eklendi, bu bir web sayfası olmaz. Farklı kaydet (Ctrl + Shift + S) ile Kayıt türünü “Tüm Dosyalar” yapıp yeniden kaydedin.`); return false; }
-        if (!/^sayfam\.html$/i.test(ev.name)) { c.note(`Dosya adı “${ev.name}”. Adı sayfam.html yapın.`); return false; }
-        return true;
-      },
-      done: '<b>sayfam.html</b> kaydedildi. Dosyanın simgesi şimdi bir globe (🌐) olmalı: bilgisayar bunu web sayfası olarak tanıdı.',
-    },
-    {
-      title: 'Tarayıcıda açın',
-      html: '<p><b>Dosya Gezgini</b> ile <b>Belgeler</b> klasöründeki <b>sayfam.html</b> dosyasına <b>çift tıklayın</b>. İnternet tarayıcısı açılır ve sayfanızı çizer.</p>',
+      title: 'Sayfayı açın',
+      html: '<p><b>Belgeler</b> klasörüne sizin için hazır bir sayfa koyduk: <b>sayfam.html</b>. Simgesi 🌐: bilgisayar onu web sayfası olarak tanıyor.</p><p>Dosyaya <b>çift tıklayın</b>. Tarayıcı açılır ve sayfayı gösterir.</p>',
       mouse: '🖱 sayfam.html: çift tık',
+      setup: (c) => { if (!pageFile(c)) c.d.fs.write('docs', 'sayfam.html', PAGE); const e = c.d.find('explorer'); if (e) c.d.close(e); c.d.open('explorer', { folder: 'docs' }); },
       on: (ev) => ev.type === 'web-nav' && ev.host === 'dosya',
-      done: 'İşte sizin web sayfanız! Adres çubuğuna bakın: <b>dosya://…</b> yazıyor, internette değil, bilgisayarınızda. Yazdığınız yazı büyük başlık ve paragraf oldu.',
+      done: 'Sayfa açıldı. Adres çubuğuna bakın: <b>dosya://…</b> yazıyor. Bu sayfa internette değil, sizin bilgisayarınızda.',
     },
     {
-      title: 'Sayfanın kaynağı',
+      title: 'Sayfanın arkasındaki yazı',
       html: `<p>Sayfa açıkken ${K('Ctrl')} + ${K('U')} tuşlarına basın (ya da tarayıcının ⋯ menüsünden <b>Sayfa kaynağını görüntüle</b>). Yeni sekmede sayfanın <b>yazı hâli</b> görünür.</p>`,
       hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın.',
       combo: ['Ctrl', 'KeyU'],
       on: (ev) => ev.type === 'web-source',
-      done: 'Gördüğünüz, az önce Not Defteri\'nde yazdığınız metin. Her web sayfasının arkasında böyle bir yazı vardır; tarayıcı onu güzel sayfaya çevirir.',
+      done: 'Tarif bu: iki satırlık bir yazı. Tarayıcı bunu okuyup büyük başlığı ve paragrafı çizdi. Her web sayfasının arkasında böyle bir yazı vardır.',
     },
     {
-      title: 'Değiştirin, yenileyin',
-      html: `<p>Not Defteri'ne dönün, ilk satırı <b>&lt;h1&gt;Merhaba Dünya&lt;/h1&gt;</b> yapın ve ${K('Ctrl')} + ${K('S')} ile kaydedin. Sonra tarayıcıda sayfa sekmesine geçip <b>⟳ Yenile</b>'ye basın.</p>`,
-      hint: 'Önce Not Defteri\'nde “Merhaba” kelimesinden sonra “ Dünya” ekleyin, kaydedin. Sonra tarayıcıya geçip ⟳.',
-      on: (ev, c) => ev.type === 'web-reload' && /D[üu]nya/i.test(String(pageFile(c)?.content || '')),
-      done: 'Başlık değişti. Web sitesi yapan kişiler böyle çalışır: dosyayı değiştirir, tarayıcıda yenileyip sonucu görür.',
+      title: 'Not Defteri ile açın',
+      html: `<p>Bu yazıyı değiştirebiliriz. ⊞ Başlat → <b>📝 Not Defteri</b>'ni açın. ${K('Ctrl', 'O')} (Aç) ile <b>Belgeler</b>'deki <b>sayfam.html</b>'yi seçip <b>Aç</b>'a basın.</p>`,
+      hint: 'Not Defteri\'nde Dosya → Aç da olur. Açılan pencerede solda Belgeler seçili olsun.',
+      on: (ev) => ev.type === 'open' && /^sayfam\.html$/i.test(ev.name),
+      done: 'Sayfanın yazısı Not Defteri\'nde. Tarayıcıda gördüğünüzün aynısı, sadece işaretleriyle birlikte.',
+    },
+    {
+      title: 'Bir kelime ekleyin',
+      html: `<p>İlk satırda <b>Merhaba</b> kelimesinin hemen arkasına tıklayın ve bir boşluk bırakıp <b>adınızı</b> yazın. Satır şöyle olsun:</p><div class="target">&lt;h1&gt;Merhaba Ayşe&lt;/h1&gt;</div>
+        <p>Köşeli işaretlere dokunmayın. Sonra ${K('Ctrl', 'S')} ile kaydedin.</p>`,
+      hint: 'Fareyle “Merhaba” kelimesinin a harfinin hemen sağına tıklayın. İmleç < işaretinden önce durmalı. Bozduysanız Ctrl + Z.',
+      on: (ev, c) => {
+        if (ev.type !== 'save') return false;
+        const t = String(pageFile(c)?.content || '');
+        if (!/<h1>[^<]*<\/h1>/i.test(t)) { c.warn('Köşeli işaretlerden biri bozulmuş. Ctrl + Z ile geri alın, sadece Merhaba\'nın arkasına adınızı ekleyip yeniden kaydedin.'); return false; }
+        if (!/<h1>\s*Merhaba\s+\S/i.test(t)) { c.note('Kaydedildi ama başlık hâlâ yalnızca “Merhaba”. Arkasına bir boşluk ve adınızı ekleyip yeniden kaydedin.'); return false; }
+        return true;
+      },
+      done: 'Dosya değişti. Şimdi tarayıcı da yeni hâlini göstersin.',
+    },
+    {
+      title: 'Tarayıcıda yenileyin',
+      html: '<p>Alttaki görev çubuğundan <b>tarayıcıya</b> geçin. Sayfanın açık olduğu sekmeye tıklayıp <b>⟳ Yenile</b>\'ye basın.</p>',
+      hint: 'Kaynak sekmesi değil, “Merhaba” başlığının göründüğü sekme. Yenile düğmesi adres çubuğunun solunda.',
+      on: (ev, c) => {
+        if (ev.type !== 'web-reload') return false;
+        if (/^view-source:/.test(c.d.find('browser')?.api.url || '')) { c.note('Bu, kaynak sekmesi: yeni yazıyı gösteriyor. Şimdi soldaki <b>sayfam.html</b> sekmesine tıklayıp orada yenileyin.'); return false; }
+        return /<h1>\s*Merhaba\s+\S/i.test(String(pageFile(c)?.content || ''));
+      },
+      done: 'Başlıkta artık adınız var! Web sitesi yapanlar da böyle çalışır: yazıyı değiştirir, tarayıcıda yenileyip sonucu görür.',
     },
     rehberSoru({
       title: 'HTML nedir?',

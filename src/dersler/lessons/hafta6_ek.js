@@ -185,8 +185,8 @@ export const klasorAgaci = {
       title: 'İçine girin',
       html: '<p><b>Ev</b> klasörüne çift tıklayıp içine girin. Adres çubuğuna bakın.</p>',
       setup: explorerAt(),
-      on: (ev) => ev.type === 'nav' && ev.name === 'Ev',
-      done: 'Adres çubuğu: Belgeler › Ev. Klasör şimdilik boş.',
+      on: (ev, c) => ev.type === 'nav' && !!ev_(c) && ev.folder === ev_(c).id,
+      done: 'Adres çubuğunda <b>Bu Bilgisayar › Belgeler › Ev</b> yazıyor: Ev klasörü, Belgeler\'in içinde. Klasör şimdilik boş.',
     },
     {
       title: 'İçeride iki klasör',
@@ -220,8 +220,8 @@ export const klasorAgaci = {
       title: 'Derine inin',
       html: '<p>Ev\'e, sonra içindeki Faturalar\'a çift tıklayarak inin. Adres çubuğunda ne yazıyor?</p>',
       setup: explorerAt(),
-      on: (ev) => ev.type === 'nav' && ev.name === 'Faturalar',
-      done: 'Belgeler › Ev › Faturalar: üç kat derindesiniz.',
+      on: (ev, c) => ev.type === 'nav' && !!ev_(c) && ev.folder === c.d.fs.find(ev_(c).id, 'Faturalar')?.id,
+      done: 'Adres çubuğu: Bu Bilgisayar › Belgeler › Ev › Faturalar. Belgeler\'den iki kat aşağıdasınız.',
     },
     {
       title: 'Geri gelin',
