@@ -97,9 +97,10 @@ function testGrid(st) {
   if (st.preset || st.fnPreset) {
     const pp = parseProg(st.preset || '');
     const pf = parseProg(st.fnPreset || '');
-    if (!st.watch && pp.length && M.every((m, k) => simulate(m, dirs[k], pp, { fn: pf, pick: st.pick }).result === 'win')) bad.push('preset kendiliğinden kazanıyor');
+    // Kısaltma görevi: hazır program çalışır ama blok sınırını aşar (board.js çalıştırmadan önce sınırı denetler)
+    const shrink = st.max && countBlocks(pp) + countBlocks(pf) > st.max;
+    if (!st.watch && !shrink && pp.length && M.every((m, k) => simulate(m, dirs[k], pp, { fn: pf, pick: st.pick }).result === 'win')) bad.push('preset kendiliğinden kazanıyor');
     if (st.watch && st.preset !== st.sol) bad.push('izleme adımında preset ile sol aynı olmalı');
-    if (st.max && countBlocks(pp) + countBlocks(pf) > st.max) bad.push('preset max\'ı aşıyor');
   }
   // Adım adım tarif: tarifin son şartı örnek çözümle uyuşmalı (imleç programın en dışında sayılır)
   if (st.tut) {

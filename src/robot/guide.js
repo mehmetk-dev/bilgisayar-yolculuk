@@ -1,5 +1,6 @@
 // Öğretmen kılavuzu: haftalık plan, sınıf etkinlikleri ve cevap anahtarı (yazdırılabilir)
-import { WEEKS, LESSONS } from './lessons/index.js';
+import { WEEKS, LESSONS, isBonus } from './lessons/index.js';
+import { hasSunum } from './sunum.js';
 import { codePic } from './board.js';
 import { BLOCKS, CATS, KEYS, SOUNDS, NOTES, COLORS } from './sahne/blocks.js';
 import { BACKDROPS } from './sahne/costumes.js';
@@ -71,7 +72,7 @@ function answer(s) {
 export function renderGuide(el) {
   const weeks = WEEKS.map((w, wi) => {
     const lessons = w.lessons.map((L) => `<section class="glesson" style="--c:${L.color}">
-  <h3>${L.icon} ${L.no}. ${L.title} <small>Kavram: ${L.concept} · ${L.steps.length} adım · ~40 dk</small></h3>
+  <h3>${L.icon} ${L.no}. ${L.title} <small>Kavram: ${L.concept} · ${L.steps.filter((s) => !isBonus(s)).length} adım${L.steps.some(isBonus) ? ` + ${L.steps.filter(isBonus).length} ⭐ bonus` : ''} · ~40 dk</small></h3>
   <p>${L.desc}</p>
   <div class="gcols">
     <div><h4>Öğrenme kazanımları</h4><ul>${L.learned.map((x) => `<li>${x}</li>`).join('')}</ul></div>
@@ -80,10 +81,10 @@ export function renderGuide(el) {
   <h4>Adımlar ve cevap anahtarı</h4>
   <ol class="gsteps">${L.steps.map((s) => {
     const a = answer(s);
-    return `<li><span class="gtype" title="${TYPE[s.type][1]}">${TYPE[s.type][0]}</span> ${s.title}${a ? `<details><summary>Cevap</summary><div class="gans">${a}</div></details>` : ''}</li>`;
+    return `<li><span class="gtype" title="${TYPE[s.type][1]}">${TYPE[s.type][0]}</span> ${s.title}${isBonus(s) ? ' <small class="mut">(isteğe bağlı)</small>' : ''}${a ? `<details><summary>Cevap</summary><div class="gans">${a}</div></details>` : ''}</li>`;
   }).join('')}</ol>
 </section>`).join('');
-    return `<section class="gweek"><h2><span>${w.extra ? 'Ek' : `${wi + 1}. Hafta`}</span> ${w.title}</h2>${w.extra ? '<p class="mut">Ek bölümler 8 haftalık programın dışındadır: hızlı bitirenler, tekrar ya da ek ders saati için. İlerleme numaraları (ve sertifika) etkilenmez.</p>' : ''}${lessons}</section>`;
+    return `<section class="gweek"><h2><span>${w.extra ? 'Ek' : `${wi + 1}. Hafta`}</span> ${w.title}${!w.extra && hasSunum(wi) ? ` <a class="btn gsun" href="#sunum/${wi + 1}">📽️ Sunum ve tarama testi</a>` : ''}</h2>${w.extra ? '<p class="mut">Ek bölümler 8 haftalık programın dışındadır: hızlı bitirenler, tekrar ya da ek ders saati için. İlerleme numaraları (ve sertifika) etkilenmez.</p>' : ''}${lessons}</section>`;
   }).join('');
 
   el.innerHTML = `<div class="guide">
@@ -94,8 +95,9 @@ export function renderGuide(el) {
   </div>
   <section class="gplan">
     <h2>Önerilen ders akışı (40 dk)</h2>
-    <ol><li><b>5–10 dk</b> Bölümün sonundaki bilgisayarsız sınıf etkinliği ile kavramı tanıtın.</li><li><b>25 dk</b> Öğrenciler adımları kendi hızlarında yapsın. Hızlı bitirenler ⭐ bonus görevlere geçsin.</li><li><b>5 dk</b> Paylaşım: “Hangi görev zordu, nasıl çözdünüz?”</li></ol>
+    <ol><li><b>5–10 dk</b> Bölümün sonundaki bilgisayarsız sınıf etkinliği ile kavramı tanıtın.</li><li><b>25 dk</b> Öğrenciler adımları kendi hızlarında yapsın. Hızlı bitirenler ⭐ bonus görevlere geçsin; bonuslar isteğe bağlıdır, bölüm onlarsız da biter (zorlanan öğrenci “Atla ▶” ile geçebilir).</li><li><b>5 dk</b> Paylaşım: “Hangi görev zordu, nasıl çözdünüz?”</li></ol>
     <p><b>İpuçları:</b> Her öğrenci başta kendi adını seçmeli (sağ üstte 👤); ilerlemesi ve kodları o bilgisayarda ayrı saklanır. Numaralı adım düğmeleriyle istediğiniz adıma geçebilirsiniz. Gerçek Scratch'ten farklı olarak burada 🏁 sahneyi başa alır.</p>
+    <p><b>📽️ Haftalık sunum:</b> Haritada her haftanın başlığındaki <b>Sunum ve tarama testi</b> düğmesi tahtaya yansıtmak içindir: haftanın kavramları, “bu hafta öğrendiklerimiz” ve sınıfça hep birlikte cevaplanan tarama soruları. Ok tuşları ya da sunum kumandasıyla ilerler, <b>F</b> tam ekran, <b>Enter</b> cevabı gösterir.</p>
     <table class="gtable"><thead><tr><th>Hafta</th><th>Konu</th><th>Bölümler</th></tr></thead><tbody>${WEEKS.map((w, wi) => `<tr><td>${w.extra ? 'Ek' : wi + 1}</td><td>${w.title}</td><td>${w.lessons.map((l) => `${l.no}. ${l.title}`).join(' · ')}</td></tr>`).join('')}</tbody></table>
   </section>
   ${weeks}

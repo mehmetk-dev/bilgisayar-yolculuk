@@ -130,6 +130,12 @@ button.link { background: none; border: 0; box-shadow: none; color: var(--acc); 
 .dot { width: 2em; height: 2em; border-radius: 50%; display: grid; place-items: center; font-size: 0.8em; font-weight: 800; text-decoration: none; color: var(--mut); background: #fff; border: 2px solid var(--line); }
 .dot.ok { background: color-mix(in srgb, var(--c), #fff 70%); border-color: var(--c); color: color-mix(in srgb, var(--c), #000 40%); }
 .dot.cur { background: var(--c); border-color: var(--c); color: #fff; transform: scale(1.15); }
+/* ⭐ bonus adımlar: kesik çerçeve ve köşede yıldız; isteğe bağlı */
+.dot.bonus { border-style: dashed; position: relative; }
+.dot.bonus::after { content: "⭐"; position: absolute; top: -0.55em; right: -0.45em; font-size: 0.75em; }
+.bonusnote { margin: 0; padding: 0.45em 0.9em; border-radius: 12px; background: #fff6d6; border: 2px dashed #f2c200; font-weight: 700; }
+.lnav .bonusgo, .bonusinv .bonusgo { background: #fff6d6; border-color: #f2c200; }
+.bonusinv { margin: 0; font-weight: 700; }
 .stage { background: var(--card); border: 3px solid color-mix(in srgb, var(--c), #fff 65%); border-radius: 26px; padding: 1.3em; min-height: 22em; box-shadow: 0 8px 0 color-mix(in srgb, var(--c), #fff 80%); }
 .lnav { display: flex; align-items: center; gap: 0.8em; }
 .nhint { flex: 1; text-align: right; font-weight: 700; color: var(--bad); }

@@ -1,9 +1,10 @@
 // Robo ile Kodlama: macera haritası ve bölüm ekranı
-import { LESSONS, WEEKS } from './lessons/index.js';
+import { LESSONS, WEEKS, isBonus } from './lessons/index.js';
 import { renderStory, renderOrder, renderQuiz } from './acts.js';
 import { renderGrid } from './board.js';
 import { renderScratch } from './sahne/task.js';
 import { renderGuide } from './guide.js';
+import { renderSunum, hasSunum } from './sunum.js';
 import { fromHome, roboSVG, play, confetti, prefs, save, pload as load, psave, pdelPrefix, profile, profiles, setProfile, removeProfile, esc } from './robo.js';
 import { startIcons } from '../icons.js';
 
@@ -20,6 +21,9 @@ const rec = (no) => {
 };
 // Sertifika 8 haftalık programın sonunda verilir; ek bölümler programın dışındadır
 const CORE = LESSONS.filter((l) => !l.extra);
+// Bölüm, ⭐ bonus olmayan adımların hepsi yapılınca biter
+const reqIdx = (L) => L.steps.map((s, k) => (isBonus(s) ? -1 : k)).filter((k) => k >= 0);
+const reqDone = (L) => reqIdx(L).every((k) => rec(L.no).steps[k]);
 const wkLabel = (L) => (L.extra ? 'Ek bölüm' : `${L.week}. Hafta`);
 const RENDER = { story: renderStory, order: renderOrder, quiz: renderQuiz, grid: renderGrid, scratch: renderScratch };
 let cleanup = null;
@@ -27,12 +31,20 @@ let cleanup = null;
 function show(view) {
   document.body.dataset.view = view;
   mapEl.hidden = view !== 'map';
+  document.body.classList.toggle('insunum', view === 'sunum');
   lesEl.hidden = view === 'map';
 }
 
 function route() {
   cleanup?.();
   cleanup = null;
+  const sm = /^#sunum\/(\d+)(?:\/(\d+))?$/.exec(location.hash);
+  if (sm && hasSunum(+sm[1] - 1)) {
+    show('sunum');
+    crumb.textContent = `${sm[1]}. Hafta · Sunum`;
+    cleanup = renderSunum(lesEl, +sm[1] - 1, +(sm[2] || 0), (k) => { location.hash = `#sunum/${sm[1]}/${k}`; });
+    return;
+  }
   if (location.hash === '#ogretmen') { show('lesson'); crumb.textContent = 'Öğretmen kılavuzu'; renderGuide(lesEl); window.scrollTo(0, 0); lesEl.scrollTop = 0; return; }
   const m = /^#b(\d+)(?:\/(\d+|son))?$/.exec(location.hash);
   const L = m && LESSONS.find((l) => l.no === +m[1]);
@@ -51,15 +63,17 @@ function showMap() {
   const started = LESSONS.some((l) => Object.keys(rec(l.no).steps).length);
   const node = (l) => {
     const r = rec(l.no);
-    const n = Object.keys(r.steps).length;
+    const req = reqIdx(l);
+    const n = req.filter((k) => r.steps[k]).length;
     const st = Object.values(r.score).reduce((a, b) => a + b, 0);
-    return `<li class="node${r.done ? ' done' : ''}" style="--c:${l.color}"><a href="#b${l.no}">
+    return `<li class="node${r.done ? ' done' : ''}" style="--c:${l.color}" data-steps="${l.steps.length}"><a href="#b${l.no}">
   <span class="nnum">${r.done ? '✓' : l.no}</span>
   <span class="ncard"><span class="nicon">${l.icon}</span><span class="ntxt"><b>${l.no}. ${l.title}</b><small>${l.desc}</small>
-  <span class="nfoot"><span class="chip">Kavram: ${l.concept}</span><span class="nprog"><i style="width:${(n / l.steps.length) * 100}%"></i></span><span class="ncount">${n}/${l.steps.length}${st ? ` · ⭐${st}` : ''}</span></span></span></span>
+  <span class="nfoot"><span class="chip">Kavram: ${l.concept}</span><span class="nprog"><i style="width:${(n / req.length) * 100}%"></i></span><span class="ncount">${n}/${req.length}${st ? ` · ⭐${st}` : ''}</span></span></span></span>
 </a></li>`;
   };
-  const nodes = WEEKS.map((w, wi) => `<li class="whead"><span>${w.extra ? 'Ek' : `${wi + 1}. Hafta`}</span>${w.title}<small>${w.extra ? 'hızlı bitirenler ve tekrar için' : '4 ders × 40 dk'}</small></li>${w.lessons.map(node).join('')}`).join('');
+  const sunumBtn = (wi) => (hasSunum(wi) ? `<a class="btn wsun" href="#sunum/${wi + 1}" title="Tahtaya yansıtmak için haftanın özeti ve tarama testi">📽️ Sunum ve tarama testi</a>` : '');
+  const nodes = WEEKS.map((w, wi) => `<li class="whead"><span>${w.extra ? 'Ek' : `${wi + 1}. Hafta`}</span>${w.title}<small>${w.extra ? 'hızlı bitirenler ve tekrar için' : '4 ders × 40 dk'}</small>${w.extra ? '' : sunumBtn(wi)}</li>${w.lessons.map(node).join('')}`).join('');
   mapEl.innerHTML = `<div class="mwrap">
 <section class="hero">
   <div class="sbot wave">${roboSVG()}</div>
@@ -89,7 +103,7 @@ function showMap() {
 
 function lessonHead(L, i) {
   const r = rec(L.no);
-  const dots = L.steps.map((s, k) => `<a class="dot${k === i ? ' cur' : ''}${r.steps[k] ? ' ok' : ''}" href="#b${L.no}/${k}" title="${k + 1}. adım">${k + 1}</a>`).join('');
+  const dots = L.steps.map((s, k) => `<a class="dot${k === i ? ' cur' : ''}${r.steps[k] ? ' ok' : ''}${isBonus(s) ? ' bonus' : ''}" href="#b${L.no}/${k}" title="${k + 1}. adım${isBonus(s) ? ' (⭐ bonus, isteğe bağlı)' : ''}">${k + 1}</a>`).join('');
   return `<div class="lbar"><span class="ltag">${L.icon} ${L.no}. Bölüm</span><h2>${L.title}</h2><nav class="dots" aria-label="Adımlar">${dots}<a class="dot fin${i === 'son' ? ' cur' : ''}${r.done ? ' ok' : ''}" href="#b${L.no}/son" title="Bitiş">🏁</a></nav></div>`;
 }
 
@@ -98,9 +112,16 @@ function showStep(L, i) {
   crumb.textContent = `${wkLabel(L)} · ${L.no}. Bölüm`;
   const r = rec(L.no);
   const s = L.steps[i];
+  const bonus = isBonus(s);
+  // Bundan sonraki adımların hepsi bonus mu? Öyleyse burada bölüm biter, bonuslar isteğe bağlı
+  const rest = L.steps.slice(i + 1);
+  const lastReq = !bonus && rest.length > 0 && rest.every(isBonus);
+  const nextHref = i + 1 < L.steps.length && !lastReq ? `#b${L.no}/${i + 1}` : `#b${L.no}/son`;
+  const goText = nextHref.endsWith('son') ? 'Bitir 🏁' : 'Devam ▶';
   lesEl.innerHTML = `<div class="lwrap" style="--c:${L.color}">${lessonHead(L, i)}
+  ${bonus ? '<p class="bonusnote">⭐ <b>Bonus görev:</b> isteyen yapar. Zor gelirse <b>Atla ▶</b> düğmesine basabilirsin.</p>' : ''}
   <div class="stage s-${s.type}"></div>
-  <nav class="lnav"><a class="btn" href="${i > 0 ? `#b${L.no}/${i - 1}` : '#'}">◀ ${i > 0 ? 'Geri' : 'Harita'}</a><span class="nhint"></span><button type="button" class="primary big go" aria-disabled="true">${i + 1 < L.steps.length ? 'Devam ▶' : 'Bitir 🏁'}</button></nav></div>`;
+  <nav class="lnav"><a class="btn" href="${i > 0 ? `#b${L.no}/${i - 1}` : '#'}">◀ ${i > 0 ? 'Geri' : 'Harita'}</a><span class="nhint"></span>${lastReq ? `<a class="btn bonusgo" href="#b${L.no}/${i + 1}">⭐ Bonus görevler</a>` : ''}<button type="button" class="primary big go" aria-disabled="${!bonus}">${bonus ? goText.replace('Devam', 'Atla') : goText}</button></nav></div>`;
   const go = lesEl.querySelector('.go');
   const hint = lesEl.querySelector('.nhint');
   let ok = false;
@@ -110,19 +131,20 @@ function showStep(L, i) {
     ok = true;
     if (!r.steps[i]) { r.steps[i] = true; psave(KEY, progress); }
     go.setAttribute('aria-disabled', 'false');
+    go.textContent = goText;
     go.classList.add('ready');
     hint.textContent = '';
     lesEl.querySelector('.dot.cur')?.classList.add('ok');
   };
   go.onclick = () => {
-    if (!ok) {
+    if (!ok && !bonus) {
       play('wrong');
       hint.textContent = s.type === 'grid' ? 'Önce Robo\'yu pile ulaştır 🔋' : s.type === 'scratch' ? (s.free ? 'Bitirince ✔ Bitirdim düğmesine bas 🙂' : 'Önce hedeflerin hepsini ✅ yap, sonra 🏁 ile dene') : 'Önce bu görevi tamamla 🙂';
       go.classList.remove('shake'); void go.offsetWidth; go.classList.add('shake');
       return;
     }
     play('click');
-    location.hash = i + 1 < L.steps.length ? `#b${L.no}/${i + 1}` : `#b${L.no}/son`;
+    location.hash = nextHref;
   };
   if (r.steps[i]) done();
   cleanup = RENDER[s.type](lesEl.querySelector('.stage'), s, done, r.score[i], { L, i }) || null;
@@ -132,8 +154,9 @@ function showFinish(L) {
   show('lesson');
   crumb.textContent = `${wkLabel(L)} · ${L.no}. Bölüm`;
   const r = rec(L.no);
-  // Bölüm ancak bütün adımları yapılınca “bitti” sayılır (öğretmen üstteki düğmelerle atlayabilir)
-  if (L.steps.every((_, k) => r.steps[k])) { r.done = true; psave(KEY, progress); }
+  // Bölüm, ⭐ bonus olmayan bütün adımları yapılınca “bitti” sayılır (öğretmen üstteki düğmelerle atlayabilir)
+  if (reqDone(L)) { r.done = true; psave(KEY, progress); }
+  const openBonus = L.steps.findIndex((s, k) => isBonus(s) && !r.steps[k]);
   const next = LESSONS.find((l) => l.no === L.no + 1);
   lesEl.innerHTML = `<div class="lwrap" style="--c:${L.color}">${lessonHead(L, 'son')}
   <div class="stage finish">
@@ -143,6 +166,7 @@ function showFinish(L) {
     ${L.no === CORE.length ? certHTML() : ''}
     <div class="learned"><h4>Bu bölümde öğrendiklerin</h4><ul>${L.learned.map((x) => `<li>${x}</li>`).join('')}</ul></div>
     <div class="tnote"><h4>👩‍🏫 Sınıfta oynayın</h4><p>${L.teacher}</p></div>
+    ${openBonus >= 0 ? `<p class="bonusinv">Hızlı mı bitirdin? <a class="btn bonusgo" href="#b${L.no}/${openBonus}">⭐ Bonus görevleri dene</a></p>` : ''}
     <div class="fbtns">${next ? `<a class="btn primary big" href="#b${next.no}">${next.extra && !L.extra ? '🎁 Ek bölümler: ' : ''}${next.icon} ${next.no}. Bölüm: ${next.title} ▶</a>` : '<span class="soon-txt">🏆 Bütün bölümleri bitirdin!</span>'}<a class="btn big" href="#">🗺 Haritaya dön</a></div>
   </div></div>`;
   play('win');

@@ -88,11 +88,19 @@ function blockHTML(b, ctx) {
   return `<div class="blk box ${k.cls}" data-id="${b.id}"><div class="lhead"><span class="bi">${k.icon}</span>${head}<span class="iter"></span><span class="chk"></span>${del}</div>${body('body')}${b.c === 'ife' ? `<div class="lmid" data-in="${b.id}:body2">değilse</div>${body('body2')}` : ''}<div class="lfoot" data-after="${b.id}">${foot}</div></div>`;
 }
 
+// Art arda aynı yöne dönüşlerin sonucu (çocuklar ikinci dönüşü unutuyor ya da fazladan dönüyor)
+const TURN_NOTE = { 2: '↩ 2 kez döndü: Robo arkasına bakar', 3: '3 kez döndü: tek dönüşün tersine bakar', 4: '4 kez döndü: tam tur, yine aynı yöne bakar' };
+const turnRun = (list, i) => { let k = 0; while (k <= i && list[i - k].c === list[i].c) k++; return k; };
+
 function listHTML(list, ctx) {
   let h = '';
   for (let i = 0; i <= list.length; i++) {
     if (!ctx.ro && ctx.caret.list === list && ctx.caret.i === i) h += '<span class="caret" aria-hidden="true"></span>';
-    if (i < list.length) h += blockHTML(list[i], ctx);
+    if (i < list.length) {
+      h += blockHTML(list[i], ctx);
+      const c = list[i].c;
+      if (!ctx.ro && (c === 'L' || c === 'R') && list[i + 1]?.c !== c && TURN_NOTE[turnRun(list, i)]) h += `<span class="pnote">${TURN_NOTE[turnRun(list, i)]}</span>`;
+    }
   }
   if (!list.length && !ctx.ro) h += ctx.root === list ? `<span class="pempty">${ctx.emptyText}</span>` : '<span class="pempty">içine komut ekle ya da bir bloğu buraya sürükle</span>';
   return h;
@@ -113,6 +121,21 @@ export function unrollPic(str) {
   return `<div class="unroll">${Array.from({ length: L.n }, (_, k) => `<div class="urow"><span class="utur">${k + 1}. tur</span>${unBody(L.body)}</div>`).join('')}</div>`;
 }
 // Program ve yanında açılmış hali: “bilgisayar bunu böyle okur”
+// Programın açılmış hali: üst düzeydeki her döngü turu ayrı satır (iç döngüler çerçeveli)
+function liveRows(list) {
+  const rows = [];
+  let flat = [];
+  const flush = () => { if (flat.length) rows.push(`<div class="urow">${flat.join(' ')}</div>`); flat = []; };
+  for (const b of list) {
+    if (b.c !== 'loop') { flat.push(chips(b.c)); continue; }
+    flush();
+    for (let k = 1; k <= b.n; k++) rows.push(`<div class="urow"><span class="utur">${k}. tur</span>${unBody(b.body)}</div>`);
+  }
+  flush();
+  return rows.join('');
+}
+// Döngüler açılınca kaç komut çalışır
+const countFlat = (list) => list.reduce((n, b) => n + (b.c === 'loop' ? b.n * countFlat(b.body) : 1), 0);
 export const loopPic = (str) => `<div class="uwrap">${codePic(str)}<span class="uarr">➜</span>${unrollPic(str)}</div>`;
 
 // Adım adım görevde bir adımın şartı: tam yazım, düzenli ifade ya da (yazım, imlecin derinliği) işlevi
@@ -120,8 +143,11 @@ const fits = (w, s, d) => (w == null ? false : typeof w === 'function' ? w(s, d)
 const HUES = ['#ff5d8f', '#2f8cff', '#ffb000', '#16b364', '#a259ff', '#ff7a1a', '#00b8d9', '#e0457b', '#7cb518'];
 
 const within = (root, list) => root === list || root.some((b) => (SLOTS[b.c] || []).some((s) => within(b[s], list)));
+// “Sağ-sol” işaretleri: dönüşlerin öğretildiği ilk haftada açık başlar; öğretmen kapatıp açabilir (sayfa açık kaldıkça hatırlanır)
+let sidesPick = null;
+const FACING = ['yukarı ⬆', 'sağa ➡', 'aşağı ⬇', 'sola ⬅'];
 
-export function renderGrid(el, step, done, prev) {
+export function renderGrid(el, step, done, prev, where = {}) {
   const rows = step.maps || [step.map];
   const M = rows.map(parseMap);
   const dirs = rows.map((_, k) => DIR[(step.dirs && step.dirs[k]) || step.dir || 'E']);
@@ -144,6 +170,8 @@ export function renderGrid(el, step, done, prev) {
   let fails = 0;
   const total = () => countBlocks(prog) + countBlocks(fn);
   const stars = (n) => '⭐'.repeat(n) + '<span class="dim">⭐</span>'.repeat(3 - n);
+  const turns = step.tools.includes('L') || step.tools.includes('R');
+  let sides = turns && (sidesPick ?? step.sides ?? (where.L?.week === 1 && !where.L.extra));
 
   const tabs = M.length > 1 ? `<div class="mtabs">${M.map((_, k) => `<button type="button" class="mtab${k ? '' : ' cur'}" data-k="${k}">🗺 Harita ${k + 1}</button>`).join('')}</div>` : '';
   el.innerHTML = `<div class="gridact${narrOn ? ' talk' : ''}">
@@ -152,7 +180,7 @@ export function renderGrid(el, step, done, prev) {
     ${T ? `<div class="tut"><h4>👣 Adım adım yap</h4><ol>${T.map((x) => `<li>${x.t}</li>`).join('')}</ol><p class="toff" hidden>🤔 Program tarife uymadı. Son eklediğin bloğu <b>✖</b> ile sil ya da <b>🗑 Temizle</b>'ye basıp baştan başla.</p></div>` : ''}
     ${tabs}
     ${narrOn ? '<div class="narr" aria-live="polite"></div>' : ''}
-    <div class="gboard"><div class="board"></div></div>
+    <div class="gboard${turns ? ' turny' : ''}"><div class="board"></div></div>
     <div class="hint" hidden></div>
   </div>
   <div class="gcode">
@@ -160,6 +188,7 @@ export function renderGrid(el, step, done, prev) {
     <div class="tools"${watch ? ' hidden' : ''}>${step.tools.map((c) => `<button type="button" class="tool ${CMDS[c].cls}" data-c="${c}"><span class="bi">${CMDS[c].icon}</span>${c === 'fn' ? fnName : CMDS[c].label}</button>`).join('')}</div>
     <h4>Programım <span class="cnt"></span></h4>
     <div class="prog" data-root="main" tabindex="-1"></div>
+    ${step.unroll ? '<div class="liveun" aria-live="polite"></div>' : ''}
     ${hasFn ? `<h4 class="fnhead">🧩 ${fnName} fonksiyonum</h4><div class="prog fnprog" data-root="fn" tabindex="-1"></div>` : ''}
     <p class="ptip"${watch || T ? ' hidden' : ''}>✋ Blokları <b>sürükleyerek</b> yerini değiştirebilir, içine ya da dışına taşıyabilirsin.</p>
     <div class="ctrl">
@@ -167,6 +196,7 @@ export function renderGrid(el, step, done, prev) {
       ${watch ? '' : `<button type="button" class="reset">↺ Başa al</button>
       <button type="button" class="clear">${step.preset || step.fnPreset ? '↺ İlk program' : '🗑 Temizle'}</button>`}
       ${step.pathHint && step.sol ? '<button type="button" class="vhint">💡 Yolu renklerle göster</button>' : ''}
+      ${turns ? `<button type="button" class="sidesbtn" aria-pressed="${sides}" title="Robo'nun solunu ve sağını tahtada göster">🧭 Sağ-sol ${sides ? 'açık' : 'kapalı'}</button>` : ''}
     </div>
   </div>
 </div>`;
@@ -190,6 +220,7 @@ export function renderGrid(el, step, done, prev) {
     board.style.setProperty('--w', m.w);
     board.style.setProperty('--h', m.h);
     board.innerHTML = boardInner(m, dirs[k]);
+    board.classList.toggle('sides', sides);
     rb = q('.rb');
     arrow = q('.rarrow');
     trail = q('.path');
@@ -200,7 +231,8 @@ export function renderGrid(el, step, done, prev) {
 
   // Kare boyutu alana göre ayarlanır
   function fit() {
-    const w = q('.gboard').clientWidth - 8;
+    const g = q('.gboard');
+    const w = g.clientWidth - 2 * parseFloat(getComputedStyle(g).paddingLeft) - 4;
     const t = Math.max(34, Math.min(80, Math.floor(w / M[mi].w)));
     board.style.setProperty('--t', t + 'px');
   }
@@ -266,10 +298,16 @@ export function renderGrid(el, step, done, prev) {
       if (cr.bottom > pr.bottom) box.scrollTop += cr.bottom - pr.bottom + 10;
       else if (cr.top < pr.top) box.scrollTop -= pr.top - cr.top + 10;
     }
+    if (step.unroll) {
+      const u = q('.liveun');
+      u.innerHTML = prog.some((b) => b.c === 'loop') ? `<b>Robo bunu uzun haliyle böyle yapar:</b><div class="unroll">${liveRows(prog)}</div><small>Toplam <b>${countFlat(prog)} komut</b> çalışır, sen <b>${n} blokla</b> yazdın.</small>` : '';
+    }
     updateTut();
   }
 
   function changed() {
+    el.querySelectorAll('.grp').forEach((b) => { b.classList.remove('grp'); b.style.removeProperty('--g'); });
+    el.querySelectorAll('.glabel').forEach((b) => b.remove());
     resetRobot();
     hideToast();
     updateTut();
@@ -325,7 +363,7 @@ export function renderGrid(el, step, done, prev) {
     // Bu döngünün dışında kaç döngü var?
     const above = (L, d) => { for (const b of L) { if (b.id === +id) return d; for (const s of SLOTS[b.c] || []) { const r = above(b[s], d + (b.c === 'loop')); if (r >= 0) return r; } } return -1; };
     const n = above(prog, 0);
-    return n === 0 ? 'Dış döngü' : n === 1 ? 'İç döngü' : 'En içteki döngü';
+    return n === 0 ? 'Büyük döngü' : n === 1 ? 'Küçük döngü' : 'En küçük döngü';
   }
   function narrIdle() {
     if (!narrEl) return;
@@ -359,7 +397,7 @@ export function renderGrid(el, step, done, prev) {
       for (const [j, id] of ended.entries()) {
         const n = find(+id).b.n;
         const outer = loopIds(cur).some((x) => !ended.includes(x)) || j < ended.length - 1;
-        out.push({ t: 'cap', loops: prev, html: `✅ <b>${loopName(id)} bitti:</b> ${n} turun hepsini yaptım. ${outer ? 'Dıştaki döngüye dönüyorum.' : 'Döngüden çıkıyorum, sıradaki bloğa geçiyorum.'}` });
+        out.push({ t: 'cap', loops: prev, html: `✅ <b>${loopName(id)} bitti:</b> ${n} turun hepsini yaptım. ${outer ? 'Büyük döngüye dönüyorum.' : 'Döngüden çıkıyorum, sıradaki bloğa geçiyorum.'}` });
         prev = Object.fromEntries(Object.entries(prev).filter(([x]) => x !== id));
       }
       for (const id of loopIds(cur)) {
@@ -415,6 +453,20 @@ export function renderGrid(el, step, done, prev) {
   el.querySelector('.tools').addEventListener('click', (e) => {
     const b = e.target.closest('.tool');
     if (b) add(b.dataset.c);
+  });
+  // Dönüş düğmesinin üstüne gelince tahtada o taraf yanıp söner: “Sola dön dersen buraya bakacaksın”
+  for (const c of ['L', 'R']) {
+    const t = el.querySelector(`.tool[data-c="${c}"]`);
+    if (!t) continue;
+    t.addEventListener('pointerenter', () => { if (!running) board.classList.add('peek-' + c); });
+    t.addEventListener('pointerleave', () => board.classList.remove('peek-' + c));
+  }
+  q('.sidesbtn') && (q('.sidesbtn').onclick = (e) => {
+    sides = sidesPick = !sides;
+    e.currentTarget.setAttribute('aria-pressed', sides);
+    e.currentTarget.textContent = `🧭 Sağ-sol ${sides ? 'açık' : 'kapalı'}`;
+    board.classList.toggle('sides', sides);
+    play('click');
   });
 
   const roots = [progEl, fnEl].filter(Boolean);
@@ -630,6 +682,12 @@ export function renderGrid(el, step, done, prev) {
   async function run() {
     if (running) { resetRobot(); return; }
     hideToast();
+    if (max && total() > max) {
+      play('wrong');
+      say('warn', `Programında <b>${total()} blok</b> var ama bu görevde en fazla <b>${max} blok</b> olmalı. ${step.tools.includes('loop') ? '🔁 Döngü ile kısaltmayı dene!' : ''}`);
+      cnt.classList.remove('shake'); void cnt.offsetWidth; cnt.classList.add('shake');
+      return;
+    }
     const my = ++tok;
     const ms = watch ? 900 : prefs.fast ? 260 : 540;
     for (let k = 0; k < M.length; k++) {
@@ -660,7 +718,10 @@ export function renderGrid(el, step, done, prev) {
         rb.classList.add('sad');
         if (!['tree', 'edge', 'water', 'door'].includes(r.result)) play('wrong');
         const multi = M.length > 1 && k > 0 ? '<br><small>Unutma: aynı program <b>bütün haritalarda</b> çalışmalı.</small>' : '<br><small>Programını düzelt ve tekrar ▶ Çalıştır\'a bas.</small>';
-        say('bad', `${where}<b>${FAIL[r.result]}</b>${multi}`);
+        // Yön karışıklığında işe yarar: Robo hata anında ekranda nereye bakıyordu?
+        const last = r.ev[r.ev.length - 1];
+        const face = turns && last && ['tree', 'edge', 'water', 'door'].includes(r.result) ? `<br>Robo o anda ekranda <b>${FACING[last.d]}</b> bakıyordu.` : '';
+        say('bad', `${where}<b>${FAIL[r.result]}</b>${face}${multi}`);
         if (step.hint && fails >= 2 && !hintOn) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
         if (fails >= 2) q('.vhint')?.classList.add('tgo');
         return;
@@ -683,10 +744,26 @@ export function renderGrid(el, step, done, prev) {
     if (watch) say('ok', `<b>${step.win || 'Döngünün nasıl çalıştığını gördün! 👀'}</b><br>İstersen bir daha izle, ya da <b>Devam ▶</b> düğmesine bas.`, 7000);
     else say('ok', `<b>${step.win || WIN[Math.floor(Math.random() * WIN.length)]}</b>${rate}<br>${n} blokla çözdün. <b>Devam ▶</b> düğmesine basabilirsin.`, 7000);
     if (!hintOn) hintEl.hidden = true;
+    if (step.groups) showGroups();
     updateTut();
     done(s);
   }
   runBtn.onclick = run;
+
+  // Uzun programda tekrar eden parçaları renklendirir: “bak, aynı parça 3 kez var!”
+  function showGroups() {
+    const els = [...progEl.querySelectorAll(':scope > .blk')];
+    const pat = step.groups;
+    let k = 0;
+    for (let i = 0; i + pat.length <= prog.length; ) {
+      if (prog.slice(i, i + pat.length).map((b) => b.c).join('') !== pat) { i++; continue; }
+      els.slice(i, i + pat.length).forEach((b) => { b.classList.add('grp'); b.style.setProperty('--g', HUES[k % HUES.length]); });
+      els[i].insertAdjacentHTML('beforebegin', `<span class="glabel" style="--g:${HUES[k % HUES.length]}">${k + 1}. tekrar</span>`);
+      k++;
+      i += pat.length;
+    }
+    if (k > 1) say('ok', step.groupsWin || `<b>Aynı parça ${k} kez tekrar ediyor!</b> Renkli kutulara bak. Tekrar eden parçayı döngüye koyarsak program kısalır.`, 9000);
+  }
 
   showMap(0);
   draw();

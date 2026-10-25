@@ -3,6 +3,8 @@
 .gleft { display: flex; flex-direction: column; gap: 0.6em; min-width: 0; }
 .ginfo h3 { font-size: 1.35em; font-weight: 900; color: color-mix(in srgb, var(--c), #000 25%); }
 .gboard { padding: 0.8em 4px 1em; min-width: 0; overflow: hidden; }
+/* sağ-sol işaretleri tahtanın kenarından taşar: yer açılır */
+.gboard.turny { padding: 1.9em 1.9em 2em; }
 .gcode { background: #faf7ff; border: 2px solid #e6dcff; border-radius: 20px; padding: 0.9em; display: flex; flex-direction: column; gap: 0.5em; }
 .gcode h4 { font-size: 0.95em; color: var(--mut); display: flex; align-items: center; gap: 0.5em; }
 .cnt { margin-left: auto; font-size: 0.85em; background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 0 0.6em; }
@@ -93,6 +95,16 @@
 .rbi .robo { width: 100%; height: 100%; display: block; position: relative; }
 .rarrow { position: absolute; inset: -12%; transform: rotate(var(--r)); transition: transform var(--dur) ease-in-out; }
 .rarrow i { position: absolute; left: 50%; top: -4%; transform: translateX(-50%); border-left: calc(var(--t) * 0.13) solid transparent; border-right: calc(var(--t) * 0.13) solid transparent; border-bottom: calc(var(--t) * 0.17) solid #ff3d7f; filter: drop-shadow(0 2px 0 #0003); }
+/* sol / sağ işaretleri: okla birlikte döner, yazı hep düz kalır (ters dönüşle) */
+.side { display: none; position: absolute; top: 50%; z-index: 4; font: 900 calc(var(--t) * 0.2)/1 "Nunito", "Segoe UI", sans-serif; color: #fff; padding: 0.18em 0.4em; border-radius: 999px; border: 2px solid #fff; box-shadow: 0 2px 0 #0003; transform: translateY(-50%) rotate(calc(-1 * var(--r))); transition: transform var(--dur) ease-in-out; }
+.side.sl { right: 86%; background: #2f8cff; }
+.side.sr { left: 86%; background: #7a5cff; }
+.board.sides .side, .board.peek-L .side.sl, .board.peek-R .side.sr { display: block; }
+.board.peek-L .side.sl, .board.peek-R .side.sr { animation: sidepulse 0.7s ease-in-out infinite; }
+@keyframes sidepulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, currentColor, transparent 60%); filter: brightness(1.15); } }
+.ctrl .sidesbtn[aria-pressed="true"] { background: #efe9ff; }
+/* art arda aynı dönüş: ne olduğunu söyleyen not */
+.pnote { align-self: flex-start; font-size: 0.78em; font-weight: 800; color: #5b3fd6; background: #f1ecff; border-radius: 999px; padding: 0.1em 0.7em; margin: -0.1em 0 0.1em 0.6em; }
 .rb.d0 .pup { transform: translateY(-2.5px); }
 .rb.d1 .pup { transform: translateX(3px); }
 .rb.d2 .pup { transform: translateY(2.5px); }
@@ -199,3 +211,15 @@
 .ugrp { display: inline-flex; gap: 0.25em; padding: 0.15em 0.3em; border: 2px dashed #e0457b; border-radius: 10px; background: #fff0f5; }
 /* anlatımlı görevde çalışan bloğu izleyebilmek için program soluklaşmaz */
 .running .talk .prog { opacity: 1; }
+/* anlatımda yan yana dönen küçük Robolar ve sol/sağ etiket örnekleri */
+.botrow { display: flex; align-items: center; justify-content: center; gap: 0.6em; flex-wrap: wrap; margin: 0.4em 0; }
+.botrow .mini { margin: 0; }
+.tsl, .tsr { color: #fff; border-radius: 999px; padding: 0.05em 0.5em; }
+.tsl { background: #2f8cff; }
+.tsr { background: #7a5cff; }
+/* tekrar eden parçalar (uzun program) ve döngünün canlı uzun hali */
+.blk.grp { outline: 4px solid var(--g); outline-offset: 1px; }
+.glabel { align-self: flex-start; font-size: 0.75em; font-weight: 900; color: #fff; background: var(--g); border-radius: 999px; padding: 0 0.6em; margin-top: 0.2em; }
+.liveun { font-size: 0.85em; background: #fff8e6; border: 2px solid #ffd77a; border-radius: 12px; padding: 0.4em 0.6em; display: flex; flex-direction: column; gap: 0.25em; }
+.liveun:empty { display: none; }
+.liveun .unroll { margin: 0; }

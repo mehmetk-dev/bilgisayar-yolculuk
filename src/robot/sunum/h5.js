@@ -1,0 +1,68 @@
+// 5. hafta sunumu: sürekli tekrarla, ses ve nota, algılama ve "eğer", kalemle çizim
+import { blk } from '../lessons/sh.js';
+
+const fish = `<div class="sl-script">${blk('events', '🏁 tıklandığında', 1)}${blk('control', 'sürekli tekrarla')}<div class="in">${blk('motion', '10 adım git')}${blk('motion', 'kenara geldiyse sek')}</div></div>`;
+const ifPic = `<div class="sl-script">${blk('events', '🏁 tıklandığında', 1)}${blk('control', 'sürekli tekrarla')}<div class="in">${blk('motion', '10 adım git')}${blk('control', 'eğer kenara dokunuyorsa')}<div class="in">${blk('looks', 'Ay! de')}</div></div></div>`;
+const squarePic = `<div class="sl-script">${blk('events', '🏁 tıklandığında', 1)}${blk('pen', 'kalemi bastır')}${blk('control', '4 kez tekrarla')}<div class="in">${blk('motion', '100 adım git')}${blk('motion', '↻ 90 derece dön')}</div></div>`;
+const notePic = `<div class="sl-script">${blk('events', '🏁 tıklandığında', 1)}${blk('sound', '♪ Do 0.5 vuruş')}${blk('sound', '♪ Re 0.5 vuruş')}${blk('sound', '♪ Mi 0.5 vuruş')}</div>`;
+
+export const s5 = {
+  slides: [
+    { k: 'kavram', title: '♾️ Sürekli tekrarla',
+      text: '<p>İçindeki bloklar <b>hiç durmadan</b> tekrar eder.</p><p>Ancak <b>⏹ düğmesine</b> basınca durur.</p>',
+      pic: fish },
+    { k: 'kavram', title: '🔀 İki betik birden',
+      text: '<p>Bir kuklanın <b>birden fazla</b> betiği olabilir.</p><p>İkisi <b>aynı anda</b> çalışır: kuş hem kanat çırpar hem uçar!</p>',
+      pic: '<ol class="sl-steps"><li>🐦 Betik 1: kanat çırp</li><li>➡️ Betik 2: ileri uç</li></ol>' },
+    { k: 'kavram', title: '🎵 Ses ve nota',
+      text: '<p>Pembe <b>ses blokları</b> kuklaya ses çıkarttırır.</p><p><b>Vuruş</b> notanın süresidir: 1 vuruş, yarım vuruştan <b>daha uzundur</b>.</p>',
+      pic: notePic },
+    { k: 'kavram', title: '👀 Algılama ve eğer',
+      text: '<p>Algılama blokları <b>evet/hayır</b> sorusu sorar: Dokunuyor mu?</p><p><b>Eğer</b> cevap evet ise içindeki bloklar çalışır.</p>',
+      pic: ifPic },
+    { k: 'kavram', title: '🔁 Neden sürekli?',
+      text: '<p>“Eğer”i <b>sürekli tekrarla</b> içine koyarız.</p><p>Böylece soru <b>hep</b> sorulur, kedi ne zaman gelirse anlarız.</p>',
+      pic: '<div class="sl-steps" style="font-size:2.4em">🐱 ➜ 🍎</div>' },
+    { k: 'kavram', title: '✏️ Kalemle çizim',
+      text: '<p><b>Kalemi bastır</b>: kukla yürüdükçe çizer.</p><p>Kare: <b>4 kez</b> [100 adım, 90 derece dön]. Üçgende <b>3 kez</b> 120 derece döneriz.</p>',
+      pic: squarePic },
+    { k: 'ogrendik', items: [
+      '<b>Sürekli tekrarla</b> ⏹ basılana kadar durmaz.',
+      'Bir kuklanın <b>aynı anda</b> çalışan birden çok betiği olabilir.',
+      'Nota bloğu notayı bir <b>vuruş</b> süresince çalar.',
+      '<b>Eğer</b> içindekiler, cevap <b>evet</b> ise çalışır.',
+      'Sürekli kontrol için “eğer” <b>sürekli tekrarla</b> içine konur.',
+      'Kare ve üçgen döngüyle çizilir: köşe sayısı kadar <b>tekrarla</b>.',
+    ] },
+    { k: 'soru', q: '<b>Sürekli tekrarla</b> döngüsü ne zaman durur?',
+      opts: ['⏹ düğmesine basınca', '10 turdan sonra', 'Kukla kenara gelince'], a: 0,
+      why: 'Kendi kendine durmaz; ⏹ düğmesi onu durdurur.' },
+    { k: 'soru', q: 'Bu betik balığa ne yaptırır?', pic: fish,
+      opts: ['Bir kez 10 adım gider', 'Durmadan yüzer, kenara gelince sekip geri döner', 'Hiç hareket etmez'], a: 1,
+      why: 'Sürekli tekrarla içindeki bloklar durmadan çalışır.' },
+    { k: 'soru', q: 'Kuş aynı anda <b>hem kanat çırpsın hem uçsun</b> istiyoruz. Ne yapmalı?',
+      opts: ['Hepsini tek betiğe sıkıştırmalı', 'Kuşa iki 🏁 betiği yazmalı', 'Önce uçup sonra kanat çırpmalı'], a: 1,
+      why: 'İki betik aynı anda çalışır; biri kanat, biri uçuş olur.' },
+    { k: 'soru', q: 'Nota bloğunda vuruşu <b>0.5</b>\'ten <b>1</b>\'e çıkarırsak ne olur?',
+      opts: ['Nota iki kez çalar', 'Nota daha ince çıkar', 'Nota daha uzun çalar'], a: 2,
+      why: 'Vuruş notanın süresidir; 1 vuruş daha uzundur.' },
+    { k: 'soru', q: 'Bu betik <b>Do Re Mi</b> notalarını nasıl çalar?', pic: notePic,
+      opts: ['Hepsini aynı anda', 'Sırayla, birer birer', 'Hiçbirini çalmaz'], a: 1,
+      why: 'Bloklar yukarıdan aşağıya sırayla çalışır; şarkı da bir algoritmadır.' },
+    { k: 'soru', q: 'Hangi blok <b>evet/hayır</b> sorusu sorar?',
+      opts: ['10 adım git', 'kenara dokunuyor mu?', 'davul sesini çal'], a: 1,
+      why: 'Algılama blokları “dokunuyor mu?” gibi evet/hayır sorusu sorar.' },
+    { k: 'soru', q: 'Bu betikte kedi <b>ne zaman</b> “Ay!” der?', pic: ifPic,
+      opts: ['Hemen, her adımda', 'Hiçbir zaman', 'Kenara dokunduğunda'], a: 2,
+      why: 'Eğer bloğunun içi, sadece cevap evet ise çalışır.' },
+    { k: 'soru', q: '“Eğer kediye dokunuyorsa” bloğunu neden <b>sürekli tekrarla</b> içine koyarız?',
+      opts: ['Elma daha hızlı olsun diye', 'Koşul hep kontrol edilsin diye', 'Koşul bir kez bakılsın diye'], a: 1,
+      why: 'Döngü olmasa sadece başlangıçta bakılır; kedi sonra gelince anlamazdı.' },
+    { k: 'soru', q: 'Kalem ile <b>kare</b> çizmek için hangisi doğrudur?', pic: squarePic,
+      opts: ['4 kez tekrarla [100 adım git, 90 derece dön]', '3 kez tekrarla [100 adım git, 90 derece dön]', '4 kez tekrarla [100 adım git] (dönmeden)'], a: 0,
+      why: 'Karenin 4 köşesi var ve her köşede dik dönülür.' },
+    { k: 'soru', q: 'Üçgenin <b>3</b> köşesi var. Her köşede kaç derece dönülür?',
+      opts: ['60', '90', '120'], a: 2,
+      why: '120 + 120 + 120 = 360, yani bir tam tur.' },
+  ],
+};

@@ -1,0 +1,55 @@
+/* Haftalık sunum ve tarama testi: tahtaya yansıtılır, arkadan okunacak kadar büyük yazı */
+.wsun { margin-left: auto; font-size: 0.62em; padding: 0.3em 0.8em; background: #efe9ff; border-color: #c9b8ff; }
+body.insunum #top { display: none; }
+body.insunum #lesson { padding: 0; }
+.sunum { min-height: 100vh; display: flex; flex-direction: column; font-size: clamp(20px, 2.35vw, 40px); padding: 0.5em 1em 0.6em; gap: 0.5em; }
+.sl-bar { display: flex; align-items: center; gap: 0.6em; font-size: 0.55em; }
+.sl-bar .sp { flex: 1; }
+.sl-title { font-weight: 800; color: var(--mut); }
+.slide { flex: 1; background: #fff; border-radius: 28px; border: 4px solid #e4d8ff; box-shadow: 0 8px 0 #e4d8ff; padding: 0.8em 1.2em; display: flex; flex-direction: column; justify-content: center; gap: 0.5em; min-height: 0; overflow: auto; animation: pop 0.3s; }
+.slide h1 { font-size: 2.1em; color: #4a2fbf; }
+.slide h2 { font-size: 1.45em; color: #4a2fbf; }
+.slide p, .slide li { line-height: 1.35; }
+.sl-tag { margin: 0; font-size: 0.7em; font-weight: 900; color: #fff; background: #7a5cff; border-radius: 999px; padding: 0.1em 0.8em; align-self: flex-start; }
+.sl-kapak, .sl-test { display: flex; align-items: center; gap: 1.2em; justify-content: center; }
+.sl-kapak .sbot, .sl-test .sbot { width: 6em; flex: none; }
+.sl-les { margin: 0.4em 0 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.2em; font-size: 0.9em; font-weight: 700; }
+.sl-les span { display: inline-block; width: 1.4em; }
+.sl-body { display: flex; gap: 1em; align-items: center; }
+.sl-body.two > * { flex: 1 1 50%; min-width: 0; }
+.sl-pic { display: flex; flex-direction: column; align-items: center; gap: 0.4em; }
+.sl-pic .board.pic { margin: 0; }
+.sl-pic .codepic { font-size: 0.75em; }
+.sl-pic .mini .board { --t: 3.6em !important; }
+.slide .chipb { font-size: 0.85em; }
+.sl-steps { margin: 0; padding-left: 1.3em; font-size: 1em; font-weight: 800; display: flex; flex-direction: column; gap: 0.25em; }
+.sl-ogr { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35em; }
+.sl-ogr li { background: #f6f2ff; border-radius: 16px; padding: 0.3em 0.7em 0.3em 1.8em; position: relative; }
+.sl-ogr li::before { content: "✅"; position: absolute; left: 0.45em; }
+.sl-q { font-size: 1.25em !important; color: var(--fg) !important; }
+.sl-opts { display: flex; flex-direction: column; gap: 0.35em; flex: 1; }
+.sl-opt { justify-content: flex-start; text-align: left; font-size: 0.95em; padding: 0.35em 0.6em; border-width: 3px; border-radius: 18px; gap: 0.6em; }
+.sl-opt b { flex: none; width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; background: #7a5cff; color: #fff; }
+.sl-opt.right { border-color: var(--ok); background: var(--ok-bg); }
+.sl-opt.right b { background: var(--ok); }
+.sl-opt.dim { opacity: 0.45; }
+.sl-opt.wrongopt { border-color: var(--bad); background: var(--bad-bg); }
+.sl-foot { display: flex; align-items: center; gap: 0.6em; min-height: 2.2em; }
+.sl-show { font-size: 0.8em; }
+.sl-why { font-size: 0.85em; background: var(--ok-bg); border-radius: 16px; padding: 0.3em 0.8em; animation: pop 0.3s; }
+.sl-nav { display: flex; align-items: center; gap: 0.6em; font-size: 0.6em; }
+.sl-dots { flex: 1; display: flex; gap: 0.3em; justify-content: center; flex-wrap: wrap; }
+.sl-dots i { width: 0.7em; height: 0.7em; border-radius: 50%; background: #e4d8ff; }
+.sl-dots i.ok { background: #b9a6ff; }
+.sl-dots i.cur { background: #7a5cff; transform: scale(1.3); }
+.sl-n { font-weight: 800; color: var(--mut); }
+@media (max-width: 760px) {
+  .sl-body { flex-direction: column; }
+  .sl-kapak, .sl-test { flex-direction: column; text-align: center; }
+}
+/* Scratch betiği resmi: <div class="sl-script">blok, <div class="in">içteki bloklar</div>, …</div> */
+.sl-script { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 0.8em; }
+.sl-script .in { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-left: 1.6em; padding-left: 0.4em; border-left: 4px solid #ffab19; }
+.sl-pic .bdpic { max-width: 100%; }
+.gsun { font-size: 0.5em; margin-left: 0.6em; vertical-align: middle; background: #efe9ff; border-color: #c9b8ff; }
+@media print { .gsun, .wsun { display: none; } }

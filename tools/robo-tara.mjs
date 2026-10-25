@@ -51,7 +51,7 @@ await page.evaluate(() => { try { sessionStorage.setItem('robo-secildi', '1'); l
 await page.reload();
 await page.waitForSelector('.node a', { timeout: 15000 });
 // bölüm listesi haritadan okunur: adres ve adım sayısı ("n/toplam")
-const lessons = await page.$$eval('.node', (ns) => ns.map((n) => ({ no: +n.querySelector('a').getAttribute('href').slice(2), title: n.querySelector('.ntxt b').textContent, steps: +n.querySelector('.ncount').textContent.split('/')[1].split(' ')[0] })));
+const lessons = await page.$$eval('.node', (ns) => ns.map((n) => ({ no: +n.querySelector('a').getAttribute('href').slice(2), title: n.querySelector('.ntxt b').textContent, steps: +n.dataset.steps })));
 if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
 
 const overflow = () => page.evaluate(() => {

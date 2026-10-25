@@ -27,6 +27,9 @@ export const WEEKS = [
   { extra: true, title: 'Ek bölümler: bulmaca, müzik ve oyunlar', lessons: [b33, b34, b35, b36, b37, b38, b39, b40, b41, b42, b43, b44] },
 ];
 
+// ⭐ bonus adım: bölümü bitirmek için zorunlu değil, atlanabilir (yapabilen öğrenciler için). Başlığı ⭐ ile başlayan ya da bonus: true olan adım.
+export const isBonus = (s) => s.bonus ?? /^⭐/.test(s.title);
+
 // Bölümlere sıra numarası ve hafta bilgisi verilir
 export const LESSONS = WEEKS.flatMap((w, wi) => w.lessons.map((l) => Object.assign(l, { week: wi + 1, extra: !!w.extra })));
 LESSONS.forEach((l, i) => { l.no = i + 1; });

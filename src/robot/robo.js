@@ -87,8 +87,9 @@ export function miniBot(d) {
   return `<div class="mini"><div class="board" style="--w:1;--h:1;--t:5em"><div class="tile t-floor"></div>${robotHTML(d)}</div></div>`;
 }
 
+// Okla birlikte dönen “sol / sağ” işaretleri: tahtada .sides sınıfı varken görünür (dönüşleri öğrenirken)
 export function robotHTML(d, x = 0, y = 0) {
-  return `<div class="rb d${d}" style="--x:${x};--y:${y}"><div class="rbi"><div class="rarrow" style="--r:${d * 90}deg"><i></i></div>${roboSVG()}</div></div>`;
+  return `<div class="rb d${d}" style="--x:${x};--y:${y}"><div class="rbi"><div class="rarrow" style="--r:${d * 90}deg"><i></i><b class="side sl">sol</b><b class="side sr">sağ</b></div>${roboSVG()}</div></div>`;
 }
 
 // Basit sesler: dosya gerekmez, tarayıcı kendisi üretir
