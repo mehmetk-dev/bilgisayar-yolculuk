@@ -28,7 +28,7 @@ const aidatOneri = (c) => revs(c).some((r) => r.type === 'del' && r.text.trim() 
 const tekrarSilindi = (c) => revs(c).some((r) => r.type === 'del' && norm(r.text) === 'toplantı');
 const aciklama = (c) => (info(c).comments || []).find((m) => norm(m.anchor).includes('bahçe'));
 const aciklamaTamam = (c) => norm(aciklama(c)?.text || '').includes('salon');
-const aidatKabul = (c) => !revs(c).some((r) => /^(100|150)$/.test(r.text.trim())) && metin(c).includes('150 tl olacaktır') && !metin(c).includes('100 tl');
+const aidatKabul = (c) => !revs(c).some((r) => /^(100|150)$/.test(r.text.trim())) && /150\s*tl olacaktır/.test(metin(c)) && !metin(c).includes('100 tl');
 const hasanBekliyor = (c) => revs(c).some((r) => r.author === HASAN);
 const hasanRed = (c) => !hasanBekliyor(c) && metin(c).includes('yakacak yardımına') && !metin(c).includes('televizyon');
 const hepsiBitti = (c) => !revs(c).length && metin(c).includes('bir sonraki toplantı 1 aralık');

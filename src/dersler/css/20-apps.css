@@ -1311,7 +1311,8 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .wd-shape { display: inline-block; min-width: 6em; padding: 0.4em 0.9em; border: 2px solid #1f4e9c; background: #dbe8fb; text-align: center; vertical-align: middle; outline: none; }
 .wd-sh-yuvarlak { border-radius: 1.3em; background: #fff3cd; border-color: #c28a00; }
 .wd-sh-ok { clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%); padding-right: 2.2em; background: #c8e6c9; border: 0; }
-.wd-shpal button { padding: 0.3em 0.7em; }
+.wd-shpal { flex-direction: column; }
+.wd-shpal button { width: auto; height: auto; white-space: nowrap; text-align: left; padding: 0.3em 0.7em; }
 .dlg-pv { display: flex; flex-direction: column; align-items: center; gap: 0.4em; margin-bottom: 0.6em; }
 .dlg-pvbox { width: 11em; height: 15.5em; overflow: hidden; border: 1px solid #888; background: #fff; box-shadow: 0 2px 6px #0003; position: relative; }
 .dlg-pvbox.yatay { width: 15.5em; height: 11em; }

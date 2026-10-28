@@ -187,6 +187,9 @@
 .tut li.cur { color: var(--fg); font-size: 1.12em; background: #fff8d6; border-radius: 10px; padding: 0.2em 0.45em; margin-left: -0.45em; box-shadow: 0 0 0 3px #ffd23f; }
 .tut li.ok { color: #1d7a47; text-decoration: line-through; text-decoration-thickness: 2px; }
 .tut li.ok::marker { content: "✅ "; }
+.tutask { display: flex; align-items: center; gap: 0.7em; flex-wrap: wrap; background: #f2fbff; border: 3px dashed #8fd3ff; border-radius: 16px; padding: 0.5em 0.9em; color: #0b5f99; font-weight: 700; }
+.tuthelp { font: inherit; font-weight: 800; border: 2px solid #8fd3ff; background: #fff; color: #0b5f99; border-radius: 999px; padding: 0.25em 0.9em; cursor: pointer; }
+.tuthelp.need { box-shadow: 0 0 0 4px #ffd23f; }
 .toff { margin: 0.5em 0 0; background: var(--warn-bg); border-radius: 10px; padding: 0.35em 0.6em; color: #5a3600; font-weight: 700; }
 .tgo { animation: tgo 1s ease-in-out infinite; position: relative; z-index: 4; }
 @keyframes tgo { 50% { box-shadow: 0 0 0 6px #ffd23f, 0 0 18px 6px #ffd23faa; } }
@@ -205,6 +208,9 @@
 /* döngünün açılmış hali */
 .uwrap { display: flex; align-items: center; justify-content: center; gap: 0.8em; flex-wrap: wrap; margin: 0.5em 0; }
 .uarr { font-size: 1.8em; color: var(--mut); }
+/* yıldız tarlası: sıra sıra yazılmış kutu; .in2 küçük döngüyü içeri alır */
+.tarla { display: flex; flex-direction: column; gap: 0.3em; margin: 0.5em 0; padding: 0.5em 0.8em; border: 2px dashed #e0457b; border-radius: 12px; background: #fff0f5; font-size: 1.05em; }
+.tarla .in2 { margin-left: 1.6em; padding: 0.2em 0.6em; border: 2px dashed #3b82f6; border-radius: 10px; background: #eff6ff; }
 .unroll { display: flex; flex-direction: column; gap: 0.3em; }
 .urow { display: flex; align-items: center; gap: 0.35em; flex-wrap: wrap; }
 .utur { font-weight: 900; font-size: 0.85em; background: #fff3c4; color: #5a3600; border-radius: 999px; padding: 0.05em 0.6em; min-width: 4em; text-align: center; }

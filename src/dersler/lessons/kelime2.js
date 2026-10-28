@@ -360,7 +360,7 @@ export const simgeSekil = {
     },
     {
       title: 'Şekil ekleyin',
-      html: '<p><b>Ekle → ◇ Şekil → ➜ Ok</b>\'a tıklayın. Sayfaya yeşil bir ok kutusu gelir.</p>',
+      html: `<p>Önce ${K('Enter')} ile <b>yeni bir satıra</b> geçin (şekil yazının yanına yapışmasın). Sonra <b>Ekle → ◇ Şekil → ➜ Ok</b>'a tıklayın. Sayfaya yeşil bir ok kutusu gelir.</p>`,
       on: when((c) => info(c).shapes >= 1),
       done: 'Şeklin içine tıklayıp yazı yazabilirsiniz.',
     },

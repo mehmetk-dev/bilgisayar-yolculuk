@@ -177,7 +177,8 @@ export function renderGrid(el, step, done, prev, where = {}) {
   el.innerHTML = `<div class="gridact${narrOn ? ' talk' : ''}">
   <div class="gleft">
     <div class="ginfo"><h3>${step.title}${best ? ` <span class="bestline" title="En az ${best} blokla çözersen 3 yıldız">${prev ? stars(prev) : ''} <small>⭐⭐⭐ hedefi: ${best} blok</small></span>` : ''}</h3>${step.text}</div>
-    ${T ? `<div class="tut"><h4>👣 Adım adım yap</h4><ol>${T.map((x) => `<li>${x.t}</li>`).join('')}</ol><p class="toff" hidden>🤔 Program tarife uymadı. Son eklediğin bloğu <b>✖</b> ile sil ya da <b>🗑 Temizle</b>'ye basıp baştan başla.</p></div>` : ''}
+    ${T && step.tutHelp ? '<div class="tutask"><span>🤔 Önce <b>kendin dene</b>! Takılırsan yardım al.</span><button type="button" class="tuthelp">👣 Adım adım göster</button></div>' : ''}
+    ${T ? `<div class="tut"${step.tutHelp ? ' hidden' : ''}><h4>👣 Adım adım yap</h4><ol>${T.map((x) => `<li>${x.t}</li>`).join('')}</ol><p class="toff" hidden>🤔 Program tarife uymadı. Son eklediğin bloğu <b>✖</b> ile sil ya da <b>🗑 Temizle</b>'ye basıp baştan başla.</p></div>` : ''}
     ${tabs}
     ${narrOn ? '<div class="narr" aria-live="polite"></div>' : ''}
     <div class="gboard${turns ? ' turny' : ''}"><div class="board"></div></div>
@@ -210,6 +211,9 @@ export function renderGrid(el, step, done, prev, where = {}) {
   const runBtn = q('.run');
   const narrEl = q('.narr');
   let hintOn = false;
+  // tutHelp: tarif ve parmak önce gizli; çocuk önce kendi dener, takılınca düğmeyle açar
+  let tutOn = !(T && step.tutHelp);
+  q('.tuthelp') && (q('.tuthelp').onclick = () => { tutOn = true; q('.tut').hidden = false; q('.tutask').hidden = true; play('click'); updateTut(); });
   let rb;
   let arrow;
   let trail;
@@ -338,7 +342,7 @@ export function renderGrid(el, step, done, prev, where = {}) {
     q('.toff').hidden = k >= 0;
     let at = k < 0 ? '.clear' : T[k]?.at;
     if (typeof at === 'function') at = at(serProg(prog));
-    tutAt = at ? (CMDS[at] ? `.tool[data-c="${at}"]` : at) : null;
+    tutAt = tutOn && at ? (CMDS[at] ? `.tool[data-c="${at}"]` : at) : null;
     pointAt();
   }
   function pointAt() {
@@ -428,13 +432,16 @@ export function renderGrid(el, step, done, prev, where = {}) {
     }
     const b = { id: newId(), c };
     if (c === 'loop') Object.assign(b, { n: step.loopN || 3, body: [] });
+    // wrap: programda hazır bloklar varken 🔁'ya basınca hepsi yeni döngünün içine sarılır
+    const wrapped = c === 'loop' && step.wrap && caret.list === prog && prog.length > 0;
+    if (wrapped) { b.body = prog.splice(0); caret = { list: prog, i: 0 }; }
     if (c === 'if' || c === 'until' || c === 'ife') {
       b.cond = c === 'until' ? (conds.includes('goal') ? 'goal' : conds[0]) : (step.ifCond || conds[0]);
       b.body = [];
       if (c === 'ife') b.body2 = [];
     }
     caret.list.splice(caret.i, 0, b);
-    caret = isBox(b) ? { list: b.body, i: 0 } : { list: caret.list, i: caret.i + 1 };
+    caret = wrapped ? { list: prog, i: 1 } : isBox(b) ? { list: b.body, i: 0 } : { list: caret.list, i: caret.i + 1 };
     play('add');
     changed();
     draw(b.id);
@@ -724,6 +731,7 @@ export function renderGrid(el, step, done, prev, where = {}) {
         say('bad', `${where}<b>${FAIL[r.result]}</b>${face}${multi}`);
         if (step.hint && fails >= 2 && !hintOn) { hintEl.hidden = false; hintEl.innerHTML = `💡 <b>İpucu:</b> ${step.hint}`; }
         if (fails >= 2) q('.vhint')?.classList.add('tgo');
+        if (fails >= 2) q('.tuthelp')?.classList.add('need');
         return;
       }
       rb.classList.add('happy');

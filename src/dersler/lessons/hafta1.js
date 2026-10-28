@@ -15,7 +15,7 @@ function cornerGame(c) {
   const scr = c.d.screen;
   const marks = ['tl', 'tr', 'br', 'bl'].map((k) => {
     const m = document.createElement('div');
-    m.className = 'corner-mark ' + k;
+    m.className = 'corner-mark cm-' + k;
     m.textContent = { tl: '↖', tr: '↗', br: '↘', bl: '↙' }[k];
     scr.append(m);
     return m;
@@ -27,7 +27,7 @@ function cornerGame(c) {
     const k = x < 0.15 && y < 0.18 ? 'tl' : x > 0.85 && y < 0.18 ? 'tr' : x > 0.85 && y > 0.75 ? 'br' : x < 0.15 && y > 0.75 ? 'bl' : null;
     if (!k || hit.has(k)) return;
     hit.add(k);
-    marks.find((m) => m.classList.contains(k)).classList.add('ok');
+    marks.find((m) => m.classList.contains('cm-' + k)).classList.add('ok');
     c.emit('corner', { n: hit.size });
   };
   scr.addEventListener('pointermove', move);

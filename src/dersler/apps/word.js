@@ -35,7 +35,7 @@ const LEADERS = [['', '1 Yok'], ['dot', '2 ..........'], ['dash', '3 ----------'
 const WORDART = [['mavi', 'Mavi dolgu, gölgeli'], ['altin', 'Altın dolgu'], ['kontur', 'Turuncu çerçeveli'], ['kirmizi', 'Kırmızı, kalın gölgeli']];
 const TBOXES = [['basit', '▭ Basit Metin Kutusu'], ['sag', '▯ Sağa yaslı kutu (yazı yanından akar)']];
 const PH = 'Metninizi buraya yazın';
-const SYMBOLS = ['₺', '€', '$', '©', '®', '™', '°', '±', '×', '÷', '½', '¼', '²', '³', '✓', '✗', '★', '☎', '✉', '→', '•', '…', '«', '»'];
+const SYMBOLS = ['₺', '€', '$', '©', '®', '™', '°', '±', '×', '÷', '½', '¼', '²', '³', '✓', '✗', '★', '☎', '✉', '→', '•', '…', '«', '»', 'â', 'î', 'û', 'Â', 'Î', 'Û', '§', '¶'];
 const MARGINS = { normal: ['Normal', '2,5 cm', '2.5em 3em'], dar: ['Dar', '1,27 cm', '1.3em 1.5em'], genis: ['Geniş', '5 cm (yanlar)', '2.5em 5.5em'] };
 // Yazım denetimi: yetişkinlerin en sık karıştırdığı yazımlar (yanlış → doğru)
 const SPELL = {
@@ -90,8 +90,8 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp"><button type="button" class="wd-findbtn" title="Bul (Ctrl + F)">🔎 Bul</button><button type="button" class="wd-replbtn" title="Değiştir (Ctrl + H)">⇄ Değiştir</button></div>
     </div>
     <div class="wd-rib" data-tab="insert" hidden>
-      <div class="wd-grp"><button type="button" class="wd-table">▦ Tablo</button><span class="wd-tpop" hidden><label>Satır <input type="number" class="wd-tr" min="1" max="10" value="3"></label><label>Sütun <input type="number" class="wd-tc" min="1" max="6" value="3"></label><button type="button" class="wd-tok">Ekle</button></span></div>
-      <div class="wd-grp"><button type="button" class="wd-pic">🖼 Resim</button><button type="button" class="wd-date">📅 Tarih</button></div>
+      <div class="wd-grp"><button type="button" class="wd-table">▦ Tablo</button><span class="wd-tpop wd-tblpop" hidden><label>Satır <input type="number" class="wd-tr" min="1" max="10" value="3"></label><label>Sütun <input type="number" class="wd-tc" min="1" max="6" value="3"></label><button type="button" class="wd-tok">Ekle</button></span></div>
+      <div class="wd-grp"><button type="button" class="wd-picbtn">🖼 Resim</button><button type="button" class="wd-date">📅 Tarih</button></div>
       <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-sym" title="Simge: klavyede olmayan işaretler">Ω Simge</button><span class="wd-pal wd-spal" hidden>${SYMBOLS.map((c) => `<button type="button" data-sym="${c}">${c}</button>`).join('')}</span></span>
         <span class="wd-colorwrap"><button type="button" class="wd-link" title="Bağlantı (Ctrl + K)">🔗 Bağlantı</button><span class="wd-tpop wd-lpop" hidden><label>Adres <input class="wd-lurl" placeholder="www.ornek.com.tr"></label><button type="button" class="wd-lok">Ekle</button></span></span>
         <button type="button" class="wd-pb" title="Sayfa sonu (Ctrl + Enter): yazının kalanı yeni sayfadan başlar">⤓ Sayfa sonu</button>
@@ -311,6 +311,9 @@ export function word({ desk, body, args, emit, setTitle }) {
   function changed() { dirty = true; renumberFn(); title(); words(); layoutTabs(); syncMarks(); }
   function addFootnote() {
     const id = 'f' + fnSeq++;
+    restore();
+    const sel = getSelection();
+    if (sel.rangeCount && !sel.isCollapsed && page.contains(sel.anchorNode)) sel.collapseToEnd();
     insertHtml(`<sup class="wd-fnref" contenteditable="false" data-fn="${id}" title="Dipnot">*</sup>`, 'footnote');
     const li = document.createElement('li');
     li.dataset.fn = id;
@@ -335,12 +338,16 @@ export function word({ desk, body, args, emit, setTitle }) {
     document.execCommand(cmd, false, cmd === 'fontSize' ? '7' : value);
     if (cmd === 'fontSize') {
       // execCommand yalnızca 1–7 boyutlarını bilir: 7 ile işaretlenen yerlere gerçek punto boyutu verilir
+      const spans = [];
       page.querySelectorAll('font[size="7"]').forEach((f) => {
         const sp = document.createElement('span');
         sp.style.fontSize = value + 'pt';
         sp.innerHTML = f.innerHTML;
         f.replaceWith(sp);
+        spans.push(sp);
       });
+      // Değişimde seçim kaybolur; sonraki biçim (kalın vb.) aynı yazıya uygulansın diye yeniden seçilir
+      if (spans.length) { const r = document.createRange(); r.setStartBefore(spans[0].firstChild || spans[0]); r.setEndAfter(spans.at(-1).lastChild || spans.at(-1)); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); }
     }
     onSel();
     changed();
@@ -1313,7 +1320,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (e.target.closest('.wd-rib button, .wd-tabs button')) e.preventDefault();
     if (!e.target.closest('.wd-menu, .wd-file')) $('.wd-menu').hidden = true;
     if (!e.target.closest('.wd-colorwrap')) body.querySelectorAll('.wd-pal, .wd-lpop').forEach((x) => { x.hidden = true; });
-    if (!e.target.closest('.wd-tpop, .wd-table')) $('.wd-tpop').hidden = true;
+    if (!e.target.closest('.wd-tpop, .wd-table')) $('.wd-tblpop').hidden = true;
     if (!e.target.closest('.wd-mmwrap')) body.querySelectorAll('.wd-mpop').forEach((x) => { x.hidden = true; });
     if (!e.target.closest('.wd-tabpop, .wd-tabsbtn')) $('.wd-tabpop').hidden = true;
   });
@@ -1379,10 +1386,10 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-pnbtn')) return showHF('pn');
     if (t.classList.contains('wd-color')) return pal('.wd-pal:not(.wd-hpal):not(.wd-spal)');
     if (t.dataset.color) { body.querySelectorAll('.wd-pal').forEach((x) => { x.hidden = true; }); $('.wd-color i').style.background = t.dataset.color; return exec('foreColor', t.dataset.color); }
-    if (t.classList.contains('wd-table')) { $('.wd-tpop').hidden = !$('.wd-tpop').hidden; return; }
+    if (t.classList.contains('wd-table')) { $('.wd-tblpop').hidden = !$('.wd-tblpop').hidden; return; }
     if (t.classList.contains('wd-tok')) {
       const r = Math.min(10, Math.max(1, +$('.wd-tr').value || 3)), c = Math.min(6, Math.max(1, +$('.wd-tc').value || 3));
-      $('.wd-tpop').hidden = true;
+      $('.wd-tblpop').hidden = true;
       return insertHtml(`<table class="wd-t">${`<tr>${'<td><br></td>'.repeat(c)}</tr>`.repeat(r)}</table><p><br></p>`, 'table');
     }
     if (t.classList.contains('wd-shbtn')) return pal('.wd-shpal');
@@ -1407,7 +1414,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-infoback')) return showInfo(false);
     if (t.classList.contains('wd-protbtn')) return pal('.wd-protpal');
     if (t.classList.contains('wd-encrypt')) { $('.wd-protpal').hidden = true; return encrypt(); }
-    if (t.classList.contains('wd-pic')) return insertPicture();
+    if (t.classList.contains('wd-picbtn')) return insertPicture();
     if (t.classList.contains('wd-date')) return insertHtml(esc(today()), 'date');
   });
   $('.wd-font').addEventListener('change', (e) => exec('fontName', e.target.value));
@@ -1476,6 +1483,10 @@ export function word({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (e.key === 'Escape' && painter) { e.preventDefault(); const was = painter.sticky; stopPainter(); if (was) emit('doc-painter', { stage: 'stop' }); return; }
+    shortcut(e);
+  });
+  // Ctrl kısayolları: sayfa odaktayken doğrudan, durum çubuğu ya da başlığa tıklanmışsa gövdeden gelir
+  function shortcut(e) {
     if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyF') { e.preventDefault(); addFootnote(); return; }
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
     if (e.shiftKey && e.code === 'KeyE') { e.preventDefault(); setTrack(!track); emit('doc-shortcut', { cmd: 'track' }); return; }
@@ -1488,8 +1499,9 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (e.code === 'KeyH') { e.preventDefault(); openFind(true); }
     if (e.code === 'KeyK') { e.preventDefault(); $('.wd-link').click(); }
     if (e.key === 'Enter') { e.preventDefault(); insertHtml('<hr class="wd-pb"><p><br></p>', 'pagebreak'); }
-  });
+  }
   body.addEventListener('keydown', (e) => {
+    if (!page.contains(e.target) && !e.target.closest?.('input, textarea, select, [contenteditable="true"]') && !desk.dialogs.busy && !(e.ctrlKey && e.code === 'KeyS')) { page.focus({ preventScroll: true }); shortcut(e); return; }
     if (e.key === 'F7') { e.preventDefault(); spellCheck(); }
     if (e.key === 'Escape' && !$('.wd-info').hidden && !desk.dialogs.busy) { e.preventDefault(); showInfo(false); }
     // Ctrl + S açıklama balonunda, üst/alt bilgide ya da Bilgi ekranındayken de kaydeder (sayfanın içindekini sayfa kendisi yakalar)

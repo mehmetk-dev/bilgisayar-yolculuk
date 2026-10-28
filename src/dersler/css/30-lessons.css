@@ -13,8 +13,8 @@ ol.steps.big li { margin: 0.4em 0; }
 .wd-bar i.x { background: #e81123; color: #fff; }
 .wd-body { padding: 1em; color: var(--mut); text-align: center; }
 .corner-mark { position: absolute; z-index: 4900; width: 3em; height: 3em; display: flex; align-items: center; justify-content: center; font-size: 1.6em; color: #fff; background: #ffc93ccc; border-radius: 50%; animation: pwglow 1.4s infinite; pointer-events: none; text-shadow: 0 1px 3px #000; }
-.corner-mark.tl { left: 0.4em; top: 0.4em; } .corner-mark.tr { right: 0.4em; top: 0.4em; }
-.corner-mark.br { right: 0.4em; bottom: 3.6em; } .corner-mark.bl { left: 0.4em; bottom: 3.6em; }
+.corner-mark.cm-tl { left: 0.4em; top: 0.4em; } .corner-mark.cm-tr { right: 0.4em; top: 0.4em; }
+.corner-mark.cm-br { right: 0.4em; bottom: 3.6em; } .corner-mark.cm-bl { left: 0.4em; bottom: 3.6em; }
 .corner-mark.ok { background: #157a3ccc; animation: none; }
 .corner-mark.ok::after { content: "✔"; position: absolute; font-size: 0.8em; }
 

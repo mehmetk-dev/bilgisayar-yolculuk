@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bilgisayarla İlk Tanışma - Renkli & Karikatür Tahta Sunumu</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@400;700&display=swap');
+
+    @page {
+      size: 1920px 1080px; /* 16:9 Akıllı Tahta */
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Fredoka', 'Comic Neue', cursive, sans-serif;
+      background: #fdfaf3;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px 80px 50px 80px;
+      background-size: 32px 32px;
+      background-image: 
+        radial-gradient(circle, #e2e8f0 2px, transparent 2.5px);
+    }
+
+    .slide:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Üst Çubuk */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #fed7aa;
+      border: 4px solid #ea580c;
+      color: #9a3412;
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 18pt;
+      font-weight: 700;
+      box-shadow: 4px 4px 0px #ea580c;
+      transform: rotate(-1deg);
+    }
+
+    .page-bubble {
+      background: #ffffff;
+      border: 4px solid #1e293b;
+      color: #1e293b;
+      font-size: 20pt;
+      font-weight: 800;
+      padding: 8px 24px;
+      border-radius: 999px;
+      box-shadow: 4px 4px 0px #1e293b;
+    }
+
+    h1.comic-title {
+      font-size: 44pt;
+      font-weight: 800;
+      color: #0f172a;
+      text-shadow: 3px 3px 0px #cbd5e1;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    /* Konuşma Balonları */
+    .bubble {
+      background: #ffffff;
+      border: 4px solid #1e293b;
+      border-radius: 28px;
+      padding: 24px 30px;
+      position: relative;
+      box-shadow: 6px 6px 0px #1e293b;
+    }
+
+    .bubble-tail-left::after {
+      content: "";
+      position: absolute;
+      left: -20px;
+      top: 36px;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-right: 20px solid #ffffff;
+      z-index: 2;
+    }
+    .bubble-tail-left::before {
+      content: "";
+      position: absolute;
+      left: -26px;
+      top: 33px;
+      border-top: 17px solid transparent;
+      border-bottom: 17px solid transparent;
+      border-right: 23px solid #1e293b;
+      z-index: 1;
+    }
+
+    /* Karikatür Kartları */
+    .neo-card {
+      border: 4.5px solid #1e293b;
+      border-radius: 30px;
+      padding: 30px;
+      background: #ffffff;
+      box-shadow: 8px 8px 0px #1e293b;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .neo-card.yellow { background: #fef08a; }
+    .neo-card.blue   { background: #bae6fd; }
+    .neo-card.pink   { background: #fbcfe8; }
+    .neo-card.green  { background: #bbf7d0; }
+    .neo-card.purple { background: #e9d5ff; }
+    .neo-card.orange { background: #fed7aa; }
+
+    .sticker {
+      position: absolute;
+      top: -18px;
+      right: 20px;
+      background: #ef4444;
+      color: #ffffff;
+      border: 3px solid #1e293b;
+      border-radius: 999px;
+      font-size: 13pt;
+      font-weight: 800;
+      padding: 5px 14px;
+      box-shadow: 3px 3px 0px #1e293b;
+      transform: rotate(4deg);
+    }
+
+    /* Grid Yapıları */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      align-items: stretch;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 36px;
+      align-items: stretch;
+      flex: 1;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
+      align-items: center;
+      flex: 1;
+    }
+
+    .content-box {
+      flex: 1;
+      display: flex;
+      margin: 15px 0 25px 0;
+    }
+
+    /* Alt Çubuk */
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border: 4px solid #1e293b;
+      border-radius: 20px;
+      padding: 14px 28px;
+      box-shadow: 5px 5px 0px #1e293b;
+      font-size: 16pt;
+      font-weight: 700;
+    }
+
+    /* Karakter & Avatar */
+    .char-avatar {
+      width: 75px;
+      height: 75px;
+      background: #facc15;
+      border: 4px solid #1e293b;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36pt;
+      box-shadow: 3px 3px 0px #1e293b;
+    }
+
+    /* Çerçeveli Resimler */
+    .img-frame {
+      border: 4px solid #1e293b;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 6px 6px 0px #1e293b;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .img-frame img {
+      width: 100%;
+      height: 280px;
+      object-fit: contain;
+      background: #f8fafc;
+      padding: 8px;
+    }
+
+    .img-label {
+      background: #1e293b;
+      color: #ffffff;
+      text-align: center;
+      padding: 10px;
+      font-size: 15pt;
+      font-weight: 700;
+    }
+
+    /* Kapak Tasarımı */
+    .cover-slide {
+      background: #fef08a !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      padding: 80px 100px;
+    }
+
+    .hero-badge {
+      background: #38bdf8;
+      border: 5px solid #1e293b;
+      color: #0f172a;
+      padding: 14px 38px;
+      border-radius: 999px;
+      font-size: 24pt;
+      font-weight: 800;
+      box-shadow: 7px 7px 0px #1e293b;
+      transform: rotate(-2deg);
+      display: inline-block;
+      margin-bottom: 25px;
+    }
+
+    .main-hero-title {
+      font-size: 78pt;
+      font-weight: 900;
+      color: #1e293b;
+      line-height: 1.05;
+      text-shadow: 5px 5px 0px #f43f5e;
+      margin-bottom: 25px;
+    }
+
+    .hero-bubble {
+      background: #ffffff;
+      border: 5px solid #1e293b;
+      border-radius: 35px;
+      padding: 24px 50px;
+      font-size: 26pt;
+      font-weight: 700;
+      color: #334155;
+      box-shadow: 8px 8px 0px #1e293b;
+      max-width: 1300px;
+      margin: 0 auto 35px auto;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 25px;
+      justify-content: center;
+    }
+
+    .pill {
+      background: #ffffff;
+      border: 4px solid #1e293b;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-size: 18pt;
+      font-weight: 800;
+      box-shadow: 5px 5px 0px #1e293b;
+    }
+
+    .pill.red { background: #fecdd3; color: #9f1239; }
+    .pill.green { background: #bbf7d0; color: #14532d; }
+    .pill.purple { background: #e9d5ff; color: #581c87; }
+
+    /* Fare Çizimi */
+    .mouse-cartoon {
+      background: #ffffff;
+      border: 5px solid #1e293b;
+      border-radius: 40px;
+      padding: 30px;
+      box-shadow: 8px 8px 0px #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== SLAYT 1: KAPAK ==================== -->
+  <section class="slide cover-slide">
+    <div style="margin-top: 20px;">
+      <div class="hero-badge">✨ 1. HAFTA BAŞLIYOR! ✨</div>
+      <h1 class="main-hero-title">BİLGİSAYARIN DÜNYASINA<br>HOŞ GELDİNİZ! 🎉</h1>
+      <div class="hero-bubble">
+        Kasa, Ekran, Fare ve Pencereler! Hiç korkmayın, tıklayarak hiçbir şeyi bozamazsınız! 😎
+      </div>
+    </div>
+
+    <div class="hero-pills">
+      <div class="pill red">🕹️ 1. Görev: Kasa & Ekran</div>
+      <div class="pill green">🖱️ 2. Görev: Süper Fare</div>
+      <div class="pill purple">🪟 3. Görev: Uçan Pencereler</div>
+    </div>
+
+    <div class="bottom-bar" style="width: 100%; justify-content: space-around;">
+      <span>🏫 <strong>Bilişim Sınıfı</strong> Akıllı Tahta Serüveni</span>
+      <span>⭐ <strong>Kurallar:</strong> Merak et, tıkla, keşfet!</span>
+    </div>
+  </section>
+
+  <!-- ==================== SLAYT 2: BİLGİSAYARIN 4 KAHRAMANI ==================== -->
+  <section class="slide">
+    <div>
+      <div class="top-bar">
+        <div class="tag-badge">🎒 TANIŞMA ZAMANI</div>
+        <div class="page-bubble">1 / 5</div>
+      </div>
+      <h1 class="comic-title">🖥️ Bilgisayarın 4 Harika Kahramanı!</h1>
+    </div>
+
+    <div class="content-box">
+      <div class="grid-4">
+        <!-- 1. Kasa -->
+        <div class="neo-card yellow">
+          <div class="sticker">BEYİN! 🧠</div>
+          <div style="font-size: 50pt; margin-bottom: 12px; text-align: center;">🗄️</div>
+          <h2 style="font-size: 24pt; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 12px;">1. KASA</h2>
+          <p style="font-size: 16pt; font-weight: 600; line-height: 1.45; color: #475569; text-align: center;">
+            <strong>Asıl bilgisayar tam olarak budur!</strong> Bütün oyunlar, hafıza ve işlemler bu kutunun içinde döner.
+          </p>
+        </div>
+
+        <!-- 2. Ekran -->
+        <div class="neo-card blue">
+          <div class="sticker">GÖZLER! 👀</div>
+          <div style="font-size: 50pt; margin-bottom: 12px; text-align: center;">🖥️</div>
+          <h2 style="font-size: 24pt; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 12px;">2. EKRAN</h2>
+          <p style="font-size: 16pt; font-weight: 600; line-height: 1.45; color: #475569; text-align: center;">
+            Kasanın düşündüğü ve yaptığı her şeyi bize gösteren <strong>büyülü camdır</strong> (Monitör).
+          </p>
+        </div>
+
+        <!-- 3. Klavye -->
+        <div class="neo-card pink">
+          <div class="sticker">DİLİ! 💬</div>
+          <div style="font-size: 50pt; margin-bottom: 12px; text-align: center;">⌨️</div>
+          <h2 style="font-size: 24pt; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 12px;">3. KLAVYE</h2>
+          <p style="font-size: 16pt; font-weight: 600; line-height: 1.45; color: #475569; text-align: center;">
+            Bilgisayara yazı yazmamızı, mesaj atmamızı ve ona emirler vermemizi sağlayan <strong>tuşlar ordusu!</strong>
+          </p>
+        </div>
+
+        <!-- 4. Fare -->
+        <div class="neo-card green">
+          <div class="sticker">ELİ! ✋</div>
+          <div style="font-size: 50pt; margin-bottom: 12px; text-align: center;">🖱️</div>
+          <h2 style="font-size: 24pt; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 12px;">4. FARE</h2>
+          <p style="font-size: 16pt; font-weight: 600; line-height: 1.45; color: #475569; text-align: center;">
+            Ekrandaki oku yönlendirip <em>"Şunu aç, bunu taşı!"</em> dediğimiz cana yakın yardımcımız.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span>💡 <strong>Biliyor musun?</strong> Laptoplarda (dizüstü) bu 4 kahraman tek bir çantaya sığdırılmıştır!</span>
+      <span style="color: #0284c7;">Sıradaki: Bilgisayarı Uyandırma! ➔</span>
+    </div>
+  </section>
+
+  <!-- ==================== SLAYT 3: BİLGİSAYARI AÇMA VE GİRİŞ ==================== -->
+  <section class="slide">
+    <div>
+      <div class="top-bar">
+        <div class="tag-badge" style="background: #bae6fd; border-color: #0284c7; color: #0369a1;">🚀 1. GÖREV</div>
+        <div class="page-bubble">2 / 5</div>
+      </div>
+      <h1 class="comic-title">⚡ Bilgisayarı Nasıl Doğru Uyandırırız?</h1>
+    </div>
+
+    <div class="content-box">
+      <div class="grid-3">
+        <!-- Adım 1 -->
+        <div class="neo-card">
+          <div class="img-frame" style="margin-bottom: 18px;">
+            <img src="/home/mehmetkerem/Masaüstü/projeler/bilgisayar-yolculuk/sunum/img/ac_kapali.png" alt="Kasa Açma">
+            <div class="img-label">1. ADIM: KASADAKİ DÜĞME</div>
+          </div>
+          <div style="background: #fef08a; border: 3px solid #1e293b; border-radius: 14px; padding: 14px; text-align: center;">
+            <strong style="font-size: 17pt; color: #854d0e;">⏻ Düğmesine BİR KEZ dokun!</strong>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              Basılı tutma! Basılı tutarsan bilgisayar donmuş sanıp geri bayılır! 😴
+            </p>
+          </div>
+        </div>
+
+        <!-- Adım 2 -->
+        <div class="neo-card">
+          <div class="img-frame" style="margin-bottom: 18px;">
+            <img src="/home/mehmetkerem/Masaüstü/projeler/bilgisayar-yolculuk/sunum/img/ac_kilit.png" alt="Kilit Ekranı">
+            <div class="img-label">2. ADIM: KİLİT EKRANI</div>
+          </div>
+          <div style="background: #bae6fd; border: 3px solid #1e293b; border-radius: 14px; padding: 14px; text-align: center;">
+            <strong style="font-size: 17pt; color: #0369a1;">Fareyle Ekrana Bir Tık!</strong>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              Manzara resmi yukarı kayar ve seni şifre kutusu karşılar. 🏞️
+            </p>
+          </div>
+        </div>
+
+        <!-- Adım 3 -->
+        <div class="neo-card">
+          <div class="img-frame" style="margin-bottom: 18px;">
+            <img src="/home/mehmetkerem/Masaüstü/projeler/bilgisayar-yolculuk/sunum/img/ac_sifre.png" alt="Şifre Gir">
+            <div class="img-label">3. ADIM: ŞİFRE VE ENTER!</div>
+          </div>
+          <div style="background: #bbf7d0; border: 3px solid #1e293b; border-radius: 14px; padding: 14px; text-align: center;">
+            <strong style="font-size: 17pt; color: #14532d;">Şifreni Yaz: ••••</strong>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              Kimse gizlice görmesin diye noktalar çıkar! Yaz ve <strong>Enter ↵</strong> tuşuna bas!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span>🛑 <strong>Hocanın Önemli Uyarısı:</strong> Ekranın düğmesine basarsan sadece ekran kararır; kasa arkada çalışmaya devam eder!</span>
+      <span style="color: #16a34a;">Hazır mıyız? ➔</span>
+    </div>
+  </section>
+
+  <!-- ==================== SLAYT 4: KAPATMANIN 3 YOLU & FİŞ YASSAH ==================== -->
+  <section class="slide">
+    <div>
+      <div class="top-bar">
+        <div class="tag-badge" style="background: #fed7aa; border-color: #ea580c; color: #9a3412;">🔌 DİKKAT</div>
+        <div class="page-bubble">3 / 5</div>
+      </div>
+      <h1 class="comic-title">🛑 Bilgisayarı Kapatmanın 3 Yolu (Fiş Çekmek Yok!)</h1>
+    </div>
+
+    <div class="content-box">
+      <div class="grid-2">
+        <!-- Sol Taraf: 3 Yol -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- 1. Uyku -->
+          <div class="bubble" style="background: #f0fdf4; border-color: #16a34a;">
+            <div style="display: flex; align-items: center; gap: 18px;">
+              <span style="font-size: 38pt;">🌙</span>
+              <div>
+                <h3 style="font-size: 22pt; font-weight: 800; color: #166534;">1. UYKU (Kısa Aralar İçin)</h3>
+                <p style="font-size: 15pt; font-weight: 600; color: #334155; margin-top: 4px;">
+                  Teneffüse veya yemeğe çıkarken! Pencereler kapanmaz, geri gelince 1 saniyede uyanır!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Yeniden Başlat -->
+          <div class="bubble" style="background: #fefce8; border-color: #ca8a04;">
+            <div style="display: flex; align-items: center; gap: 18px;">
+              <span style="font-size: 38pt;">🔄</span>
+              <div>
+                <h3 style="font-size: 22pt; font-weight: 800; color: #854d0e;">2. YENİDEN BAŞLAT (Yorulunca)</h3>
+                <p style="font-size: 15pt; font-weight: 600; color: #334155; margin-top: 4px;">
+                  Bilgisayar donarsa ya da yavaşlarsa hafızasını tazeleyip kendine gelmesi için kullanılır.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Kapat -->
+          <div class="bubble" style="background: #fee2e2; border-color: #dc2626;">
+            <div style="display: flex; align-items: center; gap: 18px;">
+              <span style="font-size: 38pt;">🛌</span>
+              <div>
+                <h3 style="font-size: 22pt; font-weight: 800; color: #991b1b;">3. BİLGİSAYARI KAPAT (Akşamları)</h3>
+                <p style="font-size: 15pt; font-weight: 600; color: #334155; margin-top: 4px;">
+                  Ders bittiğinde! Dosyalarını kaydeder, kapısını kilitler ve mışıl mışıl uyur.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sağ Taraf: Fiş Canavarı Uyarısı -->
+        <div class="neo-card" style="background: #ffe4e6; border-color: #e11d48; text-align: center; padding: 40px;">
+          <div style="font-size: 70pt; margin-bottom: 10px;">😱💥🔌</div>
+          <h2 style="font-size: 32pt; font-weight: 900; color: #9f1239; margin-bottom: 15px;">ASLA FİŞİNDEN ÇEKME!</h2>
+          <div class="bubble" style="background: #ffffff; font-size: 17pt; font-weight: 700; color: #881337; line-height: 1.5; margin-bottom: 20px;">
+            "Koşarken aniden önüne duvar çıkması gibi düşün!"<br>
+            Bilgisayar açıkken fişi çekilirse:
+            <ul style="list-style: none; margin-top: 10px; font-weight: 600; color: #be123c;">
+              <li>❌ Yaptığın tüm resimler ve ödevler uçar!</li>
+              <li>❌ Windows bozulabilir, bir daha açılmayabilir!</li>
+            </ul>
+          </div>
+          <div style="font-size: 16pt; font-weight: 800; color: #475569;">
+            ✅ Kural: Önce <strong>Başlat ⊞ ➔ Kapat</strong>, ışıklar tamamen sönünce fiş!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span>🔑 <strong>Yol Haritası:</strong> Sol alttaki <strong>Başlat ⊞</strong> tuşuna tıkla ➔ <strong>Güç ⏻</strong> simgesini seç!</span>
+      <span style="color: #dc2626;">Sırada: Farenin Büyüsü ➔</span>
+    </div>
+  </section>
+
+  <!-- ==================== SLAYT 5: SÜPER FARE ANATOMİSİ ==================== -->
+  <section class="slide">
+    <div>
+      <div class="top-bar">
+        <div class="tag-badge" style="background: #bbf7d0; border-color: #16a34a; color: #14532d;">🎮 BECERİ ZAMANI</div>
+        <div class="page-bubble">4 / 5</div>
+      </div>
+      <h1 class="comic-title">🖱️ Süper Farenin 4 Gizli Gücü!</h1>
+    </div>
+
+    <div class="content-box">
+      <div class="grid-2">
+        <!-- Sol Taraf: Renkli Karikatür Fare -->
+        <div class="mouse-cartoon">
+          <svg viewBox="0 0 200 280" width="320">
+            <!-- Fare Ana Gövde -->
+            <path d="M100 15 C45 15 25 60 25 120 L25 190 C25 240 60 265 100 265 C140 265 175 240 175 190 L175 120 C175 60 155 15 100 15 Z" fill="#f8fafc" stroke="#1e293b" stroke-width="6"/>
+            <!-- Sol Tuş Bölgesi -->
+            <path d="M30 120 L30 100 C30 60 55 20 98 17 L98 120 Z" fill="#38bdf8" stroke="#1e293b" stroke-width="4"/>
+            <!-- Sağ Tuş Bölgesi -->
+            <path d="M170 120 L170 100 C170 60 145 20 102 17 L102 120 Z" fill="#fbcfe8" stroke="#1e293b" stroke-width="4"/>
+            <!-- Ayırıcı Çizgiler -->
+            <line x1="25" y1="120" x2="175" y2="120" stroke="#1e293b" stroke-width="5"/>
+            <!-- Tekerlek -->
+            <rect x="88" y="45" width="24" height="48" rx="12" fill="#facc15" stroke="#1e293b" stroke-width="4"/>
+            <!-- Gözler Ekleyelim :) -->
+            <circle cx="65" cy="180" r="14" fill="#1e293b"/>
+            <circle cx="68" cy="177" r="5" fill="#ffffff"/>
+            <circle cx="135" cy="180" r="14" fill="#1e293b"/>
+            <circle cx="138" cy="177" r="5" fill="#ffffff"/>
+            <!-- Gülümseme -->
+            <path d="M85 215 Q100 230 115 215" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>
+            <!-- Tuş İsimleri -->
+            <text x="64" y="90" font-size="16" font-family="Fredoka" font-weight="800" fill="#0369a1" text-anchor="middle">SOL TUŞ</text>
+            <text x="136" y="90" font-size="16" font-family="Fredoka" font-weight="800" fill="#9d174d" text-anchor="middle">SAĞ TUŞ</text>
+          </svg>
+          <div style="margin-top: 15px; font-size: 16pt; font-weight: 800; color: #1e293b; text-align: center;">
+            ☝️ İşaret Parmağı: <strong>Sol Tuş</strong> | ✌️ Orta Parmak: <strong>Sağ Tuş</strong>
+          </div>
+        </div>
+
+        <!-- Sağ Taraf: 4 Hareket Kartı -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <!-- 1. Tek Tık -->
+          <div class="neo-card blue" style="padding: 20px;">
+            <div style="font-size: 28pt; margin-bottom: 6px;">👆</div>
+            <h3 style="font-size: 20pt; font-weight: 800; color: #0369a1;">1. TEK TIK</h3>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              Sol tuşa bir kere "tık!". Simgeleri <strong>seçmek</strong> ve düğmelere basmak için!
+            </p>
+          </div>
+
+          <!-- 2. Çift Tık -->
+          <div class="neo-card green" style="padding: 20px;">
+            <div style="font-size: 28pt; margin-bottom: 6px;">⚡⚡</div>
+            <h3 style="font-size: 20pt; font-weight: 800; color: #14532d;">2. ÇİFT TIK</h3>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              Sol tuşa tık-tık! Hızlıca iki kez bas. Oyunları ve klasörleri <strong>açıp içeri dalar!</strong>
+            </p>
+          </div>
+
+          <!-- 3. Sağ Tık -->
+          <div class="neo-card pink" style="padding: 20px;">
+            <div style="font-size: 28pt; margin-bottom: 6px;">📜✨</div>
+            <h3 style="font-size: 20pt; font-weight: 800; color: #9d174d;">3. SAĞ TIK</h3>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              Gizli <strong>seçenekler menüsünü</strong> açar. (Kopyala, Sil, İsmini Değiştir).
+            </p>
+          </div>
+
+          <!-- 4. Tekerlek -->
+          <div class="neo-card yellow" style="padding: 20px;">
+            <div style="font-size: 28pt; margin-bottom: 6px;">🎡📜</div>
+            <h3 style="font-size: 20pt; font-weight: 800; color: #854d0e;">4. TEKERLEK</h3>
+            <p style="font-size: 14pt; font-weight: 600; color: #1e293b; margin-top: 6px;">
+              İleri-geri yuvarla! Uzun web sayfalarını ve ödevleri <strong>aşağı-yukarı kaydırır.</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span>🤝 <strong>Taş Kuralı:</strong> Fareyi sıkma, kuşu tutar gibi yumuşak tut!</span>
+      <span style="color: #0369a1;">Son Görev: Pencereler! ➔</span>
+    </div>
+  </section>
+
+  <!-- ==================== SLAYT 6: PENCERE DÜĞMELERİ & ŞAMPİYONLUK ==================== -->
+  <section class="slide">
+    <div>
+      <div class="top-bar">
+        <div class="tag-badge" style="background: #fbcfe8; border-color: #db2777; color: #9d174d;">🏆 FİNAL</div>
+        <div class="page-bubble">5 / 5</div>
+      </div>
+      <h1 class="comic-title">🪟 Windows Pencerelerinin 3 Sihirli Düğmesi!</h1>
+    </div>
+
+    <div class="content-box">
+      <div class="grid-3">
+        <!-- Çizgi -->
+        <div class="neo-card" style="background: #f1f5f9; text-align: center;">
+          <div style="font-size: 60pt; font-weight: 900; color: #475569; margin-bottom: 10px; line-height: 1;">—</div>
+          <h2 style="font-size: 22pt; font-weight: 800; color: #334155;">KÜÇÜLT (Gizle)</h2>
+          <div class="bubble" style="background: #ffffff; margin-top: 15px; font-size: 15pt; font-weight: 600; text-align: left;">
+            Pencereyi kapatmaz! Ekranın altındaki <strong>Görev Çubuğuna</strong> saklar. İstediğin zaman simgesine basıp geri çağırabilirsin. 🙈
+          </div>
+        </div>
+
+        <!-- Kare -->
+        <div class="neo-card blue" style="text-align: center;">
+          <div style="font-size: 55pt; font-weight: 900; color: #0284c7; margin-bottom: 10px; line-height: 1;">⬜</div>
+          <h2 style="font-size: 22pt; font-weight: 800; color: #0369a1;">EKRANI KAPLA</h2>
+          <div class="bubble" style="background: #ffffff; margin-top: 15px; font-size: 15pt; font-weight: 600; text-align: left;">
+            Pencereyi dev gibi yapar, bütün ekrana yayar! Bir daha basarsan eski küçük boyutuna geri döner. 📺
+          </div>
+        </div>
+
+        <!-- Çarpı -->
+        <div class="neo-card" style="background: #fee2e2; border-color: #ef4444; text-align: center;">
+          <div style="font-size: 55pt; font-weight: 900; color: #dc2626; margin-bottom: 10px; line-height: 1;">✕</div>
+          <h2 style="font-size: 22pt; font-weight: 800; color: #991b1b;">KAPAT (Güle Güle)</h2>
+          <div class="bubble" style="background: #ffffff; margin-top: 15px; font-size: 15pt; font-weight: 600; text-align: left;">
+            Programı tamamen kapatır. Eğer resmini kaydetmediysen bilgisayar sana: <em>"Kaydedelim mi?"</em> diye sorar! 💾
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Şampiyonluk Bandı -->
+    <div class="bubble" style="background: #fef08a; border-color: #eab308; margin-bottom: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 18pt; font-weight: 800; color: #854d0e;">
+          🎉 TEBRİKLER! 1. Hafta Görevlerini Bitirdin! Artık sen de bir Bilgisayar Ustasısın!
+        </span>
+        <span style="background: #1e293b; color: #ffffff; padding: 8px 20px; border-radius: 999px; font-size: 16pt; font-weight: 800;">
+          Haftaya: Klavye & Hızlı Parmaklar! ⌨️
+        </span>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span>🚀 <strong>Alıştırma Sırası:</strong> Şimdi herkes kendi bilgisayarında fare parkurunu tamamlasın!</span>
+      <span style="color: #7c3aed;">Ders Bitti! 👏</span>
+    </div>
+  </section>
+
+</body>
+</html>
