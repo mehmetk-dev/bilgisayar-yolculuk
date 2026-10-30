@@ -12,13 +12,16 @@ const CONTACTS = [
   { id: 'ahmet', name: 'Ahmet (oğlum)', av: '👨', last: 'Bankada lazım olacak belge' },
   { id: 'komsu', name: 'Mahalle Komşuları', av: '🏘', last: 'Cumartesi toplantı' },
   { id: 'yonetici', name: 'Hasan Bey (apt. yöneticisi)', av: '🏢', last: 'Ekim aidatı' },
+  { id: 'kendime', name: 'Kendime mesaj (siz)', av: '📝', last: 'tarama.pdf' },
   { id: 'bilinmeyen', name: '+90 555 010 99 88', av: '❓', last: 'Hesabınız kapatılacak' },
 ];
+const TARAMA_KIMLIK = '<p class="pdf-org">T.C. KİMLİK KARTI (ÖRNEK)</p><h3>Ön yüz</h3><p>Adı Soyadı: <b>Ahmet Yılmaz</b></p><p>T.C. Kimlik No: 000 000 000 00 (örnek)</p><p>Doğum tarihi: 01.01.1960</p><p class="pdf-small">Bu bir alıştırma belgesidir; gerçek kimlik değildir.</p>';
 const seed = () => ({
   elif: [{ f: 'o', t: 'Dedeciğim, bayramda çektiğimiz fotoğrafları gönderiyorum. Geldi mi?', time: '10:02' }, { f: 'o', kind: 'photo', name: 'bayram sofrası.jpg', content: { emoji: '🍽', bg: ['#ffe082', '#ffab91'] }, time: '10:03' }],
   ahmet: [{ f: 'o', t: 'Baba, bankada işim var. İkametgâh belgeni (PDF) buradan gönderir misin? Masaüstünde duruyor olmalı.', time: '09:15' }],
   komsu: [{ f: 'o', who: 'Fatma Hanım', t: 'Cumartesi 14.00\'te bahçede toplantı var, herkes gelsin 🙂', time: 'Dün' }, { f: 'o', who: 'Mehmet Bey', t: 'Ben de geleceğim.', time: 'Dün' }],
   yonetici: [{ f: 'o', t: `Merhaba komşum, Ekim ayı aidatı ${YONETICI.aidat} ₺. Apartman hesabı benim adıma: ${YONETICI.ad}`, time: '09:30' }, { f: 'o', t: `IBAN: ${YONETICI.iban}`, time: '09:30' }, { f: 'o', t: 'Açıklamaya daire numaranızı yazın lütfen. Ödeyince dekontu buraya atarsanız sevinirim 🙏', time: '09:31' }],
+  kendime: [{ f: 'm', t: 'Telefonumdaki taramayı kendime yolladım.', time: '09:40' }, { f: 'm', kind: 'doc', dl: true, name: 'tarama.pdf', size: '412 KB', time: '09:41', content: { pages: [TARAMA_KIMLIK] } }],
   bilinmeyen: [{ f: 'o', t: '⚠ Mesajlaş hesabınız 24 saat içinde kapatılacaktır! Kapanmaması için hemen doğrulayın:', time: '08:40' }, { f: 'o', kind: 'link', t: 'mesajlas-dogrulama.xyz/hesabi-koru', time: '08:40' }],
 });
 const REPLY = {
@@ -26,6 +29,7 @@ const REPLY = {
   ahmet: (m) => (m.kind === 'doc' && /ikametg/i.test(m.name) ? 'Teşekkürler baba, belgeyi aldım 👍 Bu iş tamam.' : m.kind === 'doc' ? 'Bu başka bir dosya galiba baba, ikametgâh belgesini gönderir misin?' : 'Tamam baba.'),
   komsu: () => 'Teşekkürler! 👍',
   yonetici: (m) => (m.kind === 'doc' && /dekont/i.test(m.name) ? 'Dekont geldi, aidatınız ulaştı. Teşekkür ederim 🙏' : m.kind === 'doc' ? 'Bu dekont değil galiba; bankadan indirdiğiniz dekontu gönderir misiniz?' : 'Tamamdır 👍'),
+  kendime: () => '',
   bilinmeyen: () => '',
 };
 const qrSvg = () => {
@@ -60,7 +64,7 @@ const WA = {
     const bubble = (m, i) => {
       const me = m.f === 'm';
       const body = m.kind === 'photo' ? `<div class="wa-photo"><img src="${pictureURL(m.content)}" alt="${esc(m.name)}"><small>${esc(m.name)}</small>${me ? '' : `<button type="button" class="wa-dl" data-act="dl" data-i="${i}">⬇ İndir</button>`}</div>`
-        : m.kind === 'doc' ? `<div class="wa-doc"><span>${/\.pdf$/i.test(m.name) ? '📕' : '📄'}</span><div><b>${esc(m.name)}</b><small>${esc(m.size || '')}</small></div></div>`
+        : m.kind === 'doc' ? `<div class="wa-doc"><span>${/\.pdf$/i.test(m.name) ? '📕' : '📄'}</span><div><b>${esc(m.name)}</b><small>${esc(m.size || '')}</small>${m.dl ? `<button type="button" class="wa-dl" data-act="dl" data-i="${i}">⬇ İndir</button>` : ''}</div></div>`
         : m.kind === 'link' ? `<a class="wa-link" data-act="scamlink">${esc(m.t)}</a>` : esc(m.t);
       return `<div class="wa-msg ${me ? 'me' : 'them'}">${m.who ? `<b class="wa-who">${esc(m.who)}</b>` : ''}${body}<span class="wa-time">${esc(m.time)}${me ? ' ✓✓' : ''}</span></div>`;
     };
@@ -108,7 +112,7 @@ const WA = {
     if (a === 'dl') {
       const m = st.msgs[cur().id][+el.dataset.i];
       ctx.download(m.name, m.content);
-      ctx.emit('wa-download', { name: m.name });
+      ctx.emit('wa-download', { name: m.name, kind: m.kind });
       return;
     }
     if (a === 'scamlink') {

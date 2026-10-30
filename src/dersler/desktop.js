@@ -172,6 +172,7 @@ export class Desktop {
     this.webNotes = {}; // tarayıcıdaki Yapışkan Not uzantısının notları
     this.vdesks = ['Masaüstü 1']; this.vd = 0;
     this.lastInput = null;
+    this.dictation(false, true); this.dictIdx = 0; this.root.querySelector('.tb-mic')?.remove();
     this.screen.querySelector('.dk-tv')?.remove();
     this.history = []; // tarayıcı geçmişi
     this.recent = []; // Dosya Gezgini → Giriş: son kullanılan dosyalar
@@ -371,6 +372,84 @@ export class Desktop {
     else if (!s.magnifier) { if (step < 0) return; this.setSetting('magnifier', true); }
     else this.setSetting('magZoom', Math.max(150, Math.min(400, s.magZoom + step * 50)));
     this.emit('magnifier', { on: this.settings.magnifier, zoom: this.settings.magZoom });
+  }
+
+  // ------------------------------------------------------------------ Sesle yazma (⊞ + H)
+  // Benzetim: gerçek mikrofon ve ses tanıma yok. Şeritteki “Konuş” düğmesi, söylenmiş gibi hazır bir cümleyi harf harf yazar.
+  // Olaylar: 'dictation' { on, field }, 'dictation-text' { text, value }, 'dictation-nofield'
+  dictation(on = !this.screen.querySelector('.dk-dict'), quiet) {
+    let bar = this.screen.querySelector('.dk-dict');
+    if (!on) {
+      clearInterval(this.dictTimer); this.dictTimer = null;
+      if (!bar) return;
+      bar.remove();
+      if (!quiet) this.emit('dictation', { on: false });
+      return;
+    }
+    if (bar) return;
+    const live = () => (this.lastInput?.isConnected && this.lastInput.offsetParent ? this.lastInput : null);
+    bar = document.createElement('div');
+    bar.className = 'dk-dict';
+    bar.style.cssText = 'position:absolute;left:50%;top:0.6em;transform:translateX(-50%);z-index:8500;background:#202124f2;color:#fff;border-radius:1.6em;padding:0.45em 0.9em;display:flex;align-items:center;gap:0.7em;font-size:0.95em;box-shadow:0 4px 14px #0007;max-width:96%;flex-wrap:wrap;justify-content:center';
+    const bs = 'border:0;border-radius:1.4em;padding:0.4em 0.9em;font:inherit;cursor:pointer;color:#fff;background:#ffffff2e';
+    bar.innerHTML = `<button type="button" class="dd-mic" title="Mikrofon: durdurmak için tıklayın (⊞ + H)" style="border:0;border-radius:50%;width:2.4em;height:2.4em;font-size:1em;cursor:pointer;background:#d13438;color:#fff">🎤</button>
+      <div style="min-width:12em"><b class="dd-st">Dinliyor…</b><div class="dd-cap" style="font-size:0.85em;opacity:0.85;min-height:1.2em"></div></div>
+      <button type="button" class="dd-say" style="${bs}">🗣 Konuş (benzetim)</button>
+      <div style="flex-basis:100%;text-align:center;font-size:0.78em;opacity:0.75">Bu bir benzetimdir: gerçek bilgisayarda mikrofona konuşursunuz.</div>`;
+    // Düğmelere basınca yazı alanı odağı kaybetmesin
+    bar.addEventListener('mousedown', (e) => e.preventDefault());
+    const st = bar.querySelector('.dd-st'), cap = bar.querySelector('.dd-cap'), say = bar.querySelector('.dd-say');
+    const status = () => { st.textContent = live() ? 'Dinliyor…' : 'Önce bir yazı alanına tıklayın'; };
+    status();
+    this.screen.append(bar);
+    bar.querySelector('.dd-mic').onclick = () => this.dictation(false);
+    // (said: söylediğiniz, written: ekrana gelen; yanlış anlama örneği için ikincisinde “elmas”)
+    const LINES = [
+      ['yarın saat onda doktora gideceğim nokta', 'Yarın saat onda doktora gideceğim.'],
+      ['sonra pazardan elma alacağım nokta', 'Sonra pazardan elmas alacağım.'],
+      ['teşekkürler virgül görüşürüz nokta', 'Teşekkürler, görüşürüz.'],
+    ];
+    say.onclick = () => {
+      if (this.dictTimer) return;
+      const t = live();
+      status();
+      if (!t) { this.emit('dictation-nofield'); return; }
+      if (t.matches('input[type="password"]')) { cap.textContent = 'Şifre alanına konuşarak yazılmaz.'; return; }
+      const [said, written] = LINES[(this.dictIdx ||= 0) % LINES.length];
+      this.dictIdx++;
+      cap.textContent = `Dediniz: “${said}”`;
+      t.focus({ preventScroll: true });
+      const before = t.value ?? t.textContent ?? '';
+      const pos = t.selectionStart ?? before.length;
+      const text = pos > 0 && !/\s/.test(before[pos - 1]) ? ' ' + written : written;
+      let i = 0;
+      say.disabled = true; say.style.opacity = '0.5';
+      this.dictTimer = setInterval(() => {
+        if (!t.isConnected) { this.dictation(false); return; }
+        if (document.activeElement !== t) t.focus({ preventScroll: true });
+        document.execCommand('insertText', false, text[i++]);
+        if (i >= text.length) {
+          clearInterval(this.dictTimer); this.dictTimer = null;
+          say.disabled = false; say.style.opacity = '';
+          this.emit('dictation-text', { text, value: t.value ?? t.textContent ?? '' });
+        }
+      }, 45);
+    };
+    this.emit('dictation', { on: true, field: !!live() });
+  }
+
+  // Sesle yazma dersi için görev çubuğunda 🎤 düğmesi (tarayıcı ⊞ + H tuşunu alamazsa buradan açılır)
+  dictationButton(show) {
+    const tray = this.root.querySelector('.tb-tray');
+    let b = tray.querySelector('.tb-mic');
+    if (!show) { b?.remove(); return; }
+    if (b) return;
+    b = document.createElement('button');
+    b.type = 'button'; b.className = 'tb-mic'; b.textContent = '🎤';
+    b.title = 'Sesle yazma (⊞ + H)';
+    b.addEventListener('mousedown', (e) => e.preventDefault());
+    b.onclick = () => this.dictation();
+    tray.prepend(b);
   }
 
   applyTheme(key) {
@@ -1449,6 +1528,8 @@ export class Desktop {
       if (e.altKey && e.key === 'F4' && this.active) { e.preventDefault(); this.close(this.active); return; }
       // ⊞ + Tab: Görev Görünümü; ⊞ + Ctrl + D / ← / →: sanal masaüstü; ⊞ + + / − / Esc: Büyüteç
       if (e.metaKey && e.key === 'Tab') { e.preventDefault(); this.taskView(); return; }
+      // ⊞ + H: sesle yazma (dikte). Benzetimde mikrofon yok; şeritteki düğme hazır cümleleri yazar
+      if (e.metaKey && !e.ctrlKey && e.code === 'KeyH' && this.power === 'desktop') { e.preventDefault(); if (!e.repeat) this.dictation(); return; }
       if (e.metaKey && e.ctrlKey && e.code === 'KeyD') { e.preventDefault(); this.newDesk(); return; }
       if (e.metaKey && e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); this.switchDesk(this.vd + (e.key === 'ArrowLeft' ? -1 : 1)); return; }
       // ⊞ + ← / →: etkin pencereyi ekranın yarısına yaslar; ⊞ + ↑ ekranı kaplar, ⊞ + ↓ eski boyutuna getirir / küçültür

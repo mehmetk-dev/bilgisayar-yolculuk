@@ -16,6 +16,7 @@ import { HARITA_SITES } from './siteler-harita.js';
 import { BANKA_SITES } from './siteler-banka.js';
 import { KAMU_SITES } from './siteler-kamu.js';
 import { SOSYAL_SITES } from './siteler-sosyal.js';
+import { SORUN_SITES, sorunSonuc, yaziciSayfa, forumSayfa, hizlandiriciSayfa } from './siteler-sorun.js';
 
 export const SEARCH_HOST = 'www.bulalim.com';
 
@@ -110,10 +111,11 @@ export const SITES = {
             <p class="mut">Haber sonuçları tarihe göre sıralanır; yine de haberin asıl kaynağına ve tarihine bakın.</p>`, 'se');
         }
         const words = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
-        const hits = RESULTS.map((r) => ({ r, score: words.filter((w) => r.keys.some((k) => k.includes(w) || w.includes(k))).length })).filter((x) => x.score).sort((a, b) => b.score - a.score).map((x) => x.r);
+        const sk = sorunSonuc(q);
+        const hits = sk ? sk.hits : RESULTS.map((r) => ({ r, score: words.filter((w) => r.keys.some((k) => k.includes(w) || w.includes(k))).length })).filter((x) => x.score).sort((a, b) => b.score - a.score).map((x) => x.r);
         const devlet = words.some((w) => w.includes('devlet'));
-        const ad = devlet ? AD_DEVLET : AD;
-        const showAd = devlet || words.some((w) => ['indir', 'program', 'yavaş', 'hızlandır', 'resim'].some((k) => w.includes(k)));
+        const ad = sk ? sk.ad : devlet ? AD_DEVLET : AD;
+        const showAd = sk || devlet || words.some((w) => ['indir', 'program', 'yavaş', 'hızlandır', 'resim'].some((k) => w.includes(k)));
         return page(`${q} - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>
           ${tabs}<p class="se-count">Yaklaşık ${hits.length ? hits.length * 1240 : 0} sonuç bulundu</p>
           ${showAd ? `<div class="se-res ad"><small class="ad-tag">Reklam</small><a data-href="${ad.url}" data-ad="1">${ad.title}</a><cite>${ad.url}</cite><p>${ad.snip}</p></div>` : ''}
@@ -204,13 +206,17 @@ export const SITES = {
   },
   'www.yazici-destek.com.tr': {
     name: 'Yazıcı Destek', secure: true,
-    render() {
+    render(path) {
+      const sorun = yaziciSayfa(path);
+      if (sorun) return sorun;
       return page('R-200 Sürücüleri', `<header class="pi-head">🖨 Yazıcı Destek</header><div class="pi"><div class="pi-card"><div class="pi-ic">🖨</div><div><h1>Renkli Yazıcı R-200</h1><p>Sürücü (driver): yazıcının bilgisayarla anlaşmasını sağlayan programdır.</p><p class="pi-meta">Windows 11 / 10 · 64 bit · Sürüm 3.1</p><a class="pi-real" data-download="R200_Surucu.exe">Sürücüyü indir (25 MB)</a></div></div></div>`);
     },
   },
   'www.super-hizlandirici.xyz': {
     name: 'Süper Hızlandırıcı', secure: false,
-    render() {
+    render(path) {
+      const sorun = hizlandiriciSayfa(path);
+      if (sorun) return sorun;
       return page('!!! HIZLANDIR !!!', `<div class="scam"><h1>⚠ DİKKAT! Bilgisayarınız ÇOK YAVAŞ!</h1><p>Hemen “Hızlandırıcı”yı indirin, ödeme bilgilerinizi girin, bilgisayarınız 10 kat hızlansın!!!</p><div class="scam-btns"><button type="button" class="pi-ad red" data-ad="1">ŞİMDİ ÖDE VE HIZLANDIR</button></div><p class="scam-note">(Bu bir alıştırma sayfasıdır. Gerçekte böyle sayfalarda hiçbir şey indirmeyin, bilgi girmeyin.)</p></div>`, 'scam-bg');
     },
   },
@@ -243,7 +249,9 @@ export const SITES = {
   },
   'www.eski-forum.com': {
     name: 'Eski Forum', secure: false,
-    render() {
+    render(path) {
+      const sorun = forumSayfa(path);
+      if (sorun) return sorun;
       return page('Hobi Forumu', `<header class="pi-head" style="background:#5d4037">💬 Hobi Forumu</header><div class="pi"><h1>Bahçecilik sohbetleri</h1>
         <p>🌱 <b>Domates fidesi ne zaman dikilir?</b> · 42 cevap</p><p>🌷 <b>Lale soğanları için en iyi toprak</b> · 17 cevap</p>
         <div class="bk-form"><input placeholder="Kullanıcı adı" disabled><input placeholder="Şifre" disabled><button type="button" disabled>Üye girişi</button></div>
@@ -265,7 +273,7 @@ export const SITES = {
   },
 };
 
-Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES, FOTO_SITES, HARITA_SITES, BANKA_SITES, KAMU_SITES, SOSYAL_SITES);
+Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES, FOTO_SITES, HARITA_SITES, BANKA_SITES, KAMU_SITES, SOSYAL_SITES, SORUN_SITES);
 
 function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 
@@ -273,7 +281,7 @@ function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;'
 export function resolve(input) {
   let t = input.trim();
   if (!t) return null;
-  const looksUrl = !/\s/.test(t) && (/\.[a-zçğıöşü]{2,}/i.test(t) || /^tarayici:\/\//i.test(t));
+  const looksUrl = !/\s/.test(t) && (/\.[a-zçğıöşü]{2,}/i.test(t) || /^tarayici:\/\//i.test(t) || /^(https?:\/\/)?\d{1,3}(\.\d{1,3}){3}(\/|$)/i.test(t));
   if (!looksUrl) return { host: SEARCH_HOST, path: '/ara', q: t, search: true };
   if (/^tarayici:\/\//i.test(t)) return { host: 'tarayici', path: '/' + t.slice(11).replace(/^\/+/, ''), q: '' };
   t = t.replace(/^https?:\/\//i, '');

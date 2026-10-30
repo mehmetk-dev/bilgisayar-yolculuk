@@ -1,6 +1,8 @@
 /* Benzetim masaüstü: ekran çerçevesi, simgeler, pencereler, görev çubuğu, Başlat, menüler, açılış ekranları */
 .dk { position: relative; flex: 1; display: flex; min-height: 0; border-radius: 14px; overflow: hidden; border: 0.45em solid #1d2430; background: #000; font-size: calc(0.72em * var(--dk-scale, 1)); color: #1c2430; box-shadow: 0 10px 30px #1c243033; line-height: 1.35; }
-.dk button { font: inherit; border-width: 1px; border-radius: 5px; padding: 0.25em 0.6em; color: inherit; }
+.dk button { font: inherit; border-width: 1px; border-radius: 5px; padding: 0.25em 0.6em; }
+/* Düğme yazı rengi: temadan alınır ama özgüllüğü sıfır; böylece .ed-btn, .bn-btn gibi sınıfların kendi color kuralı kazanır (eskiden beyaz yazı koyuya ezilip okunmuyordu) */
+:where(.dk) button { color: inherit; }
 .dk button:focus-visible { outline: 2px solid var(--dk-acc, #0a5dc2); outline-offset: 1px; }
 .dk-screen { position: relative; flex: 1; overflow: hidden; outline: none; user-select: none; }
 .dk-screen input, .dk-screen textarea { user-select: text; }

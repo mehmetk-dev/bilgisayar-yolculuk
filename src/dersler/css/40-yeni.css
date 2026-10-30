@@ -228,7 +228,7 @@
 .hr-modes { display: flex; gap: 0.3em; }
 .hr-modes button { flex: 1; display: flex; flex-direction: column; align-items: center; border: 1px solid #dadce0 !important; background: #fff; border-radius: 8px !important; padding: 0.3em 0 !important; font-size: 1.1em; }
 .hr-modes button small { font-size: 0.6em; }
-.hr-modes button.on { background: #e8f0fe; border-color: #1a73e8 !important; color: #1a73e8; }
+.hr-modes button.on { background: #e8f0fe; border-color: #1a73e8 !important; color: #1557b0; }
 .hr-myloc { align-self: flex-start; border: 0 !important; background: none; color: #1a73e8; font-weight: 600; padding: 0 !important; }
 .hr-go { align-self: flex-start; }
 .hr-res { border-top: 1px solid #dadce0; padding-top: 0.5em; }

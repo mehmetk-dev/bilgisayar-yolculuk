@@ -1,7 +1,8 @@
 // 14. hafta sitesi (uydurma): Bankam İnternet Şubesi. Giriş (şifre + SMS kodu), hesap ve IBAN (kopyala),
 // para gönderme (IBAN yapıştırma, alıcı adı denetimi, SMS onayı), PDF dekont indirme,
 // kartlar (asıl kartı internet alışverişine kapatma, limitli sanal kart oluşturma, kartı geçici kapatma),
-// şüpheli harcamaya itiraz (hareket listesinde 4. alanı 'sus' olan satırlar).
+// şüpheli harcamaya itiraz (hareket listesinde 4. alanı 'sus' olan satırlar),
+// fatura ödeme (Ödemeler: kurum seçimi, abone no, borç sorgulama, ad kontrolü, SMS onayı, PDF makbuz, otomatik ödeme bilgisi).
 import { esc } from './util.js';
 import { KURS_TC } from './siteler-gunluk.js';
 
@@ -9,6 +10,16 @@ export const BANKA_HOST = 'www.bankam.com.tr';
 export const BANKA_SIFRE = '246810';
 export const YONETICI = { ad: 'Hasan Demir', iban: 'TR33 0006 1005 1978 6457 8413 26', aidat: 750 };
 const MY_IBAN = 'TR32 0001 2009 4520 0058 0012 34';
+// Uydurma kurumlar ve borçlar. mine: kursiyerin kendi faturası; değilse başkasının borcu (yanlış numara denemesi için)
+const BILLS = [
+  { kurum: 'Çınar Elektrik', no: '6082114735', ad: 'AH*** YI***', donem: 'Ekim 2026', son: '25.11.2026', tutar: 1386.2, mine: true },
+  { kurum: 'Çınar Elektrik', no: '6082114753', ad: 'ME*** KA***', donem: 'Ekim 2026', son: '25.11.2026', tutar: 3412.8, mine: false },
+  { kurum: 'Dere Su İdaresi', no: '2031445589', ad: 'AH*** YI***', donem: 'Ekim 2026', son: '20.11.2026', tutar: 212.4, mine: true },
+];
+const KURUMLAR = [['Çınar Elektrik', 'Elektrik'], ['Dere Su İdaresi', 'Su'], ['Mavi Doğalgaz', 'Doğalgaz'], ['Kuzey Telekom', 'Telefon']];
+// Dersin kullandığı değerler (faturanın kâğıdı bunlarla çizilir)
+export const FATURA_BANKA = { kurum: 'Çınar Elektrik', ad: 'Ahmet Yılmaz', no: '6082 1147 35', yanlis: '6082 1147 53', tutar: '1.386,20', son: '25 Kasım 2026' };
+const slug = (s) => s.toLocaleLowerCase('tr').replace(/[çğıöşü]/g, (c) => 'cgiosu'['çğıöşü'.indexOf(c)]).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 const digits = (s) => String(s || '').replace(/\D/g, '');
 // Yapıştırılan yazıdan IBAN'ı ayıklar (“IBAN:” gibi fazlalıklar ve boşluklar atılır)
@@ -44,7 +55,7 @@ const BANKA = {
     st.bal ??= 18450.75;
     st.moves ||= [['14.10.2026', 'Emekli maaşı', 15240], ['15.10.2026', 'Elektrik faturası', -1245.5], ['16.10.2026', 'Market', -386.4]];
     st.cardOnline ??= true;
-    const head = `<header class="bn-head">🏦 Bankam <span>İnternet Şubesi</span>${st.user ? `<nav><a data-href="${BANKA_HOST}/hesap">Hesaplarım</a><a data-href="${BANKA_HOST}/gonder">Para Gönder</a><a data-href="${BANKA_HOST}/kartlar">Kartlarım</a><button type="button" data-act="logout">⏻ Çıkış</button></nav>` : ''}</header>`;
+    const head = `<header class="bn-head">🏦 Bankam <span>İnternet Şubesi</span>${st.user ? `<nav><a data-href="${BANKA_HOST}/hesap">Hesaplarım</a><a data-href="${BANKA_HOST}/gonder">Para Gönder</a><a data-href="${BANKA_HOST}/odemeler">Ödemeler</a><a data-href="${BANKA_HOST}/kartlar">Kartlarım</a><button type="button" data-act="logout">⏻ Çıkış</button></nav>` : ''}</header>`;
     const err = st.err ? `<div class="bn-err">⚠ ${st.err}</div>` : '';
     if (!st.user) {
       if (st.loginCode) {
@@ -77,6 +88,26 @@ const BANKA = {
         <p>Ödediğinizi göstermek için <b>dekont</b> (makbuz) indirin; aidatı, kirayı ödediğiniz kişiye gönderebilirsiniz.</p>
         <button type="button" class="bn-btn" data-act="dekont">📄 Dekontu indir (PDF)</button></div>`);
     }
+    if (path === '/odemeler') {
+      const f = st.bform || {}, b = st.bill;
+      const sonuc = b ? `<h2>Borç bilgisi</h2><table class="bn-tbl"><tr><th>Kurum</th><td>${esc(b.kurum)}</td></tr><tr><th>Abone no</th><td>${group4(b.no)}</td></tr><tr><th>Abone adı</th><td><b>${b.ad}</b> <small class="bn-small">(gizlilik için kısmen gösterilir)</small></td></tr><tr><th>Dönem</th><td>${b.donem}</td></tr><tr><th>Son ödeme tarihi</th><td>${b.son}</td></tr><tr><th>Ödenecek tutar</th><td><b>${tl(b.tutar)}</b></td></tr></table>
+        <p class="bn-small">Gönderen hesap: Vadesiz TL · Bakiye <b>${tl(st.bal)}</b></p><button type="button" class="bn-btn" data-act="billpay">Öde</button>` : '';
+      return page('Fatura Öde - Bankam', `${head}<div class="bn-main"><h1>🧾 Fatura Öde</h1><form class="bn-form wide" data-act="billq">
+        <label>Kurum<select name="kurum" style="font:inherit;font-weight:400;padding:0.45em 0.6em;border:1px solid #b6c2d0;border-radius:6px"><option value="">Kurum seçin</option>${KURUMLAR.map(([k, t]) => `<option value="${k}"${f.kurum === k ? ' selected' : ''}>${t}: ${k}</option>`).join('')}</select></label>
+        <label>Abone numarası (tesisat no)<input name="no" inputmode="numeric" value="${esc(f.no || '')}" placeholder="Faturada yazan numara" autocomplete="off"></label>${err}<button class="bn-btn">Borç sorgula</button></form>${sonuc}
+        <p class="bn-note">💡 Ödemeden önce <b>adı</b> ve <b>tutarı</b> kontrol edin. Numarayı yanlış yazarsanız başkasının borcu çıkabilir.</p></div>`);
+    }
+    if (path === '/fatura-onay' && st.bpend) {
+      const p = st.bpend;
+      return page('Fatura onayı - Bankam', `${head}<div class="bn-main"><h1>✅ Ödemeyi kontrol edin</h1><table class="bn-tbl"><tr><th>Kurum</th><td>${esc(p.kurum)}</td></tr><tr><th>Abone no</th><td>${group4(p.no)}</td></tr><tr><th>Abone adı</th><td>${p.ad}</td></tr><tr><th>Tutar</th><td><b>${tl(p.tutar)}</b></td></tr></table>
+        <p>Telefonunuza gelen SMS onay kodunu yazın:</p><form class="bn-form" data-act="billconfirm"><input name="kod" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="______">${err}<button class="bn-btn">Onayla ve öde</button><button type="button" class="bn-btn ghost" data-act="billcancel">Vazgeç</button></form></div>`);
+    }
+    if (path === '/fatura-tamam' && st.lastBill) {
+      const l = st.lastBill;
+      return page('Fatura ödendi - Bankam', `${head}<div class="bn-main"><div class="bn-ok">✔ <b>${tl(l.tutar)}</b> ${esc(l.kurum)} faturası ödendi.</div><p>İşlem numarası: <b>${l.no}</b></p>
+        <p>Ödediğinizi gösteren <b>makbuzu</b> (dekont) PDF olarak indirip saklayın.</p><div class="bn-cbtns"><button type="button" class="bn-btn" data-act="billreceipt">📄 Makbuzu indir (PDF)</button><button type="button" class="bn-btn ghost" data-act="billauto">ℹ Otomatik ödeme talimatı nedir?</button></div>
+        ${st.autoInfo ? `<div class="bn-note"><b>Otomatik ödeme talimatı:</b> fatura her ay kesilince bankanız tutarı kendiliğinden öder.<br>➕ Son günü kaçırıp gecikme zammı ödemezsiniz.<br>➖ Tutar ne çıkarsa çıkar ödenir (bu ay fatura yüksek gelse bile). Hesapta para yoksa ödeme olmaz.<br>👉 Talimat verirseniz hesabınızı ve faturayı her ay yine de kontrol edin. Vazgeçmek için aynı menüden talimatı silersiniz.</div>` : ''}</div>`);
+    }
     if (path === '/kartlar') {
       const v = st.vcard;
       const vc = v ? `<div class="bn-card virt"><small>SANAL KART · ${v.months} ay geçerli</small><b class="bn-cno">${st.show ? group4(v.no) : '•••• •••• •••• ' + v.no.slice(-4)}</b><span>SKT ${v.skt} · CVV ${st.show ? v.cvv : '•••'}</span><span>Limit: <b>${tl(v.limit)}</b></span></div>
@@ -102,6 +133,7 @@ const BANKA = {
       ctx.emit('bank-iban-paste', { valid: ibanOk(k), same: k === ibanKey(YONETICI.iban) });
     }, 0));
     el.querySelector('.bn-online')?.addEventListener('change', (e) => { ctx.state.cardOnline = e.target.checked; ctx.emit('bank-card-online', { on: e.target.checked }); ctx.refresh(); });
+    if (ctx.loc.path === '/odemeler' && ctx.state.user) ctx.emit('bill-open');
     return 0;
   },
   act(a, v, ctx, el) {
@@ -156,6 +188,53 @@ const BANKA = {
       st.pending = null; st.form = {};
       ctx.emit('bank-transfer', { tutar: p.tutar, ad: p.ad, acik: p.acik || '' });
       ctx.go('/tamam');
+      return;
+    }
+    if (a === 'billq') {
+      st.bform = v; st.bill = null;
+      const no = digits(v.no);
+      const b = BILLS.find((x) => x.kurum === v.kurum && x.no === no);
+      let reason = null;
+      if (!v.kurum) { reason = 'kurum'; st.err = 'Önce listeden kurumu seçin.'; }
+      else if (!no) { reason = 'bos'; st.err = 'Abone numarasını yazın. Faturanın üstünde yazar.'; }
+      else if (!b) { reason = 'yok'; st.err = 'Borç bulunamadı. Kurumu ve abone numarasını faturadan bakıp yeniden kontrol edin.'; }
+      else if (st.paidBills?.[b.no]) { reason = 'odendi'; st.err = 'Borç bulunamadı: bu aboneliğin ödenmemiş faturası yok (ödenmiş olabilir).'; }
+      else st.bill = b;
+      ctx.emit('bill-query', { found: !reason, mine: !!st.bill?.mine, reason, tutar: st.bill?.tutar || 0, kurum: v.kurum });
+      ctx.refresh();
+      return;
+    }
+    if (a === 'billpay') {
+      const b = st.bill;
+      if (!b) return;
+      if (!b.mine) { st.err = 'Bu fatura sizin adınıza değil. Gerçekte yanlış kişinin faturası ödenirse para çoğu zaman geri gelmez; alıştırmada ödenmiyor. Abone numarasını faturadan kontrol edin.'; ctx.emit('bill-pay-other'); ctx.refresh(); return; }
+      st.bpend = { ...b, code: code(6) };
+      ctx.go('/fatura-onay');
+      setTimeout(() => sms(`${tl(b.tutar)} tutarındaki ${b.kurum} fatura ödemesi`, st.bpend.code), 700);
+      return;
+    }
+    if (a === 'billcancel') { st.bpend = null; smsDone(); ctx.go('/odemeler'); return; }
+    if (a === 'billconfirm') {
+      const p = st.bpend;
+      if (!p) return;
+      if (digits(v.kod) !== p.code) { st.err = 'Kod hatalı. SMS\'teki 6 haneli kodu yazın.'; ctx.refresh(); return; }
+      smsDone();
+      st.bal -= p.tutar;
+      (st.paidBills ||= {})[p.no] = true;
+      const d = ctx.desk.now();
+      st.moves.push([d.toLocaleDateString('tr-TR'), `${p.kurum} faturası`, -p.tutar]);
+      st.lastBill = { ...p, no2: p.no, no: 'FTR' + code(10), date: d.toLocaleDateString('tr-TR'), time: d.toTimeString().slice(0, 5) };
+      st.bpend = null; st.bill = null; st.bform = {}; st.autoInfo = false;
+      ctx.emit('bill-paid', { tutar: p.tutar, kurum: p.kurum });
+      ctx.go('/fatura-tamam');
+      return;
+    }
+    if (a === 'billauto') { st.autoInfo = !st.autoInfo; ctx.emit('bill-auto-info', { on: st.autoInfo }); ctx.refresh(); return; }
+    if (a === 'billreceipt') {
+      const l = st.lastBill;
+      const name = `fatura-makbuz-${slug(l.kurum)}.pdf`;
+      ctx.download(name, { pages: [`<p class="pdf-org">BANKAM A.Ş.</p><h3>Fatura Ödeme Makbuzu</h3><table class="pdf-tbl"><tr><td>İşlem tarihi</td><td>${l.date} ${l.time}</td></tr><tr><td>İşlem no</td><td>${l.no}</td></tr><tr><td>Kurum</td><td>${esc(l.kurum)}</td></tr><tr><td>Abone no</td><td>${group4(l.no2)}</td></tr><tr><td>Abone adı</td><td>${l.ad}</td></tr><tr><td>Fatura dönemi</td><td>${l.donem}</td></tr><tr><td>Ödeme hesabı</td><td>${MY_IBAN}</td></tr><tr><th>Ödenen tutar</th><th>${tl(l.tutar)}</th></tr></table><p class="pdf-small">Bu makbuz elektronik ortamda üretilmiştir; imza gerektirmez.</p>`] });
+      ctx.emit('bill-receipt', { name });
       return;
     }
     if (a === 'dekont') {
