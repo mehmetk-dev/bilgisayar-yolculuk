@@ -3,6 +3,7 @@
 import { emojiIcon } from './svgicons.js';
 import { LESSONS, WEEKS } from './lessons/index.js';
 import { Keyboard, keyLabel } from './keyboard.js';
+import { setupTouch } from './dokunmatik.js';
 import { Notepad } from './notepad.js';
 import { Dialogs, esc } from './dialog.js';
 import { Desktop } from './desktop.js';
@@ -53,6 +54,7 @@ function chime() {
 
 // ---- Sahneler ----
 const kb = new Keyboard($('#kb'));
+const touch = setupTouch({ bar: $('#tbar'), keyLabel, work: $('#work') });
 const npDialogs = new Dialogs($('#work'), (ev) => onEvent(ev));
 const np = new Notepad($('#np'), onEvent, { dialogs: npDialogs, global: true });
 np.active = false;
@@ -283,6 +285,8 @@ function showStep(i, resumed = false) {
   $('#hintBtn').hidden = !step.hint;
   msg('', '');
   kb.want([...(step.combo || []), ...(step.keys || [])]);
+  touch.want(step.combo || [], step.keys || []);
+  $('#combo .keys')?.addEventListener('click', () => touch.press(step.combo));
 
   const info = !step.on && !step.manual;
   $('#next').hidden = !info || !!step.final;
@@ -332,6 +336,7 @@ function complete() {
   $('#manual').hidden = true;
   document.body.classList.remove('waiting');
   kb.want([]);
+  touch.want();
   chime();
   saveSoon();
   reveal($('#next'));

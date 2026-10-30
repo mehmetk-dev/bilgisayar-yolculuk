@@ -1,8 +1,9 @@
-/* Telefon: anlatım üstte kısa bir kutu, alıştırma bilgisayarı altta kalan bütün alanı kullanır.
+/* Telefon: anlatım üstte sabit boylu bir kutu (masaüstü adımdan adıma küçülüp simgeler görev çubuğunun
+   altında kalmasın diye), alıştırma bilgisayarı altta kalan bütün alanı kullanır.
    Sayfa kaymaz; anlatım uzunsa yalnızca kendi kutusu kayar. */
 @media (max-width: 640px) {
   #lesson { display: flex; flex-direction: column; overflow: hidden; padding: 0.5em; gap: 0.5em; }
-  #guide { flex: 0 1 auto; max-height: 42vh; overflow-y: auto; padding: 0.7em 0.8em; gap: 0.45em; }
+  #guide { flex: none; height: 34vh; overflow-y: auto; padding: 0.7em 0.8em; gap: 0.45em; }
   #stepTitle { font-size: 1.2em; }
   #dots { display: none; }
   #work { flex: 1 1 0; min-height: 12em; gap: 0.5em; }
@@ -14,8 +15,26 @@
   #next, #manual { width: 100%; }
   /* ders açıkken üst çubuk tek satır: Ses ve Özet ana sayfada kalır */
   body[data-view="lesson"] #soundBtn, body[data-view="lesson"] #top a[href="#ozet"] { display: none; }
-  body[data-view="lesson"] #top { padding: 0.4em 0.6em; row-gap: 0.2em; }
+  body[data-view="lesson"] #top { padding: 0.35em 0.5em; row-gap: 0.15em; gap: 0.3em; }
+  body[data-view="lesson"] .brand { font-size: 0.95em; }
+  body[data-view="lesson"] #top button, body[data-view="lesson"] #top .btn { padding: 0.3em 0.55em; }
+  body[data-view="lesson"] #top .seg button { padding: 0.1em 0.55em; }
 }
 #telNot { position: fixed; left: 0.6em; right: 0.6em; bottom: 0.6em; z-index: 9999; background: #0b3c7a; color: #fff; border-radius: 14px; padding: 0.8em 1em; box-shadow: 0 8px 24px #0005; display: flex; flex-direction: column; gap: 0.6em; font-size: 0.95em; }
 #telNot[hidden] { display: none; }
 #telNot button { align-self: flex-end; background: #fff; color: #0b3c7a; border: 0; border-radius: 10px; font-weight: 800; padding: 0.4em 1.2em; }
+
+/* Dokunmatik tuş şeridi (dokunmatik.js): yalnızca dokunmatik ekranda, ders açıkken */
+#tbar { display: none; }
+body.touch[data-view="lesson"] #tbar { display: flex; gap: 0.35em; overflow-x: auto; padding: 0.35em 0.2em; flex: none; grid-column: 1 / -1; scrollbar-width: none; position: relative; }
+#tbar .tk { flex: none; min-width: 2.9em; min-height: 2.6em; padding: 0.3em 0.6em; border: 2px solid var(--line); border-radius: 10px; background: #fff; font-weight: 700; font-size: 0.9em; color: var(--fg); touch-action: manipulation; }
+#tbar .tk.want { background: #fff3c4; border-color: #d9a400; }
+#tbar .tk.on { background: var(--acc); border-color: var(--acc); color: #fff; }
+#tbar[data-hint]:not([data-hint=""])::before { content: attr(data-hint); position: fixed; left: 50%; transform: translateX(-50%); bottom: 4.2em; background: #0b3c7a; color: #fff; padding: 0.4em 0.9em; border-radius: 999px; font-weight: 700; font-size: 0.9em; z-index: 9000; white-space: nowrap; pointer-events: none; }
+body.touch #combo .keys { cursor: pointer; }
+/* Parmakla sürükleme sayfayı kaydırmasın, öğeyi taşısın (kaydırılabilir pencere içleri kendi kaydırmasını korur) */
+body.touch .dk-screen, body.touch .win-bar, body.touch .win-grip, body.touch [data-drop], body.touch .di { touch-action: none; }
+/* sağa kaydırılabildiği belli olsun */
+body.touch[data-view="lesson"] #tbar { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+body.touch[data-view="lesson"] #tbar.end { -webkit-mask-image: none; mask-image: none; }
+body.touch #lesson { grid-template-rows: minmax(0, 1fr) auto; }
