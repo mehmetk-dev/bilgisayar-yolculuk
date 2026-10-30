@@ -23,6 +23,9 @@ import { internetKesildi } from './internetkesildi.js';
 import { epostaTemizlik } from './epostatemizlik.js';
 import { epostaParkur, gunlukParkur, guvenlikParkur } from './parkurlar.js';
 import { yedekleme, ikiAdim, sosyalMedya } from './bilgiguvenligi.js';
+import { belgeGonder } from './belgegonder.js';
+import { officeYoksa } from './officeyoksa.js';
+import { telefonKayip } from './telefonkayip.js';
 import { kisiselVeri, dolandirildim } from './bilgiguvenligi2.js';
 import { wordResim, bicimBoyacisi } from './kelime3.js';
 import { kelimeDipnot } from './kelime4.js';
@@ -109,12 +112,12 @@ export const WEEKS = [
   { no: 7, title: 'Paint, Ekran Alıntısı ve Ayarlar', lessons: [paint, tebrikKarti, alinti, ayarlar, saatTarih, denetimMasasi, windowsAraclar, temalar, bluetooth, hesapPin, ayarlarParkur, odev7, test7] },
   { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, tarayicilarBilgi, adres, aramaMotorlari, medya, videoHz, ingilizce, tuzaklar, kurulum, yazici, bakimGuvenlik, virusAntivirus, internetKesildi, isletimSistemleri, oskurulum, internetParkur, odev8, test8] },
   { no: 9, title: 'E-posta', lessons: [eposta, gmailHotmail, epostaIletme, eposta2, bulutPaylas, sifreSifirla, epostaTemizlik, epostaParkur, odev9, test9] },
-  { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, kelimeDipnot, kelimeIcindekiler, kelimeBulten, kelimeIzle, kelimeIlan, dilekceParkur, odev10, test10] },
+  { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, kelimeDipnot, kelimeIcindekiler, kelimeBulten, kelimeIzle, kelimeIlan, dilekceParkur, belgeGonder, officeYoksa, odev10, test10] },
   { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, hucreInce, doldurDondur, hesap3, hesap4, duseyara, excelHata, excelYazi, excelTarih, altToplam, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
   { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, sunuBaglanti, animasyon, animasyonBolmesi, sunuAni, sunuProva, anıAlbumu, sunuParkur, odev12, test12] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukWeb, telefon, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, fotoBoyut, harita, whatsappWeb, gunlukParkur, odev13, test13] },
   { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevlet, randevu, alisveris, sanalKart, gorusme, eNabiz, kamuHizmet, ilanTuzak, eHizmetParkur, odev14, test14] },
-  { no: 15, title: 'Bilgi güvenliği: yedek, iki adımlı doğrulama, sosyal medya, kişisel veriler', lessons: [yedekleme, ikiAdim, sosyalMedya, kisiselVeri, dolandirildim, guvenlikParkur, odev15, test15] },
+  { no: 15, title: 'Bilgi güvenliği: yedek, iki adımlı doğrulama, sosyal medya, kişisel veriler', lessons: [yedekleme, ikiAdim, telefonKayip, sosyalMedya, kisiselVeri, dolandirildim, guvenlikParkur, odev15, test15] },
   { no: 0, title: 'İnternette güvenlik, yapay zekâ, yazma hızı ve kurs bitirme', lessons: [guvenlik, yapayZeka, hiz, buyukParkur, kursSinavi] },
 ];
 
