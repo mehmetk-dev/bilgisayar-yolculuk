@@ -95,6 +95,18 @@ export const hesap1 = {
       done: 'Toplam kendiliğinden <b>10.200</b> oldu. Hesap tablosunun gücü budur: formül bir kez yazılır, sayılar değişince sonuç güncellenir.',
     },
     {
+      title: 'Yanlışlıkla sildim!',
+      html: `<p>Korkmayın, bozulan her şey geri gelir. Deneyelim: <b>B2</b>\'ye (kira) tıklayıp ${K('Delete')} tuşuna basın. Kira silinir, toplam da değişir.</p><p>Şimdi ${K('Ctrl')} + ${K('Z')} tuşlarına basın: silinen sayı geri gelir.</p>`,
+      hint: 'Ctrl + Z yerine şeridin en solundaki ↶ (Geri al) düğmesine de basabilirsiniz. Fazla geri aldıysanız Ctrl + Y (↷ Yinele) ileri alır.',
+      on: (ev, c) => {
+        if (ev.type === 'xl-edit' && cell(c, 'B2').raw === '') c.s.cleared = true;
+        if (ev.type !== 'xl-undo') return false;
+        if (!c.s.cleared) { c.warn('Önce B2\'yi silin, sonra geri alın. Elektrik 750\'ye döndüyse Ctrl + Y ile yineleyin.'); return false; }
+        return near(cell(c, 'B2').value, 5000) && near(cell(c, 'B3').value, 900);
+      },
+      done: 'Kira geri geldi, toplam yine <b>10.200</b>. <b>Ctrl + Z</b> Word\'de, Not Defteri\'nde, hemen her programda çalışır; birkaç kez basarsanız daha geriye gider.',
+    },
+    {
       title: 'Formülü kendiniz yazın',
       html: `<p><b>A7</b>\'ye <b>Ortalama</b> yazın. <b>B7</b>\'ye şu formülü yazıp ${K('Enter')}:</p><div class="target">=ORTALAMA(B2:B5)</div>`,
       hint: '= işareti Shift + 0. Parantez Shift + 8 ve Shift + 9. İki nokta (:) Shift + nokta.',

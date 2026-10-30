@@ -306,6 +306,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   body.innerHTML = `
     <div class="xl-tabs"><button type="button" class="xl-file">Dosya</button><span>Giriş</span></div>
     <div class="xl-rib">
+      <button type="button" data-act="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-act="redo" title="Yinele (Ctrl + Y)">↷</button><span class="xl-sep"></span>
       <button type="button" data-act="bold" title="Kalın (Ctrl + B)"><b>K</b></button>
       <button type="button" data-act="tl" title="Para birimi biçimi">₺</button><button type="button" data-act="pct" title="Yüzde biçimi">%</button><button type="button" data-act="date" title="Tarih biçimi (gg.aa.yyyy)">📅</button><button type="button" data-act="plain" title="Genel biçim (biçimi kaldır)">123</button>
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
@@ -343,6 +344,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   let merges = []; // birleştirilmiş hücreler: { r1, c1, r2, c2 }
   let frozen = false; // üst satır dondurulmuş mu
   let prot = null; // sayfa koruması: { pass } (pass boşsa parolasız); kilidi açık hücreler fmt[a].open
+  let hist = null, histAt = 0; // geri al / yinele: her render'da sayfa değiştiyse durumu saklanır (bkz. record)
   const locked = (a) => !!prot && !fmt[a]?.open;
   // Korunan hücreye yazılmak istenince Excel'deki uyarı
   function lockedWarn(a) {
@@ -481,6 +483,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     renderSheets();
     paintSel();
     setTitle(`${dirty ? '*' : ''}${fileName || 'Kitap1'} - Hesap Tablosu`);
+    record();
   }
   function paintSel() {
     const s = sel();
@@ -1054,6 +1057,29 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   function renderSheets() {
     $('.xl-shtabs').innerHTML = sheets.map((x, i) => `<button type="button" class="xl-sh${i === curSheet ? ' on' : ''}" data-i="${i}" style="${x.color ? `border-bottom:3px solid ${x.color}` : ''}" title="Çift tık: yeniden adlandır · Sağ tık: seçenekler">${esc(x.name)}</button>`).join('');
   }
+  // ---- Geri al (Ctrl + Z) / Yinele (Ctrl + Y) ----
+  // Geçmiş yalnızca açık sayfaya aittir; sayfa değişince ya da dosya açılınca sıfırlanır (resetHist).
+  function record() {
+    if (!hist) return;
+    const d = snap(), key = JSON.stringify(d);
+    if (key === hist[histAt].key) { hist[histAt].sel = { act, anchor }; return; }
+    hist.splice(histAt + 1, Infinity, { key, d, sel: { act, anchor } });
+    if (hist.length > 50) hist.shift();
+    histAt = hist.length - 1;
+  }
+  function resetHist() { hist = null; const d = snap(); hist = [{ key: JSON.stringify(d), d, sel: { act, anchor } }]; histAt = 0; }
+  function undo(dir) {
+    if (editing) commit(0, 0);
+    const to = histAt + dir;
+    if (!hist || to < 0 || to >= hist.length) { desk.toast(dir < 0 ? 'Geri alınacak bir şey yok' : 'Yinelenecek bir şey yok', '', dir < 0 ? '↶' : '↷'); return; }
+    histAt = to;
+    const { d, sel: s } = hist[to];
+    const c = structuredClone(d);
+    cells = c.cells; fmt = c.fmt; rules = c.rules; valids = c.valids; colW = c.colW; merges = c.merges; frozen = c.frozen; pageSet = c.pageSet; prot = c.prot; subt = c.subt || null;
+    act = s.act; anchor = s.anchor; clip = null;
+    dirty = true; render();
+    emit('xl-undo', { dir: dir < 0 ? 'undo' : 'redo' });
+  }
   function stash() { sheets[curSheet].data = snap(); }
   function useSheet(i, skipStash) {
     if (editing) commit(0, 0);
@@ -1064,6 +1090,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     filt = null; chart = null; clip = null; $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
     render();
+    resetHist();
   }
   const uniqueName = (base) => { let n = base, k = 2; while (sheets.some((x) => x.name.toLowerCase() === n.toLowerCase())) n = `${base} (${k++})`; return n; };
   function addSheet() {
@@ -1153,6 +1180,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     $('.xl-chart').hidden = true;
     anchor = act = { r: 0, c: 0 };
     render();
+    resetHist();
   }
   async function save(asNew) {
     if (desk.dialogs.busy) return false;
@@ -1309,6 +1337,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     }
     if (e.ctrlKey || e.metaKey) {
       if (prot && ['KeyX', 'KeyV', 'KeyD', 'KeyB'].includes(e.code)) { const ids = []; eachSel((a) => ids.push(a)); if (guard(ids)) { e.preventDefault(); return; } }
+      if (e.code === 'KeyZ') { e.preventDefault(); undo(e.shiftKey ? 1 : -1); return; }
+      if (e.code === 'KeyY') { e.preventDefault(); undo(1); return; }
       if (e.code === 'KeyC') { e.preventDefault(); copy(false); }
       if (e.code === 'KeyX') { e.preventDefault(); copy(true); }
       if (e.code === 'KeyV') { e.preventDefault(); paste(); }
@@ -1423,6 +1453,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       prot = { pass: pop.querySelector('.xl-ppass').value };
       pop.hidden = true; dirty = true; render();
       const open = Object.entries(fmt).filter(([, f]) => f?.open).map(([k]) => k);
+      resetHist(); // Excel'de de koruma değişince geri alma geçmişi silinir
       emit('xl-protect', { on: true, pass: !!prot.pass, open });
       wrap.focus({ preventScroll: true });
       return;
@@ -1431,6 +1462,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       const pw = pop.querySelector('.xl-ppass')?.value ?? '';
       if (prot.pass && pw !== prot.pass) { const n = pop.querySelector('.xl-vnote'); n.textContent = 'Parola yanlış.'; n.classList.add('bad'); emit('xl-protect-err'); return; }
       prot = null; pop.hidden = true; dirty = true; render();
+      resetHist(); // Excel'de de koruma değişince geri alma geçmişi silinir
       emit('xl-protect', { on: false });
       wrap.focus({ preventScroll: true });
       return;
@@ -1438,6 +1470,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const a = t.dataset.act;
     if (!a) return;
     if (editing) commit(0, 0);
+    if (a === 'undo' || a === 'redo') { undo(a === 'undo' ? -1 : 1); wrap.focus({ preventScroll: true }); return; }
     if (a === 'protect') return protectDialog();
     if (prot && a !== 'chart' && a !== 'pie' && a !== 'filter') { lockedWarn(addr(act.r, act.c)); return; }
     if (a === 'unlock') {
