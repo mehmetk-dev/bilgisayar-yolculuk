@@ -78,7 +78,7 @@ export const apartmanDuyuru = {
     },
     {
       title: 'Çerçeve ekleyin',
-      html: '<p><b>Düzen</b> sekmesine tıklayın, <b>Sayfa kenarlığı</b> yanındaki <b>▣ Kutu</b>\'ya tıklayın. Sayfanın çevresine çerçeve gelir.</p>',
+      html: '<p><b>Düzen</b> sekmesine tıklayın, <b>Sayfa kenarlığı</b> yanındaki <b>▣ Kutu</b>\'ya tıklayın. Sayfanın çevresine çerçeve gelir.</p><p class="mut">Gerçek Word\'de <b>Sayfa Kenarlıkları</b> düğmesi <b>Tasarım</b> sekmesindedir (“Sayfa Arka Planı” grubu).</p>',
       mouse: '🖱 Düzen → Sayfa kenarlığı → Kutu',
       on: (ev) => ev.type === 'doc-layout' && ev.border === 'kutu',
       done: 'Çerçeve duyuruyu sayfadan ayırıyor. Bir de “Çift çizgi” seçeneği var.',
@@ -204,7 +204,7 @@ export const sayfaDuzeni = {
     },
     {
       title: 'Filigran',
-      html: '<p>Taslak bir belgenin her sayfasında silik bir yazı görünsün istiyorsunuz. <b>Düzen → Filigran → ÖRNEKTİR</b>\'e tıklayın.</p>',
+      html: '<p>Taslak bir belgenin her sayfasında silik bir yazı görünsün istiyorsunuz. <b>Düzen → Filigran → ÖRNEKTİR</b>\'e tıklayın.</p><p class="mut">Gerçek Word\'de <b>Filigran</b> düğmesi <b>Tasarım</b> sekmesindedir (“Sayfa Arka Planı” grubu).</p>',
       on: (ev) => ev.type === 'doc-layout' && ev.wm === 'ÖRNEKTİR',
       done: 'Sayfanın ortasında silik “ÖRNEKTİR” görünür; yazıyı etkilemez. Yazdırınca da çıkar. Kaldırmak için “Yok”.',
     },
@@ -404,7 +404,7 @@ export const dilekceParkur = {
     { title: '6. İki yana yaslayın', html: '<p>Yazdığınız metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: 'Paragrafa üç tıkla; Ctrl + J.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && b.align === 'justify')) },
     { title: '7. Tarih ve ad', html: '<p>Altına <b>bugünün tarihini</b> (Ekle → Tarih) ve <b>adınızı soyadınızı</b> yazıp ikisini <b>sağa hizalayın</b>.</p>', hint: 'Ekle → Tarih. İkisini birlikte seçip Ctrl + R.', on: when((c) => { const b = info(c).blocks.filter((x) => x.text); const i = b.findIndex((x) => x.text.includes(today())); return i >= 0 && b[i].align === 'right' && b.slice(i + 1).some((x) => x.align === 'right' && /\p{L}{2,}/u.test(x.text)); }) },
     { title: '8. Kaydedin', html: '<p>Belgeyi <b>dilekçe</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S.', on: (ev) => ev.type === 'doc-save' && ev.name.toLocaleLowerCase('tr').includes('dilek') },
-    { title: '9. PDF yapın', html: '<p>Aynı belgeyi <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet.', on: (ev) => ev.type === 'doc-pdf' },
+    { title: '9. PDF yapın', html: '<p>Aynı belgeyi <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF. Resmî kuruma göndereceğiniz belgeyi PDF yollayın, Word dosyanızı da saklayın.)', on: (ev) => ev.type === 'doc-pdf' },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Bir dilekçeyi baştan sona hazırladınız.</p>' },
   ],
 };

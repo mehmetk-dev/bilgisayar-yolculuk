@@ -41,7 +41,7 @@ export const adres = {
     },
     {
       title: 'Kilide tıklayın',
-      html: '<p>Adres çubuğunun solundaki <b>🔒 kilide</b> tıklayın. Açılan kutuda adresin renkli parçalarına, “Bu site” satırına ve sertifikaya bakın.</p>',
+      html: '<p>Adres çubuğunun solundaki <b>🔒 kilide</b> tıklayın. Açılan kutuda adresin renkli parçalarına, “Bu site” satırına ve sertifikaya bakın.</p><p class="mut">Gerçek Chrome\'da kilit yerine iki çizgili küçük bir ayar simgesi vardır; aynı yere tıklayın. Chrome adresin başındaki https:// kısmını da göstermeyebilir; önemli olan alan adıdır. Kilit ya da simge yalnızca bağlantının şifreli olduğunu gösterir, sitenin gerçek olduğunu göstermez.</p>',
       mouse: '🖱 🔒 kilit',
       on: (ev) => ev.type === 'web-siteinfo',
       done: 'Sarı ve mavi parça <b>alan adıdır</b>: <b>turkiye.gov.tr</b>. Sertifika da bu ada verilmiş. Kutuyu ✕ ile kapatabilirsiniz.',

@@ -41,7 +41,7 @@ export const hesap1 = {
     },
     {
       title: 'Programı açın',
-      html: '<p>⊞ <b>Başlat</b>\'tan <b>📗 Hesap Tablosu</b>\'nu açın.</p>',
+      html: '<p>⊞ <b>Başlat</b>\'tan <b>📗 Hesap Tablosu</b>\'nu açın.</p><p class="mut">Gerçek bilgisayarda bu programın adı <b>Microsoft Excel</b>\'dir (yeşil simge, beyaz X). Açılınca önce şablon listesi çıkar; boş sayfa için <b>Boş çalışma kitabı</b>\'na tıklarsınız.</p>',
       mouse: '🖱 Başlat → Hesap Tablosu',
       check: (c) => !!c.d.find('sheet'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'sheet',
@@ -77,6 +77,11 @@ export const hesap1 = {
       done: 'Sayılar hücrenin <b>sağına</b> yaslanır. Böylece sayıyla yazıyı ayırt edebilirsiniz.',
     },
     {
+      title: 'Sayı mı, yazı mı?',
+      html: `<p>Sayılar hücrede <b>sağa</b>, yazılar <b>sola</b> yaslanır. Hesaba yalnızca sayılar girer.</p>
+        <ul class="big-list"><li>Ondalık için <b>virgül</b> yazın: <b>45,50</b>. Nokta ile <b>45.50</b> yazarsanız gerçek Excel bunu sayı saymaz; hücre sola yaslanır, toplam yanlış çıkar.</li><li>Bir sayı <b>sola</b> yaslıysa ve toplama girmiyorsa yazı sanılmıştır. Hücreyi silip virgülle yeniden yazın.</li><li>Telefon numarasının başındaki <b>0</b> silinir (0532 → 532). Önce hücreyi seçip <b>Giriş</b> sekmesindeki sayı biçimi listesinden <b>Metin</b>\'i seçin, sonra numarayı yazın.</li></ul>`,
+    },
+    {
       title: 'Otomatik toplam',
       html: `<ol class="steps"><li><b>A6</b>\'ya <b>Toplam</b> yazın.</li><li><b>B6</b> hücresine tıklayın (sayıların hemen altı).</li><li>Üstteki <b>∑ Otomatik Toplam</b> düğmesine tıklayın.</li></ol>`,
       mouse: '🖱 B6 → ∑',
@@ -105,6 +110,10 @@ export const hesap1 = {
         return near(cell(c, 'B2').value, 5000) && near(cell(c, 'B3').value, 900);
       },
       done: 'Kira geri geldi, toplam yine <b>10.200</b>. <b>Ctrl + Z</b> Word\'de, Not Defteri\'nde, hemen her programda çalışır; birkaç kez basarsanız daha geriye gider.',
+    },
+    {
+      title: 'Hücreyi düzeltmek',
+      html: `<p>Hücrenin içindekini baştan yazmak yerine <b>çift tıklayın</b> ya da hücreyi seçip ${K('F2')} tuşuna basın. İmleç hücrenin içine girer; tek bir harfi ya da sayıyı düzeltebilirsiniz. ${K('Enter')} onaylar. Yazarken vazgeçerseniz ${K('Esc')} tuşuna basın.</p><p class="mut">Listenin sonuna yeni satır eklerseniz toplam formülünün onu kapsayıp kapsamadığına bakın: toplam hücresine çift tıklayınca formülün seçtiği alan renkli çerçeveyle görünür.</p>`,
     },
     {
       title: 'Formülü kendiniz yazın',
@@ -185,12 +194,14 @@ export const hesap2 = {
     },
     {
       title: 'Sıralayın',
-      html: '<p>En büyük gider en üstte olsun: <b>B3</b> gibi tutar sütunundaki bir hücreye tıklayın, sonra <b>↓ Z→A</b> (büyükten küçüğe) düğmesine basın.</p>',
-      mouse: '🖱 Tutar sütunu → ↓ Z→A',
-      hint: 'Sadece tek bir hücreye tıklayın; program başlık ve toplam satırı dışındaki bütün satırları birlikte sıralar.',
+      html: '<p>En büyük gider en üstte olsun. Tutar sütunundan başlayarak <b>B2</b>\'den <b>A5</b>\'e doğru sürükleyin (başlık satırı ve Toplam satırı seçilmesin). Sonra <b>↓ Z→A</b> (büyükten küçüğe) düğmesine basın.</p><p class="mut">Toplam satırı seçilmez, yoksa sıralamaya karışır. Excel, sürüklemeye başladığınız sütuna göre sıralar.</p>',
+      mouse: '🖱 B2 → A5 sürükle → ↓ Z→A',
+      hint: 'Başlık satırını ve Toplam satırını seçmeyin. Fareyi B2\'ye basılı tutup A5\'e kadar sürükleyin: seçim A2:B5 olur ve sıralama B (Tutar) sütununa göre yapılır.',
       on: (ev, c) => {
         if (ev.type !== 'xl-sort') return false;
-        if (ev.col !== 'B' || !ev.desc) { c.note('Sıralandı ama tutara göre büyükten küçüğe değil. B sütununda bir hücreye tıklayıp ↓ Z→A\'ya basın.'); return false; }
+        if (ev.single) { c.note('Tek hücreye tıkladınız. Bu benzetim Toplam satırını atladı ama <b>gerçek Excel atlamaz</b>: bitişik bütün alanı, Toplam satırını da sıralar. Ctrl + Z ile geri alın; B2\'den A5\'e doğru sürükleyerek seçip yeniden deneyin.'); return false; }
+        if (ev.from !== 'A2' || ev.to !== 'B5') { c.note('Seçim A2:B5 olmalı (başlık ve Toplam hariç). Ctrl + Z ile geri alıp B2\'den A5\'e doğru sürükleyerek yeniden seçin.'); return false; }
+        if (ev.col !== 'B' || !ev.desc) { c.note('Sıralandı ama tutara göre büyükten küçüğe değil. Excel, sürüklemeye başladığınız hücrenin sütununa göre sıralar. Ctrl + Z ile geri alıp Tutar sütunundan (B2) başlayarak A5\'e doğru sürükleyin, ↓ Z→A\'ya basın.'); return false; }
         return norm(cell(c, 'A2').raw) === 'kira';
       },
       done: 'Kira en üstte. Gider adları da tutarlarıyla birlikte yer değiştirdi; satırlar bozulmadı.',
@@ -315,7 +326,7 @@ export const hesap3 = {
     },
     {
       title: 'Başarıya göre sıralayın',
-      html: '<p><b>D</b> sütununda (Ortalama) bir öğrencinin hücresine tıklayın, <b>↓ Z→A</b> ile büyükten küçüğe sıralayın.</p>',
+      html: '<p><b>D</b> sütununda (Ortalama) bir öğrencinin hücresine tıklayın, <b>↓ Z→A</b> ile büyükten küçüğe sıralayın.</p><p class="mut">Bu tabloda Toplam satırı yok, o yüzden tek hücre yeter. Altında Toplam satırı olan bir tabloyu sıralarken ise önce yalnızca veri satırlarını seçin (Hesap Tablosu 2. ders).</p>',
       on: (ev, c) => ev.type === 'xl-sort' && ev.desc && ev.col === 'D' && norm(cell(c, 'A2').raw) === 'fatma' && near(cell(c, 'D2').value, 92.5),
       done: 'Fatma en üstte. Formüller satırlarıyla birlikte taşındı; ortalamalar ve durumlar yine doğru.',
     },

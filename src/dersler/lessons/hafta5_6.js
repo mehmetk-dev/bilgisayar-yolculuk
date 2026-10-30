@@ -18,7 +18,8 @@ export const masaustu = {
   steps: [
     {
       title: 'Masaüstünün parçaları',
-      html: `<ul class="big-list"><li><b>Simgeler</b>: sol taraftaki küçük resimler.</li><li><b>Görev çubuğu</b>: en alttaki şerit.</li><li><b>⊞ Başlat</b>: görev çubuğunun ortasında; bütün programlar burada.</li><li><b>🔍 Ara</b>: program ya da dosya aramak için.</li><li>Sağ altta <b>saat</b>, <b>ses 🔊</b> ve <b>internet 📶</b> simgeleri.</li></ul>`,
+      html: `<ul class="big-list"><li><b>Simgeler</b>: sol taraftaki küçük resimler.</li><li><b>Görev çubuğu</b>: en alttaki şerit.</li><li><b>⊞ Başlat</b>: görev çubuğunun ortasında; bütün programlar burada.</li><li><b>🔍 Ara</b>: program ya da dosya aramak için.</li><li>Sağ altta <b>saat</b>, <b>ses 🔊</b> ve <b>internet 📶</b> simgeleri.</li></ul>
+        <p class="mut">Windows 10 kullanıyorsanız Başlat düğmesi sol alt köşededir. Derslerde “Bluetooth ve cihazlar” yazıyorsa Windows 10\'da “Aygıtlar”, “Erişilebilirlik” yazıyorsa “Erişim Kolaylığı”, “Windows Update” yazıyorsa “Güncelleştirme ve Güvenlik” demektir.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     {
@@ -91,7 +92,7 @@ export const masaustu = {
     },
     {
       title: 'Pencereleri kapatın',
-      html: '<p>Açık pencerelerin hepsini <b>✕</b> ile kapatın. Kaydetmek isteyip istemediğiniz sorulursa <b>Kaydetme</b> deyin.</p>',
+      html: '<p>Açık pencerelerin hepsini <b>✕</b> ile kapatın. Kaydetmek isteyip istemediğiniz sorulursa <b>Kaydetme</b> deyin.</p><p class="mut">(Bu derste yazdıklarımız deneme olduğu için Kaydetme diyoruz. Gerçek bir yazı yazdıysanız <b>Kaydet</b>\'e basın.)</p>',
       setup: (c) => c.d.closeMenus(),
       check: (c) => !c.d.wins.length,
       on: (ev, c) => ev.type === 'win-close' && !c.d.wins.length,
@@ -199,7 +200,7 @@ export const dosyalar = {
         if (ev.type === 'file-clip' && ev.op === 'copy') c.note('Kopyalandı. Şimdi soldan <b>Masaüstü</b>\'ne gidip <b>Yapıştır</b>\'a tıklayın.');
         return ev.type === 'file-paste' && ev.op === 'copy';
       },
-      done: 'Dosyanın bir kopyası oluştu; asıl dosya Belgeler\'de duruyor.',
+      done: 'Dosyanın bir kopyası oluştu; asıl dosya Belgeler\'de duruyor.<br><br>Aynı klasöre aynı adlı bir dosya yapıştırırsanız Windows sorar. Seçenekler: eskisini yenisiyle <b>değiştirmek</b> (eski dosya silinir), bu dosyayı <b>atlamak</b> (hiçbir şey olmaz) ya da <b>ikisini de tutmak</b> (yenisinin adına (2) eklenir). Menü adları sürüme göre biraz değişebilir. Emin değilseniz ikisini de tutan seçeneği seçin; hiçbir şey kaybolmaz.',
     },
     {
       title: 'Silin',
@@ -242,11 +243,11 @@ export const dosyalar = {
       html: '<p>Soldan <b>Resimler</b>\'e gidin. <b>tatil</b> fotoğrafını tutup soldaki <b>💾 USB Bellek (E:)</b>\'nin üzerine sürükleyin.</p><p class="mut">Farklı bir sürücüye (USB) sürükleyince dosya taşınmaz, <b>kopyalanır</b>.</p>',
       setup: (c) => { if (!c.d.fs.usb) c.d.plugUsb(); c.d.ensure('explorer'); },
       on: (ev) => (ev.type === 'drop' && ev.to === 'usb') || (ev.type === 'file-paste' && ev.to === 'usb'),
-      done: 'Fotoğraf USB belleğe kopyalandı; aslı Resimler\'de duruyor.',
+      done: 'Fotoğraf USB belleğe kopyalandı; aslı Resimler\'de duruyor.<br><br>USB\'deki bir dosyayı doğrudan açıp düzenlemeyin. Önce Belgeler\'e kopyalayın, düzenleyin, bitince yeni hâlini USB\'ye tekrar kopyalayın. Yoksa belleği çekince çalışmanız kaybolabilir.',
     },
     {
       title: 'Güvenle çıkarın',
-      html: '<p>USB belleği çekmeden önce: Dosya Gezgini\'nde USB\'yi açıp üstteki <b>⏏ Çıkar</b>\'a ya da görev çubuğunun sağındaki <b>💾</b> simgesine tıklayın.</p><p>“Artık çıkarılabilir” yazısını görünce çekin.</p>',
+      html: '<p>USB belleği çekmeden önce: Dosya Gezgini\'nde USB\'yi açıp üstteki <b>⏏ Çıkar</b>\'a ya da görev çubuğunun sağındaki <b>💾</b> simgesine tıklayın.</p><p>“Artık çıkarılabilir” yazısını görünce çekin.</p><p class="mut">Gerçek bilgisayarda bu simge çoğu zaman görev çubuğunun sağındaki ^ (gizli simgeler) okunun altındadır. Bir kopyalama sürerken belleği çıkarmayın; ilerleme çubuğu bitsin.</p>',
       setup: (c) => { if (!c.d.fs.usb) c.d.plugUsb(); },
       on: (ev) => ev.type === 'usb' && !ev.on,
       done: 'Bu adımı atlayıp çekerseniz, yazılmakta olan dosya bozulabilir.',

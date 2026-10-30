@@ -114,6 +114,13 @@ export const yapayZeka = {
       wrong: 'Bu çok kısa ve belirsiz. Daha ayrıntılı bir soru düşünün.',
       why: 'Doğru. Kaç kişilik, nasıl bir yemek, ne kadar zamanınız olduğu gibi ayrıntıları yazdıkça cevap daha işinize yarar olur.',
     }),
+    rehberSoru({
+      title: 'Yapay zekâ ve dolandırıcılar',
+      html: '<p>Yapay zekâ yalnızca bize değil, dolandırıcılara da yardım edebilir: yakınınızın sesini ya da görüntüsünü taklit eden bir arama ya da çok inandırıcı bir mesaj hazırlayabilir. Kimi arayan “Ben torununuz, acil para lazım” diyor, sesi de tanıdık. Ne yaparsınız?</p>',
+      opts: ['Sesi tanıdık, hemen gönderirim', 'Kapatır, torunumu bildiğim numarasından arar ya da ailedeki ortak gizli kelimeyi sorarım', 'Banka şifremi söylerim ki o göndersin'], ok: 1,
+      wrong: 'Ses ya da görüntü artık taklit edilebiliyor; tanıdık gelmesi yetmez.',
+      why: 'Doğru. Acil para isteyenin kim olduğunu ikinci bir yoldan doğrulayın. Aynı şekilde yapay zekâ bir telefon numarası ya da internet adresi de uydurabilir; kullanmadan önce resmî kaynaktan doğrulayın.',
+    }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Yapay zekâyı akıllıca kullanmayı öğrendiniz:</p>' },
   ],
 };

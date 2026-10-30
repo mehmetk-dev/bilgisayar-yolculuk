@@ -193,11 +193,18 @@ export const dolandirildim = {
     },
     {
       title: 'Şifreyi değiştirin',
-      html: `<p>Aynı sayfada <b>🔑 Şifre değiştir</b>: şu anki şifre <b>${DOST_SIFRE}</b>; yeni şifre en az 8 karakter, büyük ve küçük harf, rakam (ör. <b>MaviÇay.47kiraz</b>). Yeni şifreyi iki kez yazıp <b>Şifreyi değiştir</b>.</p>`,
-      hint: 'Kırmızı yazı neyin eksik olduğunu söyler. Yeni şifreyi bir kâğıda yazıp evde saklayabilirsiniz.',
+      html: `<p>Aynı sayfada <b>🔑 Şifre değiştir</b>: şu anki şifre <b>${DOST_SIFRE}</b>; yeni şifre uzun olsun (alıştırma en az 8 ister, siz 12 ve üzerini tercih edin), büyük ve küçük harf, rakam içersin (ör. <b>MaviÇay.47kiraz</b>). Yeni şifreyi iki kez yazıp <b>Şifreyi değiştir</b>.</p>`,
+      hint: 'Kırmızı yazı neyin eksik olduğunu söyler. Şifreyi kâğıda yazacaksanız evde güvenli bir yerde saklayın; bilgisayarın yanına ya da telefon kılıfına koymayın.',
       on: (ev) => ev.type === 'ds-pass' && ev.ok,
       done: 'Şifre değişti. Eski şifreyle artık kimse giremez. Bir sonraki adım iki adımlı doğrulamayı açmak olurdu (bu haftanın dersi).',
     },
+    rehberSoru({
+      title: 'Para gönderdim, kodu söyledim',
+      html: '<p>Başka bir gün: telefonda “güvenli hesap” diyen birine <b>havale yaptınız</b> ya da <b>SMS kodunu söylediniz</b>; sonra fark ettiniz. Ne yaparsınız?</p>',
+      opts: ['Hemen bankamı kartın arkasındaki numaradan ararım', 'Utandığım için kimseye söylemem', 'Arayan kişiyi geri arayıp parayı iade etmesini rica ederim'], ok: 0,
+      wrong: 'Dakikalar önemlidir. Gönderilen para çoğu zaman geri alınamaz, ama ne kadar erken bildirirseniz şansınız o kadar artar.',
+      why: 'Doğru. Bankayı hemen arayın; kartı kapattırın, işlemin durdurulmasını isteyin, sonra şifrelerinizi değiştirip savcılığa ya da polise başvurun. Ekran görüntülerini ve mesajları saklayın. Telefonunuza program kurdurulduysa interneti kesin ve programı silin. Utanmayın; bu kişiler işini bilir, herkes kandırılabilir.',
+    }),
     rehberSoru({
       title: 'Şikâyet',
       html: '<p>Kart kapalı, şifreler değişti. Dolandırıcılığı resmî olarak nereye bildirirsiniz?</p>',

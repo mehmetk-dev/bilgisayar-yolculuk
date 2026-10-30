@@ -35,6 +35,7 @@ export const kayipDosya = {
     ['Bu Bilgisayar → Ara kutusu', 'Adının bir parçasını yazın; bütün klasörlere bakar'],
     ['Sırala: Tarih', 'En yeni en üstte; “Bugün”, “Dün” diye gruplanır'],
     [K('Ctrl', 'J'), 'Tarayıcıda İndirilenler; “Klasörde göster” dosyanın yerini açar'],
+    ['OneDrive yazıyorsa', 'Belgeler internetteki hesaba bağlı: ☁ yalnızca internette, ✔ bilgisayarda'],
     ['Kaydederken', 'Kaydet penceresinin üstündeki klasör adına bakın; emin değilseniz Belgeler\'i seçin'],
   ],
   setup: hazirla,
@@ -73,6 +74,11 @@ export const kayipDosya = {
       wrong: 'Pencerenin üstündeki adres çubuğunu soldan sağa okuyun.',
       why: 'Doğru. Word, en son hangi klasöre kaydettiyseniz yine oraya kaydetmeyi önerir. Kaydederken pencerenin üstündeki klasör adına bakmak bu kaybolmayı önler.',
     }),
+    {
+      title: 'OneDrive yazıyorsa',
+      html: `<p>Bazı bilgisayarlarda <b>Belgeler</b> ve <b>Masaüstü</b>, internetteki <b>OneDrive</b> hesabına bağlıdır. Adres çubuğunda ya da Kaydet penceresinde <b>OneDrive</b> yazar. Bilgisayarınızdaki klasörler ise <b>Bu bilgisayar</b> diye görünür.</p>
+        <p>Bu bir sorun değildir; dosyanız aynı zamanda yedeklenir. Yalnızca bulut simgesi (☁) olan dosya internettedir, açmak için internet gerekir. Yeşil tik (✔) dosyanın bilgisayarda olduğunu gösterir. OneDrive'dan sildiğiniz dosya başka cihazlarda da silinir.</p>`,
+    },
     {
       title: '2. yol: Bütün bilgisayarda arayın',
       html: `<p>Adının bir parçasını hatırlıyorsanız arayın. Soldan <b>💻 Bu Bilgisayar</b>\'a tıklayın, sağ üstteki <b>Ara</b> kutusuna <b>su fatura</b> yazın.</p>

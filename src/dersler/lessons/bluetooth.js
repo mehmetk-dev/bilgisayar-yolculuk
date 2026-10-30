@@ -140,14 +140,14 @@ export const hesapPin = {
     {
       title: 'Şifreyi güçlendirin',
       html: `<p><b>Şifre</b> satırında <b>Değiştir</b>'e tıklayın. <b>Şu anki şifre</b>: 1234. <b>Yeni şifre</b> için şunlara dikkat edin:</p>
-        <ul class="big-list"><li>En az <b>8 karakter</b></li><li><b>Büyük ve küçük harf</b>, bir <b>rakam</b></li><li>Adınız, doğum yılınız olmasın</li></ul>
+        <ul class="big-list"><li>Site en az <b>8 karakter</b> ister; siz <b>12 ve üzerini</b> tercih edin</li><li><b>Büyük ve küçük harf</b>, bir <b>rakam</b></li><li>Adınız, doğum yılınız olmasın</li></ul>
         <p>Yeni şifreyi iki kez yazıp <b>Kaydet</b>'e tıklayın. Şifrenizi <b>unutmayacağınız ama başkalarının tahmin edemeyeceği</b> bir cümleden yapabilirsiniz (kendi şifrenizi uydurun; örnek: “Kedim2Yasinda!”).</p>`,
       hint: 'Şu anki şifre 1234. Yeni şifreyi kendiniz uydurun; örnek: Kedim2Yasinda! (kendi şifrenizi yazın, bunu değil).',
       setup: ayarlarda('accounts'),
       on: (ev, c) => {
         if (ev.type !== 'pw-change') return false;
         if (!ev.ok) { c.warn('Şifre değişmedi: yazdığınız bilgileri kontrol edin (şu anki şifre 1234, yeni şifreler aynı olmalı).'); return false; }
-        if (ev.strength < 2) { c.warn('Şifre değişti ama zayıf. En az 8 karakter, büyük ve küçük harf kullanıp yeniden değiştirin.'); return false; }
+        if (ev.strength < 2) { c.warn('Şifre değişti ama zayıf. Daha uzun (tercihen 12 ve üzeri), büyük ve küçük harf içeren bir şifreyle yeniden değiştirin.'); return false; }
         return true;
       },
       done: 'Şifreniz değişti. Yeni şifreyi bilgisayarın başında değil, güvenli bir deftere yazın; ekrana ya da klavyenin altına yapıştırmayın.',
@@ -163,6 +163,11 @@ export const hesapPin = {
         return true;
       },
       done: 'PIN ayarlandı. Kilit ekranında hem şifre hem PIN kabul edilir.',
+    },
+    {
+      title: 'PIN\'i unutursanız',
+      html: `<p>Giriş ekranında PIN\'i unutursanız <b>PIN\'imi unuttum</b> yazısı çıkar. Ona tıklayınca Microsoft hesabınıza bağlı e-postaya ya da telefona bir kod gelir; yeni PIN\'i bununla belirlersiniz. Bu yüzden <b>e-posta adresinizi ve telefon numaranızı güncel tutun</b>.</p>
+        <p>Yerel hesapta şifrenizle girip PIN\'i yenilersiniz; şifreyi de unutursanız kurtarmak zordur, bu yüzden şifrenizi güvenli bir yere not edin.</p>`,
     },
     {
       title: 'Ekranı kilitleyin',

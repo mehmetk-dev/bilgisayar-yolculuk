@@ -52,7 +52,9 @@ export const eposta = {
     },
     {
       title: 'Eki indirin',
-      html: '<p>Postanın altındaki fotoğrafın yanında <b>⬇ İndir</b> düğmesine tıklayın. Fotoğraf bilgisayarınıza kaydedilir.</p>',
+      html: `<p>Postanın altındaki fotoğrafın yanında <b>⬇ İndir</b> düğmesine tıklayın. Fotoğraf bilgisayarınıza kaydedilir.</p>
+        <p class="mut"><b>Önce sorun:</b> bu postayı bekliyor muydunuz, gönderen tanıdık mı? Tanımadığınız birinden gelen ekleri, özellikle <b>.exe</b>, <b>.zip</b> ve “faturanız ektedir” diyen belgeleri açmayın, silin.</p>
+        <p class="mut">Gerçek bilgisayarda e-postadan inen bir Word ya da Excel dosyasını açınca üstte sarı <b>Korumalı Görünüm</b> çubuğu çıkabilir: dosyayı yalnızca okuyabilirsiniz. Gönderen tanıdıksa ve bekliyorsanız <b>Düzenlemeyi Etkinleştir</b>\'e basın; bilmediğiniz bir kaynaksa basmayın. <b>İçeriği Etkinleştir</b> (makro) isteyen dosyaya hiç basmayın.</p>`,
       mouse: '🖱 ⬇ İndir',
       on: (ev) => ev.type === 'mail-download',
       done: 'Fotoğraf <b>İndirilenler</b> klasörüne kaydedildi.',
@@ -105,7 +107,7 @@ export const eposta = {
         if (!ev.attachments.includes('çiçekler.jpg')) { c.warn('Posta gitti ama içinde çiçekler.jpg yok. Yeni bir posta açıp önce 📎 Dosya ekle\'ye tıklayın.'); return false; }
         return true;
       },
-      done: 'Ekli postanız gönderildi. Fotoğraf, belge, fatura… her türlü dosya böyle gönderilir.',
+      done: 'Ekli postanız gönderildi. Fotoğraf, belge, fatura… her türlü dosya böyle gönderilir. Gönderdiğiniz postanın bir kopyası <b>📤 Gönderilenler</b> klasöründe durur (Gmail\'de “Gönderilmiş”, Outlook\'ta “Gönderilmiş Öğeler”). Postanın gidip gitmediğinden emin olmak için oraya bakın. Gmail\'de gönderdikten hemen sonra altta kısa süre <b>Geri al</b> çıkar; yanlış gönderdiyseniz hemen basın. E-postalarda ek boyutu sınırlıdır (yaklaşık 20–25 MB); çok fotoğraf ya da video sığmayabilir.',
     },
     rehberSoru({
       title: 'Hangi adres doğru?',
@@ -119,14 +121,14 @@ export const eposta = {
       html: `<p>Gelen Kutusu'nda <b>“ACİL: Hesabınız askıya alındı!”</b> diye bir posta var. Açıp okuyun.</p>
         <p>Bu bir <b>dolandırıcılık</b> postasıdır: bankalar e-postayla şifre ya da kart numarası istemez. Bağlantısına <b>tıklamayın</b>; üstteki <b>⚠ İstenmeyen</b> düğmesine basın.</p>`,
       mouse: '🖱 Postayı açın → ⚠ İstenmeyen',
-      hint: 'Gönderenin adresine bakın: bankaniz-dogrulama.xyz. Gerçek bir bankanın adresi değil.',
+      hint: 'Gönderenin adresine bakın: bankaniz-dogrulama.xyz. Gerçek bir bankanın adresi değil. Gönderenin yazan adı (“Banka”) kolayca taklit edilir; asıl adrese bakın.',
       setup: (c) => { if (!c.d.find('mail')) mailOpen(c); },
       on: (ev, c) => {
         if (ev.type === 'mail-link') c.warn('Gerçek hayatta bu bağlantıya tıklamak tehlikelidir! Sahte bir siteye gider ve şifrenizi çalabilir. Şimdi ⚠ İstenmeyen\'e basın.');
         if (ev.type === 'mail-open' && ev.key === 'banka') c.note('Gönderenin adresine bakın: <b>bankaniz-dogrulama.xyz</b>. Şimdi ⚠ İstenmeyen\'e basın.');
         return (ev.type === 'mail-spam' || ev.type === 'mail-delete') && ev.key === 'banka';
       },
-      done: 'Sahte posta kaldırıldı. Şüphelendiğiniz bir postada bankanızı <b>kartın arkasındaki numaradan</b> kendiniz arayın.',
+      done: 'Sahte posta kaldırıldı. Şüphelendiğiniz bir postada bankanızı <b>kartın arkasındaki numaradan</b> kendiniz arayın. Bir ipucu daha: bağlantıya <b>tıklamadan</b> farenin okunu üstüne getirirseniz ekranın alt köşesinde bağlantının gerçek adresi görünür. Yazıda “bankam.com.tr” diyor ama altta başka bir şey yazıyorsa tıklamayın. Bankanın sitesini adresi kendiniz yazarak açın.',
     },
     {
       title: 'Hocanıza yazın',

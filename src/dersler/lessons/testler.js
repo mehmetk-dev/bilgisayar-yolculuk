@@ -181,7 +181,7 @@ export const test2 = test({
 
 export const test3 = test({
   id: 'test3', no: 3, title: '3. hafta testi',
-  desc: 'Seçme, kopyalama, kesme, geri alma, kaydetme ve açma üzerine 10 soru.',
+  desc: 'Seçme, kopyalama, kesme, geri alma, kaydetme ve açma üzerine 11 soru.',
   qs: [
     {
       t: 'Önce seçmek', pic: '<span style="background:#b3d4fc">bilgisayar</span>',
@@ -230,6 +230,12 @@ export const test3 = test({
       q: 'Pencerenin başlığında *Adsız yazıyor. Baştaki yıldız ne demek?',
       opts: ['Dosya çok önemli', 'Kaydedilmemiş değişiklik var', 'Dosya silinmiş'], ok: 1,
       why: 'Kaydedince yıldız kaybolur ve başlıkta dosyanın adı yazar.',
+    },
+    {
+      t: 'Kapatırken soru', pic: '❓ Değişiklikleri kaydetmek istiyor musunuz?',
+      q: 'Not Defteri ya da Word\'ü kapatırken “Değişiklikleri kaydetmek istiyor musunuz?” sorusu çıktı. “Kaydetme”ye basarsanız ne olur?',
+      opts: ['Program kapanmaz', 'Son kaydettiğinizden sonra yazdıklarınız gider', 'Dosya otomatik kaydedilir'], ok: 1,
+      why: 'Üç düğme vardır. <b>Kaydet</b>: yazdıklarınızı saklar, sonra kapatır. <b>Kaydetme</b>: son kaydınızdan sonra yazdıklarınızı atar, sonra kapatır. <b>İptal</b>: kapatmaktan vazgeçer; yazınız açık kalır. Emin değilseniz İptal\'e basıp önce Ctrl + S ile kaydedin.',
     },
     {
       t: 'Kaydetmek', pic: '💾',

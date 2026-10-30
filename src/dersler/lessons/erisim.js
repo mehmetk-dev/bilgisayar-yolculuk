@@ -3,6 +3,8 @@ import { K, desktopReady } from './common.js';
 import { rehberSoru } from './kalip.js';
 
 const ayarlarda = (page) => (c) => { const w = c.d.ensure('settings'); w.api.go(page); };
+// Ayarlar → Fare sayfasında “Ek fare ayarları” ile açılan Fare Özellikleri penceresi (çift tıklama hızı oradadır)
+const fareOzellikleri = (open) => (c) => { const w = c.d.ensure('settings'); w.api.go('devices'); w.api.mouseProps(open); };
 
 export const fareAyar = {
   id: 'fare-ayar', icon: '🖱', title: 'Fareyi kendinize göre ayarlayın', minutes: 25, stage: 'desktop',
@@ -10,7 +12,9 @@ export const fareAyar = {
   desktop: { settings: { dblSpeed: 10 } },
   summary: [
     ['Ayarlar → Bluetooth ve cihazlar → Fare', 'Çift tıklama hızı, birincil düğme'],
-    ['Çift tıklama hızı', 'Yavaşa çekerseniz iki tıklama arasında daha uzun süre tanınır'],
+    ['Ek fare ayarları', 'Fare sayfasındaki bağlantı; Fare Özellikleri penceresini açar (Windows 10’da: Ek fare seçenekleri)'],
+    ['Fare Özellikleri → Düğmeler → Çift tıklama hızı', 'Yavaşa çekerseniz iki tıklama arasında daha uzun süre tanınır'],
+    ['Çift tık hiç olmuyorsa', 'Simgeye bir kez tıklayıp Enter’a basın; çift tıkla aynı işi yapar'],
     ['Birincil düğme', 'Sol elini kullananlar için Sağ yapılabilir; tık ile sağ tık yer değiştirir'],
     ['Ayarlar → Erişilebilirlik → Fare işaretçisi', 'Boyut ve renk: kaybolan imleci bulmanın yolu'],
     ['Kısaca', 'Fare size uymuyorsa suç sizde değil; ayarı değiştirin'],
@@ -19,35 +23,51 @@ export const fareAyar = {
     {
       title: 'Fare size uymuyor mu?',
       html: `<p>Çift tıklamakta zorlanmak çok yaygındır; iki tıklama arasında beklemeniz gereken süre bilgisayara göre çok kısa olabilir. Bunun için <b>fareyi ayarlamak</b> yeter.</p>
-        <ul class="big-list"><li>Çift tık zor geliyor: <b>hızı yavaşlatın</b></li><li>Sol elinizi kullanıyorsunuz: <b>düğmeleri değiştirin</b></li><li>İmleci bulamıyorsunuz: <b>büyütün, renklendirin</b></li></ul>`,
+        <ul class="big-list"><li>Çift tık zor geliyor: <b>hızı yavaşlatın</b> (ya da tek tıklayıp ${K('Enter')}'a basın)</li><li>Sol elinizi kullanıyorsunuz: <b>düğmeleri değiştirin</b></li><li>İmleci bulamıyorsunuz: <b>büyütün, renklendirin</b></li></ul>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     {
       title: 'Fare ayarlarını açın',
-      html: '<p>⊞ Başlat → <b>⚙ Ayarlar</b>. Soldan <b>🖨 Bluetooth ve cihazlar</b>\'a tıklayın; aşağıda <b>Fare</b> bölümü var.</p>',
+      html: '<p>⊞ Başlat → <b>⚙ Ayarlar</b>. Soldan <b>🖨 Bluetooth ve cihazlar</b>\'a tıklayın; aşağıda <b>Fare</b> bölümü var. (Windows 10\'da: Ayarlar → <b>Aygıtlar</b> → Fare.)</p>',
       setup: (c) => c.d.ensure('settings'),
       check: (c) => c.d.find('settings')?.el.querySelector('[data-page="devices"].on'),
       on: (ev) => ev.type === 'settings-page' && ev.page === 'devices',
     },
     {
+      title: 'Ek fare ayarlarını açın',
+      html: '<p>Çift tıklama hızı bu sayfada <b>yok</b>. Fare bölümündeki <b>Ek fare ayarları</b> yazısına (bağlantıya) tıklayın. <b>Fare Özellikleri</b> adlı küçük bir pencere açılır.</p><p>Windows 10\'da bu bağlantının adı <b>Ek fare seçenekleri</b>dir.</p>',
+      hint: 'Fare bölümünde, mavi altı çizili “Ek fare ayarları” yazısı. Düğme gibi görünmez; yazının üstüne tıklayın.',
+      setup: fareOzellikleri(false),
+      on: (ev) => ev.type === 'mouse-props' && ev.open === true,
+      done: 'Fare Özellikleri açıldı. Çift tıklama hızı <b>Düğmeler</b> sekmesindedir.',
+    },
+    {
       title: 'Çift tıklamayı deneyin',
-      html: `<p>Fare bölümünün altındaki <b>📁 klasör</b> kutusuna <b>çift tıklayın</b>. Açılırsa (📂 olur) çift tıklama algılandı demektir.</p>
-        <p>Bu sefer hız <b>en yüksek</b> (10) ayarlandı; çift tıklamak bilerek zorlaştırıldı. Kutuya hızlı hızlı çift tıklamayı deneyin; olmuyorsa sonraki adıma geçin.</p>`,
+      html: `<p>Fare Özellikleri\'nin <b>Düğmeler</b> sekmesinde bir <b>📁 klasör</b> kutusu var. Ona <b>çift tıklayın</b>. Açılırsa (📂 olur) çift tıklama algılandı demektir.</p>
+        <p>Bu sefer hız <b>en yüksek</b> (10) ayarlandı; çift tıklamak bilerek zorlaştırıldı. Hızlı hızlı çift tıklamayı deneyin; olmuyorsa sonraki adıma geçin.</p>
+        <p>Gerçek bilgisayarda çift tık hiç olmazsa: simgeye <b>bir kez</b> tıklayıp ${K('Enter')}\'a basın, aynı işi yapar.</p>`,
       manual: 'Denedim ✔',
-      setup: ayarlarda('devices'),
+      setup: fareOzellikleri(true),
       done: 'Çok hızlı ayarda iki tıklama arasında çok az süre vardır. Şimdi bunu yavaşlatalım.',
     },
     {
       title: 'Hızı yavaşlatın',
-      html: '<p><b>Çift tıklama hızı</b> çubuğunu <b>sola</b> (yavaş tarafa) çekip <b>3 ya da daha az</b> yapın. Sonra klasör kutusuna yeniden çift tıklayın ve 📂\'ın açıldığını görün.</p>',
+      html: '<p>Fare Özellikleri\'ndeki <b>Çift tıklama hızı</b> çubuğunu <b>sola</b> (yavaş tarafa) çekip <b>3 ya da daha az</b> yapın. Sonra klasör kutusuna yeniden çift tıklayın ve 📂\'ın açıldığını görün.</p>',
       hint: 'Çubuk, “Çift tıklama hızı” yazan satırda. Sola sürükleyin; yanındaki sayı küçülsün. Sonra kutuya iki kez, aralıksız tıklayın.',
-      setup: ayarlarda('devices'),
+      setup: fareOzellikleri(true),
       on: (ev, c) => {
         if (ev.type === 'dbl-speed' && ev.speed > 3) c.note(`Hız şu an ${ev.speed}. Daha yavaş olması için 3 ya da daha küçük bir sayıya getirin.`);
         if (ev.type === 'dbl-test' && ev.speed > 3) { c.warn('Çift tıklama açıldı ama hız hâlâ yüksek. Çubuğu 3 ya da daha az yapıp bir kez daha deneyin.'); return false; }
         return ev.type === 'dbl-test' && ev.speed <= 3;
       },
       done: 'Yavaş ayarda iki tıklama arasında rahat zaman var. Kendi elinize uygun hızı böyle bulursunuz.',
+    },
+    {
+      title: 'Tamam\'a basın',
+      html: '<p>Fare Özellikleri penceresini <b>Tamam</b> düğmesiyle kapatın. Ayar böylece kaydedilir.</p>',
+      setup: fareOzellikleri(true),
+      on: (ev) => ev.type === 'mouse-props' && ev.open === false,
+      done: 'Pencere kapandı; hız ayarınız yerinde kaldı.',
     },
     {
       title: 'Sol elini kullananlar',
@@ -101,7 +121,7 @@ export const fareAyar = {
     rehberSoru({
       title: 'Ne önerirsiniz?',
       html: '<p>Bir komşunuz: “Çift tıklayamıyorum, bazen iki ayrı tık sayıyor.” Ona ne dersiniz?</p>',
-      opts: ['Fareyi yenile', 'Ayarlar → Bluetooth ve cihazlar → Fare’den çift tıklama hızını yavaşlat', 'Yalnızca tek tıkla çalış, çift tık gereksiz'], ok: 1,
+      opts: ['Fareyi yenile', 'Ayarlar → Fare → Ek fare ayarları’ndan çift tıklama hızını yavaşlat; olmazsa tek tıklayıp Enter’a bas', 'Yalnızca tek tıkla çalış, çift tık gereksiz'], ok: 1,
       wrong: 'Bu değil. Önce ayarı denemek gerekir; fare bozuk değil.',
       why: 'Evet: çoğu zaman fare sağlamdır; yalnızca hız ayarı el hızına uymamıştır.',
     }),

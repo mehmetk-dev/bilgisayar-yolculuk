@@ -12,6 +12,7 @@ export const dizustu = {
     ['İki parmak dokunuş', 'Sağ tık'],
     ['İki parmak kaydırma', 'Sayfayı aşağı-yukarı kaydırır (fare tekerleği gibi)'],
     ['İki parmak aç-kapa', 'Yakınlaştırır / uzaklaştırır'],
+    ['Sürükleme / yazı seçme', 'Bir elle sol alt köşeye basılı tutun, öbür elle kaydırın'],
     ['Avuç içi', 'Yazarken touchpad\'e değmesin; imleç kayarsa yazı başka yere gider'],
     ['Pil simgesi', 'Sağ altta; %20\'nin altına inmeden şarja takın'],
     ['Fn + ses / Wi-Fi tuşu', 'Yanlışlıkla ses ya da internet kapanabilir; aynı tuşla geri açılır'],
@@ -53,6 +54,19 @@ export const dizustu = {
       q: 'Fotoğraf küçük görünüyor. İki parmağınızı birbirinden uzaklaştırırsanız (telefondaki gibi) ne olur?',
       opts: ['Çoğu programda yakınlaşır; birbirine yaklaştırırsanız uzaklaşır', 'Dosya silinir', 'Hiçbir şey olmaz, bu yalnızca telefonda çalışır'], ok: 0,
       why: 'Touchpad telefonun ekranı gibi çalışır. Tarayıcıda alternatif olarak Ctrl ile + ve − tuşları da kullanılır.',
+    }),
+    {
+      title: 'Sürükleme ve seçme',
+      html: `<p>Pencere taşırken, simge sürüklerken ve yazı seçerken sol tuşu <b>basılı tutup</b> kaydırmak gerekir. Touchpad'de bunu tek elle yapmak yeni başlayanlar için zordur. İki kolay yol var:</p>
+        <ol class="steps"><li><b>İki el:</b> Bir elinizin başparmağıyla touchpad'in <b>sol alt köşesine basılı tutun</b>. Öbür elinizin işaret parmağıyla yüzeyde kaydırın. Bırakınca yazı ya da simge yerinde kalır.</li><li><b>Tek el:</b> Bazı bilgisayarlarda iki kez hızlıca dokunup ikincisinde parmağınızı kaldırmadan kaydırmak da sürükler. Çalışmazsa 1. yolu kullanın.</li></ol>
+        <p>Bu yöntem yazı seçerken, pencere taşırken ve simge sürüklerken aynıdır.</p>`,
+      scene: info('<div class="sc-big">💻<br>👍 + ☝</div><p>Başparmak köşede basılı, işaret parmağı kaydırıyor</p>'),
+    },
+    sec({
+      title: 'Touchpad ile yazı seçmek', text: pad('👍 ▭ ☝'),
+      q: 'Yazının bir kısmını touchpad ile seçmek için ne yaparsınız?',
+      opts: ['Bir elimle sol alt köşeye basılı tutar, öbür elimin parmağıyla yazının üstünde kaydırırım', 'Parmağımı çok hızlı oynatırım', 'İki parmağımla sayfayı kaydırırım'], ok: 0,
+      why: 'Sürükleme için sol tuşun basılı kalması gerekir. Touchpad\'de bunu bir elinizle köşeye basarak, öbür elinizle kaydırarak yaparsınız.',
     }),
     ayir({
       title: 'Hangi hareket?',

@@ -82,10 +82,18 @@ export function settings({ desk, body, args, emit, dialogs }) {
         <div class="st-flow">${flow.printer || `<button type="button" class="st-btn primary" data-act="addPrinter">＋ Cihaz ekle</button>`}</div></section>
         <section><h3>Fare</h3>
         <label class="st-row">Birincil fare düğmesi <select data-act="primaryBtn"><option value="left" ${s.swapButtons ? '' : 'selected'}>Sol</option><option value="right" ${s.swapButtons ? 'selected' : ''}>Sağ</option></select></label>
-        <label class="st-row">Çift tıklama hızı <small>(yavaş ↔ hızlı)</small> <input type="range" data-range="dblSpeed" min="1" max="10" value="${s.dblSpeed}"><b>${s.dblSpeed}</b></label>
-        <p class="st-note">Çift tıklamakta zorlanıyorsanız hızı <b>yavaşlatın</b>: iki tıklama arasında daha fazla zaman tanınır.</p>
-        <div class="st-dbl"><div class="st-dbl-box" data-test="dbl" title="Çift tıklayın"><span>${flow.dbl ? '📂' : '📁'}</span><small>${flow.dblMsg || 'Klasöre çift tıklayarak deneyin'}</small></div>
-        <div class="st-dbl-box" data-test="btn" title="Sol ve sağ düğmeyle tıklayın"><span>🖱</span><small>${flow.btnMsg || 'Sol ve sağ düğmeyle tıklayarak deneyin'}</small></div></div></section>`;
+        <p class="st-note">Çift tıklama hızı bu sayfada değildir; <b>Ek fare ayarları</b> bağlantısıyla açılan <b>Fare Özellikleri</b> penceresindedir.</p>
+        <div class="st-row"><button type="button" data-act="mouseProps" style="font:inherit;background:none;border:0;padding:0;color:var(--dk-acc,#0a5dc2);text-decoration:underline;cursor:pointer">Ek fare ayarları</button></div>
+        ${flow.mprops ? `<div class="st-mprops" style="border:2px solid #556;border-radius:6px;background:#fff;margin:0.4em 0;box-shadow:0 4px 14px rgba(0,0,0,.25)">
+          <div style="background:#e8eaf0;padding:0.3em 0.6em;font-weight:600;border-bottom:1px solid #99a">Fare Özellikleri</div>
+          <div style="display:flex;gap:0.2em;padding:0.4em 0.6em 0;border-bottom:1px solid #99a;font-size:0.9em"><span style="padding:0.2em 0.7em;border:1px solid #99a;border-bottom:0;background:#fff;font-weight:600">Düğmeler</span><span style="padding:0.2em 0.7em;color:#889">İşaretçiler</span><span style="padding:0.2em 0.7em;color:#889">Tekerlek</span></div>
+          <div style="padding:0.6em">
+            <label class="st-row">Çift tıklama hızı <small>(yavaş ↔ hızlı)</small> <input type="range" data-range="dblSpeed" min="1" max="10" value="${s.dblSpeed}"><b>${s.dblSpeed}</b></label>
+            <p class="st-note">Çift tıklamakta zorlanıyorsanız hızı <b>yavaşlatın</b>: iki tıklama arasında daha fazla zaman tanınır.</p>
+            <div class="st-dbl"><div class="st-dbl-box" data-test="dbl" title="Çift tıklayın"><span>${flow.dbl ? '📂' : '📁'}</span><small>${flow.dblMsg || 'Klasöre çift tıklayarak deneyin'}</small></div></div>
+            <div style="text-align:right;margin-top:0.6em"><button type="button" class="st-btn primary" data-act="mousePropsOk">Tamam</button></div>
+          </div></div>` : ''}
+        <div class="st-dbl"><div class="st-dbl-box" data-test="btn" title="Sol ve sağ düğmeyle tıklayın"><span>🖱</span><small>${flow.btnMsg || 'Sol ve sağ düğmeyle tıklayarak deneyin'}</small></div></div></section>`;
     } else if (page === 'network') {
       h += `<section>${toggle('airplane', s.airplane, '✈ Uçak modu')}<p class="st-note">Uçak modu Wi-Fi ve Bluetooth'u birlikte kapatır. Uçakta ya da yanlışlıkla açılırsa internet kesilir.</p>${toggle('wifi', s.wifi, 'Wi-Fi')}`;
       if (s.wifi) {
@@ -167,7 +175,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
     pg.innerHTML = h;
   }
 
-  const go = (p) => { page = p; render(); emit('settings-page', { page }); };
+  const go = (p) => { if (p !== page) flow.mprops = false; page = p; render(); emit('settings-page', { page }); };
 
   body.addEventListener('click', async (e) => {
     const b = e.target.closest('button');
@@ -185,6 +193,8 @@ export function settings({ desk, body, args, emit, dialogs }) {
       case 'accPw': flow.acc = 'pw'; flow.accErr = ''; render(); pg.querySelector('.st-a1')?.focus(); emit('acc-open', { what: 'pw' }); return;
       case 'accPin': flow.acc = 'pin'; flow.accErr = ''; render(); pg.querySelector('.st-a1')?.focus(); emit('acc-open', { what: 'pin' }); return;
       case 'accCancel': flow.acc = null; render(); return;
+      case 'mouseProps': flow.mprops = true; render(); emit('mouse-props', { open: true }); return;
+      case 'mousePropsOk': flow.mprops = false; render(); emit('mouse-props', { open: false }); return;
       case 'accPwSave': {
         const [cur, nu, again] = ['.st-a1', '.st-a2', '.st-a3'].map((q) => pg.querySelector(q).value);
         const err = cur !== s.password ? 'Şu anki şifre yanlış.' : nu.length < 4 ? 'Yeni şifre en az 4 karakter olmalı.' : nu === cur ? 'Yeni şifre eskisinden farklı olmalı.' : nu !== again ? 'İki yeni şifre aynı değil. Tekrar yazın.' : '';
@@ -450,6 +460,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
   if (args.page) setTimeout(() => emit('settings-page', { page }), 0);
   return {
     onArgs: (a) => { if (a.page) go(a.page); },
+    mouseProps: (open) => { flow.mprops = open; render(); }, // Fare Özellikleri penceresini (Ek fare ayarları) açar / kapatır; ders kurulumu için
     onSettings: () => { if (!pg.contains(document.activeElement) || document.activeElement.type !== 'range') render(); },
     go,
   };

@@ -981,7 +981,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     emit('xl-autosum', { addr: a, formula: f });
   }
   function sort(desc) {
-    // Etkin sütuna göre, başlık satırının altındaki veri satırlarını sıralar. Toplam satırında durur.
+    // Sürüklemenin başladığı (etkin) hücrenin sütununa göre, başlık satırının altındaki veri satırlarını sıralar; gerçek Excel gibi. Tek hücrede Toplam satırında durur.
     const s = sel();
     const lastCol = (r) => { let c = COLS.length - 1; while (c >= 0 && !cells[addr(r, c)]) c--; return c; };
     let r1 = s.r1 === s.r2 ? 1 : s.r1, r2 = s.r1 === s.r2 ? r1 : s.r2;
@@ -994,7 +994,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     // Sıralama anahtarı hesaplanmış değerdir (formül sütununa göre de sıralanabilir)
     const rows = Array.from({ length: r2 - r1 + 1 }, (_, k) => ({
       src: r1 + k,
-      key: show(addr(r1 + k, act.c)).v,
+      key: show(addr(r1 + k, anchor.c)).v,
       data: Array.from({ length: c2 - c1 + 1 }, (__, j) => [cells[addr(r1 + k, c1 + j)], fmt[addr(r1 + k, c1 + j)]]),
     }));
     const kv = (x) => (x === '' || x == null ? '' : x);
@@ -1003,7 +1003,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     rows.forEach((row, k) => row.data.forEach(([raw, f], j) => { const a = addr(r1 + k, c1 + j); if (raw) cells[a] = shiftFormula(raw, r1 + k - row.src, 0); else delete cells[a]; if (f) fmt[a] = f; else delete fmt[a]; }));
     dirty = true;
     render();
-    emit('xl-sort', { desc, col: COLS[act.c], from: addr(r1, c1), to: addr(r2, c2) });
+    emit('xl-sort', { desc, col: COLS[anchor.c], single: s.r1 === s.r2, from: addr(r1, c1), to: addr(r2, c2) });
   }
   function drawChart() {
     const s = chart;

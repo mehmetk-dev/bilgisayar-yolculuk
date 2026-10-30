@@ -36,7 +36,7 @@ export const dilekce = {
     },
     {
       title: 'Programı açın',
-      html: '<p>⊞ <b>Başlat</b>\'a tıklayın ve <b>📘 Kelime İşlemci</b>\'yi açın. (Başlat\'ı açıp <b>kelime</b> yazmak da olur.)</p>',
+      html: '<p>⊞ <b>Başlat</b>\'a tıklayın ve <b>📘 Kelime İşlemci</b>\'yi açın. (Başlat\'ı açıp <b>kelime</b> yazmak da olur.)</p><p class="mut">Gerçek bilgisayarda bu programın adı <b>Microsoft Word</b>\'dür (mavi simge, beyaz W). Başlat\'a <b>Word</b> yazıp açın. Önünüze şablonlar gelir; kendi yazınızı yazmak için <b>Boş belge</b>\'ye tıklayın. Excel\'de (yeşil X) <b>Boş çalışma kitabı</b>, PowerPoint\'te (turuncu P) <b>Boş sunu</b> seçilir.</p>',
       mouse: '🖱 Başlat → Kelime İşlemci',
       check: (c) => !!c.d.find('word'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'word',
@@ -88,6 +88,12 @@ export const dilekce = {
       done: 'Kelime işlemcide satır sonunda Enter\'a basmak gerekmez; yazı kendiliğinden alt satıra akar.',
     },
     {
+      title: 'Kırmızı ve mavi çizgiler',
+      html: `<p>Gerçek Word\'de yazarken bazı kelimelerin altı <b>kırmızı dalgalı</b> çizilir: Word o kelimeyi sözlüğünde bulamadı, yazım hatası olabilir. Sağ tıklayın, doğrusu önerilir.</p>
+        <p>Özel isimler (<b>Çiçek Mahallesi</b> gibi) sözlükte olmadığı için çizilebilir; doğruysa <b>Yoksay</b> deyin. <b>Mavi</b> çizgi dilbilgisi ya da düzen önerisidir. Çizgiler kâğıda çıkmaz.</p>
+        <p class="mut">Hemen her kelime kırmızıysa yazım dili Türkçe seçili değildir. Word\'ün <b>Gözden Geçir</b> sekmesinde dil ayarına bakın.</p>`,
+    },
+    {
       title: 'İki yana yaslayın',
       html: `<p>“Mahallemizdeki parkın…” paragrafına üç kez tıklayıp seçin ve <b>İki yana yasla</b> düğmesine (dördüncü hizalama düğmesi) tıklayın ya da ${K('Ctrl', 'J')}.</p>`,
       combo: ['Ctrl', 'KeyJ'],
@@ -116,7 +122,14 @@ export const dilekce = {
         if (!/dilek/i.test(ev.name)) { c.note(`“${ev.name}” adıyla kaydedildi. Ders için adı <b>dilekçe</b> olsun: Dosya → Farklı kaydet.`); return false; }
         return true;
       },
-      done: 'Word belgelerinin uzantısı <b>.docx</b>\'tir. Dosya Gezgini\'nde mavi 📘 simgesiyle görünür.',
+      done: 'Word belgelerinin uzantısı <b>.docx</b>\'tir. Dosya Gezgini\'nde mavi 📘 simgesiyle görünür. Gerçek Word\'de ilk kayıtta Kaydet penceresinde dosyanın nereye gideceğine (<b>Bu bilgisayar</b> ya da <b>OneDrive</b>) bakın.',
+    },
+    {
+      title: 'Kapatırken ve elektrik giderse',
+      html: `<p>Kaydetmeden kapatmaya çalışırsanız Word sorar:</p>
+        <ul class="big-list"><li><b>Kaydet</b>: değişiklikleri saklar.</li><li><b>Kaydetme</b>: yaptığınız değişiklikler <b>gider</b>.</li><li><b>İptal</b>: kapatmaz, belgeye geri döner.</li></ul>
+        <p>Emin değilseniz <b>İptal</b>\'e basın, sonra ${K('Ctrl', 'S')} ile kaydedin. Yazarken de ara sıra ${K('Ctrl', 'S')} yapın.</p>
+        <p class="mut">Elektrik giderse ya da program donarsa üzülmeyin: Word belgeyi birkaç dakikada bir kendiliğinden yedekler (<b>Otomatik Kurtarma</b>). Word\'ü yeniden açın; belge kurtarma listesi çıkarsa belgenize tıklayıp <b>Farklı Kaydet</b> ile saklayın. Çıkmazsa bir yardımcıya gösterin.</p>`,
     },
     {
       title: 'Yazdırın',
@@ -200,10 +213,10 @@ export const belgeEkle = {
     },
     {
       title: 'PDF olarak kaydedin',
-      html: '<p><b>Dosya</b> menüsünden <b>📕 PDF olarak kaydet</b>\'i seçin ve <b>Belgeler</b>\'e <b>ilaç çizelgesi</b> adıyla kaydedin.</p>',
+      html: '<p><b>Dosya</b> menüsünden <b>📕 PDF olarak kaydet</b>\'i seçin ve <b>Belgeler</b>\'e <b>ilaç çizelgesi</b> adıyla kaydedin.</p><p class="mut">Gerçek Word\'de bu düğme bu adla yok. Yol şöyledir: <b>Dosya → Farklı Kaydet</b>, sonra <b>Kayıt türü</b> listesinden <b>PDF</b>\'i seçin. Bir yol daha: <b>Dosya → Dışarı Aktar → PDF/XPS Oluştur</b>.</p>',
       mouse: '🖱 Dosya → PDF olarak kaydet',
       on: (ev) => ev.type === 'doc-pdf',
-      done: 'PDF dosyası her bilgisayarda ve telefonda aynı görünür, kolayca değiştirilemez. E-postayla göndermek için en uygun biçimdir.',
+      done: 'PDF dosyası her bilgisayarda ve telefonda aynı görünür, kolayca değiştirilemez. E-postayla göndermek için en uygun biçimdir. PDF yaptıktan sonra yazıyı değiştiremezsiniz; bu yüzden <b>Word dosyanızı da saklayın</b>: düzeltme gerekirse onu değiştirir, yeniden PDF yaparsınız. Resmî kuruma gidecek belgeyi (dilekçe, özgeçmiş) PDF olarak gönderin; birlikte düzenleyeceğiniz belgeyi Word dosyası olarak gönderin. Aynı adla iki dosya (.docx ve .pdf) olacağını unutmayın; birini silip ötekini kaybetmeyin.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Kelime işlemcinin Ekle sekmesini öğrendiniz:</p>' },
   ],
@@ -307,6 +320,11 @@ export const belgeDuzen = {
       combo: ['Ctrl', 'KeyS'],
       on: (ev) => ev.type === 'doc-save',
       done: 'Kaydedildi. Başlığın başındaki * işareti kayboldu: “kaydedilmemiş değişiklik yok” demektir.',
+    },
+    {
+      title: 'İnternetten yapıştırınca',
+      html: `<p>İnternetteki ya da postadaki yazıyı kopyalayıp Word\'e yapıştırınca (${K('Ctrl', 'V')}) yazı çoğu zaman kendi renk ve yazı tipiyle gelir. Belgenin geri kalanından farklı görünür; belge bozulmadı, yalnızca biçim taşındı.</p>
+        <p>Gerçek Word\'de yapıştırdığınız yerin yanında küçük bir <b>(Ctrl)</b> düğmesi çıkar. Ona tıklayıp <b>Yalnızca Metni Koru</b>\'yu (üstünde A harfi olan simge) seçin: yazı belgenizin biçimine uyar.</p>`,
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Belgeyi düzenlemeyi öğrendiniz:</p>' },
   ],

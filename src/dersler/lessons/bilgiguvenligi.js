@@ -377,6 +377,10 @@ export const sosyalMedya = {
       done: 'Gerçek çekilişler kart bilgisi ya da “kargo ücreti” istemez. Tanımadığınız sayfaların çekilişlerine katılmayın.',
     },
     {
+      title: 'Başka tuzaklar',
+      html: `<ul class="big-list"><li>💸 <b>“Kısa sürede çok kazanç”</b> reklamları: ünlü bir kişinin adıyla bile olsa yatırım vaadine para yatırmayın. Bankanız ya da SPK izinli bir aracı kurum dışında kimseye para yatırmayın.</li><li>🎁 <b>“Sana hediye gönderdim, gümrükte kaldı, vergi yatır”</b>: tanımadığınız biriyle kurulan dostluk, sonunda para istemeye çıkar. Göndermeyin.</li></ul>`,
+    },
+    {
       title: 'Çıkış yapın',
       html: '<p>Sağ üstteki <b>⏻ Çıkış</b>\'a basın.</p>',
       on: (ev) => ev.type === 'ds-logout',

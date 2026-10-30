@@ -69,7 +69,7 @@ export const internet = {
         if (ev.type === 'web-nav' && ev.error) c.warn('Bu adres bulunamadı: harflerden biri yanlış yazılmış olabilir. Adres çubuğuna tıklayıp düzeltin.');
         return ev.type === 'web-nav' && ev.host === 'www.hava-durumu.com.tr' && ev.via === 'address';
       },
-      done: 'Adresi tam bildiğiniz sitelere böyle doğrudan gidebilirsiniz. Soldaki 🔒 kilit, bağlantının güvenli olduğunu gösterir.',
+      done: 'Adresi tam bildiğiniz sitelere böyle doğrudan gidebilirsiniz. Soldaki 🔒 kilit, bağlantının şifreli olduğunu gösterir; sitenin gerçek olduğunu göstermez, onu adresi okuyarak anlarsınız. (Chrome\'da kilit yerine küçük bir ayar simgesi vardır.)',
     },
     {
       title: 'Sekmeyi kapatın',
@@ -94,7 +94,7 @@ export const internet = {
     },
     {
       title: 'İndirilenler klasörü',
-      html: '<p>İndirdiğiniz her şey <b>İndirilenler</b> klasörüne gider. İndirme kutusundaki <b>Klasörde göster</b>\'e tıklayın.</p><p class="mut">Kutu kapandıysa tarayıcının sağ üstündeki ⬇ simgesine tıklayın.</p>',
+      html: '<p>İndirdiğiniz her şey <b>İndirilenler</b> klasörüne gider. İndirme kutusundaki <b>Klasörde göster</b>\'e tıklayın.</p><p class="mut">Kutu kapandıysa tarayıcının sağ üstündeki ⬇ simgesine tıklayın.</p><p class="mut">İndirirken tarayıcı “bu dosya zararlı olabilir” gibi bir uyarı verirse ve emin değilseniz <b>Sil</b>\'e basın; programı resmî siteden yeniden indirmeyi deneyin.</p>',
       on: (ev) => ev.type === 'download-folder' || (ev.type === 'nav' && ev.folder === 'downloads') || (ev.type === 'app-open' && ev.app === 'explorer' && ev.args?.folder === 'downloads'),
       done: 'İndirdiğiniz dosya burada: <b>ResimGosterici_Kurulum.exe</b>. Kurulumunu bu haftanın program kurma dersinde yapacağız.',
     },
@@ -135,8 +135,13 @@ export const kurulum = {
       on: (ev) => ev.type === 'exe-open',
     },
     {
+      title: 'Mavi uyarı penceresi',
+      html: `<p>Gerçek bilgisayarda kurulum dosyasını açınca bazen mavi bir pencere çıkar: <b>“Windows bilgisayarınızı korudu”</b>. Bu, programın az kişi tarafından indirildiğini söyler.</p>
+        <p>Programı kendiniz resmî siteden indirdiyseniz <b>Ek bilgi → Yine de çalıştır</b> diyebilirsiniz. Bilmediğiniz bir yerden geldiyse <b>Çalıştırma</b> deyin. Bu alıştırma bilgisayarında bu pencere çıkmaz.</p>`,
+    },
+    {
       title: 'İzin penceresi',
-      html: '<p>Ekran karardı ve “<b>Bu uygulamanın cihazınızda değişiklik yapmasına izin vermek istiyor musunuz?</b>” diye soruluyor.</p><p>Programı siz bilerek indirdiyseniz <b>Evet</b>\'e tıklayın.</p>',
+      html: '<p>Ekran karardı ve “<b>Bu uygulamanın cihazınızda değişiklik yapmasına izin vermek istiyor musunuz?</b>” diye soruluyor.</p><p>Programı siz bilerek indirdiyseniz <b>Evet</b>\'e tıklayın.</p><p class="mut">Gerçek pencerede <b>Doğrulanmış yayımcı</b> ve şirketin adı yazar (örneğin Google LLC). “Bilinmeyen yayımcı” yazıyorsa ve programı resmî siteden indirmediyseniz <b>Hayır</b> deyin.</p>',
       on: (ev, c) => {
         if (ev.type === 'uac' && ev.answer === 'no') c.note('Hayır dediniz; kurulum başlamadı. Dosyaya yeniden çift tıklayın ve bu sefer Evet deyin.');
         return ev.type === 'uac' && ev.answer === 'yes';
@@ -160,7 +165,7 @@ export const kurulum = {
     },
     {
       title: '⚠ Dikkat: ek yazılımlar',
-      html: '<p>Burası tuzak! “Önerilen” diye <b>istemediğiniz programlar</b> da kurulmak isteniyor. <b>İki kutucuğun da işaretini kaldırın</b>, sonra İleri.</p>',
+      html: '<p>Burası tuzak! “Önerilen” diye <b>istemediğiniz programlar</b> da kurulmak isteniyor. <b>İki kutucuğun da işaretini kaldırın</b>, sonra İleri.</p><p class="mut">Bazı gerçek sihirbazlarda bu seçenekler kutucuk olarak görünmez; “Hızlı kurulum (önerilen)” ve “Özel kurulum” diye ikiye ayrılır. Özel kurulumu seçin; ek yazılımlar orada görünür.</p>',
       on: (ev, c) => {
         if (ev.type === 'setup-extra') c.s.clean = !ev.all;
         if (ev.type === 'setup-page' && ev.page === 'ready') {
@@ -221,7 +226,7 @@ export const yazici = {
     },
     {
       title: 'Cihaz ekleyin',
-      html: '<p><b>＋ Cihaz ekle</b>\'ye tıklayın. Windows yakındaki yazıcıları arayacak.</p>',
+      html: '<p><b>＋ Cihaz ekle</b>\'ye tıklayın. Windows yakındaki yazıcıları arayacak.</p><p class="mut">USB kablolu yazıcıyı bilgisayara takıp açınca Windows çoğunlukla kendisi tanır; Cihaz ekle\'ye gerek kalmaz. Wi-Fi\'li yazıcı ile bilgisayar aynı Wi-Fi ağında olmalıdır.</p>',
       setup: (c) => { const w = c.d.ensure('settings'); w.api.go('devices'); },
       on: (ev) => ev.type === 'printer-found',
       done: 'Bir yazıcı bulundu.',
@@ -248,6 +253,10 @@ export const yazici = {
         return ev.type === 'print' && ev.app === 'notepad' && /R-200/.test(ev.printer);
       },
       done: 'Belge yazıcıya gönderildi.',
+    },
+    {
+      title: 'Yazıcı yazmıyorsa',
+      html: `<ol class="steps"><li>Yazıcı açık mı, kablosu takılı mı? Wi-Fi\'liyse ağa bağlı mı?</li><li>Ayarlar → Bluetooth ve cihazlar → Yazıcılar ve tarayıcılar\'da yazıcının altında <b>Çevrimdışı</b> yazıyorsa yazıcıyı kapatıp açın.</li><li>Yazıcıya tıklayıp yazdırma kuyruğunu açın. Takılı kalmış iş varsa sağ tıklayıp <b>İptal</b> edin.</li><li>Kâğıt sıkıştıysa yazıcıyı kapatın, kapağı açın, kâğıdı yırtmadan yavaşça çekin.</li><li>Yazdır penceresinde <b>doğru yazıcıyı</b> seçtiniz mi? “PDF olarak kaydet” kâğıda değil dosyaya yazdırır.</li></ol>`,
     },
     {
       title: 'Aygıt Yöneticisi',

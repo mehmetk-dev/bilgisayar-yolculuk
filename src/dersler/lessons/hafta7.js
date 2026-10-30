@@ -246,14 +246,14 @@ export const ayarlar = {
     },
     {
       title: 'Ekran parlaklığı',
-      html: '<p>Aynı sayfada <b>Ekran</b> bölümündeki <b>☀ Parlaklık</b> çubuğunu <b>60 ile 80 arasına</b> getirin.</p>',
+      html: '<p>Aynı sayfada <b>Ekran</b> bölümündeki <b>☀ Parlaklık</b> çubuğunu <b>60 ile 80 arasına</b> getirin.</p><p class="mut">Masaüstü bilgisayarda parlaklık monitörün düğmelerindedir; bu çubuk görünmeyebilir.</p>',
       setup: (c) => { const w = c.d.ensure('settings'); w.api.go('system'); },
       on: (ev, c) => ev.type === 'setting' && ev.key === 'brightness' && c.d.settings.brightness >= 60 && c.d.settings.brightness <= 80,
       done: 'Parlaklık odaya uygun olmalı: karanlık odada çok parlak ekran gözü yorar. Dizüstünde klavyedeki ☀ tuşları da (çoğu zaman Fn ile) aynı işi yapar.',
     },
     {
       title: 'Wi-Fi\'yi açın',
-      html: '<p>Soldan <b>📶 Ağ ve İnternet</b>\'e gidin. <b>Wi-Fi</b> anahtarı kapalı: tıklayıp açın.</p>',
+      html: '<p>Soldan <b>📶 Ağ ve İnternet</b>\'e gidin. <b>Wi-Fi</b> anahtarı kapalı: tıklayıp açın.</p><p class="mut">Bilgisayarınız modeme kablolu bağlıysa Wi-Fi görünmeyebilir.</p>',
       setup: (c) => c.d.ensure('settings'),
       check: (c) => c.d.settings.wifi,
       on: (ev) => ev.type === 'toggle' && ev.key === 'wifi' && ev.on,
@@ -303,7 +303,9 @@ export const ayarlar = {
     },
     {
       title: 'Güncelleştirmeler',
-      html: '<p>Soldan <b>🔄 Windows Update</b>\'e gidin ve <b>Güncelleştirmeleri denetle</b>\'ye tıklayın.</p>',
+      html: `<p>Soldan <b>🔄 Windows Update</b>\'e gidin ve <b>Güncelleştirmeleri denetle</b>\'ye tıklayın.</p>
+        <p class="mut">Güncelleştirmeyi bilgisayar kendisi indirir; bitirmek için yeniden başlatmak gerekir. İşinizi kaydedin, sonra <b>Şimdi yeniden başlat</b>\'a tıklayın. Başlat → Güç menüsünde <b>Güncelleştir ve kapat</b> ya da <b>Güncelleştir ve yeniden başlat</b> yazıyorsa onu seçin; bu normaldir.</p>
+        <p class="mut">Açılırken ya da kapanırken <b>“Güncelleştirmeler yapılıyor, bilgisayarınızı kapatmayın”</b> yazarsa sabırla bekleyin. Güç düğmesine basmayın, fişi çekmeyin; bilgisayar bozulabilir.</p>`,
       setup: (c) => c.d.ensure('settings'),
       on: (ev) => ev.type === 'update-check',
       done: 'Güncelleştirmeler güvenlik açıklarını kapatır; ertelemeyin. Bilgisayar “yeniden başlatılması gerekiyor” derse işiniz bitince yeniden başlatın.',

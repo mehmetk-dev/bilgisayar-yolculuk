@@ -30,7 +30,7 @@ export const secme = {
     },
     {
       title: 'Sürükleyerek seçin',
-      html: '<p><b>hava çok güzel</b> sözcüklerini seçin: “hava”nın başına gelin, sol tuşu <b>basılı tutun</b>, “güzel”in sonuna kadar sürükleyip bırakın.</p>',
+      html: '<p><b>hava çok güzel</b> sözcüklerini seçin: “hava”nın başına gelin, sol tuşu <b>basılı tutun</b>, “güzel”in sonuna kadar sürükleyip bırakın.</p><p class="mut">Dizüstü touchpad\'iyle zor geliyorsa: bir elinizin başparmağıyla touchpad\'in sol alt köşesine basılı tutun, öbür elinizin parmağıyla kaydırın.</p>',
       mouse: '🖱 Basılı tut ve sürükle',
       hint: 'Fazla ya da eksik seçerseniz boş bir yere tıklayıp yeniden deneyin. Noktayı seçmeseniz de olur.',
       on: (ev) => ev.type === 'select' && norm(ev.text) === 'hava çok güzel',
@@ -282,6 +282,12 @@ export const kaydetPratik = {
       opts: ['Yalnızca Belgeler\'deki “randevu”', 'İkisi birden', 'Yalnızca masaüstündeki kopya'], ok: 0,
       why: 'Doğru! Farklı kaydedilen kopya ayrı bir dosyadır; birini değiştirmek diğerini etkilemez.',
     }),
+    {
+      title: 'Kapatırken çıkan soru',
+      html: `<p>Bir pencereyi kapatırken “Değişiklikler kaydedilsin mi?” diye sorarsa:</p>
+        <ul class="big-list"><li><b>Kaydet:</b> yazdıklarınız saklanır.</li><li><b>Kaydetme:</b> yazdıklarınız <b>silinir, geri gelmez</b>.</li><li><b>İptal:</b> vazgeçtiniz, pencere açık kalır.</li></ul>
+        <div class="box">Emin değilseniz <b>İptal</b>'e basın, sonra durumu düşünün. Gerçek bir yazı yazdıysanız <b>Kaydetme</b> demeyin.</div>`,
+    },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Dosyalarınızı nereye kaydettiğinizi artık biliyorsunuz:</p>' },
   ],
 };

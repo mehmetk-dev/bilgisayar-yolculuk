@@ -15,7 +15,7 @@ export const sanalKart = {
     ['Asıl kart: internete kapalı', 'Kartlarım → “İnternet alışverişine açık” kutusunu boşaltın; numara çalınsa da internetten harcanamaz'],
     ['Sanal kart', 'İnternet için ayrı numara; yalnızca belirlediğiniz limit kadar harcanır, sonra silinebilir'],
     ['IBAN', 'TR + 24 rakam = 26 karakter. Elle yazmayın: seçip ' + K('Ctrl', 'C') + ', kutuya ' + K('Ctrl', 'V')],
-    ['Alıcı adı', 'Banka adı IBAN sahibiyle karşılaştırır; uyuşmazsa para gitmez'],
+    ['Alıcı adı', 'Göndermeden önce bankanın gösterdiği alıcı adını kontrol edin; ad beklediğiniz kişi değilse göndermeyin. Giden para çoğu zaman geri alınamaz'],
     ['SMS kodu', 'Yalnızca bankanın sitesine yazılır; kimse telefonla isteyemez'],
     ['📄 Dekont (PDF)', 'Ödediğinizin kanıtı; İndirilenler\'e iner, mesajla ya da e-postayla gönderilir'],
     ['⏻ Çıkış', 'İş bitince internet şubesinden mutlaka çıkın'],
@@ -24,7 +24,7 @@ export const sanalKart = {
     {
       title: 'Bankacılık işleri',
       html: `<p>Bugün iki iş yapacağız: <b>internet alışverişi için güvenli bir kart</b> hazırlamak ve apartman yöneticisinin gönderdiği <b>IBAN'a aidat ödemek</b>.</p>
-        <p>Alıştırma bankasına giriş bilgileri: T.C. Kimlik No <b>${KURS_TC}</b>, şifre <b>${BANKA_SIFRE}</b>. Gerçek şifrenizi kimseye söylemeyin, hiçbir yere yazmayın.</p>`,
+        <p>Alıştırma bankasına giriş bilgileri: T.C. Kimlik No <b>${KURS_TC}</b>, şifre <b>${BANKA_SIFRE}</b>. Gerçek şifrenizi kimseye söylemeyin. Kâğıda yazacaksanız evde güvenli bir yerde saklayın; bilgisayarın yanına ya da telefon kılıfına koymayın.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'browser', { url: BANKA_HOST }); },
     },
     {
@@ -96,7 +96,8 @@ export const sanalKart = {
     },
     {
       title: 'Ödemeyi yapın',
-      html: `<p>Alıcının adı: <b>${YONETICI.ad}</b> · Tutar: <b>${YONETICI.aidat}</b> · Açıklama: <b>Ekim aidatı Daire 7</b>. <b>Devam</b>'a basın, bilgileri kontrol edin; SMS kodunu yazıp <b>Onayla ve gönder</b>.</p>`,
+      html: `<p>Alıcının adı: <b>${YONETICI.ad}</b> · Tutar: <b>${YONETICI.aidat}</b> · Açıklama: <b>Ekim aidatı Daire 7</b>. <b>Devam</b>'a basın, bilgileri kontrol edin; SMS kodunu yazıp <b>Onayla ve gönder</b>.</p>
+        <p class="mut">Göndermeden önce onay ekranında <b>alıcının adını</b> ve <b>tutarı</b> mesajdaki bilgiyle karşılaştırın. Banka size IBAN'ın sahibini gösteriyorsa ad beklediğiniz kişi olmalı; değilse göndermeyin. Gönderilen para çoğu zaman geri alınamaz. İlk kez para gönderdiğiniz biri ya da IBAN'ı yeni değişmiş biri ise önce onu bildiğiniz numaradan arayıp sorun.</p>`,
       hint: 'Alıcı adını mesajdaki gibi yazın: Hasan Demir. Tutar yalnızca rakam: 750.',
       on: (ev, c) => {
         if (ev.type === 'bank-send' && !ev.ok) c.note('Banka formu kabul etmedi: kırmızı yazıyı okuyun.');
@@ -104,7 +105,7 @@ export const sanalKart = {
         if (ev.tutar !== YONETICI.aidat) c.note(`${ev.tutar} ₺ gönderildi; aidat ${YONETICI.aidat} ₺ idi. Gerçekte tutarı göndermeden önce mutlaka kontrol edin.`);
         return true;
       },
-      done: 'Para gönderildi. Banka, alıcının adını IBAN sahibiyle karşılaştırdı ve SMS ile onayınızı aldı.',
+      done: 'Para gönderildi. Banka SMS ile onayınızı aldı. Gerçekte göndermeden önce alıcı adını ve tutarı siz de kontrol edin.',
     },
     {
       title: 'Dekontu indirin',

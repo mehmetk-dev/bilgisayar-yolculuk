@@ -115,7 +115,7 @@ export const cerezler = {
       html: '<p>Kütüphanede ortak bir bilgisayarda e-postanıza girdiniz. Çıkarken en güvenli davranış hangisi?</p>',
       opts: ['Sekmeyi açık bırakmak', '“Çıkış yap”a basmak ve göz atma verilerini silmek (ya da en baştan gizli pencere kullanmak)', 'Bilgisayarı kapatmadan kalkmak'], ok: 1,
       wrong: 'Giriş çerezi hâlâ duruyorsa sonraki kişi oturumunuza girebilir.',
-      why: 'Doğru. Giriş çerezi oturumu açık tutar; çıkış yapmak ve verileri silmek onu kaldırır. Gizli pencere ise kapanınca çerezleri kendiliğinden siler.',
+      why: 'Doğru. Giriş çerezi oturumu açık tutar; çıkış yapmak ve verileri silmek onu kaldırır. Gizli pencere ise kapanınca çerezleri kendiliğinden siler. Tarayıcı “Şifreyi kaydedeyim mi?” diye sorarsa <b>Hayır</b> deyin, giriş sayfalarındaki “Beni hatırla” kutusunu da işaretlemeyin.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Çerezleri tanıyorsunuz:</p>' },
   ],

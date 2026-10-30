@@ -106,6 +106,8 @@ export const whatsappWeb = {
     ['⬇ İndir', 'Gelen fotoğrafı İndirilenler klasörüne kaydeder; oradan açıp yazdırılır'],
     ['⋮ → Oturumu kapat', 'Ortak bilgisayarda iş bitince mutlaka'],
     ['Tanımadığınız numara + bağlantı', 'Tıklamayın; doğrulama istemek dolandırıcılıktır'],
+    ['6 haneli WhatsApp kodu', 'SMS ile gelen kodu kimseye söylemeyin; tanıdığınız birinden gelen istek olsa bile'],
+    ['Karekod', 'Yalnızca kendi bilgisayarınızın ekranındaki karekodu okutun; Bağlı cihazlar\'daki tanımadığınız cihazı çıkarın'],
   ],
   steps: [
     {
@@ -181,6 +183,13 @@ export const whatsappWeb = {
       wrong: 'Bu bir tuzak. Hesap doğrulaması için hiçbir uygulama size bağlantı göndermez.',
       why: 'Doğru. Mesajlaşma uygulamaları hesabınızı bağlantıyla doğrulamanızı istemez; tıklarsanız sahte sayfaya düşersiniz.',
     }),
+    {
+      title: 'Hesabınızı koruyun',
+      html: `<ul class="big-list"><li>🔢 WhatsApp size <b>SMS ile 6 haneli kod</b> gönderdiyse ve siz istemediyseniz, o kodu <b>kimseye söylemeyin</b>. “Yanlışlıkla sana gitti, iletir misin?” diyen <b>tanıdığınız biri</b> bile olsa: onun hesabı çalınmış olabilir. Onu telefonla arayın.</li>
+        <li>📷 Karekodu <b>yalnızca kendi bilgisayarınızın ekranından</b> okutun. Biri size karekod gönderip “okut” derse, hesabınızı ona bağlarsınız.</li>
+        <li>📱 Telefonda <b>⋮ → Bağlı cihazlar</b>'a bakın; tanımadığınız cihaz varsa çıkarın.</li>
+        <li>🔐 <b>Ayarlar → Hesap → İki adımlı doğrulama</b>'yı açıp 6 haneli bir PIN belirleyin.</li></ul>`,
+    },
     {
       title: 'Oturumu kapatın',
       html: '<p>İşiniz bitti. Sohbet listesinin en üstündeki, sağ taraftaki <b>⋮</b> işaretine tıklayıp <b>⏻ Oturumu kapat</b>\'ı seçin. Ortak bilgisayarda bunu yapmazsanız sonra gelen herkes mesajlarınızı okuyabilir.</p>',

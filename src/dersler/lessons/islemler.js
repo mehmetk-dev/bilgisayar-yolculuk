@@ -15,7 +15,8 @@ export const edevlet = {
   desc: 'e-Devlet\'e giriş, ikametgâh belgesi almak, PDF indirmek, barkodla doğrulamak.',
   summary: [
     ['turkiye.gov.tr', 'e-Devlet\'in tek gerçek adresi (.gov.tr)'],
-    ['Giriş yap → e-Devlet şifresi', 'T.C. Kimlik No ve şifre; şifre PTT\'den alınır'],
+    ['Giriş yap → e-Devlet şifresi', 'T.C. Kimlik No ve şifre; ilk şifre PTT şubesinden kimlikle şahsen alınır'],
+    ['Başka giriş yolları', 'e-imza, mobil imza, çipli kimlik kartı, internet bankacılığı'],
     ['Hizmet ara', 'Kelimeyle arayın: ikametgâh, SGK, sabıka…'],
     ['Belge Oluştur → İndir', 'Belge PDF olarak İndirilenler klasörüne iner'],
     ['PDF → 🖨 Yazdır', 'Belgeyi kâğıda basar'],
@@ -47,7 +48,9 @@ export const edevlet = {
     {
       title: 'Giriş yapın',
       html: `<p><b>Giriş Yap</b>'a tıklayın. Kimlik numarasını ve şifreyi yazıp <b>Giriş Yap</b>'a basın.</p>${KART}
-        <p class="mut">Şifre yazarken nokta (•) görünür; başkası görmesin diye. Büyük-küçük harf farklıdır: <b>K</b>urs2026.</p>`,
+        <p class="mut">Şifre yazarken nokta (•) görünür; başkası görmesin diye. Büyük-küçük harf farklıdır: <b>K</b>urs2026.</p>
+        <p class="mut">Gerçek e-Devlet'e şifreyle, e-imzayla, mobil imzayla, çipli kimlik kartıyla ya da internet bankacılığıyla girilir. İlk şifreyi kimliğinizle bir <b>PTT şubesinden</b> şahsen alırsınız.</p>
+        <p class="mut">Kendi bilgisayarınız değilse (kurs, kütüphane): tarayıcı <b>“Şifreyi kaydedeyim mi?”</b> derse <b>Hayır</b> deyin, sayfalardaki <b>“Beni hatırla”</b> kutusunu işaretlemeyin, işiniz bitince <b>Çıkış</b> yapın.</p>`,
       hint: 'Kimlik numarasının 11 hane olduğunu kontrol edin.',
       on: (ev, c) => {
         if (ev.type === 'edevlet-login' && !ev.ok) { c.note('Giriş olmadı: kırmızı yazıyı okuyun. Şifrenin ilk harfi büyük K.'); return false; }
@@ -102,7 +105,7 @@ export const edevlet = {
       opts: ['Şifremi söylerim', 'Telefonu kapatırım; şifremi kimseye söylemem', 'Yalnızca kimlik numaramı söylerim'],
       ok: 1,
       wrong: 'Devlet kurumları telefonla şifre istemez.',
-      why: 'Doğru. e-Devlet şifresini yalnızca siz bilirsiniz; unutursanız PTT\'den yenisini alırsınız.',
+      why: 'Doğru. e-Devlet şifresini yalnızca siz bilirsiniz; unutursanız şifre yenileme yollarını kullanır ya da kimliğinizle PTT şubesine gidersiniz.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>e-Devlet\'ten belge almayı öğrendiniz:</p>' },
   ],
@@ -132,8 +135,8 @@ export const randevu = {
     },
     {
       title: 'Siteyi bulun',
-      html: '<p>Adres çubuğuna <b>hastane randevusu</b> yazıp aratın. Sonuçlardan <b>MHRS</b>\'ye tıklayın, sonra <b>📅 Randevu al</b>\'a basın.</p>',
-      target: 'hastane randevusu',
+      html: '<p>Adres çubuğuna <b>mhrs.gov.tr</b> yazıp Enter\'a basın, sonra <b>📅 Randevu al</b>\'a tıklayın.</p><p class="mut">Adresi kendiniz yazın; arama motorunda “hastane randevusu” aratınca üstte çıkan reklamlı sonuçlara girmeyin. MHRS randevu için sizden para ya da kart bilgisi istemez; isteyen site MHRS değildir.</p>',
+      target: 'mhrs.gov.tr',
       on: nav('www.mhrs.gov.tr', '/randevu'),
       done: 'Adres <b>mhrs.gov.tr</b>: .gov.tr, yani devletin sitesi. Formun üstünde “* işaretli alanlar zorunludur” yazıyor.',
     },
@@ -191,6 +194,9 @@ export const alisveris = {
     ['Kargo', 'Çoğu site belli tutarın üstünde kargoyu bedava yapar'],
     ['Kapıda ödeme', 'Ürün gelince ödersiniz; biraz ek ücreti olur'],
     ['Kart ile ödeme', 'Yalnızca 🔒 ve adresini bildiğiniz sitelerde'],
+    ['Tanımadığınız site', 'Fiyat çok düşükse, iletişim/adres bilgisi yoksa, sitenin adı + “şikâyet” aratınca kötü yorumlar çıkıyorsa kart bilgisi girmeyin'],
+    ['Cayma hakkı', 'İnternetten alınan çoğu üründe teslimden sonra genellikle 14 gün içinde sebep göstermeden iade; fatura ve onay e-postasını saklayın'],
+    ['Sipariş vermediğiniz paket', 'Kapıda ödemeli olsa da teslim almayın; önce ailenize sorun'],
     ['Kartımı kaydet', 'İstemiyorsanız işareti kaldırın'],
     ['3D Secure SMS kodu', 'Ödemeyi onaylar. Kimseye söylenmez'],
     ['Siparişlerim', 'Kargonun nerede olduğu'],
@@ -201,6 +207,11 @@ export const alisveris = {
       html: `<p>İnternetten alışveriş evden çıkmadan yapılır ama dikkat ister: <b>doğru site</b>, <b>doğru tutar</b> ve <b>kart güvenliği</b>.</p>
         <p>Bu derste <b>Fırsat Pazarı</b>'ndan alışveriş yapacağız. Gerçek para harcanmaz; kart bilgisi de deneme kartıdır.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); c.d.alisverisYol = null; br(c, 'www.firsat-pazari.com.tr'); },
+    },
+    {
+      title: 'Tanımadığınız site',
+      html: `<p>Fırsat Pazarı'nı derste güvenli sayıyoruz. Gerçek hayatta reklamda gördüğünüz, adını ilk kez duyduğunuz bir sitede şunlara bakın:</p>
+        <ul class="big-list"><li>💸 Fiyat piyasanın <b>çok altındaysa</b> durun.</li><li>📍 Sayfanın altında <b>adres, telefon, şirket bilgisi</b> var mı? Yoksa kart bilgisi girmeyin.</li><li>🔎 Sitenin adını “… şikâyet” diye aratıp başkalarının yazdıklarına bakın.</li><li>🔒 Kilit tek başına yetmez: sahte sitelerde de olur.</li></ul>`,
     },
     {
       title: 'Bildirim sorusu',
@@ -243,7 +254,8 @@ export const alisveris = {
     {
       title: 'Kartla ödeyin',
       html: `<p><b>Kart ile öde</b> seçili kalsın ve deneme kartını yazın:</p><div class="kurs-kart">💳 Kart no: <b>${TEST_KART}</b><br>Ad: <b>adınız</b> · Son kullanma: <b>12/28</b> · CVV: <b>123</b></div>
-        <ol class="steps"><li><b>Kartımı kaydet</b> kutusundaki işareti <b>kaldırın</b> (sık alışveriş yapmadığınız sitelerde kart saklatmayın).</li><li><b>Mesafeli satış sözleşmesini</b> onaylayın.</li><li><b>Siparişi onayla</b>.</li></ol>`,
+        <ol class="steps"><li><b>Kartımı kaydet</b> kutusundaki işareti <b>kaldırın</b> (sık alışveriş yapmadığınız sitelerde kart saklatmayın).</li><li><b>Mesafeli satış sözleşmesini</b> onaylayın.</li><li><b>Siparişi onayla</b>.</li></ol>
+        <p class="mut">Mesafeli satış sözleşmesi, internetten alışverişte sizin ve satıcının haklarını yazar. En önemli hakkınız <b>cayma</b>: ürünü teslim aldıktan sonra çoğu üründe genellikle 14 gün içinde sebep göstermeden iade edebilirsiniz (kişiye özel üretilen ya da çabuk bozulan ürünlerde yoktur). Faturayı ve onay e-postasını saklayın.</p>`,
       hint: '<b>Kart ile öde</b> seçili kalsın (kapıda ödemede SMS kodu çıkmaz). Kırmızı yazı çıkarsa o alanı düzeltin.',
       on: (ev, c) => {
         if (ev.type === 'form-submit' && ev.site === 'shop-pay' && !ev.errors.length && ev.save) c.note('“Kartımı kaydet” işaretli kaldı. Sorun değil ama genelde kaldırmak daha güvenli.');
@@ -280,6 +292,13 @@ export const alisveris = {
       ok: 1,
       wrong: 'SMS\'teki “Bu kodu kimseyle paylaşmayın” yazısını hatırlayın.',
       why: 'Doğru. O kodu isteyen kişi, sizin kartınızla ödeme yapmaya çalışan dolandırıcıdır. Banka bu kodu asla sormaz.',
+    }),
+    rehberSoru({
+      title: 'Sipariş vermediğiniz paket',
+      html: '<p>Kapı çaldı. Kargocu, <b>sipariş vermediğiniz</b> bir paket için “kapıda ödeme, 850 lira” diyor. Ne yaparsınız?</p>',
+      opts: ['Öderim, belki ailemden biri sipariş etmiştir', 'Teslim almam; önce ailemdekilere sorarım. Onların siparişi bile olsa içeriğini görmeden ödeme yapmam', 'Paketi açıp bakarım, beğenirsem öderim'], ok: 1,
+      wrong: 'Sipariş vermediğiniz paketi kapıda ödeme baskısıyla vermek yaygın bir dolandırıcılıktır; ödeme yapıldıktan sonra geri almak zordur.',
+      why: 'Doğru. Emin olmadığınız pakette en güvenli cevap “teslim almam”dır. Aileden biri sipariş verdiyse ona sorarak sonra yeniden teslim aldırabilirsiniz.',
     }),
     {
       title: 'Siparişi takip edin',

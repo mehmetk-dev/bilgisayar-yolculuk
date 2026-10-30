@@ -103,7 +103,7 @@ export const hucreInce = {
       title: 'Yeni satırı doldurun',
       html: '<p><b>A6</b>\'ya <b>Doğalgaz</b>, <b>B6</b>\'ya <b>2100</b> yazın.</p>',
       on: when((c) => norm(cell(c, 'A6').raw) === 'doğalgaz' && near(cell(c, 'B6').value, 2100)),
-      done: 'Satır eklemek, tabloyu baştan yazmadan araya bilgi sokmanın yoludur.',
+      done: 'Satır eklemek, tabloyu baştan yazmadan araya bilgi sokmanın yoludur. <b>Dikkat:</b> listenin sonuna, Toplam satırının hemen altına ya da üstüne satır eklerseniz yeni tutar toplama girmeyebilir. Toplam hücresine çift tıklayın: formülün seçtiği alan renkli çerçeveyle görünür. Yeni satır çerçevenin dışındaysa toplamı yeniden hesaplatın (∑ Otomatik Toplam).',
     },
     {
       title: 'Boş satırı silin',
@@ -347,7 +347,7 @@ export const tabloParkur = {
     { title: '3. Toplamı bulun', html: '<p><b>B6</b> hücresine pazarın <b>toplamını</b> hesaplatın.</p>', hint: 'B6\'ya tıklayıp ∑ Otomatik Toplam ya da =TOPLA(B1:B5) yazın.', on: when((c) => near(cell(c, 'B6').value, 304.25)) },
     { title: '4. Toplamı kalın yapın', html: '<p>Toplam hücresini (B6) <b>kalın</b> yapın.</p>', hint: 'B6\'yı seçip K düğmesi ya da Ctrl + B.', on: when((c) => cell(c, 'B6').bold) },
     { title: '5. Para biçimi', html: '<p>B1\'den B6\'ya kadar fiyatları <b>₺ (para birimi)</b> biçiminde gösterin.</p>', hint: 'B1:B6\'yı fareyle sürükleyerek seçin, ₺ düğmesine tıklayın.', on: when((c) => ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'].every((a) => cell(c, a).f === 'tl')) },
-    { title: '6. En pahalıdan sıralayın', html: '<p>A1:B5 aralığını fiyata göre <b>büyükten küçüğe</b> sıralayın. Toplam satırı yerinde kalmalı.</p>', hint: 'A1:B5\'i seçip B sütunundayken ↓ Z→A. İlk satır Peynir olmalı.', on: when((c) => norm(cell(c, 'A1').raw) === 'peynir' && near(cell(c, 'B6').value, 304.25)) },
+    { title: '6. En pahalıdan sıralayın', html: '<p>A1:B5 aralığını fiyata göre <b>büyükten küçüğe</b> sıralayın. Toplam satırı yerinde kalmalı. Sürüklemeye fiyat sütunundan (B1) başlayın.</p>', hint: 'Fiyat sütunundan başlayın: B1\'e basılı tutup A5\'e doğru sürükleyin (B6, yani Toplam seçime girmesin), sonra ↓ Z→A. Excel, sürüklemeye başladığınız hücrenin sütununa göre sıralar. İlk satır Peynir olmalı.', on: when((c) => norm(cell(c, 'A1').raw) === 'peynir' && near(cell(c, 'B6').value, 304.25)) },
     { title: '7. Kaydedin', html: '<p>Dosyayı <b>pazar</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S, adı pazar yazın.', on: (ev) => ev.type === 'xl-save' && /pazar/i.test(ev.name) },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Pazar listesini yazıp topladınız, biçimlendirdiniz ve sıraladınız.</p>' },
   ],

@@ -23,7 +23,8 @@ export const epostaIletme = {
       title: 'Yanıtla mı, ilet mi?',
       html: `<p>Gelen bir postayla iki şey yapabilirsiniz:</p>
         <ul class="big-list"><li><b>↩ Yanıtla</b>: size yazana cevap verirsiniz.</li><li><b>↪ İlet</b>: postayı <b>başka birine</b> gönderirsiniz (örneğin faturayı kardeşiniz Ahmet'e).</li></ul>
-        <p>Ayrıca bir postayı <b>çok kişiye</b> atarken <b>Bilgi (Cc)</b> ve <b>Gizli (Bcc)</b> kutuları vardır.</p>`,
+        <p>Ayrıca bir postayı <b>çok kişiye</b> atarken <b>Bilgi (Cc)</b> ve <b>Gizli (Bcc)</b> kutuları vardır.</p>
+        <p class="mut">Gerçek posta programlarında üçüncü bir düğme daha olur: <b>Tümünü yanıtla</b>. Yanıtla yalnızca gönderene gider; Tümünü yanıtla, gönderene ve Kime/Bilgi kutusundaki <b>herkese</b> gider. Özel bir şey yazacaksanız <b>Yanıtla</b>\'yı seçin ve Kime kutusuna bakın. Dernek duyurusuna yalnızca başkana teşekkür edecekseniz bile Tümünü yanıtla\'ya basarsanız bütün üyeler okur.</p>`,
       setup: (c) => {
         desktopReady(c); c.d.closeAll();
         deliverMail(c.d, { key: 'fatura', from: 'fatura@elektrik-dagitim.com.tr', fromName: 'Elektrik Dağıtım', subject: 'Ekim ayı faturanız', time: '10:05', body: 'Sayın abonemiz,\n\nEkim ayı elektrik faturanız ekte yer almaktadır. Son ödeme tarihi 25 Ekim\'dir.\n\nElektrik Dağıtım', attachments: [{ name: 'elektrik faturası ekim.pdf', content: '' }] }, true);
@@ -178,8 +179,8 @@ export const sifreSifirla = {
     ['Giriş sayfası', '“Şifremi unuttum” bağlantısı genellikle şifre kutusunun altındadır'],
     ['Doğrulama kodu', 'SMS ile gelir; yalnızca ilgili sayfaya yazılır'],
     ['Kimse kodu sormaz', 'Telefonla arayan “kodu söyleyin” derse dolandırıcıdır'],
-    ['Yeni şifre', '8+ karakter, büyük-küçük harf, rakam; eskisi olmasın'],
-    ['Şifre defteri', 'Evde güvenli yerde; “banka şifresi: …” diye açıkça yazmayın'],
+    ['Yeni şifre', 'Site en az 8 ister; siz 12+ karakterli, kolay hatırlanan uzun bir cümle seçin; eskisi olmasın'],
+    ['Şifre defteri', 'Evde güvenli yerde, bilgisayarın yanında değil; “banka şifresi: …” diye açıkça yazmayın'],
     ['Aynı şifreyi her yerde kullanmayın', 'Biri çalınırsa hepsi gider'],
   ],
   steps: [
@@ -227,10 +228,10 @@ export const sifreSifirla = {
     },
     {
       title: 'Yeni şifre belirleyin',
-      html: `<p>İki kutuya da <b>aynı yeni şifreyi</b> yazın. Şifre en az <b>8 karakter</b> olsun, hem <b>büyük hem küçük harf</b> ve bir <b>rakam</b> içersin. Eski şifre (Kedi2019) olmasın.</p>
-        <p class="mut">Örnek bir fikir: sevdiğiniz bir cümle ➜ “Ben3Yilda1Kez!”. (Bu örneği değil, kendi şifrenizi yazın.)</p>`,
+      html: `<p>İki kutuya da <b>aynı yeni şifreyi</b> yazın. Bu site en az <b>8 karakter</b> ister; siz <b>12 ve üzerini</b> tercih edin. Hem <b>büyük hem küçük harf</b> ve bir <b>rakam</b> içersin. Eski şifre (Kedi2019) olmasın.</p>
+        <p class="mut">Uzun ve kolay hatırlanan bir <b>cümle</b> seçin, örneğin sevdiğiniz bir söz ➜ “Ben3Yilda1Kez!”. (Bu örneği değil, kendi şifrenizi yazın.)</p>`,
       on: (ev, c) => { if (ev.type === 'hesap-newpass' && !ev.ok) c.note('Şifre kabul edilmedi; kırmızı uyarıyı okuyup düzeltin.'); return ev.type === 'hesap-newpass' && ev.ok; },
-      done: 'Yeni şifreniz kaydedildi. Yine unutmamak için onu evde güvenli bir yerde duran bir deftere yazın (sayfadaki not da bunu hatırlatıyor).',
+      done: 'Yeni şifreniz kaydedildi. Yine unutmamak için onu evde güvenli bir yerde duran bir deftere yazın (sayfadaki not da bunu hatırlatıyor). Kâğıdı bilgisayarın yanına koymayın, monitöre yapıştırmayın.',
     },
     {
       title: 'Yeni şifreyle girin',

@@ -32,7 +32,7 @@ export const sunu = {
     },
     {
       title: 'Programı açın',
-      html: '<p>⊞ <b>Başlat</b>\'tan <b>📙 Sunu</b>\'yu açın.</p>',
+      html: '<p>⊞ <b>Başlat</b>\'tan <b>📙 Sunu</b>\'yu açın.</p><p class="mut">Gerçek bilgisayarda bu programın adı <b>Microsoft PowerPoint</b>\'tir (turuncu simge, beyaz P). Açılınca önce şablon listesi çıkar; boş sunu için <b>Boş sunu</b>\'ya tıklarsınız.</p>',
       mouse: '🖱 Başlat → Sunu',
       check: (c) => !!c.d.find('slides'),
       on: (e) => e.type === 'app-open' && e.app === 'slides',

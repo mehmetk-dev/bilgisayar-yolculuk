@@ -117,6 +117,8 @@ export const ilanTuzak = {
     ['Satıcı bilgisi', 'Üyelik süresi, telefon doğrulaması'],
     ['Şüpheli ilan', 'Fiyat çok düşük, ev gösterilmiyor, “anahtar kargoyla”, “hemen kapora yatırın”'],
     ['Kapora', 'Evi görmeden ve sözleşmeyi imzalamadan para göndermeyin'],
+    ['Gerçek ev sahibi mi?', 'Evi görürken kimliğini ve tapu kaydını isteyin; adlar uyuşsun'],
+    ['Siz satıcıysanız', '“Para gönderdim” diye dekont ya da ekran görüntüsü yetmez; eşyayı vermeden önce parayı kendi bankanızın uygulamasında görün'],
     ['🚩 Şikayet et', 'Sahte ilan fark ettiyseniz siteye bildirin'],
   ],
   steps: [
@@ -179,7 +181,7 @@ export const ilanTuzak = {
       html: '<p>Gerçek bir ilan buldunuz ve ev sahibi 1 aylık kapora istiyor. Ne yaparsınız?</p>',
       opts: ['Hemen IBAN\'a yatırırım', 'Evi gördükten ve sözleşmeyi imzaladıktan sonra, makbuz alarak öderim', 'Ev sahibinin kimlik fotokopisini isterim ve yatırırım'], ok: 1,
       wrong: 'Para göndermeden önce evi ve sözleşmeyi görmek gerekir.',
-      why: 'Doğru. Kaporayı (ve depozitoyu) evi yerinde görüp sözleşmeyi imzaladıktan sonra, makbuz karşılığı verin. Ödemeyi mümkünse banka yoluyla (havale/EFT) yapın ve sözleşmeye yazdırın; elden ya da tanımadığınız birinin hesabına göndermeyin. Bir yakınınızı yanınıza almak da iyi bir fikirdir.',
+      why: 'Doğru. Kaporayı (ve depozitoyu) evi yerinde görüp sözleşmeyi imzaladıktan sonra, makbuz karşılığı verin. Ödemeyi mümkünse banka yoluyla (havale/EFT) yapın ve sözleşmeye yazdırın; elden ya da tanımadığınız birinin hesabına göndermeyin. Evi görmeye gittiğinizde ev sahibinden kimliğini ve tapu kaydını isteyin; adlar uyuşmalı (evi gerçek sahibi olmayan biri kiraya çıkarmış olabilir). Bir yakınınızı yanınıza almak da iyi bir fikirdir.',
     }),
     rehberSoru({
       title: 'Sahte ilan işareti değil',
@@ -187,6 +189,13 @@ export const ilanTuzak = {
       opts: ['Fiyat piyasanın çok altında', 'Satıcı telefonunu doğrulamış, evi gösterebileceğini söylüyor', '“Ev sahibi yurtdışında, anahtar kargoyla” demesi'], ok: 1,
       wrong: 'Sahte ilan genellikle ev göstermemeye çalışır.',
       why: 'Doğru. Telefonu doğrulanmış, evi göstermeye hazır satıcı güven verir; öbür ikisi tipik dolandırıcılık işaretleridir.',
+    }),
+    rehberSoru({
+      title: 'Siz satıcıysanız',
+      html: '<p>Bu kez siz bir eşya sattınız. Alıcı “Ödemeyi yaptım” diyerek bir <b>dekont fotoğrafı</b> gönderdi ve eşyayı hemen istiyor. Ne yaparsınız?</p>',
+      opts: ['Fotoğrafı görünce eşyayı veririm', 'Parayı kendi bankamın uygulamasında hesabımda görmeden eşyayı vermem', 'Alıcıya IBAN\'ımın yanında şifremi de yollarım'], ok: 1,
+      wrong: 'Dekont fotoğrafı kolayca sahte hazırlanabilir.',
+      why: 'Doğru. Para gerçekten hesabınıza geçtiyse bankanızın kendi uygulamasında ya da internet şubesinde görürsünüz. Alıcının gönderdiği görüntüye güvenmeyin.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>İlan sitelerini güvenle kullanabilirsiniz:</p>' },
   ],

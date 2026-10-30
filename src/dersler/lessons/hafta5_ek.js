@@ -92,7 +92,8 @@ export const masaustuDuzen = {
     },
     {
       title: 'Yeni klasör',
-      html: '<p>Masaüstünde <b>boş bir yere sağ tıklayın</b> → <b>Yeni</b> → <b>📁 Klasör</b>. Adı seçiliyken <b>Önemli</b> yazıp Enter\'a basın.</p>',
+      html: `<p>Masaüstünde <b>boş bir yere sağ tıklayın</b> → <b>Yeni</b> → <b>📁 Klasör</b>. Adı seçiliyken <b>Önemli</b> yazıp Enter\'a basın.</p>
+        <p class="mut">Windows 11\'de bir dosyaya sağ tıkladığınızda menünün üstünde Kes, Kopyala, Yeniden adlandır, Sil yazısız simgelerdir. Aradığınızı bulamazsanız en alttaki <b>Diğer seçenekleri göster</b>\'e tıklayın (ya da ${K('Shift', 'F10')}).</p>`,
       mouse: '🖱 Boş yere sağ tık → Yeni → Klasör',
       hint: 'Yeni\'nin üzerine gelince yanında küçük bir menü açılır; oradaki Klasör\'e tıklayın.',
       check: (c) => !!c.d.fs.find('desktop', 'Önemli'),

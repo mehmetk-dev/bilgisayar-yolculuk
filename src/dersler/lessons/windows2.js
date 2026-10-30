@@ -24,7 +24,7 @@ export const windowsAraclar = {
     },
     {
       title: 'Masaüstüne kısayol gönderin',
-      html: '<p>Her ay <b>Faturalar</b> klasörünü açıyorsunuz ama her seferinde Dosya Gezgini → Belgeler → Faturalar diye aramak zahmetli. Masaüstüne bir <b>kısayol</b> koyacağız.</p><p>Yandaki Dosya Gezgini’nde <b>Belgeler</b> açık. <b>Faturalar</b> klasörüne <b>sağ tıklayın</b>; menüde <b>Gönder</b>’in üzerine gelin ve yandan açılan <b>🖥 Masaüstü (kısayol oluştur)</b>’a tıklayın.</p>',
+      html: '<p>Her ay <b>Faturalar</b> klasörünü açıyorsunuz ama her seferinde Dosya Gezgini → Belgeler → Faturalar diye aramak zahmetli. Masaüstüne bir <b>kısayol</b> koyacağız.</p><p>Yandaki Dosya Gezgini’nde <b>Belgeler</b> açık. <b>Faturalar</b> klasörüne <b>sağ tıklayın</b>; menüde <b>Gönder</b>’in üzerine gelin ve yandan açılan <b>🖥 Masaüstü (kısayol oluştur)</b>’a tıklayın.</p><p class="mut">Gerçek Windows 11’de menüde <b>Gönder</b> görünmüyorsa en alttaki <b>Diğer seçenekleri göster</b>’e tıklayın (ya da sağ tıklarken ' + K('Shift') + ' tuşunu basılı tutun). Gönder orada.</p>',
       mouse: '🖱 Faturalar → sağ tık → Gönder ›',
       hint: 'Faturalar klasörüne sağ tık → Gönder › → Masaüstü (kısayol oluştur).',
       setup: docs,

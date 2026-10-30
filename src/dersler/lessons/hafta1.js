@@ -91,7 +91,7 @@ export const ackapa = {
     },
     {
       title: 'Başlat menüsünü açın',
-      html: `<p>Ekranın altındaki çubuğa <b>görev çubuğu</b> denir. Ortasındaki dört kareli simge <b>Başlat</b> düğmesidir.</p><p>Başlat düğmesine bir kez tıklayın.</p>`,
+      html: `<p>Ekranın altındaki çubuğa <b>görev çubuğu</b> denir. Ortasındaki dört kareli simge <b>Başlat</b> düğmesidir.</p><p>Başlat düğmesine bir kez tıklayın.</p><p class="mut">Windows 10'da Başlat düğmesi sol alttadır.</p>`,
       mouse: '🖱 Görev çubuğundaki ⊞ Başlat\'a tıklayın',
       setup: desktopReady,
       check: (c) => !c.d.startEl.hidden,
@@ -100,7 +100,7 @@ export const ackapa = {
     },
     {
       title: 'Güç düğmesi',
-      html: `<p>Başlat menüsünün <b>sağ alt köşesinde</b> ⏻ işareti var. Ona tıklayın.</p><p class="mut">Menü kapandıysa önce yine Başlat'a tıklayın.</p>`,
+      html: `<p>Başlat menüsünün <b>sağ alt köşesinde</b> ⏻ işareti var. Ona tıklayın.</p><p class="mut">Menü kapandıysa önce yine Başlat'a tıklayın. Windows 10'da ⏻ menünün solundadır.</p>`,
       mouse: '🖱 Başlat menüsünde ⏻\'a tıklayın',
       setup: desktopReady,
       on: (ev) => ev.type === 'power-menu',
@@ -108,15 +108,17 @@ export const ackapa = {
     },
     {
       title: 'Üç seçenek ne demek?',
-      html: `<table class="sum"><tr><th>🌙 Uyku</th><td>Bilgisayar dinlenir. Açık programlar yerinde kalır. Fareyi oynatınca hemen uyanır. <b>Kısa aralar</b> için.</td></tr>
-        <tr><th>⏻ Kapat</th><td>Bilgisayar tamamen kapanır. <b>Gün sonunda</b> ya da uzun süre kullanmayacaksanız.</td></tr>
+      html: `<table class="sum"><tr><th>🌙 Uyku</th><td>Bilgisayar dinlenir. Açık programlar yerinde kalır. Fareyi oynatınca ya da bir tuşa basınca uyanır. <b>Kısa aralar</b> için. Elektrik kesilirse kaydetmediğiniz işler gider; uykuya yatırmadan önce işinizi kaydedin.</td></tr>
+        <tr><th>⏻ Kapat</th><td>Bilgisayar kapanır. <b>Gün sonunda</b> ya da uzun süre kullanmayacaksanız. Bir sorun varsa Kapat yerine <b>Yeniden başlat</b>'ı seçin; sorunları daha iyi giderir.</td></tr>
         <tr><th>🔄 Yeniden başlat</th><td>Kapanıp hemen yeniden açılır. Bilgisayar <b>yavaşladığında, donduğunda</b> ya da bir güncellemeden sonra.</td></tr></table>
+        <p>Menüde Kapat'ın yerine <b>Güncelleştir ve kapat</b> yazıyorsa bilgisayar güncelleme bekliyor demektir. Onu seçin; bilgisayar güncellemeyi yapıp kapanır.</p>
         <p>Şimdi üçünü de sırayla deneyeceğiz.</p>`,
       setup: (c) => c.d.closeMenus(),
     },
     {
       title: 'Uyku',
-      html: `<ol class="steps"><li>Başlat ⊞ → ⏻ → <b>Uyku</b>'ya tıklayın. Ekran kararacak.</li><li>Sonra <b>fareyi oynatın</b>: bilgisayar uyanır.</li><li>Kilidi açıp şifreyle (1234) yeniden girin.</li></ol>`,
+      html: `<ol class="steps"><li>Başlat ⊞ → ⏻ → <b>Uyku</b>'ya tıklayın. Ekran kararacak.</li><li>Sonra <b>fareyi oynatın</b>: bilgisayar uyanır.</li><li>Kilidi açıp şifreyle (1234) yeniden girin.</li></ol>
+        <p class="mut">Gerçek bilgisayarda fareyle uyanmazsa klavyede bir tuşa basın; dizüstüyse kapağı açın. Hâlâ uyanmazsa güç düğmesine <b>bir kez, kısaca</b> basın ve birkaç saniye bekleyin; art arda basmayın.</p>`,
       setup: desktopReady,
       on: (ev, c) => {
         if (ev.type === 'power' && ev.state === 'sleep') { c.s.sleep = true; c.note('Ekran karardı: bilgisayar uyuyor. Şimdi fareyi oynatın.'); }
@@ -147,7 +149,9 @@ export const ackapa = {
       title: 'Neden fişten çekilmez?',
       html: `<p>Bilgisayar kapanırken açık programlar, kaydetmek isteyip istemediğinizi sorar. Fişi çekerseniz bu soruya fırsat kalmaz:</p>
         <ul><li>Kaydedilmemiş yazılarınız <b>kaybolur</b>.</li><li>Güncelleme yarım kalırsa bilgisayar <b>bir daha açılmayabilir</b>.</li><li>Disk zarar görebilir.</li></ul>
-        <div class="box"><b>Bilgisayar tamamen donduysa?</b> Fare de klavye de çalışmıyorsa, kasadaki ⏻ düğmesini <b>5–10 saniye basılı tutun</b>. Bu son çaredir.</div>`,
+        <div class="box"><b>Bilgisayar donduysa, güç düğmesine basmadan önce:</b>
+          <ol class="steps"><li>Ekranda <b>“Güncelleştirmeler yükleniyor”</b>, “bilgisayarınızı kapatmayın” ya da dönen noktalar varsa bilgisayar <b>donmamıştır</b>, çalışıyordur. <b>Güç düğmesini asla basılı tutmayın</b>; önce birkaç dakika bekleyin. Bu 10–30 dakika sürebilir.</li><li>${K('Caps Lock')} tuşuna bir kez basın. Caps Lock'a her basışınızda ışık yanıp sönüyorsa (açılıp kapanıyorsa) bilgisayar çalışıyordur, biraz daha bekleyin. Işığı olmayan klavyede bu deneme olmaz.</li><li>Işık tepki vermiyorsa ve ekran 5 dakikadır hiç değişmiyorsa bilgisayar donmuştur. O zaman kasadaki ⏻ düğmesini <b>5–10 saniye basılı tutun</b>. Bu son çaredir.</li></ol>
+          <p>Tek bir program donduysa bilgisayarı kapatmanız gerekmez; 5. haftada Görev Yöneticisi ile o programı kapatmayı öğreneceğiz.</p></div>`,
     },
     {
       title: 'Şimdi gerçek bilgisayarınızda',
@@ -246,7 +250,8 @@ export const fare2 = {
       title: 'Çift tık nedir?',
       html: `<p>Sol tuşa <b>hızlıca iki kez</b> basmaya <b>çift tık</b> denir: <b>tık-tık</b>.</p><p>Simgeleri, dosyaları ve programları açmak için kullanılır.</p>
         <div class="box"><b>Püf noktası:</b> tıklarken fareyi oynatmayın. Yalnızca parmağınız hareket etsin. İki tıklama arasında beklemeyin.</div>
-        <p>Çift tık başta herkesi zorlar; acele etmeyin. Önce balon oyunuyla alıştırma yapalım.</p>`,
+        <p>Çift tık başta herkesi zorlar; acele etmeyin. Önce balon oyunuyla alıştırma yapalım.</p>
+        <div class="box"><b>Çift tık hâlâ zor geliyorsa:</b> simgeye <b>bir kez</b> tıklayın (seçilir), sonra klavyede ${K('Enter')} tuşuna basın. Çift tıkla aynı işi yapar. Çift tık hızını 5. haftada birlikte ayarlayacağız.</div>`,
     },
     {
       title: 'Balon oyunu: çift tık',
@@ -368,7 +373,8 @@ export const surukle = {
     {
       title: 'Sürükle-bırak nedir?',
       html: `<p>Bir şeyi tutup başka yere götürmeye <b>sürükle-bırak</b> denir:</p>
-        <ol class="steps big"><li>Fareyi nesnenin üzerine getirin.</li><li>Sol tuşa <b>basın ve basılı tutun</b>.</li><li>Parmağınızı kaldırmadan fareyi <b>kaydırın</b>.</li><li>Gideceği yere gelince tuşu <b>bırakın</b>.</li></ol>`,
+        <ol class="steps big"><li>Fareyi nesnenin üzerine getirin.</li><li>Sol tuşa <b>basın ve basılı tutun</b>.</li><li>Parmağınızı kaldırmadan fareyi <b>kaydırın</b>.</li><li>Gideceği yere gelince tuşu <b>bırakın</b>.</li></ol>
+        <p class="mut">Dizüstü bilgisayarda touchpad kullanıyorsanız ‘basılı tutma’ için touchpad dersindeki ‘Sürükleme ve seçme’ adımına bakın.</p>`,
     },
     {
       title: 'Simgeyi taşıyın',
@@ -600,7 +606,7 @@ export const parkur = {
       on: (ev) => ev.type === 'win-move' && ev.app === 'notepad' && Math.hypot(ev.dx, ev.dy) > 60,
     },
     {
-      title: '9. Kaydetmeden kapatın', html: '<p>Not Defteri\'ni <b>✕</b> ile kapatın. “Kaydetmek istiyor musunuz?” sorusuna <b>Kaydetme</b> deyin.</p>',
+      title: '9. Kaydetmeden kapatın', html: '<p>Not Defteri\'ni <b>✕</b> ile kapatın. “Kaydetmek istiyor musunuz?” sorusuna <b>Kaydetme</b> deyin.</p><p class="mut">(Bu derste yazdıklarımız deneme olduğu için Kaydetme diyoruz. Gerçek bir yazı yazdıysanız <b>Kaydet</b>\'e basın.)</p>',
       setup: (c) => c.d.ensure('notepad'),
       on: (ev) => ev.type === 'win-close' && ev.app === 'notepad',
     },

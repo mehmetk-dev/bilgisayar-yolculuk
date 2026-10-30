@@ -51,7 +51,7 @@ export const zip = {
       mouse: '🖱 İndirilenler → tatil fotoğrafları.zip (çift tık) → Tümünü ayıkla',
       hint: 'Dosyayı seçip üstteki sarı <b>🗜 Tümünü ayıkla</b> düğmesine de basabilirsiniz.',
       on: (ev) => ev.type === 'zip-extract',
-      done: 'Zip\'in içindeki dört fotoğraf <b>“tatil fotoğrafları”</b> adlı normal bir klasöre çıktı. Zip; e-postayla ya da internetten gelen, birçok dosyayı tek pakette taşıyan bir “koli”dir.',
+      done: 'Zip\'in içindeki dört fotoğraf <b>“tatil fotoğrafları”</b> adlı normal bir klasöre çıktı. Zip; e-postayla ya da internetten gelen, birçok dosyayı tek pakette taşıyan bir “koli”dir.<br><br>Gerçek bilgisayarda ayıklanan klasör, zip dosyasının yanında (İndirilenler\'de) aynı adla oluşur; dosyaları oradan açın. Zip\'in içindeki bir dosyaya çift tıklayıp doğrudan düzenlemeyin: değişiklikleriniz kaybolabilir. Önce Tümünü ayıklayın.',
     },
     {
       title: 'Klasörü sıkıştırın',
@@ -259,10 +259,10 @@ export const ozgecmis = {
     },
     {
       title: 'PDF olarak kaydedin',
-      html: '<p><b>Dosya → 📕 PDF olarak kaydet…</b> ile <b>Belgeler</b>\'e <b>özgeçmiş</b> adıyla kaydedin.</p>',
+      html: '<p><b>Dosya → 📕 PDF olarak kaydet…</b> ile <b>Belgeler</b>\'e <b>özgeçmiş</b> adıyla kaydedin.</p><p class="mut">Gerçek Word\'de: <b>Dosya → Farklı Kaydet</b>, sonra <b>Kayıt türü</b> listesinden <b>PDF</b>. Bir yol daha: Dosya → Dışarı Aktar → PDF/XPS Oluştur.</p>',
       mouse: '🖱 Dosya → PDF olarak kaydet',
       on: (ev) => ev.type === 'doc-pdf',
-      done: 'İş başvurularında özgeçmiş genellikle <b>PDF</b> gönderilir: her bilgisayarda aynı görünür, kolayca değiştirilemez.',
+      done: 'İş başvurularında özgeçmiş genellikle <b>PDF</b> gönderilir: her bilgisayarda aynı görünür, kolayca değiştirilemez. Word dosyanızı da saklayın: düzeltme gerekirse onu değiştirip yeniden PDF yaparsınız.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Şablondan belge hazırlamak:</p>' },
   ],

@@ -228,7 +228,8 @@ export const notdefteri = {
       title: 'Kaydettiğinizi açın: Ctrl + O',
       html: (c) => `<ol class="steps"><li>${K('Ctrl', 'O')} tuşlarına basın (ya da Dosya → Aç…).</li>
         <li>Not Defteri, “deneme” yazısını kaydetmek isteyip istemediğinizi soracak: <b>Kaydetme</b> deyin.</li>
-        <li>Açılan pencerede <b>${(c.L.saved || 'kaydettiğiniz dosya').replace(/\.txt$/i, '')}</b> dosyasına tıklayıp <b>Aç</b>'a basın.</li></ol>`,
+        <li>Açılan pencerede <b>${(c.L.saved || 'kaydettiğiniz dosya').replace(/\.txt$/i, '')}</b> dosyasına tıklayıp <b>Aç</b>'a basın.</li></ol>
+        <p class="mut">(Bu derste yazdığımız “deneme” olduğu için Kaydetme diyoruz. Gerçek bir yazı yazdıysanız <b>Kaydet</b>'e basın.)</p>`,
       combo: ['Ctrl', 'KeyO'],
       on: (ev, c) => {
         if (ev.type === 'ask' && ev.answer === 'discard') c.note('Şimdi listeden dosyanızı seçip <b>Aç</b>\'a tıklayın.');

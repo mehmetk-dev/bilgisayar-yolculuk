@@ -21,7 +21,11 @@ export const guvenlik = {
     ['Acele ettiren, korkutan mesaj', 'Durun, düşünün, kimseye hemen bilgi vermeyin'],
     ['Şifre, kart bilgisi, SMS kodu', 'Bankanız ve devlet kurumları ASLA telefonla ya da SMS ile istemez'],
     ['Garip bağlantılar', 'Mesajdaki bağlantıya tıklamayın; siteyi kendiniz açın'],
+    ['“Polisiz / savcıyız / bankadanız, paranızı aktarın”', 'Kapatın. Hiçbiri telefonla para istemez, “güvenli hesaba” yollatmaz. Bankanızı kartın arkasındaki numaradan kendiniz arayın; 155'],
+    ['“Şu programı kurun, ekranı paylaşın”', 'Kurmayın, paylaşmayın, gelen dosyayı açmayın. Kurduysanız interneti kesip bankayı arayın'],
     ['“Acil para lazım” diyen yakın', 'Önce bildiğiniz eski numarasından arayıp doğrulayın'],
+    ['“Kısa sürede çok kazanç” reklamı', 'Ünlü kişinin adıyla bile olsa yatırım vaadine para yatırmayın; bankanız ya da SPK izinli bir aracı kurum dışında kimseye para yatırmayın'],
+    ['“Hediye gönderdim, gümrükte kaldı”', 'Tanımadığınız birine vergi, harç ya da kargo parası göndermeyin'],
     ['Sahte virüs uyarısı', 'Numarayı aramayın; sekmeyi ya da tarayıcıyı kapatın'],
     ['Güçlü şifre', 'En az 12 karakter, harf + rakam + işaret; doğum yılı ve 1234 olmasın'],
   ],
@@ -59,10 +63,22 @@ export const guvenlik = {
       explain: 'Gelen kodu isteyen her arama dolandırıcılıktır; o kodla hesabınıza girerler. Telefonu kapatın, bankanızı <b>kartın arkasındaki numaradan</b> kendiniz arayın.',
     }),
     card({
+      title: 'Telefon araması: polis', kind: 'call', from: 'Görünen numara: bir emniyet numarası gibi',
+      text: '“Ben Ankara Emniyeti\'nden komiser. Adınıza bir soruşturma var, paranız tehlikede. Hepsini <b>bizim verdiğimiz güvenli hesaba</b> aktarın. <b>Kimseye söylemeyin, telefonu kapatmayın.</b>”',
+      correct: 'scam',
+      explain: 'Polis, savcı, banka ve devlet kurumları telefonda para istemez, “güvenli hesaba” da yollatmaz. “Kimseye söylemeyin” diyen kişi dolandırıcıdır. Ekranda görünen numara gerçek bir kurum numarası gibi olabilir, <b>görünene güvenmeyin</b>. Kapatın; bankanızı <b>kartın arkasındaki numaradan</b> kendiniz arayın, tehlike varsa 155\'i (jandarma bölgesinde 156) arayın. Bir yakınınıza da anlatın.',
+    }),
+    card({
+      title: 'Telefon araması: destek', kind: 'call', from: 'Bilinmeyen numara',
+      text: '“İşleminizi iptal edebilmem için size bir program göndereceğim. <b>Kurun ve ekranınızı benimle paylaşın</b>; ayrıca mesajla gelen dosyayı da açın.”',
+      correct: 'scam',
+      explain: 'AnyDesk, TeamViewer gibi programlar ekranınızı karşıdakine gösterir; banka uygulamanızdaki şifre ve kodlar onun eline geçer. Telefonla “yardım ediyorum” diyen birine program kurmayın, ekran paylaşmayın, gönderilen uygulama dosyasını (.apk) kurmayın. Kurduysanız interneti kesin, programı silin, bankayı arayın. Uygulamaları yalnızca telefonunuzun kendi mağazasından indirin.',
+    }),
+    card({
       title: 'Torundan mesaj', kind: 'sms', from: '+90 5XX XXX XX XX (kayıtlı değil)',
       text: `Babaanne benim Elif, ${clue('telefonum bozuldu, bu yeni numaram', 'Yeni numara bahanesi')}. ${clue('Çok acil', 'Acele')} 5.000 TL lazım, ${clue('şu hesaba atar mısın? Anneme söyleme', 'Gizlilik istiyor')}.`,
       correct: 'scam',
-      explain: 'Çok yaygın bir dolandırıcılık! Para göndermeden önce torununuzu <b>bildiğiniz eski numarasından</b> arayın ya da ailenize sorun.',
+      explain: 'Çok yaygın bir dolandırıcılık! Para göndermeden önce torununuzu <b>bildiğiniz eski numarasından</b> arayın ya da ailenize sorun. Bugün yakınınızın sesi ya da görüntüsü de taklit edilebilir; ailenizle bir <b>ortak gizli kelime</b> belirleyin, acil para isteyene bu kelimeyi sorun.',
     }),
     card({
       title: 'Fatura e-postası', kind: 'mail', from: 'Elektrik Dağıtım <fatura@…>', subject: 'Ekim ayı faturanız hazır',
@@ -89,10 +105,10 @@ export const guvenlik = {
     {
       title: 'Güçlü şifre',
       html: `<p>İyi bir şifre <b>uzun</b> olmalı ve <b>tahmin edilemez</b> olmalı.</p><ul class="big-list"><li>En az <b>12 karakter</b></li><li>Büyük + küçük harf, rakam, işaret</li><li>Doğum yılı, isim, 1234 <b>olmasın</b></li></ul>
-        <p>İpucu: üç kelimeyi birleştirin: <b>MaviBalık!Çay7</b></p><p>Yandaki kutuda bir şifre deneyin; çubuk <b>Güçlü</b> olana kadar.</p>`,
+        <p>İpucu: kolay hatırlanan uzun bir cümle ya da üç kelime: <b>MaviBalık!Çay7</b>. Her sitenin şifresi farklı olsun. En önemli şifreniz <b>e-posta</b> şifrenizdir: diğer sitelerin şifre yenileme kodları oraya gelir.</p><p>Yandaki kutuda bir şifre deneyin; çubuk <b>Güçlü</b> olana kadar.</p>`,
       scene: passwordMeter,
       on: (ev) => ev.type === 'pw' && ev.score >= 3,
-      done: 'Güçlü bir şifre! Her yerde aynı şifreyi kullanmayın; bir kâğıda yazacaksanız bilgisayarın yanında değil, güvenli bir yerde saklayın.',
+      done: 'Güçlü bir şifre! Her yerde aynı şifreyi kullanmayın. Kolay hatırlanan uzun bir cümle iyi şifredir. Kâğıda yazacaksanız evde güvenli bir yerde saklayın; bilgisayarın yanına ya da telefon kılıfına koymayın.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Altın kurallar:</p>', scene: (el) => { el.className = 'sc sc-info'; el.innerHTML = '<div class="sc-big">🛡</div><p><b>Dur · Düşün · Sor</b><br>Emin değilseniz bir yakınınıza danışın.</p>'; } },
   ],

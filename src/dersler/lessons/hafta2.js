@@ -168,6 +168,12 @@ export const klavye = {
       },
       done: 'Bir de ⊞ <b>Windows</b> tuşu var (Ctrl ile Alt arasında, pencere resimli). Başlat menüsünü açar; 5. haftada kullanacağız.',
     },
+    {
+      title: 'Alt sıradaki tuşlar',
+      html: `<p>Klavyenin en alt sırasında, boşluk çubuğunun solunda sırayla şunlar var: ${K('Ctrl')}, <b>⊞ Windows</b> (pencere işareti), ${K('Alt')}. Dizüstünde Ctrl'nin yanında bir de ${K('Fn')} olur. Boşluğun sağında ${K('AltGr')} vardır.</p>
+        <ul class="big-list"><li>${K('Ctrl')}: başka bir tuşla <b>birlikte</b> basılır (kopyala, kaydet gibi). Tek başına bir şey yapmaz.</li><li><b>⊞ Windows</b>: bir kez basın, Başlat menüsü açılır. Bir daha basın, kapanır.</li><li>${K('Alt')}: menü ve pencere kısayollarında kullanılır.</li></ul>
+        <p>Ctrl ve Shift'in solda da sağda da birer tane olduğunu fark edin; ikisi de aynı işi yapar.</p>`,
+    },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Klavyenin önemli tuşlarını öğrendiniz:</p>' },
   ],
 };

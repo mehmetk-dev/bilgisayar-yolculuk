@@ -101,7 +101,7 @@ export const yanYana = {
       html: '<p>İnternetteki bir tarifi Word\'e geçireceksiniz. En rahat yol hangisi?</p>',
       opts: ['Tarayıcıyı ve Word\'ü sürekli küçültüp büyütmek', 'Tarayıcıyı bir yarıya, Word\'ü öbür yarıya yaslamak', 'Tarifi önce kâğıda yazdırmak'], ok: 1,
       wrong: 'Bu yorucu ve yavaş. İkisini aynı anda görmenin yolu vardı.',
-      why: 'Doğru: ekranı ikiye bölünce ikisini birden görürsünüz; okumak ve yazmak aynı anda olur.',
+      why: 'Doğru: ekranı ikiye bölünce ikisini birden görürsünüz; okumak ve yazmak aynı anda olur. Tarifi kopyalayıp Word\'e yapıştırınca (Ctrl + V) yazı kendi renk ve yazı tipiyle gelebilir. Yapıştırdığınız yerdeki küçük (Ctrl) düğmesinden <b>Yalnızca Metni Koru</b>\'yu seçin.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Ekranı ikiye bölüp iki pencereyle birlikte çalışabiliyorsunuz:</p>' },
   ],

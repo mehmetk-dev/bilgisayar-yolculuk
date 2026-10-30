@@ -100,7 +100,7 @@ export const temalar = {
     },
     {
       title: 'Görev çubuğu',
-      html: '<p>Son olarak: Ayarlar → Kişiselleştirme\'nin en altında <b>Görev çubuğu simgelerini sola hizala</b>\'yı açın. Eski Windows\'a alışkın olanlar böyle sever.</p>',
+      html: '<p>Son olarak: Ayarlar → Kişiselleştirme\'nin en altında <b>Görev çubuğu simgelerini sola hizala</b>\'yı açın. Eski Windows\'a alışkın olanlar böyle sever.</p><p class="mut">Bu ayar yalnızca Windows 11\'de vardır; Windows 10\'da Başlat zaten sol alttadır.</p>',
       mouse: '🖱 Ayarlar → Kişiselleştirme → Görev çubuğu',
       setup: (c) => c.d.ensure('settings', { page: 'personal' }),
       check: (c) => !!S(c).taskbarLeft,

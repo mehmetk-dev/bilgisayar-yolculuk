@@ -86,6 +86,10 @@ export const slaytDuzen = {
       on: (ev) => ev.type === 'ppt-view' && ev.view === 'normal' && ev.open !== undefined,
       done: 'Sıralayıcı bakmak ve yerleştirmek için; asıl yazı işi Normal görünümde yapılır.',
     },
+    {
+      title: 'Fazlalığı silmek, atlamak',
+      html: `<ul class="big-list"><li><b>Gereksiz slayt:</b> soldaki listeden slayda tıklayın, ${K('Delete')} tuşuna basın (ya da sağ tık ve <b>Slaytı Sil</b>).</li><li><b>Slayt dursun ama gösteride atlansın:</b> sağ tık ve <b>Slaytı Gizle</b>.</li><li><b>Slayta yeni yazı yeri gerekirse</b> (örneğin Yalnızca başlık düzeninde): gerçek PowerPoint\'te <b>Ekle → Metin Kutusu</b>\'na tıklayın, slaytta bir yere tıklayıp yazın.</li><li><b>Düzen yanlışsa:</b> <b>Giriş → Düzen</b>\'den başka bir düzen seçin; yazılarınız silinmez.</li></ul>`,
+    },
     rehberSoru({
       title: 'Hangi yol?',
       html: '<p>Çok benzer iki slayt yapacaksınız; yalnızca başlık ve maddeler değişecek. En hızlı yol?</p>',
