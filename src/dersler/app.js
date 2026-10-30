@@ -185,6 +185,11 @@ function openLesson(l) {
   const stage = l.stage || 'notepad';
   document.body.dataset.view = 'lesson';
   document.body.dataset.stage = stage;
+  // Telefonda bir kez: dersler bilgisayar için yapıldı
+  if (matchMedia('(max-width: 640px)').matches && !sessionStorage.getItem('telNot')) {
+    $('#telNot').hidden = false;
+    $('#telNot button').onclick = () => { $('#telNot').hidden = true; sessionStorage.setItem('telNot', '1'); };
+  }
   document.body.classList.toggle('with-kb', stage === 'notepad' || !!l.keyboard);
   $('#crumb').textContent = l.title;
   $('#dots').innerHTML = l.steps.map((s, i) => `<button type="button" data-i="${i}" title="${esc(s.title)}"></button>`).join('');

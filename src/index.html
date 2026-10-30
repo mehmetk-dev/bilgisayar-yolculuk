@@ -219,6 +219,34 @@ body.comparing #lessonPanel { display: none !important; }
   :root { --fs: 16px; }
   #tools { width: 11.5em; }
 }
+#menuBtn { display: none; }
+/* Telefon: düğmeler ☰ Menü altında; bilgi ve ders panelleri alttan açılır */
+@media (max-width: 700px) {
+  :root { --fs: 15px; }
+  #top { flex-wrap: wrap; gap: 0.4em; padding: 0.4em 0.5em; }
+  .brand { font-size: 1.05em; }
+  #eraBadge, .spacer { display: none; }
+  #variantBox { order: 3; width: 100%; }
+  #menuBtn { display: inline-block; margin-left: auto; font-weight: 700; }
+  #top .topbtns, #tools { display: none; }
+  body.mmenu #top { background: var(--bg2); border-bottom: 2px solid var(--line); }
+  body.mmenu #top .topbtns { display: flex; order: 4; width: 100%; justify-content: flex-start; }
+  body.mmenu #tools { display: flex; top: calc(var(--toph, 6em) + 0.4em); bottom: auto; max-height: calc(100vh - var(--toph, 6em) - 1em); left: 0.5em; right: 0.5em; width: auto; z-index: 13; }
+  body.mmenu #tools .grp { font-size: 0.8em; }
+  #tools button { font-size: 0.95em; padding: 0.45em 0.6em; }
+  #bottom { gap: 0.45em; padding: 0.4em 0.4em 0.6em; }
+  #timeline { width: 100%; justify-content: space-between; }
+  #timeline .era { padding: 0.35em 0.5em; font-size: 0.92em; }
+  .slider { padding: 0.3em 0.8em; }
+  .slider input { width: 7em; }
+  #tourBtns button { padding: 0.4em 0.6em; }
+  #info { left: 0.5em; right: 0.5em; width: auto; top: auto; bottom: 0.5em; max-height: 48vh; z-index: 14; }
+  #lessonPanel, body.lessoning #lessonPanel { left: 0.5em; right: 0.5em; width: auto; top: auto; bottom: 0.5em; height: 50vh; }
+  body.lessoning #bottom { display: none; }
+  #legend, #featureMenu, body.lessoning #legend, body.lessoning #featureMenu { left: 0.5em; right: 0.5em; width: auto; top: 3.4em; }
+  #quizBar { bottom: 9.5em; }
+  .qq { font-size: 1.1em; }
+}
 </style>
 </head>
 <body>
@@ -230,6 +258,7 @@ body.comparing #lessonPanel { display: none !important; }
   <div id="eraBadge"></div>
   <div id="variantBox"></div>
   <div class="spacer"></div>
+  <button id="menuBtn" aria-expanded="false" aria-controls="tools">☰ Menü</button>
   <div class="topbtns">
     <button id="lessonsBtn" title="Adım adım bilgisayar dersleri" onclick="location.href='index.html'">📝 Derslere dön</button>
     <button id="lessonTop" data-lesson title="Adım adım donanım dersi (sınıfta anlatmak için)">🎓 Donanım dersi</button>

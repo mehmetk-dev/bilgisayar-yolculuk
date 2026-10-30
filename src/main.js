@@ -95,13 +95,19 @@ function resize() {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   const dx = w > 900 ? Math.round(($('#tools')?.offsetWidth || 0) / 2) : 0;
-  camera.setViewOffset(w, h, -dx, 0, w, h);
+  // Telefonda ders/bilgi paneli alttan açılır: model ekranın üst yarısına kayar
+  const dy = w <= 700 && (document.body.classList.contains('lessoning') || $('#info').classList.contains('open')) ? Math.round(h * 0.22) : 0;
+  camera.setViewOffset(w, h, -dx, dy, w, h);
   camera.updateProjectionMatrix();
   cmpCam.aspect = w / h;
   cmpCam.setViewOffset(w, h, 0, -Math.round(h * 0.17), w, h);
   cmpCam.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
+// panel açılıp kapanınca telefonda kamera kayması güncellensin
+{ const mo = new MutationObserver(() => { if (window.innerWidth <= 700) resize(); });
+  mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  mo.observe($('#info'), { attributes: true, attributeFilter: ['class'] }); }
 
 // ================================================================ Tween
 const tweens = [];
@@ -315,6 +321,12 @@ function updateLabels() {
   const tb = (L.on ? lessonPanel : $('#tools')).getBoundingClientRect(), top = $('#top').getBoundingClientRect(), bot = $('#bottom').getBoundingClientRect();
   const ir = info.classList.contains('open') ? info.getBoundingClientRect() : null;
   const safe = { l: S.compare ? 8 : tb.right + 8, t: S.compare ? 70 : top.bottom + 2, r: ir ? ir.left - 8 : W - 8, b: S.compare ? H * 0.5 : bot.top - 4 };
+  if (W <= 700 && !S.compare) { // telefon: paneller altta, menü üstte
+    safe.l = 8; safe.r = W - 8;
+    const sheet = ir || (L.on ? lessonPanel.getBoundingClientRect() : null);
+    if (sheet) safe.b = sheet.top - 4;
+    if (document.body.classList.contains('mmenu')) safe.b = 0;
+  }
   for (const it of items) {
     const el = it.L.el;
     if (it.x < safe.l || it.x > safe.r || it.y > safe.b || it.y < safe.t + 20) { el.style.display = 'none'; continue; }
@@ -888,6 +900,16 @@ function bindUI() {
   $('#fontDown').onclick = () => setFont(-1);
   $$('[data-lesson]').forEach((b) => b.onclick = () => (L.on ? lessonClose() : lessonOpen()));
   $('#helpBtn').onclick = () => $('#help').classList.toggle('open');
+  // Telefon menüsü: üst düğmeler ve sol araçlar ☰ Menü altında; bir düğmeye basınca kapanır
+  const setMenu = (on) => {
+    document.body.classList.toggle('mmenu', on);
+    $('#menuBtn').setAttribute('aria-expanded', on);
+    $('#menuBtn').textContent = on ? '✕ Kapat' : '☰ Menü';
+    document.documentElement.style.setProperty('--toph', $('#top').offsetHeight + 'px');
+  };
+  $('#menuBtn').onclick = () => setMenu(!document.body.classList.contains('mmenu'));
+  ['#tools', '#top .topbtns'].forEach((q) => $(q).addEventListener('click', (e) => { if (e.target.closest('button') && innerWidth <= 700) setMenu(false); }));
+  canvas.addEventListener('pointerdown', () => { if (document.body.classList.contains('mmenu')) setMenu(false); });
   $('#help').onclick = () => $('#help').classList.remove('open');
 
   // tıklama / seçme

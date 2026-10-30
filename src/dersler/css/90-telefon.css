@@ -1,0 +1,21 @@
+/* Telefon: anlatım üstte kısa bir kutu, alıştırma bilgisayarı altta kalan bütün alanı kullanır.
+   Sayfa kaymaz; anlatım uzunsa yalnızca kendi kutusu kayar. */
+@media (max-width: 640px) {
+  #lesson { display: flex; flex-direction: column; overflow: hidden; padding: 0.5em; gap: 0.5em; }
+  #guide { flex: 0 1 auto; max-height: 42vh; overflow-y: auto; padding: 0.7em 0.8em; gap: 0.45em; }
+  #stepTitle { font-size: 1.2em; }
+  #dots { display: none; }
+  #work { flex: 1 1 0; min-height: 12em; gap: 0.5em; }
+  body[data-stage="scene"] #scene { overflow-y: auto; }
+  .np-win { min-height: 0; }
+  .kbwrap { display: none; }
+  #pano { max-width: none; flex-basis: auto; }
+  .keys { font-size: 1.2em; flex-wrap: wrap; }
+  #next, #manual { width: 100%; }
+  /* ders açıkken üst çubuk tek satır: Ses ve Özet ana sayfada kalır */
+  body[data-view="lesson"] #soundBtn, body[data-view="lesson"] #top a[href="#ozet"] { display: none; }
+  body[data-view="lesson"] #top { padding: 0.4em 0.6em; row-gap: 0.2em; }
+}
+#telNot { position: fixed; left: 0.6em; right: 0.6em; bottom: 0.6em; z-index: 9999; background: #0b3c7a; color: #fff; border-radius: 14px; padding: 0.8em 1em; box-shadow: 0 8px 24px #0005; display: flex; flex-direction: column; gap: 0.6em; font-size: 0.95em; }
+#telNot[hidden] { display: none; }
+#telNot button { align-self: flex-end; background: #fff; color: #0b3c7a; border: 0; border-radius: 10px; font-weight: 800; padding: 0.4em 1.2em; }
