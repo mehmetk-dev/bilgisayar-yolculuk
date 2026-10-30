@@ -432,8 +432,9 @@ export function renderGrid(el, step, done, prev, where = {}) {
     }
     const b = { id: newId(), c };
     if (c === 'loop') Object.assign(b, { n: step.loopN || 3, body: [] });
-    // wrap: programda hazır bloklar varken 🔁'ya basınca hepsi yeni döngünün içine sarılır
-    const wrapped = c === 'loop' && step.wrap && caret.list === prog && prog.length > 0;
+    // wrap: programda birden çok hazır blok varken 🔁'ya basınca hepsi yeni döngünün içine sarılır
+    // (imleç nerede olursa olsun; sarıldıktan sonra program tek blok olur, 🔁 yine normal çalışır)
+    const wrapped = c === 'loop' && step.wrap && prog.length > 1;
     if (wrapped) { b.body = prog.splice(0); caret = { list: prog, i: 0 }; }
     if (c === 'if' || c === 'until' || c === 'ife') {
       b.cond = c === 'until' ? (conds.includes('goal') ? 'goal' : conds[0]) : (step.ifCond || conds[0]);
