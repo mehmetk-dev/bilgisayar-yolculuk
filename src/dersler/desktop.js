@@ -57,6 +57,8 @@ const CELL_W = 6.2, CELL_H = 5.7; // em
 const PINNED = ['explorer', 'browser'];
 
 import { KB, mapKey } from './keymap.js';
+// Dokunmatik ekranda (dokunmatik.js body'ye 'touch' koyar) yazı kutuları kendiliğinden seçilmez
+const touchOnly = () => document.body.classList.contains('touch');
 
 const DEFAULT_SETTINGS = () => ({
   wallpaper: 'mavi', customWall: null, volume: 50, muted: false, brightness: 100, wifi: true, network: 'EvAğı',
@@ -1046,6 +1048,12 @@ export class Desktop {
       if (e.key === 'Enter') { const a = match(input.value)[0]; if (input.value.trim() && a) { this.closeMenus(); this.emit('start-open', { app: a, via: 'search' }); this.open(a); } }
       if (e.key === 'Escape') this.closeMenus();
     });
+    // Dokunmatikte odak menünün kendisindedir: Esc yine kapatsın, yazılan harf aramaya gitsin
+    el.onkeydown = (e) => {
+      if (e.target !== el) return;
+      if (e.key === 'Escape') this.closeMenus();
+      else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) input.focus({ preventScroll: true });
+    };
     el.addEventListener('click', (e) => {
       const b = e.target.closest('[data-app]');
       if (b) { this.closeMenus(); this.emit('start-open', { app: b.dataset.app, via: 'click' }); this.open(b.dataset.app); return; }
@@ -1057,8 +1065,11 @@ export class Desktop {
           (cmd) => { this.startEl.hidden = true; if (cmd === 'lock') this.lockScreen('start'); else this.open('settings', { page: 'accounts' }); }, 'startuser');
       }
     });
-    // Windows'ta olduğu gibi Başlat açıkken doğrudan yazmaya başlamak arama yapar
-    setTimeout(() => input.focus({ preventScroll: true }), focusSearch ? 0 : 30);
+    // Windows'ta olduğu gibi Başlat açıkken doğrudan yazmaya başlamak arama yapar.
+    // Dokunmatik ekranda ise kutu kendiliğinden seçilmez: yoksa her açılışta telefon klavyesi ekranı kaplar.
+    if (touchOnly()) el.tabIndex = -1;
+    const focusEl = touchOnly() && !focusSearch ? el : input;
+    setTimeout(() => focusEl.focus({ preventScroll: true }), focusSearch ? 0 : 30);
   }
 
   powerMenu(btn) {
@@ -1200,7 +1211,7 @@ export class Desktop {
     const n = this.wins.length;
     const win = {
       id: 'w' + this.seq++, app, title: def.name, icon: def.icon, vd: this.vd,
-      x: Math.round((W - w) / 2 + (n % 5) * 24 - 40), y: Math.max(6, Math.round((H - h) / 2 + (n % 5) * 22 - 30)), w, h, min: false, max: !!def.max, args,
+      x: Math.round((W - w) / 2 + (n % 5) * 24 - 40), y: Math.max(6, Math.round((H - h) / 2 + (n % 5) * 22 - 30)), w, h, min: false, max: !!def.max || W < 600, args, // dar ekranda (telefon) pencereler tam ekran açılır
     };
     win.x = Math.max(4, Math.min(win.x, W - w - 4));
     const el = document.createElement('div');
@@ -1458,7 +1469,7 @@ export class Desktop {
     if (this.dialogs.busy || this.snipping) return;
     if (this.power === 'login') { this.overEl.querySelector('input')?.focus({ preventScroll: true }); return; }
     if (this.power !== 'desktop') { this.overEl.focus({ preventScroll: true }); return; }
-    if (!this.startEl.hidden) { this.startEl.querySelector('.st-search')?.focus({ preventScroll: true }); return; }
+    if (!this.startEl.hidden) { (touchOnly() ? this.startEl : this.startEl.querySelector('.st-search'))?.focus({ preventScroll: true }); return; }
     if (this.active && !this.active.min) this.active.api?.focus?.();
     else this.iconsEl.focus({ preventScroll: true });
   }

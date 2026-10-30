@@ -55,6 +55,13 @@ function chime() {
 // ---- Sahneler ----
 const kb = new Keyboard($('#kb'));
 const touch = setupTouch({ bar: $('#tbar'), keyLabel, work: $('#work') });
+// Telefonda anlatım kutusu küçültülebilir: yalnızca başlık, tuş ve düğmeler kalır, alıştırma bilgisayarı büyür
+function setMini(on) {
+  document.body.classList.toggle('gmini', on);
+  $('#gmini').textContent = on ? '▾ Anlatımı göster' : '▴ Anlatımı küçült';
+  $('#gmini').setAttribute('aria-expanded', !on);
+}
+$('#gmini').onclick = () => setMini(!document.body.classList.contains('gmini'));
 const npDialogs = new Dialogs($('#work'), (ev) => onEvent(ev));
 const np = new Notepad($('#np'), onEvent, { dialogs: npDialogs, global: true });
 np.active = false;
@@ -187,6 +194,7 @@ function openLesson(l) {
   const stage = l.stage || 'notepad';
   document.body.dataset.view = 'lesson';
   document.body.dataset.stage = stage;
+  setMini(false);
   // Telefonda bir kez: dersler bilgisayar için yapıldı
   if (matchMedia('(max-width: 640px)').matches && !sessionStorage.getItem('telNot')) {
     $('#telNot').hidden = false;

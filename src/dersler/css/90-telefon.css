@@ -13,6 +13,13 @@
   #pano { max-width: none; flex-basis: auto; }
   .keys { font-size: 1.2em; flex-wrap: wrap; }
   #next, #manual { width: 100%; }
+  #guide #gmini { display: block; align-self: flex-end; margin: -0.3em -0.2em -0.2em 0; padding: 0.25em 0.7em; font-size: 0.8em; font-weight: 700; border-radius: 999px; }
+  body.gmini #guide { height: auto; max-height: 34vh; }
+  body.gmini #stepBody, body.gmini .prog, body.gmini #hint, body.gmini #kbAlerts { display: none; }
+  /* Word, Excel, sunu…: şerit dar ekranda birkaç satır olur; pencerenin içi aşağı kayar,
+     hücreler ve sayfa en az belli bir boyda kalır */
+  .win-body.xl, .win-body.wd, .win-body.pp, .win-body.pt, .win-body.pm, .win-body.br { overflow-y: auto; }
+  .xl-wrap, .wd-scroll, .pp-main { min-height: 15em; }
   /* ders açıkken üst çubuk tek satır: Ses ve Özet ana sayfada kalır */
   body[data-view="lesson"] #soundBtn, body[data-view="lesson"] #top a[href="#ozet"] { display: none; }
   body[data-view="lesson"] #top { padding: 0.35em 0.5em; row-gap: 0.15em; gap: 0.3em; }
@@ -25,7 +32,7 @@
 #telNot button { align-self: flex-end; background: #fff; color: #0b3c7a; border: 0; border-radius: 10px; font-weight: 800; padding: 0.4em 1.2em; }
 
 /* Dokunmatik tuş şeridi (dokunmatik.js): yalnızca dokunmatik ekranda, ders açıkken */
-#tbar { display: none; }
+#tbar, #gmini { display: none; }
 body.touch[data-view="lesson"] #tbar { display: flex; gap: 0.35em; overflow-x: auto; padding: 0.35em 0.2em; flex: none; grid-column: 1 / -1; scrollbar-width: none; position: relative; }
 #tbar .tk { flex: none; min-width: 2.9em; min-height: 2.6em; padding: 0.3em 0.6em; border: 2px solid var(--line); border-radius: 10px; background: #fff; font-weight: 700; font-size: 0.9em; color: var(--fg); touch-action: manipulation; }
 #tbar .tk.want { background: #fff3c4; border-color: #d9a400; }
@@ -38,3 +45,4 @@ body.touch .dk-screen, body.touch .win-bar, body.touch .win-grip, body.touch [da
 body.touch[data-view="lesson"] #tbar { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
 body.touch[data-view="lesson"] #tbar.end { -webkit-mask-image: none; mask-image: none; }
 body.touch #lesson { grid-template-rows: minmax(0, 1fr) auto; }
+#tbar .tk.let { min-width: 2.4em; padding: 0.3em 0.4em; background: #eef4ff; }

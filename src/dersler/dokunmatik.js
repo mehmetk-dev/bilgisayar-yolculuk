@@ -100,6 +100,7 @@ export function setupTouch({ bar, keyLabel, work }) {
       else if (code === 'KeyZ' && ed) document.execCommand(m.shiftKey ? 'redo' : 'undo');
       else if (code === 'KeyY' && ed) document.execCommand('redo');
       else if (textField(el) && /^(ArrowLeft|ArrowRight|Home|End)$/.test(code)) caret(el, code, m.shiftKey, true);
+      else if (el.isContentEditable) move(code, m.shiftKey, true);
       return;
     }
     if (m.metaKey || (m.altKey && !m.ctrlKey)) return;
@@ -117,6 +118,16 @@ export function setupTouch({ bar, keyLabel, work }) {
     else if (code === 'Delete') document.execCommand('forwardDelete');
     else if (code === 'Tab') moveFocus(el, m.shiftKey ? -1 : 1);
     else if (textField(el) && /^(ArrowLeft|ArrowRight|Home|End)$/.test(code)) caret(el, code, m.shiftKey);
+    else if (el.isContentEditable) move(code, m.shiftKey, false);
+  }
+
+  // Word sayfası gibi düzenlenebilir alanlarda imleç: Shift ile seçerek, Ctrl ile kelime kelime / belgenin başı-sonu
+  function move(code, shift, ctrl) {
+    const how = { ArrowLeft: ['backward', ctrl ? 'word' : 'character'], ArrowRight: ['forward', ctrl ? 'word' : 'character'], ArrowUp: ['backward', 'line'], ArrowDown: ['forward', 'line'],
+      Home: ['backward', ctrl ? 'documentboundary' : 'lineboundary'], End: ['forward', ctrl ? 'documentboundary' : 'lineboundary'] }[code];
+    if (!how) return;
+    getSelection().modify?.(shift ? 'extend' : 'move', ...how);
+    document.dispatchEvent(new Event('selectionchange'));
   }
 
   // execCommand ile yazılınca input olayı "insertText" der; gerçek klavyedeki türü (yapıştırma, yeni satır) taşısın
@@ -193,6 +204,28 @@ export function setupTouch({ bar, keyLabel, work }) {
     }
   }, true);
 
+  // ---- Basılı Ctrl/Shift/Alt ile dokunmak: Shift + tık (aralık seçme), Ctrl + tık (birden çok seçme) ----
+  const MOUSE = ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click', 'dblclick'];
+  for (const type of MOUSE) addEventListener(type, (e) => {
+    if (!e.isTrusted || mouse || !work.contains(e.target) || !(mods.ctrlKey || mods.shiftKey || mods.altKey)) return;
+    e.stopImmediatePropagation();
+    if (type !== 'pointerdown' && type !== 'pointerup') e.preventDefault();
+    const init = { bubbles: true, cancelable: true, composed: true, view: window, clientX: e.clientX, clientY: e.clientY, button: e.button, buttons: e.buttons, detail: e.detail, ...mods };
+    e.target.dispatchEvent(type.startsWith('pointer') ? new PointerEvent(type, { ...init, pointerType: 'mouse', isPrimary: true, pointerId: 1 }) : new MouseEvent(type, init));
+    if (type === 'click') { mods.ctrlKey = mods.shiftKey = mods.altKey = false; render(); }
+  }, true);
+
+  // ---- Şeritte Ctrl/Alt basılıyken telefon klavyesinden yazılan harf kısayol olur (Ctrl + R gibi) ----
+  const CODE_OF = { ...Object.fromEntries(Object.entries(TRQ).map(([c, ch]) => [ch, c])), i: 'KeyI' }; // i de ı da I tuşu sayılır
+  addEventListener('beforeinput', (e) => {
+    if (!(mods.ctrlKey || mods.altKey) || e.inputType !== 'insertText' || e.data?.length !== 1) return;
+    const ch = e.data.toLocaleLowerCase('tr');
+    const code = CODE_OF[ch] || (/^[a-z]$/.test(ch) ? 'Key' + ch.toUpperCase() : /^\d$/.test(ch) ? 'Digit' + ch : null);
+    if (!code) return;
+    e.preventDefault();
+    press([code]);
+  }, true);
+
   // ---- Şerit ----
   let wanted = [], singles = [], singleMods = [];
   function render() {
@@ -206,6 +239,8 @@ export function setupTouch({ bar, keyLabel, work }) {
     // Tek başına istenen Ctrl/Shift/Alt basılı tutulacak tuştur: o düğme sarı yanar
     const wantMod = new Set(singleMods.map((k) => MODS[k]));
     for (const [p, l] of [['ctrlKey', 'Ctrl'], ['shiftKey', '⇧ Shift'], ['altKey', 'Alt']]) parts.push(btn(`data-mod="${p}"`, l, (mods[p] ? 'on ' : '') + (wantMod.has(p) ? 'want' : '')));
+    // Ctrl/Alt basılıyken harfler de çıkar (Ctrl + R gibi adımın istemediği kısayollar için)
+    if (mods.ctrlKey || mods.altKey) for (const ch of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') parts.push(btn(`data-combo="Key${ch}"`, ch, 'let'));
     for (const [c, l] of FIXED) parts.push(btn(`data-combo="${c}"`, l));
     bar.innerHTML = parts.join('');
     const hint = mouse === 'right' ? 'Şimdi sağ tıklanacak yere dokunun' : mouse === 'double' ? 'Şimdi çift tıklanacak yere dokunun' : '';

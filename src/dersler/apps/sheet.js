@@ -1271,8 +1271,12 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     e.preventDefault();
     if (editing) commit();
     const p = parseAddr(cell.dataset.a);
+    // Dokunmatik ekranda seçili hücreye bir kez daha dokunmak yazmayı başlatır (telefon klavyesi açılır)
+    const again = document.body.classList.contains('touch') && !e.shiftKey && !e.ctrlKey && p.r === act.r && p.c === act.c && sel().r1 === sel().r2 && sel().c1 === sel().c2;
     select(p.r, p.c, e.shiftKey);
     dragging = true;
+    // içindekinin tamamı seçili gelir: yazılan yenisi eskisinin yerine geçer (bilgisayarda hücreyi seçip yazmak gibi)
+    if (again) { dragging = false; startEdit(null, false); editing?.input.select(); return; }
     wrap.focus({ preventScroll: true });
   });
   wrap.addEventListener('mouseover', (e) => {
