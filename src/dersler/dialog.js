@@ -112,7 +112,8 @@ export class Dialogs {
 
     const err = (t) => { $('.dlg-err').textContent = t; input.focus(); };
     const ok = () => {
-      let n = input.value.trim();
+      // Windows gibi: adın sonundaki nokta ve boşluklar atılır (“sayfam.html.” → “sayfam.html”)
+      let n = input.value.trim().replace(/[.\s]+$/, '');
       if (!n || n === ext || n === '*' + ext) return err('Lütfen “Dosya adı” kutusuna bir ad yazın.');
       if (BAD_CHARS.test(n)) return err('Dosya adında şu işaretler olamaz:  \\ / : * ? " < > |');
       if (typeSel) {

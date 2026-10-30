@@ -18,7 +18,7 @@ export const paint = {
   steps: [
     {
       title: 'Paint nedir?',
-      html: '<p><b>Paint</b>, Windows\'la birlikte gelen basit bir çizim programıdır. Resim çizmek, fotoğrafa yazı eklemek, ekran görüntüsünü düzenlemek için kullanılır.</p>',
+      html: '<p><b>Paint</b>, Windows\'la birlikte gelen basit bir çizim programıdır. Resim çizmek, fotoğrafa yazı eklemek, ekran görüntüsünü düzenlemek için kullanılır.</p><p>Bu derste araçları tek tek öğrenirken adım adım <b>saksıda bir çiçek</b> çizeceğiz:</p><div class="sc-big" style="text-align:center">🌷 ➜ 🪴</div>',
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     {
@@ -28,19 +28,23 @@ export const paint = {
       on: (ev) => ev.type === 'app-open' && ev.app === 'paint',
     },
     {
-      title: 'Kalemle çizin',
-      html: '<p>Kalem seçili. Beyaz alanda sol tuşu <b>basılı tutup</b> fareyi gezdirin: bir ev, bir güneş, ne isterseniz.</p>',
+      title: 'Kalemle sap çizin',
+      html: '<p>Kalem seçili. Üstteki renklerden <b>yeşile</b> tıklayın. Sonra tuvalin <b>ortasında</b>, sol tuşu <b>basılı tutarak</b> yukarıdan aşağıya uzun bir çizgi çizin: bu, çiçeğin <b>sapı</b>.</p>',
+      hint: 'Tuvalin üst yarısının ortasından başlayın, aşağıya doğru çekin; altta saksıya yer kalsın.',
       mouse: '🖱 Bas, tut, çiz',
       setup: paintOpen,
       on: (ev, c) => {
-        if (ev.type === 'paint-draw') { c.s.len = (c.s.len || 0) + ev.len; if (c.s.len < 150) c.note('Güzel, biraz daha çizin.'); }
+        if (ev.type === 'paint-draw') {
+          if (ev.colorName !== 'Yeşil') c.note('Bu çizgi yeşil olmadı. Önce üstteki yeşil renge tıklayın, sonra sapı çizin.');
+          else if ((c.s.len = (c.s.len || 0) + ev.len) < 150) c.note('Güzel, biraz daha uzatın.');
+        }
         return (c.s.len || 0) >= 150;
       },
-      done: 'İlk çiziminiz!',
+      done: 'Sap hazır. Kalemle çizmek bu kadar: basılı tut, gezdir, bırak.',
     },
     {
-      title: 'Renk değiştirin',
-      html: '<p>Üstteki renklerden <b>kırmızıya</b> tıklayın, sonra çizin.</p>',
+      title: 'Çiçeği çizin',
+      html: '<p>Şimdi <b>kırmızıya</b> tıklayın. Sapın <b>tepesine</b>, küçük yuvarlaklar çizerek çiçeğin yapraklarını yapın (papatya gibi, ortanın çevresinde 5-6 yuvarlak).</p>',
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-color') c.note(`Seçili renk: <b>${ev.colorName}</b>`);
@@ -49,8 +53,9 @@ export const paint = {
       },
     },
     {
-      title: 'Fırça ve kalınlık',
-      html: '<p><b>🖌 Fırça</b>\'yı seçin, kalınlıktan <b>Kalın</b>\'ı seçin ve çizin.</p>',
+      title: 'Fırça ile yapraklar',
+      html: '<p><b>🖌 Fırça</b>\'yı seçin, kalınlıktan <b>Kalın</b>\'ı seçin, rengi yeniden <b>yeşil</b> yapın. Sapın iki yanına birer <b>yaprak</b> çizin.</p>',
+      hint: 'Yaprak için sapın ortasından yana doğru kısa, kalın bir çizgi yeter.',
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-draw' && ev.tool === 'brush' && ev.size < 14) c.note('Fırça oldu; şimdi <b>Kalın</b>\'ı da seçip tekrar çizin.');
@@ -58,25 +63,25 @@ export const paint = {
       },
     },
     {
-      title: 'Dikdörtgen çizin',
-      html: '<p><b>▭ Dikdörtgen</b>\'i seçin. Bir köşeden başlayıp sol tuşu basılı tutarak <b>çapraz</b> sürükleyin, bırakın.</p>',
+      title: 'Dikdörtgenle saksı',
+      html: '<p>Rengi <b>kahverengi</b> yapın ve <b>▭ Dikdörtgen</b>\'i seçin. Sapın <b>alt ucuna</b> bir saksı çizin: saksının sol üst köşesinden başlayıp sol tuşu basılı tutarak sağ alta doğru <b>çapraz</b> sürükleyin, bırakın.</p>',
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-shape' && ev.shape === 'rect',
-      done: 'Elips ve çizgi de aynı şekilde çizilir.',
+      done: 'Saksı yerinde. ◯ Elips ve ╱ Çizgi de aynı şekilde, çapraz sürükleyerek çizilir.',
     },
     {
-      title: 'İçini doldurun',
-      html: '<p><b>🪣 Doldur</b>\'u seçin, <b>sarı</b> renge tıklayın, sonra dikdörtgenin <b>içine</b> tıklayın.</p>',
+      title: 'Saksıyı boyayın',
+      html: '<p><b>🪣 Doldur</b>\'u seçin, <b>turuncu</b> renge tıklayın, sonra saksının <b>içine</b> tıklayın.</p>',
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-fill' && ev.pixels > 200000) c.note('Bütün sayfa boyandı: dikdörtgenin <b>dışına</b> tıkladınız. Ctrl + Z ile geri alıp içine tıklayın.');
         return ev.type === 'paint-fill' && ev.pixels <= 200000;
       },
-      done: 'Doldurma, kenarları kapalı bir alanın içini boyar.',
+      done: 'Doldurma, kenarları kapalı bir alanın içini boyar. Çiçeğin ortasını da sarıya boyayabilirsiniz.',
     },
     {
       title: 'Geri alın: Ctrl + Z',
-      html: `<p>Bir hata mı yaptınız? ${K('Ctrl', 'Z')} son yaptığınızı geri alır. Deneyin.</p>`,
+      html: `<p>Bir hata mı yaptınız? ${K('Ctrl', 'Z')} son yaptığınızı geri alır. Deneyin: son yaptığınız şey geri gider. İsterseniz sonra yeniden yaparsınız.</p>`,
       combo: ['Ctrl', 'KeyZ'],
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-undo',
@@ -84,19 +89,19 @@ export const paint = {
     },
     {
       title: 'Yazı ekleyin',
-      html: `<p><b>A Metin</b> aracını seçin, resmin bir yerine tıklayın, adınızı yazıp ${K('Enter')}'a basın.</p>`,
+      html: `<p><b>A Metin</b> aracını seçin, saksının <b>altına</b> tıklayın, adınızı yazıp ${K('Enter')}'a basın. Resminizin imzası olsun.</p>`,
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-text',
     },
     {
       title: 'Silgi',
-      html: '<p><b>🧽 Silgi</b>\'yi seçin ve resmin bir yerini silin.</p>',
+      html: '<p><b>🧽 Silgi</b>\'yi seçin. Taşan bir çizgi ya da beğenmediğiniz bir yer varsa silin (yoksa boş bir köşede deneyin).</p>',
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-draw' && ev.tool === 'eraser',
     },
     {
       title: 'Kaydedin',
-      html: `<ol class="steps"><li>${K('Ctrl', 'S')}'ye basın (ya da 💾).</li><li><b>Resimler</b> klasörü seçili; dosya adına <b>ilk resmim</b> yazın.</li><li><b>Kaydet</b>'e tıklayın.</li></ol>`,
+      html: `<ol class="steps"><li>${K('Ctrl', 'S')}'ye basın (ya da 💾).</li><li><b>Resimler</b> klasörü seçili; dosya adına <b>çiçeğim</b> yazın.</li><li><b>Kaydet</b>'e tıklayın.</li></ol>`,
       combo: ['Ctrl', 'KeyS'],
       setup: paintOpen,
       on: (ev, c) => { if (ev.type === 'save' && ev.app === 'paint') { c.L.pic = ev.name; return true; } return false; },
@@ -107,7 +112,7 @@ export const paint = {
       html: '<p>Paint\'i kapatın. Dosya Gezgini\'ni (📁) açıp <b>Resimler</b>\'e gidin. Resminize <b>sağ tıklayın</b> → <b>Masaüstü arka planı olarak ayarla</b>.</p>',
       mouse: '🖱 Resme sağ tık',
       on: (ev) => ev.type === 'wallpaper' && ev.custom,
-      done: 'Masaüstünüzde artık kendi resminiz var!',
+      done: 'Masaüstünüzde artık kendi çiçeğiniz var!',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Paint ile resim yapmayı öğrendiniz.</p>' },
   ],

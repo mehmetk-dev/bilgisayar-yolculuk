@@ -45,17 +45,45 @@ export const yaziSorun = {
     {
       title: 'Harfler yutuluyor',
       html: `<p>Not Defteri'ne bir yazı koyduk: <b>Yarın pazar.</b> İmleç en başta.</p>
-        <p>Yazının <b>başına</b> şunu ekleyin: <b>Dikkat: </b> (iki noktadan sonra boşluk). Yazının sonu <b>Dikkat: Yarın pazar.</b> olmalı.</p>
-        <p>Dikkat edin: yazıyı ekleyince ne oluyor? Sonra sorunu çözün. Klavyenizde <b>Insert</b> tuşu yoksa alttaki <b>“Üzerine yaz (INS)”</b> yazısına tıklayın.</p>`,
-      hint: `Sağ alttaki durum çubuğunda <b>“Üzerine yaz (INS)”</b> yazıyor. ${K('Insert')} tuşu harfleri yutturur. Bir kez ${K('Insert')}'e basarak kapatın, ${K('Ctrl', 'A')} ile hepsini seçip yazıyı baştan yazın. Klavyenizde Insert yoksa alttaki <b>“Üzerine yaz (INS)”</b> yazısına tıklayın.`,
+        <p>Yazının <b>başına</b> şunu yazın: <b>Dikkat: </b> (iki noktadan sonra bir boşluk). Yazarken yazıya <b>dikkatle bakın</b>: ne oluyor?</p>`,
+      hint: 'İmleç yazının en başında duruyor; hiçbir yere tıklamadan yazmaya başlayın.',
       setup: (c) => {
         c.np.setText('Yarın pazar.');
         c.np.setOverwrite(true);
+        c.np.ta.focus();
         c.np.ta.setSelectionRange(0, 0);
       },
-      leave: (c) => c.np.setOverwrite(false),
-      on: (ev, c) => (ev.type === 'input' || ev.type === 'insert-toggle') && !c.np.overwrite && c.np.value.trim() === HEDEF,
-      done: `Yazdıkça yanındaki harfleri yiyen şey <b>Insert</b> tuşudur. Üzerine yazma kipi açık kalınca yeni harf, imlecin sağındaki harfi siler. Aynı tuşa bir daha basınca normale döner. Bu tuş genellikle klavyenin sağ üstündedir; yanlışlıkla basmak çok kolay.`,
+      on: (ev, c) => {
+        // Üzerine yazma kipi açıkken yazınca “Yarın pazar.” bozulur: sorun görüldü
+        if (ev.type === 'insert-toggle') { c.s.erken = true; return true; }
+        return ev.type === 'input' && c.np.overwrite && !c.np.value.includes('Yarın pazar.');
+      },
+      done: (c) => (c.s.erken
+        ? `Sorunu hemen buldunuz: <b>Insert</b> tuşu. Yine de bilin: Insert açıkken yazdığınız her harf, imlecin sağındaki harfi <b>siler</b>.`
+        : 'Gördünüz mü? Yazdıkça <b>Yarın pazar.</b> yazısının harfleri <b>siliniyor</b>. Yeni yazdığınız harf, imlecin sağındaki harfin yerine geçiyor. Klavye bozuk değil; bunun bir sebebi var.'),
+    },
+    {
+      title: 'Sebebi: Insert tuşu',
+      html: `<p>Not Defteri'nin <b>sağ altındaki</b> durum çubuğuna bakın: <b>“Üzerine yaz (INS)”</b> yazıyor. Bu, ${K('Insert')} tuşuna yanlışlıkla basıldığını gösterir.</p>
+        <p>${K('Insert')} tuşuna <b>bir kez</b> basıp kapatın. Klavyenizde Insert tuşu yoksa sağ alttaki <b>“Üzerine yaz (INS)”</b> yazısına tıklayın.</p>
+        <p class="mut">Masaüstü klavyelerde Insert, genellikle silme (Backspace) tuşunun sağındaki küçük tuş grubundadır. Dizüstü bilgisayarlarda yeri değişir; bazılarında <b>Ins</b> yazar, bazılarında hiç yoktur.</p>`,
+      hint: 'Sağ alttaki “Üzerine yaz (INS)” yazısına tıklamak da aynı işi yapar.',
+      setup: (c) => { if (!c.np.overwrite) c.np.setOverwrite(true); },
+      check: (c) => !c.np.overwrite,
+      on: (ev, c) => ev.type === 'insert-toggle' && !c.np.overwrite,
+      done: 'Üzerine yazma kapandı. Artık yazdığınız harfler araya eklenir, hiçbir harf silinmez.',
+    },
+    {
+      title: 'Şimdi yeniden deneyin',
+      html: `<p>Yazıyı baştan koyduk: <b>Yarın pazar.</b> Başına yeniden <b>Dikkat: </b> yazın. Bu sefer hiçbir harf silinmemeli.</p><div class="target">${HEDEF}</div>`,
+      setup: (c) => {
+        c.np.setOverwrite(false);
+        c.np.setText('Yarın pazar.');
+        c.np.ta.focus();
+        c.np.ta.setSelectionRange(0, 0);
+      },
+      on: (ev, c) => ev.type === 'input' && c.np.value.trim() === HEDEF,
+      done: `Oldu! Yazı harf yutmadan eklendi. Yazarken harfler siliniyorsa ilk bakacağınız yer ${K('Insert')} tuşudur; bir kez basınca normale döner.`,
     },
     {
       title: 'HER ŞEY BÜYÜK',
@@ -90,7 +118,7 @@ export const yaziSorun = {
     rehberSoru({
       title: 'Ne yaparsınız?',
       html: '<p>Bir komşunuz arıyor: “Bilgisayarda yazı yazıyorum, harfler yazıdaki başka harfleri siliyor, bozuldu galiba.” Ona ne söylersiniz?</p>',
-      opts: ['Servise götür', 'Klavyenin sağ üstündeki <b>Insert</b> tuşuna yanlışlıkla basmış olabilirsin, bir kez daha bas', 'Bilgisayarı sıfırla'], ok: 1,
+      opts: ['Servise götür', 'Klavyedeki <b>Insert</b> tuşuna yanlışlıkla basmış olabilirsin, bir kez daha bas', 'Bilgisayarı sıfırla'], ok: 1,
       wrong: 'Bu kadar büyük bir adıma gerek yok. Yazının harfleri yemesi bir klavye kilidinden olur.',
       why: 'Aynen öyle! Çoğu “bozuldu” şikâyeti bir tuşa yanlışlıkla basmaktan çıkar. Önce Insert, Caps Lock, Num Lock ve klavye diline bakın.',
     }),
