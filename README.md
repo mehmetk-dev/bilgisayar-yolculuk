@@ -103,7 +103,8 @@ npm install
 node build.mjs          # dist/index.html (dersler) ve dist/bilgisayar.html (3B) (küçültülmüş, internetsiz çalışır)
 node build.mjs --dev    # okunabilir çıktı
 node tools/shot.mjs senaryo.json   # ekran görüntüsü (Brave/Chromium + puppeteer-core)
-python3 sunum/uret.py && node sunum/pdf.mjs donanim   # slaytlar (donanım sunusu: sunum/Bilgisayar-Isletmenligi-donanim.pdf, görseller sunum/img2/dh_*.jpg)
+python3 sunum/yetiskin-kursu/kaynak/uret.py && node sunum/yetiskin-kursu/kaynak/pdf.mjs donanim   # slaytlar (PDF'ler sunum/yetiskin-kursu/PDF/, görseller sunum/yetiskin-kursu/kaynak/img2/dh_*.jpg)
+node sunum/robo/kaynak/derle.mjs && node sunum/robo/kaynak/dizin.mjs   # Robo tahta sunumları (sunum/robo/hafta-1..8.html, giriş: sunum/robo/index.html)
 ```
 
 ### Klasör yapısı

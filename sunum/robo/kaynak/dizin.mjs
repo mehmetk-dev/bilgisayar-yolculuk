@@ -31,6 +31,7 @@ footer { text-align: center; color: #fff; opacity: .85; padding-bottom: 30px; fo
 <main>
 ${cards}
 </main>
+<p style="text-align:center;margin:0 0 24px"><a href="ekstra/ic-ice-donguler.html" style="color:#fff;font-size:22px;font-weight:800">➕ Ekstra: İç içe döngüler (tek konu sunumu) ›</a></p>
 <footer>Sunumda: → / Boşluk ileri · ← geri · <b>F</b> tam ekran · <b>M</b> ders menüsü · <b>N</b> öğretmen notu · <b>P</b> oynat · 1-2-3 soru şıkkı</footer>
 </body></html>
 `);

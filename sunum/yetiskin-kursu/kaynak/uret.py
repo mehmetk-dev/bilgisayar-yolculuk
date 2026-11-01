@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""1.–14. hafta, ek ders ve donanım slaytlarını üretir: sunum/hafta1.html ... sunum/hafta14.html, sunum/ek-guvenlik.html
-Kullanım: python3 sunum/uret.py && node sunum/pdf.mjs   (PDF'ler sunum/ klasörüne yazılır)"""
+"""1.–15. hafta, ek ders ve donanım slaytlarını üretir: sunum/yetiskin-kursu/kaynak/hafta1.html … hafta15.html, ek-guvenlik.html
+Kullanım: python3 sunum/yetiskin-kursu/kaynak/uret.py && node sunum/yetiskin-kursu/kaynak/pdf.mjs   (PDF'ler sunum/yetiskin-kursu/PDF/ klasörüne yazılır)"""
 import os
 
 D = os.path.dirname(os.path.abspath(__file__))
