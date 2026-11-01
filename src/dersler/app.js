@@ -172,11 +172,95 @@ function showHome() {
     const tint = rgb(h, 90, 95);
     return `--h:${h};--l1:${fit(h, 80, 46, [1, 1, 1], tint)}%;--l2:${fit((h + 28) % 360, 85, 58, [1, 1, 1])}%;--ld:${fit(h, 75, 34, [1, 1, 1], tint)}%`;
   };
-  $('#cards').innerHTML = WEEKS.map((w) => `<section class="week" style="${weekColors(w.no ? HUES[(w.no - 1) % HUES.length] : 200)}"><h2><span>${w.no ? `${w.no}. hafta` : 'Ek'}</span>${w.title}</h2>
-    <div class="wcards">${w.lessons.map(card).join('')}</div></section>`).join('');
+  homeCtx = { card, weekColors, HUES };
+  renderHome();
 }
 
+// Ana sayfa: üstte "kaldığınız yer", ortada hafta kutucukları, altta yalnızca seçili haftanın dersleri
+let homeCtx = null;
+let query = '';
+const realLessons = (w) => w.lessons.filter((l) => !l.link);
+const isDone = (l) => !!store.lessons[l.id]?.done;
+const weekOf = (l) => WEEKS.findIndex((w) => w.lessons.includes(l));
+const weekName = (w) => (w.no ? `${w.no}. hafta` : 'Ek dersler');
+const trLow = (t) => t.toLocaleLowerCase('tr');
+
+function siradaki() {
+  const all = LESSONS.filter((l) => !l.link);
+  const going = all.find((l) => !isDone(l) && store.lessons[l.id]?.step > 0);
+  if (going) return { l: going, going: true };
+  return { l: all.find((l) => !isDone(l)), going: false };
+}
+
+function renderHome() {
+  const { card, weekColors, HUES } = homeCtx;
+  const col = (i) => weekColors(WEEKS[i].no ? HUES[(WEEKS[i].no - 1) % HUES.length] : 200);
+  const nx = siradaki();
+  if (!(store.week >= 0 && store.week < WEEKS.length)) store.week = nx.l ? weekOf(nx.l) : 0;
+  const sel = store.week;
+
+  // Kaldığınız yer
+  const all = LESSONS.filter((l) => !l.link);
+  const nDone = all.filter(isDone).length;
+  const genel = `<div class="dv-genel"><span>Bitirdiğiniz: <b>${nDone}</b> / ${all.length} ders</span><div class="wbar"><i style="width:${(nDone / all.length) * 100}%"></i></div></div>`;
+  if (nx.l) {
+    const wi = weekOf(nx.l);
+    const p = store.lessons[nx.l.id];
+    $('#devam').innerHTML = `<div class="devam" style="${col(wi)}">
+      <div class="dv-ust">${nx.going ? 'Kaldığınız yer' : nDone ? 'Sıradaki ders' : 'İlk ders'} · ${weekName(WEEKS[wi])}</div>
+      <div class="dv-ders"><div class="licon">${emojiIcon(nx.l.icon)}</div><div><b>${nx.l.title}</b>${nx.going ? `<small>Adım ${p.step + 1} / ${nx.l.steps.length}</small>` : `<small>~${nx.l.minutes} dk</small>`}</div></div>
+      <a class="btn primary dv-git" href="#ders/${nx.l.id}">${nx.going ? 'Devam et' : 'Başla'} ›</a>${genel}</div>`;
+  } else {
+    $('#devam').innerHTML = `<div class="devam bitti"><div class="dv-ust">Tebrikler 🎉</div><div class="dv-ders"><b>Bütün dersleri bitirdiniz!</b></div>${genel}</div>`;
+  }
+
+  // Hafta kutucukları
+  $('#weeks').innerHTML = WEEKS.map((w, i) => {
+    const ls = realLessons(w);
+    const n = ls.filter(isDone).length;
+    const full = ls.length && n === ls.length;
+    return `<button type="button" class="wtile${i === sel && !query ? ' on' : ''}${full ? ' full' : ''}" data-w="${i}" style="${col(i)}" aria-pressed="${i === sel && !query}" title="${esc(w.title)}">
+      <span class="wno">${weekName(w)}${full ? ' ✔' : ''}</span><span class="wad">${w.title}</span>
+      <span class="wbar"><i style="width:${ls.length ? (n / ls.length) * 100 : 0}%"></i></span><span class="wsay">${n} / ${ls.length} ders</span></button>`;
+  }).join('');
+
+  // Dersler: arama varsa bütün haftalarda, yoksa seçili hafta
+  const section = (i, ls, nav) => `<section class="week" style="${col(i)}"><h2><span>${weekName(WEEKS[i])}</span>${WEEKS[i].title}</h2>
+    <div class="wcards">${ls.map(card).join('')}</div>${nav || ''}</section>`;
+  if (query) {
+    const q = trLow(query.trim());
+    const hits = WEEKS.map((w, i) => [i, w.lessons.filter((l) => trLow(w.title + ' ' + l.title + ' ' + l.desc).includes(q))]).filter(([, ls]) => ls.length);
+    const n = hits.reduce((a, [, ls]) => a + ls.length, 0);
+    $('#cards').innerHTML = `<p class="bulunan">${n ? `“${esc(query.trim())}” için <b>${n}</b> ders bulundu.` : `“${esc(query.trim())}” ile ilgili ders bulunamadı. Başka bir kelime deneyin.`} <button type="button" class="link" data-temizle>Aramayı temizle</button></p>${hits.map(([i, ls]) => section(i, ls)).join('')}`;
+  } else {
+    const prev = WEEKS[sel - 1], next = WEEKS[sel + 1];
+    const nav = `<div class="wnav">${prev ? `<button type="button" data-w="${sel - 1}">‹ Önceki: ${weekName(prev)}</button>` : ''}<span class="sp"></span>${next ? `<button type="button" class="primary" data-w="${sel + 1}">Sonraki: ${weekName(next)} ›</button>` : ''}</div>`;
+    $('#cards').innerHTML = section(sel, WEEKS[sel].lessons, nav);
+  }
+  // Telefonda kutucuklar yana kayar: seçili hafta görünsün
+  const on = $('#weeks .on');
+  if (on && $('#weeks').scrollWidth > $('#weeks').clientWidth) $('#weeks').scrollLeft = on.offsetLeft - $('#weeks').offsetLeft - 8;
+}
+
+function pickWeek(i, scroll) {
+  store.week = i;
+  persist();
+  query = '';
+  $('#ara').value = '';
+  renderHome();
+  if (scroll) $('#cards').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+$('#weeks').addEventListener('click', (e) => {
+  const t = e.target.closest('[data-w]');
+  if (t) pickWeek(+t.dataset.w, false);
+});
+$('#ara').addEventListener('input', (e) => { query = e.target.value; renderHome(); });
+
 $('#cards').addEventListener('click', (e) => {
+  const w = e.target.closest('[data-w]');
+  if (w) { pickWeek(+w.dataset.w, true); return; }
+  if (e.target.closest('[data-temizle]')) { pickWeek(store.week, false); $('#ara').focus(); return; }
   const r = e.target.closest('[data-restart]');
   if (!r) return;
   e.preventDefault();

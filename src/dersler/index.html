@@ -27,17 +27,21 @@
 
 <main id="home">
   <div class="hero">
-    <h1>Bilgisayarı adım adım öğrenelim</h1>
-    <p>Bir ders seçin. Her adımda ne yapacağınız yazar; doğru yaptığınızda ekran size haber verir. Acele etmeyin, yanlış yapmaktan korkmayın: burada hiçbir şey bozulmaz. Yandaki bilgisayar bir <b>alıştırma bilgisayarıdır</b>; gerçek dosyalarınıza dokunmaz.</p>
+    <div class="hero-txt">
+      <h1>Bilgisayarı adım adım öğrenelim</h1>
+      <ol class="hero-adim">
+        <li><b>1</b><span>Aşağıdan bir hafta, sonra bir ders seçin.</span></li>
+        <li><b>2</b><span>Soldaki yazıda ne yapacağınız yazar; sırayla yapın.</span></li>
+        <li><b>3</b><span>Doğru yapınca ekran haber verir. Takılırsanız <b>İpucu</b>'na basın.</span></li>
+      </ol>
+      <p class="hero-not">🛡️ Burası bir <b>alıştırma bilgisayarı</b>: hiçbir şey bozulmaz, gerçek dosyalarınıza dokunmaz.</p>
+    </div>
+    <div id="devam"></div>
   </div>
-  <a class="live" href="bilgisayar.html">
-    <span class="live-txt"><b>Bilgisayarı canlı görün</b><small>Kasayı açın, parçaları tek tek inceleyin: 1990'lardan bugüne üç boyutlu bilgisayar.</small></span>
-    <span class="live-go">Aç</span>
-  </a>
-  <a class="live robo" href="robot.html">
-    <span class="live-txt"><b>Robo ile Kodlama (8–12 yaş)</b><small>8 haftalık kodlama eğitimi: Robo ile algoritma, döngü ve koşullar; ardından Scratch gibi bloklarla animasyon ve oyun yapımı.</small></span>
-    <span class="live-go">Başla</span>
-  </a>
+  <section class="hsec">
+    <div class="hsec-bas"><h2>Haftalar</h2><label class="ara"><span aria-hidden="true">🔍</span><input id="ara" type="search" placeholder="Ders ara: e-posta, Excel, fare…" aria-label="Ders ara"></label></div>
+    <div id="weeks" role="group" aria-label="Haftalar"></div>
+  </section>
   <div id="cards"></div>
 </main>
 
