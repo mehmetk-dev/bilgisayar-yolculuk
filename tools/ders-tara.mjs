@@ -30,7 +30,14 @@ await page.reload();
 const guest = await page.waitForSelector('.pguest', { timeout: 8000 }).catch(() => null);
 if (guest) await guest.click();
 await page.waitForSelector('a[href^="#ders/"]', { timeout: 15000 });
-let ids = [...new Set(await page.$$eval('a[href^="#ders/"]', (as) => as.map((a) => a.getAttribute('href').slice(6))))];
+// Ana sayfada haftalar kart; her haftanın sayfası (#hafta/N) gezilip bütün dersler toplanır
+let ids = [];
+const nWeeks = await page.$$eval('a[href^="#hafta/"]', (as) => as.length);
+for (let w = 0; w < Math.max(nWeeks, 1); w++) {
+  if (nWeeks) { await page.evaluate((h) => { location.hash = h; }, '#hafta/' + w); await sleep(100); }
+  ids.push(...await page.$$eval('#cards a[href^="#ders/"]', (as) => as.map((a) => a.getAttribute('href').slice(6))));
+}
+ids = [...new Set(ids)];
 if (ONLY.length) ids = ids.filter((id) => ONLY.includes(id));
 
 let steps = 0;

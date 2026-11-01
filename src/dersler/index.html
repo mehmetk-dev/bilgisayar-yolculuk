@@ -26,24 +26,17 @@
 </header>
 
 <main id="home">
-  <aside id="plan">
-    <h2>Kurs planı</h2>
-    <label class="ara"><span aria-hidden="true">🔍</span><input id="ara" type="search" placeholder="Ders ara…" aria-label="Ders ara"></label>
-    <nav id="weeks" aria-label="Haftalar"></nav>
-  </aside>
-  <div id="hmain">
-    <section class="hero">
-      <div class="hero-txt">
-        <h1>Bilgisayarı adım adım öğrenelim</h1>
-        <ol class="hero-adim">
-          <li><b>1</b><span>Soldan bir hafta, sonra bir ders seçin.</span></li>
-          <li><b>2</b><span>Ekrandaki yazı ne yapacağınızı söyler; sırayla yapın.</span></li>
-          <li><b>3</b><span>Takılırsanız <b>İpucu</b> düğmesine basın.</span></li>
-        </ol>
-        <p class="hero-not">Burası bir <b>alıştırma bilgisayarı</b>. Hiçbir şey bozulmaz, gerçek dosyalarınıza dokunmaz.</p>
-      </div>
-      <div id="devam"></div>
-    </section>
+  <div class="h-wrap">
+    <div class="hero">
+      <h1>Hoş geldiniz!</h1>
+      <p>Burası bir <b>alıştırma bilgisayarı</b>. Rahat olun: hiçbir şey bozulmaz.</p>
+    </div>
+    <div id="devam"></div>
+    <div class="h-bas">
+      <h2 id="hBaslik">Haftalar</h2>
+      <label class="ara"><span aria-hidden="true">🔍</span><input id="ara" type="search" placeholder="Ders ara…" aria-label="Ders ara"></label>
+    </div>
+    <div id="weeks"></div>
     <div id="cards"></div>
   </div>
 </main>
