@@ -224,30 +224,41 @@ function weekPage(i) {
 const hello = () => (who ? `Hoş geldiniz, ${esc(who)}!` : 'Hoş geldiniz!');
 const safeNote = 'Burası bir <b>alıştırma bilgisayarı</b>. Rahat olun: hiçbir şey bozulmaz.';
 
-// Kıvrılan yol üstünde duraklar
+// Kıvrılan yol üstünde duraklar. Yerler yazı boyuna göre (em) hesaplanır: A düğmesiyle yazı büyüyünce
+// satırlar da büyür, sığmazsa bir satırdaki durak sayısı azalır; böylece etiketler üst üste binmez.
+const OK_SVG = '<svg class="yh-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function yolMap(W, D) {
-  const per = matchMedia('(max-width: 700px)').matches ? 2 : 4;
-  const rowH = 210, colW = 1000 / per;
+  const fs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fs')) || 20;
+  const narrow = matchMedia('(max-width: 760px)').matches;
+  const labelEm = narrow ? 8 : 11;
+  const avail = Math.min($('#home').clientWidth || innerWidth, 68 * fs) - (narrow ? 1.6 : 2.8) * fs;
+  const per = Math.max(1, Math.min(4, Math.floor(avail / ((labelEm + 0.4) * fs))));
+  // Dikey ölçüler em cinsinden (×100 SVG birimi); yatay ölçüler genişliğin binde biri
+  const rowEm = 10.5, topEm = 6, colW = 1000 / per;
   const pts = W.map((x, k) => {
     const r = Math.floor(k / per), c = k % per;
-    return { x: colW / 2 + colW * (r % 2 ? per - 1 - c : c), y: 120 + rowH * r, r };
+    return { x: colW / 2 + colW * (r % 2 ? per - 1 - c : c), y: topEm + rowEm * r, r };
   });
-  let d = `M ${pts[0].x - colW / 2} ${pts[0].y} L ${pts[0].x} ${pts[0].y}`;
+  const last = pts.at(-1);
+  const dir = last.r % 2 ? -1 : 1; // son satırda yol hangi yöne gidiyor
+  const end = { x: Math.max(40, Math.min(960, last.x + dir * (per > 1 ? colW / 2 : 0))), y: last.y + (per > 1 ? 0 : rowEm * 0.6) };
+  const u = (v) => (v * 100).toFixed(0);
+  let d = `M ${pts[0].x - colW / 2} ${u(pts[0].y)} L ${pts[0].x} ${u(pts[0].y)}`;
   for (let k = 1; k < pts.length; k++) {
     const a = pts[k - 1], b = pts[k];
-    if (a.r === b.r) d += ` L ${b.x} ${b.y}`;
-    else { const s = a.r % 2 ? -1 : 1; d += ` C ${a.x + s * 140} ${a.y}, ${b.x + s * 140} ${b.y}, ${b.x} ${b.y}`; }
+    if (a.r === b.r) d += ` L ${b.x} ${u(b.y)}`;
+    else { const s = per > 1 ? (a.r % 2 ? -1 : 1) : (a.r % 2 ? -1 : 1); const bx = per > 1 ? 140 : 260; d += ` C ${a.x + s * bx} ${u(a.y)}, ${b.x + s * bx} ${u(b.y)}, ${b.x} ${u(b.y)}`; }
   }
-  const last = pts.at(-1);
-  const H = last.y + 120;
+  d += ` L ${end.x} ${u(end.y)}`;
+  const H = last.y + 6;
   const cur = D.bitti ? -1 : D.wi;
-  return `<div class="yh-map" style="height:${H}px"><svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="yh-yol" d="${d}"/><path class="yh-cizgi" d="${d}"/></svg>
-    ${W.map((x, k) => `<a class="yh-d${x.full ? ' full' : ''}${k === cur ? ' cur' : ''}" href="${x.href}" style="left:${pts[k].x / 10}%;top:${pts[k].y}px;--h:${x.hue}" title="${esc(x.title)}">
-      ${k === cur ? '<span class="yh-flag">Buradasınız</span>' : ''}<span class="yh-top">${x.full ? '✔' : x.icon}</span><span class="yh-lb"><small>${x.name}</small><span class="t2">${x.title}</span></span><span class="yh-say">${x.n} / ${x.total}</span></a>`).join('')}
-    <span class="yh-bit" style="left:${last.x / 10}%;top:${last.y + 70}px">🏁</span></div>`;
+  return `<div class="yh-map" style="height:${H}em"><svg viewBox="0 0 1000 ${u(H)}" preserveAspectRatio="none" aria-hidden="true"><path class="yh-yol" d="${d}"/><path class="yh-cizgi" d="${d}"/></svg>
+    ${W.map((x, k) => `<a class="yh-d${x.full ? ' full' : ''}${k === cur ? ' cur' : ''}" href="${x.href}" style="left:${pts[k].x / 10}%;top:${pts[k].y}em;--h:${x.hue}" title="${esc(x.title)}">
+      ${k === cur ? '<span class="yh-flag">Buradasınız</span>' : ''}<span class="yh-top">${x.full ? OK_SVG : x.icon}</span><span class="yh-lb"><small>${x.name}${x.full ? ' · bitti' : ''}</small><span class="t3">${x.title}</span></span><span class="yh-say">${x.n} / ${x.total} ders</span></a>`).join('')}
+    <span class="yh-bit" style="left:${end.x / 10}%;top:${end.y}em" title="Kursun sonu"><span>🏁</span></span></div>`;
 }
-const yolDevam = (D) => (D.bitti ? '<div class="yh-dv"><b>🏁 Yolculuk bitti, tebrikler!</b></div>'
-  : `<a class="yh-dv" href="${D.href}"><span class="yh-dv-ic">${D.icon}</span><span><small>${D.label}</small><b>${D.title}</b></span><span class="yh-go">${D.go} ›</span></a>`);
+const yolDevam = (D) => (D.bitti ? `<div class="yh-dv"><b>🏁 Yolculuk bitti, tebrikler! Bütün ${D.total} dersi bitirdiniz.</b></div>`
+  : `<a class="yh-dv" href="${D.href}"><span class="yh-dv-ic">${D.icon}</span><span><small>${D.label}</small><b>${D.title}</b><span class="yh-dv-alt">Bütün kurs: ${D.nDone} / ${D.total} ders bitti</span></span><span class="yh-go">${D.go} ›</span></a>`);
 
 function homeHarita(W, D) {
   return `<div class="harita"><div class="yh-ust"><div><h1>${hello()}</h1><p>${safeNote} Yol 1. haftadan başlar; bir durağa tıklayın.</p></div>
@@ -638,8 +649,10 @@ function applyFont() {
   document.documentElement.style.setProperty('--fs', store.fs + 'px');
   $('#soundBtn').textContent = store.sound ? 'Ses açık' : 'Ses kapalı';
 }
-$('#fontUp').onclick = () => { store.fs = Math.min(30, store.fs + 2); applyFont(); persist(); desk?.renderIcons(); };
-$('#fontDown').onclick = () => { store.fs = Math.max(14, store.fs - 2); applyFont(); persist(); desk?.renderIcons(); };
+$('#fontUp').onclick = () => { store.fs = Math.min(30, store.fs + 2); applyFont(); persist(); desk?.renderIcons(); if (document.body.dataset.view === 'home') renderHome(); };
+$('#fontDown').onclick = () => { store.fs = Math.max(14, store.fs - 2); applyFont(); persist(); desk?.renderIcons(); if (document.body.dataset.view === 'home') renderHome(); };
+let homeResize;
+addEventListener('resize', () => { clearTimeout(homeResize); homeResize = setTimeout(() => { if (document.body.dataset.view === 'home' && homeWeek == null) renderHome(); }, 200); });
 $('#soundBtn').onclick = () => { store.sound = !store.sound; applyFont(); persist(); };
 
 // Not Defteri dersinde odak pencerede değilken basılan kısayollar sayfanın kendisini etkilemesin

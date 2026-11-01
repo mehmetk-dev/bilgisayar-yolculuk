@@ -64,7 +64,10 @@
 .yh-d.full .yh-top { background: #16803c; border-color: #0f5f2c; color: #fff; }
 .yh-d.cur .yh-top { background: #ffd43b; border-color: #e8590c; animation: yh-nab 1.6s ease-in-out infinite; }
 .yh-flag { position: absolute; top: -1.9em; background: #e8590c; color: #fff; font-size: 0.75em; font-weight: 800; padding: 0.15em 0.6em; border-radius: 6px; white-space: nowrap; }
-.yh-bit { position: absolute; transform: translate(-50%, -50%); font-size: 2.4em; }
+.yh-bit > span { font-size: 2.4em; line-height: 1; display: block; }
+.yh-bit { position: absolute; transform: translate(-50%, -50%); z-index: 2; filter: drop-shadow(0 3px 4px #0003); }
+.yh-ok { width: 1em; height: 1em; display: block; }
+.yh-dv-alt { font-size: 0.78em; color: #4a5d44; margin-top: 0.15em; }
 @keyframes yh-nab { 50% { box-shadow: 0 0 0 0.45em #ffd43b66; } }
 @media (prefers-reduced-motion: reduce) { .yh-d.cur .yh-top { animation: none; } }
 #home .li-ic { border-radius: 50%; }
@@ -75,7 +78,7 @@
   .wk, .harita { padding-left: 0.8em; padding-right: 0.8em; }
   .wk-ic { font-size: 1.8em; }
   .wk-bas h2 { font-size: 1.35em; }
-  .yh-d { width: 8.5em; }
+  .yh-d { width: 8em; }
   .yh-top { font-size: 1.5em; }
   .yh-ust h1 { font-size: 1.6em; }
   .yh-dv { flex-wrap: wrap; }
