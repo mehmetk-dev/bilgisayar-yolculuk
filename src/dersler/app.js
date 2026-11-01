@@ -142,9 +142,10 @@ function showHome(w = null) {
   renderHome();
 }
 
-// Ana sayfa (kocaman ve sade): kocaman "Devam et" kartı ve resimli hafta kartları.
-// Bir haftaya tıklanınca (#hafta/N) yalnızca o haftanın dersleri görünür.
-let query = '';
+// ---- Ana sayfa: 4 ayrı tasarım; sağ üstteki "Tasarım" düğmesi sırayla değiştirir ----
+// Ana görünümde haftalar; bir haftaya tıklanınca (#hafta/N) yalnızca o haftanın dersleri görünür.
+const DESIGNS = [['karo', 'Karolar'], ['masa', 'Masaüstü'], ['harita', 'Yolculuk haritası'], ['koyu', 'Koyu modern']];
+let design = Math.max(0, DESIGNS.findIndex(([k]) => k === lsGet('bd-tasarim', 'karo')));
 let homeWeek = null;
 const WEEK_ICONS = ['🖱️', '⌨️', '📝', '🖥️', '🪟', '📁', '🎨', '🌐', '📧', '📄', '📊', '📽️', '📱', '🏛', '🔒'];
 const WEEK_HUES = [210, 265, 330, 25, 200, 45, 300, 175, 230, 220, 140, 15, 190, 0, 160];
@@ -154,7 +155,6 @@ const realLessons = (w) => w.lessons.filter((l) => !l.link);
 const isDone = (l) => !!store.lessons[l.id]?.done;
 const weekOf = (l) => WEEKS.findIndex((w) => w.lessons.includes(l));
 const weekName = (w) => (w.no ? `${w.no}. hafta` : 'Ek dersler');
-const trLow = (t) => t.toLocaleLowerCase('tr');
 
 function siradaki() {
   const all = LESSONS.filter((l) => !l.link);
@@ -163,14 +163,36 @@ function siradaki() {
   return { l: all.find((l) => !isDone(l)), going: false };
 }
 
-// Bir haftanın içindeki büyük ders kartı
-function lessonCard(l) {
-  const w = WEEKS[weekOf(l)];
+// Haftaların özeti: tasarımların hepsi bunu kullanır
+function weekInfo() {
+  return WEEKS.map((w, i) => {
+    const ls = realLessons(w);
+    const n = ls.filter(isDone).length;
+    return { w, i, n, total: ls.length, full: ls.length > 0 && n === ls.length, pct: ls.length ? (n / ls.length) * 100 : 0, hue: weekHue(w), icon: weekIcon(w), name: weekName(w), title: w.title, href: `#hafta/${i}` };
+  });
+}
+
+// "Kaldığınız yer" bilgisi
+function devamInfo() {
+  const nx = siradaki();
+  const all = LESSONS.filter((l) => !l.link);
+  const nDone = all.filter(isDone).length;
+  if (!nx.l) return { bitti: true, nDone, total: all.length };
+  const w = WEEKS[weekOf(nx.l)];
+  const p = store.lessons[nx.l.id];
+  return {
+    nDone, total: all.length, href: `#ders/${nx.l.id}`, icon: emojiIcon(nx.l.icon), title: nx.l.title, hue: weekHue(w), wi: weekOf(nx.l),
+    label: nx.going ? 'Kaldığınız yer' : nDone ? 'Sıradaki ders' : 'İlk dersiniz',
+    sub: `${weekName(w)} · ${nx.going ? `Adım ${p.step + 1} / ${nx.l.steps.length}` : `yaklaşık ${nx.l.minutes} dakika`}`,
+    go: nx.going ? 'Devam et' : 'Başla',
+  };
+}
+
+// Bir haftanın içindeki ders (bütün tasarımlarda aynı yapı, görünüşü CSS belirler)
+function lessonItem(l, no) {
   const desc = esc(l.desc);
-  if (l.link) {
-    return `<article class="dcard link" style="--h:${weekHue(w)}"><div class="dcard-ic">${emojiIcon(l.icon)}</div><h3>${l.title}</h3><p title="${desc}">${l.desc}</p>
-      <div class="dcard-alt"><span class="tag">3B gezinti</span><a class="btn" href="${l.link}">Aç</a></div></article>`;
-  }
+  const head = `<span class="li-no">${no}</span><span class="li-ic">${emojiIcon(l.icon)}</span><div class="li-tx"><h3>${l.title}</h3><p title="${desc}">${l.desc}</p></div>`;
+  if (l.link) return `<article class="li link">${head}<div class="li-alt"><span class="tag">3B gezinti</span><a class="btn" href="${l.link}">Aç</a></div></article>`;
   const p = store.lessons[l.id];
   const total = l.steps.length;
   const sc = l.test && testScore(l);
@@ -187,70 +209,99 @@ function lessonCard(l) {
     status = `<span class="tag yarim">Adım ${p.step + 1} / ${total}</span>`;
     btn = `<a class="btn primary" href="#ders/${l.id}">Devam</a>`;
   }
-  return `<article class="dcard${p?.done ? ' done' : ''}" style="--h:${weekHue(w)}"><div class="dcard-ic">${emojiIcon(l.icon)}</div><h3>${l.title}</h3><p title="${desc}">${l.desc}</p>
-    <div class="dcard-alt">${status}${btn}</div></article>`;
+  return `<article class="li${p?.done ? ' done' : ''}">${head}<div class="li-alt">${status}${btn}</div></article>`;
 }
+
+function weekPage(i) {
+  const w = WEEKS[i];
+  const info = weekInfo()[i];
+  const prev = WEEKS[i - 1], next = WEEKS[i + 1];
+  return `<div class="wk" style="--h:${info.hue}">
+    <div class="wk-bar"><span class="wk-ad">${info.icon} ${info.name}: ${w.title}</span><a class="geri" href="#">‹ Bütün haftalar</a></div>
+    <div class="wk-body"><div class="wk-bas"><span class="wk-ic">${info.icon}</span><div><small>${info.name}</small><h2>${w.title}</h2><span class="wk-say">${info.total} dersten <b>${info.n}</b> tanesi bitti</span></div></div>
+    <div class="wk-ler">${w.lessons.map((l, k) => lessonItem(l, k + 1)).join('')}</div>
+    <div class="wnav">${prev ? `<a class="btn" href="#hafta/${i - 1}">‹ ${weekName(prev)}</a>` : ''}<span class="sp"></span>${next ? `<a class="btn primary" href="#hafta/${i + 1}">Sonraki: ${weekName(next)} ›</a>` : ''}</div></div>
+  </div>`;
+}
+
+const hello = () => (who ? `Hoş geldiniz, ${esc(who)}!` : 'Hoş geldiniz!');
+const safeNote = 'Burası bir <b>alıştırma bilgisayarı</b>. Rahat olun: hiçbir şey bozulmaz.';
+
+// 1) Karolar: koyu mor zemin, dolgun renkli kareler
+function homeKaro(W, D) {
+  const dv = D.bitti ? `<div class="kr kr-dv"><span class="kr-ic">🎉</span><b>Bütün dersleri bitirdiniz!</b></div>`
+    : `<a class="kr kr-dv" href="${D.href}"><small>${D.label}</small><span class="kr-ic">${D.icon}</span><b>${D.title}</b><span class="kr-sub">${D.sub}</span><span class="kr-go">${D.go} ›</span></a>`;
+  return `<div class="karo"><h1>${hello()}</h1><p class="kr-not">${safeNote}</p>
+    <div class="kr-grid">${dv}${W.map((x) => `<a class="kr${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue}" title="${esc(x.title)}">
+      <span class="kr-ic">${x.icon}</span><small>${x.name}${x.full ? ' ✔' : ''}</small><b>${x.title}</b><span class="kr-say">${x.n} / ${x.total}</span><span class="kr-bar"><i style="width:${x.pct}%"></i></span></a>`).join('')}</div></div>`;
+}
+
+// 2) Masaüstü: haftalar klasör simgesi, altta görev çubuğu, sağ üstte yapışkan not
+function homeMasa(W, D) {
+  const now = new Date();
+  const saat = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  return `<div class="masa"><div class="mz-icons">${W.map((x) => `<a class="mz-ic${x.full ? ' full' : ''}" href="${x.href}" title="${esc(x.title)}">
+      <span class="mz-folder"><span class="mz-badge">${x.icon}</span>${x.full ? '<span class="mz-ok">✔</span>' : ''}</span><span class="mz-ad">${x.w.no ? `${x.w.no}. ` : ''}${x.title}</span></a>`).join('')}</div>
+    <div class="mz-note"><b>${hello()}</b><p>Bir klasörü açın; içinde o haftanın dersleri var.</p><p>${safeNote}</p></div>
+    <div class="mz-task"><span class="mz-start">⊞ Dersler</span>${D.bitti ? '<span class="mz-pin">🎉 Bütün dersler bitti</span>' : `<a class="mz-pin" href="${D.href}"><span class="mz-pin-ic">${D.icon}</span><span><small>${D.label}</small>${D.title}</span><b>${D.go} ›</b></a>`}
+      <span class="sp"></span><span class="mz-tray">${D.nDone} / ${D.total} ders · ${saat}</span></div></div>`;
+}
+
+// 3) Yolculuk haritası: kıvrılan yol üstünde duraklar
+function homeHarita(W, D) {
+  const per = matchMedia('(max-width: 700px)').matches ? 2 : 4;
+  const rowH = 210, colW = 1000 / per;
+  const pts = W.map((x, k) => {
+    const r = Math.floor(k / per), c = k % per;
+    return { x: colW / 2 + colW * (r % 2 ? per - 1 - c : c), y: 120 + rowH * r, r };
+  });
+  let d = `M ${pts[0].x - colW / 2} ${pts[0].y} L ${pts[0].x} ${pts[0].y}`;
+  for (let k = 1; k < pts.length; k++) {
+    const a = pts[k - 1], b = pts[k];
+    if (a.r === b.r) d += ` L ${b.x} ${b.y}`;
+    else { const s = a.r % 2 ? -1 : 1; d += ` C ${a.x + s * 140} ${a.y}, ${b.x + s * 140} ${b.y}, ${b.x} ${b.y}`; }
+  }
+  const last = pts.at(-1);
+  const H = last.y + 120;
+  const cur = D.bitti ? -1 : D.wi;
+  return `<div class="harita"><div class="yh-ust"><div><h1>${hello()}</h1><p>${safeNote} Yol 1. haftadan başlar; bir durağa tıklayın.</p></div>
+    ${D.bitti ? '<div class="yh-dv"><b>🏁 Yolculuk bitti, tebrikler!</b></div>' : `<a class="yh-dv" href="${D.href}"><span class="yh-dv-ic">${D.icon}</span><span><small>${D.label}</small><b>${D.title}</b></span><span class="yh-go">${D.go} ›</span></a>`}</div>
+    <div class="yh-map" style="height:${H}px"><svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="yh-yol" d="${d}"/><path class="yh-cizgi" d="${d}"/></svg>
+    ${W.map((x, k) => `<a class="yh-d${x.full ? ' full' : ''}${k === cur ? ' cur' : ''}" href="${x.href}" style="left:${pts[k].x / 10}%;top:${pts[k].y}px;--h:${x.hue}" title="${esc(x.title)}">
+      ${k === cur ? '<span class="yh-flag">Buradasınız</span>' : ''}<span class="yh-top">${x.full ? '✔' : x.icon}</span><span class="yh-lb"><small>${x.name}</small>${x.title}</span><span class="yh-say">${x.n} / ${x.total}</span></a>`).join('')}
+    <span class="yh-bit" style="left:${last.x / 10}%;top:${last.y + 70}px">🏁</span></div></div>`;
+}
+
+// 4) Koyu modern: gece zemini, büyük "Devam et" ve yana kayan hafta afişleri
+function homeKoyu(W, D) {
+  return `<div class="koyu"><div class="ky-hero"><div><p class="ky-not">${safeNote}</p><h1>${hello()}</h1>
+    ${D.bitti ? '<p class="ky-big">Bütün dersleri bitirdiniz 🎉</p>' : `<p class="ky-lb">${D.label}</p><p class="ky-big">${D.title}</p><p class="ky-sub">${D.sub}</p><a class="ky-go" href="${D.href}">${D.go} ›</a>`}</div>
+    <div class="ky-ring" style="--p:${(D.nDone / D.total) * 100}"><b>${D.nDone}</b><span>/ ${D.total} ders</span></div></div>
+    <h2 class="ky-h2">Haftalar <span>yana kaydırın ›</span></h2>
+    <div class="ky-row">${W.map((x) => `<a class="ky-p${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue}" title="${esc(x.title)}">
+      <span class="ky-ic">${x.icon}</span><small>${x.name}${x.full ? ' · ✔' : ''}</small><b>${x.title}</b><span class="ky-bar"><i style="width:${x.pct}%"></i></span><span class="ky-say">${x.n} / ${x.total} ders</span></a>`).join('')}</div></div>`;
+}
+
+const HOMES = { karo: homeKaro, masa: homeMasa, harita: homeHarita, koyu: homeKoyu };
 
 function renderHome() {
-  const nx = siradaki();
-  const all = LESSONS.filter((l) => !l.link);
-  const nDone = all.filter(isDone).length;
-  const inWeek = homeWeek != null && !query;
-  document.body.dataset.hafta = inWeek ? '1' : '';
-
-  // Kocaman "Devam et" kartı (yalnızca ana listede)
-  if (inWeek || query) $('#devam').innerHTML = '';
-  else if (nx.l) {
-    const p = store.lessons[nx.l.id];
-    const w = WEEKS[weekOf(nx.l)];
-    $('#devam').innerHTML = `<a class="devam" href="#ders/${nx.l.id}" style="--h:${weekHue(w)}">
-      <span class="dv-ic">${emojiIcon(nx.l.icon)}</span>
-      <span class="dv-txt"><small>${nx.going ? 'Kaldığınız yer' : nDone ? 'Sıradaki ders' : 'İlk dersiniz'}</small><b>${nx.l.title}</b>
-        <span class="dv-alt">${weekName(w)} · ${nx.going ? `Adım ${p.step + 1} / ${nx.l.steps.length}` : `yaklaşık ${nx.l.minutes} dakika`}</span></span>
-      <span class="dv-git">${nx.going ? 'Devam et' : 'Başla'} ›</span></a>`;
-  } else {
-    $('#devam').innerHTML = '<div class="devam bitti"><span class="dv-ic">🎉</span><span class="dv-txt"><small>Tebrikler</small><b>Bütün dersleri bitirdiniz!</b></span></div>';
-  }
-
-  if (query) {
-    // Arama: bütün haftalarda
-    const q = trLow(query.trim());
-    const hits = LESSONS.filter((l) => trLow(WEEKS[weekOf(l)].title + ' ' + l.title + ' ' + l.desc).includes(q));
-    $('#hBaslik').textContent = 'Arama';
-    $('#weeks').innerHTML = '';
-    $('#cards').innerHTML = `<p class="bulunan">${hits.length ? `“${esc(query.trim())}” için <b>${hits.length}</b> ders bulundu.` : `“${esc(query.trim())}” ile ilgili ders bulunamadı. Başka bir kelime deneyin.`}
-      <button type="button" class="btn" data-temizle>✕ Aramayı temizle</button></p><div class="dcard-ler">${hits.map(lessonCard).join('')}</div>`;
-  } else if (inWeek) {
-    // Bir haftanın dersleri
-    const i = homeWeek, w = WEEKS[i];
-    const rl = realLessons(w);
-    const n = rl.filter(isDone).length;
-    const prev = WEEKS[i - 1], next = WEEKS[i + 1];
-    $('#hBaslik').textContent = '';
-    $('#weeks').innerHTML = `<a class="geri" href="#">‹ Bütün haftalar</a>
-      <div class="hf-bas" style="--h:${weekHue(w)}"><span class="hf-ic">${weekIcon(w)}</span><span><small>${weekName(w)}</small><h2>${w.title}</h2><span class="hf-say">${rl.length} dersten <b>${n}</b> tanesi bitti</span></span></div>`;
-    $('#cards').innerHTML = `<div class="dcard-ler">${w.lessons.map(lessonCard).join('')}</div>
-      <div class="wnav">${prev ? `<a class="btn" href="#hafta/${i - 1}">‹ ${weekName(prev)}</a>` : ''}<span class="sp"></span>${next ? `<a class="btn primary" href="#hafta/${i + 1}">Sonraki: ${weekName(next)} ›</a>` : ''}</div>`;
-  } else {
-    // Hafta kartları
-    $('#hBaslik').textContent = 'Haftalar';
-    $('#weeks').innerHTML = `<div class="hk-ler">${WEEKS.map((w, i) => {
-      const ls = realLessons(w);
-      const n = ls.filter(isDone).length;
-      const full = ls.length && n === ls.length;
-      return `<a class="hk${full ? ' full' : ''}" href="#hafta/${i}" style="--h:${weekHue(w)}" title="${esc(w.title)}">
-        <span class="hk-ic">${weekIcon(w)}</span><small>${weekName(w)}${full ? ' · ✔ bitti' : ''}</small><b>${w.title}</b>
-        <span class="hk-bar"><i style="width:${ls.length ? (n / ls.length) * 100 : 0}%"></i></span><span class="hk-say">${n} / ${ls.length} ders</span></a>`;
-    }).join('')}</div>`;
-    $('#cards').innerHTML = '';
-  }
-  if (inWeek) $('#home').scrollTop = 0;
+  const [key, name] = DESIGNS[design];
+  const home = $('#home');
+  home.dataset.t = key;
+  home.dataset.hafta = homeWeek != null ? '1' : '';
+  if (homeWeek != null) home.innerHTML = key === 'masa' ? homeMasa(weekInfo(), devamInfo()) + weekPage(homeWeek) : weekPage(homeWeek);
+  else home.innerHTML = HOMES[key](weekInfo(), devamInfo());
+  $('#tasarim').innerHTML = `🎨 Tasarım ${design + 1} / ${DESIGNS.length}: <b>${name}</b> ›`;
+  if (homeWeek != null) home.scrollTop = 0;
 }
 
-$('#ara').addEventListener('input', (e) => { query = e.target.value; renderHome(); });
+$('#tasarim').addEventListener('click', () => {
+  design = (design + 1) % DESIGNS.length;
+  lsSet('bd-tasarim', DESIGNS[design][0]);
+  renderHome();
+});
 
-$('#cards').addEventListener('click', (e) => {
-  if (e.target.closest('[data-temizle]')) { query = ''; $('#ara').value = ''; renderHome(); $('#ara').focus(); return; }
+$('#home').addEventListener('click', (e) => {
   const r = e.target.closest('[data-restart]');
   if (!r) return;
   e.preventDefault();
@@ -688,7 +739,6 @@ addEventListener('beforeunload', (e) => {
 const pick = $('#pick');
 $('#who').textContent = who ? who : 'Öğrenci seç';
 $('#who').onclick = () => openPicker();
-if (who) $('.hero h1').textContent = `Hoş geldiniz, ${who}!`;
 
 function choose(name, dest) {
   saveProgress();
