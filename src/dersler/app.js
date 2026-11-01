@@ -144,7 +144,7 @@ function showHome(w = null) {
 
 // ---- Ana sayfa: 4 ayrı tasarım; sağ üstteki "Tasarım" düğmesi sırayla değiştirir ----
 // Ana görünümde haftalar; bir haftaya tıklanınca (#hafta/N) yalnızca o haftanın dersleri görünür.
-const DESIGNS = [['harita', 'Yolculuk haritası'], ['metro', 'Metro hattı'], ['ada', 'Adalar'], ['dag', 'Dağa tırmanış']];
+const DESIGNS = [['harita', 'Yolculuk haritası'], ['kitap', 'Kitaplık'], ['gazete', 'Gazete'], ['retro', 'Eski bilgisayar']];
 let design = Math.max(0, DESIGNS.findIndex(([k]) => k === lsGet('bd-tasarim', 'harita')));
 let homeWeek = null;
 const WEEK_ICONS = ['🖱️', '⌨️', '📝', '🖥️', '🪟', '📁', '🎨', '🌐', '📧', '📄', '📊', '📽️', '📱', '🏛', '🔒'];
@@ -252,92 +252,40 @@ function homeHarita(W, D) {
     <span class="yh-bit" style="left:${last.x / 10}%;top:${last.y + 70}px">🏁</span></div></div>`;
 }
 
-// Ortak: "Kaldığınız yer" kutusu (harita tasarımlarının üstünde)
-const devamBox = (D, cls, bitti) => (D.bitti ? `<div class="${cls}"><b>${bitti}</b></div>`
-  : `<a class="${cls}" href="${D.href}"><span class="${cls}-ic">${D.icon}</span><span class="${cls}-tx"><small>${D.label}</small><b>${D.title}</b></span><span class="${cls}-go">${D.go} ›</span></a>`);
-const narrow = () => matchMedia('(max-width: 700px)').matches;
-
-// 2) Metro hattı: haftalar istasyon; bitirilen kısım renkli, kalan gri
-function homeMetro(W, D) {
-  const per = narrow() ? 2 : 4;
-  const rowH = 200, colW = 1000 / per, edge = narrow() ? 40 : 30;
-  const pts = W.map((x, k) => {
-    const r = Math.floor(k / per), c = k % per;
-    return { x: colW / 2 + colW * (r % 2 ? per - 1 - c : c), y: 90 + rowH * r, r };
-  });
-  const path = (n) => {
-    let d = `M ${pts[0].x - colW / 2 + 20} ${pts[0].y} L ${pts[0].x} ${pts[0].y}`;
-    for (let k = 1; k < n; k++) {
-      const a = pts[k - 1], b = pts[k];
-      if (a.r === b.r) d += ` L ${b.x} ${b.y}`;
-      else { const ex = a.r % 2 ? edge : 1000 - edge; d += ` L ${ex} ${a.y} L ${ex} ${b.y} L ${b.x} ${b.y}`; }
-    }
-    return d;
-  };
-  const cur = D.bitti ? W.length - 1 : D.wi;
-  const H = pts.at(-1).y + 140;
-  return `<div class="metro"><div class="mt-tabela"><span class="mt-m">M</span><div><small>${D.bitti ? 'Son durak' : D.label}</small><b>${D.bitti ? 'Bütün istasyonlar bitti 🎉' : D.title}</b>${D.bitti ? '' : `<span>${D.sub}</span>`}</div>${D.bitti ? '' : `<a class="mt-go" href="${D.href}">${D.go} ›</a>`}</div>
-    <div class="mt-ust"><h1>${hello()}</h1><p>${safeNote} Hat 1. haftadan başlar; bir istasyona tıklayın.</p></div>
-    <div class="mt-map" style="height:${H}px"><svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="mt-gri" d="${path(W.length)}"/><path class="mt-renk" d="${path(cur + 1)}"/></svg>
-    ${W.map((x, k) => `<a class="mt-ist${x.full ? ' full' : ''}${k === cur && !D.bitti ? ' cur' : ''}${k <= cur ? ' gecti' : ''}" href="${x.href}" style="left:${pts[k].x / 10}%;top:${pts[k].y}px;--h:${x.hue}" title="${esc(x.title)}">
-      <span class="mt-nokta">${x.full ? '✔' : ''}</span><span class="mt-lb"><span class="mt-ic">${x.icon}</span><span class="mt-ad"><small>${x.name} · ${x.n}/${x.total}</small><span class="t2">${x.title}</span></span></span></a>`).join('')}</div></div>`;
+// 2) Kitaplık: ahşap raflarda kitaplar; her hafta bir kitap
+function homeKitap(W, D) {
+  const raf = (list) => `<div class="kt-raf"><div class="kt-kitaplar">${list.map((x) => `<a class="kt-k${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue}" title="${esc(x.title)}">
+      <span class="kt-ic">${x.icon}</span><small>${x.name}</small><b class="t3">${x.title}</b><span class="kt-say">${x.full ? '✔ Okundu' : `${x.n} / ${x.total} ders`}</span></a>`).join('')}</div><div class="kt-tahta"></div></div>`;
+  const per = matchMedia('(max-width: 700px)').matches ? 2 : 6;
+  const rows = [];
+  for (let k = 0; k < W.length; k += per) rows.push(W.slice(k, k + per));
+  return `<div class="kitap"><div class="kt-ust"><div class="kt-kart"><small>Okuma kartı</small><h1>${hello()}</h1><p>${safeNote}</p><p>Raftan bir kitap (hafta) seçin.</p></div>
+    ${D.bitti ? '<div class="kt-acik"><b>Bütün kitapları bitirdiniz 🎉</b></div>' : `<a class="kt-acik" href="${D.href}"><span class="kt-sayfa"><small>${D.label}</small><b>${D.title}</b><span>${D.sub}</span></span><span class="kt-sayfa kt-sag"><span class="kt-buyuk">${D.icon}</span><span class="kt-go">${D.go} ›</span></span></a>`}</div>
+    ${rows.map(raf).join('')}</div>`;
 }
 
-// 3) Adalar: mavi deniz, her hafta bir ada; gemi bulunduğunuz adada
-function homeAda(W, D) {
-  const per = narrow() ? 2 : 4;
-  const rowH = 230, colW = 1000 / per;
-  const jx = [-40, 30, -20, 45, 15, -35, 40, -10], jy = [10, -25, 20, -10, 30, -20, 5, 25];
-  const pts = W.map((x, k) => {
-    const r = Math.floor(k / per), c = k % per;
-    const j = narrow() ? 0.4 : 1;
-    return { x: colW / 2 + colW * (r % 2 ? per - 1 - c : c) + jx[k % 8] * j, y: 130 + rowH * r + jy[k % 8], r };
-  });
-  let d = `M ${pts[0].x} ${pts[0].y}`;
-  for (let k = 1; k < pts.length; k++) {
-    const a = pts[k - 1], b = pts[k];
-    if (a.r === b.r) { const mx = (a.x + b.x) / 2; d += ` C ${mx} ${a.y + 70}, ${mx} ${b.y - 70}, ${b.x} ${b.y}`; }
-    else { const s = a.r % 2 ? -1 : 1; d += ` C ${a.x + s * 170} ${a.y + 20}, ${b.x + s * 170} ${b.y - 20}, ${b.x} ${b.y}`; }
-  }
-  const cur = D.bitti ? -1 : D.wi;
-  const H = pts.at(-1).y + 140;
-  return `<div class="ada"><div class="ad-ust"><div><h1>${hello()}</h1><p>${safeNote} Gemi 1. adadan yola çıkar; bir adaya tıklayın.</p></div>${devamBox(D, 'ad-dv', '⚓ Bütün adaları gezdiniz!')}</div>
-    <div class="ad-deniz" style="height:${H}px"><svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="ad-rota" d="${d}"/></svg>
-    ${W.map((x, k) => `<a class="ad-i${x.full ? ' full' : ''}${k === cur ? ' cur' : ''}" href="${x.href}" style="left:${pts[k].x / 10}%;top:${pts[k].y}px;--h:${x.hue};--r:${(k % 3) - 1}" title="${esc(x.title)}">
-      ${k === cur ? '<span class="ad-gemi">⛵</span>' : ''}<span class="ad-kara"><span class="ad-ic">${x.icon}</span>${x.full ? '<span class="ad-bay">🚩</span>' : ''}</span><span class="ad-lb"><small>${x.name} · ${x.n}/${x.total}</small><span class="t2">${x.title}</span></span></a>`).join('')}</div></div>`;
+// 3) Gazete: manşette kaldığınız yer, haftalar sütunlarda haber gibi
+function homeGazete(W, D) {
+  const tarih = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return `<div class="gazete"><header class="gz-bas"><div class="gz-ust"><span>${tarih}</span><span>Sayı: ${D.nDone + 1}</span><span>Fiyatı: ücretsiz</span></div><h1>Bilgisayar Gazetesi</h1><div class="gz-alt">${hello()} · ${safeNote}</div></header>
+    ${D.bitti ? '<section class="gz-manset"><h2>Bütün dersler bitti, tebrikler!</h2></section>' : `<a class="gz-manset" href="${D.href}"><small>Manşet · ${D.label}</small><h2>${D.title}</h2><p>${D.sub}. Okumaya kaldığınız yerden devam edin.</p><span class="gz-go">${D.go} ›</span><span class="gz-resim"><span>${D.icon}</span></span></a>`}
+    <h3 class="gz-bolum">Bu sayıda: ${W.length} hafta</h3>
+    <div class="gz-sutun">${W.map((x) => `<a class="gz-h${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue}"><small>${x.name}${x.full ? ' · ✔ okundu' : ''}</small><b>${x.title}</b><span>${x.icon} ${x.total} ders · ${x.n} tanesi bitti</span></a>`).join('')}</div></div>`;
 }
 
-// 4) Dağa tırmanış: etekten zirveye kıvrılan patika, her hafta bir kamp
-function homeDag(W, D) {
-  const rows = narrow() ? [2, 2, 2, 2, 2, 2, 2, 2] : [4, 4, 3, 3, 2];
-  const rowH = narrow() ? 150 : 165;
-  const H = 200 + rowH * (rows.length - 1) + 170;
-  const pts = [];
-  rows.forEach((n, r) => {
-    const span = narrow() ? 640 : 760 - r * 130;
-    for (let c = 0; c < n && pts.length < W.length; c++) {
-      const cc = r % 2 ? n - 1 - c : c;
-      pts.push({ x: 500 - span / 2 + (n > 1 ? (span * cc) / (n - 1) : span / 2), y: H - 110 - rowH * r, r });
-    }
-  });
-  let d = `M ${pts[0].x - 60} ${pts[0].y + 60} L ${pts[0].x} ${pts[0].y}`;
-  for (let k = 1; k < pts.length; k++) {
-    const a = pts[k - 1], b = pts[k];
-    d += a.r === b.r ? ` L ${b.x} ${b.y}` : ` Q ${a.x + (a.x > 500 ? 70 : -70)} ${(a.y + b.y) / 2}, ${b.x} ${b.y}`;
-  }
-  d += ` L 500 70`;
-  const cur = D.bitti ? -1 : D.wi;
-  return `<div class="dag"><div class="dg-ust"><div><h1>${hello()}</h1><p>${safeNote} Tırmanış 1. haftadan (aşağıdan) başlar; bir kampa tıklayın.</p></div>${devamBox(D, 'dg-dv', '🚩 Zirveye ulaştınız, tebrikler!')}</div>
-    <div class="dg-sahne" style="height:${H}px"><svg viewBox="0 0 1000 ${H}" preserveAspectRatio="none" aria-hidden="true">
-      <polygon class="dg-arka" points="-50,${H} 220,${H * 0.35} 420,${H} "/><polygon class="dg-arka" points="600,${H} 820,${H * 0.3} 1050,${H}"/>
-      <polygon class="dg-ana" points="-20,${H} 500,40 1020,${H}"/><polygon class="dg-kar" points="500,40 ${500 - H * 0.09},${40 + H * 0.17} ${500 - H * 0.03},${40 + H * 0.14} 500,${40 + H * 0.19} ${500 + H * 0.04},${40 + H * 0.14} ${500 + H * 0.09},${40 + H * 0.17}"/>
-      <path class="dg-patika" d="${d}"/></svg>
-    <span class="dg-zirve" style="top:${40 - 6}px">🚩<small>Zirve: kurs biter</small></span>
-    ${W.map((x, k) => `<a class="dg-k${x.full ? ' full' : ''}${k === cur ? ' cur' : ''}" href="${x.href}" style="left:${pts[k].x / 10}%;top:${pts[k].y}px;--h:${x.hue}" title="${esc(x.title)}">
-      ${k === cur ? '<span class="dg-flag">Buradasınız</span>' : ''}<span class="dg-ic">${x.full ? '✔' : x.icon}</span><span class="dg-lb"><small>${x.name} · ${x.n}/${x.total}</small><span class="t2">${x.title}</span></span></a>`).join('')}</div></div>`;
+// 4) Eski bilgisayar: siyah ekranda yeşil yazılı menü
+function homeRetro(W, D) {
+  const bar = (x) => { const n = Math.round(x.pct / 10); return `[${'█'.repeat(n)}${'░'.repeat(10 - n)}]`; };
+  return `<div class="retro"><div class="rt-kasa"><div class="rt-ekran">
+    <p class="rt-sat">BİLGİSAYAR DERSLERİ  v1.0          ${D.nDone} / ${D.total} DERS BİTTİ</p>
+    <p>${hello().toLocaleUpperCase('tr')}</p><p class="rt-sol">${safeNote}</p>
+    ${D.bitti ? '<p>&gt; BÜTÜN DERSLER BİTTİ. TEBRİKLER!</p>' : `<a class="rt-devam" href="${D.href}">C:\\&gt; ${D.go.toLocaleUpperCase('tr')}: ${esc(D.title)} <span class="rt-imlec">█</span></a><p class="rt-sol">     ${D.sub}</p>`}
+    <p class="rt-sat">─── HAFTALAR ── (birine tıklayın) ─────────────────</p>
+    <div class="rt-menu">${W.map((x) => `<a class="rt-m${x.full ? ' full' : ''}" href="${x.href}"><span class="rt-no">${x.w.no ? String(x.w.no).padStart(2, '0') : 'EK'}</span><span class="rt-ad">${x.title}</span><span class="rt-bar">${bar(x)} ${x.n}/${x.total}</span></a>`).join('')}</div>
+  </div><div class="rt-alt"><span class="rt-led"></span>DERSLER-286</div></div></div>`;
 }
 
-const HOMES = { harita: homeHarita, metro: homeMetro, ada: homeAda, dag: homeDag };
+const HOMES = { harita: homeHarita, kitap: homeKitap, gazete: homeGazete, retro: homeRetro };
 
 function renderHome() {
   const [key, name] = DESIGNS[design];
