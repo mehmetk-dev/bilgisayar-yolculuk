@@ -26,23 +26,26 @@
 </header>
 
 <main id="home">
-  <div class="hero">
-    <div class="hero-txt">
-      <h1>Bilgisayarı adım adım öğrenelim</h1>
-      <ol class="hero-adim">
-        <li><b>1</b><span>Aşağıdan bir hafta, sonra bir ders seçin.</span></li>
-        <li><b>2</b><span>Soldaki yazıda ne yapacağınız yazar; sırayla yapın.</span></li>
-        <li><b>3</b><span>Doğru yapınca ekran haber verir. Takılırsanız <b>İpucu</b>'na basın.</span></li>
-      </ol>
-      <p class="hero-not">🛡️ Burası bir <b>alıştırma bilgisayarı</b>: hiçbir şey bozulmaz, gerçek dosyalarınıza dokunmaz.</p>
-    </div>
-    <div id="devam"></div>
+  <aside id="plan">
+    <h2>Kurs planı</h2>
+    <label class="ara"><span aria-hidden="true">🔍</span><input id="ara" type="search" placeholder="Ders ara…" aria-label="Ders ara"></label>
+    <nav id="weeks" aria-label="Haftalar"></nav>
+  </aside>
+  <div id="hmain">
+    <section class="hero">
+      <div class="hero-txt">
+        <h1>Bilgisayarı adım adım öğrenelim</h1>
+        <ol class="hero-adim">
+          <li><b>1</b><span>Soldan bir hafta, sonra bir ders seçin.</span></li>
+          <li><b>2</b><span>Ekrandaki yazı ne yapacağınızı söyler; sırayla yapın.</span></li>
+          <li><b>3</b><span>Takılırsanız <b>İpucu</b> düğmesine basın.</span></li>
+        </ol>
+        <p class="hero-not">Burası bir <b>alıştırma bilgisayarı</b>. Hiçbir şey bozulmaz, gerçek dosyalarınıza dokunmaz.</p>
+      </div>
+      <div id="devam"></div>
+    </section>
+    <div id="cards"></div>
   </div>
-  <section class="hsec">
-    <div class="hsec-bas"><h2>Haftalar</h2><label class="ara"><span aria-hidden="true">🔍</span><input id="ara" type="search" placeholder="Ders ara: e-posta, Excel, fare…" aria-label="Ders ara"></label></div>
-    <div id="weeks" role="group" aria-label="Haftalar"></div>
-  </section>
-  <div id="cards"></div>
 </main>
 
 <main id="ozet"></main>

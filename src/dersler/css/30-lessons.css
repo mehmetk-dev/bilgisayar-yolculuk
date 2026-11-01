@@ -225,8 +225,6 @@ button:hover, .btn:hover { border-color: #aab2bd; }
 .brand { font-weight: 800; font-size: 1.15em; }
 .brand span { background: linear-gradient(90deg, #0a5dc2, #7a4cf0, #ef5da8); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; }
 #crumb { font-weight: 500; }
-#home { padding: 1.8em 1.2em 4em; }
-#cards { margin-top: 1.6em; gap: 2em; }
 /* ders paneli */
 #lesson { padding: 1.2em 1.4em; gap: 1.2em; }
 #guide, #scene { border: 1px solid var(--line); border-radius: 10px; }
