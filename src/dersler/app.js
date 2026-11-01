@@ -131,7 +131,10 @@ function showOzet() {
   };
 }
 
+let homeShown = false; // ilk açılışta geçiş animasyonu olmasın
 function showHome(w = null) {
+  const wasHome = homeShown && document.body.dataset.view === 'home';
+  homeShown = true;
   homeWeek = w;
   if (lesson) saveProgress();
   lesson = null;
@@ -139,12 +142,14 @@ function showHome(w = null) {
   document.body.dataset.view = 'home';
   $('#crumb').textContent = '';
   clearTimeout(hintTimer);
-  renderHome();
+  // Ana sayfada hafta değişince (şerit açılması, kutunun büyümesi, kartların kayması) yumuşak geçiş
+  if (wasHome && document.startViewTransition && DESIGNS[design][0] !== 'harita' && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(renderHome);
+  else renderHome();
 }
 
 // ---- Ana sayfa: 4 ayrı tasarım; sağ üstteki "Tasarım" düğmesi sırayla değiştirir ----
 // Ana görünümde haftalar; bir haftaya tıklanınca (#hafta/N) yalnızca o haftanın dersleri görünür.
-const DESIGNS = [['harita', 'Yolculuk haritası'], ['kitap', 'Kitaplık'], ['gazete', 'Gazete'], ['retro', 'Eski bilgisayar']];
+const DESIGNS = [['harita', 'Yolculuk haritası'], ['mac', 'Cam masaüstü'], ['perde', 'Perde'], ['vitrin', 'Vitrin'], ['mozaik', 'Renk mozaiği'], ['dergi', 'Dergi']];
 let design = Math.max(0, DESIGNS.findIndex(([k]) => k === lsGet('bd-tasarim', 'harita')));
 let homeWeek = null;
 const WEEK_ICONS = ['🖱️', '⌨️', '📝', '🖥️', '🪟', '📁', '🎨', '🌐', '📧', '📄', '📊', '📽️', '📱', '🏛', '🔒'];
@@ -189,10 +194,10 @@ function devamInfo() {
 }
 
 // Bir haftanın içindeki ders (bütün tasarımlarda aynı yapı, görünüşü CSS belirler)
-function lessonItem(l, no) {
+function lessonItem(l, no, i = no - 1) {
   const desc = esc(l.desc);
   const head = `<span class="li-no">${no}</span><span class="li-ic">${emojiIcon(l.icon)}</span><div class="li-tx"><h3>${l.title}</h3><p title="${desc}">${l.desc}</p></div>`;
-  if (l.link) return `<article class="li link">${head}<div class="li-alt"><span class="tag">3B gezinti</span><a class="btn" href="${l.link}">Aç</a></div></article>`;
+  if (l.link) return `<article class="li link" style="--i:${i}">${head}<div class="li-alt"><span class="tag">3B gezinti</span><a class="btn" href="${l.link}">Aç</a></div></article>`;
   const p = store.lessons[l.id];
   const total = l.steps.length;
   const sc = l.test && testScore(l);
@@ -209,7 +214,7 @@ function lessonItem(l, no) {
     status = `<span class="tag yarim">Adım ${p.step + 1} / ${total}</span>`;
     btn = `<a class="btn primary" href="#ders/${l.id}">Devam</a>`;
   }
-  return `<article class="li${p?.done ? ' done' : ''}">${head}<div class="li-alt">${status}${btn}</div></article>`;
+  return `<article class="li${p?.done ? ' done' : ''}" style="--i:${i}">${head}<div class="li-alt">${status}${btn}</div></article>`;
 }
 
 function weekPage(i) {
@@ -252,50 +257,88 @@ function homeHarita(W, D) {
     <span class="yh-bit" style="left:${last.x / 10}%;top:${last.y + 70}px">🏁</span></div></div>`;
 }
 
-// 2) Kitaplık: ahşap raflarda kitaplar; her hafta bir kitap
-function homeKitap(W, D) {
-  const raf = (list) => `<div class="kt-raf"><div class="kt-kitaplar">${list.map((x) => `<a class="kt-k${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue}" title="${esc(x.title)}">
-      <span class="kt-ic">${x.icon}</span><small>${x.name}</small><b class="t3">${x.title}</b><span class="kt-say">${x.full ? '✔ Okundu' : `${x.n} / ${x.total} ders`}</span></a>`).join('')}</div><div class="kt-tahta"></div></div>`;
-  const per = matchMedia('(max-width: 700px)').matches ? 2 : 6;
-  const rows = [];
-  for (let k = 0; k < W.length; k += per) rows.push(W.slice(k, k + per));
-  return `<div class="kitap"><div class="kt-ust"><div class="kt-kart"><small>Okuma kartı</small><h1>${hello()}</h1><p>${safeNote}</p><p>Raftan bir kitap (hafta) seçin.</p></div>
-    ${D.bitti ? '<div class="kt-acik"><b>Bütün kitapları bitirdiniz 🎉</b></div>' : `<a class="kt-acik" href="${D.href}"><span class="kt-sayfa"><small>${D.label}</small><b>${D.title}</b><span>${D.sub}</span></span><span class="kt-sayfa kt-sag"><span class="kt-buyuk">${D.icon}</span><span class="kt-go">${D.go} ›</span></span></a>`}</div>
-    ${rows.map(raf).join('')}</div>`;
+// Seçili haftanın dersleri ve kısa başlığı (yeni tasarımlar ortak kullanır)
+const lessonsOf = (i) => WEEKS[i].lessons.map((l, k) => lessonItem(l, k + 1)).join('');
+const devamBtn = (D, cls) => (D.bitti ? '' : `<a class="${cls}" href="${D.href}"><span class="${cls}-ic">${D.icon}</span><span class="${cls}-tx"><small>${D.label}</small><b>${D.title}</b></span><span class="${cls}-go">${D.go} ›</span></a>`);
+
+// 2) Cam masaüstü (macOS/iPadOS gibi): aurora arka plan, cam klasörler, altta Dock; klasör ortada pencere olarak açılır
+function homeMac(W, D, sel, open) {
+  const win = open ? `<div class="mc-perde"></div><section class="mc-pen" style="--h:${W[sel].hue}" role="dialog" aria-label="${esc(W[sel].title)}">
+      <div class="mc-bar"><a class="mc-nok r" href="#" title="Kapat" aria-label="Pencereyi kapat"></a><a class="mc-nok y" href="#" title="Küçült" aria-label="Küçült"></a><span class="mc-nok g"></span>
+        <span class="mc-bas">${W[sel].icon} ${W[sel].name}: ${W[sel].title}</span><a class="mc-kapat" href="#">Kapat</a></div>
+      <div class="mc-ic"><p class="mc-say">${W[sel].total} dersten <b>${W[sel].n}</b> tanesi bitti</p><div class="mc-ler">${lessonsOf(sel)}</div>
+      <div class="wnav">${sel > 0 ? `<a class="btn" href="#hafta/${sel - 1}">‹ ${W[sel - 1].name}</a>` : ''}<span class="sp"></span>${W[sel + 1] ? `<a class="btn primary" href="#hafta/${sel + 1}">Sonraki: ${W[sel + 1].name} ›</a>` : ''}</div></div></section>` : '';
+  return `<div class="mc-aurora"><i></i><i></i><i></i></div><div class="mac${open ? ' acik' : ''}">
+    <div class="mc-ust"><h1>${hello()}</h1><p>${safeNote} Bir klasör açın.</p></div>
+    <div class="mc-grid">${W.map((x) => `<a class="mc-k${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue};view-transition-name:mc${x.i}" title="${esc(x.title)}">
+      <span class="mc-ikon">${x.icon}${x.full ? '<span class="mc-ok">✔</span>' : ''}</span><span class="mc-ad t2">${x.title}</span><span class="mc-alt">${x.name} · ${x.n}/${x.total}</span></a>`).join('')}</div></div>
+    <nav class="mc-dock" aria-label="Dock">${D.bitti ? '' : `<a class="mc-d mc-dv" href="${D.href}" title="${esc(D.title)}"><span class="mc-di">${D.icon}</span><span class="mc-dl"><small>${D.label}</small>${D.go}</span></a><span class="mc-ayr"></span>`}
+      <a class="mc-d" href="robot.html" title="Robo ile Kodlama"><span class="mc-di">🤖</span><span class="mc-dl">Robo</span></a>
+      <a class="mc-d" href="bilgisayar.html" title="Bilgisayarı canlı gör"><span class="mc-di">🖥️</span><span class="mc-dl">3B</span></a>
+      <a class="mc-d" href="#ozet" title="Eğitmen özeti"><span class="mc-di">📊</span><span class="mc-dl">Özet</span></a>
+      <span class="mc-ayr"></span><span class="mc-d mc-ilerle" title="Bitirilen dersler"><span class="mc-di"><b>${D.nDone}</b></span><span class="mc-dl">/ ${D.total} ders</span></span></nav>
+    ${win}`;
 }
 
-// 3) Gazete: manşette kaldığınız yer, haftalar sütunlarda haber gibi
-function homeGazete(W, D) {
-  const tarih = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  return `<div class="gazete"><header class="gz-bas"><div class="gz-ust"><span>${tarih}</span><span>Sayı: ${D.nDone + 1}</span><span>Fiyatı: ücretsiz</span></div><h1>Bilgisayar Gazetesi</h1><div class="gz-alt">${hello()} · ${safeNote}</div></header>
-    ${D.bitti ? '<section class="gz-manset"><h2>Bütün dersler bitti, tebrikler!</h2></section>' : `<a class="gz-manset" href="${D.href}"><small>Manşet · ${D.label}</small><h2>${D.title}</h2><p>${D.sub}. Okumaya kaldığınız yerden devam edin.</p><span class="gz-go">${D.go} ›</span><span class="gz-resim"><span>${D.icon}</span></span></a>`}
-    <h3 class="gz-bolum">Bu sayıda: ${W.length} hafta</h3>
-    <div class="gz-sutun">${W.map((x) => `<a class="gz-h${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue}"><small>${x.name}${x.full ? ' · ✔ okundu' : ''}</small><b>${x.title}</b><span>${x.icon} ${x.total} ders · ${x.n} tanesi bitti</span></a>`).join('')}</div></div>`;
+// 3) Perde: yan yana dikey şeritler; seçilen şerit genişler, içinde dersler
+function homePerde(W, D, sel) {
+  return `<div class="perde"><div class="pr-ust"><h1>${hello()}</h1><p>${safeNote} Bir şeride tıklayın, açılsın.</p>${devamBtn(D, 'pr-dv')}</div>
+    <div class="pr-sahne">${W.map((x) => (x.i === sel
+    ? `<section class="pr-s acik" style="--h:${x.hue};view-transition-name:pr${x.i}"><div class="pr-bas"><span class="pr-ikon">${x.icon}</span><div><small>${x.name}</small><h2>${x.title}</h2><span>${x.total} dersten <b>${x.n}</b> tanesi bitti</span></div></div><div class="pr-ler">${lessonsOf(sel)}</div></section>`
+    : `<a class="pr-s${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue};view-transition-name:pr${x.i}" title="${esc(x.title)}"><span class="pr-no">${x.w.no || 'Ek'}</span><span class="pr-dik">${x.title}</span><span class="pr-ki">${x.full ? '✔' : x.icon}</span></a>`)).join('')}</div></div>`;
 }
 
-// 4) Eski bilgisayar: siyah ekranda yeşil yazılı menü
-function homeRetro(W, D) {
-  const bar = (x) => { const n = Math.round(x.pct / 10); return `[${'█'.repeat(n)}${'░'.repeat(10 - n)}]`; };
-  return `<div class="retro"><div class="rt-kasa"><div class="rt-ekran">
-    <p class="rt-sat">BİLGİSAYAR DERSLERİ  v1.0          ${D.nDone} / ${D.total} DERS BİTTİ</p>
-    <p>${hello().toLocaleUpperCase('tr')}</p><p class="rt-sol">${safeNote}</p>
-    ${D.bitti ? '<p>&gt; BÜTÜN DERSLER BİTTİ. TEBRİKLER!</p>' : `<a class="rt-devam" href="${D.href}">C:\\&gt; ${D.go.toLocaleUpperCase('tr')}: ${esc(D.title)} <span class="rt-imlec">█</span></a><p class="rt-sol">     ${D.sub}</p>`}
-    <p class="rt-sat">─── HAFTALAR ── (birine tıklayın) ─────────────────</p>
-    <div class="rt-menu">${W.map((x) => `<a class="rt-m${x.full ? ' full' : ''}" href="${x.href}"><span class="rt-no">${x.w.no ? String(x.w.no).padStart(2, '0') : 'EK'}</span><span class="rt-ad">${x.title}</span><span class="rt-bar">${bar(x)} ${x.n}/${x.total}</span></a>`).join('')}</div>
-  </div><div class="rt-alt"><span class="rt-led"></span>DERSLER-286</div></div></div>`;
+// 4) Vitrin: 3B kart dizisi; ortadaki hafta büyük, arka plan ışığı onun renginde, dersler altta sırayla belirir
+function homeVitrin(W, D, sel) {
+  const x0 = W[sel];
+  const cards = W.map((x) => {
+    const d = x.i - sel, a = Math.abs(d);
+    if (a > 4) return '';
+    const tx = d === 0 ? 0 : Math.sign(d) * (8.5 + (a - 1) * 4.2);
+    const st = `--h:${x.hue};transform:translateX(calc(-50% + ${tx}em)) translateZ(${-a * 70}px) rotateY(${-Math.sign(d) * (a ? 42 : 0)}deg) scale(${a ? 0.86 : 1.08});z-index:${10 - a};opacity:${a > 3 ? 0.35 : 1};view-transition-name:vt${x.i}`;
+    return `<a class="vt-k${d === 0 ? ' on' : ''}${x.full ? ' full' : ''}" href="${x.href}" style="${st}" title="${esc(x.title)}"${d === 0 ? ' aria-current="true"' : ''}>
+      <span class="vt-ikon">${x.icon}</span><small>${x.name}${x.full ? ' · ✔' : ''}</small><b class="t2">${x.title}</b><span class="vt-bar"><i style="width:${x.pct}%"></i></span></a>`;
+  }).join('');
+  return `<div class="vitrin" style="--h:${x0.hue}"><div class="vt-isik"></div><div class="vt-ust"><div><h1>${hello()}</h1><p>${safeNote}</p></div>${devamBtn(D, 'vt-dv')}</div>
+    <div class="vt-sahne">${sel > 0 ? `<a class="vt-ok sol" href="#hafta/${sel - 1}" aria-label="Önceki hafta">‹</a>` : ''}${cards}${W[sel + 1] ? `<a class="vt-ok sag" href="#hafta/${sel + 1}" aria-label="Sonraki hafta">›</a>` : ''}</div>
+    <div class="vt-baslik"><small>${x0.name}</small><h2>${x0.title}</h2><span>${x0.total} dersten <b>${x0.n}</b> tanesi bitti · Kartları oklarla ya da tıklayarak değiştirin</span></div>
+    <div class="vt-ler" style="view-transition-name:vtler">${lessonsOf(sel)}</div></div>`;
 }
 
-const HOMES = { harita: homeHarita, kitap: homeKitap, gazete: homeGazete, retro: homeRetro };
+// 5) Renk mozaiği: tek ekrana sığan renkli kutular; tıklanan kutu büyüyüp derslerini açar
+function homeMozaik(W, D, sel, open) {
+  const SIZE = ['g', '', '', 'u', '', 'g', '', '', '', 'g', '', 'u', '', '', 'g', ''];
+  return `<div class="mozaik"><div class="mz-ust"><h1>${hello()}</h1><p>${safeNote} Bir kutuya tıklayın.</p></div>
+    <div class="mz-grid">${D.bitti ? '' : `<a class="mz-t mz-dv" href="${D.href}" style="--h:140;view-transition-name:mzdv"><span class="mz-su">${D.icon}</span><small>${D.label}</small><b class="t3">${D.title}</b><span class="mz-go">${D.go} ›</span></a>`}
+    ${W.map((x, k) => (open && x.i === sel
+    ? `<section class="mz-t acik" style="--h:${x.hue};view-transition-name:mz${x.i}"><span class="mz-su">${x.icon}</span><div class="mz-acbas"><div><small>${x.name}</small><h2>${x.title}</h2><span>${x.total} dersten ${x.n} tanesi bitti</span></div><a class="mz-kapat" href="#">✕ Kapat</a></div><div class="mz-ler">${lessonsOf(sel)}</div></section>`
+    : `<a class="mz-t ${SIZE[k] || ''}${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue};view-transition-name:mz${x.i}" title="${esc(x.title)}"><span class="mz-su">${x.icon}</span><small>${x.name}${x.full ? ' · ✔' : ''}</small><b class="t3">${x.title}</b><span class="mz-say">${x.n} / ${x.total}</span></a>`)).join('')}</div></div>`;
+}
+
+// 6) Dergi: solda dev numara ve haftanın adı, sağda zarif ders satırları
+function homeDergi(W, D, sel) {
+  const x = W[sel];
+  const num = x.w.no ? String(x.w.no).padStart(2, '0') : 'EK';
+  return `<div class="dergi" style="--h:${x.hue}"><section class="dg-sol" style="view-transition-name:dgsol"><span class="dg-num">${num}</span>
+      <div class="dg-ust"><small>${hello()} ${safeNote}</small></div>
+      <div class="dg-orta"><span class="dg-ikon">${x.icon}</span><small>${x.name} · ${x.total} ders · ${x.n} bitti</small><h1>${x.title}</h1>${devamBtn(D, 'dg-dv')}</div>
+      <nav class="dg-sec" aria-label="Haftalar">${W.map((y) => `<a href="${y.href}" class="${y.i === sel ? 'on' : ''}${y.full ? ' full' : ''}" title="${esc(y.title)}">${y.w.no ? String(y.w.no).padStart(2, '0') : 'EK'}</a>`).join('')}</nav></section>
+    <section class="dg-sag"><div class="dg-sbas"><span>${num} / ${x.title}</span><span>${x.n} / ${x.total}</span></div><div class="dg-ler">${lessonsOf(sel)}</div>
+      <div class="wnav">${sel > 0 ? `<a class="btn" href="#hafta/${sel - 1}">‹ Önceki</a>` : ''}<span class="sp"></span>${W[sel + 1] ? `<a class="btn primary" href="#hafta/${sel + 1}">Sonraki hafta ›</a>` : ''}</div></section></div>`;
+}
+
+const HOMES = { harita: homeHarita, mac: homeMac, perde: homePerde, vitrin: homeVitrin, mozaik: homeMozaik, dergi: homeDergi };
 
 function renderHome() {
   const [key, name] = DESIGNS[design];
   const home = $('#home');
   home.dataset.t = key;
   home.dataset.hafta = homeWeek != null ? '1' : '';
-  if (homeWeek != null) home.innerHTML = weekPage(homeWeek);
-  else home.innerHTML = HOMES[key](weekInfo(), devamInfo());
+  const D = devamInfo();
+  if (key === 'harita') home.innerHTML = homeWeek != null ? weekPage(homeWeek) : homeHarita(weekInfo(), D);
+  else home.innerHTML = HOMES[key](weekInfo(), D, homeWeek ?? (D.bitti ? 0 : D.wi), homeWeek != null);
   $('#tasarim').innerHTML = `🎨 Tasarım ${design + 1} / ${DESIGNS.length}: <b>${name}</b> ›`;
-  if (homeWeek != null) home.scrollTop = 0;
+  if (homeWeek != null && key === 'harita') home.scrollTop = 0;
 }
 
 $('#tasarim').addEventListener('click', () => {
