@@ -13,28 +13,33 @@ export const btns = () => '<div class="btns"><button class="btn go" data-act="pl
 // Izgara resmi (oynatıcısız): grid(['S..G'], {dir, size, lr})
 export const grid = (map, o = {}) => `<div class="gridbox" data-grid="${attr(map.join('|'))}" data-dir="${o.dir || 'E'}" data-size="${o.size || 100}"${o.lr ? ' data-lr="1"' : ''}></div>`;
 // Kod kutusu
-export const code = (prog, o = {}) => `<div class="code${o.flow ? ' flow' : ''}${o.sm ? ' sm' : ''}${o.fnbody ? ' fnbody' : ''}" data-code="${attr(prog)}"${o.fname ? ` data-fname="${attr(o.fname)}"` : ''}${o.named != null ? ` data-named="${o.named ? 1 : 0}"` : ''}${o.w ? ` style="width:${o.w}px"` : ''}></div>`;
+export const code = (prog, o = {}) => `<div class="code${o.cols ? ' cols' : ''}${o.flow ? ' flow' : ''}${o.sm ? ' sm' : ''}${o.fnbody ? ' fnbody' : ''}" data-code="${attr(prog)}"${o.fname ? ` data-fname="${attr(o.fname)}"` : ''}${o.named != null ? ` data-named="${o.named ? 1 : 0}"` : ''}${o.w ? ` style="width:${o.w}px"` : ''}></div>`;
 
 // Canlı oynatıcı: harita + program + düğmeler. Düz programlar soldan sağa numaralı kutularla gösterilir;
 // geniş-alçak haritalarda harita üstte, program altta durur (stack).
 export function player(o) {
+  if (o.progs) o = { ...o, prog: o.progs[0][1] };
   const m0 = o.maps ? o.maps[0] : o.map;
   const linear = !/[\d(){}]/.test(o.prog) && o.fn == null;
   const stack = o.stack ?? (m0.length <= 2 && m0[0].length >= 3);
   const cols = Math.max(...m0.map((r) => r.length)), rows = m0.length;
-  if (!o.size) o = { ...o, size: stack ? Math.min(170, Math.floor(1380 / cols), Math.floor(300 / rows)) : Math.min(160, Math.floor(620 / cols), Math.floor(540 / rows)) };
+  if (!o.size) o = { ...o, size: stack ? Math.min(170, Math.floor(1380 / cols), Math.floor(300 / rows)) : Math.min(150, Math.floor(620 / cols), Math.floor(440 / rows)) };
   const gb = o.maps
     ? `<div class="gridbox" data-maps="${attr(JSON.stringify(o.maps))}" data-dir="${o.dir || 'E'}" data-size="${o.size}"${o.lr ? ' data-lr="1"' : ''}></div>`
     : grid(o.map, o);
   const fn = o.fn != null
     ? `<div class="codettl fn">🧩 ${o.fname} fonksiyonu</div>${code(o.fn, { fnbody: true, fname: o.fname, sm: o.sm })}<div class="codettl">📜 Programım</div>`
     : '';
-  const cd = code(o.prog, { fname: o.fname, sm: o.sm, w: linear ? null : (o.codeW || 520), flow: linear });
+  const tabs = o.progs ? `<div class="progtabs">${o.progs.map(([t, p], j) => `<button class="${t.includes('🐞') ? 'bug' : t.includes('✅') ? 'fix' : ''}${j ? '' : ' on'}" data-prog="${attr(p)}">${t}</button>`).join('')}</div>` : '';
+  if (o.progs) o = { ...o, prog: o.progs[0][1] };
+  const rowsOf = (p) => (p.match(/[A-Za-z]/g) || []).length - (p.match(/[iue]\{/g) || []).length * 0 + (p.match(/\(/g) || []).length;
+  const sm = o.sm ?? Math.max(...(o.progs || [[0, o.prog]]).map((x) => rowsOf(x[1]))) > 8;
+  const cd = tabs + code(o.prog, { cols: o.cols, fname: o.fname, sm, w: linear ? null : o.codeW, flow: linear });
   const lim = o.limit ? ` data-limit="${o.limit}"` : '';
   if (stack) return `<div class="player stack"${lim}><div>${gb}</div><div class="lower"><div class="col">${fn}${cd}</div>${btns()}</div>${o.under || ''}${o.side || ''}</div>`;
   return `<div class="player row" style="align-items:flex-start;gap:${o.gap || 50}px"${lim}>
-<div style="flex:0 0 auto${o.pad ? ';padding-left:' + o.pad + 'px' : ''}">${gb}</div>
-<div class="col" style="min-width:540px"><div class="codewrap">${fn}${cd}</div>${btns()}${o.under || ''}${o.side || ''}</div></div>`;
+<div style="flex:0 0 auto${o.pad ? ';padding-left:' + o.pad + 'px' : ''}">${gb}${btns()}</div>
+<div class="col" style="min-width:540px"><div class="codewrap">${fn}${cd}</div>${o.under || ''}${o.side || ''}</div></div>`;
 }
 
 // Soru
@@ -75,3 +80,9 @@ export function weekEnd({ week, color, items, next }) {
   return `<section class="s" data-color="${color}" data-where="${week}. hafta" data-menu="Bu hafta öğrendiklerimiz" data-note="Her maddeyi okuyup sınıfa tekrarlatın. Kim örnek verebilir?"><span class="tag lc">🎓 BU HAFTA ÖĞRENDİKLERİMİZ</span><h2>Aklında kalsın!</h2>${learned(items)}</section>
 <section class="s cover center" data-color="${color}" data-end="1" data-note="Sonraki hafta: ${attr(next)}"><div class="sky"></div><div class="row center" style="flex-direction:column;gap:20px">${robo('dance', 230)}<h1>Aferin! 🎉</h1><p>${week}. haftayı bitirdik. Gelecek hafta: <b>${next}</b></p></div></section>`;
 }
+
+// Ritim oynatıcı: beat('3(2(A)M)')
+export const beat = (prog) => `<div class="player row" style="align-items:flex-start"><div class="col" style="flex:0 0 640px">${code(prog)}${btns()}</div><div class="col"><div class="beat"><div><div class="bx">🙂</div><div class="tx">Hazır mısın?</div></div></div><div class="tally"></div></div></div>`;
+// İki elle sayma
+export const hands = (big, small, bl, sl) => `<div class="hands" data-big="${big}" data-small="${small}"><div class="hand b"><div class="h">Büyük döngü<br>(${bl})</div><div class="n hb">1</div></div><div class="hand k"><div class="h">Küçük döngü<br>(${sl})</div><div class="n hk">1</div></div></div>`;
+export const BAG = '<svg viewBox="0 0 64 64" width="120" height="120" aria-hidden="true"><path d="M22 14a10 10 0 0 1 20 0" fill="none" stroke="#1d3557" stroke-width="4"/><rect x="10" y="14" width="44" height="46" rx="12" fill="#e5484d" stroke="#1d3557" stroke-width="3"/><path d="M10 28q22 10 44 0" fill="none" stroke="#1d3557" stroke-width="3"/><rect x="20" y="38" width="24" height="14" rx="5" fill="#ff8f8f" stroke="#1d3557" stroke-width="3"/></svg>';

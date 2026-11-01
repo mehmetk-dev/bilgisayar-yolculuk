@@ -208,9 +208,20 @@ function makeGrid(box) {
 function makePlayer(pl) {
   const codeEl = $('.code[data-code]', pl), fnEl = $('.code.fnbody', pl), box = $('.gridbox', pl), beatEl = $('.beat', pl);
   const grid = box ? makeGrid(box) : null;
-  const tree = codeEl._tree, fn = fnEl ? fnEl._tree : [];
-  const allText = (codeEl.dataset.code + (fnEl ? fnEl.dataset.code : ''));
+  let tree = codeEl._tree;
+  const fn = fnEl ? fnEl._tree : [];
+  const allText = $$('[data-prog]', pl).map((b) => b.dataset.prog).join('') + codeEl.dataset.code + (fnEl ? fnEl.dataset.code : '');
   const autoStar = !allText.includes('P');
+  const ptabs = $$('.progtabs button', pl);
+  ptabs.forEach((b) => (b.onclick = () => {
+    ptabs.forEach((x) => x.classList.toggle('on', x === b));
+    codeEl.dataset.code = b.dataset.prog;
+    codeEl.classList.toggle('flow', !/[\d(){}f]/.test(b.dataset.prog));
+    if (codeEl.classList.contains('flow')) codeEl.style.width = '';
+    tree = codeEl._tree = parse(b.dataset.prog);
+    codeEl.innerHTML = renderCode(tree, { fname: codeEl.dataset.fname || 'Fonksiyon', named: hasNested(tree) });
+    reset();
+  }));
   const limit = +(pl.dataset.limit || 400);
   const btnPlay = $('[data-act="play"]', pl), btnSlow = $('[data-act="slow"]', pl);
   let gen = null, timer = null, slow = true, steps = 0, ctx = null;
@@ -309,6 +320,21 @@ $$('.turn').forEach((t) => {
   show();
 });
 
+/* ---------- İki elle sayma (büyük/küçük döngü) ---------- */
+let handTimer = null;
+function handsStart(h) {
+  const hb = $('.hb', h), hk = $('.hk', h), nb = +(h.dataset.big || 3), nk = +(h.dataset.small || 3);
+  let b = 1, k = 0;
+  hb.textContent = 1; hk.textContent = 1;
+  const t = () => {
+    k++;
+    if (k > nk) { k = 1; b = b % nb + 1; hb.textContent = b; again(hb, 'flash'); }
+    hk.textContent = k; again(hk, 'flash');
+    handTimer = setTimeout(t, k === nk ? 1500 : 1000);
+  };
+  handTimer = setTimeout(t, 400);
+}
+
 /* ---------- Sorular ---------- */
 $$('.opts').forEach((box) => {
   const a = +box.dataset.a, opts = $$('.opt', box), why = box.parentElement.querySelector('.why');
@@ -384,6 +410,7 @@ function go(j, back) {
   $$('.opts', s).forEach((o) => o._reset());
   $$('.order', s).forEach((o) => o._reset());
   $$('.turn', s).forEach((t) => t._reset());
+  clearTimeout(handTimer); $$('.hands', s).forEach(handsStart);
   if (s.dataset.end) setTimeout(() => confetti(70), 300);
   deck.classList.toggle('dark', s.classList.contains('cover') || s.classList.contains('lcover'));
   $$('i', dots).forEach((d, k) => d.classList.toggle('on', k === cur));
