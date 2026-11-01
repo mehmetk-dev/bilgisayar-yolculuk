@@ -35,7 +35,7 @@ let ids = [];
 const nWeeks = await page.$$eval('a[href^="#hafta/"]', (as) => as.length);
 for (let w = 0; w < Math.max(nWeeks, 1); w++) {
   if (nWeeks) { await page.evaluate((h) => { location.hash = h; }, '#hafta/' + w); await sleep(100); }
-  ids.push(...await page.$$eval('#home .wk a[href^="#ders/"]', (as) => as.map((a) => a.getAttribute('href').slice(6))));
+  ids.push(...await page.$$eval('#home .li a[href^="#ders/"]', (as) => as.map((a) => a.getAttribute('href').slice(6))));
 }
 ids = [...new Set(ids)];
 if (ONLY.length) ids = ids.filter((id) => ONLY.includes(id));

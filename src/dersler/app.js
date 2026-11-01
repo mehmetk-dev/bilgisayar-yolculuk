@@ -131,10 +131,7 @@ function showOzet() {
   };
 }
 
-let homeShown = false; // ilk açılışta geçiş animasyonu olmasın
 function showHome(w = null) {
-  const wasHome = homeShown && document.body.dataset.view === 'home';
-  homeShown = true;
   homeWeek = w;
   if (lesson) saveProgress();
   lesson = null;
@@ -142,15 +139,10 @@ function showHome(w = null) {
   document.body.dataset.view = 'home';
   $('#crumb').textContent = '';
   clearTimeout(hintTimer);
-  // Ana sayfada hafta değişince (şerit açılması, kutunun büyümesi, kartların kayması) yumuşak geçiş
-  if (wasHome && document.startViewTransition && DESIGNS[design][0] !== 'harita' && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(renderHome);
-  else renderHome();
+  renderHome();
 }
 
-// ---- Ana sayfa: 4 ayrı tasarım; sağ üstteki "Tasarım" düğmesi sırayla değiştirir ----
-// Ana görünümde haftalar; bir haftaya tıklanınca (#hafta/N) yalnızca o haftanın dersleri görünür.
-const DESIGNS = [['birlesik', 'Birleşik (cam + yol)'], ['harita', 'Yolculuk haritası'], ['mac', 'Cam masaüstü']];
-let design = Math.max(0, DESIGNS.findIndex(([k]) => k === lsGet('bd-tasarim2', 'birlesik')));
+// ---- Ana sayfa: Yolculuk haritası. Haftaya tıklanınca (#hafta/N) yalnızca o haftanın dersleri görünür ----
 let homeWeek = null;
 const WEEK_ICONS = ['🖱️', '⌨️', '📝', '🖥️', '🪟', '📁', '🎨', '🌐', '📧', '📄', '📊', '📽️', '📱', '🏛', '🔒'];
 const WEEK_HUES = [210, 265, 330, 25, 200, 45, 300, 175, 230, 220, 140, 15, 190, 0, 160];
@@ -194,10 +186,10 @@ function devamInfo() {
 }
 
 // Bir haftanın içindeki ders (bütün tasarımlarda aynı yapı, görünüşü CSS belirler)
-function lessonItem(l, no, i = no - 1) {
+function lessonItem(l, no) {
   const desc = esc(l.desc);
   const head = `<span class="li-no">${no}</span><span class="li-ic">${emojiIcon(l.icon)}</span><div class="li-tx"><h3>${l.title}</h3><p title="${desc}">${l.desc}</p></div>`;
-  if (l.link) return `<article class="li link" style="--i:${i}">${head}<div class="li-alt"><span class="tag">3B gezinti</span><a class="btn" href="${l.link}">Aç</a></div></article>`;
+  if (l.link) return `<article class="li link">${head}<div class="li-alt"><span class="tag">3B gezinti</span><a class="btn" href="${l.link}">Aç</a></div></article>`;
   const p = store.lessons[l.id];
   const total = l.steps.length;
   const sc = l.test && testScore(l);
@@ -214,7 +206,7 @@ function lessonItem(l, no, i = no - 1) {
     status = `<span class="tag yarim">Adım ${p.step + 1} / ${total}</span>`;
     btn = `<a class="btn primary" href="#ders/${l.id}">Devam</a>`;
   }
-  return `<article class="li${p?.done ? ' done' : ''}" style="--i:${i}">${head}<div class="li-alt">${status}${btn}</div></article>`;
+  return `<article class="li${p?.done ? ' done' : ''}">${head}<div class="li-alt">${status}${btn}</div></article>`;
 }
 
 function weekPage(i) {
@@ -232,7 +224,7 @@ function weekPage(i) {
 const hello = () => (who ? `Hoş geldiniz, ${esc(who)}!` : 'Hoş geldiniz!');
 const safeNote = 'Burası bir <b>alıştırma bilgisayarı</b>. Rahat olun: hiçbir şey bozulmaz.';
 
-// Kıvrılan yol üstünde duraklar (Yolculuk haritası ve Birleşik tasarım kullanır)
+// Kıvrılan yol üstünde duraklar
 function yolMap(W, D) {
   const per = matchMedia('(max-width: 700px)').matches ? 2 : 4;
   const rowH = 210, colW = 1000 / per;
@@ -257,65 +249,19 @@ function yolMap(W, D) {
 const yolDevam = (D) => (D.bitti ? '<div class="yh-dv"><b>🏁 Yolculuk bitti, tebrikler!</b></div>'
   : `<a class="yh-dv" href="${D.href}"><span class="yh-dv-ic">${D.icon}</span><span><small>${D.label}</small><b>${D.title}</b></span><span class="yh-go">${D.go} ›</span></a>`);
 
-// 2) Yolculuk haritası
 function homeHarita(W, D) {
   return `<div class="harita"><div class="yh-ust"><div><h1>${hello()}</h1><p>${safeNote} Yol 1. haftadan başlar; bir durağa tıklayın.</p></div>
     ${yolDevam(D)}</div>${yolMap(W, D)}</div>`;
 }
 
-// Seçili haftanın dersleri ve kısa başlığı (yeni tasarımlar ortak kullanır)
-const lessonsOf = (i) => WEEKS[i].lessons.map((l, k) => lessonItem(l, k + 1)).join('');
-
-// Cam pencere (haftanın dersleri) ve Dock: Cam masaüstü ve Birleşik tasarım kullanır
-function macWin(W, sel) {
-  const x = W[sel];
-  return `<div class="mc-perde"></div><section class="mc-pen" style="--h:${x.hue}" role="dialog" aria-label="${esc(x.title)}">
-      <div class="mc-bar"><a class="mc-nok r" href="#" title="Kapat" aria-label="Pencereyi kapat"></a><a class="mc-nok y" href="#" title="Küçült" aria-label="Küçült"></a><span class="mc-nok g"></span>
-        <span class="mc-bas">${x.icon} ${x.name}: ${x.title}</span><a class="mc-kapat" href="#">Kapat</a></div>
-      <div class="mc-ic"><p class="mc-say">${x.total} dersten <b>${x.n}</b> tanesi bitti</p><div class="mc-ler">${lessonsOf(sel)}</div>
-      <div class="wnav">${sel > 0 ? `<a class="btn" href="#hafta/${sel - 1}">‹ ${W[sel - 1].name}</a>` : ''}<span class="sp"></span>${W[sel + 1] ? `<a class="btn primary" href="#hafta/${sel + 1}">Sonraki: ${W[sel + 1].name} ›</a>` : ''}</div></div></section>`;
-}
-const macDock = (D) => `<nav class="mc-dock" aria-label="Dock">${D.bitti ? '' : `<a class="mc-d mc-dv" href="${D.href}" title="${esc(D.title)}"><span class="mc-di">${D.icon}</span><span class="mc-dl"><small>${D.label}</small>${D.go}</span></a><span class="mc-ayr"></span>`}
-      <a class="mc-d" href="robot.html" title="Robo ile Kodlama"><span class="mc-di">🤖</span><span class="mc-dl">Robo</span></a>
-      <a class="mc-d" href="bilgisayar.html" title="Bilgisayarı canlı gör"><span class="mc-di">🖥️</span><span class="mc-dl">3B</span></a>
-      <a class="mc-d" href="#ozet" title="Eğitmen özeti"><span class="mc-di">📊</span><span class="mc-dl">Özet</span></a>
-      <span class="mc-ayr"></span><span class="mc-d mc-ilerle" title="Bitirilen dersler"><span class="mc-di"><b>${D.nDone}</b></span><span class="mc-dl">/ ${D.total} ders</span></span></nav>`;
-const aurora = '<div class="mc-aurora"><i></i><i></i><i></i></div>';
-
-// 1) Birleşik: haritanın yolu, Cam'ın akan ışığı, buzlu cam duraklar, Dock ve cam pencere
-function homeBirlesik(W, D, sel, open) {
-  return `${aurora}<div class="mac yolcam${open ? ' acik' : ''}"><div class="yh-ust yc-ust"><div><h1>${hello()}</h1><p>${safeNote} Yol 1. haftadan başlar; bir durağa tıklayın.</p></div>
-    ${yolDevam(D)}</div>${yolMap(W, D)}</div>${macDock(D)}${open ? macWin(W, sel) : ''}`;
-}
-
-// 3) Cam masaüstü (macOS/iPadOS gibi): aurora arka plan, cam klasörler, altta Dock; klasör ortada pencere olarak açılır
-function homeMac(W, D, sel, open) {
-  return `${aurora}<div class="mac${open ? ' acik' : ''}">
-    <div class="mc-ust"><h1>${hello()}</h1><p>${safeNote} Bir klasör açın.</p></div>
-    <div class="mc-grid">${W.map((x) => `<a class="mc-k${x.full ? ' full' : ''}" href="${x.href}" style="--h:${x.hue};view-transition-name:mc${x.i}" title="${esc(x.title)}">
-      <span class="mc-ikon">${x.icon}${x.full ? '<span class="mc-ok">✔</span>' : ''}</span><span class="mc-ad t2">${x.title}</span><span class="mc-alt">${x.name} · ${x.n}/${x.total}</span></a>`).join('')}</div></div>
-    ${macDock(D)}${open ? macWin(W, sel) : ''}`;
-}
-
-const HOMES = { birlesik: homeBirlesik, harita: homeHarita, mac: homeMac };
 
 function renderHome() {
-  const [key, name] = DESIGNS[design];
   const home = $('#home');
-  home.dataset.t = key;
   home.dataset.hafta = homeWeek != null ? '1' : '';
-  const D = devamInfo();
-  if (key === 'harita') home.innerHTML = homeWeek != null ? weekPage(homeWeek) : homeHarita(weekInfo(), D);
-  else home.innerHTML = HOMES[key](weekInfo(), D, homeWeek ?? (D.bitti ? 0 : D.wi), homeWeek != null);
-  $('#tasarim').innerHTML = `🎨 Tasarım ${design + 1} / ${DESIGNS.length}: <b>${name}</b> ›`;
-  if (homeWeek != null && key === 'harita') home.scrollTop = 0;
+  home.innerHTML = homeWeek != null ? weekPage(homeWeek) : homeHarita(weekInfo(), devamInfo());
+  if (homeWeek != null) home.scrollTop = 0;
 }
 
-$('#tasarim').addEventListener('click', () => {
-  design = (design + 1) % DESIGNS.length;
-  lsSet('bd-tasarim2', DESIGNS[design][0]);
-  renderHome();
-});
 
 $('#home').addEventListener('click', (e) => {
   const r = e.target.closest('[data-restart]');
