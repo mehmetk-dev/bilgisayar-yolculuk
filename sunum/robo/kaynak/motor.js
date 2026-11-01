@@ -206,11 +206,11 @@ function makeGrid(box) {
 
 /* ---------- Oynatıcı ---------- */
 function makePlayer(pl) {
-  const codeEl = $('.code[data-code]', pl), fnEl = $('.code.fnbody', pl), box = $('.gridbox', pl), beatEl = $('.beat', pl);
+  const codeEl = $('.code[data-code]:not(.fnbody)', pl), fnEl = $('.code.fnbody', pl), box = $('.gridbox', pl), beatEl = $('.beat', pl);
   const grid = box ? makeGrid(box) : null;
   let tree = codeEl._tree;
-  const fn = fnEl ? fnEl._tree : [];
-  const allText = $$('[data-prog]', pl).map((b) => b.dataset.prog).join('') + codeEl.dataset.code + (fnEl ? fnEl.dataset.code : '');
+  let fn = fnEl ? fnEl._tree : [];
+  const allText = $$('[data-prog]', pl).map((b) => b.dataset.prog + (b.dataset.fn || '')).join('') + codeEl.dataset.code + (fnEl ? fnEl.dataset.code : '');
   const autoStar = !allText.includes('P');
   const ptabs = $$('.progtabs button', pl);
   ptabs.forEach((b) => (b.onclick = () => {
@@ -220,20 +220,21 @@ function makePlayer(pl) {
     if (codeEl.classList.contains('flow')) codeEl.style.width = '';
     tree = codeEl._tree = parse(b.dataset.prog);
     codeEl.innerHTML = renderCode(tree, { fname: codeEl.dataset.fname || 'Fonksiyon', named: hasNested(tree) });
+    if (fnEl && b.dataset.fn != null) { fnEl.dataset.code = b.dataset.fn; fn = fnEl._tree = parse(b.dataset.fn); fnEl.innerHTML = renderCode(fn, { fname: fnEl.dataset.fname, named: false }); }
     reset();
   }));
   const limit = +(pl.dataset.limit || 400);
   const btnPlay = $('[data-act="play"]', pl), btnSlow = $('[data-act="slow"]', pl);
   let gen = null, timer = null, slow = true, steps = 0, ctx = null;
   const codes = [codeEl, fnEl].filter(Boolean);
-  const clearHl = () => codes.forEach((c) => { $$('.on', c).forEach((e) => e.classList.remove('on')); $$('.bub', c).forEach((e) => e.remove()); });
+  const clearHl = () => codes.forEach((c) => { $$('.on', c).forEach((e) => e.classList.remove('on')); $$('.cbub', c).forEach((e) => e.remove()); });
   const showBeads = () => codes.forEach((c) => $$('.blk', c).forEach((lp) => {
     const k = (ctx && ctx.cnt[lp.dataset.id]) || 0;
     $$(':scope > .lh .bd', lp).forEach((b, j) => b.classList.toggle('done', j < k));
     const tr = $(':scope > .lh .tur', lp); if (tr) { tr.hidden = !k; tr.textContent = `${k}. tur`; }
   }));
   const node = (id) => codes.map((c) => $(`[data-id="${id}"]`, c)).find(Boolean);
-  const bub = (lh, text, cls) => { const b = document.createElement('span'); b.className = 'bub ' + (cls || ''); b.textContent = text; lh.appendChild(b); };
+  const bub = (lh, text, cls) => { const b = document.createElement('span'); b.className = 'cbub ' + (cls || ''); b.textContent = text; lh.appendChild(b); };
   const hooks = beatEl ? beatHooks(pl, beatEl) : null;
   function reset() {
     clearTimeout(timer); timer = null; gen = null; ctx = null; steps = 0;
@@ -381,6 +382,130 @@ function confetti(n) {
 }
 $$('.sky').forEach((s) => (s.innerHTML = Array.from({ length: 26 }, (_, i) => `<span style="left:${(i * 61) % 100}%;top:${(i * 37) % 92}%;font-size:${18 + (i % 4) * 10}px;animation-delay:${(i % 7) * 0.35}s">★</span>`).join('')));
 
+/* ---------- Scratch sahnesi ---------- */
+const RS = window.RoboSahne;
+const CATCOL = { motion: '#4c97ff', looks: '#9966ff', sound: '#cf63cf', events: '#ffbf00', control: '#ffab19', sensing: '#5cb1d6', pen: '#0fbd8c', vars: '#ff8c1a', operators: '#59c059' };
+const escH = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const OPN = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+function repH(v, kind) {
+  if (v == null || v === '') return '<span class="sxi">&nbsp;</span>';
+  if (typeof v !== 'object') return `<span class="sxi${kind === 'text' ? ' t' : ''}">${escH(v)}</span>`;
+  const R = RS.REPORTERS[v.r] || { cat: 'operators', label: v.r };
+  let inner = escH(R.label);
+  if (v.r === 'rand') inner = `rastgele ${repH(v.a)} ile ${repH(v.b)} arası`;
+  if (v.r === 'join') inner = `birleştir ${repH(v.a, 'text')} ${repH(v.b, 'text')}`;
+  if (v.r === 'op') inner = `${repH(v.a)} ${OPN[v.o] || v.o} ${repH(v.b)}`;
+  if (v.r === 'var') inner = escH(v.v);
+  return `<span class="sxr" style="--k:${CATCOL[R.cat]}">${inner}</span>`;
+}
+function condH(c) {
+  if (!c) return '<span class="sxc empty"></span>';
+  let body = '', cat = 'sensing';
+  if (c.k === 'touch') body = `<span class="sxi">${escH(RS.yonelme(c.o))}</span> dokunuyor mu?`;
+  else if (c.k === 'key') body = `<span class="sxi">${escH(RS.KEYS[c.key] || c.key)}</span> tuşuna basılı mı?`;
+  else if (c.k === 'mouse') body = 'fare tıklandı mı?';
+  else if (c.k === 'cmp') { cat = 'operators'; body = `${repH(c.a)} ${c.op} ${repH(c.b)}`; }
+  return `<span class="sxc" style="--k:${CATCOL[cat]}">${body}</span>`;
+}
+function argH(type, v) {
+  if (type === 'cond') return condH(v);
+  if (type === 'key') return `<span class="sxd">${escH(RS.KEYS[v] || v)} ▾</span>`;
+  if (type === 'sound') return `<span class="sxd">${escH(RS.SOUNDS[v] || v)} ▾</span>`;
+  if (type === 'note') return `<span class="sxi">${escH(RS.NOTES[v] || v)}</span>`;
+  if (type === 'backdrop') return `<span class="sxd">${escH((RS.BACKDROPS[v] || {}).name || v)} ▾</span>`;
+  if (type === 'color') return `<span class="sxi"><i class="sxsw" style="background:${v}"></i>${escH(RS.COLORS[v] || '')}</span>`;
+  if (type === 'msg' || type === 'var' || type === 'target' || type === 'clonesrc' || type === 'costume') return `<span class="sxd">${escH(v)} ▾</span>`;
+  return repH(v, type);
+}
+function blockH(b) {
+  const def = RS.BLOCKS[b.op];
+  const col = CATCOL[def.cat];
+  const dark = def.cat === 'events' || def.cat === 'control';
+  const text = escH(def.text).replace(/\{(\w+)\}/g, (_, k) => argH((def.args[k] || [])[0], b.args[k]));
+  const cls = `sx${def.kind === 'hat' ? ' hat' : ''}${dark ? ' dk' : ''}`;
+  if (def.kind === 'c' || def.kind === 'c2') {
+    const body = (list) => `<div class="sxbody">${list.map(blockH).join('') || '<div class="sxgap"></div>'}</div>`;
+    return `<div class="${cls} cblk" style="--k:${col}" data-bid="${b.id}"><div class="sxh">${text}</div>${body(b.body)}${def.kind === 'c2' ? `<div class="sxh mid">değilse</div>${body(b.body2)}` : ''}<div class="sxfoot${def.cap ? ' cap' : ''}"></div></div>`;
+  }
+  return `<div class="${cls}" style="--k:${col}" data-bid="${b.id}"><div class="sxh">${text}</div></div>`;
+}
+let sbid = 0;
+const mkScripts = (specs) => (specs || []).map((sc) => sc.map((b) => RS.mk(b, () => ++sbid)));
+function makeScratch(el) {
+  const setup = JSON.parse(el.dataset.setup);
+  let variants = JSON.parse(el.dataset.variants);
+  let vi = 0, progs, w = null, stage = null, raf = 0, last = 0, acc = 0, show = el.dataset.show;
+  const codeBox = $('.sxcode', el), host = $('.sxstage', el), info = $('.sxinfo', el);
+  const build = () => {
+    progs = {};
+    for (const s of setup.sprites) progs[s.name] = mkScripts(variants[vi][1][s.name] || s.scripts || []);
+    const names = setup.sprites.filter((s) => progs[s.name].length).map((s) => s.name);
+    if (!names.includes(show)) show = names[0];
+    const tabs = names.length > 1 ? `<div class="sxtabs">${names.map((n) => `<button class="${n === show ? 'on' : ''}" data-n="${escH(n)}">${RS.thumb(setup.sprites.find((s) => s.name === n).costume)} ${escH(n)}</button>`).join('')}</div>` : '';
+    codeBox.innerHTML = tabs + `<div class="sxscripts">${(progs[show] || []).map((sc) => `<div class="sxscript">${sc.map(blockH).join('')}</div>`).join('')}</div>`;
+    $$('.sxtabs button', codeBox).forEach((b) => (b.onclick = () => { show = b.dataset.n; build(); }));
+    fitCode();
+  };
+  // Kod alanı sığmazsa küçült (tahtada kaydırma çubuğu olmasın)
+  const fitCode = () => {
+    const sc = $('.sxscripts', codeBox);
+    if (!sc || !el.offsetParent) return;
+    sc.style.transform = '';
+    const r = sc.getBoundingClientRect(), e = el.getBoundingClientRect(), c = codeBox.getBoundingClientRect();
+    const k = Math.min(1, (e.bottom - r.top - 4) / r.height, (c.right - r.left) / sc.scrollWidth / (r.width / sc.offsetWidth || 1));
+    if (k < 1) sc.style.transform = `scale(${Math.max(0.45, k)})`;
+  };
+  const reset = () => {
+    if (w) w.stopAll();
+    w = RS.createWorld(setup, progs);
+    w.onSound = (snd, sp) => { try { RS.playSound(snd); } catch { /* ses yok */ } stage.fx(sp, '🔊 ' + (RS.SOUNDS[snd] || snd)); };
+    w.onNote = (n, d, sp) => { try { RS.playNote(n, d); } catch { /* ses yok */ } stage.fx(sp, '♪ ' + (RS.NOTES[n] || n)); };
+    stage.attach(w);
+    stage.render();
+  };
+  const loop = (now) => {
+    acc += last ? Math.min(0.1, (now - last) / 1000) : 0; last = now;
+    if (w) {
+      let n = 0;
+      while (acc >= 1 / 30 && n < 3) { w.step(1 / 30); acc -= 1 / 30; n++; }
+      if (n === 3) acc = 0;
+      stage.render();
+      $$('.sx.run', codeBox).forEach((x) => x.classList.remove('run'));
+      for (const t of w.threads) {
+        if (t.done || !t.sp || t.sp.name !== show || t.sp.isClone) continue;
+        const c = $(`[data-bid="${t.cur}"]`, codeBox); c && c.classList.add('run');
+        const h = $(`[data-bid="${t.script[0].id}"]`, codeBox); h && h.classList.add('run');
+      }
+      const sp = w.sprite(show);
+      if (sp && info) info.innerHTML = `${RS.thumb(sp.costume, sp.frame)} <b>${escH(sp.name)}</b> <span>x: ${Math.round(sp.x)}</span> <span>y: ${Math.round(sp.y)}</span> <span>yön: ${Math.round(sp.dir)}</span>`;
+    }
+    raf = requestAnimationFrame(loop);
+  };
+  const vt = $$('.sxvar button', el);
+  vt.forEach((b, j) => (b.onclick = () => { vi = j; vt.forEach((x) => x.classList.toggle('on', x === b)); build(); reset(); }));
+  $('[data-act="flag"]', el).onclick = () => { reset(); w.flag(); };
+  $('[data-act="stop"]', el).onclick = () => w && w.stopAll();
+  $('[data-act="reset"]', el).onclick = () => reset();
+  $$('[data-key]', el).forEach((b) => {
+    let t = null;
+    const k = b.dataset.key;
+    const down = (e) => { e.preventDefault(); if (!w) return; w.keyDown(k); clearInterval(t); t = setInterval(() => w.keyDown(k), 100); b.classList.add('on'); };
+    const up = () => { clearInterval(t); t = null; if (w) w.keyUp(k); b.classList.remove('on'); };
+    b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointerleave', up);
+  });
+  return {
+    start() { if (stage) return; build(); stage = RS.createStage(host, { showVars: el.dataset.sv ? JSON.parse(el.dataset.sv) : undefined }); reset(); last = 0; raf = requestAnimationFrame(loop); if (el.dataset.auto) w.flag(); },
+    stop() { cancelAnimationFrame(raf); if (w) w.stopAll(); if (stage && stage.destroy) stage.destroy(); stage = null; w = null; host.innerHTML = ''; },
+  };
+}
+if (RS) $$('.costumes').forEach((el) => { el.innerHTML = RS.COSTUMES[el.dataset.c].frames.map((f, i) => `<div class="cos"><div class="cosimg">${f}</div>${i + 1}. kostüm</div>`).join(''); });
+// Kostüm değiştirerek yürüme (flipbook)
+let flipT = null;
+if (RS) $$('.flipper').forEach((el) => { el._fr = RS.COSTUMES[el.dataset.c].frames; el._i = 0; el.innerHTML = el._fr[0]; });
+const scratches = RS ? $$('.sc').map((el) => (el._sc = makeScratch(el))) : [];
+// Statik blok resimleri: <div class="sxpic" data-spec='[...]'>
+if (RS) $$('.sxpic').forEach((el) => { el.innerHTML = mkScripts(JSON.parse(el.dataset.spec)).map((sc) => `<div class="sxscript">${sc.map(blockH).join('')}</div>`).join(''); });
+
 /* ---------- Gezinme ---------- */
 const secs = $$('.s');
 let cur = 0;
@@ -401,6 +526,7 @@ $$('button', menu).forEach((b) => (b.onclick = () => { menu.classList.remove('vi
 function go(j, back) {
   if (j < 0 || j >= secs.length) return;
   players.forEach((p) => p.stop());
+  $$('.sc', secs[cur]).forEach((e) => e._sc && e._sc.stop());
   secs[cur].classList.remove('on');
   cur = j;
   const s = secs[cur];
@@ -411,6 +537,8 @@ function go(j, back) {
   $$('.order', s).forEach((o) => o._reset());
   $$('.turn', s).forEach((t) => t._reset());
   clearTimeout(handTimer); $$('.hands', s).forEach(handsStart);
+  $$('.sc', s).forEach((e) => e._sc && e._sc.start());
+  clearInterval(flipT); const fl = $('.flipper', s); if (fl) flipT = setInterval(() => { fl._i = (fl._i + 1) % fl._fr.length; fl.innerHTML = fl._fr[fl._i]; }, +(fl.dataset.ms || 400));
   if (s.dataset.end) setTimeout(() => confetti(70), 300);
   deck.classList.toggle('dark', s.classList.contains('cover') || s.classList.contains('lcover'));
   $$('i', dots).forEach((d, k) => d.classList.toggle('on', k === cur));
@@ -427,6 +555,8 @@ $('#fs').onclick = fs;
 document.addEventListener('keydown', (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   const k = e.key;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if ($('.sc[data-keys]', secs[cur]) && /^(Arrow|\s$)/.test(k === ' ' ? ' ' : k)) return;
   if (k === 'Escape') { menu.classList.remove('vis'); return; }
   if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); next(); }
   else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); prev(); }

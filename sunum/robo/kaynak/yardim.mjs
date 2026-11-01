@@ -18,28 +18,29 @@ export const code = (prog, o = {}) => `<div class="code${o.cols ? ' cols' : ''}$
 // Canlı oynatıcı: harita + program + düğmeler. Düz programlar soldan sağa numaralı kutularla gösterilir;
 // geniş-alçak haritalarda harita üstte, program altta durur (stack).
 export function player(o) {
-  if (o.progs) o = { ...o, prog: o.progs[0][1] };
+  if (o.progs) o = { ...o, prog: o.progs[0][1], fn: o.progs[0][2] ?? o.fn };
   const m0 = o.maps ? o.maps[0] : o.map;
   const linear = !/[\d(){}]/.test(o.prog) && o.fn == null;
   const stack = o.stack ?? (m0.length <= 2 && m0[0].length >= 3);
-  const cols = Math.max(...m0.map((r) => r.length)), rows = m0.length;
-  if (!o.size) o = { ...o, size: stack ? Math.min(170, Math.floor(1380 / cols), Math.floor(300 / rows)) : Math.min(150, Math.floor(620 / cols), Math.floor(440 / rows)) };
+  const all = o.maps || [o.map];
+  const cols = Math.max(...all.flat().map((r) => r.length)), rows = Math.max(...all.map((m) => m.length));
+  if (!o.size) o = { ...o, size: stack ? Math.min(170, Math.floor(1380 / cols), Math.floor((o.maps ? 240 : 300) / rows)) : Math.min(150, Math.floor(620 / cols), Math.floor((o.maps ? 380 : 440) / rows)) };
   const gb = o.maps
     ? `<div class="gridbox" data-maps="${attr(JSON.stringify(o.maps))}" data-dir="${o.dir || 'E'}" data-size="${o.size}"${o.lr ? ' data-lr="1"' : ''}></div>`
     : grid(o.map, o);
   const fn = o.fn != null
     ? `<div class="codettl fn">🧩 ${o.fname} fonksiyonu</div>${code(o.fn, { fnbody: true, fname: o.fname, sm: o.sm })}<div class="codettl">📜 Programım</div>`
     : '';
-  const tabs = o.progs ? `<div class="progtabs">${o.progs.map(([t, p], j) => `<button class="${t.includes('🐞') ? 'bug' : t.includes('✅') ? 'fix' : ''}${j ? '' : ' on'}" data-prog="${attr(p)}">${t}</button>`).join('')}</div>` : '';
+  const tabs = o.progs ? `<div class="progtabs">${o.progs.map(([t, p, fnb], j) => `<button class="${t.includes('🐞') ? 'bug' : t.includes('✅') ? 'fix' : ''}${j ? '' : ' on'}" data-prog="${attr(p)}"${fnb != null ? ` data-fn="${attr(fnb)}"` : ''}>${t}</button>`).join('')}</div>` : '';
   if (o.progs) o = { ...o, prog: o.progs[0][1] };
   const rowsOf = (p) => (p.match(/[A-Za-z]/g) || []).length - (p.match(/[iue]\{/g) || []).length * 0 + (p.match(/\(/g) || []).length;
   const sm = o.sm ?? Math.max(...(o.progs || [[0, o.prog]]).map((x) => rowsOf(x[1]))) > 8;
-  const cd = tabs + code(o.prog, { cols: o.cols, fname: o.fname, sm, w: linear ? null : o.codeW, flow: linear });
+  const cd = code(o.prog, { cols: o.cols, fname: o.fname, sm, w: linear ? null : o.codeW, flow: linear });
   const lim = o.limit ? ` data-limit="${o.limit}"` : '';
-  if (stack) return `<div class="player stack"${lim}><div>${gb}</div><div class="lower"><div class="col">${fn}${cd}</div>${btns()}</div>${o.under || ''}${o.side || ''}</div>`;
+  if (stack) return `<div class="player stack"${lim}><div>${gb}</div><div class="lower"><div class="col">${tabs}${fn}${cd}</div>${btns()}</div>${o.under || ''}${o.side || ''}</div>`;
   return `<div class="player row" style="align-items:flex-start;gap:${o.gap || 50}px"${lim}>
 <div style="flex:0 0 auto${o.pad ? ';padding-left:' + o.pad + 'px' : ''}">${gb}${btns()}</div>
-<div class="col" style="min-width:540px"><div class="codewrap">${fn}${cd}</div>${o.under || ''}${o.side || ''}</div></div>`;
+<div class="col" style="min-width:540px"><div class="codewrap">${tabs}${fn}${cd}</div>${o.under || ''}${o.side || ''}</div></div>`;
 }
 
 // Soru
@@ -86,3 +87,44 @@ export const beat = (prog) => `<div class="player row" style="align-items:flex-s
 // İki elle sayma
 export const hands = (big, small, bl, sl) => `<div class="hands" data-big="${big}" data-small="${small}"><div class="hand b"><div class="h">Büyük döngü<br>(${bl})</div><div class="n hb">1</div></div><div class="hand k"><div class="h">Küçük döngü<br>(${sl})</div><div class="n hk">1</div></div></div>`;
 export const BAG = '<svg viewBox="0 0 64 64" width="120" height="120" aria-hidden="true"><path d="M22 14a10 10 0 0 1 20 0" fill="none" stroke="#1d3557" stroke-width="4"/><rect x="10" y="14" width="44" height="46" rx="12" fill="#e5484d" stroke="#1d3557" stroke-width="3"/><path d="M10 28q22 10 44 0" fill="none" stroke="#1d3557" stroke-width="3"/><rect x="20" y="38" width="24" height="14" rx="5" fill="#ff8f8f" stroke="#1d3557" stroke-width="3"/></svg>';
+
+/* ---------- Scratch haftaları ---------- */
+// Ders dosyalarını (src/robot/lessons/hN.js) okur: görevlerin kurulumu ve çözümü buradan gelir
+import path from 'node:path';
+const ROOT = path.resolve(import.meta.dirname, '../../..');
+export async function ders(n) {
+  const esbuild = await import('esbuild');
+  const out = path.join(ROOT, `node_modules/.cache/sunum-dersler/h${n}.mjs`);
+  await esbuild.build({ absWorkingDir: ROOT, entryPoints: [`src/robot/lessons/h${n}.js`], bundle: true, format: 'esm', platform: 'node', outfile: out, logLevel: 'error' });
+  return import(out + `?t=${Date.now()}`);
+}
+export const step = (L, t) => {
+  const s = L.steps.find((x) => x.type === 'scratch' && x.title.startsWith(t));
+  if (!s) throw new Error(`Görev bulunamadı: ${L.title} / ${t}`);
+  return s;
+};
+const KEYLBL = { right: '→', left: '←', up: '↑', down: '↓', space: 'boşluk', a: 'a', s: 's', d: 'd', w: 'w' };
+const keysOf = (progs) => {
+  const ks = new Set();
+  const walk = (x) => { if (Array.isArray(x)) { if (x[0] === 'key' && typeof x[1] === 'string') ks.add(x[1]); x.forEach(walk); } else if (x && typeof x === 'object' && x.k === 'key') ks.add(x.key); else if (x && typeof x === 'object') Object.values(x).forEach(walk); };
+  walk(progs);
+  return ['left', 'up', 'down', 'right', 'space', 'a', 's', 'd', 'w'].filter((k) => ks.has(k));
+};
+// Scratch görevi: kod + sahne + 🏁. o.variants: [['🐞 Hatalı', progs], ['✅ Düzeltilmiş', progs]]; o.nocode: yalnız sahne
+export function scratch(L, title, o = {}) {
+  const st = typeof title === 'string' ? step(L, title) : title;
+  const setup = o.setup || st.setup;
+  const variants = o.variants || [['', o.progs || st.sol]];
+  const allProgs = variants.map((v) => v[1]).concat(setup.sprites.map((s) => s.scripts || []));
+  const keys = keysOf(allProgs);
+  const show = o.show || st.edit || Object.keys(variants[0][1] || {})[0] || setup.sprites[setup.sprites.length - 1].name;
+  const vtabs = variants.length > 1 ? `<div class="sxvar">${variants.map(([t], j) => `<button class="${t.includes('🐞') ? 'bug' : t.includes('✅') ? 'fix' : ''}${j ? '' : ' on'}">${t}</button>`).join('')}</div>` : '';
+  const keyb = keys.length ? `<div class="sxkeys">${keys.map((k) => `<button data-key="${k}">${KEYLBL[k]}</button>`).join('')}</div>` : '';
+  return `<div class="sc${o.nocode ? ' nocode' : ''}" data-setup="${attr(JSON.stringify(setup))}" data-variants="${attr(JSON.stringify(variants))}" data-show="${attr(show)}"${st.showVars ? ` data-sv="${attr(JSON.stringify(st.showVars))}"` : ''}${keys.length ? ' data-keys="1"' : ''}${o.auto ? ' data-auto="1"' : ''}>
+<div class="sxleft">${o.top || ''}${vtabs}<div class="sxcode${o.sm ? ' sm' : ''}"></div>${o.under || ''}</div>
+<div class="sxright"><div class="sxstage"></div><div class="sxctl"><button class="btn flagb" data-act="flag" title="Başlat">🏁</button><button class="btn stopb" data-act="stop" title="Durdur">⏹</button><button class="btn w" data-act="reset" title="Sahneyi başa al">↺</button>${keyb}</div><div class="sxinfo"></div>${o.side || ''}</div></div>`;
+}
+// Statik blok resmi: blocks([[['flag'], ['move', 10]]])
+export const blocks = (scripts, sm) => `<div class="sxpic${sm ? ' sm' : ''}" data-spec="${attr(JSON.stringify(scripts))}"></div>`;
+// Kostüm kareleri
+export const costumes = (c, anim) => `<div class="costumes${anim ? ' anim' : ''}" data-c="${c}"></div>`;

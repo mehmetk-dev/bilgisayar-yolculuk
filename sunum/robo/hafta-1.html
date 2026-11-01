@@ -115,8 +115,8 @@ b { font-weight: 900; }
 .bd.done { background: currentColor; transform: scale(1.15); }
 .tur { margin-left: auto; font-size: 22px; background: #fff; border-radius: 99px; padding: 2px 12px; }
 .lh.on { background: #fff; box-shadow: 0 0 0 5px #ffd23f; }
-.bub { position: absolute; right: -10px; top: -36px; background: #ffd23f; color: var(--ink); font-size: 23px; padding: 6px 16px; border-radius: 14px; white-space: nowrap; animation: pop .35s; z-index: 3; box-shadow: 0 4px 0 #0002; }
-.bub.yes { background: #b8f0cf; } .bub.no { background: #ffd0d0; }
+.cbub { position: absolute; right: -10px; top: -36px; background: #ffd23f; color: var(--ink); font-size: 23px; padding: 6px 16px; border-radius: 14px; white-space: nowrap; animation: pop .35s; z-index: 3; box-shadow: 0 4px 0 #0002; }
+.cbub.yes { background: #b8f0cf; } .cbub.no { background: #ffd0d0; }
 @keyframes pop { from { transform: scale(.3); opacity: 0; } }
 .codewrap { display: flex; flex-direction: column; gap: 18px; }
 .codettl { font-size: 24px; font-weight: 900; color: var(--soft); margin-bottom: -8px; }
@@ -311,6 +311,92 @@ b { font-weight: 900; }
 .beads { flex-shrink: 0; }
 .code.sm .bd { width: 18px; height: 18px; border-width: 3px; }
 
+/* Scratch blokları (sitedeki renkler) */
+.sxscripts { display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+.sxscript, .sxpic { display: flex; flex-direction: column; align-items: flex-start; }
+.sxpic { gap: 18px; }
+.sx { --k: #4c97ff; background: var(--k); color: #fff; border-radius: 10px; font-size: 27px; font-weight: 800; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 28%); margin-bottom: 3px; width: max-content; transition: box-shadow .15s; }
+.sx .sx { font-size: 1em; }
+.sx.dk > .sxh { color: #3a2600; }
+.sx.hat { border-radius: 26px 26px 10px 10px; } .sx.hat > .sxh { padding-top: 16px; }
+.sxh { padding: 9px 16px; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap; }
+.sxh.mid { padding: 6px 16px; }
+.cblk { padding: 0; min-width: 300px; }
+.sxbody { margin-left: 26px; padding: 4px 0 2px; background: transparent; display: flex; flex-direction: column; align-items: flex-start; position: relative; }
+.sxbody::before { content: ""; position: absolute; left: -26px; top: 0; bottom: 0; width: 26px; background: var(--k); }
+.cblk { background: transparent; box-shadow: none; }
+.cblk > .sxh { background: var(--k); border-radius: 10px 10px 0 0; }
+.cblk > .sxh.mid { border-radius: 0 10px 10px 0; }
+.cblk > .sxfoot { height: 22px; background: var(--k); border-radius: 0 0 10px 10px; width: 160px; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 28%); }
+.sxgap { height: 34px; }
+.sxi { background: #fff; color: #333; border-radius: 99px; padding: 1px 14px; min-width: 40px; text-align: center; font-weight: 800; }
+.sxd { background: color-mix(in srgb, var(--k), #000 18%); color: #fff; border-radius: 8px; padding: 1px 10px; }
+.sx.dk .sxd { color: #3a2600; background: color-mix(in srgb, var(--k), #fff 25%); }
+.sxr { --k: #59c059; background: var(--k); color: #fff; border-radius: 99px; padding: 2px 10px; display: inline-flex; gap: 6px; align-items: center; border: 2px solid #0002; }
+.sxc { --k: #5cb1d6; background: var(--k); color: #fff; padding: 2px 18px; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%); display: inline-flex; gap: 6px; align-items: center; }
+.sxc.empty { width: 80px; height: 32px; background: color-mix(in srgb, var(--k), #000 25%); }
+.sxsw { display: inline-block; width: 22px; height: 22px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+.sx.run > .sxh, .sx.run.cblk > .sxh { box-shadow: 0 0 0 4px #ffe14d, 0 0 18px #ffd23f; }
+.sx.run:not(.cblk) { box-shadow: 0 0 0 4px #ffe14d, 0 0 18px #ffd23f; }
+.sx.sm, .sxpic.sm .sx { font-size: 22px; }
+
+/* Scratch slaytı yerleşimi */
+.sc { display: flex; gap: 36px; flex: 1; min-height: 0; align-items: flex-start; }
+.sc .sxcode { flex: 1; min-width: 0; }
+.sc .sxright { flex: 0 0 600px; display: flex; flex-direction: column; gap: 12px; }
+.sc .sxstage { width: 600px; }
+.sc .stg { border: 5px solid #d9d0f5; border-radius: 18px; }
+.sxctl { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.sxctl .flagb { font-size: 34px; background: #2fbf71; }
+.sxctl .stopb { font-size: 30px; background: #e5484d; }
+.sxinfo { font-size: 22px; font-weight: 800; color: var(--soft); display: flex; gap: 14px; align-items: center; }
+.sxinfo .thumb { width: 44px; height: 36px; }
+.sxkeys { display: flex; gap: 10px; flex-wrap: wrap; }
+.sxkeys button { font: inherit; font-size: 26px; font-weight: 900; min-width: 64px; height: 60px; border-radius: 14px; border: 4px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; padding: 0 14px; box-shadow: 0 5px 0 #0003; touch-action: none; }
+.sxkeys button.on { background: #ffd23f; transform: translateY(3px); box-shadow: 0 2px 0 #0003; }
+.sxtabs { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.sxtabs button, .sxvar button { font: inherit; font-size: 22px; font-weight: 900; border: 3px solid var(--ink); background: #fff; color: var(--ink); border-radius: 12px; padding: 4px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.sxtabs button.on, .sxvar button.on { background: var(--ink); color: #fff; }
+.sxvar { display: flex; gap: 10px; margin-bottom: 12px; }
+.sxvar button.bug.on { background: var(--no); border-color: var(--no); } .sxvar button.fix.on { background: var(--ok); border-color: var(--ok); }
+.sxtabs .thumb { width: 34px; height: 28px; }
+.sc .sxleft { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.sc.nocode .sxleft { display: none; }
+.sxcode.sm .sx { font-size: 22px; }
+.costumes { display: flex; gap: 30px; }
+.costumes .cos { background: #fff; border-radius: 24px; padding: 18px; text-align: center; font-size: 26px; font-weight: 800; box-shadow: 0 6px 0 #1d355714; }
+.costumes .cosimg { width: 220px; height: 180px; display: grid; place-items: center; }
+.costumes .cosimg svg { width: 100%; height: 100%; }
+.costumes.anim .cos { position: relative; }
+.flipper { width: 300px; height: 240px; background: #fff; border-radius: 28px; display: grid; place-items: center; box-shadow: 0 8px 0 #1d355714; }
+.flipper svg { width: 240px; height: 200px; }
+.sxcode.sm .sxscripts { gap: 12px; }
+.sxcode.sm .sx .sxh { padding: 6px 14px; }
+[hidden] { display: none !important; }
+.sxscripts { flex-direction: row; flex-wrap: wrap; gap: 22px 34px; transform-origin: 0 0; }
+.sc { min-height: 0; }
+
+.stg { position: relative; width: 100%; overflow: hidden; border-radius: 12px; border: 3px solid #d9d0f5; background: #fff; touch-action: none; }
+.stg-world { position: absolute; left: 0; top: 0; width: 480px; height: 360px; transform-origin: 0 0; overflow: hidden; }
+.stg-bd, .stg-pen, .stg-stamps, .stg-sprites { position: absolute; left: 0; top: 0; width: 480px; height: 360px; }
+.stg-bd svg { width: 480px; height: 360px; display: block; }
+.stg-stamps, .stg-pen { pointer-events: none; }
+.spr { position: absolute; cursor: pointer; }
+.spr.stamp { cursor: default; }
+.spr-img, .spr-img svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.bub { position: absolute; display: none; transform: translate(-15%, -100%); background: #fff; border: 2px solid #c9c2dc; border-radius: 14px; padding: 4px 10px; font: 700 14px/1.3 "Nunito", UISymC, UISymM, UISymD, "Segoe UI", sans-serif; color: #2b2340; max-width: 170px; width: max-content; white-space: pre-wrap; z-index: 5; pointer-events: none; box-shadow: 0 2px 6px #0002; }
+.bub.on { display: block; animation: pop 0.25s; }
+.bub::after { content: ""; position: absolute; left: 14px; bottom: -9px; width: 12px; height: 12px; background: #fff; border: solid #c9c2dc; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.bub.think { border-style: dashed; border-radius: 22px; }
+.bub.think::after { border-radius: 50%; transform: none; width: 8px; height: 8px; border: 2px solid #c9c2dc; bottom: -14px; }
+.stg-vars { position: absolute; left: 6px; top: 6px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.mon { background: #fff; border: 1px solid #c9c2dc; border-radius: 6px; font: 700 12px/1.4 sans-serif; padding: 2px 4px; display: flex; gap: 6px; align-items: center; color: #2b2340; }
+.mon span { background: #ff8c1a; color: #fff; border-radius: 4px; padding: 0 6px; min-width: 1.6em; text-align: center; }
+.thumb { display: inline-block; width: 1.9em; height: 1.6em; vertical-align: middle; }
+.thumb svg { width: 100%; height: 100%; display: block; }
+.stg-ask { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; gap: 6px; background: #fff; border: 2px solid #5cb1d6; border-radius: 12px; padding: 6px; z-index: 8; box-shadow: 0 4px 12px #0003; }
+.stg-ask input { flex: 1; font: 700 16px/1.3 "Nunito", UISymC, UISymM, UISymD, "Segoe UI", sans-serif; border: 2px solid #d8e9f2; border-radius: 8px; padding: 4px 8px; min-width: 0; }
+.stg-ask button { font: 800 16px sans-serif; background: #5cb1d6; color: #fff; border: 0; border-radius: 8px; padding: 0 14px; box-shadow: none; }
 </style>
 </head>
 <body>
@@ -434,6 +520,83 @@ b { font-weight: 900; }
   <button class="nav" id="next" title="İleri (→ ya da Boşluk)">›</button>
 </div>
 </div>
+<script>
+(()=>{var C=(s,i,c)=>()=>{if(c)throw c[0];try{return s&&(i=s(s=0)),i}catch(r){throw c=[r],r}};var Ve=(s,i)=>()=>{try{return i||s((i={exports:{}}).exports,i),i.exports}catch(c){throw i=0,c}};function D(s,i){let[c,...r]=s,m=P[c];if(!m)throw new Error("Bilinmeyen blok: "+c);let h={id:i(),op:c,args:{}},f=Object.keys(m.args||{});f.forEach((u,M)=>{h.args[u]=r[M]!==void 0?r[M]:m.args[u][1]});let k=r.slice(f.length);return(m.kind==="c"||m.kind==="c2")&&(h.body=(k[0]||[]).map(u=>D(u,i))),m.kind==="c2"&&(h.body2=(k[1]||[]).map(u=>D(u,i))),h}var P,te,re,se,ne,oe,_=C(()=>{P={flag:{cat:"events",kind:"hat",text:"🏁 tıklandığında"},key:{cat:"events",kind:"hat",text:"{key} tuşuna basılınca",args:{key:["key","space"]}},click:{cat:"events",kind:"hat",text:"bu kukla tıklanınca"},recv:{cat:"events",kind:"hat",text:"{msg} haberini aldığımda",args:{msg:["msg","mesaj1"]}},bcast:{cat:"events",text:"{msg} haberini sal",args:{msg:["msg","mesaj1"]}},bcastw:{cat:"events",text:"{msg} haberini sal ve bekle",args:{msg:["msg","mesaj1"]}},move:{cat:"motion",text:"{n} adım git",args:{n:["num",10]}},turnR:{cat:"motion",text:"↻ {n} derece dön",args:{n:["num",15]}},turnL:{cat:"motion",text:"↺ {n} derece dön",args:{n:["num",15]}},goto:{cat:"motion",text:"x: {x} y: {y} konumuna git",args:{x:["num",0],y:["num",0]}},gotoRand:{cat:"motion",text:"rastgele konuma git"},gotoMouse:{cat:"motion",text:"fare imlecine git"},gotoT:{cat:"motion",text:"{o} konumuna git",args:{o:["target","fare"]}},glide:{cat:"motion",text:"{s} saniyede x: {x} y: {y} konumuna süzül",args:{s:["num",1],x:["num",0],y:["num",0]}},point:{cat:"motion",text:"{d} yönüne dön",args:{d:["num",90]}},chx:{cat:"motion",text:"x'i {n} değiştir",args:{n:["num",10]}},setx:{cat:"motion",text:"x'i {n} yap",args:{n:["num",0]}},chy:{cat:"motion",text:"y'yi {n} değiştir",args:{n:["num",10]}},sety:{cat:"motion",text:"y'yi {n} yap",args:{n:["num",0]}},bounce:{cat:"motion",text:"kenara geldiyse sek"},pointTo:{cat:"motion",text:"{o} doğru dön",args:{o:["target","fare"]}},sayFor:{cat:"looks",text:"{t} de {s} saniye",args:{t:["text","Merhaba!"],s:["num",2]}},say:{cat:"looks",text:"{t} de",args:{t:["text","Merhaba!"]}},thinkFor:{cat:"looks",text:"{t} diye düşün {s} saniye",args:{t:["text","Hmm…"],s:["num",2]}},costume:{cat:"looks",text:"{c} kostümüne geç",args:{c:["costume",1]}},costumeN:{cat:"looks",text:"{n}. kostüme geç",args:{n:["num",1]}},next:{cat:"looks",text:"sonraki kostüm"},backdrop:{cat:"looks",text:"dekoru {b} yap",args:{b:["backdrop","cayir"]}},size:{cat:"looks",text:"büyüklüğü %{n} yap",args:{n:["num",100]}},chsize:{cat:"looks",text:"büyüklüğü {n} değiştir",args:{n:["num",10]}},color:{cat:"looks",text:"renk etkisini {n} değiştir",args:{n:["num",25]}},clearfx:{cat:"looks",text:"görsel etkileri temizle"},show:{cat:"looks",text:"göster"},hide:{cat:"looks",text:"gizle"},sound:{cat:"sound",text:"{snd} sesini başlat",args:{snd:["sound","pop"]}},soundW:{cat:"sound",text:"{snd} sesini bitene kadar çal",args:{snd:["sound","pop"]}},note:{cat:"sound",text:"♪ {note} notasını {b} vuruş çal",args:{note:["note",60],b:["num",.5]}},rest:{cat:"sound",text:"♪ {b} vuruş sus",args:{b:["num",.5]}},wait:{cat:"control",text:"{s} saniye bekle",args:{s:["num",1]}},repeat:{cat:"control",kind:"c",text:"{n} kez tekrarla",args:{n:["num",10]}},forever:{cat:"control",kind:"c",cap:!0,text:"sürekli tekrarla"},if:{cat:"control",kind:"c",text:"eğer {c} ise",args:{c:["cond",null]}},ife:{cat:"control",kind:"c2",text:"eğer {c} ise",args:{c:["cond",null]}},waitUntil:{cat:"control",text:"{c} olana kadar bekle",args:{c:["cond",null]}},until:{cat:"control",kind:"c",text:"{c} olana kadar tekrarla",args:{c:["cond",null]}},stop:{cat:"control",cap:!0,text:"tümünü durdur"},cloneStart:{cat:"control",kind:"hat",text:"klon olarak başladığımda"},clone:{cat:"control",text:"{o} klonunu oluştur",args:{o:["clonesrc","kendim"]}},delClone:{cat:"control",cap:!0,text:"bu klonu sil"},ask:{cat:"sensing",text:"{t} diye sor ve bekle",args:{t:["text","Adın ne?"]}},resetTimer:{cat:"sensing",text:"zamanlayıcıyı sıfırla"},clear:{cat:"pen",text:"tümünü sil"},down:{cat:"pen",text:"kalemi bastır"},up:{cat:"pen",text:"kalemi kaldır"},pcolor:{cat:"pen",text:"kalem rengini {col} yap",args:{col:["color","#4c97ff"]}},psize:{cat:"pen",text:"kalem kalınlığını {n} yap",args:{n:["num",3]}},stamp:{cat:"pen",text:"damga"},setv:{cat:"vars",text:"{v} değişkenini {n} yap",args:{v:["var",null],n:["num",0]}},chv:{cat:"vars",text:"{v} değişkenini {n} değiştir",args:{v:["var",null],n:["num",1]}}},te={space:"boşluk",right:"sağ ok",left:"sol ok",up:"yukarı ok",down:"aşağı ok",a:"a",s:"s",d:"d",w:"w"},re={pop:"Pop",miyav:"Miyav",hav:"Hav hav",davul:"Davul",zil:"Zil",boing:"Boing",alkis:"Alkış",kazandin:"Kazandın"},se={60:"Do",62:"Re",64:"Mi",65:"Fa",67:"Sol",69:"La",71:"Si",72:"İnce Do"},ne={"#4c97ff":"mavi","#ff4d4d":"kırmızı","#2fbf71":"yeşil","#ffbf00":"sarı","#9966ff":"mor","#ff8a3d":"turuncu","#ff6fb5":"pembe","#2b2340":"siyah"},oe={rand:{cat:"operators",label:"rastgele"},op:{cat:"operators",label:"işlem (+ − × ÷)"},join:{cat:"operators",label:"birleştir"},answer:{cat:"sensing",label:"cevap"},timer:{cat:"sensing",label:"zamanlayıcı"},x:{cat:"motion",label:"x konumu"},y:{cat:"motion",label:"y konumu"},dir:{cat:"motion",label:"yön"},mx:{cat:"sensing",label:"fare x"},my:{cat:"sensing",label:"fare y"},var:{cat:"vars",label:"değişken"}}});function A(s,i){try{let c=localStorage.getItem(s);return c==null?i:JSON.parse(c)}catch{return i}}function J(s,i){try{localStorage.setItem(s,JSON.stringify(i))}catch{}}function Be(s){if(he.name=s,J("robo-profil",s),J(me,s),s){let i=A("bilgisayar-dersleri.ogrenciler",[]);i.includes(s)||J("bilgisayar-dersleri.ogrenciler",[...i,s].sort((c,r)=>c.localeCompare(r,"tr")))}s&&!ue().includes(s)&&J("robo-profiller",[...ue(),s].sort((i,c)=>i.localeCompare(c,"tr")))}function pe(){return`<svg class="robo" viewBox="0 0 100 106" aria-hidden="true">
+  <g class="ant"><line x1="50" y1="7" x2="50" y2="20"/><circle class="bulb" cx="50" cy="7" r="5.5"/></g>
+  <g class="arm arm-l"><rect x="9" y="62" width="17" height="8" rx="4"/><circle cx="10" cy="66" r="5.5"/></g>
+  <g class="arm arm-r"><rect x="74" y="62" width="17" height="8" rx="4"/><circle cx="90" cy="66" r="5.5"/></g>
+  <rect class="wheel" x="27" y="88" width="17" height="13" rx="5"/><rect class="wheel" x="56" y="88" width="17" height="13" rx="5"/>
+  <rect class="body" x="25" y="57" width="50" height="34" rx="11"/>
+  <circle class="heart" cx="50" cy="74" r="6.5"/>
+  <rect class="head" x="16" y="18" width="68" height="45" rx="17"/>
+  <rect class="face" x="24" y="25" width="52" height="31" rx="12"/>
+  <g class="eye"><circle cx="39" cy="38" r="7.5"/><circle class="pup" cx="39" cy="38" r="3.8"/></g>
+  <g class="eye"><circle cx="61" cy="38" r="7.5"/><circle class="pup" cx="61" cy="38" r="3.8"/></g>
+  <path class="mouth smile" d="M42 47 Q50 54 58 47"/>
+  <path class="mouth frown" d="M42 51 Q50 45 58 51"/>
+  <circle class="cheek" cx="29" cy="49" r="3.5"/><circle class="cheek" cx="71" cy="49" r="3.5"/>
+</svg>`}var me,he,ue,Ye,ae,X=C(()=>{me="ogrenci-ortak",he={name:A("robo-profil","")},ue=()=>A("robo-profiller",[]);Ye=(()=>{let s=!1;try{s=!!sessionStorage.getItem("ogrenci-ortak-oturum")}catch{}let i=A(me,null);if(!s||typeof i!="string")return!1;let c=i.replace(/[<>":]/g,"").trim();return(c!==he.name||c!==i)&&Be(c),!0})(),ae={fast:A("robo-hizli",!1),sound:A("robo-ses",!0)}});function qe(s){let i=s;return()=>(i=i*16807%2147483647,i/2147483647)}var p,ke,ye,be,ge,xe,we,ve,Re,L,Me,O,$e,Le,Se,j,K=C(()=>{X();p=(s,i)=>`<svg viewBox="${s}" xmlns="http://www.w3.org/2000/svg">${i}</svg>`,ke=(s,i)=>p("0 0 110 90",`
+<path d="${i}" fill="none" stroke="#d9771f" stroke-width="9" stroke-linecap="round"/>
+${s.map(([c,r])=>`<rect x="${c}" y="${r}" width="10" height="20" rx="5" fill="#f4a340" stroke="#c96f1c" stroke-width="2.5"/>`).join("")}
+<ellipse cx="48" cy="56" rx="31" ry="20" fill="#f4a340" stroke="#c96f1c" stroke-width="3"/>
+<ellipse cx="50" cy="63" rx="18" ry="10" fill="#ffe2bd"/>
+<path d="M63 22 L66 3 L77 18 Z M85 18 L95 4 L97 25 Z" fill="#f4a340" stroke="#c96f1c" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M66 18 L67 8 L74 17 Z M88 17 L94 9 L95 21 Z" fill="#ff9fb4"/>
+<circle cx="80" cy="37" r="22" fill="#f4a340" stroke="#c96f1c" stroke-width="3"/>
+<ellipse cx="74" cy="33" rx="3.6" ry="5.2" fill="#2b2340"/><ellipse cx="88" cy="33" rx="3.6" ry="5.2" fill="#2b2340"/>
+<circle cx="75" cy="31.5" r="1.3" fill="#fff"/><circle cx="89" cy="31.5" r="1.3" fill="#fff"/>
+<path d="M93 41 l5 0 l-2.5 3.5 z" fill="#ff6f91"/>
+<path d="M90 47 q4 4 8 0" fill="none" stroke="#7a3d12" stroke-width="2" stroke-linecap="round"/>
+<path d="M100 44 l9 -2 M100 47 l9 2" stroke="#7a3d12" stroke-width="1.5" stroke-linecap="round"/>
+<circle cx="70" cy="43" r="3" fill="#ff9fb4" opacity="0.7"/>`),ye=s=>p("0 0 110 90",`
+<path d="M18 50 Q6 40 10 28" fill="none" stroke="#a0662f" stroke-width="8" stroke-linecap="round"/>
+${s.map(([i,c])=>`<rect x="${i}" y="${c}" width="11" height="20" rx="5" fill="#c98a4b" stroke="#8a5525" stroke-width="2.5"/>`).join("")}
+<ellipse cx="46" cy="56" rx="31" ry="19" fill="#c98a4b" stroke="#8a5525" stroke-width="3"/>
+<ellipse cx="40" cy="50" rx="10" ry="7" fill="#fff3e3" opacity="0.8"/>
+<circle cx="80" cy="36" r="21" fill="#c98a4b" stroke="#8a5525" stroke-width="3"/>
+<ellipse cx="96" cy="44" rx="12" ry="9" fill="#f2d3ae" stroke="#8a5525" stroke-width="2.5"/>
+<ellipse cx="104" cy="40" rx="4.5" ry="3.5" fill="#2b2340"/>
+<path d="M66 18 Q56 26 60 48 Q68 46 70 26 Z" fill="#7a4a1f"/>
+<circle cx="84" cy="30" r="3.8" fill="#2b2340"/><circle cx="85" cy="28.8" r="1.2" fill="#fff"/>
+<path d="M95 51 q4 5 9 1" fill="none" stroke="#5b2f10" stroke-width="2" stroke-linecap="round"/>
+<path d="M100 52 q2 7 -3 7 q-4 0 -2 -6" fill="#ff7a8a"/>`),be=s=>pe().replace('<g class="arm arm-l">',`<g class="arm arm-l" transform="rotate(${s} 26 66)">`).replace('<g class="arm arm-r">',`<g class="arm arm-r" transform="rotate(${-s} 74 66)">`).replace('class="robo"','class="robo" xmlns="http://www.w3.org/2000/svg"'),ge=s=>p("0 0 100 64",`
+<path d="M22 32 L2 ${14+s} L6 32 L2 ${50-s} Z" fill="#ff8a3d" stroke="#c75b14" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="54" cy="32" rx="38" ry="24" fill="#ffb547" stroke="#c75b14" stroke-width="3"/>
+<path d="M44 10 Q56 0 66 9" fill="#ff8a3d" stroke="#c75b14" stroke-width="2.5"/>
+<path d="M40 14 Q34 32 40 50 M52 10 Q46 32 52 54" fill="none" stroke="#ff8a3d" stroke-width="5" opacity="0.7"/>
+<circle cx="76" cy="26" r="7.5" fill="#fff" stroke="#c75b14" stroke-width="2"/><circle cx="78" cy="26" r="3.6" fill="#2b2340"/>
+<path d="M84 40 q4 3 8 -1" fill="none" stroke="#7a3300" stroke-width="2" stroke-linecap="round"/>`),xe=s=>p("0 0 90 70",`
+<ellipse cx="38" cy="${20-s}" rx="14" ry="${18-s}" fill="#e6f6ff" stroke="#8fc4e8" stroke-width="2" opacity="0.9" transform="rotate(-20 38 30)"/>
+<ellipse cx="54" cy="${20-s}" rx="12" ry="${16-s}" fill="#e6f6ff" stroke="#8fc4e8" stroke-width="2" opacity="0.9" transform="rotate(15 54 30)"/>
+<path d="M8 44 L18 41 L18 47 Z" fill="#2b2340"/>
+<ellipse cx="44" cy="44" rx="28" ry="20" fill="#ffd23f" stroke="#2b2340" stroke-width="3"/>
+<path d="M32 26 Q28 44 32 62 M46 24 Q42 44 46 64" fill="none" stroke="#2b2340" stroke-width="7"/>
+<circle cx="70" cy="40" r="13" fill="#ffd23f" stroke="#2b2340" stroke-width="3"/>
+<circle cx="74" cy="37" r="3.5" fill="#2b2340"/><circle cx="75" cy="36" r="1.1" fill="#fff"/>
+<path d="M72 45 q4 3 8 -1" fill="none" stroke="#2b2340" stroke-width="2" stroke-linecap="round"/>
+<path d="M68 28 Q70 16 76 14 M74 30 Q80 20 86 20" fill="none" stroke="#2b2340" stroke-width="2"/>`),we=s=>p("0 0 90 70",`
+<path d="M10 38 L2 30 L4 44 Z" fill="#2f6fd6"/>
+<ellipse cx="40" cy="40" rx="28" ry="20" fill="#4c97ff" stroke="#1f5fbf" stroke-width="3"/>
+<ellipse cx="44" cy="46" rx="16" ry="10" fill="#cfe4ff"/>
+${s?'<path d="M30 34 Q36 4 54 10 Q46 26 44 36 Z" fill="#2f6fd6" stroke="#1f5fbf" stroke-width="2.5" stroke-linejoin="round"/>':'<path d="M30 40 Q38 66 54 62 Q46 50 46 40 Z" fill="#2f6fd6" stroke="#1f5fbf" stroke-width="2.5" stroke-linejoin="round"/>'}
+<circle cx="64" cy="30" r="13" fill="#4c97ff" stroke="#1f5fbf" stroke-width="3"/>
+<path d="M75 28 L88 32 L75 36 Z" fill="#ffab19" stroke="#c77800" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="67" cy="27" r="3.5" fill="#2b2340"/><circle cx="68" cy="26" r="1.1" fill="#fff"/>`),ve=s=>p("0 0 110 50",`
+${s?'<path d="M18 25 L0 14 L8 25 L0 36 Z" fill="#ff8a3d"/><path d="M18 25 L6 19 L11 25 L6 31 Z" fill="#ffd23f"/>':""}
+<path d="M24 12 L14 2 L14 18 Z M24 38 L14 48 L14 32 Z" fill="#e0457b" stroke="#9c1f4d" stroke-width="2" stroke-linejoin="round"/>
+<path d="M18 13 H74 Q100 16 108 25 Q100 34 74 37 H18 Z" fill="#f4f6fb" stroke="#5a6676" stroke-width="3" stroke-linejoin="round"/>
+<path d="M90 18 Q100 20 108 25 Q100 30 90 32 Z" fill="#e0457b"/>
+<circle cx="62" cy="25" r="7" fill="#7fd3ff" stroke="#2f6fd6" stroke-width="2.5"/>
+<rect x="26" y="20" width="18" height="10" rx="3" fill="#e0457b"/>`),Re=s=>p("0 0 50 50",`<rect x="2" y="2" width="46" height="46" rx="10" fill="#fff" stroke="#2b2340" stroke-width="3"/>${{1:[[25,25]],2:[[14,14],[36,36]],3:[[14,14],[25,25],[36,36]],4:[[14,14],[36,14],[14,36],[36,36]],5:[[14,14],[36,14],[25,25],[14,36],[36,36]],6:[[14,13],[36,13],[14,25],[36,25],[14,37],[36,37]]}[s].map(([c,r])=>`<circle cx="${c}" cy="${r}" r="4.6" fill="${s===1?"#e0457b":"#2b2340"}"/>`).join("")}`),L={kedi:{name:"Kedi",w:95,h:78,frames:[ke([[26,66],[58,66]],"M20 52 Q4 40 10 18"),ke([[20,64],[64,64]],"M20 52 Q2 46 4 24")]},kopek:{name:"Köpek",w:95,h:78,frames:[ye([[24,66],[58,66]]),ye([[18,64],[64,64]])]},robo:{name:"Robo",w:66,h:70,frames:[be(0),be(-60)]},balik:{name:"Balık",w:80,h:52,frames:[ge(0),ge(8)]},ari:{name:"Arı",w:64,h:50,frames:[xe(0),xe(6)]},kus:{name:"Kuş",w:68,h:53,frames:[we(!0),we(!1)]},roket:{name:"Roket",w:88,h:40,frames:[ve(!1),ve(!0)]},elma:{name:"Elma",w:40,h:44,frames:[p("0 0 40 44",'<path d="M20 12 Q30 4 37 14 Q42 28 30 40 Q25 44 20 41 Q15 44 10 40 Q-2 28 3 14 Q10 4 20 12 Z" fill="#ff4d4d" stroke="#b81f1f" stroke-width="2.5"/><path d="M20 12 Q19 6 22 1" stroke="#7a4a1f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M22 7 Q30 0 34 6 Q28 10 22 7 Z" fill="#2fbf71"/><ellipse cx="11" cy="18" rx="3" ry="5" fill="#fff" opacity="0.5"/>')]},top:{name:"Top",w:44,h:44,frames:[p("0 0 44 44",'<circle cx="22" cy="22" r="20" fill="#fff" stroke="#2b2340" stroke-width="2.5"/><path d="M22 2 A20 20 0 0 1 42 22 L22 22 Z" fill="#ff4d4d"/><path d="M22 42 A20 20 0 0 1 2 22 L22 22 Z" fill="#2f8cff"/><path d="M2 22 A20 20 0 0 1 22 2 L22 22 Z" fill="#ffd23f"/><circle cx="22" cy="22" r="20" fill="none" stroke="#2b2340" stroke-width="2.5"/><circle cx="22" cy="22" r="4" fill="#fff" stroke="#2b2340" stroke-width="2"/>')]},yildiz:{name:"Yıldız",w:46,h:46,frames:[p("0 0 46 46",'<path d="M23 2 L29 16 L44 17 L32 27 L36 43 L23 34 L10 43 L14 27 L2 17 L17 16 Z" fill="#ffd23f" stroke="#c99a00" stroke-width="2.5" stroke-linejoin="round"/><circle cx="19" cy="22" r="2" fill="#2b2340"/><circle cx="27" cy="22" r="2" fill="#2b2340"/><path d="M19 28 q4 3 8 0" fill="none" stroke="#2b2340" stroke-width="1.8" stroke-linecap="round"/>')]},cicek:{name:"Çiçek",w:46,h:60,frames:[p("0 0 46 60",'<path d="M23 30 V58" stroke="#2fbf71" stroke-width="4"/><path d="M23 48 Q10 40 8 46 Q14 52 23 50 Z" fill="#2fbf71"/>'+[0,72,144,216,288].map(s=>`<ellipse cx="23" cy="12" rx="8" ry="11" fill="#ff7ab6" stroke="#d1457f" stroke-width="2" transform="rotate(${s} 23 23)"/>`).join("")+'<circle cx="23" cy="23" r="8" fill="#ffd23f" stroke="#c99a00" stroke-width="2"/>')]},kalem:{name:"Kalem",w:130,h:24,frames:[p("0 0 130 24",'<path d="M65 12 L78 4 H120 Q128 4 128 12 Q128 20 120 20 H78 Z" fill="#ffd23f" stroke="#b07a00" stroke-width="2"/><path d="M65 12 L78 4 V20 Z" fill="#f2d3ae" stroke="#b07a00" stroke-width="2" stroke-linejoin="round"/><path d="M65 12 L70 9 V15 Z" fill="#2b2340"/><rect x="112" y="4" width="8" height="16" fill="#ff7ab6"/>')]},sepet:{name:"Sepet",w:90,h:50,frames:[p("0 0 90 50",'<path d="M18 14 Q45 -14 72 14" fill="none" stroke="#8a5525" stroke-width="4"/><path d="M4 16 H86 L76 48 H14 Z" fill="#d9a066" stroke="#8a5525" stroke-width="3" stroke-linejoin="round"/><path d="M10 26 H80 M13 36 H77 M30 16 L28 48 M45 16 V48 M60 16 L62 48" stroke="#8a5525" stroke-width="2" opacity="0.6"/>')]},fare:{name:"Fare",w:46,h:30,frames:[p("0 0 60 40",'<path d="M8 26 Q0 34 -2 22" fill="none" stroke="#ff9fb4" stroke-width="3" stroke-linecap="round"/><ellipse cx="28" cy="25" rx="20" ry="12" fill="#b9b9c9" stroke="#6b6380" stroke-width="2.5"/><circle cx="40" cy="12" r="7" fill="#b9b9c9" stroke="#6b6380" stroke-width="2.5"/><circle cx="40" cy="12" r="3.5" fill="#ff9fb4"/><path d="M42 18 Q50 20 58 26 Q50 30 42 30 Z" fill="#b9b9c9" stroke="#6b6380" stroke-width="2.5"/><circle cx="50" cy="23" r="2.2" fill="#2b2340"/><circle cx="58" cy="26" r="2.4" fill="#ff6f91"/>')]},peynir:{name:"Peynir",w:48,h:36,frames:[p("0 0 48 36",'<path d="M2 32 L46 32 L46 12 L10 4 Z" fill="#ffd23f" stroke="#c99a00" stroke-width="2.5" stroke-linejoin="round"/><path d="M2 32 L10 4 L46 12" fill="none" stroke="#c99a00" stroke-width="2.5"/><circle cx="20" cy="22" r="4" fill="#e8b800"/><circle cx="34" cy="20" r="3" fill="#e8b800"/><circle cx="38" cy="27" r="2.5" fill="#e8b800"/>')]},hayalet:{name:"Hayalet",w:60,h:68,frames:[p("0 0 60 68",'<path d="M6 30 Q6 4 30 4 Q54 4 54 30 V62 L46 56 L38 64 L30 56 L22 64 L14 56 L6 62 Z" fill="#fff" stroke="#9aa6c4" stroke-width="3" stroke-linejoin="round"/><ellipse cx="22" cy="28" rx="4.5" ry="6.5" fill="#2b2340"/><ellipse cx="38" cy="28" rx="4.5" ry="6.5" fill="#2b2340"/><ellipse cx="30" cy="42" rx="5" ry="6" fill="#2b2340"/>')]},asteroit:{name:"Göktaşı",w:56,h:50,frames:[p("0 0 56 50",'<path d="M10 14 L26 4 L46 8 L54 26 L44 44 L22 48 L4 34 Z" fill="#8a8299" stroke="#4d4660" stroke-width="3" stroke-linejoin="round"/><circle cx="22" cy="20" r="6" fill="#6b6380"/><circle cx="38" cy="32" r="5" fill="#6b6380"/><circle cx="18" cy="36" r="3" fill="#6b6380"/>')]},kalp:{name:"Kalp",w:40,h:36,frames:[p("0 0 40 36",'<path d="M20 34 Q2 22 2 11 Q2 2 11 2 Q17 2 20 8 Q23 2 29 2 Q38 2 38 11 Q38 22 20 34 Z" fill="#ff4d6d" stroke="#b8173a" stroke-width="2.5"/><ellipse cx="11" cy="10" rx="3" ry="4" fill="#fff" opacity="0.6"/>')]},bayrak:{name:"Bayrak",w:44,h:60,frames:[p("0 0 44 60",'<rect x="6" y="4" width="4" height="54" rx="2" fill="#6b6380"/><path d="M10 6 H40 V30 H10 Z" fill="#fff" stroke="#2b2340" stroke-width="2"/><path d="M10 6 H18 V14 H10 Z M26 6 H34 V14 H26 Z M18 14 H26 V22 H18 Z M34 14 H40 V22 H34 Z M10 22 H18 V30 H10 Z M26 22 H34 V30 H26 Z" fill="#2b2340"/>')]},boc:{name:"Uğur böceği",w:46,h:40,frames:[p("0 0 46 40",'<circle cx="38" cy="20" r="8" fill="#2b2340"/><ellipse cx="21" cy="20" rx="19" ry="17" fill="#ff3d3d" stroke="#2b2340" stroke-width="2.5"/><path d="M21 3 V37" stroke="#2b2340" stroke-width="2.5"/><circle cx="12" cy="12" r="3.5" fill="#2b2340"/><circle cx="30" cy="12" r="3.5" fill="#2b2340"/><circle cx="12" cy="27" r="3.5" fill="#2b2340"/><circle cx="30" cy="27" r="3.5" fill="#2b2340"/><circle cx="41" cy="17" r="1.6" fill="#fff"/><circle cx="41" cy="23" r="1.6" fill="#fff"/>')]},davul:{name:"Davul",w:70,h:56,frames:[p("0 0 70 56",'<ellipse cx="35" cy="16" rx="30" ry="10" fill="#fff3e3" stroke="#8a5525" stroke-width="3"/><path d="M5 16 V42 Q35 58 65 42 V16 Q35 32 5 16 Z" fill="#e0457b" stroke="#8a5525" stroke-width="3"/><path d="M8 22 L20 46 L32 24 L44 48 L56 24 L62 40" fill="none" stroke="#ffd23f" stroke-width="3"/>'),p("0 0 70 56",'<ellipse cx="35" cy="18" rx="30" ry="10" fill="#ffe14d" stroke="#8a5525" stroke-width="3"/><path d="M5 18 V44 Q35 60 65 44 V18 Q35 34 5 18 Z" fill="#ff6f9a" stroke="#8a5525" stroke-width="3"/><path d="M8 24 L20 48 L32 26 L44 50 L56 26 L62 42" fill="none" stroke="#ffd23f" stroke-width="3"/><path d="M2 4 L10 10 M68 4 L60 10 M35 0 V6" stroke="#ff8a3d" stroke-width="3" stroke-linecap="round"/>')]},zil:{name:"Zil",w:54,h:56,frames:[p("0 0 54 56",'<path d="M27 4 Q44 4 46 26 Q47 40 52 44 H2 Q7 40 8 26 Q10 4 27 4 Z" fill="#ffd23f" stroke="#c99a00" stroke-width="3" stroke-linejoin="round"/><circle cx="27" cy="49" r="5" fill="#c99a00"/><path d="M17 14 Q14 22 15 32" stroke="#fff" stroke-width="3" fill="none" opacity="0.7" stroke-linecap="round"/>')]},lazer:{name:"Lazer",w:10,h:34,frames:[p("0 0 10 34",'<rect x="1" y="1" width="8" height="32" rx="4" fill="#ff3d7f"/><rect x="3.5" y="3" width="3" height="28" rx="1.5" fill="#fff"/>')]},zar:{name:"Zar",w:50,h:50,frames:[1,2,3,4,5,6].map(Re)}};Me=(s,i,c=360)=>{let r=qe(i);return Array.from({length:s},()=>`<circle cx="${(r()*480).toFixed(0)}" cy="${(r()*c).toFixed(0)}" r="${(r()*1.6+.4).toFixed(1)}" fill="#fff" opacity="${(r()*.6+.4).toFixed(2)}"/>`).join("")},O=s=>`<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">${s}</svg>`,$e=[[-240,170,240,180],[-240,-180,240,-170],[-240,-180,-230,180],[230,-180,240,180],[-160,-80,-150,170],[-80,-170,-70,90],[0,-80,10,170],[80,-170,90,90],[160,-80,170,170]],Le=[[-240,170,240,180],[-240,-180,240,-170],[-240,-180,-230,180],[230,-180,240,180],[-240,-100,160,-90],[-160,-10,240,0],[-240,80,160,90]],Se=(s,i,c)=>s.map(([r,m,h,f])=>`<rect x="${r+240}" y="${180-f}" width="${h-r}" height="${f-m}" rx="4" fill="${i}" stroke="${c}" stroke-width="2"/>`).join(""),j={beyaz:{name:"Beyaz",svg:O('<rect width="480" height="360" fill="#fff"/>')},koordinat:{name:"Koordinat",svg:O(`<rect width="480" height="360" fill="#fff"/>${Array.from({length:11},(s,i)=>`<line x1="${i*48}" y1="0" x2="${i*48}" y2="360" stroke="#e4e9f0"/>`).join("")}${Array.from({length:8},(s,i)=>`<line x1="0" y1="${i*45+22.5}" x2="480" y2="${i*45+22.5}" stroke="#e4e9f0"/>`).join("")}<line x1="0" y1="180" x2="480" y2="180" stroke="#8a93a3" stroke-width="2"/><line x1="240" y1="0" x2="240" y2="360" stroke="#8a93a3" stroke-width="2"/><g font-family="sans-serif" font-size="13" font-weight="700" fill="#5a6676"><text x="462" y="174">x</text><text x="248" y="16">y</text><text x="244" y="196">0</text><text x="440" y="196">240</text><text x="4" y="196">-240</text><text x="246" y="34">180</text><text x="246" y="352">-180</text></g>`)},cayir:{name:"Çayır",svg:O('<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc8ff"/><stop offset="1" stop-color="#d9f1ff"/></linearGradient></defs><rect width="480" height="360" fill="url(#g1)"/><circle cx="410" cy="60" r="34" fill="#ffe14d"/><g fill="#fff" opacity="0.9"><ellipse cx="90" cy="60" rx="40" ry="16"/><ellipse cx="120" cy="50" rx="28" ry="18"/><ellipse cx="270" cy="90" rx="34" ry="12"/></g><path d="M0 250 Q120 190 240 240 Q360 290 480 220 V360 H0 Z" fill="#7ccf5e"/><path d="M0 290 Q160 250 300 290 Q400 315 480 290 V360 H0 Z" fill="#5db544"/>')},uzay:{name:"Uzay",svg:O(`<defs><radialGradient id="g2" cx="0.3" cy="0.3" r="1"><stop offset="0" stop-color="#2c2a6b"/><stop offset="1" stop-color="#0b0b26"/></radialGradient></defs><rect width="480" height="360" fill="url(#g2)"/>${Me(90,7)}<circle cx="390" cy="280" r="50" fill="#ff8a3d"/><ellipse cx="390" cy="280" rx="80" ry="16" fill="none" stroke="#ffd23f" stroke-width="5" transform="rotate(-15 390 280)"/><circle cx="80" cy="70" r="18" fill="#d9d9e6"/><circle cx="74" cy="66" r="4" fill="#b9b9c9"/>`)},deniz:{name:"Deniz",svg:O('<defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3bb4f2"/><stop offset="1" stop-color="#0b4f8a"/></linearGradient></defs><rect width="480" height="360" fill="url(#g3)"/><path d="M60 0 L140 360 H90 L30 0 Z M300 0 L360 360 H330 L280 0 Z" fill="#fff" opacity="0.07"/><path d="M0 330 Q120 310 240 330 Q360 345 480 325 V360 H0 Z" fill="#f2d49b"/><path d="M60 335 Q50 300 64 270 Q74 240 62 210 M80 338 Q90 300 78 260 M420 330 Q410 290 424 250 Q436 220 422 190" fill="none" stroke="#2fbf71" stroke-width="8" stroke-linecap="round"/><g fill="none" stroke="#bfe9ff" stroke-width="2" opacity="0.7"><circle cx="200" cy="80" r="6"/><circle cx="214" cy="60" r="4"/><circle cx="360" cy="120" r="5"/></g>')},sahne:{name:"Tiyatro",svg:O('<rect width="480" height="360" fill="#2b2340"/><ellipse cx="240" cy="310" rx="200" ry="40" fill="#ffe8a3" opacity="0.25"/><rect y="290" width="480" height="70" fill="#a0662f"/><path d="M0 290 H480" stroke="#7a4a1f" stroke-width="4"/><path d="M0 0 H90 Q70 150 100 290 H0 Z M480 0 H390 Q410 150 380 290 H480 Z" fill="#c8102e"/><path d="M0 0 H480 V30 Q240 50 0 30 Z" fill="#a50d26"/>')},gece:{name:"Gece",svg:O(`<rect width="480" height="360" fill="#1b2350"/>${Me(50,3,220)}<circle cx="400" cy="70" r="30" fill="#fff6c9"/><circle cx="388" cy="62" r="30" fill="#1b2350"/><path d="M0 360 V250 H40 V210 H90 V260 H130 V190 H190 V270 H230 V230 H290 V180 H340 V260 H380 V220 H430 V250 H480 V360 Z" fill="#0d1230"/><g fill="#ffd23f" opacity="0.8"><rect x="145" y="210" width="8" height="10"/><rect x="165" y="230" width="8" height="10"/><rect x="300" y="200" width="8" height="10"/><rect x="315" y="225" width="8" height="10"/><rect x="55" y="225" width="8" height="10"/></g>`)},orman:{name:"Orman",svg:O(`<rect width="480" height="360" fill="#c9f0d4"/><path d="M0 270 H480 V360 H0 Z" fill="#6cbf4f"/>${[30,120,210,330,430].map((s,i)=>`<rect x="${s-8}" y="${180+i%2*20}" width="16" height="${90-i%2*20}" fill="#8a5525"/><circle cx="${s}" cy="${160+i%2*20}" r="${44-i%2*8}" fill="#2f9e57"/><circle cx="${s-20}" cy="${185+i%2*20}" r="26" fill="#3cb46a"/><circle cx="${s+22}" cy="${182+i%2*20}" r="24" fill="#3cb46a"/>`).join("")}`)},labirent1:{name:"Labirent 1",walls:$e,svg:O(`<rect width="480" height="360" fill="#eaf7e4"/>${Se($e,"#2f9e57","#1d6b39")}`)},labirent2:{name:"Labirent 2",walls:Le,svg:O(`<rect width="480" height="360" fill="#eef1ff"/>${Se(Le,"#5b6ee1","#2d3aa0")}`)}}});function Te(s,i,c={}){let r={t:0,random:c.random||Math.random,backdrop:s.backdrop||"beyaz",vars:{...s.vars||{}},sprites:[],threads:[],keys:new Set,mouse:{x:0,y:0,down:!1},answer:"",asking:null,timer0:0,penLines:[],penOps:[],log:{touch:new Set,answers:[],clones:0,said:[],sounds:[],notes:[],bcasts:[],backdrops:[],keys:[],clicks:[],flags:0},onSound:null,mem:{},onNote:null};for(let e of s.sprites){let t=L[e.costume];r.sprites.push({name:e.name,costume:e.costume,frame:(e.frame||1)-1,x:e.x??0,y:e.y??0,dir:e.dir??90,size:e.size??100,visible:e.visible!==!1,rot:e.rot||"lr",effect:0,say:null,turned:0,frames:0,pen:{down:!1,color:"#4c97ff",size:3},w:t.w,h:t.h,scripts:i[e.name]||[],uid:r.sprites.length+1})}let m=e=>r.sprites.find(t=>t.name===e&&!t.isClone)||r.sprites.find(t=>t.name===e);r.sprite=m;let h=e=>[e.w*e.size/100,e.h*e.size/100],f=(e,t=1)=>{let[o,n]=h(e);return{l:e.x-o/2*t,r:e.x+o/2*t,b:e.y-n/2*t,t:e.y+n/2*t}},k=(e,t)=>e.l<t.r&&e.r>t.l&&e.b<t.t&&e.t>t.b;function u(e,t,o){if(t=V(t,-g,g),o=V(o,-w,w),e.pen.down&&(t!==e.x||o!==e.y)){let n={x1:e.x,y1:e.y,x2:t,y2:o,color:e.pen.color,size:e.pen.size};r.penLines.push(n),r.penOps.push(n)}e.x=t,e.y=o}r.setPos=u;function M(e,t){let o=T(e,t);return o&&r.log.touch.add(e.name+">"+t),o}function T(e,t){if(!e.visible)return!1;if(t==="kenar"){let n=f(e);return n.l<=-g||n.r>=g||n.b<=-w||n.t>=w}if(t==="duvar"){let n=f(e,.8);return(j[r.backdrop].walls||[]).some(([a,l,b,x])=>k(n,{l:a,b:l,r:b,t:x}))}if(t==="fare"){let n=f(e);return r.mouse.x>=n.l&&r.mouse.x<=n.r&&r.mouse.y>=n.b&&r.mouse.y<=n.t}let o=f(e,.75);return r.sprites.some(n=>n.name===t&&n!==e&&n.visible&&k(o,f(n,.75)))}r.touching=M;function d(e){let t=f(e);t.r>g?(e.dir=Q(-e.dir),e.x-=t.r-g):t.l<-g&&(e.dir=Q(-e.dir),e.x+=-g-t.l),t.t>w?(e.dir=Q(180-e.dir),e.y-=t.t-w):t.b<-w&&(e.dir=Q(180-e.dir),e.y+=-w-t.b)}function y(e,t){if(typeof t=="number")return t;if(t==null)return 0;if(typeof t=="string"){let o=parseFloat(t.replace(",","."));return Number.isFinite(o)?o:0}switch(t.r){case"rand":{let o=y(e,t.a),n=y(e,t.b),a=Math.min(o,n),l=Math.max(o,n);return Number.isInteger(a)&&Number.isInteger(l)?a+Math.floor(r.random()*(l-a+1)):a+r.random()*(l-a)}case"x":return Math.round(e.x);case"y":return Math.round(e.y);case"dir":return e.dir;case"mx":return Math.round(r.mouse.x);case"my":return Math.round(r.mouse.y);case"var":return y(e,r.vars[t.v]);case"answer":return y(e,String(r.answer));case"join":return y(e,String(S(e,t.a))+String(S(e,t.b)));case"timer":return Math.round((r.t-r.timer0)*10)/10;case"op":{let o=y(e,t.a),n=y(e,t.b),a=t.o==="+"?o+n:t.o==="-"?o-n:t.o==="*"?o*n:n?o/n:0;return Math.round(a*1e6)/1e6}default:return 0}}let S=(e,t)=>t&&typeof t=="object"?t.r==="answer"?r.answer:t.r==="var"?r.vars[t.v]??0:t.r==="join"?String(S(e,t.a))+String(S(e,t.b)):y(e,t):t??"",E=(e,t)=>String(S(e,t));r.num=y;function z(e,t){if(!t)return!1;switch(t.k){case"touch":return M(e,t.o);case"key":return r.keys.has(t.key);case"mouse":return r.mouse.down;case"cmp":{let o=S(e,t.a),n=S(e,t.b),a=x=>typeof x=="number"||/^\s*-?(\d+([.,]\d+)?|[.,]\d+)\s*$/.test(String(x));if(a(o)&&a(n)){let x=y(e,typeof o=="number"?o:String(o)),$=y(e,typeof n=="number"?n:String(n));return t.op==="<"?x<$:t.op===">"?x>$:Math.abs(x-$)<1e-9}let l=String(o).trim().toLocaleLowerCase("tr"),b=String(n).trim().toLocaleLowerCase("tr");return t.op==="<"?l<b:t.op===">"?l>b:l===b}default:return!1}}function*H(e){let t=r.t;for(;r.t<t+e;)yield}function*Z(e,t,o){for(let n of t){if(o.dead)return;o.cur=n.id,yield*ee(e,n,o)}}function*B(e,t,o){yield*Z(e,t.body,o),o.cur=t.id,yield}function*ee(e,t,o){let n=t.args,a=l=>y(e,n[l]);switch(t.op){case"move":{let l=e.dir*Math.PI/180,b=a("n");u(e,e.x+b*Math.sin(l),e.y+b*Math.cos(l));break}case"turnR":e.dir=Q(e.dir+a("n")),e.turned+=Math.abs(a("n"));break;case"turnL":e.dir=Q(e.dir-a("n")),e.turned+=Math.abs(a("n"));break;case"goto":u(e,a("x"),a("y"));break;case"gotoRand":u(e,Math.round(r.random()*440-220),Math.round(r.random()*320-160));break;case"gotoMouse":u(e,r.mouse.x,r.mouse.y);break;case"glide":{let l=Math.max(0,a("s")),b=e.x,x=e.y,$=a("x"),W=a("y"),Y=r.t;for(;r.t<Y+l;){let fe=(r.t-Y)/l;u(e,b+($-b)*fe,x+(W-x)*fe),yield}u(e,$,W);break}case"point":e.dir=Q(a("d"));break;case"chx":u(e,e.x+a("n"),e.y);break;case"setx":u(e,a("n"),e.y);break;case"chy":u(e,e.x,e.y+a("n"));break;case"sety":u(e,e.x,a("n"));break;case"bounce":d(e);break;case"gotoT":{let l=n.o==="fare"?r.mouse:m(n.o);l&&u(e,l.x,l.y);break}case"pointTo":{let l=n.o==="fare"?r.mouse:m(n.o);l&&(e.dir=Q(Math.round(Math.atan2(l.x-e.x,l.y-e.y)*180/Math.PI)));break}case"say":case"sayFor":case"thinkFor":{let l={text:E(e,n.t),think:t.op==="thinkFor"};e.say=l.text?l:null,r.log.said.push({sp:e.name,text:l.text,t:r.t}),t.op!=="say"&&(yield*H(a("s")),e.say===l&&(e.say=null));break}case"costume":e.frame=V((+n.c||1)-1,0,L[e.costume].frames.length-1);break;case"costumeN":{let l=L[e.costume].frames.length;e.frame=((Math.round(a("n"))-1)%l+l)%l;break}case"next":e.frame=(e.frame+1)%L[e.costume].frames.length,e.frames++;break;case"backdrop":r.backdrop=n.b,r.log.backdrops.push(n.b);break;case"size":e.size=V(a("n"),5,400);break;case"chsize":e.size=V(e.size+a("n"),5,400);break;case"color":e.effect=(e.effect+a("n"))%200;break;case"clearfx":e.effect=0;break;case"show":e.visible=!0;break;case"hide":e.visible=!1,e.say=null;break;case"sound":case"soundW":r.log.sounds.push({sp:e.name,snd:n.snd,t:r.t}),r.onSound?.(n.snd,e),t.op==="soundW"&&(yield*H(Pe[n.snd]||.4));break;case"note":{let l=Math.max(0,a("b"));r.log.notes.push(+n.note),r.onNote?.(+n.note,l*ie,e),yield*H(l*ie);break}case"rest":yield*H(Math.max(0,a("b"))*ie);break;case"wait":yield*H(Math.max(0,a("s")));break;case"repeat":{let l=Math.round(a("n"));for(let b=0;b<l&&!o.dead;b++)yield*B(e,t,o);break}case"forever":for(;!o.dead;)yield*B(e,t,o);break;case"if":z(e,n.c)&&(yield*Z(e,t.body,o));break;case"ife":yield*Z(e,z(e,n.c)?t.body:t.body2,o);break;case"waitUntil":for(;!z(e,n.c);)yield;break;case"until":for(;!o.dead&&!z(e,n.c);)yield*B(e,t,o);break;case"stop":r.stopAll(),o.dead=!0;break;case"clone":G(n.o==="kendim"||!n.o?e:m(n.o));break;case"delClone":e.isClone&&(F(e),o.dead=!0);break;case"ask":{let l=E(e,n.t);for(e.say=e.visible&&l?{text:l,think:!1}:null,r.asking={sp:e,text:l};r.asking;)yield;e.say?.text===l&&(e.say=null);break}case"resetTimer":r.timer0=r.t;break;case"clear":r.penLines=[],r.penOps.push({clear:!0});break;case"down":e.pen.down=!0;{let l={x1:e.x,y1:e.y,x2:e.x+.01,y2:e.y,color:e.pen.color,size:e.pen.size,dot:!0};r.penLines.push(l),r.penOps.push(l)}break;case"up":e.pen.down=!1;break;case"pcolor":e.pen.color=n.col;break;case"psize":e.pen.size=V(a("n"),1,60);break;case"stamp":r.penOps.push({stamp:{costume:e.costume,frame:e.frame,x:e.x,y:e.y,dir:e.dir,size:e.size,rot:e.rot,effect:e.effect,w:e.w,h:e.h}});break;case"setv":r.vars[n.v]=a("n");break;case"chv":r.vars[n.v]=y(e,r.vars[n.v])+a("n");break;case"bcast":q(n.msg);break;case"bcastw":{let l=q(n.msg);for(;l.some(b=>!b.done);)yield;break}default:break}}let U=1e3;function G(e){if(!e||r.sprites.filter(o=>o.isClone).length>=100)return;let t={...e,isClone:!0,uid:++U,say:null,pen:{...e.pen},turned:0,frames:0};r.sprites.splice(r.sprites.indexOf(e)+1,0,t),r.log.clones++;for(let o of t.scripts)o[0]&&o[0].op==="cloneStart"&&R(t,o)}function F(e){r.sprites=r.sprites.filter(t=>t!==e);for(let t of r.threads)t.sp===e&&(t.dead=!0,t.done=!0)}r.answerQ=e=>{r.answer=String(e),r.log.answers.push(r.answer),r.asking=null};function R(e,t){for(let n of r.threads)n.script===t&&n.sp===e&&(n.dead=!0,n.done=!0);let o={sp:e,script:t,done:!1,dead:!1,cur:t[0].id};return o.gen=Z(e,t.slice(1),o),r.threads.push(o),o}let N=(e,t=()=>!0)=>{let o=[];for(let n of r.sprites.slice())if(!(n.isClone&&e==="flag"))for(let a of n.scripts)a[0]&&a[0].op===e&&t(a[0])&&o.push(R(n,a));return o};function q(e){return r.log.bcasts.push(e),N("recv",t=>t.args.msg===e)}return r.flag=()=>(r.log.flags++,r.timer0=r.t,N("flag")),r.keyDown=e=>{r.keys.has(e)||r.log.keys.push(e),r.keys.add(e),N("key",t=>t.args.key===e)},r.keyUp=e=>r.keys.delete(e),r.clickSprite=(e,t)=>{let o=t||m(e);if(o){r.log.clicks.push(e);for(let n of o.scripts)n[0]&&n[0].op==="click"&&R(o,n)}},r.stopAll=()=>{for(let e of r.threads)e.dead=!0,e.done=!0;r.threads=[],r.sprites=r.sprites.filter(e=>!e.isClone),r.asking=null},r.running=()=>r.threads.some(e=>!e.done),r.step=e=>{r.t+=e;for(let t of r.threads.slice()){if(t.done)continue;t.gen.next().done&&(t.done=!0)}r.threads=r.threads.filter(t=>!t.done)},r}var g,w,ie,Pe,Q,V,le=C(()=>{_();K();g=240,w=180,ie=.5,Pe={pop:.2,miyav:.6,hav:.5,davul:.3,zil:.8,boing:.5,alkis:.7,kazandin:1},Q=s=>{let i=((s+180)%360+360)%360-180;return i===-180&&(i=180),i},V=(s,i,c)=>Math.max(i,Math.min(c,s))});function Ee(s){let i=s.size/100;return s.rot==="all"?`scale(${i}) rotate(${s.dir-90}deg)`:s.rot==="lr"&&s.dir<0?`scale(${-i}, ${i})`:`scale(${i})`}function He(s,i={}){s.innerHTML=`<div class="stg"><div class="stg-world">
+    <div class="stg-bd"></div>
+    <canvas class="stg-pen" width="960" height="720"></canvas>
+    <div class="stg-stamps"></div>
+    <div class="stg-sprites"></div>
+    <div class="stg-vars"></div>
+    <form class="stg-ask" hidden><input type="text" maxlength="40" aria-label="Cevabın"><button type="submit">✔</button></form>
+  </div></div>`;let c=s.querySelector(".stg"),r=s.querySelector(".stg-world"),m=s.querySelector(".stg-bd"),h=s.querySelector(".stg-pen").getContext("2d"),f=s.querySelector(".stg-stamps"),k=s.querySelector(".stg-sprites"),u=s.querySelector(".stg-vars"),M=s.querySelector(".stg-ask"),T=M.querySelector("input");M.onsubmit=t=>{t.preventDefault(),d?.asking&&(d.answerQ(T.value),T.value="")};let d=null,y=new Map,S=null,E=1,z=()=>{E=c.clientWidth/(g*2),r.style.transform=`scale(${E})`,c.style.height=w*2*E+"px"},H=new ResizeObserver(z);H.observe(c);function Z(t){d=t,k.innerHTML="",f.innerHTML="",h.clearRect(0,0,960,720),y=new Map,S=null,U()}function B(){let t=new Set(d.sprites);for(let[n,a]of y)t.has(n)||(a.d.remove(),a.bub.remove(),y.delete(n));let o=null;for(let n of d.sprites){let a=y.get(n);if(!a){let l=document.createElement("div");l.className="spr",l.dataset.name=n.name,l.innerHTML='<div class="spr-img"></div>';let b=document.createElement("div");b.className="bub",a={d:l,img:l.firstChild,bub:b,frame:-1,costume:null,say:void 0,sp:n},y.set(n,a),l.spr=n,o?o.d.after(l):k.prepend(l),k.appendChild(b)}o=a}}function ee(){for(let t of d.penOps){if(t.clear){h.clearRect(0,0,960,720),f.innerHTML="";continue}if(t.stamp){let o=t.stamp,n=document.createElement("div");n.className="spr stamp",n.innerHTML=`<div class="spr-img">${L[o.costume].frames[o.frame]}</div>`,Object.assign(n.style,{width:o.w+"px",height:o.h+"px",left:g+o.x-o.w/2+"px",top:w-o.y-o.h/2+"px",transform:Ee(o),filter:o.effect?`hue-rotate(${o.effect*1.8}deg)`:""}),f.appendChild(n);continue}h.strokeStyle=t.color,h.lineWidth=t.size*2,h.lineCap="round",h.beginPath(),h.moveTo((t.x1+g)*2,(w-t.y1)*2),h.lineTo((t.x2+g)*2,(w-t.y2)*2),h.stroke()}d.penOps.length=0}function U(){if(!d)return;S!==d.backdrop&&(S=d.backdrop,m.innerHTML=j[d.backdrop]?.svg||""),d.penOps.length&&ee(),(y.size!==d.sprites.length||d.sprites.some(a=>!y.has(a)))&&B(),!!d.asking===M.hidden&&(M.hidden=!d.asking,d.asking&&setTimeout(()=>T.focus(),0));let t=new Set(d.threads.filter(a=>!a.done).map(a=>a.sp));for(let[a,l]of y){let b=L[a.costume];(l.frame!==a.frame||l.costume!==a.costume)&&(l.frame=a.frame,l.costume=a.costume,l.img.innerHTML=b.frames[a.frame]);let x=l.d.style;x.width=a.w+"px",x.height=a.h+"px",x.left=g+a.x-a.w/2+"px",x.top=w-a.y-a.h/2+"px",x.transform=Ee(a),x.filter=a.effect?`hue-rotate(${a.effect*1.8}deg) saturate(1.3)`:"",x.display=a.visible?"":"none",l.d.classList.toggle("busy",t.has(a));let $=a.visible&&a.say?a.say.text:"";if(l.say!==$+(a.say?.think?"1":"")&&(l.say=$+(a.say?.think?"1":""),l.bub.textContent=$,l.bub.className="bub"+($?" on":"")+(a.say?.think?" think":"")),$){let W=w-a.y-a.h*a.size/200,Y=g+a.x+a.w*a.size/400;l.bub.style.left=Math.min(Y,g*2-150)+"px",l.bub.style.top=Math.max(W,40)+"px"}}let n=(i.showVars?Object.keys(d.vars).filter(a=>i.showVars.includes(a)):Object.keys(d.vars)).map(a=>`<div class="mon"><b>${a}</b><span>${typeof d.vars[a]=="number"?Math.round(d.vars[a]*100)/100:d.vars[a]}</span></div>`).join("");u.innerHTML!==n&&(u.innerHTML=n)}let G=t=>{let o=r.getBoundingClientRect();return{x:Math.round((t.clientX-o.left)/E-g),y:Math.round(w-(t.clientY-o.top)/E)}};r.addEventListener("pointermove",t=>{if(!d)return;let o=G(t);d.mouse.x=Math.max(-g,Math.min(g,o.x)),d.mouse.y=Math.max(-w,Math.min(w,o.y)),i.onMouse?.(d.mouse)}),r.addEventListener("pointerdown",t=>{if(!d||t.target.closest(".stg-ask"))return;let o=G(t);d.mouse.x=o.x,d.mouse.y=o.y,d.mouse.down=!0;let n=[...k.querySelectorAll(".spr")].reverse().find(a=>a.spr&&a.style.display!=="none"&&a.contains(t.target));n&&d.clickSprite(n.spr.name,n.spr)});let F=()=>{d&&(d.mouse.down=!1)};addEventListener("pointerup",F);let R=t=>/^(INPUT|SELECT|TEXTAREA)$/.test(t.target.tagName),N=t=>{if(!d||R(t)||t.ctrlKey||t.metaKey||t.altKey)return;let o=Oe[t.key];o&&((o==="space"||o.length>1)&&t.preventDefault(),d.keyDown(o))},q=t=>{let o=Oe[t.key];o&&d&&d.keyUp(o)};addEventListener("keydown",N),addEventListener("keyup",q),z();function e(t,o){if(!t?.visible)return;let n=document.createElement("div");n.className="sfx",n.textContent=o,n.style.left=g+t.x+"px",n.style.top=w-t.y-t.h*t.size/200+"px",k.appendChild(n),setTimeout(()=>n.remove(),1100)}return{attach:Z,render:U,fx:e,destroy(){H.disconnect(),removeEventListener("pointerup",F),removeEventListener("keydown",N),removeEventListener("keyup",q)}}}var Oe,ce,de=C(()=>{K();le();Oe={ArrowRight:"right",ArrowLeft:"left",ArrowUp:"up",ArrowDown:"down"," ":"space",a:"a",s:"s",d:"d",w:"w",A:"a",S:"s",D:"d",W:"w"};ce=(s,i=0)=>`<span class="thumb">${L[s].frames[i]}</span>`});function Qe(s){if(s==="fare imleci")return"fare imlecine";if(/böceği$/.test(s))return s.slice(0,-1)+"ine";let i=s.replace(/\d/g,f=>" "+Ke[f]).toLocaleLowerCase("tr"),c=[...i].filter(f=>"aeıioöuü".includes(f)),r="eiöü".includes(c[c.length-1]||"a")||Ie.includes(i.split(" ").pop()),m="aeıioöuü".includes(i[i.length-1]),h=/^\p{Lu}/u.test(s)||/\d$/.test(s);return s+(h?"’":"")+(m?"y":"")+(r?"e":"a")}var Ke,Ie,ze=C(()=>{_();K();de();X();Ke=["sıfır","bir","iki","üç","dört","beş","altı","yedi","sekiz","dokuz"],Ie=["kalp","saat","harf","hal","gol","rol","alkol"]});function je(){return I||(I=new(window.AudioContext||window.webkitAudioContext)),I.state==="suspended"&&I.resume(),I}function v(s,i,c,r="sine",m=.15,h=s){let f=je(),k=f.createOscillator(),u=f.createGain();k.type=r,k.frequency.setValueAtTime(s,f.currentTime+i),k.frequency.exponentialRampToValueAtTime(Math.max(20,h),f.currentTime+i+c),u.gain.setValueAtTime(1e-4,f.currentTime+i),u.gain.exponentialRampToValueAtTime(m,f.currentTime+i+.01),u.gain.exponentialRampToValueAtTime(1e-4,f.currentTime+i+c),k.connect(u).connect(f.destination),k.start(f.currentTime+i),k.stop(f.currentTime+i+c+.05)}function Ce(s,i,c=.3,r=800){let m=je(),h=m.createBuffer(1,Math.ceil(m.sampleRate*i),m.sampleRate),f=h.getChannelData(0);for(let T=0;T<f.length;T++)f[T]=(Math.random()*2-1)*(1-T/f.length);let k=m.createBufferSource(),u=m.createBiquadFilter(),M=m.createGain();u.type="highpass",u.frequency.value=r,M.gain.value=c,k.buffer=h,k.connect(u).connect(M).connect(m.destination),k.start(m.currentTime+s)}function Ze(s){if(ae.sound)try{Ue[s]?.()}catch{}}function Ne(s,i){if(ae.sound)try{let c=440*2**((s-69)/12),r=Math.max(.12,i*.95);v(c,0,r,"triangle",.18),v(c*2,0,r*.6,"sine",.04)}catch{}}var I,Ue,Ae=C(()=>{X();I=null;Ue={pop:()=>v(700,0,.12,"sine",.25,180),miyav:()=>{v(520,0,.25,"sawtooth",.06,820),v(820,.22,.35,"sawtooth",.06,420),v(1040,0,.55,"sine",.05,840)},hav:()=>{v(260,0,.14,"square",.08,170),v(260,.22,.16,"square",.08,160)},davul:()=>{v(150,0,.3,"sine",.5,45),Ce(0,.08,.2,1500)},zil:()=>{v(1500,0,.8,"triangle",.12),v(2250,0,.6,"sine",.06),v(3010,0,.4,"sine",.03)},boing:()=>{v(180,0,.45,"sine",.25,650),v(650,.05,.3,"triangle",.05,300)},alkis:()=>{for(let s=0;s<5;s++)Ce(s*.12+Math.random()*.03,.08,.35,1200)},kazandin:()=>[523,659,784,1047,784,1047].forEach((s,i)=>v(s,i*.12,.18,"triangle",.14))}});var Ge=Ve(()=>{le();de();_();ze();K();Ae();window.RoboSahne={yonelme:Qe,REPORTERS:oe,createWorld:Te,createStage:He,thumb:ce,mk:D,BLOCKS:P,KEYS:te,SOUNDS:re,NOTES:se,COLORS:ne,COSTUMES:L,BACKDROPS:j,playSound:Ze,playNote:Ne}});Ge();})();
+
+</script>
 <script>
 // Robo tahta sunumları: ortak motor (gezinme, ızgara oynatıcı, kod blokları, sorular, sıralama, dönüş oyuncağı)
 (() => {
@@ -643,11 +806,11 @@ function makeGrid(box) {
 
 /* ---------- Oynatıcı ---------- */
 function makePlayer(pl) {
-  const codeEl = $('.code[data-code]', pl), fnEl = $('.code.fnbody', pl), box = $('.gridbox', pl), beatEl = $('.beat', pl);
+  const codeEl = $('.code[data-code]:not(.fnbody)', pl), fnEl = $('.code.fnbody', pl), box = $('.gridbox', pl), beatEl = $('.beat', pl);
   const grid = box ? makeGrid(box) : null;
   let tree = codeEl._tree;
-  const fn = fnEl ? fnEl._tree : [];
-  const allText = $$('[data-prog]', pl).map((b) => b.dataset.prog).join('') + codeEl.dataset.code + (fnEl ? fnEl.dataset.code : '');
+  let fn = fnEl ? fnEl._tree : [];
+  const allText = $$('[data-prog]', pl).map((b) => b.dataset.prog + (b.dataset.fn || '')).join('') + codeEl.dataset.code + (fnEl ? fnEl.dataset.code : '');
   const autoStar = !allText.includes('P');
   const ptabs = $$('.progtabs button', pl);
   ptabs.forEach((b) => (b.onclick = () => {
@@ -657,20 +820,21 @@ function makePlayer(pl) {
     if (codeEl.classList.contains('flow')) codeEl.style.width = '';
     tree = codeEl._tree = parse(b.dataset.prog);
     codeEl.innerHTML = renderCode(tree, { fname: codeEl.dataset.fname || 'Fonksiyon', named: hasNested(tree) });
+    if (fnEl && b.dataset.fn != null) { fnEl.dataset.code = b.dataset.fn; fn = fnEl._tree = parse(b.dataset.fn); fnEl.innerHTML = renderCode(fn, { fname: fnEl.dataset.fname, named: false }); }
     reset();
   }));
   const limit = +(pl.dataset.limit || 400);
   const btnPlay = $('[data-act="play"]', pl), btnSlow = $('[data-act="slow"]', pl);
   let gen = null, timer = null, slow = true, steps = 0, ctx = null;
   const codes = [codeEl, fnEl].filter(Boolean);
-  const clearHl = () => codes.forEach((c) => { $$('.on', c).forEach((e) => e.classList.remove('on')); $$('.bub', c).forEach((e) => e.remove()); });
+  const clearHl = () => codes.forEach((c) => { $$('.on', c).forEach((e) => e.classList.remove('on')); $$('.cbub', c).forEach((e) => e.remove()); });
   const showBeads = () => codes.forEach((c) => $$('.blk', c).forEach((lp) => {
     const k = (ctx && ctx.cnt[lp.dataset.id]) || 0;
     $$(':scope > .lh .bd', lp).forEach((b, j) => b.classList.toggle('done', j < k));
     const tr = $(':scope > .lh .tur', lp); if (tr) { tr.hidden = !k; tr.textContent = `${k}. tur`; }
   }));
   const node = (id) => codes.map((c) => $(`[data-id="${id}"]`, c)).find(Boolean);
-  const bub = (lh, text, cls) => { const b = document.createElement('span'); b.className = 'bub ' + (cls || ''); b.textContent = text; lh.appendChild(b); };
+  const bub = (lh, text, cls) => { const b = document.createElement('span'); b.className = 'cbub ' + (cls || ''); b.textContent = text; lh.appendChild(b); };
   const hooks = beatEl ? beatHooks(pl, beatEl) : null;
   function reset() {
     clearTimeout(timer); timer = null; gen = null; ctx = null; steps = 0;
@@ -818,6 +982,130 @@ function confetti(n) {
 }
 $$('.sky').forEach((s) => (s.innerHTML = Array.from({ length: 26 }, (_, i) => `<span style="left:${(i * 61) % 100}%;top:${(i * 37) % 92}%;font-size:${18 + (i % 4) * 10}px;animation-delay:${(i % 7) * 0.35}s">★</span>`).join('')));
 
+/* ---------- Scratch sahnesi ---------- */
+const RS = window.RoboSahne;
+const CATCOL = { motion: '#4c97ff', looks: '#9966ff', sound: '#cf63cf', events: '#ffbf00', control: '#ffab19', sensing: '#5cb1d6', pen: '#0fbd8c', vars: '#ff8c1a', operators: '#59c059' };
+const escH = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const OPN = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+function repH(v, kind) {
+  if (v == null || v === '') return '<span class="sxi">&nbsp;</span>';
+  if (typeof v !== 'object') return `<span class="sxi${kind === 'text' ? ' t' : ''}">${escH(v)}</span>`;
+  const R = RS.REPORTERS[v.r] || { cat: 'operators', label: v.r };
+  let inner = escH(R.label);
+  if (v.r === 'rand') inner = `rastgele ${repH(v.a)} ile ${repH(v.b)} arası`;
+  if (v.r === 'join') inner = `birleştir ${repH(v.a, 'text')} ${repH(v.b, 'text')}`;
+  if (v.r === 'op') inner = `${repH(v.a)} ${OPN[v.o] || v.o} ${repH(v.b)}`;
+  if (v.r === 'var') inner = escH(v.v);
+  return `<span class="sxr" style="--k:${CATCOL[R.cat]}">${inner}</span>`;
+}
+function condH(c) {
+  if (!c) return '<span class="sxc empty"></span>';
+  let body = '', cat = 'sensing';
+  if (c.k === 'touch') body = `<span class="sxi">${escH(RS.yonelme(c.o))}</span> dokunuyor mu?`;
+  else if (c.k === 'key') body = `<span class="sxi">${escH(RS.KEYS[c.key] || c.key)}</span> tuşuna basılı mı?`;
+  else if (c.k === 'mouse') body = 'fare tıklandı mı?';
+  else if (c.k === 'cmp') { cat = 'operators'; body = `${repH(c.a)} ${c.op} ${repH(c.b)}`; }
+  return `<span class="sxc" style="--k:${CATCOL[cat]}">${body}</span>`;
+}
+function argH(type, v) {
+  if (type === 'cond') return condH(v);
+  if (type === 'key') return `<span class="sxd">${escH(RS.KEYS[v] || v)} ▾</span>`;
+  if (type === 'sound') return `<span class="sxd">${escH(RS.SOUNDS[v] || v)} ▾</span>`;
+  if (type === 'note') return `<span class="sxi">${escH(RS.NOTES[v] || v)}</span>`;
+  if (type === 'backdrop') return `<span class="sxd">${escH((RS.BACKDROPS[v] || {}).name || v)} ▾</span>`;
+  if (type === 'color') return `<span class="sxi"><i class="sxsw" style="background:${v}"></i>${escH(RS.COLORS[v] || '')}</span>`;
+  if (type === 'msg' || type === 'var' || type === 'target' || type === 'clonesrc' || type === 'costume') return `<span class="sxd">${escH(v)} ▾</span>`;
+  return repH(v, type);
+}
+function blockH(b) {
+  const def = RS.BLOCKS[b.op];
+  const col = CATCOL[def.cat];
+  const dark = def.cat === 'events' || def.cat === 'control';
+  const text = escH(def.text).replace(/\{(\w+)\}/g, (_, k) => argH((def.args[k] || [])[0], b.args[k]));
+  const cls = `sx${def.kind === 'hat' ? ' hat' : ''}${dark ? ' dk' : ''}`;
+  if (def.kind === 'c' || def.kind === 'c2') {
+    const body = (list) => `<div class="sxbody">${list.map(blockH).join('') || '<div class="sxgap"></div>'}</div>`;
+    return `<div class="${cls} cblk" style="--k:${col}" data-bid="${b.id}"><div class="sxh">${text}</div>${body(b.body)}${def.kind === 'c2' ? `<div class="sxh mid">değilse</div>${body(b.body2)}` : ''}<div class="sxfoot${def.cap ? ' cap' : ''}"></div></div>`;
+  }
+  return `<div class="${cls}" style="--k:${col}" data-bid="${b.id}"><div class="sxh">${text}</div></div>`;
+}
+let sbid = 0;
+const mkScripts = (specs) => (specs || []).map((sc) => sc.map((b) => RS.mk(b, () => ++sbid)));
+function makeScratch(el) {
+  const setup = JSON.parse(el.dataset.setup);
+  let variants = JSON.parse(el.dataset.variants);
+  let vi = 0, progs, w = null, stage = null, raf = 0, last = 0, acc = 0, show = el.dataset.show;
+  const codeBox = $('.sxcode', el), host = $('.sxstage', el), info = $('.sxinfo', el);
+  const build = () => {
+    progs = {};
+    for (const s of setup.sprites) progs[s.name] = mkScripts(variants[vi][1][s.name] || s.scripts || []);
+    const names = setup.sprites.filter((s) => progs[s.name].length).map((s) => s.name);
+    if (!names.includes(show)) show = names[0];
+    const tabs = names.length > 1 ? `<div class="sxtabs">${names.map((n) => `<button class="${n === show ? 'on' : ''}" data-n="${escH(n)}">${RS.thumb(setup.sprites.find((s) => s.name === n).costume)} ${escH(n)}</button>`).join('')}</div>` : '';
+    codeBox.innerHTML = tabs + `<div class="sxscripts">${(progs[show] || []).map((sc) => `<div class="sxscript">${sc.map(blockH).join('')}</div>`).join('')}</div>`;
+    $$('.sxtabs button', codeBox).forEach((b) => (b.onclick = () => { show = b.dataset.n; build(); }));
+    fitCode();
+  };
+  // Kod alanı sığmazsa küçült (tahtada kaydırma çubuğu olmasın)
+  const fitCode = () => {
+    const sc = $('.sxscripts', codeBox);
+    if (!sc || !el.offsetParent) return;
+    sc.style.transform = '';
+    const r = sc.getBoundingClientRect(), e = el.getBoundingClientRect(), c = codeBox.getBoundingClientRect();
+    const k = Math.min(1, (e.bottom - r.top - 4) / r.height, (c.right - r.left) / sc.scrollWidth / (r.width / sc.offsetWidth || 1));
+    if (k < 1) sc.style.transform = `scale(${Math.max(0.45, k)})`;
+  };
+  const reset = () => {
+    if (w) w.stopAll();
+    w = RS.createWorld(setup, progs);
+    w.onSound = (snd, sp) => { try { RS.playSound(snd); } catch { /* ses yok */ } stage.fx(sp, '🔊 ' + (RS.SOUNDS[snd] || snd)); };
+    w.onNote = (n, d, sp) => { try { RS.playNote(n, d); } catch { /* ses yok */ } stage.fx(sp, '♪ ' + (RS.NOTES[n] || n)); };
+    stage.attach(w);
+    stage.render();
+  };
+  const loop = (now) => {
+    acc += last ? Math.min(0.1, (now - last) / 1000) : 0; last = now;
+    if (w) {
+      let n = 0;
+      while (acc >= 1 / 30 && n < 3) { w.step(1 / 30); acc -= 1 / 30; n++; }
+      if (n === 3) acc = 0;
+      stage.render();
+      $$('.sx.run', codeBox).forEach((x) => x.classList.remove('run'));
+      for (const t of w.threads) {
+        if (t.done || !t.sp || t.sp.name !== show || t.sp.isClone) continue;
+        const c = $(`[data-bid="${t.cur}"]`, codeBox); c && c.classList.add('run');
+        const h = $(`[data-bid="${t.script[0].id}"]`, codeBox); h && h.classList.add('run');
+      }
+      const sp = w.sprite(show);
+      if (sp && info) info.innerHTML = `${RS.thumb(sp.costume, sp.frame)} <b>${escH(sp.name)}</b> <span>x: ${Math.round(sp.x)}</span> <span>y: ${Math.round(sp.y)}</span> <span>yön: ${Math.round(sp.dir)}</span>`;
+    }
+    raf = requestAnimationFrame(loop);
+  };
+  const vt = $$('.sxvar button', el);
+  vt.forEach((b, j) => (b.onclick = () => { vi = j; vt.forEach((x) => x.classList.toggle('on', x === b)); build(); reset(); }));
+  $('[data-act="flag"]', el).onclick = () => { reset(); w.flag(); };
+  $('[data-act="stop"]', el).onclick = () => w && w.stopAll();
+  $('[data-act="reset"]', el).onclick = () => reset();
+  $$('[data-key]', el).forEach((b) => {
+    let t = null;
+    const k = b.dataset.key;
+    const down = (e) => { e.preventDefault(); if (!w) return; w.keyDown(k); clearInterval(t); t = setInterval(() => w.keyDown(k), 100); b.classList.add('on'); };
+    const up = () => { clearInterval(t); t = null; if (w) w.keyUp(k); b.classList.remove('on'); };
+    b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointerleave', up);
+  });
+  return {
+    start() { if (stage) return; build(); stage = RS.createStage(host, { showVars: el.dataset.sv ? JSON.parse(el.dataset.sv) : undefined }); reset(); last = 0; raf = requestAnimationFrame(loop); if (el.dataset.auto) w.flag(); },
+    stop() { cancelAnimationFrame(raf); if (w) w.stopAll(); if (stage && stage.destroy) stage.destroy(); stage = null; w = null; host.innerHTML = ''; },
+  };
+}
+if (RS) $$('.costumes').forEach((el) => { el.innerHTML = RS.COSTUMES[el.dataset.c].frames.map((f, i) => `<div class="cos"><div class="cosimg">${f}</div>${i + 1}. kostüm</div>`).join(''); });
+// Kostüm değiştirerek yürüme (flipbook)
+let flipT = null;
+if (RS) $$('.flipper').forEach((el) => { el._fr = RS.COSTUMES[el.dataset.c].frames; el._i = 0; el.innerHTML = el._fr[0]; });
+const scratches = RS ? $$('.sc').map((el) => (el._sc = makeScratch(el))) : [];
+// Statik blok resimleri: <div class="sxpic" data-spec='[...]'>
+if (RS) $$('.sxpic').forEach((el) => { el.innerHTML = mkScripts(JSON.parse(el.dataset.spec)).map((sc) => `<div class="sxscript">${sc.map(blockH).join('')}</div>`).join(''); });
+
 /* ---------- Gezinme ---------- */
 const secs = $$('.s');
 let cur = 0;
@@ -838,6 +1126,7 @@ $$('button', menu).forEach((b) => (b.onclick = () => { menu.classList.remove('vi
 function go(j, back) {
   if (j < 0 || j >= secs.length) return;
   players.forEach((p) => p.stop());
+  $$('.sc', secs[cur]).forEach((e) => e._sc && e._sc.stop());
   secs[cur].classList.remove('on');
   cur = j;
   const s = secs[cur];
@@ -848,6 +1137,8 @@ function go(j, back) {
   $$('.order', s).forEach((o) => o._reset());
   $$('.turn', s).forEach((t) => t._reset());
   clearTimeout(handTimer); $$('.hands', s).forEach(handsStart);
+  $$('.sc', s).forEach((e) => e._sc && e._sc.start());
+  clearInterval(flipT); const fl = $('.flipper', s); if (fl) flipT = setInterval(() => { fl._i = (fl._i + 1) % fl._fr.length; fl.innerHTML = fl._fr[fl._i]; }, +(fl.dataset.ms || 400));
   if (s.dataset.end) setTimeout(() => confetti(70), 300);
   deck.classList.toggle('dark', s.classList.contains('cover') || s.classList.contains('lcover'));
   $$('i', dots).forEach((d, k) => d.classList.toggle('on', k === cur));
@@ -864,6 +1155,8 @@ $('#fs').onclick = fs;
 document.addEventListener('keydown', (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   const k = e.key;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if ($('.sc[data-keys]', secs[cur]) && /^(Arrow|\s$)/.test(k === ' ' ? ' ' : k)) return;
   if (k === 'Escape') { menu.classList.remove('vis'); return; }
   if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); next(); }
   else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); prev(); }

@@ -35,7 +35,7 @@ for (const w of weeks) {
     const info = await p.evaluate(() => {
       const s = document.querySelector('.s.on'), r = s.getBoundingClientRect(), k = r.height / 900, bad = [];
       s.querySelectorAll('*').forEach((e) => {
-        if (e.closest('.sky') || e.closest('.cf') || e.closest('.bub') || e.closest('.gmsg') || e.closest('.where')) return;
+        if (e.closest('.sxleft') && !e.closest('.sxscripts') || e.closest('.sky') || e.closest('.cf') || e.closest('.cbub') || e.closest('.bub') || e.closest('.gmsg') || e.closest('.where')) return;
         const q = e.getBoundingClientRect();
         if (q.width && (q.right > r.right - 20 * k || q.bottom > r.bottom - 84 * k || q.left < r.left + 10 * k)) bad.push((e.className && String(e.className)) || e.tagName);
       });
@@ -43,15 +43,27 @@ for (const w of weeks) {
     });
     if (info.bad.length) { problems++; console.log(`  hafta ${w} slayt ${i + 1} (${info.title.slice(0, 40)}) taşma: ${info.bad.join(', ')}`); }
     if (SHOTS) await p.screenshot({ path: path.join(SHOTS, `h${w}-${String(i + 1).padStart(2, '0')}.png`) });
+    const hasSc = await p.evaluate(() => document.querySelectorAll('.s.on .sc').length);
+    if (hasSc) {
+      const r = await p.evaluate(async () => {
+        const el = document.querySelector('.s.on .sc'); el.querySelector('[data-act="flag"]').click();
+        await new Promise((r) => setTimeout(r, 3500));
+        const blocks = el.querySelectorAll('.sxcode .sx').length, spr = el.querySelectorAll('.spr').length;
+        return `bloklar: ${blocks}, kukla: ${spr}`;
+      });
+      if (SHOTS) await p.screenshot({ path: path.join(SHOTS, `h${w}-${String(i + 1).padStart(2, '0')}b.png`) });
+      results.push(`  ${i + 1}. ${info.title.slice(0, 38).padEnd(38)} → sahne ${r}`);
+    }
     if (info.players) {
       // hızlı modda sonuna kadar oynat
       const res = await p.evaluate(async () => {
         const out = [];
         for (const pl of document.querySelectorAll('.s.on .player')) {
-          const tabs = pl.querySelectorAll('.maptabs button');
-          const runs = tabs.length || 1;
+          const tabs = pl.querySelectorAll('.maptabs button'), ptabs = pl.querySelectorAll('.progtabs button');
+          const runs = Math.max(tabs.length, ptabs.length, 1);
           for (let t = 0; t < runs; t++) {
             if (tabs.length) tabs[t].click();
+            if (ptabs.length) ptabs[t].click();
             const sl = pl.querySelector('[data-act="slow"]'); if (sl.classList.contains('on')) sl.click();
             pl.querySelector('[data-act="play"]').click();
             for (let k = 0; k < 600; k++) {

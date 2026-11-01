@@ -10,6 +10,10 @@ const FONTS = [['UISymC', 'ui-color.woff2'], ['UISymM', 'ui-mono.woff2'], ['UISy
 const fontCss = FONTS.map(([n, f]) => `@font-face { font-family: ${n}; src: url(data:font/woff2;base64,${fs.readFileSync(path.join(ROOT, 'src/fonts', f)).toString('base64')}) format("woff2"); }`).join('\n');
 const css = fs.readFileSync(path.join(DIR, 'motor.css'), 'utf8');
 const js = fs.readFileSync(path.join(DIR, 'motor.js'), 'utf8');
+// Scratch sahnesi: sitenin sahne motoru paketlenir, sahne CSS'inden yalnız sahne kuralları alınır
+const esbuild = await import('esbuild');
+const sahneJs = (await esbuild.build({ absWorkingDir: ROOT, entryPoints: [path.join(DIR, 'sahne-giris.js')], bundle: true, format: 'iife', minify: true, write: false, target: ['es2020'], legalComments: 'none', charset: 'utf8', logLevel: 'error' })).outputFiles[0].text;
+const sahneCss = fs.readFileSync(path.join(ROOT, 'src/robot/css/20-sahne.css'), 'utf8').split('\n').filter((l) => /^\.(stg|spr|bub|mon|thumb)/.test(l)).join('\n');
 
 // Yazı tipinde olmayan simgeleri bul (fontTools varsa)
 let cmap = null;
@@ -43,6 +47,7 @@ for (const w of weeks) {
 <style>
 ${fontCss}
 ${css}
+${sahneCss}
 </style>
 </head>
 <body>
@@ -59,6 +64,9 @@ ${body}
   <button class="nav" id="next" title="İleri (→ ya da Boşluk)">›</button>
 </div>
 </div>
+<script>
+${sahneJs.replace(/<\/script/gi, '<\\/script')}
+</script>
 <script>
 ${js.replace(/<\/script/gi, '<\\/script')}
 </script>

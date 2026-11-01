@@ -105,8 +105,8 @@ b { font-weight: 900; }
 .bd.done { background: currentColor; transform: scale(1.15); }
 .tur { margin-left: auto; font-size: 22px; background: #fff; border-radius: 99px; padding: 2px 12px; }
 .lh.on { background: #fff; box-shadow: 0 0 0 5px #ffd23f; }
-.bub { position: absolute; right: -10px; top: -36px; background: #ffd23f; color: var(--ink); font-size: 23px; padding: 6px 16px; border-radius: 14px; white-space: nowrap; animation: pop .35s; z-index: 3; box-shadow: 0 4px 0 #0002; }
-.bub.yes { background: #b8f0cf; } .bub.no { background: #ffd0d0; }
+.cbub { position: absolute; right: -10px; top: -36px; background: #ffd23f; color: var(--ink); font-size: 23px; padding: 6px 16px; border-radius: 14px; white-space: nowrap; animation: pop .35s; z-index: 3; box-shadow: 0 4px 0 #0002; }
+.cbub.yes { background: #b8f0cf; } .cbub.no { background: #ffd0d0; }
 @keyframes pop { from { transform: scale(.3); opacity: 0; } }
 .codewrap { display: flex; flex-direction: column; gap: 18px; }
 .codettl { font-size: 24px; font-weight: 900; color: var(--soft); margin-bottom: -8px; }
@@ -300,3 +300,68 @@ b { font-weight: 900; }
 .blk { min-width: max-content; }
 .beads { flex-shrink: 0; }
 .code.sm .bd { width: 18px; height: 18px; border-width: 3px; }
+
+/* Scratch blokları (sitedeki renkler) */
+.sxscripts { display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+.sxscript, .sxpic { display: flex; flex-direction: column; align-items: flex-start; }
+.sxpic { gap: 18px; }
+.sx { --k: #4c97ff; background: var(--k); color: #fff; border-radius: 10px; font-size: 27px; font-weight: 800; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 28%); margin-bottom: 3px; width: max-content; transition: box-shadow .15s; }
+.sx .sx { font-size: 1em; }
+.sx.dk > .sxh { color: #3a2600; }
+.sx.hat { border-radius: 26px 26px 10px 10px; } .sx.hat > .sxh { padding-top: 16px; }
+.sxh { padding: 9px 16px; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap; }
+.sxh.mid { padding: 6px 16px; }
+.cblk { padding: 0; min-width: 300px; }
+.sxbody { margin-left: 26px; padding: 4px 0 2px; background: transparent; display: flex; flex-direction: column; align-items: flex-start; position: relative; }
+.sxbody::before { content: ""; position: absolute; left: -26px; top: 0; bottom: 0; width: 26px; background: var(--k); }
+.cblk { background: transparent; box-shadow: none; }
+.cblk > .sxh { background: var(--k); border-radius: 10px 10px 0 0; }
+.cblk > .sxh.mid { border-radius: 0 10px 10px 0; }
+.cblk > .sxfoot { height: 22px; background: var(--k); border-radius: 0 0 10px 10px; width: 160px; box-shadow: 0 3px 0 color-mix(in srgb, var(--k), #000 28%); }
+.sxgap { height: 34px; }
+.sxi { background: #fff; color: #333; border-radius: 99px; padding: 1px 14px; min-width: 40px; text-align: center; font-weight: 800; }
+.sxd { background: color-mix(in srgb, var(--k), #000 18%); color: #fff; border-radius: 8px; padding: 1px 10px; }
+.sx.dk .sxd { color: #3a2600; background: color-mix(in srgb, var(--k), #fff 25%); }
+.sxr { --k: #59c059; background: var(--k); color: #fff; border-radius: 99px; padding: 2px 10px; display: inline-flex; gap: 6px; align-items: center; border: 2px solid #0002; }
+.sxc { --k: #5cb1d6; background: var(--k); color: #fff; padding: 2px 18px; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%); display: inline-flex; gap: 6px; align-items: center; }
+.sxc.empty { width: 80px; height: 32px; background: color-mix(in srgb, var(--k), #000 25%); }
+.sxsw { display: inline-block; width: 22px; height: 22px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+.sx.run > .sxh, .sx.run.cblk > .sxh { box-shadow: 0 0 0 4px #ffe14d, 0 0 18px #ffd23f; }
+.sx.run:not(.cblk) { box-shadow: 0 0 0 4px #ffe14d, 0 0 18px #ffd23f; }
+.sx.sm, .sxpic.sm .sx { font-size: 22px; }
+
+/* Scratch slaytı yerleşimi */
+.sc { display: flex; gap: 36px; flex: 1; min-height: 0; align-items: flex-start; }
+.sc .sxcode { flex: 1; min-width: 0; }
+.sc .sxright { flex: 0 0 600px; display: flex; flex-direction: column; gap: 12px; }
+.sc .sxstage { width: 600px; }
+.sc .stg { border: 5px solid #d9d0f5; border-radius: 18px; }
+.sxctl { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.sxctl .flagb { font-size: 34px; background: #2fbf71; }
+.sxctl .stopb { font-size: 30px; background: #e5484d; }
+.sxinfo { font-size: 22px; font-weight: 800; color: var(--soft); display: flex; gap: 14px; align-items: center; }
+.sxinfo .thumb { width: 44px; height: 36px; }
+.sxkeys { display: flex; gap: 10px; flex-wrap: wrap; }
+.sxkeys button { font: inherit; font-size: 26px; font-weight: 900; min-width: 64px; height: 60px; border-radius: 14px; border: 4px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; padding: 0 14px; box-shadow: 0 5px 0 #0003; touch-action: none; }
+.sxkeys button.on { background: #ffd23f; transform: translateY(3px); box-shadow: 0 2px 0 #0003; }
+.sxtabs { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.sxtabs button, .sxvar button { font: inherit; font-size: 22px; font-weight: 900; border: 3px solid var(--ink); background: #fff; color: var(--ink); border-radius: 12px; padding: 4px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.sxtabs button.on, .sxvar button.on { background: var(--ink); color: #fff; }
+.sxvar { display: flex; gap: 10px; margin-bottom: 12px; }
+.sxvar button.bug.on { background: var(--no); border-color: var(--no); } .sxvar button.fix.on { background: var(--ok); border-color: var(--ok); }
+.sxtabs .thumb { width: 34px; height: 28px; }
+.sc .sxleft { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.sc.nocode .sxleft { display: none; }
+.sxcode.sm .sx { font-size: 22px; }
+.costumes { display: flex; gap: 30px; }
+.costumes .cos { background: #fff; border-radius: 24px; padding: 18px; text-align: center; font-size: 26px; font-weight: 800; box-shadow: 0 6px 0 #1d355714; }
+.costumes .cosimg { width: 220px; height: 180px; display: grid; place-items: center; }
+.costumes .cosimg svg { width: 100%; height: 100%; }
+.costumes.anim .cos { position: relative; }
+.flipper { width: 300px; height: 240px; background: #fff; border-radius: 28px; display: grid; place-items: center; box-shadow: 0 8px 0 #1d355714; }
+.flipper svg { width: 240px; height: 200px; }
+.sxcode.sm .sxscripts { gap: 12px; }
+.sxcode.sm .sx .sxh { padding: 6px 14px; }
+[hidden] { display: none !important; }
+.sxscripts { flex-direction: row; flex-wrap: wrap; gap: 22px 34px; transform-origin: 0 0; }
+.sc { min-height: 0; }
