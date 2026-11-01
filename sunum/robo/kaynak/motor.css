@@ -365,3 +365,6 @@ b { font-weight: 900; }
 [hidden] { display: none !important; }
 .sxscripts { flex-direction: row; flex-wrap: wrap; gap: 22px 34px; transform-origin: 0 0; }
 .sc { min-height: 0; }
+.ocard { padding: 6px 20px; font-size: 32px; }
+.ocard .e { font-size: 40px; }
+.order .pool, .order .done { gap: 11px; }
