@@ -1314,6 +1314,16 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .wd-shpal { flex-direction: column; }
 .wd-shpal button { width: auto; height: auto; white-space: nowrap; text-align: left; padding: 0.3em 0.7em; }
 .dlg-pv { display: flex; flex-direction: column; align-items: center; gap: 0.4em; margin-bottom: 0.6em; }
+/* Fotoğraf yazdırma önizlemesi (dialog.js print photo): A4 sayfa ya da 10 × 15 kâğıt, üzerinde fotoğraf(lar) */
+.pz-pv { display: flex; flex-direction: column; align-items: center; gap: 0.4em; }
+.pz-pg { width: 9.5em; height: 13.4em; background: #fff; box-shadow: 0 1px 4px #0004; padding: 0.45em; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center; gap: 0.3em; }
+.pz-pg img { object-fit: cover; display: block; }
+.pz-tam img { width: 100%; height: 100%; }
+.pz-13x18 img { width: 62%; height: 60%; }
+.pz-10x15 img { width: 47%; height: 50%; }
+.pz-cuzdan img { width: 30%; height: 30%; }
+.pz-pg.pz-k10 { width: 7.4em; height: 11.1em; padding: 0; }
+.pz-k10 img { width: 100%; height: 100%; }
 .dlg-pvbox { width: 11em; height: 15.5em; overflow: hidden; border: 1px solid #888; background: #fff; box-shadow: 0 2px 6px #0003; position: relative; }
 .dlg-pvbox.yatay { width: 15.5em; height: 11em; }
 .dlg-pvp { width: 42em !important; min-height: 0 !important; margin: 0 !important; box-shadow: none !important; transform: scale(0.262); transform-origin: top left; pointer-events: none; font-size: 11pt; box-sizing: border-box; }

@@ -4,6 +4,10 @@
 const BAD_CHARS = /[\\/:*?"<>|]/;
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
+// Fotoğraf yazdırma: A4 kâğıtta boyut seçenekleri ve sayfadaki fotoğraf sayısı
+const PH_SIZES = [['tam', 'Tam sayfa'], ['13x18', '13 × 18 cm'], ['10x15', '10 × 15 cm, 2 tane'], ['cuzdan', 'Cüzdan boyu, 9 tane']];
+const PH_COUNT = { tam: 1, '13x18': 1, '10x15': 2, cuzdan: 9, k10: 1 };
+
 export class Dialogs {
   constructor(host, onEvent = () => {}) {
     this.host = host;
@@ -170,7 +174,9 @@ export class Dialogs {
   // preview (isteğe bağlı): { html, pages, orient, border, wm, padding } — Word gibi programların yazdırma önizlemesi
   // pvHtml: yazdırma önizlemesinin hazır HTML'i (Hesap Tablosu gibi programlar kendisi çizer); pvWide: pencereyi genişletir
   // pages (isteğe bağlı): belgenin sayfa sayısı; verilirse sayfa aralığı, renk, iki yüz ve yaprak sayısı seçenekleri de çıkar (PDF Okuyucu)
-  print({ printers, doc, preview, pvHtml, pvWide, pages, current = 1 }) {
+  // photo (isteğe bağlı): fotoğrafın resim adresi; verilirse fotoğraf boyutu, kâğıt ve kâğıt türü seçenekleri ve önizleme çıkar (Fotoğraflar)
+  print({ printers, doc, preview, pvHtml, pvWide, pages, current = 1, photo }) {
+    if (photo) pvHtml = `<div class="pz-pv"><div class="pz-pg"></div><div class="dlg-pvnote ok pz-note"></div></div>`;
     const pv = preview ? `<div class="dlg-pv"><div class="dlg-pvbox ${preview.orient === 'yatay' ? 'yatay' : ''}"><div class="wd-page dlg-pvp ${preview.border === 'kutu' ? 'bordered' : preview.border === 'cift' ? 'bordered2' : ''} ${preview.orient === 'yatay' ? 'yatay' : ''}" data-wm="${esc(preview.wm || '')}" style="padding:${preview.padding}">${preview.html}</div></div>
         <div class="dlg-pvnote ${preview.pages > 1 ? 'bad' : 'ok'}">${preview.pages > 1 ? `⚠ Belge <b>${preview.pages} sayfa</b>; her sayfa ayrı kâğıda çıkar. Tek kâğıda sığdırmak için yazı boyutunu ya da kenar boşluklarını küçültün.` : '✔ Belge <b>tek kâğıda</b> sığıyor.'}<br><small>Kâğıt: A4, ${preview.orient === 'yatay' ? 'yatay' : 'dikey'}</small></div></div>` : '';
     const inner = `${pvHtml ? `<div class="dlg-pv">${pvHtml}</div>` : pv}<div class="dlg-pr">
@@ -181,6 +187,9 @@ export class Dialogs {
         <label class="dlg-row"><span>Renk:</span><select class="dlg-color"><option value="color">Renkli</option><option value="bw">Siyah-beyaz</option></select></label>
         <label class="dlg-row"><span>İki yüze:</span><input type="checkbox" class="dlg-duplex"> <small>kâğıdın iki yüzüne yazdır (tasarruf)</small></label>
         <div class="dlg-pvnote ok dlg-sheets"></div>` : ''}
+        ${photo ? `<label class="dlg-row"><span>Kâğıt:</span><select class="pz-paper"><option value="a4">A4 (normal kâğıt boyu)</option><option value="k10">10 × 15 cm fotoğraf kâğıdı</option></select></label>
+        <label class="dlg-row pz-size-row"><span>Fotoğraf boyutu:</span><select class="pz-size">${PH_SIZES.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></label>
+        <label class="dlg-row"><span>Kâğıt türü:</span><select class="pz-kind"><option value="duz">Düz kâğıt</option><option value="parlak">Parlak fotoğraf kâğıdı</option></select></label>` : ''}
         <div class="dlg-row"><span>Belge:</span><b>${esc(doc)}</b></div></div>
       <div class="dlg-btns"><button type="button" class="dlg-ok">🖨 Yazdır</button><button type="button" class="dlg-cancel">İptal</button></div>`;
     const p = this.shell('dlg-print', 'Yazdır', inner, 'print');
@@ -208,14 +217,30 @@ export class Dialogs {
       box.className = 'dlg-pvnote ' + (sheets > 2 ? 'bad' : 'ok') + ' dlg-sheets';
       box.innerHTML = `${n} sayfa × ${copies} kopya${duplex ? ', iki yüzlü' : ''} = <b>${sheets} yaprak kâğıt</b>`;
     };
-    back.addEventListener('input', info);
-    back.addEventListener('change', info);
+    // Fotoğraf önizlemesi: kâğıt ve boyuta göre sayfada kaç fotoğraf, ne büyüklükte
+    const phInfo = () => {
+      if (!photo) return;
+      const paper = q('.pz-paper').value, size = paper === 'k10' ? 'k10' : q('.pz-size').value, kind = q('.pz-kind').value;
+      q('.pz-size-row').hidden = paper === 'k10';
+      const n = PH_COUNT[size];
+      const pg = q('.pz-pg');
+      pg.className = `pz-pg pz-${size}`;
+      pg.innerHTML = `<img src="${photo}" alt="">`.repeat(n);
+      const copies = Math.max(1, +q('.dlg-copies').value || 1);
+      q('.pz-note').className = `dlg-pvnote ${kind === 'duz' && paper === 'k10' ? 'bad' : 'ok'} pz-note`;
+      q('.pz-note').innerHTML = `${paper === 'k10' ? '10 × 15 cm kâğıda <b>1 fotoğraf</b>' : `A4 kâğıda <b>${n} fotoğraf</b> (${PH_SIZES.find((x) => x[0] === size)[1]})`} · ${copies} kopya = <b>${copies} yaprak</b>`
+        + (kind === 'duz' ? '<br><small>Düz kâğıtta renkler soluk çıkabilir. Fotoğraf kâğıdı taktıysanız türünü “Parlak fotoğraf kâğıdı” seçin.</small>' : '<br><small>Fotoğraf kâğıdını tepsiye, yazıcının kılavuzunda gösterilen yüzü doğru gelecek şekilde koyun.</small>');
+    };
+    back.addEventListener('input', () => { info(); phInfo(); });
+    back.addEventListener('change', () => { info(); phInfo(); });
     info();
+    phInfo();
     q('.dlg-ok').onclick = () => {
       const sp = span();
       if (pages && !sp) { info(); return; }
       const copies = +q('.dlg-copies').value || 1;
       const out = { printer: q('.dlg-printer').value, copies };
+      if (photo) { const paper = q('.pz-paper').value, size = paper === 'k10' ? 'k10' : q('.pz-size').value; Object.assign(out, { paper, size, kind: q('.pz-kind').value, perPage: PH_COUNT[size] }); }
       if (pages) {
         const duplex = q('.dlg-duplex').checked, n = sp[1] - sp[0] + 1;
         Object.assign(out, { from: sp[0], to: sp[1], pagesPrinted: n, range: q('.dlg-range').value, color: q('.dlg-color').value !== 'bw', duplex, sheets: copies * Math.ceil(n / (duplex ? 2 : 1)) });
