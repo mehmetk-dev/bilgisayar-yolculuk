@@ -13,6 +13,7 @@ export const medya = {
     ['⛶ Tam ekran', 'Büyük izlemek için; çıkış: Esc'],
     ['CC', 'Altyazı açar/kapatır'],
     ['⚙ Hız', 'Yavaşlatınca konuşma rahat anlaşılır (0,75x, 0,5x)'],
+    ['🔊 / 🔇', 'Videonun kendi sesi; ses yoksa önce buna, sonra sağ alttaki bilgisayar sesine bakın'],
     ['📻 Radyo', 'Kanalın yanındaki ▶; başka kanal seçince öncekisi susar'],
     ['Gazete', 'Habere tıklayın; “Sponsorlu” kutular reklamdır; “Galeri” sayfaları sizi oyalar'],
     ['Reklam engelleyici', 'Tarayıcı uzantısı; reklamların çoğunu engeller'],
@@ -85,6 +86,19 @@ export const medya = {
       hint: 'Düğme “⚙ 1x” yazıyor. Tıkladıkça 0,75x, 0,5x, 1,25x… diye değişir.',
       on: (ev) => ev.type === 'iz-speed' && ev.speed < 1,
       done: 'Video yavaşladı; tarifi not almak ya da yabancı dil dinlemek için çok iyi.',
+    },
+    {
+      title: 'Ses gelmiyor mu?',
+      html: `<p>Videonun ses düğmesi alt çubuktaki <b>🔊</b>'dür. Bir kez tıklayın: <b>🔇</b> olur, video susar. Bir daha tıklayın: ses geri gelir.</p>
+        <p>Video sesi açıkken hâlâ ses yoksa sırayla bakın: bilgisayarın sesi (sağ alttaki <b>🔊</b> simgesi) kısık mı, hoparlör ya da kulaklık takılı ve açık mı?</p>`,
+      mouse: '🖱 🔊 → 🔇 → 🔊',
+      hint: 'Ses düğmesi alt çubukta, sürenin (0:12 / 1:00 gibi) hemen sağında.',
+      on: (ev, c) => {
+        if (ev.type !== 'iz-mute') return false;
+        if (ev.on) { c.s.muted = true; c.note('Video sustu. Şimdi aynı düğmeye bir daha tıklayıp sesi geri açın.'); return false; }
+        return !!c.s.muted;
+      },
+      done: 'Ses geri geldi. “Ses yok” şikâyetinin çoğu bu düğmeden ya da bilgisayarın kısık sesinden çıkar.',
     },
     {
       title: 'Radyo dinleyin',
