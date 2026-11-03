@@ -3,7 +3,7 @@
 import { esc } from './util.js';
 
 const page = (title, html, cls = '') => ({ title, html: `<div class="wp ${cls}">${html}</div>` });
-export const YZ_HOST = 'yardimci.bulalim.com';
+export const YZ_HOST = 'gemini.google.com';
 
 export const RESMI_YAZI = 'Belediye Başkanlığı Kültür Müdürlüğü: 60 yaş üstü vatandaşlarımız için ücretsiz bilgisayar kursu açılmıştır. Kurs, Kültür Merkezi\'nde her salı ve perşembe günü saat 10.00\'da yapılacaktır. Başvurular 20 Ekim tarihine kadar Kültür Merkezi\'nden ya da belediyenin internet sitesinden alınacaktır. Kontenjan 24 kişiyle sınırlıdır. Katılımcılara kurs sonunda katılım belgesi verilecektir.';
 

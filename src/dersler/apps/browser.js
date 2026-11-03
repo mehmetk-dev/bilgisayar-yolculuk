@@ -1,13 +1,14 @@
-// İnternet tarayıcısı: sekmeler, adres çubuğu (adres mi, arama mı?), geri/ileri, indirmeler, reklamlar;
-// ⋯ menüsü, geçmiş, gizli pencere, sayfada bul, yazdırma, uzantılar (uzantı mağazası, izinler, sahte uzantı);
+// Google Chrome benzeri tarayıcı: sekmeler, adres çubuğu (adres mi, arama mı?), geri/ileri, indirmeler, reklamlar;
+// ⋮ menüsü, geçmiş, gizli pencere, sayfada bul, yazdırma, uzantılar (uzantı mağazası, izinler, sahte uzantı);
 // site bilgileri (kilide tıklayınca: adresin parçaları, sertifika, site izinleri), adres çubuğu önerileri, bildirim izni.
-import { SITES, SEARCH_HOST, resolve, PHOTOS, photoContent, siteName } from './sites.js';
+import { SITES, SEARCH_HOST, EXT_HOST, resolve, PHOTOS, photoContent, siteName, encQ, chromeName } from './sites.js';
+import { ic, icIncognito, icChrome, gLogo, favicon } from './google-ui.js';
+import { searchBox } from './siteler-google.js';
 import { esc, pictureURL } from './util.js';
 import { fileIcon } from '../dialog.js';
 import { online } from './modem.js';
 
 let tabSeq = 1;
-const EXT_HOST = 'uzantilar.bulalim.com';
 
 // Uzantılar: tarayıcıya eklenen küçük programlar. fake: doğrulanmamış, fazla izin isteyen, zararlı uzantı.
 export const EXTS = {
@@ -17,21 +18,27 @@ export const EXTS = {
   reader: { icon: '🔊', name: 'Sesli Okuyucu', pub: 'Erişilebilirlik Derneği', verified: true, users: '800.000+', stars: 4.6, desc: 'Seçtiğiniz yazıyı (seçim yoksa sayfayı) sesli okur. Simgesine tıklayın.', perms: ['Seçtiğiniz yazıyı okuma'] },
   fake: { icon: '⚡', name: 'Süper İndirici PRO', pub: 'free-dl-pro-2026', verified: false, users: '312', stars: 1.9, desc: 'İNDİRMELERİNİZİ 10 KAT HIZLANDIRIR!!! Tamamen BEDAVA!!!', perms: ['Ziyaret ettiğiniz BÜTÜN sitelerdeki verilerinizi okuma ve değiştirme', 'Kayıtlı şifrelerinizi görme', 'İndirmelerinizi yönetme', 'Ana sayfanızı ve arama motorunuzu değiştirme'] },
 };
+// Uzantı simgeleri (emoji yerine çizim)
+const EXT_SVG = { adblock: 'shield', dark: 'moon', note: 'note', reader: 'volume', fake: 'bolt' };
+const extIc = (k, size = 20) => ic(EXT_SVG[k] || 'puzzle', size, k === 'fake' ? 'ext-bad' : '');
+const mi = (name, size = 20) => (name === 'incog' ? icIncognito(size) : name ? ic(name, size) : '');
 const stars = (n) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
 
 export function browser({ desk, body, args, emit, setTitle }) {
+  const priv0 = !!args.private;
   body.classList.add('br');
+  const who = (desk.settings.user || 'K').charAt(0).toLocaleUpperCase('tr');
   body.innerHTML = `
-    <div class="br-tabs"><div class="br-tablist"></div><button type="button" class="br-newtab" title="Yeni sekme">＋</button></div>
+    <div class="br-tabs"><div class="br-tablist"></div><button type="button" class="br-newtab" title="Yeni sekme" aria-label="Yeni sekme">${ic('add', 18)}</button></div>
     <div class="br-bar">
-      <button type="button" class="br-back" title="Geri">←</button><button type="button" class="br-fwd" title="İleri">→</button><button type="button" class="br-reload" title="Yenile">⟳</button><button type="button" class="br-home" title="Ana sayfa">⌂</button>
-      <div class="br-addr"><button type="button" class="br-lock" title="Site bilgilerini görüntüle"></button><input class="br-url" spellcheck="false" autocomplete="off" aria-label="Adres çubuğu" placeholder="Arama yapın ya da adres yazın"><button type="button" class="br-zoomlbl" hidden title="Yakınlaştırmayı sıfırla (Ctrl + 0)"></button><button type="button" class="br-star" title="Bu sayfayı sık kullanılanlara ekle (Ctrl + D)">☆</button></div>
-      <button type="button" class="br-cap" title="Web yakalama: sayfanın resmini al (Ctrl + Shift + S)">✂</button><button type="button" class="br-dl" title="İndirmeler (Ctrl + J)">⬇</button>
-      <span class="br-exts"></span><button type="button" class="br-ext" title="Uzantılar">🧩</button><button type="button" class="br-more" title="Ayarlar ve diğer">⋯</button>
+      <button type="button" class="br-back" title="Geri" aria-label="Geri">${ic('back', 20)}</button><button type="button" class="br-fwd" title="İleri" aria-label="İleri">${ic('fwd', 20)}</button><button type="button" class="br-reload" title="Bu sayfayı yeniden yükle" aria-label="Yenile">${ic('reload', 20)}</button><button type="button" class="br-home" title="Ana sayfa" aria-label="Ana sayfa">${ic('home', 20)}</button>
+      <div class="br-addr"><button type="button" class="br-lock" title="Site bilgilerini görüntüle"></button><input class="br-url" spellcheck="false" autocomplete="off" aria-label="Adres çubuğu" placeholder="Google'da arayın ya da bir URL yazın"><button type="button" class="br-zoomlbl" hidden title="Yakınlaştırmayı sıfırla (Ctrl + 0)"></button><button type="button" class="br-star" title="Bu sayfayı yer işaretlerine ekle (Ctrl + D)" aria-label="Yer işareti ekle"></button></div>
+      <button type="button" class="br-cap" title="Web yakalama: sayfanın resmini al (Ctrl + Shift + S)" aria-label="Web yakalama">${ic('cut', 20)}</button><button type="button" class="br-dl" title="İndirilenler (Ctrl + J)" aria-label="İndirilenler">${ic('download', 20)}</button>
+      <span class="br-exts"></span><button type="button" class="br-ext" title="Uzantılar" aria-label="Uzantılar">${ic('puzzle', 20)}</button><button type="button" class="br-prof" title="Siz" aria-label="Profil"><span>${priv0 ? icIncognito(16) : esc(who)}</span></button><button type="button" class="br-more" title="Google Chrome'u özelleştir ve yönet" aria-label="Google Chrome'u özelleştir ve yönet">${ic('more', 20)}</button>
     </div>
     <div class="br-bm" hidden></div>
-    <div class="br-find" hidden><input class="br-fq" placeholder="Sayfada bul" aria-label="Sayfada bul"><span class="br-fn"></span><button type="button" data-find="-1" title="Önceki">⌃</button><button type="button" data-find="1" title="Sonraki">⌄</button><button type="button" data-find="0" title="Kapat (Esc)">✕</button></div>
-    <div class="br-toolbar" hidden>🔎 Hızlı Arama Araç Çubuğu <input placeholder="Süper Arama" disabled> <span>📢 Reklam: Bugün %90 indirim!</span><span>📢 Kazandınız!</span></div>
+    <div class="br-find" hidden><input class="br-fq" placeholder="Sayfada bul" aria-label="Sayfada bul"><span class="br-fn"></span><button type="button" data-find="-1" title="Önceki" aria-label="Önceki">${ic('up', 20)}</button><button type="button" data-find="1" title="Sonraki" aria-label="Sonraki">${ic('down', 20)}</button><button type="button" data-find="0" title="Kapat (Esc)" aria-label="Kapat">${ic('close', 18)}</button></div>
+    <div class="br-toolbar" hidden>${ic('search', 16)} Hızlı Arama Araç Çubuğu <input placeholder="Süper Arama" disabled> <span>Reklam: Bugün %90 indirim!</span><span>Reklam: Kazandınız!</span></div>
     <div class="br-page"></div>
     <div class="br-dlpanel" hidden></div>
     <div class="br-pop" hidden></div>
@@ -55,7 +62,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   const curUrl = () => (cur?.hist[cur.idx] ? fmtUrl(cur.hist[cur.idx]) : '');
   const history = () => (desk.history ||= []);
 
-  const fmtUrl = (loc) => (loc.host === 'tarayici' ? 'tarayici:/' + loc.path : loc.host === 'dosya' ? 'dosya://' + loc.path : loc.host === 'kaynak' ? 'view-source:dosya://' + loc.path : loc.host + (loc.path === '/' ? '' : loc.path) + (loc.q ? '?q=' + loc.q : ''));
+  const fmtUrl = (loc) => (loc.host === 'tarayici' ? 'chrome://' + chromeName(loc.path) : loc.host === 'dosya' ? 'dosya://' + loc.path : loc.host === 'kaynak' ? 'view-source:dosya://' + loc.path : loc.host + (loc.path === '/' ? '' : loc.path) + (loc.q ? '?q=' + encQ(loc.q) : ''));
   const internal = (loc) => loc && (loc.host === 'tarayici' || loc.host === EXT_HOST || loc.host === 'dosya' || loc.host === 'kaynak');
   // Bilgisayardaki bir .html dosyasını tarayıcıda açmak: dosya içeriği güvenli bir süzgeçten geçirilip çizilir
   const fileLoc = (node) => ({ host: 'dosya', path: `/C:/Kullanıcılar/${desk.settings.user}/${desk.fs.label(node.parent)}/${node.name}`, q: '', node: node.id });
@@ -105,28 +112,30 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (internal(loc)) {
       ({ title, html } = internalPage(loc));
     } else if (!loc && priv) {
-      html = `<div class="wp nt priv"><div class="priv-ic">🕶</div><h1>Gizli pencere</h1><p>Bu pencerede gezdiğiniz sayfalar <b>geçmişe kaydedilmez</b>; pencereyi kapatınca çerezler ve form bilgileri silinir.</p>
-        <p><b>Ama görünmez olmazsınız:</b> girdiğiniz siteler, iş yeriniz ya da internet sağlayıcınız ne yaptığınızı yine görebilir. İndirdiğiniz dosyalar ve sık kullanılanlar da kalır.</p>
-        <form class="se-form big" data-search><input name="q" placeholder="Arama yapın ya da adres yazın" autocomplete="off"><button>🔍 Ara</button></form></div>`;
+      html = `<div class="wp br-priv"><div class="priv-ic">${icIncognito(72)}</div><h1>Gizli pencerede gezindiniz</h1><p>Bu pencerede gezdiğiniz sayfalar <b>geçmişe kaydedilmez</b>; pencereyi kapatınca çerezler ve form bilgileri silinir.</p>
+        <p><b>Ama görünmez olmazsınız:</b> girdiğiniz siteler, iş yeriniz ya da internet sağlayıcınız ne yaptığınızı yine görebilir. İndirdiğiniz dosyalar ve yer işaretleri de kalır.</p>
+        ${searchBox('', true, '', 'Google\'da arayın ya da bir URL yazın')}</div>`;
     } else if (!loc) {
-      html = `<div class="wp nt"><div class="se-logo">Bulalım</div><form class="se-form big" data-search><input name="q" placeholder="Arama yapın ya da adres yazın" autocomplete="off"><button>🔍 Ara</button></form>
-        <div class="nt-tiles">${[['www.gunun-haberleri.com.tr', '📰', 'Haberler'], ['www.hava-durumu.com.tr', '🌤', 'Hava durumu'], ['www.lezzetli-tarifler.com.tr', '🥘', 'Tarifler']].map(([h, i, l]) => `<a data-href="${h}"><span>${i}</span>${l}</a>`).join('')}</div></div>`;
+      // Yeni sekme sayfası (Chrome): Google yazısı, arama kutusu, sık girilen siteler
+      html = `<div class="wp br-nt"><div class="br-nt-c">${gLogo('xl')}${searchBox('', true, '', 'Google\'da arayın ya da bir URL yazın')}
+        <div class="br-nt-tiles">${[['www.gunun-haberleri.com.tr', 'Haberler'], ['www.hava-durumu.com.tr', 'Hava durumu'], ['www.lezzetli-tarifler.com.tr', 'Tarifler']].map(([h, l]) => `<a data-href="${h}"><span>${favicon(l, h)}</span>${l}</a>`).join('')}<a data-soon="1"><span class="br-nt-add">${ic('add', 22)}</span>Kısayol ekle</a></div></div>
+        <a class="br-nt-cust" data-soon="1">${ic('gear', 16)} Chrome'u özelleştir</a></div>`;
     } else if (s.netSim && !online(desk)) {
       // Wi-Fi'ye bağlı ama internet yok (modem sorunu) ya da hiçbir ağa bağlı değil
       title = 'İnternet yok';
-      html = `<div class="wp err"><div class="err-ic">📡✖</div><h1>İnternete bağlı değilsiniz</h1><p class="mut">ERR_INTERNET_DISCONNECTED</p>
+      html = `<div class="wp err"><div class="err-ic">${ic('globe', 64)}</div><h1>İnternete bağlı değilsiniz</h1><p class="mut">ERR_INTERNET_DISCONNECTED</p>
         <ul><li>Modemin ışıklarına bakın: <b>Internet</b> ışığı yeşil mi?</li><li>Modemi kapatın, <b>10 saniye</b> bekleyin, yeniden açın.</li><li>Wi-Fi ağına yeniden bağlanın.</li></ul>
-        <p><button type="button" class="ed-btn" data-clock="retry">⟳ Yeniden dene</button> <button type="button" class="ed-btn ghost" data-clock="net">📶 Ağ ayarlarını aç</button></p></div>`;
+        <p><button type="button" class="ed-btn" data-clock="retry">${ic('reload', 16)} Yeniden dene</button> <button type="button" class="ed-btn ghost" data-clock="net">Ağ ayarlarını aç</button></p></div>`;
       setTimeout(() => emit('web-offline', { host: loc.host }), 0);
     } else if (!site) {
       title = loc.host;
-      html = `<div class="wp err"><div class="err-ic">😕</div><h1>Bu siteye ulaşılamıyor</h1><p><b>${esc(loc.host)}</b> adresi bulunamadı.</p><ul><li>Adreste yazım hatası olabilir. Harfleri kontrol edin.</li><li>Adresi bilmiyorsanız, adres çubuğuna aradığınız şeyi kelimelerle yazın.</li></ul></div>`;
+      html = `<div class="wp err"><div class="err-ic">${ic('warn', 64)}</div><h1>Bu siteye ulaşılamıyor</h1><p><b>${esc(loc.host)}</b> adresi bulunamadı.</p><ul><li>Adreste yazım hatası olabilir. Harfleri kontrol edin.</li><li>Adresi bilmiyorsanız, adres çubuğuna aradığınız şeyi kelimelerle yazın.</li></ul></div>`;
     } else if (site.secure && clockOff()) {
       // Bilgisayarın saati/tarihi çok yanlışsa güvenli (https) siteler açılmaz: sertifikanın geçerlilik tarihi kontrol edilir
       title = 'Bağlantınız gizli değil';
-      html = `<div class="wp err"><div class="err-ic">🕒⚠</div><h1>Bağlantınız gizli değil</h1><p><b>${esc(loc.host)}</b> sitesinin güvenlik sertifikası doğrulanamadı.</p><p class="mut">NET::ERR_CERT_DATE_INVALID</p>
+      html = `<div class="wp err"><div class="err-ic">${ic('warn', 64)}</div><h1>Bağlantınız gizli değil</h1><p><b>${esc(loc.host)}</b> sitesinin güvenlik sertifikası doğrulanamadı.</p><p class="mut">NET::ERR_CERT_DATE_INVALID</p>
         <div class="ed-note">Sık görülen bir neden: <b>bilgisayarınızın tarih ve saati yanlış</b>. Bilgisayarınız şu an tarihi <b>${esc(desk.now().toLocaleDateString('tr-TR'))}</b> sanıyor. Sağ alttaki saate bakın.</div>
-        <p><button type="button" class="ed-btn" data-clock="settings">🕒 Tarih ve saat ayarlarını aç</button> <button type="button" class="ed-btn ghost" data-clock="retry">⟳ Yeniden dene</button></p></div>`;
+        <p><button type="button" class="ed-btn" data-clock="settings">Tarih ve saat ayarlarını aç</button> <button type="button" class="ed-btn ghost" data-clock="retry">${ic('reload', 16)} Yeniden dene</button></p></div>`;
       setTimeout(() => emit('web-clock-error', { host: loc.host }), 0);
     } else {
       const r = site.render(loc.path, loc.q || '', webCtx(loc));
@@ -134,6 +143,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       html = r.html;
     }
     t.title = title;
+    t.fav = !loc ? ic('search', 16) : internal(loc) && loc.host !== EXT_HOST ? icChrome(16) : loc.host === SEARCH_HOST ? '<span class="gg-fav g">G</span>' : loc.host === EXT_HOST ? icChrome(16) : favicon(site?.name || loc.host, loc.host);
     pageEl.innerHTML = html;
     pageEl.scrollTop = 0;
     closeFind();
@@ -145,13 +155,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (site?.mount) t.timer = site.mount(pageEl, webCtx(loc));
     if (document.activeElement !== url) url.value = loc ? fmtUrl(loc) : '';
     const secure = site?.secure;
-    $('.br-lock').innerHTML = !loc ? '🔍' : internal(loc) ? (loc.host === EXT_HOST ? '🔒' : '🧭') : !site ? 'ⓘ' : secure ? '🔒' : '<b class="br-insecure">⚠ Güvenli değil</b>';
+    $('.br-lock').innerHTML = !loc ? ic('search', 16) : internal(loc) ? (loc.host === EXT_HOST ? ic('lock', 16) : icChrome(16)) : !site ? ic('info', 16) : secure ? ic('lock', 16) : `<b class="br-insecure">${ic('warn', 16)} Güvenli değil</b>`;
     $('.br-back').disabled = t.idx <= 0;
     $('.br-fwd').disabled = t.idx >= t.hist.length - 1;
     $('.br-toolbar').hidden = !desk.settings.toolbar;
     $('.br-pop').hidden = true;
     if (site?.popup) {
-      if (extOn('adblock') || s.popupBlock) { $('.br-lock').innerHTML += ' <span class="br-popblk" title="Açılır pencere engellendi">🚫🗗</span>'; emit('web-popup-blocked', { by: extOn('adblock') ? 'adblock' : 'settings' }); }
+      if (extOn('adblock') || s.popupBlock) { $('.br-lock').innerHTML += ` <span class="br-popblk" title="Açılır pencere engellendi">${ic('newwin', 16)}</span>`; emit('web-popup-blocked', { by: extOn('adblock') ? 'adblock' : 'settings' }); }
       else setTimeout(() => popup(), 600);
     }
     renderExts();
@@ -162,7 +172,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     renderTabs();
     renderBm();
     applyZoom();
-    setTitle(`${title} - İnternet${priv ? ' (Gizli)' : ''}`);
+    setTitle(`${title} - Google Chrome${priv ? ' (Gizli)' : ''}`);
     settleFocus();
   }
 
@@ -174,7 +184,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   }
 
   function renderTabs() {
-    $('.br-tablist').innerHTML = tabs.map((t) => `<div class="br-tab ${t === cur ? 'on' : ''}" data-tab="${t.id}"><span>${esc(t.title.slice(0, 28))}</span><button type="button" class="br-tabx" data-close="${t.id}" title="Sekmeyi kapat">✕</button></div>`).join('');
+    $('.br-tablist').innerHTML = tabs.map((t) => `<div class="br-tab ${t === cur ? 'on' : ''}" data-tab="${t.id}" title="${esc(t.title)}"><i class="br-fav">${t.fav || ''}</i><span>${esc(t.title.slice(0, 28))}</span><button type="button" class="br-tabx" data-close="${t.id}" title="Sekmeyi kapat" aria-label="Sekmeyi kapat">${ic('close', 14)}</button></div>`).join('');
   }
 
   function closeTab(id) {
@@ -246,12 +256,12 @@ export function browser({ desk, body, args, emit, setTitle }) {
 
   function renderDl(open) {
     const p = $('.br-dlpanel');
-    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x">✕</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>${fileIcon(d.name)}</span><div><b>${esc(d.name)}</b><small>${d.when ? esc(d.when) + ' · ' : ''}${desk.fs.get(d.id) && !desk.fs.inRecycle(d.id) ? 'Tamamlandı' : 'Silindi'}</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="${d.id}">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
+    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x" aria-label="Kapat">${ic('close', 16)}</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>${fileIcon(d.name)}</span><div><b>${esc(d.name)}</b><small>${d.when ? esc(d.when) + ' · ' : ''}${desk.fs.get(d.id) && !desk.fs.inRecycle(d.id) ? 'Tamamlandı' : 'Silindi'}</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="${d.id}">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
     if (open) p.hidden = false;
   }
 
   // ---- Site bilgileri: kilide tıklayınca adresin parçaları, bağlantı, sertifika ve site izinleri ----
-  const PERMS = [['location', '📍 Konum'], ['camera', '📷 Kamera'], ['mic', '🎤 Mikrofon'], ['notify', '🔔 Bildirimler']];
+  const PERMS = [['location', 'Konum', 'pin'], ['camera', 'Kamera', 'cam'], ['mic', 'Mikrofon', 'micp'], ['notify', 'Bildirimler', 'bell']];
   const perms = (host) => ((desk.sitePerms ||= {})[siteName(host)] ||= {});
   // Adresi parçalarına ayırır: https:// · www. · alt alan · alan adı · /yol · ?q=arama
   function urlParts(loc, secure) {
@@ -273,15 +283,15 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const loc = cur.hist[cur.idx];
     if (!loc || internal(loc)) return;
     const site = SITES[loc.host];
-    if (!site) { box.innerHTML = `<div class="bi-head">ⓘ Site bulunamadı</div><p><b>${esc(loc.host)}</b> diye bir site yok. Adreste yazım hatası olabilir.</p>`; box.hidden = false; return; }
+    if (!site) { box.innerHTML = `<div class="bi-head">${ic('info', 18)} Site bulunamadı</div><p><b>${esc(loc.host)}</b> diye bir site yok. Adreste yazım hatası olabilir.</p>`; box.hidden = false; return; }
     const name = siteName(loc.host), p = perms(loc.host);
-    box.innerHTML = `<div class="bi-head ${site.secure ? 'ok' : 'bad'}">${site.secure ? '🔒 Bağlantı güvenli' : '⚠ Bağlantı güvenli değil'}<button type="button" class="bi-x" title="Kapat">✕</button></div>
+    box.innerHTML = `<div class="bi-head ${site.secure ? 'ok' : 'bad'}">${site.secure ? ic('lock', 18) + ' Bağlantı güvenli' : ic('warn', 18) + ' Bağlantı güvenli değil'}<button type="button" class="bi-x" title="Kapat" aria-label="Kapat">${ic('close', 16)}</button></div>
       <p class="bi-note">${site.secure ? 'Bu siteye gönderdiğiniz bilgiler yolda şifrelenir; başkaları okuyamaz. <b>Ama kilit, sitenin dürüst olduğunu göstermez!</b> Sahte siteler de kilit alabilir.' : 'Bu siteye girdiğiniz şifre ve kart bilgileri yolda başkaları tarafından görülebilir. <b>Bilgi girmeyin.</b>'}</p>
       <div class="bi-sec">Adresin parçaları</div><div class="bi-url">${urlParts(loc, site.secure).map(([x, k, why]) => `<span class="bu-${k}" title="${esc(why)}">${esc(x)}</span>`).join('')}</div>
       <ul class="bi-legend">${urlParts(loc, site.secure).filter(([, k]) => k !== 'www').map(([x, k, why]) => `<li><span class="bu-${k}">${esc(x)}</span> ${esc(why)}</li>`).join('')}</ul>
       <p class="bi-who">Bu site: <b>${esc(name)}</b></p>
-      ${site.secure ? `<div class="bi-sec">Sertifika</div><p class="bi-cert">✔ Geçerli · Kime verildi: <b>${esc(name)}</b></p>` : ''}
-      <div class="bi-sec">Bu sitenin izinleri</div>${PERMS.map(([k, l]) => `<label class="bi-perm"><span>${l}</span><select data-perm="${k}">${[['', 'Sor'], ['allow', 'İzin ver'], ['block', 'Engelle']].map(([v, n]) => `<option value="${v}" ${(p[k] || '') === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`).join('')}`;
+      ${site.secure ? `<div class="bi-sec">Sertifika</div><p class="bi-cert">${ic('check', 14)} Geçerli · Kime verildi: <b>${esc(name)}</b></p>` : ''}
+      <div class="bi-sec">Bu sitenin izinleri</div>${PERMS.map(([k, l, i]) => `<label class="bi-perm"><span>${ic(i, 16)} ${l}</span><select data-perm="${k}">${[['', 'Sor'], ['allow', 'İzin ver'], ['block', 'Engelle']].map(([v, n]) => `<option value="${v}" ${(p[k] || '') === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`).join('')}`;
     box.hidden = false;
     emit('web-siteinfo', { host: loc.host, site: name, secure: !!site.secure });
   }
@@ -290,7 +300,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     emit('web-perm', { host, site: siteName(host), perm: k, value: v, via });
   }
   // Birden çok izni birlikte sorar (ör. görüntülü görüşme: kamera ve mikrofon). Cevap then(değer) ile döner.
-  const PERM_LABEL = { camera: '📷 Kameranızı kullanmak', mic: '🎤 Mikrofonunuzu kullanmak', location: '📍 Konumunuzu bilmek', notify: '🔔 Bildirim göstermek' };
+  const PERM_LABEL = { camera: 'Kameranızı kullanmak', mic: 'Mikrofonunuzu kullanmak', location: 'Konumunuzu bilmek', notify: 'Bildirim göstermek' };
   function askPerms(host, list, then) {
     const box = $('.br-perm');
     box.innerHTML = `<p><b>${esc(siteName(host))}</b> şunu yapmak istiyor:</p>${list.map((k) => `<p class="bp-what">${PERM_LABEL[k]}</p>`).join('')}<div><button type="button" data-pp="allow">İzin ver</button><button type="button" data-pp="block">Engelle</button></div>`;
@@ -309,7 +319,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const loc = cur.hist[cur.idx];
     if (!loc || loc.host !== host) return;
     const box = $('.br-perm');
-    box.innerHTML = `<p><b>${esc(siteName(host))}</b> şunu yapmak istiyor:</p><p class="bp-what">🔔 Bildirim göster</p><div><button type="button" data-np="allow">İzin ver</button><button type="button" data-np="block">Engelle</button></div><button type="button" class="bi-x" data-np="close" title="Kapat">✕</button>`;
+    box.innerHTML = `<p><b>${esc(siteName(host))}</b> şunu yapmak istiyor:</p><p class="bp-what">Bildirim göster</p><div><button type="button" data-np="allow">İzin ver</button><button type="button" data-np="block">Engelle</button></div><button type="button" class="bi-x" data-np="close" title="Kapat" aria-label="Kapat">${ic('close', 16)}</button>`;
     box.hidden = false;
     emit('web-perm-ask', { host, perm: 'notify' });
   }
@@ -335,13 +345,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const add = (icon, text, sub, kind) => { if (seen.has(text) || sugList.length >= 7) return; seen.add(text); sugList.push({ icon, text, sub, kind }); };
     sugList = [];
     const looks = /\.[a-zçğıöşü]{2,}/i.test(q) && !/\s/.test(q);
-    if (!looks) add('🔍', url.value.trim(), 'Bulalım\'da ara', 'search');
-    for (const b of desk.bookmarks || []) if (b.url.toLocaleLowerCase('tr').includes(q) || b.title.toLocaleLowerCase('tr').includes(q)) add('⭐', b.url, b.title, 'bookmark');
-    if (!priv) for (const h of history()) if (h.url.toLocaleLowerCase('tr').includes(q) || h.title.toLocaleLowerCase('tr').includes(q)) add('🕘', h.url, h.title, 'history');
-    for (const [host, st] of Object.entries(SITES)) if (!/\.xyz$|hesap-dogrulama|gov-giris/.test(host) && (host.includes(q) || st.name.toLocaleLowerCase('tr').includes(q))) add('🌐', host, st.name, 'site');
-    if (looks) add('🔍', url.value.trim(), 'Bulalım\'da ara', 'search');
+    if (!looks) add('search', url.value.trim(), 'Google Arama', 'search');
+    for (const b of desk.bookmarks || []) if (b.url.toLocaleLowerCase('tr').includes(q) || b.title.toLocaleLowerCase('tr').includes(q)) add('star', b.url, b.title, 'bookmark');
+    if (!priv) for (const h of history()) if (h.url.toLocaleLowerCase('tr').includes(q) || h.title.toLocaleLowerCase('tr').includes(q)) add('history', h.url, h.title, 'history');
+    for (const [host, st] of Object.entries(SITES)) if (!/\.xyz$|hesap-dogrulama|gov-giris/.test(host) && (host.includes(q) || st.name.toLocaleLowerCase('tr').includes(q))) add('globe', host, st.name, 'site');
+    if (looks) add('search', url.value.trim(), 'Google Arama', 'search');
     sugIdx = -1;
-    sug.innerHTML = sugList.map((x, i) => `<div class="bs-row" data-sug="${i}"><span>${x.icon}</span><b>${esc(x.text)}</b><small>${esc(x.sub)}</small></div>`).join('');
+    sug.innerHTML = sugList.map((x, i) => `<div class="bs-row" data-sug="${i}"><span>${ic(x.icon, 16)}</span><b>${esc(x.text)}</b><small>${esc(x.sub)}</small></div>`).join('');
     sug.hidden = !sugList.length;
   }
   function pickSug(i) {
@@ -349,7 +359,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     sug.hidden = true;
     if (!x) return;
     url.blur();
-    if (x.kind === 'search') navigate({ host: SEARCH_HOST, path: '/ara', q: x.text, search: true }, 'suggest');
+    if (x.kind === 'search') navigate({ host: SEARCH_HOST, path: '/search', q: x.text, search: true }, 'suggest');
     else go(x.text, 'suggest');
   }
   url.addEventListener('input', () => { $('.br-info').hidden = true; suggest(); }); // site bilgisi kutusu öneri listesini örtmesin
@@ -383,36 +393,36 @@ export function browser({ desk, body, args, emit, setTitle }) {
       const text = typeof n?.content === 'string' ? n.content : '';
       if (loc.host === 'kaynak') return { title: `view-source:${n?.name || ''}`, html: `<div class="wp src"><pre>${esc(text) || '(dosya boş)'}</pre></div>` };
       const r = safeHtml(text);
-      return { title: r.title || n?.name || 'Dosya', html: `<div class="wp filepg"><div class="fp-bar">📁 Bu sayfa internette değil, bilgisayarınızdaki bir dosyadır: <b>${esc(n?.name || '')}</b></div><div class="fp-body">${r.html || '<p><i>(Dosya boş)</i></p>'}</div></div>` };
+      return { title: r.title || n?.name || 'Dosya', html: `<div class="wp filepg"><div class="fp-bar">${ic('info', 16)} Bu sayfa internette değil, bilgisayarınızdaki bir dosyadır: <b>${esc(n?.name || '')}</b></div><div class="fp-body">${r.html || '<p><i>(Dosya boş)</i></p>'}</div></div>` };
     }
     if (loc.host === EXT_HOST) {
       const id = loc.path.slice(1);
       const x = EXTS[id];
-      const btn = (k) => (s.ext[k] !== undefined ? '<button type="button" class="xs-btn" disabled>✔ Eklendi</button>' : `<button type="button" class="xs-btn primary" data-addext="${k}">Tarayıcıya ekle</button>`);
-      const head = '<header class="xs-head">🧩 Uzantı Mağazası <a data-href="uzantilar.bulalim.com">Ana sayfa</a></header>';
+      const btn = (k) => (s.ext[k] !== undefined ? `<button type="button" class="xs-btn" disabled>${ic('check', 16)} Chrome'a eklendi</button>` : `<button type="button" class="xs-btn primary" data-addext="${k}">Chrome'a ekle</button>`);
+      const head = `<header class="xs-head"><span class="xs-brand">${icChrome(28)} <span><b>Chrome Web Mağazası</b></span></span><a data-href="${EXT_HOST}">Ana sayfa</a></header>`;
       if (x) {
-        return { title: `${x.name} - Uzantı Mağazası`, html: `<div class="wp xs">${head}<div class="xs-detail"><span class="xs-ic">${x.icon}</span><div><h1>${x.name}</h1>
-          <p class="xs-pub">${esc(x.pub)} ${x.verified ? '<b class="xs-ok" title="Yayımcının kimliği doğrulandı">✔ Doğrulanmış yayımcı</b>' : '<b class="xs-no">Doğrulanmamış</b>'}</p>
+        return { title: `${x.name} - Chrome Web Mağazası`, html: `<div class="wp xs">${head}<div class="xs-detail"><span class="xs-ic">${extIc(id, 56)}</span><div><h1>${x.name}</h1>
+          <p class="xs-pub">${esc(x.pub)} ${x.verified ? `<b class="xs-ok" title="Yayımcının kimliği doğrulandı">${ic('check', 14)} Doğrulanmış yayımcı</b>` : '<b class="xs-no">Doğrulanmamış</b>'}</p>
           <p><span class="xs-stars">${stars(x.stars)}</span> ${String(x.stars).replace('.', ',')} · ${x.users} kullanıcı</p>${btn(id)}</div></div>
           <section><h3>Açıklama</h3><p>${esc(x.desc)}</p></section><section><h3>İstediği izinler</h3><ul>${x.perms.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></section></div>` };
       }
-      return { title: 'Uzantı Mağazası', html: `<div class="wp xs">${head}<h1>Tarayıcınıza yeni özellikler ekleyin</h1><p class="xs-tip">Uzantı eklemeden önce bakın: <b>yayımcı doğrulanmış mı?</b> <b>kaç kişi kullanıyor, puanı kaç?</b> <b>hangi izinleri istiyor?</b></p>
-        <div class="xs-grid">${Object.entries(EXTS).map(([k, e]) => `<a class="xs-card" data-href="${EXT_HOST}/${k}"><span class="xs-ic">${e.icon}</span><b>${e.name}</b><small>${esc(e.pub)} ${e.verified ? '✔' : ''}</small><small class="xs-stars">${stars(e.stars)} · ${e.users}</small></a>`).join('')}</div></div>` };
+      return { title: 'Chrome Web Mağazası', html: `<div class="wp xs">${head}<h1>Tarayıcınıza yeni özellikler ekleyin</h1><p class="xs-tip">Uzantı eklemeden önce bakın: <b>yayımcı doğrulanmış mı?</b> <b>kaç kişi kullanıyor, puanı kaç?</b> <b>hangi izinleri istiyor?</b></p>
+        <div class="xs-grid">${Object.entries(EXTS).map(([k, e]) => `<a class="xs-card" data-href="${EXT_HOST}/${k}"><span class="xs-ic">${extIc(k, 40)}</span><b>${e.name}</b><small>${esc(e.pub)} ${e.verified ? ic('check', 13) : ''}</small><small class="xs-stars">${stars(e.stars)} · ${e.users}</small></a>`).join('')}</div></div>` };
     }
     const page = loc.path.slice(1);
-    const nav = `<nav class="ti-nav">${[['gecmis', '🕘 Geçmiş'], ['uzantilar', '🧩 Uzantılar'], ['cerezler', '🍪 Çerezler'], ['ayarlar', '⚙ Ayarlar']].map(([k, l]) => `<a data-go="tarayici://${k}" class="${k === page ? 'on' : ''}">${l}</a>`).join('')}</nav>`;
+    const nav = `<nav class="ti-nav"><div class="ti-brand">${icChrome(22)} Chrome</div>${[['gecmis', 'history', 'Geçmiş'], ['uzantilar', 'puzzle', 'Uzantılar'], ['cerezler', 'cookie', 'Çerezler'], ['ayarlar', 'gear', 'Ayarlar']].map(([k, i, l]) => `<a data-go="chrome://${chromeName('/' + k)}" class="${k === page ? 'on' : ''}">${ic(i, 18)} ${l}</a>`).join('')}</nav>`;
     if (page === 'gecmis') {
       const h = history();
-      return { title: 'Geçmiş', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Geçmiş</h1>${priv ? '<p class="ti-note">🕶 Gizli pencerede gezdikleriniz buraya yazılmaz.</p>' : ''}
-        <button type="button" class="xs-btn" data-clear="1">🧹 Göz atma verilerini temizle</button>
-        ${h.length ? `<h3>Bugün</h3><div class="ti-hist">${h.map((x, i) => `<div class="ti-row"><span>${x.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span><a data-go="${esc(x.url)}">${esc(x.title)}</a><small>${esc(x.url.split('/')[0])}</small><button type="button" data-hdel="${i}" title="Geçmişten kaldır">✕</button></div>`).join('')}</div>` : '<p class="ti-note">Geçmiş boş.</p>'}</div></div>` };
+      return { title: 'Geçmiş', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Geçmiş</h1>${priv ? `<p class="ti-note">${icIncognito(16)} Gizli pencerede gezdikleriniz buraya yazılmaz.</p>` : ''}
+        <button type="button" class="xs-btn" data-clear="1">Tarama verilerini temizle...</button>
+        ${h.length ? `<h3>Bugün</h3><div class="ti-hist">${h.map((x, i) => `<div class="ti-row"><span>${x.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span><a data-go="${esc(x.url)}">${esc(x.title)}</a><small>${esc(x.url.split('/')[0])}</small><button type="button" data-hdel="${i}" title="Geçmişten kaldır" aria-label="Geçmişten kaldır">${ic('close', 14)}</button></div>`).join('')}</div>` : '<p class="ti-note">Geçmiş boş.</p>'}</div></div>` };
     }
     if (page === 'uzantilar') {
       const mine = Object.keys(s.ext);
       return { title: 'Uzantılar', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Uzantılar</h1>
-        ${mine.length ? mine.map((k) => `<div class="ti-ext ${EXTS[k].verified ? '' : 'bad'}"><span class="xs-ic">${EXTS[k].icon}</span><div><b>${EXTS[k].name}</b><small>${esc(EXTS[k].desc)}</small>${EXTS[k].verified ? '' : '<small class="xs-no">⚠ Doğrulanmamış yayımcı. Bu uzantıyı siz eklemediyseniz hemen kaldırın.</small>'}</div>
+        ${mine.length ? mine.map((k) => `<div class="ti-ext ${EXTS[k].verified ? '' : 'bad'}"><span class="xs-ic">${extIc(k, 32)}</span><div><b>${EXTS[k].name}</b><small>${esc(EXTS[k].desc)}</small>${EXTS[k].verified ? '' : `<small class="xs-no">${ic('warn', 14)} Doğrulanmamış yayımcı. Bu uzantıyı siz eklemediyseniz hemen kaldırın.</small>`}</div>
           <label class="ti-tog"><input type="checkbox" data-exttog="${k}" ${extOn(k) ? 'checked' : ''}><i></i></label><button type="button" class="xs-btn" data-extdel="${k}">Kaldır</button></div>`).join('') : '<p class="ti-note">Henüz uzantı eklenmedi.</p>'}
-        <p><a class="xs-link" data-href="${EXT_HOST}">🧩 Uzantı Mağazası'nda yeni uzantılar bulun</a></p></div></div>` };
+        <p><a class="xs-link" data-href="${EXT_HOST}">Chrome Web Mağazası'nı ziyaret et</a></p></div></div>` };
     }
     if (page === 'cerezler') {
       const list = getCookies();
@@ -420,29 +430,29 @@ export function browser({ desk, body, args, emit, setTitle }) {
       return { title: 'Çerezler ve site verileri', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Çerezler ve site verileri</h1>
         <p class="ti-note">Çerez, sitelerin tarayıcınıza bıraktığı küçük bir <b>not</b>tur: giriş yaptığınızı, sepetinizi, tercihlerinizi hatırlamak için. Kendi sitenin bıraktığına <b>birinci taraf</b>, sayfaya gömülü başka bir şirketin (genellikle reklam) bıraktığına <b>üçüncü taraf</b> çerez denir.</p>
         <label class="ti-line"><input type="checkbox" data-blockthird="1" ${s.blockThird ? 'checked' : ''}> Üçüncü taraf çerezlerini engelle <small>(reklam şirketlerinin sizi siteden siteye izlemesini zorlaştırır)</small></label>
-        <h3>Saklanan çerezler (${list.length})</h3>${list.length ? `<div class="ti-ck">${list.map((c, i) => `<div class="ti-row ck-${c.party}"><b>${esc(c.site)}</b><span class="ck-tag ${c.party}">${c.party === 'third' ? 'Üçüncü taraf' : 'Birinci taraf'}</span><span class="ck-nm">${esc(c.name)}</span><button type="button" data-ckdel="${i}" title="Bu çerezi sil">✕ Sil</button><small>${esc(c.purpose)}${c.interest ? ` <i>(kaydedilen: ${esc(c.interest)})</i>` : ''}</small></div>`).join('')}</div>
-        <p><button type="button" class="xs-btn" data-ckall="1">🗑 Tümünü sil</button></p>` : '<p class="ti-note">Saklanan çerez yok.</p>'}
-        ${third ? '<p class="ti-note">⚠ Listede <b>üçüncü taraf</b> çerezler var: bunlar sizi başka sitelerde de tanır.</p>' : ''}</div></div>` };
+        <h3>Saklanan çerezler (${list.length})</h3>${list.length ? `<div class="ti-ck">${list.map((c, i) => `<div class="ti-row ck-${c.party}"><b>${esc(c.site)}</b><span class="ck-tag ${c.party}">${c.party === 'third' ? 'Üçüncü taraf' : 'Birinci taraf'}</span><span class="ck-nm">${esc(c.name)}</span><button type="button" data-ckdel="${i}" title="Bu çerezi sil">Sil</button><small>${esc(c.purpose)}${c.interest ? ` <i>(kaydedilen: ${esc(c.interest)})</i>` : ''}</small></div>`).join('')}</div>
+        <p><button type="button" class="xs-btn" data-ckall="1">Tümünü sil</button></p>` : '<p class="ti-note">Saklanan çerez yok.</p>'}
+        ${third ? `<p class="ti-note">${ic('warn', 14)} Listede <b>üçüncü taraf</b> çerezler var: bunlar sizi başka sitelerde de tanır.</p>` : ''}</div></div>` };
     }
     return { title: 'Ayarlar', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Ayarlar</h1>
       <section><h3>Gizlilik</h3><label class="ti-line"><input type="checkbox" data-popblock="1" ${s.popupBlock ? 'checked' : ''}> Açılır pencereleri engelle</label>
         <label class="ti-line"><input type="checkbox" data-blockthird="1" ${s.blockThird ? 'checked' : ''}> Üçüncü taraf çerezlerini engelle</label>
-        <p><a data-go="tarayici://cerezler">🍪 Çerezler ve site verilerini gör</a></p>
-        <button type="button" class="xs-btn" data-clear="1">🧹 Göz atma verilerini temizle</button></section>
+        <p><a data-go="chrome://settings/cookies">Çerezler ve site verilerini gör</a></p>
+        <button type="button" class="xs-btn" data-clear="1">Tarama verilerini temizle...</button></section>
       <section><h3>Sıfırla</h3><p class="ti-note">Tarayıcı kendiliğinden değiştiyse (istemediğiniz araç çubuğu, ana sayfa, uzantı) ayarları ilk hâline döndürün.</p>
-        <button type="button" class="xs-btn" data-reset="1">↺ Ayarları varsayılanlarına sıfırla</button></section></div></div>` };
+        <button type="button" class="xs-btn" data-reset="1">Ayarları varsayılanlarına sıfırla</button></section></div></div>` };
   }
 
   async function addExt(id) {
     const x = EXTS[id];
-    const a = await desk.dialogs.ask({ title: 'Uzantı ekle', icon: x.icon, text: `<b>“${x.name}” eklensin mi?</b><br>Şunları yapabilir:<ul>${x.perms.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>`, buttons: [['add', 'Uzantı ekle'], ['no', 'İptal', true]] });
+    const a = await desk.dialogs.ask({ title: 'Uzantı ekle', icon: extIc(id, 32), text: `<b>“${x.name}” Chrome'a eklensin mi?</b><br>Şunları yapabilir:<ul>${x.perms.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>`, buttons: [['add', 'Uzantı ekle'], ['no', 'İptal', true]] });
     emit('ext-ask', { id, answer: a, fake: !x.verified });
     if (a !== 'add') return;
     s.ext[id] = true;
     if (!x.verified) {
       desk.setSetting('toolbar', true);
-      desk.toast('Süper İndirici PRO eklendi', 'Tarayıcınıza bir reklam araç çubuğu geldi ve arka planda bir program çalışmaya başladı. 🧩 → Uzantıları yönet\'den kaldırın.', '😬', 9000);
-    } else desk.toast('Uzantı eklendi', `${x.icon} ${x.name} araç çubuğunda. Simgesine tıklayarak kullanabilirsiniz.`, '🧩', 4000);
+      desk.toast('Süper İndirici PRO eklendi', 'Tarayıcınıza bir reklam araç çubuğu geldi ve arka planda bir program çalışmaya başladı. Uzantılar → Uzantıları yönet\'den kaldırın.', extIc('fake', 24), 9000);
+    } else desk.toast('Uzantı eklendi', `${x.name} araç çubuğunda. Simgesine tıklayarak kullanabilirsiniz.`, extIc(id, 24), 4000);
     emit('ext-add', { id, name: x.name, fake: !x.verified });
     show();
   }
@@ -463,33 +473,35 @@ export function browser({ desk, body, args, emit, setTitle }) {
   const refreshAll = () => desk.wins.filter((w) => w.app === 'browser').forEach((w) => w.api.refresh?.());
 
   async function clearData() {
-    const a = await desk.dialogs.ask({ title: 'Göz atma verilerini temizle', icon: '🧹', text: '<b>Şunlar silinecek:</b><ul><li>Göz atma geçmişi</li><li>Çerezler ve site verileri (sitelerdeki oturumlarınız kapanır)</li><li>Önbellekteki resimler ve dosyalar</li></ul>İndirdiğiniz dosyalar ve sık kullanılanlar silinmez.', buttons: [['yes', 'Şimdi temizle', true], ['no', 'İptal']] });
+    const a = await desk.dialogs.ask({ title: 'Tarama verilerini temizle', icon: ic('sweep', 28), text: '<b>Şunlar silinecek:</b><ul><li>Tarama geçmişi</li><li>Çerezler ve site verileri (sitelerdeki oturumlarınız kapanır)</li><li>Önbellekteki resimler ve dosyalar</li></ul>İndirdiğiniz dosyalar ve sık kullanılanlar silinmez.', buttons: [['yes', 'Şimdi temizle', true], ['no', 'İptal']] });
     if (a !== 'yes') return;
     history().length = 0;
     desk.cookies = [];
     desk.webState = {}; // giriş yapılmış oturumlar ve sepetler de çerezlerle birlikte silinir
-    desk.toast('Temizlendi', 'Göz atma verileri silindi.', '🧹', 3000);
+    desk.toast('Temizlendi', 'Tarama verileri silindi.', ic('sweep', 22), 3000);
     emit('web-clear');
     show();
   }
 
   function renderExts() {
-    $('.br-exts').innerHTML = Object.keys(s.ext).filter(extOn).map((k) => `<button type="button" data-extbtn="${k}" title="${EXTS[k].name}">${EXTS[k].icon}${k === 'adblock' && cur?.blocked ? `<sup>${cur.blocked}</sup>` : ''}${k === 'note' && notes[curUrl()] ? '<sup>•</sup>' : ''}</button>`).join('');
+    $('.br-exts').innerHTML = Object.keys(s.ext).filter(extOn).map((k) => `<button type="button" data-extbtn="${k}" title="${EXTS[k].name}">${extIc(k, 20)}${k === 'adblock' && cur?.blocked ? `<sup>${cur.blocked}</sup>` : ''}${k === 'note' && notes[curUrl()] ? '<sup>•</sup>' : ''}</button>`).join('');
   }
 
-  // ---- Açılır menüler: ⋯ ve 🧩 ----
+  // ---- Açılır menüler: ⋮ (Google Chrome'u özelleştir ve yönet) ve uzantılar (bulmaca simgesi) ----
   const menu = $('.br-menu');
+  const mzHtml = () => `<button type="button" data-z="-10" title="Uzaklaştır" aria-label="Uzaklaştır">${ic('add', 16).replace('M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z', 'M19 13H5v-2h14v2z')}</button><b>%${zoom}</b><button type="button" data-z="10" title="Yakınlaştır" aria-label="Yakınlaştır">${ic('add', 16)}</button><span class="br-mzf">${ic('expand', 16)}</span>`;
   function openMenu(kind) {
     if (!menu.hidden && menu.dataset.kind === kind) { menu.hidden = true; return; }
     menu.dataset.kind = kind;
     if (kind === 'more') {
-      const items = [['newtab', '＋ Yeni sekme', 'Ctrl+T'], ['private', '🕶 Yeni gizli pencere', 'Ctrl+Shift+N'], '-', ['history', '🕘 Geçmiş', 'Ctrl+H'], ['downloads', '⬇ İndirilenler', 'Ctrl+J'], ['bookmark', '☆ Sık kullanılanlara ekle', 'Ctrl+D'], ['bmbar', '⭐ Sık kullanılanlar çubuğunu göster/gizle', 'Ctrl+Shift+B'], ['extensions', '🧩 Uzantılar', ''], '-',
-        ['zoom', `🔍 Yakınlaştır <span class="br-mz"><button type="button" data-z="-10">−</button> %${zoom} <button type="button" data-z="10">＋</button></span>`, ''], ['print', '🖨 Yazdır', 'Ctrl+P'], ['find', '🔎 Sayfada bul', 'Ctrl+F'], ['source', '</> Sayfa kaynağını görüntüle', 'Ctrl+U'], ['clear', '🧹 Göz atma verilerini temizle', 'Ctrl+Shift+Del'], '-', ['settings', '⚙ Ayarlar', '']];
-      menu.innerHTML = items.map((it) => (it === '-' ? '<hr>' : `<div class="br-mi" data-m="${it[0]}" role="button" tabindex="0"><span>${it[1]}</span><kbd>${it[2]}</kbd></div>`)).join('');
+      const items = [['newtab', 'add', 'Yeni sekme', 'Ctrl+T'], ['newwin', 'newwin', 'Yeni pencere', 'Ctrl+N'], ['private', 'incog', 'Yeni Gizli pencere', 'Ctrl+Shift+N'], '-',
+        ['history', 'history', 'Geçmiş', 'Ctrl+H'], ['downloads', 'download', 'İndirilenler', 'Ctrl+J'], ['bookmark', 'bookmark', 'Bu sayfayı yer işaretlerine ekle', 'Ctrl+D'], ['bmbar', '', 'Yer işaretleri çubuğunu göster/gizle', 'Ctrl+Shift+B'], ['extensions', 'puzzle', 'Uzantılar', ''], ['clear', 'sweep', 'Tarama verilerini temizle...', 'Ctrl+Shift+Del'], '-',
+        'zoom', '-', ['print', 'print', 'Yazdır...', 'Ctrl+P'], ['find', 'search', 'Bul...', 'Ctrl+F'], ['source', 'code', 'Sayfa kaynağını görüntüle', 'Ctrl+U'], '-', ['settings', 'gear', 'Ayarlar', ''], ['exit', 'exit', 'Çıkış', '']];
+      menu.innerHTML = items.map((it) => (it === '-' ? '<hr>' : it === 'zoom' ? `<div class="br-mi br-mzrow"><span class="br-mic"></span><span>Yakınlaştırma</span><span class="br-mz">${mzHtml()}</span></div>` : `<div class="br-mi" data-m="${it[0]}" role="button" tabindex="0"><span class="br-mic">${mi(it[1])}</span><span>${it[2]}</span><kbd>${it[3]}</kbd></div>`)).join('');
     } else {
       const mine = Object.keys(s.ext);
-      menu.innerHTML = `<div class="br-mh">Uzantılar</div>${mine.length ? mine.map((k) => `<label class="br-mx"><span>${EXTS[k].icon} ${EXTS[k].name}</span><input type="checkbox" data-exttog="${k}" ${extOn(k) ? 'checked' : ''}></label>`).join('') : '<p class="br-mnone">Eklenmiş uzantı yok.</p>'}
-        <hr><div class="br-mi" data-m="extensions" role="button" tabindex="0"><span>⚙ Uzantıları yönet</span></div><div class="br-mi" data-m="extstore" role="button" tabindex="0"><span>🧩 Yeni uzantılar bul</span></div>`;
+      menu.innerHTML = `<div class="br-mh">Uzantılar</div>${mine.length ? mine.map((k) => `<label class="br-mx"><span>${extIc(k, 18)} ${EXTS[k].name}</span><input type="checkbox" data-exttog="${k}" ${extOn(k) ? 'checked' : ''}></label>`).join('') : '<p class="br-mnone">Eklenmiş uzantı yok.</p>'}
+        <hr><div class="br-mi" data-m="extensions" role="button" tabindex="0"><span class="br-mic">${ic('gear', 18)}</span><span>Uzantıları yönet</span></div><div class="br-mi" data-m="extstore" role="button" tabindex="0"><span class="br-mic">${icChrome(18)}</span><span>Chrome Web Mağazası'nı ziyaret et</span></div>`;
     }
     menu.hidden = false;
     emit('web-menu', { kind });
@@ -497,7 +509,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   // Yapışkan Not uzantısı: bu sayfaya küçük bir not (sayfa adresine göre saklanır)
   function openNote() {
     menu.dataset.kind = 'note';
-    menu.innerHTML = `<div class="br-mh">🗒 Yapışkan Not</div><p class="br-npar">Bu sayfa için notunuz:</p><textarea class="br-ntext" rows="3" maxlength="200" placeholder="ör. Fiyatı yarın tekrar bak"></textarea><button type="button" class="xs-btn primary" data-notesave="1">💾 Notu kaydet</button>`;
+    menu.innerHTML = `<div class="br-mh">${extIc('note', 18)} Yapışkan Not</div><p class="br-npar">Bu sayfa için notunuz:</p><textarea class="br-ntext" rows="3" maxlength="200" placeholder="ör. Fiyatı yarın tekrar bak"></textarea><button type="button" class="xs-btn primary" data-notesave="1">Notu kaydet</button>`;
     menu.querySelector('.br-ntext').value = notes[curUrl()] || '';
     menu.hidden = false;
     menu.querySelector('.br-ntext').focus();
@@ -511,6 +523,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     else if (m === 'history') newTab({ host: 'tarayici', path: '/gecmis', q: '' });
     else if (m === 'downloads') renderDl(true);
     else if (m === 'bookmark') bookmark();
+    else if (m === 'newwin') { desk.open('browser'); emit('web-newwin'); }
+    else if (m === 'exit') desk.close(desk.wins.find((w) => w.api === api));
     else if (m === 'bmbar') toggleBmBar();
     else if (m === 'extensions') newTab({ host: 'tarayici', path: '/uzantilar', q: '' });
     else if (m === 'extstore') newTab({ host: EXT_HOST, path: '/', q: '' });
@@ -528,15 +542,15 @@ export function browser({ desk, body, args, emit, setTitle }) {
   }
   async function print() {
     const r = await desk.dialogs.print({ printers: s.printers, doc: cur.title });
-    if (r) { desk.toast('Yazdırılıyor', `“${esc(cur.title)}” → ${esc(r.printer)}`, '🖨'); emit('web-print', { ...r, title: cur.title }); }
+    if (r) { desk.toast('Yazdırılıyor', `“${esc(cur.title)}” → ${esc(r.printer)}`, ic('print', 22)); emit('web-print', { ...r, title: cur.title }); }
   }
 
   // ---- Sesli Okuyucu ----
   function readAloud() {
     const ss = window.speechSynthesis;
-    if (!ss) { desk.toast('Sesli Okuyucu', 'Bu bilgisayarda konuşma desteği yok.', '🔊'); return; }
+    if (!ss) { desk.toast('Sesli Okuyucu', 'Bu bilgisayarda konuşma desteği yok.', extIc('reader', 22)); return; }
     if (ss.speaking) { ss.cancel(); emit('ext-read', { stop: true }); return; }
-    if (s.muted || !s.volume) { desk.toast('Ses kapalı', 'Sesli Okuyucu\'yu duymak için sesi açın.', '🔇'); return; }
+    if (s.muted || !s.volume) { desk.toast('Ses kapalı', 'Sesli Okuyucu\'yu duymak için sesi açın.', extIc('reader', 22)); return; }
     const sel = getSelection().toString().trim();
     const text = (sel || pageEl.innerText).slice(0, 700);
     const u = new SpeechSynthesisUtterance(text);
@@ -628,17 +642,17 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const mi = e.target.closest('[data-m]');
     if (mi && !e.target.closest('[data-z]')) { menuCmd(mi.dataset.m); return; }
     const z = e.target.closest('[data-z]');
-    if (z) { setZoom(zoom + +z.dataset.z); menu.querySelector('.br-mz').innerHTML = `<button type="button" data-z="-10">−</button> %${zoom} <button type="button" data-z="10">＋</button>`; return; }
+    if (z) { setZoom(zoom + +z.dataset.z); menu.querySelector('.br-mz').innerHTML = mzHtml(); return; }
     if (e.target.closest('.br-more')) { openMenu('more'); return; }
     if (e.target.closest('.br-ext')) { openMenu('ext'); return; }
     const xb = e.target.closest('[data-extbtn]');
     if (xb) {
       const k = xb.dataset.extbtn;
       if (k === 'reader') readAloud();
-      else if (k === 'adblock') desk.toast('Reklam Kalkanı', `Bu sayfada <b>${cur.blocked || 0}</b> reklam engellendi.`, '🛡', 3000);
+      else if (k === 'adblock') desk.toast('Reklam Kalkanı', `Bu sayfada <b>${cur.blocked || 0}</b> reklam engellendi.`, extIc('adblock', 22), 3000);
       else if (k === 'dark') setExt('dark', false);
       else if (k === 'note') openNote();
-      else desk.toast('Süper İndirici PRO', 'REKLAMSIZ SÜRÜM İÇİN ŞİMDİ ÖDEYİN!!! (İşte zararlı uzantı böyle davranır.)', '⚡', 5000);
+      else desk.toast('Süper İndirici PRO', 'REKLAMSIZ SÜRÜM İÇİN ŞİMDİ ÖDEYİN!!! (İşte zararlı uzantı böyle davranır.)', extIc('fake', 22), 5000);
       emit('ext-click', { id: k });
       return;
     }
@@ -654,7 +668,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       for (const k of Object.keys(s.ext)) if (!EXTS[k].verified) delete s.ext[k];
       s.popupBlock = false;
       desk.setSetting('toolbar', false);
-      desk.toast('Tarayıcı sıfırlandı', 'İstenmeyen araç çubuğu ve doğrulanmamış uzantılar kaldırıldı.', '↺', 4000);
+      desk.toast('Tarayıcı sıfırlandı', 'İstenmeyen araç çubuğu ve doğrulanmamış uzantılar kaldırıldı.', ic('reload', 22), 4000);
       emit('web-reset');
       refreshAll();
     }
@@ -672,10 +686,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     }
     const q = e.target.closest('[data-q]');
     if (q) { go(q.dataset.q, 'search'); return; }
+    const cq = e.target.closest('[data-clearq]');
+    if (cq) { const inp = cq.closest('form').querySelector('input'); inp.value = ''; cq.hidden = true; inp.focus(); return; }
+    if (e.target.closest('[data-soon]')) { e.preventDefault(); desk.toast('Alıştırma sayfası', 'Bu bağlantı bu alıştırmada açılmaz.', ic('info', 22), 3000); return; }
     const ad = e.target.closest('button[data-ad]');
     if (ad) {
       emit('web-ad', { url: 'button' });
-      desk.toast('Bu bir reklamdı!', 'Büyük, yanıp sönen “İNDİR” düğmeleri çoğu zaman reklamdır. Gerçek indirme bağlantısı genellikle programın adının yazdığı sade bağlantıdır.', '⚠', 8000);
+      desk.toast('Bu bir reklamdı!', 'Büyük, yanıp sönen “İNDİR” düğmeleri çoğu zaman reklamdır. Gerçek indirme bağlantısı genellikle programın adının yazdığı sade bağlantıdır.', ic('warn', 22), 8000);
       return;
     }
     const dl = e.target.closest('[data-download]');
@@ -707,7 +724,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (!f) return;
     e.preventDefault();
     const q = f.querySelector('input').value.trim();
-    if (q) navigate({ host: SEARCH_HOST, path: '/ara', q, search: true }, 'search');
+    if (q) navigate({ host: SEARCH_HOST, path: '/search', q, search: true }, 'search');
   });
   url.addEventListener('focus', () => setTimeout(() => url.select(), 0));
   url.addEventListener('keydown', (e) => {
@@ -732,10 +749,10 @@ export function browser({ desk, body, args, emit, setTitle }) {
   function renderBm() {
     const u = cur?.hist[cur.idx] ? fmtUrl(cur.hist[cur.idx]) : '';
     const on = bms.some((b) => b.url === u);
-    $('.br-star').textContent = on ? '★' : '☆';
+    $('.br-star').innerHTML = ic(on ? 'star' : 'starO', 18);
     $('.br-star').classList.toggle('on', on);
     $('.br-bm').hidden = !bms.length || s.bmBar === false;
-    $('.br-bm').innerHTML = bms.map((b, i) => `<button type="button" data-bm="${i}" title="${esc(b.url)}">⭐ ${esc(b.title.slice(0, 24))}</button>`).join('');
+    $('.br-bm').innerHTML = bms.map((b, i) => `<button type="button" data-bm="${i}" title="${esc(b.url)}">${favicon(b.title, b.url.split('/')[0])}<span>${esc(b.title.slice(0, 24))}</span></button>`).join('');
   }
   function toggleBmBar() {
     s.bmBar = s.bmBar === false;
@@ -747,7 +764,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (!loc) return;
     const u = fmtUrl(loc), i = bms.findIndex((b) => b.url === u);
     if (i >= 0) { bms.splice(i, 1); emit('web-bookmark', { url: u, removed: true }); }
-    else { bms.push({ url: u, title: cur.title }); emit('web-bookmark', { url: u, title: cur.title }); desk.toast('Sık kullanılanlara eklendi', esc(cur.title), '⭐', 3000); }
+    else { bms.push({ url: u, title: cur.title }); emit('web-bookmark', { url: u, title: cur.title }); desk.toast('Yer işareti eklendi', esc(cur.title), ic('star', 22), 3000); }
     renderBm();
   }
   $('.br-star').onclick = bookmark;
@@ -764,7 +781,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     pageEl.style.zoom = zoom / 100;
     const l = $('.br-zoomlbl');
     l.hidden = zoom === 100;
-    l.textContent = `🔍 %${zoom}`;
+    l.innerHTML = `${ic('search', 14)} %${zoom}`;
   }
   function setZoom(z) {
     zoom = Math.max(50, Math.min(200, z));
@@ -778,7 +795,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   function capture() {
     const s = desk.screen.getBoundingClientRect(), r = pageEl.getBoundingClientRect();
     desk.imageClip = desk.renderScreen({ x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height });
-    desk.toast('Web yakalama: sayfanın resmi panoya kopyalandı', `<img class="to-img" src="${desk.imageClip.toDataURL()}" alt="">Paint'te ya da e-postada <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, '✂', 8000);
+    desk.toast('Web yakalama: sayfanın resmi panoya kopyalandı', `<img class="to-img" src="${desk.imageClip.toDataURL()}" alt="">Paint'te ya da e-postada <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, ic('cut', 22), 8000);
     emit('web-capture');
   }
   $('.br-cap').onclick = capture;
@@ -799,6 +816,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     else if (e.code === 'KeyT') { e.preventDefault(); menuCmd('newtab'); }
     else if (e.code === 'KeyW') { e.preventDefault(); closeTab(cur.id); }
     else if (e.code === 'KeyN' && e.shiftKey) { e.preventDefault(); menuCmd('private'); }
+    else if (e.code === 'KeyN') { e.preventDefault(); menuCmd('newwin'); }
     else if (e.code === 'Delete' && e.shiftKey) { e.preventDefault(); clearData(); }
   });
 
@@ -811,8 +829,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (!img && !text) return;
     e.preventDefault();
     const items = img
-      ? [['save', '💾 Resmi farklı kaydet…'], ['copyimg', '⧉ Resmi kopyala'], ['newtab', '↗ Resmi yeni sekmede aç']]
-      : [['copy', '⧉ Kopyala <small>Ctrl+C</small>'], ['search', `🔍 Bulalım'da ara: “${esc(text.slice(0, 18))}”`]];
+      ? [['newtab', 'Resmi yeni sekmede aç'], ['save', 'Resmi farklı kaydet...'], ['copyimg', 'Resmi kopyala']]
+      : [['copy', 'Kopyala <small>Ctrl+C</small>'], ['search', `“${esc(text.slice(0, 18))}” için Google'da ara`]];
     ctx.innerHTML = items.map(([k, l]) => `<button type="button" data-ctx="${k}">${l}</button>`).join('');
     ctx.dataset.photo = img?.dataset.photo || '';
     ctx.dataset.text = text;
@@ -830,7 +848,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     hideCtx();
     const id = ctx.dataset.photo, p = PHOTOS[id];
     if (k === 'copy') { document.execCommand('copy'); return; }
-    if (k === 'search') { newTab({ host: SEARCH_HOST, path: '/ara', q: ctx.dataset.text, search: true }); return; }
+    if (k === 'search') { newTab({ host: SEARCH_HOST, path: '/search', q: ctx.dataset.text, search: true }); return; }
     if (k === 'newtab') { newTab(null); pageEl.innerHTML = `<div class="wp uf-one"><img src="${pictureURL(photoContent(id))}" alt=""></div>`; cur.title = p.name; renderTabs(); return; }
     if (k === 'copyimg') {
       const im = new Image();
@@ -842,7 +860,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       const r = await desk.dialogs.file({ mode: 'save', fs: desk.fs.dialogApi(), folder: 'downloads', name: p.name, ext: '.jpg', typeLabel: 'JPEG resmi (*.jpg)' });
       if (!r) return;
       desk.fs.write(r.folder, r.name, photoContent(id));
-      desk.toast('Resim kaydedildi', `${esc(r.name)} → ${esc(desk.fs.label(r.folder))}`, '💾', 4000);
+      desk.toast('Resim kaydedildi', `${esc(r.name)} → ${esc(desk.fs.label(r.folder))}`, ic('download', 22), 4000);
       emit('web-img-save', { name: r.name, folder: r.folder });
     }
   });

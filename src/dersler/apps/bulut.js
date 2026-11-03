@@ -1,13 +1,13 @@
 // Bulut Depo: dosyaları internetteki depoya yüklemek, paylaşım bağlantısı oluşturmak (bağlantıya sahip herkes /
 // yalnızca eklenen kişiler), bağlantıyı kopyalamak ya da e-postayla göndermek, paylaşımı kapatmak.
-// Bağlantı tarayıcıda açılınca bulut.bulalim.com sayfası dosyayı gösterir. Yedekleme de buraya yapılır.
+// Bağlantı tarayıcıda açılınca drive.google.com sayfası dosyayı gösterir. Yedekleme de buraya yapılır.
 import { esc, pictureURL, isImage, progress } from './util.js';
 import { fmtSize } from './explorer.js';
 import { fileIcon } from '../dialog.js';
 
 const QUOTA = 15e9;
 const cloud = (desk) => (desk.cloud ||= { files: [], seq: 1 });
-const linkOf = (f) => `bulut.bulalim.com/s/${f.key}`;
+const linkOf = (f) => `drive.google.com/s/${f.key}`;
 const KEYCH = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const newKey = () => Array.from({ length: 8 }, () => KEYCH[Math.floor(Math.random() * KEYCH.length)]).join('');
 
@@ -109,7 +109,7 @@ export function bulut({ desk, body, args, emit, dialogs }) {
 
 // Paylaşım bağlantısının açtığı sayfa
 export const BULUT_SITE = {
-  'bulut.bulalim.com': {
+  'drive.google.com': {
     name: 'Bulut Depo', secure: true,
     render(path, q, ctx) {
       const key = path.match(/^\/s\/(\w+)/)?.[1];
