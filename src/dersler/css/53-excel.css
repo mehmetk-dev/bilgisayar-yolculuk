@@ -1,0 +1,18 @@
+/* Hesap Tablosu: Giriş sekmesinin biçim düğmeleri (yazı tipi, kenarlık, dolgu, hizalama), formülde başvuru çerçevesi */
+.xl-rib select.xl-font, .xl-rib select.xl-fsize { height: 1.9em; font: inherit; font-size: 0.85em; border: 1px solid #c8c8c8; border-radius: 3px; background: #fff; padding: 0 0.2em; }
+.xl-rib select.xl-font { width: 8.5em; }
+.xl-rib select.xl-fsize { width: 3.6em; }
+.xl-split { display: inline-flex; align-items: center; border-radius: 4px; }
+.xl-split > button { position: relative; }
+.xl-rib .xl-split .xl-dd { padding: 0 0.25em !important; font-size: 0.75em; }
+.xl-swatch { position: absolute; left: 18%; right: 18%; bottom: 0.15em; height: 0.25em; border-radius: 1px; }
+.xl-pal { display: grid; grid-template-columns: repeat(5, 1.8em); gap: 0.3em; }
+.xl-pop .xl-pal button { width: 1.8em; height: 1.8em; padding: 0 !important; border: 1px solid #888 !important; border-radius: 3px !important; cursor: pointer; }
+.xl-pop .xl-pal button:hover { outline: 2px solid #1e7145; }
+.xl-mvlist { font: inherit; min-width: 12em; }
+/* Dolgu rengi: seçili / etkin hücrede de görünsün */
+.xl-grid td.xl-bg { background: var(--xl-bg); }
+.xl-grid td.xl-bg.sel { background: linear-gradient(#1e714530, #1e714530), var(--xl-bg); }
+.xl-grid td.xl-bg.act { background: var(--xl-bg); }
+/* Formül yazılırken formüldeki hücreler (gerçek Excel'deki renkli çerçeve gibi) */
+.xl-grid td.xl-ref { outline: 2px dashed #1565c0; outline-offset: -3px; background-color: #e8f0fe; }
