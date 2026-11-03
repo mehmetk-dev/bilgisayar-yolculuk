@@ -163,3 +163,6 @@
 .xs-no { display: inline-flex; align-items: center; gap: 0.2em; }
 .xs-card small { display: flex; align-items: center; gap: 0.2em; }
 .ti-ext { align-items: center; }
+.wp.xs .xs-card, .wp.xs .xs-card b { color: #202124; text-decoration: none; }
+.wp.xs .xs-card small { color: #5f6368; text-decoration: none; }
+.wp.xs .xs-head a { text-decoration: none; }

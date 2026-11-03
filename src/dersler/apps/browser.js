@@ -260,6 +260,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (open) p.hidden = false;
   }
 
+  // Açılır kutular (site bilgisi, izin sorusu, öneriler) adres çubuğunun hemen altında açılır
+  const placeUnder = (el, wide) => { const r = $('.br-addr').getBoundingClientRect(), b = body.getBoundingClientRect(); el.style.left = (r.left - b.left) + 'px'; el.style.top = (r.bottom - b.top - 2) + 'px'; if (wide) { el.style.right = 'auto'; el.style.width = r.width + 'px'; } };
   // ---- Site bilgileri: kilide tıklayınca adresin parçaları, bağlantı, sertifika ve site izinleri ----
   const PERMS = [['location', 'Konum', 'pin'], ['camera', 'Kamera', 'cam'], ['mic', 'Mikrofon', 'micp'], ['notify', 'Bildirimler', 'bell']];
   const perms = (host) => ((desk.sitePerms ||= {})[siteName(host)] ||= {});
@@ -293,6 +295,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       ${site.secure ? `<div class="bi-sec">Sertifika</div><p class="bi-cert">${ic('check', 14)} Geçerli · Kime verildi: <b>${esc(name)}</b></p>` : ''}
       <div class="bi-sec">Bu sitenin izinleri</div>${PERMS.map(([k, l, i]) => `<label class="bi-perm"><span>${ic(i, 16)} ${l}</span><select data-perm="${k}">${[['', 'Sor'], ['allow', 'İzin ver'], ['block', 'Engelle']].map(([v, n]) => `<option value="${v}" ${(p[k] || '') === v ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`).join('')}`;
     box.hidden = false;
+    placeUnder(box);
     emit('web-siteinfo', { host: loc.host, site: name, secure: !!site.secure });
   }
   function setPerm(host, k, v, via) {
@@ -305,6 +308,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const box = $('.br-perm');
     box.innerHTML = `<p><b>${esc(siteName(host))}</b> şunu yapmak istiyor:</p>${list.map((k) => `<p class="bp-what">${PERM_LABEL[k]}</p>`).join('')}<div><button type="button" data-pp="allow">İzin ver</button><button type="button" data-pp="block">Engelle</button></div>`;
     box.hidden = false;
+    placeUnder(box);
     emit('web-perm-ask', { host, perm: list.join(',') });
     box.onclick = (e) => {
       const v = e.target.closest('[data-pp]')?.dataset.pp;
@@ -321,6 +325,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const box = $('.br-perm');
     box.innerHTML = `<p><b>${esc(siteName(host))}</b> şunu yapmak istiyor:</p><p class="bp-what">Bildirim göster</p><div><button type="button" data-np="allow">İzin ver</button><button type="button" data-np="block">Engelle</button></div><button type="button" class="bi-x" data-np="close" title="Kapat" aria-label="Kapat">${ic('close', 16)}</button>`;
     box.hidden = false;
+    placeUnder(box);
     emit('web-perm-ask', { host, perm: 'notify' });
   }
   $('.br-lock').addEventListener('click', siteInfo);
@@ -353,6 +358,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     sugIdx = -1;
     sug.innerHTML = sugList.map((x, i) => `<div class="bs-row" data-sug="${i}"><span>${ic(x.icon, 16)}</span><b>${esc(x.text)}</b><small>${esc(x.sub)}</small></div>`).join('');
     sug.hidden = !sugList.length;
+    placeUnder(sug, true);
   }
   function pickSug(i) {
     const x = sugList[i];
