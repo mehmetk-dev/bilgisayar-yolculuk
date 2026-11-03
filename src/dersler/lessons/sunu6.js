@@ -31,9 +31,8 @@ const KERMES = {
 const an = (c) => info(c).slides[1]?.anims || [];
 const bul = (c, t, effect) => an(c).find((a) => a.t === t && (!effect || a.effect === effect));
 const durum = (test) => ({ check: (c) => !!P(c) && !!test(c), on: (ev, c) => ev.type.startsWith('ppt-') && !!test(c) });
-// Seçili nesne yokken giriş efekti eski yolla bütün maddelere uygulanır: öğrenciyi uyarır
+// Animasyon başka bir slayda verildiyse öğrenciyi uyarır
 const eskiYol = (ev, c) => {
-  if (ev.type === 'ppt-anim' && ev.effect !== 'none') c.note('Slaytta hiçbir nesne seçili değildi; efekt bütün maddelere uygulandı. Önce <b>Giriş → Yok</b>\'a basıp geri alın, sonra nesnenin üzerine tıklayıp efekti yeniden seçin.');
   if (ev.type === 'ppt-oanim' && ev.index !== 1) c.note('Bu animasyon başka bir slayda verildi. Soldan 2. slayda (Hayır Kermesi) tıklayıp orada yapın.');
 };
 
@@ -133,18 +132,33 @@ export const animasyonBolmesi = {
       done: 'Bölmede kırmızı bir ★ belirdi. Eski tarih başta ekranda olacak, 3. tıklamada silinip gidecek.',
     },
     {
+      title: 'Yeni tarih gelsin',
+      html: '<p>Yeşil <b>Yeni tarih: 25 Ekim</b> kutusuna tıklayın. <b>Giriş → Soldan gel</b>\'i seçin.</p>',
+      mouse: '🖱 Yeşil kutu → Giriş: Soldan gel',
+      check: (c) => !!bul(c, YENI, 'left'),
+      on: (ev, c) => { eskiYol(ev, c); return ev.type.startsWith('ppt-') && !!bul(c, YENI, 'left'); },
+      done: 'Yeni tarih soldan gelecek. Ama şimdilik ayrı bir tıklama bekliyor.',
+    },
+    {
       title: 'Yeni tarih aynı anda',
-      html: '<p>Yeşil <b>Yeni tarih: 25 Ekim</b> kutusuna tıklayın. <b>Giriş → Soldan gel</b>\'i seçin. Sonra <b>Başlangıç</b>\'ta <b>Öncekiyle</b>\'ye tıklayın: eski tarih giderken yenisi aynı anda gelsin.</p>',
-      mouse: '🖱 Yeşil kutu → Giriş: Soldan gel → Başlangıç: Öncekiyle',
-      hint: 'Önce efekti seçin; Başlangıç düğmeleri ancak bir animasyon seçiliyken çalışır.',
+      html: '<p>Yeşil kutu hâlâ seçili. <b>Başlangıç</b>\'ta <b>Öncekiyle</b>\'ye tıklayın: eski tarih giderken yenisi aynı anda gelsin.</p>',
+      mouse: '🖱 Başlangıç: Öncekiyle',
+      hint: 'Başlangıç düğmeleri ancak bir animasyon seçiliyken çalışır. Gri görünüyorsa önce yeşil kutuya tıklayın.',
       check: (c) => bul(c, YENI, 'left')?.start === 'with',
       on: (ev, c) => { eskiYol(ev, c); return ev.type.startsWith('ppt-') && bul(c, YENI, 'left')?.start === 'with'; },
       done: 'Yeni tarih, eski tarihle <b>aynı tıklamada</b> oynayacak: biri giderken öteki gelir.',
     },
     {
       title: 'Maddeler kendiliğinden',
-      html: `<p>Soldaki <b>maddelerin</b> üzerine tıklayın. <b>Giriş → Belirme</b>\'yi seçin. Sonra:</p>
-        <ul><li><b>Başlangıç: Öncekinden Sonra</b>,</li><li><b>Gecikme</b> kutusunun <b>+</b> düğmesine iki kez basarak <b>00,50</b>.</li></ul>`,
+      html: '<p>Soldaki <b>maddelerin</b> üzerine tıklayın. <b>Giriş → Belirme</b>\'yi seçin. Sonra <b>Başlangıç: Öncekinden Sonra</b>\'yı seçin.</p>',
+      mouse: '🖱 Maddeler → Giriş: Belirme → Başlangıç: Öncekinden Sonra',
+      check: (c) => bul(c, 'body', 'fade')?.start === 'after',
+      on: (ev, c) => { eskiYol(ev, c); return ev.type.startsWith('ppt-') && bul(c, 'body', 'fade')?.start === 'after'; },
+      done: 'Maddeler tarih değişince kendiliğinden gelecek.',
+    },
+    {
+      title: 'Gecikme',
+      html: '<p>Maddeler seçiliyken <b>Gecikme</b> kutusunun <b>+</b> düğmesine iki kez basarak <b>00,50</b> yapın.</p>',
       hint: 'Gecikme, animasyon başlamadan önceki kısa bekleyiştir. Maddeler tarih değiştikten yarım saniye sonra gelmeye başlar.',
       check: (c) => { const a = bul(c, 'body', 'fade'); return !!a && a.start === 'after' && a.delay === 0.5; },
       on: (ev, c) => { eskiYol(ev, c); const a = bul(c, 'body', 'fade'); return ev.type.startsWith('ppt-') && !!a && a.start === 'after' && a.delay === 0.5; },
@@ -161,7 +175,7 @@ export const animasyonBolmesi = {
     {
       title: 'Gösteride deneyin',
       html: `<p>${K('F5')} ile gösteriyi başlatın. Her tıklamada ne olduğuna bakın. 2. slaydın sonuna kadar gidin (maddelerin üçü de gelsin), sonra ${K('Esc')} ile çıkın.</p>
-        <p class="mut">Kaç kez tıkladığınızı sayın: bu slaytta 7 animasyon var.</p>`,
+        <p class="mut">Kaç kez tıkladığınızı sayın: bölmede 6 satır var, maddeler tek satır olsa da üçü ayrı ayrı gelir.</p>`,
       combo: ['F5'],
       hint: 'Tıklama yerine → (sağ ok) ya da boşluk tuşu da olur. Çıktıysanız F5 ile yeniden başlatın.',
       on: (ev, c) => {
@@ -170,7 +184,7 @@ export const animasyonBolmesi = {
         if (!c.s.clicks) { c.note(`Gösteri 2. slaydın sonuna gelmeden kapandı. ${K('F5')} ile yeniden başlatıp maddelerin üçü de gelene kadar ilerleyin.`); return false; }
         return true;
       },
-      done: (c) => `2. slaytta 7 animasyon oynadı ama siz yalnızca <b>${c.s.clicks || 3} kez</b> tıkladınız${(c.s.clicks || 3) > 3 ? ' (animasyon bitmeden tıklayınca o adım hemen tamamlanır)' : ''}. <b>Öncekiyle</b> ve <b>Öncekinden Sonra</b> tıklama beklemez; konuşurken elinizi rahatlatır.`,
+      done: (c) => `2. slaytta 8 hareket oynadı (maddeler üç ayrı hareket) ama siz yalnızca <b>${c.s.clicks || 3} kez</b> tıkladınız${(c.s.clicks || 3) > 3 ? ' (animasyon bitmeden tıklayınca o adım hemen tamamlanır)' : ''}. <b>Öncekiyle</b> ve <b>Öncekinden Sonra</b> tıklama beklemez; konuşurken elinizi rahatlatır.`,
     },
     rehberSoru({
       title: 'Hangi başlangıç?',

@@ -82,9 +82,10 @@ export const sunuAni = {
   id: 'sunu-ani', icon: '🎤', title: 'Sunum anı: konuşmacı notları ve kısayollar', minutes: 30, stage: 'desktop',
   desc: 'Slayt numarası, konuşmacı notları, B ile ekranı karartmak, slayda atlamak.',
   summary: [
-    ['＃ Slayt numarası', 'Ekle → Slayt numarası; her slaydın köşesine sıra numarası yazar'],
+    ['Ekle → Slayt Numarası', 'Üst Bilgi ve Alt Bilgi penceresi açılır: Slayt numarası işaretlenip Tümüne Uygula'],
     ['Konuşmacı notları', 'Slaydın altındaki kutuya yazılır; izleyiciye görünmez, siz bakarsınız'],
     ['F5', 'Baştan başlat; Shift + F5 geçerli slayttan'],
+    ['Sunucu Görünümü', 'İki ekranda: perdede slayt, sizin ekranınızda slayt, notlar ve saat'],
     ['B', 'Ekranı karartır (izleyici sizi dinlesin); yeniden B ya da başka tuş → geri gelir'],
     ['W', 'Ekranı beyaz yapar'],
     ['Rakam + Enter', 'O numaralı slayda atlar: 3 yazıp Enter → 3. slayt'],
@@ -103,11 +104,16 @@ export const sunuAni = {
     },
     {
       title: 'Slayt numarası',
-      html: '<p><b>Ekle</b> sekmesine tıklayın ve <b>＃ Slayt numarası</b> düğmesine basın. Slaytların sağ alt köşesine numara gelir (ilk slayda gelmez).</p>',
-      hint: 'Ekle sekmesi Giriş\'in sağında. Düğme Fotoğraf Albümü ve SmartArt\'ın yanında.',
+      html: `<ol class="steps"><li><b>Ekle</b> sekmesine tıklayın ve <b>＃ Slayt Numarası</b> düğmesine basın. <b>Üst Bilgi ve Alt Bilgi</b> penceresi açılır.</li>
+        <li>Pencerede <b>Slayt numarası</b> kutusunu ve <b>Başlık slaydında gösterme</b> kutusunu işaretleyin.</li><li><b>Tümüne Uygula</b>'ya basın.</li></ol>`,
+      hint: 'Ekle sekmesi Giriş\'in sağında. Slayt Numarası düğmesi Grafik\'in yanında. Kutucuğa ya da yanındaki yazıya tıklayınca işaret (✔) konur.',
       check: (c) => inf(c).slideNum,
-      on: (ev) => ev.type === 'ppt-slidenum' && ev.on,
-      done: 'Slaytlara numara geldi. Soru-cevap sırasında “5. slayda dönebilir miyiz?” denince hemen bulursunuz.',
+      on: (ev, c) => {
+        if (ev.type !== 'ppt-hf') return false;
+        if (!ev.num) { c.note('Slayt numarası işaretlenmeden uygulandı. Ekle → Slayt Numarası ile pencereyi yeniden açıp Slayt numarası\'nı işaretleyin.'); return false; }
+        return true;
+      },
+      done: (c) => `Slaytların sağ alt köşesine numara geldi${inf(c).hf?.hideTitle ? '; kapak slaydında yok' : ''}. Soru-cevap sırasında “5. slayda dönebilir miyiz?” denince hemen bulursunuz.`,
     },
     {
       title: 'Konuşmacı notu yazın',
@@ -154,7 +160,7 @@ export const sunuAni = {
       html: '<p>Slaytların altına <b>konuşmacı notları</b> yazdınız. Sunuyu izleyicilere perdeden gösterirken bu notları <b>onlar</b> görür mü?</p>',
       opts: ['Evet, slaydın altında görünür', 'Hayır; yalnızca siz görürsünüz (sunucu görünümünde ya da yazdırırsanız)', 'Notlar sunuyu bozar'], ok: 1,
       wrong: 'Notların amacı izleyiciden saklı kalmak. Siz nerede görürsünüz?',
-      why: 'Notlar perdede görünmez. İki ekranla (bilgisayar + projeksiyon) <b>Genişlet</b> modunda sunucu görünümü açılırsa notlar yalnızca sizin ekranınızda belirir. Ayrıca “Not sayfası” olarak yazdırabilirsiniz.',
+      why: 'Notlar perdede görünmez. İki ekranla (bilgisayar + projeksiyon) <b>Genişlet</b> seçilince <b>Sunucu Görünümü</b> açılır: perdede yalnızca slayt, sizin ekranınızda slayt, notlarınız ve saat görünür. Tek ekranda denemek için gerçek PowerPoint\'te Alt + F5. Ayrıca “Not Sayfaları” olarak yazdırabilirsiniz.',
     }),
     rehberSoru({
       title: 'Hangi tuş?',

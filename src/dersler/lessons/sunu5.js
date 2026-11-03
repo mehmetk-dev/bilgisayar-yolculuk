@@ -36,8 +36,8 @@ export const sunuProva = {
     [K('E') + ' (gösteride)', 'O slayttaki bütün çizimleri siler'],
     ['Esc → Sakla / At', 'Çıkarken çizimlerin slaytta kalıp kalmayacağı sorulur'],
     ['Slayt Gösterisi → ⏱ Zamanlamaları Prova Et', 'Her slaytta ne kadar konuştuğunuzu ölçer; Evet derseniz süreler kaydedilir'],
-    ['Yazdır → Dinleyici notları (3 slayt)', 'İzleyiciye dağıtılır: slaytların yanında not alma çizgileri'],
-    ['Yazdır → Not sayfaları', 'Sizin içindir: her slaydın altında konuşmacı notunuz'],
+    ['Yazdır → Dinleyici Notları: 3 Slayt', 'İzleyiciye dağıtılır: slaytların yanında not alma çizgileri'],
+    ['Yazdır → Not Sayfaları', 'Sizin içindir: her slaydın altında konuşmacı notunuz'],
   ],
   steps: [
     {
@@ -164,11 +164,12 @@ export const sunuProva = {
     },
     {
       title: 'Dinleyici notları yazdırın',
-      html: `<p>Dinleyicilere dağıtmak için çıktı alalım. ${K('Ctrl', 'P')}'ye basın (ya da <b>Dosya → Yazdır</b>). Düzen sorulunca <b>Dinleyici notları (3 slayt)</b>\'yı seçin; önizlemeye bakıp <b>Yazdır</b>\'a tıklayın.</p>`,
+      html: `<p>Dinleyicilere dağıtmak için çıktı alalım. ${K('Ctrl', 'P')}'ye basın (ya da <b>Dosya → Yazdır</b>). Düzen sorulunca <b>Dinleyici Notları: 3 Slayt</b>\'ı seçin; önizlemeye bakıp <b>Yazdır</b>\'a tıklayın.</p>
+        <p class="mut">Gerçek PowerPoint\'te Yazdır ekranında <b>Tam Sayfa Slaytlar</b> düğmesine basınca bu liste açılır.</p>`,
       hint: 'Ctrl + P çalışmazsa soldaki slaytlardan birine tıklayıp yeniden deneyin ya da sol üstteki Dosya → 🖨 Yazdır.',
       on: (ev, c) => {
         if (ev.type !== 'ppt-print') return false;
-        if (ev.kind !== 'handout') { c.note('Başka bir düzenle yazdırıldı. Yeniden Ctrl + P, bu kez “Dinleyici notları (3 slayt)”.'); return false; }
+        if (ev.kind !== 'handout') { c.note('Başka bir düzenle yazdırıldı. Yeniden Ctrl + P, bu kez “Dinleyici Notları: 3 Slayt”.'); return false; }
         return true;
       },
       done: 'Her kâğıtta 3 slayt ve yanında not alma çizgileri var: 5 slayt 2 kâğıda çıktı. Dinleyiciler konuşurken bu çizgilere not alır.',
@@ -176,9 +177,9 @@ export const sunuProva = {
     rehberSoru({
       title: 'Hangi çıktı?',
       html: '<p>Sunum sırasında <b>kendi elinizde</b> tutacağınız, her slaydın altında ne söyleyeceğinizin yazdığı kâğıtlar hangisi?</p>',
-      opts: ['Dinleyici notları (3 slayt)', 'Not sayfaları', 'Bir kâğıda 6 slayt'], ok: 1,
+      opts: ['Dinleyici Notları: 3 Slayt', 'Not Sayfaları', 'Dinleyici Notları: 6 Slayt'], ok: 1,
       wrong: 'Bu çıktıda sizin konuşmacı notlarınız yok; izleyiciye dağıtılır.',
-      why: 'Doğru: <b>Not sayfaları</b> her slaydı kendi konuşmacı notuyla basar; sizin içindir. <b>Dinleyici notları</b> ise izleyiciye dağıtılır.',
+      why: 'Doğru: <b>Not Sayfaları</b> her slaydı kendi konuşmacı notuyla basar; sizin içindir. <b>Dinleyici Notları</b> ise izleyiciye dağıtılır.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Sunuma hazırlığın bütün adımlarını yaptınız:</p>' },
   ],
@@ -229,7 +230,7 @@ export const sunuBaglanti = {
       title: 'Şekil ekleyin',
       html: `<p>Soldan <b>3. slayda</b> (Bilgisayar kursu) tıklayın. <b>Ekle → ⬟ Şekiller ▾ → ★ Yıldız</b>\'ı seçin. İmleç yıldızın içinde yanıp söner; yazın:</p>`,
       target: 'Ücretsiz!',
-      hint: 'Yıldız başka bir slayda geldiyse Şekil Biçimi → 🗑 Şekli sil ile silin, 3. slayda geçip yeniden ekleyin.',
+      hint: 'Yıldız başka bir slayda geldiyse Şekil Biçimi → 🗑 Şekli sil ile silin (gerçek PowerPoint\'te: şeklin kenarına tıklayıp Delete), 3. slayda geçip yeniden ekleyin.',
       ...durum((c) => { const o = sekil(c, 2, 'star'); return o && norm(o.text).includes('ücretsiz'); }),
       done: 'Yıldız slaydın sağına yerleşti, içinde yazınız var. Ok, konuşma balonu, dikdörtgen de aynı yolla eklenir.',
     },
@@ -257,19 +258,19 @@ export const sunuBaglanti = {
         if (ev.index !== 3) { c.note('Video başka bir slayda eklendi. Videoya tıklayıp Şekil Biçimi → 🗑 Şekli sil ile silin, 4. slayda geçip yeniden ekleyin.'); return false; }
         return true;
       },
-      done: 'Video slaydın ortasına yerleşti. Gösteride üzerine tıklayınca oynar. Video dosyası sunuyla birlikte taşınmalıdır; flash belleğe sunuyu atarken videoyu da atın.',
+      done: 'Video slaydın ortasına yerleşti. Gösteride üzerine tıklayınca oynar. Video, sunu dosyasının <b>içine girer</b>; dosya büyür. E-postayla gönderirken boyutuna dikkat edin.',
     },
     {
       title: 'Web adresine bağlantı',
-      html: `<p>Soldan <b>5. slayda</b> tıklayın. Son maddedeki <b>e-yaygin.meb.gov.tr</b> yazısına <b>üç kez hızlıca</b> tıklayarak satırı seçin. Sonra ${K('Ctrl', 'K')}'ye basın. Açılan <b>Köprü Ekle</b> penceresinde adres kendiliğinden yazılı; <b>Tamam</b>\'a tıklayın.</p>`,
+      html: `<p><b>Köprü</b>, tıklanınca başka bir yere götüren bağlantıdır. Soldan <b>5. slayda</b> tıklayın. Son maddedeki <b>e-yaygin.meb.gov.tr</b> yazısını seçin: yazının başına tıklayın, farenin sol tuşunu basılı tutup yazının sonuna kadar sürükleyin. Sonra ${K('Ctrl', 'K')}'ye basın. Açılan <b>Köprü Ekle</b> penceresinde <b>Adres</b> kutusunda adres yoksa <b>e-yaygin.meb.gov.tr</b> yazın; <b>Tamam</b>\'a tıklayın.</p>`,
       combo: ['Ctrl', 'KeyK'],
-      hint: 'Üç kez tıklama satırın tamamını seçer. Ctrl + K yerine Ekle → 🔗 Bağlantı da olur. Adres kutusu boşsa e-yaygin.meb.gov.tr yazın.',
+      hint: 'Sürükleyerek seçmek zor gelirse yazının üzerine üç kez hızlıca tıklayın. Ctrl + K yerine Ekle → 🔗 Bağlantı da olur.',
       ...durum((c) => (info(c).slides[4]?.links || []).some((l) => l.href.includes('e-yaygin'))),
       done: 'Yazının altı çizildi: artık bir <b>köprü</b> (bağlantı). Gösteride tıklanınca internet tarayıcısında o site açılır.',
     },
     {
       title: 'Başka slayda bağlantı',
-      html: `<p>Soldan <b>2. slayda</b> (Kurslarımız) tıklayın. <b>Bilgisayar</b> maddesine üç kez tıklayıp seçin, ${K('Ctrl', 'K')}'ye basın. Pencerenin solunda <b>📑 Bu Belgeye Yerleştir</b>\'i seçin, listeden <b>3. Bilgisayar kursu</b>\'na tıklayıp <b>Tamam</b>.</p>`,
+      html: `<p>Soldan <b>2. slayda</b> (Kurslarımız) tıklayın. <b>Bilgisayar</b> yazısını fareyle üzerinden geçerek seçin (ya da üç kez hızlıca tıklayın), ${K('Ctrl', 'K')}'ye basın. Pencerenin solunda <b>📑 Bu Belgeye Yerleştir</b>\'i seçin, listeden <b>3. Bilgisayar kursu</b>\'na tıklayıp <b>Tamam</b>.</p>`,
       hint: 'Listede önce Sonraki, Önceki, İlk ve Son slayt; altında slaytların adları var.',
       ...durum((c) => (info(c).slides[1]?.links || []).some((l) => norm(l.text) === 'bilgisayar' && l.href === 'slayt:3')),
       done: '“Bilgisayar” yazısı artık 3. slayda götüren bir köprü. Böylece dinleyici hangi kursu sorarsa doğrudan oraya atlarsınız.',
@@ -284,21 +285,31 @@ export const sunuBaglanti = {
         if (ev.link !== 'slayt:2') { c.note('Düğme başka bir yere gidiyor. Düğmeye tıklayın, Ekle → ⚡ Eylem ile pencereyi açıp Köprü listesinden “2. Kurslarımız”ı seçin.'); return false; }
         return true;
       },
-      done: 'Sol altta mavi bir ⌂ düğmesi belirdi. Gösteride tıklanınca Kurslarımız slaydına döner.',
+      done: 'Sol altta mavi bir ⌂ düğmesi belirdi. Gösteride tıklanınca Kurslarımız slaydına döner. Gerçek PowerPoint\'te düğmeyi seçtikten sonra slaytta bir yere tıklayıp sürükleyerek çizersiniz; Eylem Ayarları penceresi ondan sonra açılır.',
     },
     {
-      title: 'Üst Bilgi ve Alt Bilgi',
-      html: `<p><b>Ekle → ▤ Üst Bilgi ve Alt Bilgi</b>\'ye tıklayın. Pencerede:</p>
-        <ul><li><b>Tarih ve saat</b> kutusunu işaretleyin (Otomatik olarak güncelleştir kalsın),</li><li><b>Slayt numarası</b>\'nı işaretleyin,</li><li><b>Alt bilgi</b> kutusuna <b>Kültür Evi</b> yazın,</li><li><b>Başlık slaydında gösterme</b>\'yi işaretleyin,</li></ul>
-        <p>sonra <b>Tümüne Uygula</b>\'ya basın.</p>`,
+      title: 'Tarih ve slayt numarası',
+      html: `<p><b>Ekle → ▤ Üst Bilgi ve Alt Bilgi</b>\'ye tıklayın. Pencerede <b>Tarih ve saat</b> kutusunu (Otomatik olarak güncelleştir kalsın) ve <b>Slayt numarası</b>\'nı işaretleyin. <b>Tümüne Uygula</b>\'ya basın.</p>`,
       hint: 'Kutucuğa ya da yanındaki yazıya tıklayınca işaret (✔) konur. Bir şey eksik kaldıysa pencereyi yeniden açıp düzeltin.',
       on: (ev, c) => {
         if (ev.type !== 'ppt-hf') return false;
-        const eksik = [!ev.date && 'Tarih ve saat', !ev.num && 'Slayt numarası', !norm(ev.footer || '').includes('kültür evi') && 'Alt bilgi (Kültür Evi)', !ev.hideTitle && 'Başlık slaydında gösterme'].filter(Boolean);
+        const eksik = [!ev.date && 'Tarih ve saat', !ev.num && 'Slayt numarası'].filter(Boolean);
         if (eksik.length) { c.note(`Eksik kalan: <b>${eksik.join(', ')}</b>. Ekle → ▤ Üst Bilgi ve Alt Bilgi ile pencereyi yeniden açın.`); return false; }
         return true;
       },
-      done: 'Başlık slaydı dışındaki bütün slaytlarda solda tarih, ortada “Kültür Evi”, sağda slayt numarası var. Tarih her açılışta kendiliğinden günün tarihi olur.',
+      done: 'Slaytların solunda tarih, sağında numara var. Tarih her açılışta kendiliğinden günün tarihi olur.',
+    },
+    {
+      title: 'Alt bilgi',
+      html: `<p>Pencereyi yeniden açın (<b>Ekle → ▤ Üst Bilgi ve Alt Bilgi</b>). <b>Alt bilgi</b> altındaki kutuya <b>Kültür Evi</b> yazın, <b>Başlık slaydında gösterme</b>\'yi işaretleyin ve <b>Tümüne Uygula</b>\'ya basın.</p>`,
+      hint: 'Alt bilgi kutusuna yazınca üstündeki kutucuk kendiliğinden işaretlenir. Önceki işaretler duruyor; onlara dokunmayın.',
+      on: (ev, c) => {
+        if (ev.type !== 'ppt-hf') return false;
+        const eksik = [!norm(ev.footer || '').includes('kültür evi') && 'Alt bilgi (Kültür Evi)', !ev.hideTitle && 'Başlık slaydında gösterme', !ev.date && 'Tarih ve saat', !ev.num && 'Slayt numarası'].filter(Boolean);
+        if (eksik.length) { c.note(`Eksik kalan: <b>${eksik.join(', ')}</b>. Ekle → ▤ Üst Bilgi ve Alt Bilgi ile pencereyi yeniden açın.`); return false; }
+        return true;
+      },
+      done: 'Başlık slaydı dışındaki bütün slaytlarda solda tarih, ortada “Kültür Evi”, sağda slayt numarası var; kapak slaydında hiçbiri yok.',
     },
     {
       title: 'Bağlantıyı deneyin',

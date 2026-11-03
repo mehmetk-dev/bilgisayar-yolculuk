@@ -23,12 +23,14 @@ const TOPLANTI = {
 };
 
 export const asilSlayt = {
-  id: 'asil-slayt', icon: '🎨', title: 'Asıl Slayt; slayda tablo ve grafik', minutes: 30, stage: 'desktop',
+  id: 'asil-slayt', icon: '🎨', title: 'Asıl Slayt; slayda tablo ve grafik', minutes: 40, stage: 'desktop',
   desc: 'Logo, alt bilgi, renk ve yazı tipini bütün slaytlara tek seferde vermek; tablo ve grafik eklemek.',
   summary: [
     ['Görünüm → 🎨 Asıl Slayt', 'Bütün slaytların ortak görünüşü; burada yapılan her şey tüm slaytlara uygulanır'],
-    ['Asıl Slayt: Logo, Alt bilgi', 'Dernek logosu, kurum adı, tarih: her slaytta aynı yerde'],
-    ['Asıl Slayt: Başlık rengi, Yazı tipi', '20 slaydı tek tek değiştirmek yerine bir kez'],
+    ['Asıl Slayt\'ta Ekle → Resim', 'Logo: bir kez eklenir, her slaytta aynı yerde görünür'],
+    ['Asıl slayttaki Alt Bilgi kutusu', 'Kurum adı; görünmesi için Ekle → Üst Bilgi ve Alt Bilgi → Alt bilgi işaretlenir'],
+    ['Asıl başlığa tıkla → Giriş → Yazı Tipi Rengi', 'Bütün başlıkların rengi bir kerede'],
+    ['Asıl Slayt → Yazı Tipleri', 'Bütün slaytların yazı tipi bir kerede'],
     ['✖ Asıl Görünümü Kapat', 'Normal slaytlara döner; yazılar olduğu gibi kalır'],
     ['Ekle → ▦ Tablo', 'Sütun × satır seçilir; ilk satır başlıktır'],
     [K('Tab') + ' (tabloda)', 'Sonraki hücre; son hücrede yeni satır açar. ' + K('Shift', 'Tab') + ' geri gider'],
@@ -38,7 +40,7 @@ export const asilSlayt = {
   steps: [
     {
       title: 'Dernek toplantısı',
-      html: `<p>Emekliler derneğinin <b>Ekim toplantısı</b> için 5 slaytlık bir sunu hazır. Başkan şunu istedi: <i>“Her slaydın köşesinde dernek logosu, altında derneğin adı olsun; başlıklar lacivert olsun.”</i></p>
+      html: `<p>Emekliler derneğinin <b>Ekim toplantısı</b> için 5 slaytlık bir sunu hazır. Başkan şunu istedi: <i>“Her slaydın köşesinde dernek logosu, altında derneğin adı olsun; başlıklar koyu mavi olsun.”</i></p>
         <p>Beş slaydı tek tek değiştirmek yerine hepsini bir kerede değiştireceğiz. Bunun yeri <b>Asıl Slayt</b>: bütün slaytların ortak kalıbı.</p>`,
       setup: (c) => {
         desktopReady(c); c.d.closeAll();
@@ -51,39 +53,47 @@ export const asilSlayt = {
       html: '<p>Üstteki <b>Görünüm</b> sekmesine tıklayın ve <b>🎨 Asıl Slayt</b>\'ı seçin.</p>',
       mouse: '🖱 Görünüm → Asıl Slayt',
       on: (ev) => ev.type === 'ppt-view' && ev.view === 'master',
-      done: 'Solda kalıp slayt, sağda bütün slaytlarınız. Üstte yeni bir <b>Asıl Slayt</b> sekmesi açıldı.',
+      done: 'Solda büyük <b>asıl slayt</b> (kalıp), sağda bütün slaytlarınız. Üstte yeni bir <b>Asıl Slayt</b> sekmesi açıldı. Gerçek PowerPoint\'te asıl slayt, soldaki listenin <b>en üstündeki büyük slayttır</b>; altındakiler düzenlerdir.',
     },
     {
       title: 'Logo ekleyin',
-      html: '<p><b>🖼 Logo ekle</b>\'ye tıklayın; <b>Resimler</b> klasöründen <b>dernek logosu.png</b>\'yi seçip <b>Aç</b>\'a basın. Sağdaki küçük slaytlara bakın.</p>',
+      html: '<p>Asıl Slayt görünümü açıkken <b>Ekle</b> sekmesine tıklayın ve <b>🖼 Resim</b>\'e basın. <b>Resimler</b> klasöründen <b>dernek logosu.png</b>\'yi seçip <b>Aç</b>\'a tıklayın. Sağdaki küçük slaytlara bakın.</p><p class="mut">Gerçek PowerPoint\'te önce en üstteki büyük slayda tıklarsınız; Ekle → Resimler ile eklenen logoyu sürükleyip köşeye koyarsınız.</p>',
+      hint: 'Ekle sekmesi Giriş\'in sağında. Asıl Slayt görünümünden çıktıysanız Görünüm → Asıl Slayt ile geri dönün.',
       ...durum((c) => info(c).master.logo),
       done: 'Logo bir kez eklendi, beş slaydın da sağ üst köşesine yerleşti.',
     },
     {
       title: 'Alt bilgi yazın',
-      html: '<p><b>Alt bilgi</b> kutusuna derneğin adını yazın: <b>Çınar Emekliler Derneği</b></p>',
-      hint: 'Kutu, Logoyu kaldır düğmesinin sağında. İçine tıklayıp yazın; her harf hemen slaytlara geçer.',
+      html: '<p>Soldaki büyük asıl slaytın en altında <b>Alt Bilgi</b> yazan kesik çizgili kutu var. İçine tıklayıp derneğin adını yazın: <b>Çınar Emekliler Derneği</b></p>',
+      hint: 'Kutu, büyük asıl slaytın alt ortasında. Üzerinde soluk “Alt Bilgi” yazıyor.',
       ...durum((c) => norm(info(c).master.footer || '').includes('emekliler')),
-      done: 'Bütün slaytların altında aynı yazı. Tarih, sayfa adı ya da telefon numarası da buraya yazılır.',
+      done: 'Yazı asıl slayta yazıldı. Ama sağdaki küçük slaytlara bakın: <b>henüz görünmüyor!</b> Gerçek PowerPoint\'te de böyledir; birazdan görünür yapacağız.',
     },
     {
       title: 'Başlık rengi',
-      html: '<p><b>Başlık rengi</b>\'nden <b>lacivert</b> kareyi seçin (ilk kare).</p>',
-      hint: 'Fareyi renk karelerinin üzerinde bekletince adı çıkar.',
-      ...durum((c) => info(c).master.color === '#1f3864'),
-      done: 'Bütün başlıklar lacivert oldu; başlık slaydı dahil.',
+      html: '<p>Büyük asıl slayttaki <b>Asıl başlık stili</b> yazısına bir kez tıklayın. Sonra <b>Giriş</b> sekmesinde <b>Yazı Tipi Rengi ▾</b>\'ya tıklayıp <b>Koyu Mavi</b>\'yi seçin.</p>',
+      hint: 'Başlığa tıklayınca çevresinde çerçeve belirir. Fareyi renk karelerinin üzerinde bekletince adı çıkar; Koyu Mavi, Mavi\'nin sağında.',
+      ...durum((c) => info(c).master.color === '#002060'),
+      done: 'Bütün başlıklar koyu mavi oldu; başlık slaydı dahil.',
     },
     {
       title: 'Okunaklı yazı tipi',
-      html: '<p>Arka sıradakiler de rahat okusun: <b>Yazı tipi</b>\'nden <b>Verdana</b>\'yı seçin.</p>',
+      html: '<p>Arka sıradakiler de rahat okusun: üstteki <b>Asıl Slayt</b> sekmesine tıklayın, <b>Yazı Tipleri ▾</b>\'nden <b>Verdana</b>\'yı seçin.</p>',
       ...durum((c) => info(c).master.font === 'verdana'),
-      done: 'Verdana geniş ve açık bir yazı tipi; ekranda ve projeksiyonda kolay okunur.',
+      done: 'Verdana geniş ve açık bir yazı tipi; ekranda ve projeksiyonda kolay okunur. Gerçek PowerPoint\'te Yazı Tipleri listesinde başlık ve metin için ikişer yazı tipi birlikte durur.',
     },
     {
       title: 'Asıl görünümü kapatın',
-      html: '<p>Sağ uçtaki <b>✖ Asıl Görünümü Kapat</b>\'a basın. Soldaki slaytlara tek tek bakın.</p>',
+      html: '<p>Asıl Slayt sekmesinin sağ ucundaki <b>✖ Asıl Görünümü Kapat</b>\'a basın. Soldaki slaytlara tek tek bakın.</p>',
       on: (ev) => ev.type === 'ppt-view' && ev.from === 'master',
-      done: 'Beş slaydın beşi de değişti; içlerindeki yazılara hiç dokunulmadı.',
+      done: 'Beş slaydın beşinde de logo ve koyu mavi başlık var; içlerindeki yazılara hiç dokunulmadı. Ama alt bilgi hâlâ yok.',
+    },
+    {
+      title: 'Alt bilgiyi görünür yapın',
+      html: `<ol class="steps"><li><b>Ekle → ▤ Üst Bilgi ve Alt Bilgi</b>'ye tıklayın.</li><li>Pencerede <b>Alt bilgi</b> kutusunu işaretleyin (yazınız altında hazır duruyor).</li><li><b>Tümüne Uygula</b>'ya basın.</li></ol>`,
+      hint: 'Kutucuğa ya da yanındaki “Alt bilgi” yazısına tıklayınca işaret (✔) konur.',
+      ...durum((c) => !!info(c).hf?.foot && norm(info(c).master.footer || '').includes('emekliler')),
+      done: 'Şimdi bütün slaytların altında “Çınar Emekliler Derneği” yazıyor. Unutmayın: asıl slayta alt bilgi yazmak yetmez, <b>Üst Bilgi ve Alt Bilgi</b>\'de <b>Alt bilgi</b> işaretlenmelidir.',
     },
     rehberSoru({
       title: 'Hangi yol?',
@@ -95,7 +105,7 @@ export const asilSlayt = {
     {
       title: 'Tablo ekleyin',
       html: '<p>Soldan <b>3. slayda</b> (Gezi önerileri) tıklayın. <b>Ekle</b> sekmesinde <b>▦ Tablo</b>\'ya basıp <b>2 sütun × 3 satır</b>\'ı seçin.</p>',
-      hint: 'Tablo düğmesi Ekle sekmesinde, SmartArt\'ın sağında. Yanlış slayda eklerseniz aynı listeden “Tabloyu kaldır”.',
+      hint: 'Tablo düğmesi Ekle sekmesinde, SmartArt\'ın sağında. Yanlış slayda eklerseniz aynı listeden “Tabloyu kaldır” (gerçek PowerPoint\'te: tablonun kenarına tıklayıp Delete).',
       on: (ev, c) => {
         if (ev.type !== 'ppt-table' || !ev.ok) return false;
         if (ev.index !== 2) { c.note('Tablo başka bir slayda eklendi. Ekle → Tablo → Tabloyu kaldır ile silin; 3. slayda geçip yeniden ekleyin.'); return false; }
@@ -207,12 +217,12 @@ export const sunuParkur = {
     },
     {
       title: '5. Tema', html: '<p>Sunuya beyaz yerine renkli bir <b>tasarım teması</b> verin.</p>',
-      hint: 'Tasarım sekmesinden Okyanus, Bahar ya da Gece.',
+      hint: 'Tasarım sekmesinden beyazdan farklı herhangi bir tema.',
       ...durum((c) => info(c).theme && info(c).theme !== 'beyaz'),
     },
     {
       title: '6. Geçişler', html: '<p><b>Bütün slaytlara</b> bir geçiş efekti verin.</p>',
-      hint: 'Geçişler sekmesi seçili slayda uygulanır: soldan her slayda tek tek tıklayıp Solma gibi bir geçiş seçin. Geçişi olan slaytın numarasının yanında ★ görünür.',
+      hint: 'Geçişler sekmesinde bir geçiş (ör. Solma) seçin, sonra sağdaki Tümüne Uygula\'ya basın. Geçişi olan slaytın numarasının yanında ★ görünür.',
       ...durum((c) => { const s = info(c).slides; return s.length >= 4 && s.every((x) => x.trans !== 'none'); }),
     },
     {
@@ -231,7 +241,7 @@ export const sunuParkur = {
     },
     {
       title: '9. PDF', html: '<p>Bilgisayarı olmayan üyelere göndermek için sunuyu <b>PDF olarak</b> Belgeler\'e kaydedin.</p>',
-      hint: 'Dosya → 📕 PDF olarak kaydet… → Kaydet.',
+      hint: 'Dosya → 📤 Dışarı Aktar → 📕 PDF/XPS Belgesi Oluştur → Kaydet. (Ya da Dosya → Farklı Kaydet → Kayıt türü: PDF.)',
       on: (ev) => ev.type === 'ppt-pdf' && ev.slides >= 5,
     },
     { final: true, title: 'Parkur bitti! 🏁', html: '<p>Bir sunuyu baştan sona kendiniz tamamladınız.</p>' },
