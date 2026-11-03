@@ -433,3 +433,130 @@ export const hesap4 = {
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Mutlak başvuru, ETOPLA ve filtreyi öğrendiniz:</p>' },
   ],
 };
+
+// ---- 5. ders: yüzde hesabı ve mutlak başvuru. Toplam içindeki pay (=B2/$B$7), F4, Yüzde Stili, Ondalık Artır, indirim ve artış oranı ----
+const PAY = [['Kira', 6000], ['Market', 5200], ['Elektrik', 800], ['Doğalgaz', 1600], ['Diğer', 2400]];
+const PAY_TOP = 16000;
+const yuzdeData = () => {
+  const cells = { A1: 'Gider', B1: 'Tutar', C1: 'Payı', A7: 'Toplam',
+    A9: 'Ürün', B9: 'Fiyat', C9: 'İndirimli fiyat', E9: 'İndirim oranı', E10: '%15', A10: 'Ceket', B10: '2400', A11: 'Ayakkabı', B11: '1800', A12: 'Çanta', B12: '950',
+    A14: 'Eski kira', B14: '6000', A15: 'Yeni kira', B15: '7500', A16: 'Artış oranı' };
+  PAY.forEach(([a, b], i) => { cells['A' + (i + 2)] = a; cells['B' + (i + 2)] = String(b); });
+  const fmt = { E10: { f: 'pct' } };
+  for (const a of ['A1', 'B1', 'C1', 'A7', 'B7', 'A9', 'B9', 'C9', 'E9', 'A16']) fmt[a] = { b: true };
+  return { cells, fmt, colW: { 0: 10, 2: 11, 4: 11 } };
+};
+const yuzdeEv = ['xl-edit', 'xl-fill', 'xl-paste', 'xl-format', 'xl-style', 'xl-select'];
+const yz = (test) => (ev, c) => yuzdeEv.includes(ev.type) && !!test(c);
+const payOk = (c) => PAY.every(([, b], i) => near(cell(c, 'C' + (i + 2)).value, b / PAY_TOP));
+
+export const excelYuzde = {
+  id: 'excel-yuzde', icon: '💯', title: 'Yüzde hesabı ve mutlak başvuru ($)', minutes: 35, stage: 'desktop',
+  desc: 'Her giderin toplam içindeki payı, F4 ile $ koymak, Yüzde Stili, indirim ve artış oranı.',
+  summary: [
+    ['=B2/$B$7', 'Payı: bir kalemin toplamın ne kadarı olduğu (bölme)'],
+    ['Göreli başvuru (B2)', 'Formül aşağı kopyalanınca B3, B4… diye kayar'],
+    ['Mutlak başvuru ($B$7)', 'Formül nereye kopyalanırsa kopyalansın hep B7\'yi gösterir'],
+    ['F4', 'Formül yazarken adresi $\'lı yapar: B7 → $B$7 → B$7 → $B7 → B7'],
+    ['% (Yüzde Stili)', '0,375 → 38%: sayıyı yüzde olarak gösterir'],
+    ['Ondalık Artır', '38% → 37,5%: virgülden sonra bir basamak daha gösterir'],
+    ['=B10*(1-$E$10)', '%15 indirimli fiyat'],
+    ['=(B15-B14)/B14', 'Artış oranı: fark ÷ eski değer'],
+    ['Gerçek Excel\'de', 'Yüzde Stili ve Ondalık Artır: Giriş sekmesi → Sayı bölümü'],
+  ],
+  steps: [
+    {
+      title: 'Toplamın yüzde kaçı?',
+      html: `<p>Ay sonunda soru hep aynıdır: <b>Paramın ne kadarı kiraya gidiyor?</b> Bunun cevabı bir <b>yüzde</b>dir.</p>
+        <p>Bir kalemin payı = kalem ÷ toplam. Kira 6.000 ₺, bütün giderler 16.000 ₺ ise 6000 ÷ 16000 = 0,375; yani <b>%37,5</b>.</p>
+        <p>Bu derste payları formülle bulacağız, sonra indirimli fiyat ve zam oranı hesaplayacağız. Bu sırada Excel'in en önemli kurallarından birini öğreneceğiz: <b>mutlak başvuru</b>.</p>`,
+      setup: (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'sheet', { data: yuzdeData() }); },
+    },
+    {
+      title: 'Önce toplam',
+      html: `<p><b>B7</b> hücresine tıklayın, <b>∑ Otomatik Toplam</b>'a basın ve ${K('Enter')}.</p>`,
+      setup: (c) => sheetOpen(c, yuzdeData()),
+      hint: '∑ formülü önerir: =TOPLA(B2:B6). Enter\'a basınca onaylanır.',
+      on: yz((c) => near(cell(c, 'B7').value, PAY_TOP) && cell(c, 'B7').raw.startsWith('=')),
+      done: 'Bütün giderler 16.000 ₺.',
+    },
+    {
+      title: 'Kiranın payı',
+      html: `<p><b>C2</b> hücresine yazın ve ${K('Enter')}:</p><div class="target">=B2/B7</div>`,
+      hint: 'Bölü işareti (/) Shift + 7 ile yazılır.',
+      on: yz((c) => near(cell(c, 'C2').value, 0.375) && cell(c, 'C2').raw.startsWith('=')),
+      done: '<b>0,375</b> çıktı: kira, giderlerin 0,375\'i. Yüzde olarak göstermeyi birazdan yapacağız.',
+    },
+    {
+      title: 'Aşağı çekin',
+      html: '<p><b>C2</b>\'nin doldurma tutamacını (sağ alttaki küçük kare) <b>C6</b>\'ya kadar aşağı çekin. Ne oluyor?</p>',
+      mouse: '🖱 Doldurma tutamacı → C6',
+      on: yz((c) => /^#/.test(cell(c, 'C3').text) && cell(c, 'C6').raw !== ''),
+      done: 'Alttaki hücrelerde <b>#SAYI/0!</b> çıktı. C3\'e tıklayıp formül çubuğuna bakın: <b>=B3/B8</b>. B7 de kayıp B8 oldu; B8 boş, boş hücreye bölünemez.',
+    },
+    {
+      title: 'Mutlak başvuru: F4',
+      html: `<p>Formül aşağı kopyalanırken B2 → B3 olsun isteriz (buna <b>göreli başvuru</b> denir). Ama toplam hep <b>B7</b>'de kalmalı. Adresi sabitlemek için önüne <b>$</b> konur: <b>$B$7</b>. Buna <b>mutlak başvuru</b> denir.</p>
+        <ol class="steps"><li><b>C2</b>'ye tıklayın ve ${K('F2')}'ye basın: imleç formülün sonunda, B7'nin hemen arkasında durur.</li><li>${K('F4')}'e bir kez basın: B7 → <b>$B$7</b> olur.</li><li>${K('Enter')}.</li></ol>`,
+      hint: 'F4, klavyenin en üst sırasındaki F tuşlarından dördüncüsüdür. Dizüstü bilgisayarda Fn tuşuyla birlikte basmanız gerekebilir. $ işaretini elle de yazabilirsiniz: AltGr + 4.',
+      on: (ev, c) => {
+        if (ev.type === 'xl-f4') c.s.f4 = true;
+        return yz((x) => /\$B\$7/i.test(cell(x, 'C2').raw) && near(cell(x, 'C2').value, 0.375))(ev, c);
+      },
+      done: (c) => (c.s.f4 ? 'Formül artık <b>=B2/$B$7</b>. F4 en kolay yoldur; yazarken adresin hemen arkasındayken basmanız yeter.' : 'Formül artık <b>=B2/$B$7</b>. $ işaretlerini elle yazdınız; gerçek Excel\'de F4 daha kolaydır, bir sonraki formülde deneyin.'),
+    },
+    {
+      title: 'Yeniden aşağı çekin',
+      html: '<p><b>C2</b>\'nin doldurma tutamacını yine <b>C6</b>\'ya kadar çekin.</p>',
+      on: yz(payOk),
+      check: payOk,
+      done: 'Bütün paylar hesaplandı. Hata yok, çünkü her satırdaki formül aynı toplama ($B$7) bölüyor.',
+    },
+    rehberSoru({
+      title: 'C5\'te ne yazıyor?',
+      html: '<p><b>C5</b> hücresine tıklayıp formül çubuğuna bakın. Hangisi?</p>',
+      opts: ['=B5/B10', '=B2/$B$7', '=B5/$B$7'], ok: 2,
+      wrong: 'C5\'e tıklayın ve üstteki formül çubuğunu okuyun.',
+      why: 'Doğru. B2 → B5 oldu (göreli başvuru, kaydı); $B$7 hiç değişmedi (mutlak başvuru).',
+    }),
+    {
+      title: 'Yüzde Stili',
+      html: '<p><b>C2</b>\'den <b>C6</b>\'ya kadar seçin ve şeritteki <b>%</b> (Yüzde Stili) düğmesine basın.</p>',
+      hint: 'Gerçek Excel\'de: Giriş sekmesi → Sayı bölümündeki % düğmesi.',
+      on: yz((c) => ['C2', 'C3', 'C4', 'C5', 'C6'].every((a) => cell(c, a).f === 'pct')),
+      done: '0,375 artık <b>38%</b> görünüyor. Yüzde Stili sayıyı 100 ile çarpıp % işareti koyar; virgülden sonrasını yuvarlayarak gösterir.',
+    },
+    {
+      title: 'Ondalık Artır',
+      html: '<p>C2:C6 seçiliyken <b>Ondalık Artır</b> düğmesine (<b>,0→,00</b>) bir kez basın.</p>',
+      on: yz((c) => X(c).fmtOf('C2').dp === 1 && X(c).fmtOf('C6').dp === 1),
+      done: 'Kira <b>37,5%</b>, market 32,5%. Görünüş değişti; sayının kendisi hep 0,375 idi.',
+    },
+    {
+      title: '%15 indirim',
+      html: `<p>Mağazada her şeyde <b>%15 indirim</b> var; oran <b>E10</b>'da yazılı. İndirimli fiyat = fiyat × (1 − oran).</p>
+        <ol class="steps"><li><b>C10</b>'a <b>=B10*(1-E10</b> yazın.</li><li>${K('F4')}'e basın: E10 → <b>$E$10</b>.</li><li><b>)</b> yazıp ${K('Enter')}.</li><li>C10'un doldurma tutamacını <b>C12</b>'ye kadar çekin.</li></ol>`,
+      target: '=B10*(1-$E$10)',
+      hint: 'Kapanış parantezini F4\'ten sonra yazın; F4 imlecin hemen önündeki adresi değiştirir. Eksi (-) tuşu 0\'ın iki sağındadır.',
+      on: yz((c) => near(cell(c, 'C10').value, 2040) && near(cell(c, 'C11').value, 1530) && near(cell(c, 'C12').value, 807.5) && /\$E\$10/i.test(cell(c, 'C11').raw)),
+      done: 'Ceket 2.040 ₺, ayakkabı 1.530 ₺, çanta 807,50 ₺. İndirim %20 olursa yalnızca E10\'u değiştirmeniz yeter.',
+    },
+    {
+      title: 'Kiraya yüzde kaç zam geldi?',
+      html: `<p>Kira 6.000 ₺'den 7.500 ₺'ye çıktı. Artış oranı = (yeni − eski) ÷ eski.</p>
+        <ol class="steps"><li><b>B16</b>'ya <b>=(B15-B14)/B14</b> yazıp ${K('Enter')}.</li><li>B16'yı seçip <b>%</b> (Yüzde Stili) düğmesine basın.</li></ol>`,
+      target: '=(B15-B14)/B14',
+      hint: 'Parantez önemlidir: önce fark bulunur, sonra eski kiraya bölünür. Parantezsiz yazarsanız Excel önce bölmeyi yapar.',
+      on: yz((c) => near(cell(c, 'B16').value, 0.25) && cell(c, 'B16').f === 'pct'),
+      done: 'Artış <b>25%</b>: 1.500 ₺\'lik fark, eski kiranın dörtte biri.',
+    },
+    rehberSoru({
+      title: 'F4 ne yapar?',
+      html: '<p>Formül yazarken <b>B7</b> adresinin hemen arkasındayken <b>F4</b>\'e bir kez basarsanız ne olur?</p>',
+      opts: ['Formül onaylanır', 'B7, $B$7 olur: formül kopyalanınca B7 kaymaz', 'B7 silinir'], ok: 1,
+      wrong: 'Bu derste C2\'deki formülde ne olduğunu hatırlayın.',
+      why: 'Doğru. F4 adresi mutlak başvuruya çevirir. Bir daha basarsanız B$7, sonra $B7, sonra yeniden B7 olur.',
+    }),
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Yüzde hesabı ve mutlak başvuru:</p>' },
+  ],
+};
