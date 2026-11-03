@@ -52,7 +52,8 @@
 /* Renkler */
 .pnt-g-col .pnt-gb { gap: 0.5em; }
 .pnt-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15em; width: 3.9em; height: 4.3em; font-size: 0.82em; }
-.pnt-slot i { display: block; width: 2.6em; height: 2.6em; border-radius: 50%; border: 1px solid #0006; box-shadow: inset 0 0 0 1px #fff6; }
+.pnt-slot { white-space: nowrap; }
+.pnt-slot i { display: block; flex: none; width: 2.6em; height: 2.6em; border-radius: 50%; border: 1px solid #0006; box-shadow: inset 0 0 0 1px #fff6; }
 .pnt-pal { display: grid; grid-template-columns: repeat(10, 1.6em); grid-template-rows: repeat(2, 1.6em); gap: 0.2em; align-content: center; }
 .pnt-sw { width: 1.6em; height: 1.6em; border-radius: 50% !important; border: 1px solid #0005 !important; padding: 0 !important; }
 .pnt-sw:hover:not(:disabled) { outline: 2px solid var(--pnt-onb); outline-offset: 1px; }
@@ -97,7 +98,7 @@
 .pnt-mi.on .pnt-ml { font-weight: 700; }
 .pnt-ck { width: 1.1em; flex: none; display: inline-flex; color: #0a5dc2; }
 .pnt-ml { flex: 1; }
-.pnt-mi kbd { color: var(--pnt-mut); font: inherit; font-size: 0.85em; margin-left: 1.6em; }
+.pnt-mi kbd { border: 0; background: none; box-shadow: none; padding: 0; color: var(--pnt-mut); font: inherit; font-size: 0.85em; margin-left: 1.6em; }
 .pnt-mb2 .pnt-bs { width: 3.2em; height: 1.4em; flex: none; margin-left: 0.3em; }
 .pnt-pop-shapes, .pnt-pop-more { padding: 0.5em; }
 .pnt-pop-shapes .pnt-sg { grid-template-columns: repeat(7, 2.3em); grid-auto-rows: 2.3em; }
@@ -128,5 +129,4 @@
   .pnt-st { min-width: 0; }
   .pnt-zr { width: 4.5em; }
   .pnt-status { gap: 0.8em; }
-  .pnt-slot { width: 3.2em; }
 }
