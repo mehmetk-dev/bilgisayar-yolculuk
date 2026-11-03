@@ -146,3 +146,11 @@
 .dlg-title .dlg-x { display: inline-flex; align-items: center; justify-content: center; }
 .dlg-side .wi, .dlg-files .wi { font-size: 1.25em; vertical-align: -0.3em; margin-right: 0.2em; }
 .dlg-icon .wi { display: block; }
+
+/* Dar ekran (telefon): Başlat menüsünde 4 sütun */
+@media (max-width: 640px) {
+  .st-grid { grid-template-columns: repeat(4, 1fr); }
+  .st-rec { grid-template-columns: 1fr; }
+  .st-sbox, .st-foot, .st-home, .st-alist, .st-results { margin-left: 0; }
+  .st-sbox { margin-left: 1.2em; margin-right: 1.2em; }
+}

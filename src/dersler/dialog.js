@@ -1,7 +1,7 @@
 // Windows tarzı ortak pencereler: "Farklı kaydet" / "Aç", "Kaydetmek istiyor musunuz?" sorusu ve "Yazdır".
 // Pencereler verilen kabın (host) içinde açılır; kabın position değeri relative/absolute olmalıdır.
 
-import { iconFor, fileIconSvg, SYS_ICONS, WIN_BTN } from './apps/appicons.js';
+import { iconFor, fileIconSvg, SYS_ICONS, WIN_BTN, MONO } from './apps/appicons.js';
 
 const BAD_CHARS = /[\\/:*?"<>|]/;
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -52,7 +52,7 @@ export class Dialogs {
   file({ mode, fs, folder, name = '', ext = '.txt', typeLabel = 'Metin Belgeleri (*.txt)', accept, types }) {
     const title = mode === 'save' ? 'Farklı kaydet' : 'Aç';
     const inner = `
-      <div class="dlg-path"><button type="button" class="dlg-up" title="Bir üst klasör">⬆</button><span class="dlg-crumb"></span></div>
+      <div class="dlg-path"><button type="button" class="dlg-up" title="Bir üst klasör">${MONO.chevup}</button><span class="dlg-crumb"></span></div>
       <div class="dlg-body"><ul class="dlg-side"></ul><ul class="dlg-files"></ul></div>
       <label class="dlg-row"><span>Dosya adı:</span><input class="dlg-name" autocomplete="off" spellcheck="false" autofocus></label>
       <div class="dlg-row"><span>Kayıt türü:</span>${types && mode === 'save' ? `<select class="dlg-type">${types.map(([e, l]) => `<option value="${e}">${esc(l)}</option>`).join('')}</select>` : `<span class="dlg-type">${esc(typeLabel)}</span>`}</div>
