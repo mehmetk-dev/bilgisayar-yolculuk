@@ -98,7 +98,7 @@ export const kelimeIlan = {
       hint: 'Kutu sağa yaslanır, paragrafın yazısı solunda akar. Yer tutucu yazı seçiliyken yazmaya başlayın.',
       check: ucretsiz,
       on: (ev, c) => (ev.type === 'doc-input' || ev.type === 'doc-textbox') && ucretsiz(c),
-      done: 'Yazı kutunun çevresinden akıyor. Gerçek Word\'de kutunun kenarından tutup sürükleyerek yerini de değiştirebilirsiniz.',
+      done: 'Yazı kutunun çevresinden akıyor. Gerçek Word\'de galeride “Sağa yaslı kutu” diye bir seçenek yoktur: <b>Basit Metin Kutusu</b>\'nu ekleyip yanındaki <b>Düzen Seçenekleri</b>\'nden <b>Kare</b>\'yi seçin, sonra kutuyu kenarından tutup paragrafın sağına sürükleyin.',
     },
     {
       title: 'Kaydedin',
@@ -110,10 +110,10 @@ export const kelimeIlan = {
     {
       title: 'Baskı önizlemesi',
       html: `<p>Panoya asmadan önce kâğıtta nasıl duracağına bakın: ${K('Ctrl', 'P')}.</p>
-        <p>Önizlemeye baktıktan sonra pencereyi <b>İptal</b> ya da ✕ ile kapatabilirsiniz.</p>`,
+        <p>Önizlemeye baktıktan sonra sol üstteki <b>←</b> düğmesine ya da ${K('Esc')}\'ye basarak belgeye dönün.</p><p class="mut">Gerçek Word\'de yazdırma ekranı belgenin yerine açılır. Belgeye dönmek için sol üstteki <b>← (geri ok)</b> düğmesine ya da <b>Esc</b>\'ye basın. Sağ üstteki <b>✕</b>\'e basmayın: Word kapanır.</p>`,
       combo: ['Ctrl', 'KeyP'],
-      hint: 'Ctrl + P imleç sayfanın içindeyken çalışır. Olmazsa Dosya → Yazdır….',
-      on: (ev) => ev.type === 'doc-print-open',
+      hint: 'Ctrl + P imleç sayfanın içindeyken çalışır. Olmazsa Dosya → Yazdır…. Yazdır ekranının sol üstündeki yuvarlak ← düğmesi belgeye döndürür.',
+      on: (ev) => ev.type === 'doc-print-close',
       done: 'WordArt ve kutular kâğıtta da görünür. Tek sayfaya sığıyorsa yazdırmaya hazırdır.',
     },
     rehberSoru({

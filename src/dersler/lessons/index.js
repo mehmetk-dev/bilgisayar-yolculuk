@@ -39,7 +39,7 @@ import { wordResim, bicimBoyacisi } from './kelime3.js';
 import { kelimeDipnot } from './kelime4.js';
 import { kelimeIcindekiler } from './kelime5.js';
 import { kelimeBulten } from './kelime6.js';
-import { kelimeIzle } from './kelime7.js';
+import { kelimeIzle, kelimeParola } from './kelime7.js';
 import { kelimeIlan } from './kelime8.js';
 import { excelHata } from './excel4.js';
 import { excelYazi } from './excel5.js';
@@ -120,7 +120,7 @@ export const WEEKS = [
   { no: 7, title: 'Paint, Ekran Alıntısı ve Ayarlar', lessons: [paint, tebrikKarti, alinti, ayarlar, saatTarih, denetimMasasi, windowsAraclar, temalar, bluetooth, hesapPin, ayarlarParkur, odev7, test7] },
   { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, tarayicilarBilgi, adres, aramaMotorlari, sorunAra, medya, videoHz, ingilizce, tuzaklar, kurulum, yazici, bakimGuvenlik, virusAntivirus, internetKesildi, modemSifre, isletimSistemleri, oskurulum, internetParkur, odev8, test8] },
   { no: 9, title: 'E-posta', lessons: [eposta, gmailHotmail, epostaHesap, epostaIletme, eposta2, bulutPaylas, sifreSifirla, epostaTemizlik, epostaParkur, odev9, test9] },
-  { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, kelimeDipnot, kelimeIcindekiler, kelimeBulten, kelimeIzle, kelimeIlan, dilekceParkur, belgeGonder, officeYoksa, odev10, test10] },
+  { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, kelimeDipnot, kelimeIcindekiler, kelimeBulten, kelimeIzle, kelimeParola, kelimeIlan, dilekceParkur, belgeGonder, officeYoksa, odev10, test10] },
   { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, hucreInce, doldurDondur, hesap3, hesap4, duseyara, excelHata, excelYazi, excelTarih, altToplam, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
   { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, sunuBaglanti, animasyon, animasyonBolmesi, sunuAni, sunuProva, anıAlbumu, sunuParkur, odev12, test12] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukWeb, telefon, telefonTarama, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, fotoBoyut, harita, whatsappWeb, gunlukParkur, odev13, test13] },

@@ -19,12 +19,13 @@ export const kelimeDipnot = {
   id: 'kelime-dipnot', icon: '📑', title: 'Üst bilgi, alt bilgi, sayfa numarası, dipnot ve köprü', minutes: 35, stage: 'desktop',
   desc: 'Bir bilgi notuna dernek adını üst bilgi, hazırlayanı alt bilgi olarak eklemek; sayfa numarası, dipnot ve internet köprüsü.',
   summary: [
-    ['Ekle → Üst bilgi', 'Her sayfanın en üstünde tekrarlanan yazı (kurum adı, belgenin adı)'],
-    ['Ekle → Alt bilgi', 'Her sayfanın en altında tekrarlanan yazı (hazırlayan, tarih)'],
-    ['Ekle → Sayfa numarası', 'Alt bilgiye “Sayfa 1 / 2” ekler; sayfalar karışırsa sırası bulunur'],
+    ['Ekle → Üst Bilgi', 'Her sayfanın en üstünde tekrarlanan yazı (kurum adı, belgenin adı)'],
+    ['Ekle → Alt Bilgi', 'Her sayfanın en altında tekrarlanan yazı (hazırlayan, tarih)'],
+    ['Ekle → Sayfa Numarası → Sayfanın Altı', 'Düz Numara 1 / 2 / 3: numara solda, ortada ya da sağda'],
+    ['Üst Bilgi ve Alt Bilgiyi Kapat', 'Gerçek Word\'de belgeye dönmek için (ya da sayfanın ortasına çift tık)'],
     ['Başvurular → Dipnot Ekle', 'İmlecin yerine küçük bir sayı koyar; açıklama sayfanın altına yazılır. Kısayolu ' + K('Alt', 'Ctrl', 'F')],
     ['Dipnotu silmek', 'Metindeki küçük sayıyı silin: alttaki açıklama da kalkar, numaralar yeniden sıralanır'],
-    ['Köprü (bağlantı)', 'Yazıyı seçin → ' + K('Ctrl', 'K') + ' → adresi yazın → Ekle'],
+    ['Köprü (bağlantı)', 'Yazıyı seçin → ' + K('Ctrl', 'K') + ' → adresi yazın → Tamam'],
     ['Köprüyü açmak', K('Ctrl') + ' basılıyken köprüye tıklayın: tarayıcıda açılır'],
   ],
   setup: (c) => { put(c, 'docs', DOSYA, 'file', { html: HTML }); },
@@ -32,29 +33,29 @@ export const kelimeDipnot = {
     {
       title: 'Uzun belgelerin süsleri',
       html: `<p>Dernek için hazırlanmış bir <b>gezi bilgi notu</b> açık. Bugün ona resmî belgelerde sık görülen beş şeyi ekleyeceğiz:</p>
-        <ul class="big-list"><li>▔ <b>Üst bilgi</b> ve ▁ <b>alt bilgi</b>: her sayfada tekrarlanan yazı</li><li>#️ <b>Sayfa numarası</b></li><li>¹ <b>Dipnot</b>: bir sözcüğe eklenen küçük açıklama</li><li>🔗 <b>Köprü</b>: tıklayınca internet sayfası açan yazı</li></ul>`,
+        <ul class="big-list"><li>▔ <b>Üst Bilgi</b> ve ▁ <b>Alt Bilgi</b>: her sayfada tekrarlanan yazı</li><li>#️ <b>Sayfa numarası</b></li><li>¹ <b>Dipnot</b>: bir sözcüğe eklenen küçük açıklama</li><li>🔗 <b>Köprü</b>: tıklayınca internet sayfası açan yazı</li></ul>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'word', { node: c.d.fs.find('docs', DOSYA)?.id }); },
     },
     {
       title: 'Üst bilgi',
-      html: '<p>Üstten <b>Ekle</b> sekmesine geçin, <b>▔ Üst bilgi</b>\'ye basın. Sayfanın üstünde açılan alana <b>Çınar Emekliler Derneği</b> yazın.</p>',
-      mouse: '🖱 Ekle → Üst bilgi',
+      html: '<p>Üstten <b>Ekle</b> sekmesine geçin, <b>▔ Üst Bilgi</b>\'ye basın. Sayfanın üstünde açılan alana <b>Çınar Emekliler Derneği</b> yazın.</p><p class="mut">Gerçek Word\'de Üst Bilgi düğmesi bir liste açar; en üstteki <b>Boş</b>\'u seçin, sonra yazın.</p>',
+      mouse: '🖱 Ekle → Üst Bilgi',
       on: (ev) => ev.type === 'doc-hf' && ev.which === 'header' && norm(ev.text).includes('emekliler derneği'),
       done: 'Üst bilgi her sayfanın en üstünde aynen tekrarlanır. Belge kaç sayfa olursa olsun bir kez yazmanız yeter.',
     },
     {
       title: 'Alt bilgi',
-      html: '<p>Aynı sekmede <b>▁ Alt bilgi</b>\'ye basın; sayfanın altında açılan alana <b>Hazırlayan:</b> yazıp yanına adınızı soyadınızı yazın.</p>',
-      mouse: '🖱 Ekle → Alt bilgi',
+      html: '<p>Aynı sekmede <b>▁ Alt Bilgi</b>\'ye basın; sayfanın altında açılan alana <b>Hazırlayan:</b> yazıp yanına adınızı soyadınızı yazın.</p><p class="mut">Gerçek Word\'de üst bilgiden ya da alt bilgiden çıkmak için şeritteki <b>Üst Bilgi ve Alt Bilgiyi Kapat</b>\'a basın ya da sayfanın ortasına çift tıklayın.</p>',
+      mouse: '🖱 Ekle → Alt Bilgi',
       hint: 'Alt bilgi alanı sayfanın en altındadır; görmüyorsanız fare tekerleğiyle aşağı inin.',
       on: (ev) => ev.type === 'doc-hf' && ev.which === 'footer' && /hazırlayan:?\s*\S{2,}/i.test(ev.text),
       done: 'Alt bilgi de her sayfanın en altında görünür.',
     },
     {
       title: 'Sayfa numarası',
-      html: '<p><b>Ekle</b> sekmesinde <b>#️ Sayfa numarası</b>\'na basın. Alt bilginin sağında “Sayfa 1 / 1” çıkar.</p>',
+      html: '<p><b>Ekle</b> sekmesinde <b>#️ Sayfa Numarası ▾</b>\'na basın. <b>Sayfanın Altı</b> başlığı altından <b>Düz Numara 2 (ortada)</b>\'yi seçin. Alt bilginin ortasında <b>1</b> çıkar.</p><p class="mut">Gerçek Word\'de de Sayfa Numarası ▾ → <b>Sayfanın Altı</b> → <b>Düz Numara 2</b> yolu izlenir; numara alt bilgiye girer.</p>',
       on: (ev) => ev.type === 'doc-pagenum' && ev.on,
-      done: 'Numara kendiliğinden artar; belgeye sayfa eklenince “1 / 2, 2 / 2” olur.',
+      done: 'Numara kendiliğinden artar: ikinci sayfanın altında 2, üçüncüsünde 3 yazar.',
     },
     {
       title: 'İmleci yerleştirin',
@@ -89,7 +90,7 @@ export const kelimeDipnot = {
     },
     {
       title: 'Köprü ekleyin',
-      html: `<p>${K('Ctrl', 'K')} tuşlarına basın (ya da Ekle → <b>🔗 Bağlantı</b>). Adres kutusuna <b>${BELEDIYE_HOST}</b> yazıp <b>Ekle</b>'ye basın.</p>`,
+      html: `<p>${K('Ctrl', 'K')} tuşlarına basın (ya da Ekle → <b>🔗 Bağlantı</b>). Adres kutusuna <b>${BELEDIYE_HOST}</b> yazıp <b>Tamam</b>'a basın.</p>`,
       combo: ['Ctrl', 'KeyK'],
       on: (ev, c) => {
         if (ev.type !== 'doc-link') return false;
