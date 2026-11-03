@@ -101,7 +101,7 @@ export const excelTarih = {
       title: 'Yaş hesabı: ETARİHLİ',
       html: `<p><b>C2</b> hücresine <b>=ETARİHLİ(B2;$H$2;"Y")</b> yazıp ${K('Enter')}.</p>
         <p>Doğum tarihi (B2) ile bugün (H2) arasında kaç <b>tam yıl</b> var? <b>"Y"</b> yıl demektir.</p>
-        <p class="mut">$H$2'deki <b>$</b> işaretleri, formülü aşağı çekince H2'nin kaymamasını sağlar (sabit başvuru).</p>`,
+        <p class="mut">$H$2'deki <b>$</b> işaretleri, formülü aşağı çekince H2'nin kaymamasını sağlar (mutlak başvuru). H2 yazdıktan sonra ${K('F4')}'e basarsanız $ işaretleri kendiliğinden gelir.</p>`,
       target: '=ETARİHLİ(B2;$H$2;"Y")',
       hint: 'İşlev adı E ile başlar: ETARİHLİ. Gerçek Excel bu işlevi yazarken önermez; harf harf doğru yazın. $ işareti AltGr + 4.',
       on: (ev, c) => ev.type === 'xl-edit' && ev.addr === 'C2' && has(c, 'C2', /ETAR[İI]HL[İI]\(B2;\$H\$2;"Y"\)/) && cell(c, 'C2').value === yas('12.04.1958'),
@@ -118,6 +118,7 @@ export const excelTarih = {
     {
       title: 'Tarihe gün eklemek',
       html: `<p>Kurs ücreti kayıttan <b>30 gün</b> sonra ödenecek. <b>E2</b> hücresine <b>=D2+30</b> yazıp ${K('Enter')}.</p>`,
+      hint: 'Artı işareti (+) Shift + 4 ile yazılır.',
       target: '=D2+30',
       on: (ev, c) => ev.type === 'xl-edit' && ev.addr === 'E2' && has(c, 'E2', /^=D2\+30$/) && cell(c, 'E2').text === '02.10.2026',
       done: '02.09.2026 + 30 gün = <b>02.10.2026</b>. Ay sonunu, şubatın 28 gününü Excel kendisi hesaplar. Randevu ve vade hesabında çok işe yarar.',

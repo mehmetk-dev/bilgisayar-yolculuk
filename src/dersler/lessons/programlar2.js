@@ -205,8 +205,8 @@ export const ozgecmis = {
     ['Dosya → Yeni… → şablon', 'Başlıkları ve düzeni hazır belge'],
     ['[Köşeli parantez]', 'Kendi bilginizle değiştirilecek yer'],
     ['Ctrl + F → [', 'Doldurmayı unuttuğunuz yerleri bulur'],
-    ['Ekle → Üst bilgi / Alt bilgi', 'Her sayfanın üstünde / altında tekrarlanan yazı'],
-    ['Ekle → Sayfa numarası', 'Alt bilgiye “Sayfa 1 / 2” ekler'],
+    ['Ekle → Üst Bilgi / Alt Bilgi', 'Her sayfanın üstünde / altında tekrarlanan yazı'],
+    ['Ekle → Sayfa Numarası → Sayfanın Altı', 'Düz Numara 2: ortada, Düz Numara 3: sağda'],
     ['Dosya → PDF olarak kaydet', 'İş başvurusunda gönderilecek biçim'],
   ],
   steps: [
@@ -225,7 +225,7 @@ export const ozgecmis = {
     {
       title: 'Adınızı yazın',
       html: '<p><b>[Adınız Soyadınız]</b> yazısını fareyle sürükleyerek seçin (köşeli parantezler dahil) ve adınızı soyadınızı yazın. Seçili yazının üstüne yazınca eskisi silinir.</p>',
-      hint: 'Satıra üç kez hızlıca tıklamak da bütün satırı seçer.',
+      hint: 'Satıra üç kez hızlıca tıklamak da bütün paragrafı (tek satırlık başlıkta bütün satırı) seçer.',
       on: (ev, c) => docEv.includes(ev.type) && !winfo(c).blocks[0]?.text.includes('[') && winfo(c).blocks[0]?.text.length >= 3,
       done: 'Başlık sizin adınız oldu; biçimi (büyük, ince yazı) bozulmadı.',
     },
@@ -237,7 +237,8 @@ export const ozgecmis = {
     },
     {
       title: 'Unutulan yerleri bulun',
-      html: `<p>Uzun belgede doldurmayı unuttuğunuz yer kalmasın: ${K('Ctrl', 'F')} ile <b>Bul</b>'u açın ve <b>[</b> yazıp <b>Sonrakini bul</b>'a basın. Bulunan her yeri doldurun ya da o satırı silin. Hiç <b>[</b> kalmayınca adım tamamlanır.</p>`,
+      html: `<p>Uzun belgede doldurmayı unuttuğunuz yer kalmasın: ${K('Ctrl', 'F')} ile <b>Bul</b>'u açın ve <b>[</b> yazıp <b>Sonrakini bul</b>'a basın. Bulunan her yeri doldurun ya da o satırı silin. Hiç <b>[</b> kalmayınca adım tamamlanır.</p>
+        <p class="mut">Gerçek Word\'de ${K('Ctrl', 'F')} solda <b>Gezinti</b> bölmesini açar: bulunanlar sarı boyanır, aşağı okla (▼) sıradakine geçersiniz.</p>`,
       combo: ['Ctrl', 'KeyF'],
       hint: '[ işareti klavyede AltGr + 8 ile yazılır. İstemediğiniz bir satırı (ör. hiç iş deneyiminiz yoksa) seçip Delete ile silebilirsiniz.',
       on: (ev, c) => docEv.includes(ev.type) && !winfo(c).text.includes('['),
@@ -245,17 +246,17 @@ export const ozgecmis = {
     },
     {
       title: 'Üst bilgi',
-      html: '<p><b>Ekle</b> sekmesinde <b>▔ Üst bilgi</b>\'ye basın ve sayfanın üstünde açılan alana <b>Özgeçmiş</b> yazın.</p>',
+      html: '<p><b>Ekle</b> sekmesinde <b>▔ Üst Bilgi</b>\'ye basın ve sayfanın üstünde açılan alana <b>Özgeçmiş</b> yazın.</p><p class="mut">Gerçek Word\'de üst bilgiden ya da alt bilgiden çıkmak için şeritteki <b>Üst Bilgi ve Alt Bilgiyi Kapat</b>\'a basın ya da sayfanın ortasına çift tıklayın.</p>',
       mouse: '🖱 Ekle → Üst bilgi',
       on: (ev) => ev.type === 'doc-hf' && ev.which === 'header' && norm(ev.text).includes('özgeçmiş'),
       done: 'Üst bilgi her sayfanın en üstünde tekrarlanır. Resmî yazılarda kurum adı, raporlarda belgenin adı yazılır.',
     },
     {
       title: 'Sayfa numarası',
-      html: '<p><b>Ekle</b> sekmesinde <b>#️ Sayfa numarası</b>\'na basın. Sonra belgeyi en alta kaydırıp sayfanın en altına bakın.</p>',
-      mouse: '🖱 Ekle → Sayfa numarası',
+      html: '<p><b>Ekle</b> sekmesinde <b>#️ Sayfa Numarası ▾</b>\'na basın, <b>Sayfanın Altı</b> başlığı altından <b>Düz Numara 3 (sağda)</b>\'ü seçin. Sonra belgeyi en alta kaydırıp sayfanın en altına bakın.</p>',
+      mouse: '🖱 Ekle → Sayfa Numarası → Düz Numara 3',
       on: (ev) => ev.type === 'doc-pagenum' && ev.on,
-      done: 'Alt bilgide “Sayfa 1 / 1” çıktı. Belge yazdırılıp sayfalar karışırsa sırası bulunur.',
+      done: 'Alt bilginin sağında sayfanın numarası (1) çıktı. Belge yazdırılıp sayfalar karışırsa sırası bulunur. Gerçek Word\'de de <b>Sayfanın Altı</b> listesi açılır; Düz Numara 1 solda, 2 ortada, 3 sağdadır.',
     },
     {
       title: 'PDF olarak kaydedin',
@@ -311,7 +312,7 @@ export const butce = {
       title: 'Pasta grafiği',
       html: '<p>Giderlerin adlarını ve tutarlarını seçin: <b>A9</b>\'dan <b>B15</b>\'e kadar fareyle sürükleyin. Sonra şeritteki <b>🥧 Pasta grafiği</b>\'ne tıklayın.</p>',
       mouse: '🖱 A9:B15 seç → Pasta grafiği',
-      hint: 'A9 (Kira) hücresine basılı tutup B15 (ilaç tutarı) hücresine kadar sürükleyin. Toplam satırını seçmeyin.',
+      hint: 'A9 (Kira) hücresine basılı tutup B15 (ilaç tutarı) hücresine kadar sürükleyin. Toplam satırını seçmeyin. Gerçek Excel\'de: Ekle sekmesi → Grafikler → Pasta.',
       on: (ev) => ev.type === 'xl-chart' && ev.kind === 'pie' && /A9/.test(ev.range) && /B15/.test(ev.range),
       check: (c) => X(c)?.chart?.type === 'pie',
       done: 'Pastanın her dilimi bir gider; ne kadar büyükse bütçeden o kadar pay alıyor.',

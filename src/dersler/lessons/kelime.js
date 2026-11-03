@@ -22,7 +22,8 @@ export const dilekce = {
     ['Ctrl + E', 'Ortala'],
     ['Ctrl + J', 'İki yana yasla (dilekçe ve mektup paragrafları)'],
     ['Ctrl + R / Ctrl + L', 'Sağa / sola hizala'],
-    ['Yazı boyutu', 'Giriş sekmesindeki sayı kutusu (11 → 14)'],
+    ['Yazı boyutu', 'Giriş sekmesindeki sayı kutusu (ör. 11 → 14)'],
+    ['Yazı tipi kutusu', 'Calibri yazan kutu: Times New Roman (resmî yazılar), Arial…'],
     ['Üç tık', 'Bütün paragrafı seçer'],
     ['Ctrl + S / Ctrl + P', 'Kaydet / yazdır'],
   ],
@@ -54,7 +55,7 @@ export const dilekce = {
     },
     {
       title: 'Kalın yapın',
-      html: `<ol class="steps"><li>Başlığın üzerine <b>hızlıca üç kez</b> tıklayın: bütün satır seçilir (mavi olur).</li><li>Şeritteki <b>K</b> düğmesine tıklayın ya da ${K('Ctrl', 'B')}.</li></ol>`,
+      html: `<ol class="steps"><li>Başlığın üzerine <b>hızlıca üç kez</b> tıklayın: bütün paragraf seçilir (başlıkta bu, bütün satırdır; mavi olur).</li><li>Şeritteki <b>K</b> düğmesine tıklayın ya da ${K('Ctrl', 'B')}.</li></ol>`,
       combo: ['Ctrl', 'KeyB'],
       hint: 'Seçmek için fareyle satırın başından sonuna sürükleyebilirsiniz de. Seçili yazı mavi görünür.',
       check: (c) => block(c, 'muhtarlığına')?.bold,
@@ -72,7 +73,7 @@ export const dilekce = {
     },
     {
       title: 'Yazıyı büyütün',
-      html: '<p>Başlık seçiliyken şeritteki <b>11</b> yazan kutuya tıklayın ve <b>14</b>\'ü seçin.</p>',
+      html: '<p>Başlık seçiliyken şeritteki <b>yazı boyutu</b> kutusuna (içinde <b>11</b> yazar; Word\'ün yeni sürümlerinde <b>12</b>) tıklayın ve <b>14</b>\'ü seçin.</p>',
       mouse: '🖱 Boyut kutusu → 14',
       hint: 'Seçim kaybolduysa başlığa yeniden üç kez tıklayın.',
       check: (c) => block(c, 'muhtarlığına')?.size >= 14,
@@ -86,6 +87,17 @@ export const dilekce = {
       hint: 'Satır sonuna gelince Enter\'a basmayın: kelime işlemci yazıyı kendisi alt satıra geçirir. Enter yalnızca yeni paragraf için.',
       on: when((c) => block(c, 'aydınlatma') && block(c, 'arz ederim')),
       done: 'Kelime işlemcide satır sonunda Enter\'a basmak gerekmez; yazı kendiliğinden alt satıra akar.',
+    },
+    {
+      title: 'Yazı tipini değiştirin',
+      html: `<p>Resmî yazılarda yazı tipi olarak çoğu zaman <b>Times New Roman</b> istenir.</p>
+        <ol class="steps"><li>${K('Ctrl', 'A')} ile bütün belgeyi seçin.</li><li><b>Giriş</b> sekmesinde yazı tipinin adının yazdığı kutuya (<b>Calibri</b> yazar) tıklayın.</li><li>Listeden <b>Times New Roman</b>\'ı seçin.</li></ol>
+        <p class="mut">Gerçek Word\'de bu kutuda <b>Calibri</b> ya da <b>Aptos</b> yazar. Liste uzundur; kutuya <b>Times</b> yazmaya başlarsanız Word adı tamamlar, sonra ${K('Enter')}.</p>`,
+      combo: ['Ctrl', 'KeyA'],
+      hint: 'Yazı tipi kutusu, boyut kutusunun hemen solundadır. Seçim kalktıysa yeniden Ctrl + A.',
+      check: (c) => { const b = info(c).blocks.filter((x) => x.text); return b.length >= 3 && b.every((x) => x.fonts?.length && x.fonts.every((n) => n === 'Times New Roman')); },
+      on: when((c) => { const b = info(c).blocks.filter((x) => x.text); return b.length >= 3 && b.every((x) => x.fonts?.length && x.fonts.every((n) => n === 'Times New Roman')); }),
+      done: 'Bütün yazı Times New Roman oldu. Yazı tipi bütün belgede aynı olmalı; başlık için yalnızca boyut ve kalınlık değişir.',
     },
     {
       title: 'Kırmızı ve mavi çizgiler',
@@ -103,8 +115,9 @@ export const dilekce = {
     },
     {
       title: 'Tarih ve ad',
-      html: `<ol class="steps"><li>Son satırın sonuna tıklayın, ${K('Enter')} ile yeni satıra geçin.</li><li>Üstteki <b>Ekle</b> sekmesine, sonra <b>📅 Tarih</b>\'e tıklayın.</li><li>${K('Enter')}, sonra adınızı ve soyadınızı yazın.</li>
-        <li>Tarih ve ad satırlarını fareyle sürükleyerek seçin, <b>Giriş</b> sekmesinden <b>Sağa hizala</b> (${K('Ctrl', 'R')}).</li></ol>`,
+      html: `<ol class="steps"><li>Son satırın sonuna tıklayın, ${K('Enter')} ile yeni satıra geçin.</li><li>Üstteki <b>Ekle</b> sekmesine, sonra <b>📅 Tarih ve Saat</b>\'e tıklayın.</li><li>${K('Enter')}, sonra adınızı ve soyadınızı yazın.</li>
+        <li>Tarih ve ad satırlarını fareyle sürükleyerek seçin, <b>Giriş</b> sekmesinden <b>Sağa hizala</b> (${K('Ctrl', 'R')}).</li></ol>
+        <p class="mut">Gerçek Word\'de <b>Tarih ve Saat</b> bir pencere açar: listeden bir yazılış (ör. 03.11.2026) seçip <b>Tamam</b>\'a basarsınız. Burada tarih hemen yazılır.</p>`,
       hint: 'Dilekçede tarih ve imza sağ alta yazılır. İki satırı birlikte seçmek için tarihin başından adınızın sonuna kadar sürükleyin.',
       on: when((c) => {
         const b = info(c).blocks.filter((x) => x.text);
@@ -133,7 +146,7 @@ export const dilekce = {
     },
     {
       title: 'Yazdırın',
-      html: `<p>${K('Ctrl', 'P')}\'ye basın (ya da <b>Dosya → Yazdır</b>), yazıcıyı seçip <b>🖨 Yazdır</b>\'a tıklayın.</p>`,
+      html: `<p>${K('Ctrl', 'P')}\'ye basın (ya da <b>Dosya → Yazdır</b>), yazıcıyı seçip <b>🖨 Yazdır</b>\'a tıklayın.</p><p class="mut">Gerçek Word\'de yazdırma ekranı belgenin yerine açılır. Belgeye dönmek için sol üstteki <b>← (geri ok)</b> düğmesine ya da <b>Esc</b>\'ye basın. Sağ üstteki <b>✕</b>\'e basmayın: Word kapanır.</p>`,
       combo: ['Ctrl', 'KeyP'],
       on: (ev) => ev.type === 'doc-print',
       done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse kâğıda çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir.',
@@ -180,7 +193,7 @@ export const belgeEkle = {
     },
     {
       title: 'Tablo ekleyin',
-      html: '<p>Başlığın altındaki boş satıra tıklayın. Üstte <b>Ekle</b> sekmesine, sonra <b>▦ Tablo</b>\'ya tıklayın. <b>3 satır, 3 sütun</b> bırakıp <b>Ekle</b> deyin.</p>',
+      html: '<p>Başlığın altındaki boş satıra tıklayın. Üstte <b>Ekle</b> sekmesine, sonra <b>▦ Tablo</b>\'ya tıklayın. <b>Sütun sayısı 3, Satır sayısı 3</b> bırakıp <b>Tamam</b> deyin.</p><p class="mut">Gerçek Word\'de küçük kareler açılır: fareyle <b>3 sütun × 3 satırın</b> üzerine gelip tıklayın. Karelerin altındaki <b>Tablo Ekle…</b> da aynı sayıları soran bir pencere açar.</p>',
       mouse: '🖱 Ekle → Tablo',
       check: (c) => info(c).tables > 0,
       on: when((c) => info(c).tables > 0),
@@ -205,7 +218,7 @@ export const belgeEkle = {
     },
     {
       title: 'Resim ekleyin',
-      html: '<p>Belgenin sonuna tıklayın. <b>Ekle → 🖼 Resim</b>\'e tıklayın, <b>Resimler</b> klasöründen <b>çiçekler.jpg</b>\'yi seçip <b>Aç</b>\'a basın.</p>',
+      html: '<p>Belgenin sonuna tıklayın. <b>Ekle → 🖼 Resim</b>\'e tıklayın, <b>Resimler</b> klasöründen <b>çiçekler.jpg</b>\'yi seçip <b>Aç</b>\'a basın.</p><p class="mut">Gerçek Word\'de: <b>Ekle → Resimler → Bu Cihaz…</b> (Word 2016\'da <b>Ekle → Resimler</b>).</p>',
       mouse: '🖱 Ekle → Resim',
       check: (c) => info(c).images > 0,
       on: when((c) => info(c).images > 0),
@@ -240,7 +253,7 @@ export const belgeDuzen = {
     ['F7 / Gözden Geçir → Yazım denetimi', 'Kırmızı dalgalı çizgili kelimeleri düzeltir'],
     ['Sağ tık (kırmızı çizgili kelime)', 'Doğru yazılışını önerir'],
     ['🖍 Vurgu rengi', 'Fosforlu kalem gibi yazının arkasını boyar'],
-    ['Düzen → Kenar boşlukları', 'Sayfanın kenarındaki boşluk (Dar: sayfaya daha çok yazı sığar)'],
+    ['Düzen → Kenar Boşlukları', 'Sayfanın kenarındaki boşluk (Dar: sayfaya daha çok yazı sığar)'],
     ['Gözden Geçir → Sözcük sayısı', 'Sayfa, sözcük ve karakter sayısı'],
   ],
   steps: [
@@ -272,21 +285,30 @@ export const belgeDuzen = {
       done: 'Belgenin iskeleti belli oldu: okuyan kişi başlıklara bakarak istediği bölümü hemen bulur. Uzun belgelerde içindekiler tablosu da bu başlıklardan yapılır.',
     },
     {
-      title: 'Bul ve değiştir',
-      html: `<p>Bahçe günü artık <b>fidan şenliği</b> olacak. Belgedeki bütün “bahçe günü” yazılarını tek tek düzeltmek yerine:</p>
-        <ol class="steps"><li>${K('Ctrl', 'H')}\'ye basın (ya da Giriş → <b>⇄ Değiştir</b>).</li><li><b>Aranan</b>: bahçe günü &nbsp; <b>Yeni</b>: fidan şenliği</li><li><b>Tümünü değiştir</b>\'e tıklayın.</li><li>Sonra kutunun köşesindeki <b>✕</b>\'e basarak <b>Bul ve Değiştir</b> kutusunu kapatın.</li></ol>`,
+      title: 'Bul ve Değiştir\'i açın',
+      html: `<p>Bahçe günü artık <b>fidan şenliği</b> olacak. Belgedeki bütün “bahçe günü” yazılarını tek tek düzeltmeyeceğiz.</p>
+        <p>${K('Ctrl', 'H')}\'ye basın (ya da Giriş → <b>⇄ Değiştir</b>). <b>Bul ve Değiştir</b> kutusu açılır.</p>`,
       combo: ['Ctrl', 'KeyH'],
+      check: (c) => !!c.d.find('word')?.el.querySelector('.wd-find.repl:not([hidden])'),
+      on: (ev) => ev.type === 'doc-find-open' && ev.replace,
+      done: 'Kutuda iki yer var: <b>Aranan</b> (bulunacak yazı) ve <b>Yeni değer</b> (yerine gelecek yazı).',
+    },
+    {
+      title: 'Tümünü değiştirin',
+      html: `<ol class="steps"><li><b>Aranan</b> kutusuna: bahçe günü</li><li><b>Yeni değer</b> kutusuna: fidan şenliği</li><li><b>Tümünü değiştir</b>\'e tıklayın.</li></ol>`,
+      hint: 'Kutu kapandıysa yeniden Ctrl + H. Bir kutudan ötekine fareyle tıklayarak geçin.',
       on: (ev, c) => {
         if (ev.type !== 'doc-replace') return false;
         if (!ev.all) { c.note('Tek tek değiştirmek de olur; ama <b>Tümünü değiştir</b> hepsini birden yapar.'); return !/bahçe günü/i.test(info(c).text); }
         return /bahçe/i.test(ev.from) && ev.count >= 3;
       },
-      done: 'Kelime işlemci hepsini bir anda değiştirdi; cümle başındaki büyük harf de korundu. Kaç değişiklik yapıldığını sağ alttaki bildirim söyledi. Bul ve Değiştir kutusunu ✕ ile kapatın; sonraki adımda yazının üstünü örtmesin.',
+      done: 'Kelime işlemci hepsini bir anda değiştirdi; cümle başındaki büyük harf de korundu. Şimdi kutunun köşesindeki <b>✕</b> ile <b>Bul ve Değiştir</b>\'i kapatın; sonraki adımda yazının üstünü örtmesin.',
     },
     {
       title: 'Yazım denetimi',
       html: `<p>Üstteki <b>Gözden Geçir</b> sekmesine geçin ve <b>ABC✓ Yazım denetimi</b>\'ne tıklayın (ya da ${K('F7')}). Hatalı kelimelerin altı kırmızı dalgalı çizilir.</p>
-        <p>Açılan kutuda her hatanın yanındaki <b>Değiştir</b>\'e ya da <b>Tümünü değiştir</b>\'e tıklayın.</p>`,
+        <p>Açılan kutuda her hatanın yanındaki <b>Değiştir</b>\'e ya da <b>Tümünü değiştir</b>\'e tıklayın.</p>
+        <p class="mut">Gerçek Word\'de düğmenin adı <b>Yazım ve Dilbilgisi</b>\'dir. Microsoft 365\'te ${K('F7')}\'ye basınca sağda bir bölme (Düzenleyici) açılır; önerilen doğru yazılışa tıklayarak düzeltirsiniz.</p>`,
       mouse: '🖱 Gözden Geçir → Yazım denetimi → Değiştir',
       hint: 'Kırmızı çizgili kelimeye sağ tıklayınca da doğrusu önerilir.',
       on: whenDoc((c) => { const t = norm(info(c).text); return !/herkez|malesef|şuan/.test(t) && t.includes('herkes') && t.includes('maalesef'); }),
@@ -302,8 +324,8 @@ export const belgeDuzen = {
     },
     {
       title: 'Kenar boşlukları',
-      html: '<p><b>Düzen</b> sekmesine geçin ve <b>Kenar boşlukları: Dar</b>\'a tıklayın. Sayfanın kenarlarına bakın.</p>',
-      mouse: '🖱 Düzen → Dar',
+      html: '<p><b>Düzen</b> sekmesine geçin. <b>▤ Kenar Boşlukları ▾</b> düğmesine tıklayın ve listeden <b>Dar</b>\'ı seçin. Sayfanın kenarlarına bakın.</p>',
+      mouse: '🖱 Düzen → Kenar Boşlukları → Dar',
       on: (ev) => ev.type === 'doc-layout' && ev.margin === 'dar',
       done: 'Kenarlar daraldı, satırlar uzadı: sayfaya daha çok yazı sığar. İlan ve bültenlerde Dar, resmî yazılarda Normal kullanılır. Aynı yerden sayfayı <b>Yatay</b> da çevirebilirsiniz.',
     },

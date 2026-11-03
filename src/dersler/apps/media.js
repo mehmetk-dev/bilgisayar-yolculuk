@@ -25,7 +25,8 @@ function imageViewer(appName) {
       const a = e.target.closest('[data-a]')?.dataset.a;
       if (!a) return;
       if (a === 'print') {
-        desk.dialogs.print({ printers: desk.settings.printers, doc: node.name }).then((r) => { if (r) { desk.toast('Yazdırılıyor', `“${esc(node.name)}” → ${esc(r.printer)}`, '🖨'); emit('photo-print', { ...r, name: node.name }); } });
+        emit('photo-print-open', { name: node.name });
+        desk.dialogs.print({ printers: desk.settings.printers, doc: node.name, photo: pictureURL(node.content) }).then((r) => { if (r) { desk.toast('Yazdırılıyor', `“${esc(node.name)}” → ${esc(r.printer)}<br>${r.paper === 'k10' ? '10 × 15 fotoğraf kâğıdı' : `A4, ${r.perPage} fotoğraf`} · ${r.copies} kopya`, '🖨'); emit('photo-print', { ...r, name: node.name }); } });
         return;
       }
       const l = list(), i = l.findIndex((n) => n.id === node.id);

@@ -12,7 +12,8 @@ const when = (test) => (ev, c) => evs.includes(ev.type) && !!test(c);
 const FIYAT = () => ({
   cells: { A1: 'Ürün', B1: 'Adet', C1: 'Birim fiyat', D1: 'Tutar', A2: 'Domates', B2: '3', A3: 'Peynir', B3: '1', A4: 'Ekmek', B4: '2', A5: 'Süt', B5: '2',
     D2: '=B2*C2', D3: '=B3*C3', D4: '=B4*C4', D5: '=B5*C5', A7: 'TOPLAM', D7: '=TOPLA(D2:D5)',
-    F1: 'Ürün', G1: 'Fiyat', F2: 'Domates', G2: '45', F3: 'Peynir', G3: '120,5', F4: 'Zeytin', G4: '85', F5: 'Ekmek', G5: '15', F6: 'Süt', G6: '38,75', F7: 'Yumurta', G7: '6' },
+    // Domates en altta: $ unutulup formül aşağı çekilince Peynir'in satırı tablonun dışında kalır ve #YOK çıkar
+    F1: 'Ürün', G1: 'Fiyat', F2: 'Peynir', G2: '120,5', F3: 'Zeytin', G3: '85', F4: 'Ekmek', G4: '15', F5: 'Süt', G5: '38,75', F6: 'Yumurta', G6: '6', F7: 'Domates', G7: '45' },
   fmt: { A1: { b: true }, B1: { b: true }, C1: { b: true }, D1: { b: true }, F1: { b: true }, G1: { b: true }, A7: { b: true }, D7: { b: true, f: 'tl' }, G2: { f: 'tl' }, G3: { f: 'tl' }, G4: { f: 'tl' }, G5: { f: 'tl' }, G6: { f: 'tl' }, G7: { f: 'tl' },
     C2: { f: 'tl' }, C3: { f: 'tl' }, C4: { f: 'tl' }, C5: { f: 'tl' }, D2: { f: 'tl' }, D3: { f: 'tl' }, D4: { f: 'tl' }, D5: { f: 'tl' } },
   colW: { 0: 10, 2: 11, 3: 10, 5: 10, 6: 10 },
@@ -44,13 +45,14 @@ export const duseyara = {
       title: 'Formülün parçaları',
       html: `<p>Yazacağımız formül:</p><div class="target" style="font-size:1.05em;overflow-wrap:break-word">=DÜŞEYARA(A2;<wbr>$F$2:$G$7;<wbr>2;<wbr>YANLIŞ)</div>
         <ol class="steps"><li><b>A2</b>: aranan (ürünün adı)</li><li><b>$F$2:$G$7</b>: aranacak tablo (fiyat listesi)</li><li><b>2</b>: tablonun <b>2. sütunundaki</b> değer getirilsin (Fiyat)</li><li><b>YANLIŞ</b>: tam eşleşme (yaklaşık değil)</li></ol>
-        <p class="mut">Parçaları noktalı virgülle ayırın. $ işaretlerini ve tablo adresini yazmakla uğraşmayın: fareyle seçerek de yazabilirsiniz.</p>`,
+        <p class="mut">Parçaları noktalı virgülle ayırın. Tablo adresini yazmak yerine fareyle de seçebilirsiniz: <b>F2</b>'den <b>G7</b>'ye sürükleyin. Ama fareyle seçince <b>$</b> işaretleri gelmez; seçtikten hemen sonra <b>F4</b>'e basın: F2:G7 → $F$2:$G$7 olur.</p>`,
       manual: 'Anladım ✔',
     },
     {
       title: 'İlk formülü yazın',
-      html: '<p><b>C2</b> hücresine tıklayın ve yukarıdaki formülü <b>aynen</b> yazıp Enter\'a basın. Domates\'in fiyatı (45 ₺) gelmeli.</p>',
-      hint: 'Formül = ile başlar. Noktalı virgül: Shift + virgül tuşu. Tırnak koymayın; YANLIŞ yazı değil, bir sözcüktür. 45\'i elle yazmayın: formülü yazın.',
+      html: `<p><b>C2</b> hücresine tıklayın ve formülü yazıp Enter'a basın. Domates'in fiyatı (45 ₺) gelmeli.</p><div class="target">=DÜŞEYARA(A2;$F$2:$G$7;2;YANLIŞ)</div>
+        <p class="mut">Fareyle denemek isterseniz: <b>=DÜŞEYARA(A2;</b> yazın → F2'den G7'ye sürükleyin → ${K('F4')} → <b>;2;YANLIŞ)</b> yazın → ${K('Enter')}.</p>`,
+      hint: 'Formül = ile başlar. Noktalı virgül: Shift + virgül tuşu. YANLIŞ\'ı tırnak içine almayın; o Excel\'in kendi sözcüğüdür. 45\'i elle yazmayın: formülü yazın.',
       on: (ev, c) => {
         if (!evs.includes(ev.type) || !near(cell(c, 'C2').value, 45)) return false;
         if (!isVlookup(cell(c, 'C2').raw)) { c.warn('45 yazmışsınız ama bu bir formül değil. C2\'ye =DÜŞEYARA(A2;$F$2:$G$7;2;YANLIŞ) formülünü yazın.'); return false; }
@@ -63,7 +65,7 @@ export const duseyara = {
       html: '<p>C2\'yi seçip sağ alt köşesindeki <b>doldurma tutamacını</b> <b>C5</b>\'e kadar aşağı çekin. Diğer ürünlerin fiyatları da gelmeli.</p>',
       hint: 'C2 hücresini seçin; köşedeki küçük kareyi C5\'e kadar sürükleyin. Aşağıda #YOK çıkarsa formüldeki $ işaretlerini unutmuşsunuzdur: C2\'ye formülü $F$2:$G$7 diye, $ işaretleriyle yazıp yeniden kopyalayın.',
       on: when((c) => isVlookup(cell(c, 'C3').raw) && near(cell(c, 'C3').value, 120.5) && near(cell(c, 'C4').value, 15) && near(cell(c, 'C5').value, 38.75)),
-      done: 'Dört ürünün fiyatı geldi. Bu mümkün oldu çünkü tablo adresi <b>$ ile sabitlenmişti</b>: aşağı kopyalanırken kaymadı, yalnızca A2 → A3, A4… oldu.',
+      done: 'Dört ürünün fiyatı geldi. Bu mümkün oldu çünkü tablo adresi <b>$ ile sabitlenmişti</b> (mutlak başvuru): aşağı kopyalanırken kaymadı, yalnızca A2 → A3, A4… oldu. $ olmasaydı C3\'teki formül F3:G8\'de arardı; Peynir F2\'de kaldığı için #YOK çıkardı.',
     },
     rehberSoru({
       title: 'Toplam kaç lira?',
@@ -74,9 +76,9 @@ export const duseyara = {
     }),
     {
       title: 'Fiyat zamlandı',
-      html: '<p>Domates 50 ₺ oldu. <b>G2</b> hücresini (fiyat listesindeki Domates) <b>50</b> yapın. Toplamın kendiliğinden nasıl değiştiğine bakın.</p>',
-      hint: 'Fiyat listesi sağ taraftaki F–G sütunlarında. G2\'ye tıklayıp 50 yazın.',
-      on: when((c) => near(cell(c, 'G2').value, 50) && near(cell(c, 'C2').value, 50) && near(cell(c, 'D7').value, 378)),
+      html: '<p>Domates 50 ₺ oldu. <b>G7</b> hücresini (fiyat listesindeki Domates) <b>50</b> yapın. Toplamın kendiliğinden nasıl değiştiğine bakın.</p>',
+      hint: 'Fiyat listesi sağ taraftaki F–G sütunlarında; Domates en altta. G7\'ye tıklayıp 50 yazın.',
+      on: when((c) => near(cell(c, 'G7').value, 50) && near(cell(c, 'C2').value, 50) && near(cell(c, 'D7').value, 378)),
       done: 'C2 de 50 oldu, toplam 378 ₺. Fiyatı <b>tek yerden</b> değiştirdiniz, bütün alışveriş listeleri güncellendi: DÜŞEYARA\'nın asıl gücü bu.',
     },
     {
@@ -96,7 +98,7 @@ export const duseyara = {
       html: '<p>Formülün sonundaki <b>YANLIŞ</b> neyi söyler?</p>',
       opts: ['Formül yanlış, düzeltin', 'Tam eşleşme ara: “Domates” için aynen Domates olan satırı bul', 'Fiyatı sıfır yap'], ok: 1,
       wrong: 'Bu bir hata mesajı değil; formüle verilen bir talimat.',
-      why: 'Doğru. YANLIŞ (ya da 0) “tam eşleşme” demektir. Aramayı unutursanız ya da DOĞRU yazarsanız Excel yaklaşık eşleşme arar ve ürün adlarında yanlış sonuç verebilir; fiyat ve ürün listelerinde hep YANLIŞ kullanın.',
+      why: 'Doğru. YANLIŞ (ya da 0) “tam eşleşme” demektir. YANLIŞ\'ı yazmayı unutursanız ya da DOĞRU yazarsanız Excel yaklaşık eşleşme arar ve ürün adlarında yanlış sonuç verebilir; fiyat ve ürün listelerinde hep YANLIŞ kullanın.',
     }),
     rehberSoru({
       title: 'Sütun numarası',
@@ -122,7 +124,8 @@ export const aidatTakip = {
   desc: 'Açılır liste, EĞERSAY ile saymak, koşullu biçimle renklendirmek.',
   summary: [
     ['✔ Açılır Liste', 'Hücrelere yalnızca belirlediğiniz seçenekler girilebilir; hücrenin yanında ▾ çıkar'],
-    ['Seçenekleri yazmak', 'Virgülle ayırın: Ödendi, Ödenmedi, Kısmen'],
+    ['Seçenekleri yazmak', 'Noktalı virgülle ayırın: Ödendi;Ödenmedi;Kısmen'],
+    ['Gerçek Excel\'de', 'Veri → Veri Doğrulama → İzin verilen: Liste → Kaynak'],
     ['Neden?', 'Elle yazınca “odendi”, “Ödendi ” gibi küçük farklar sayımı bozar; listeden seçince herkes aynı yazar'],
     ['=EĞERSAY(C2:C9;"Ödendi")', 'Kaç kişinin ödediğini sayar'],
     ['Koşullu Biçim', '“Ödenmedi”leri kırmızı yapar: bir bakışta görülür'],
@@ -144,8 +147,8 @@ export const aidatTakip = {
     },
     {
       title: 'Açılır liste kuralı',
-      html: '<p>Şeritteki <b>✔ Açılır Liste</b> düğmesine tıklayın. Kutuya <b>Ödendi, Ödenmedi, Kısmen</b> yazın (virgülle ayırarak) ve <b>Uygula</b>\'ya basın.</p>',
-      hint: 'Düğme Koşullu Biçim\'in yanında. Üç seçeneği virgülle ayırın.',
+      html: '<p>Şeritteki <b>✔ Açılır Liste</b> düğmesine tıklayın. <b>Kaynak</b> kutusuna <b>Ödendi;Ödenmedi;Kısmen</b> yazın (aralarına noktalı virgül) ve <b>Uygula</b>\'ya basın.</p><p class="mut">Gerçek Excel\'de: Veri sekmesi → <b>Veri Doğrulama</b> → İzin verilen: <b>Liste</b> → Kaynak: Ödendi;Ödenmedi;Kısmen → Tamam. Bazı bilgisayarlarda ayırıcı virgüldür; listede tek seçenek çıkarsa virgülle deneyin.</p>',
+      hint: 'Düğme Koşullu Biçim\'in yanında. Üç seçeneği noktalı virgülle (Shift + virgül) ayırın, boşluk bırakmayın.',
       on: (ev, c) => ev.type === 'xl-valid' && ev.list.length >= 3 && ev.range === 'C2:C9',
       done: 'Kural kondu. Artık C2:C9 aralığındaki bir hücreye tıkladığınızda yanında küçük bir <b>▾</b> belirir.',
     },
@@ -185,7 +188,7 @@ export const aidatTakip = {
     },
     {
       title: '“Ödenmedi”leri boyayın',
-      html: '<p>C2:C9\'u yeniden seçin. <b>🎨 Koşullu Biçim</b> → <b>eşit olanları</b> → <b>Ödenmedi</b> yazıp rengi <b>Kırmızı</b> yapın → <b>Uygula</b>.</p>',
+      html: '<p>C2:C9\'u yeniden seçin. <b>🎨 Koşullu Biçim</b> → <b>eşit olanları</b> → <b>Ödenmedi</b> yazıp rengi <b>Kırmızı</b> yapın → <b>Uygula</b>.</p><p class="mut">Gerçek Excel\'de: Giriş → <b>Koşullu Biçimlendirme</b> → Hücre Vurgulama Kuralları → <b>Eşittir…</b></p>',
       hint: 'Önce C2:C9\'u fareyle seçin. Kutuya Ödenmedi yazın, renk listesinden kırmızıyı seçin.',
       on: (ev) => ev.type === 'xl-cond' && /ödenmedi/i.test(ev.crit),
       done: 'Ödenmeyenler kırmızı oldu: toplantıda kimi arayacağınızı bir bakışta görürsünüz.',

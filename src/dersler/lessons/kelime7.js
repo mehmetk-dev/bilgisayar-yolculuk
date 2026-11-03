@@ -1,6 +1,7 @@
-// 10. hafta ek dersi: dernek tutanağı (MEB Kelime İşlemci: belgeyi gözden geçirme ve koruma).
-// Üye olarak Değişiklikleri İzle ile öneri yapmak ve Yeni Açıklama eklemek; başkan olarak Kabul Et / Reddet;
-// sonra Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele, kaydedip kapatmak ve yanlış / doğru parolayla yeniden açmak.
+// 10. hafta ek dersleri: dernek tutanağı (MEB Kelime İşlemci: belgeyi gözden geçirme ve koruma).
+// kelime-izle: Basit İşaretleme → Tüm İşaretlemeler; üye olarak Değişiklikleri İzle ile öneri yapmak ve Yeni Açıklama eklemek;
+// başkan olarak Kabul Et / Reddet. kelime-parola: Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele, kaydedip kapatmak
+// ve yanlış / doğru parolayla yeniden açmak (ayrı dosyada, ayrı 15 dakikalık ders).
 import { K, desktopReady, maxed, norm, put } from './common.js';
 import { rehberSoru } from './kalip.js';
 
@@ -33,19 +34,22 @@ const hasanBekliyor = (c) => revs(c).some((r) => r.author === HASAN);
 const hasanRed = (c) => !hasanBekliyor(c) && metin(c).includes('yakacak yardımına') && !metin(c).includes('televizyon');
 const hepsiBitti = (c) => !revs(c).length && metin(c).includes('bir sonraki toplantı 1 aralık');
 const dosya = (c) => c.d.fs.find('docs', DOSYA);
-const korunuyor = (c) => !!dosya(c)?.content?.pass;
+// Parola dersi kendi dosyasıyla çalışır: izleme dersinin dosyası parolalı kalıp o dersi bozmasın
+const PDOSYA = 'dernek tutanağı.docx';
+const PHTML = HTML.replace(/<del[^>]*>.*?<\/del>/g, '').replace(/<ins[^>]*>(.*?)<\/ins>/g, '').replace('kış aylarında ', 'kış aylarında yakacak yardımına').replace('100 TL', '150 TL').replace('toplantı toplantı', 'toplantı');
+const pdosya = (c) => c.d.fs.find('docs', PDOSYA);
+const korunuyor = (c) => !!pdosya(c)?.content?.pass;
 
 export const kelimeIzle = {
-  id: 'kelime-izle', icon: '📝', title: 'Tutanak: değişiklikleri izle, açıklama ve parola', minutes: 40, stage: 'desktop',
-  desc: 'Bir belgede öneriyi iz bırakarak yapmak (Değişiklikleri İzle), kenara not düşmek (Yeni Açıklama), önerileri kabul ya da reddetmek; belgeyi parolayla korumak ve parolayla açmak.',
+  id: 'kelime-izle', icon: '📝', title: 'Tutanak: değişiklikleri izle ve açıklama', minutes: 30, stage: 'desktop',
+  desc: 'Bir belgede öneriyi iz bırakarak yapmak (Değişiklikleri İzle), değişiklikleri görmek (Tüm İşaretlemeler), kenara not düşmek (Yeni Açıklama), önerileri kabul ya da reddetmek.',
   summary: [
-    ['Gözden Geçir → 📝 Değişiklikleri İzle', 'Açıkken eklenen yazı altı çizili renkli, silinen yazı üstü çizili görünür · ' + K('Ctrl', 'Shift', 'E')],
+    ['Gözden Geçir → Basit İşaretleme ▾', 'Tüm İşaretlemeler\'i seçin: silinen yazı üstü çizili, eklenen yazı altı çizili renkli görünür'],
+    ['Gözden Geçir → 📝 Değişiklikleri İzle', 'Açıkken her değişiklik adınızla işaretlenir; düğme renkli kalır · ' + K('Ctrl', 'Shift', 'E')],
     ['Gözden Geçir → 💬 Yeni Açıklama', 'Seçili yazıya sağ kenarda not balonu; yazının kendisi değişmez'],
     ['Sonraki ▶ / ◀ Önceki', 'Bir sonraki (önceki) değişikliği seçer'],
     ['✔ Kabul Et / ✖ Reddet', 'Öneriyi belgeye işler / geri alır, sonrakine geçer. ▾ ile Tüm Değişiklikleri Kabul Et'],
     ['🗑 Sil', 'Seçili açıklamayı siler'],
-    ['Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele', 'Parola iki kez yazılır; kaydedince belge parolasız açılmaz'],
-    ['Parolayı unutursanız', 'Belge kurtarılamaz: parolayı güvenli bir yere yazın'],
   ],
   setup: (c) => { put(c, 'docs', DOSYA, 'file', { html: HTML }); },
   steps: [
@@ -53,13 +57,23 @@ export const kelimeIzle = {
       title: 'Toplantı tutanağı',
       html: `<p>Derneğin yönetim kurulu toplandı; yazman <b>tutanağı</b> yazıp herkese gönderdi. Siz de kurul üyesisiniz ve birkaç düzeltmeniz var.</p>
         <p>Düzeltmeyi doğrudan yaparsanız başkan neyin değiştiğini göremez. Bu yüzden önce <b>Değişiklikleri İzle</b>\'yi açacağız: yaptığınız her değişiklik renkli görünür, başkan da her birini <b>kabul eder</b> ya da <b>reddeder</b>.</p>
-        <p>3. kararda başka bir üyenin (<b>Hasan Yılmaz</b>) önerisi zaten duruyor: üstü çizili yazı silinmesini, altı çizili yazı eklenmesini istediği yazıdır.</p>`,
+        <p>3. kararda başka bir üyenin (<b>Hasan Yılmaz</b>) önerisi zaten var. Ama ilk bakışta görünmez: Word belgeyi <b>Basit İşaretleme</b> ile gösterir. Değişiklik olan satırın solunda yalnızca <b>kırmızı bir çizgi</b> olur.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'word', { node: dosya(c)?.id }); },
+    },
+    {
+      title: 'Değişiklikleri görün',
+      html: `<ol class="steps"><li>Üstteki <b>Gözden Geçir</b> sekmesine tıklayın.</li><li><b>📝 Değişiklikleri İzle</b> düğmesinin yanındaki kutuda <b>Basit İşaretleme</b> yazar. Kutuya tıklayın.</li><li>Listeden <b>Tüm İşaretlemeler</b>\'i seçin.</li></ol>`,
+      mouse: '🖱 Gözden Geçir → Basit İşaretleme → Tüm İşaretlemeler',
+      hint: '3. kararın solundaki kırmızı çizgiye tıklamak da Tüm İşaretlemeler\'e geçirir.',
+      check: (c) => info(c).markup === 'all',
+      on: (ev, c) => ev.type === 'doc-markup' && info(c).markup === 'all',
+      done: 'Şimdi 3. kararda Hasan Bey\'in önerisi görünüyor: <b>üstü çizili</b> yazı silinmesini, <b>altı çizili renkli</b> yazı eklenmesini istediği yazıdır. Gerçek Word\'de değişiklik göremezseniz ilk bakacağınız yer bu kutudur.',
     },
     {
       title: 'Değişiklikleri İzle',
       html: `<p>Üstteki <b>Gözden Geçir</b> sekmesine tıklayın. Sonra <b>📝 Değişiklikleri İzle</b> düğmesine basın.</p>
-        <p>Düğme mavi kalır ve en alttaki çubukta <b>Değişiklikleri İzle: Açık</b> yazar.</p>`,
+        <p>Düğme renkli (basılı) kalır: izleme açık demektir.</p>
+        <p class="mut">Bu alıştırmada en alttaki çubukta da “Değişiklikleri İzle: Açık” yazar. Gerçek Word\'de bu yazı çoğu zaman yoktur; düğmenin rengine bakın.</p>`,
       mouse: '🖱 Gözden Geçir → 📝 Değişiklikleri İzle',
       hint: `Kısayolu: ${K('Ctrl', 'Shift', 'E')}. Aynı düğmeye yeniden basarsanız izleme kapanır.`,
       check: izleniyor,
@@ -81,7 +95,7 @@ export const kelimeIzle = {
       html: `<p>4. kararda <b>toplantı toplantı</b> diye bir sözcük iki kez yazılmış.</p>
         <p>İkinci <b>toplantı</b> sözcüğüne çift tıklayın ve ${K('Delete')} tuşuna basın.</p>`,
       keys: ['Delete'],
-      hint: 'Delete tuşu klavyenin sağ üst tarafında, Backspace\'in altındadır (Del yazabilir). Backspace de olur.',
+      hint: 'Delete (Del) tuşu: masaüstü klavyede Enter\'ın sağındaki küçük tuş grubunda (Insert\'in altında), dizüstünde sağ üst köşede. Backspace de olur.',
       check: tekrarSilindi,
       on: (ev, c) => ev.type === 'doc-revision' && tekrarSilindi(c),
       done: 'Sözcük kaybolmadı, üstü çizili kaldı: “bunu silmeyi öneriyorum” demek. Başkan kabul edince gerçekten silinir.',
@@ -91,7 +105,7 @@ export const kelimeIzle = {
       html: `<p>2. kararda kermesin yeri için bir sorunuz var ama yazıyı değiştirmek istemiyorsunuz: <b>kenara not</b> düşeceksiniz.</p>
         <ol class="big-list"><li><b>dernek bahçesinde</b> sözcüklerini fareyle sürükleyerek seçin.</li><li><b>Gözden Geçir → 💬 Yeni Açıklama</b>\'ya basın.</li><li>Sağda açılan balona şunu yazın: <b>Yağmur yağarsa kermes salonda yapılsın.</b></li></ol>`,
       mouse: '🖱 Sözcükleri seçin → 💬 Yeni Açıklama → balona yazın',
-      hint: 'Balon sayfanın sağında, seçtiğiniz satırın hizasında açılır; imleç içindedir, doğrudan yazabilirsiniz. Nokta tuşu Ç harfinin sağındadır.',
+      hint: 'Balon sayfanın sağında, seçtiğiniz satırın hizasında açılır; imleç içindedir, doğrudan yazabilirsiniz. Nokta tuşu Ç harfinin sağındadır. Microsoft 365\'te balonun altında ➤ düğmesi varsa yazdıktan sonra ona da basın.',
       check: aciklamaTamam,
       on: (ev, c) => (ev.type === 'doc-comment' || ev.type === 'doc-comment-text') && aciklamaTamam(c),
       done: 'Seçtiğiniz sözcükler renklendi, notunuz sağ kenarda adınızla duruyor. Açıklama yazdırılan belgeye girmez; yalnızca belgeyi okuyan kişilere görünür.',
@@ -143,15 +157,34 @@ export const kelimeIzle = {
     {
       title: 'İzlemeyi kapatın',
       html: '<p>İnceleme bitti. <b>📝 Değişiklikleri İzle</b> düğmesine yeniden basıp izlemeyi kapatın.</p>',
-      hint: `Alttaki çubukta “Değişiklikleri İzle: Açık” yazısı kaybolmalı. Kısayol: ${K('Ctrl', 'Shift', 'E')}.`,
+      hint: `Düğmenin rengi kalkmalı. Kısayol: ${K('Ctrl', 'Shift', 'E')}.`,
       check: (c) => !izleniyor(c),
       on: (ev, c) => ev.type === 'doc-track' && !izleniyor(c),
       done: 'İzleme kapandı. Açık unutulursa sonraki her düzeltme de renkli işaretlenir ve belge karışık görünür.',
     },
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Bir belgeyi birlikte düzeltmeyi öğrendiniz:</p>' },
+  ],
+};
+
+export const kelimeParola = {
+  id: 'kelime-parola', icon: '🔑', title: 'Belgeyi parolayla korumak', minutes: 15, stage: 'desktop',
+  desc: 'Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele; kaydedip kapatmak, yanlış ve doğru parolayla yeniden açmak.',
+  summary: [
+    ['Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele', 'Parola iki kez yazılır; kaydedince belge parolasız açılmaz'],
+    ['Parolayı unutursanız', 'Belge kurtarılamaz: parolayı güvenli bir yere yazın'],
+    ['Parolayı kaldırmak', 'Aynı yerden Parola ile Şifrele, kutuyu boş bırakıp Tamam, sonra kaydet'],
+  ],
+  setup: (c) => { put(c, 'docs', PDOSYA, 'file', { html: PHTML }); },
+  steps: [
+    {
+      title: 'Tutanağı koruyalım',
+      html: `<p>Derneğin yönetim kurulu tutanağı hazır. İçinde üyelerin adları ve kararlar var; parolayı bilmeyen kimse açamasın istiyoruz.</p>
+        <p>Belgeye <b>parola</b> koyacak, kaydedip kapatacak ve parolasız açılmadığını kendi gözünüzle göreceksiniz.</p>`,
+      setup: (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'word', { node: pdosya(c)?.id }); },
+    },
     {
       title: 'Belgeyi parolayla koruyun',
-      html: `<p>Tutanakta üyelerin bilgileri ve kararlar var; parolayı bilmeyen kimse açamasın.</p>
-        <ol class="big-list"><li><b>Dosya</b> menüsünden <b>ℹ Bilgi</b>\'yi seçin.</li><li><b>🔒 Belgeyi Koru ▾</b> düğmesine, sonra <b>🔑 Parola ile Şifrele</b>\'ye basın.</li><li>Parola olarak <b>${PAROLA}</b> yazın, <b>Tamam</b>. Açılan ikinci pencerede <b>aynı parolayı</b> yeniden yazın, <b>Tamam</b>.</li></ol>`,
+      html: `<ol class="big-list"><li><b>Dosya</b> menüsünden <b>ℹ Bilgi</b>\'yi seçin.</li><li><b>🔒 Belgeyi Koru ▾</b> düğmesine, sonra <b>🔑 Parola ile Şifrele</b>\'ye basın.</li><li>Parola olarak <b>${PAROLA}</b> yazın, <b>Tamam</b>. Açılan ikinci pencerede <b>aynı parolayı</b> yeniden yazın, <b>Tamam</b>.</li></ol>`,
       mouse: '🖱 Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele',
       hint: `Parolada büyük C ve küçük harfler var: C\'yi ${K('Shift')} ile yazın. Yazdığınız harfler nokta (•) olarak görünür. İki parola aynı olmazsa “Onay parolası aynı değil” yazar; yeniden deneyin.`,
       check: (c) => !!info(c).protected,
@@ -172,10 +205,10 @@ export const kelimeIzle = {
     {
       title: 'Yanlış parolayla deneyin',
       html: `<p><b>Belgeler</b> klasörü açıldı. Parolayı bilmeyen biri ne görür, bakalım.</p>
-        <p><b>${DOSYA}</b> dosyasına çift tıklayın. Parola kutusuna <b>bilerek yanlış</b> bir parola yazın (ör. <b>1234</b>) ve <b>Tamam</b>\'a basın. Çıkan uyarıda da <b>Tamam</b>.</p>`,
+        <p><b>${PDOSYA}</b> dosyasına çift tıklayın. Parola kutusuna <b>bilerek yanlış</b> bir parola yazın (ör. <b>1234</b>) ve <b>Tamam</b>\'a basın. Çıkan uyarıda da <b>Tamam</b>.</p>`,
       setup: (c) => { const w = maxed(c, 'explorer', { folder: 'docs' }); w.api?.go?.('docs'); },
       mouse: '🖱 Dosyaya çift tık → yanlış parola → Tamam',
-      hint: 'Dosya “Belgeler” klasöründe, adı “yönetim kurulu tutanağı”.',
+      hint: 'Dosya “Belgeler” klasöründe, adı “dernek tutanağı”.',
       on: (ev) => ev.type === 'doc-open-pass' && !ev.ok && !ev.cancel,
       done: '<b>Girdiğiniz parola yanlış</b>: belge açılmadı, pencere kapandı. Dosyayı e-postayla alan ya da bilgisayarınızı kullanan biri de bunu görür.',
     },
@@ -197,6 +230,6 @@ export const kelimeIzle = {
       wrong: 'Belge parolası bir hesap şifresi gibi değildir: “şifremi unuttum” bağlantısı yoktur.',
       why: 'Doğru. Bu yüzden parolayı güvenilir bir yere (ör. kilitli çekmecedeki deftere) yazın. Önemli belgenin parolasız bir kopyasını da güvenli bir yerde saklayabilirsiniz.',
     }),
-    { final: true, title: 'Tebrikler! 🎉', html: '<p>Bir belgeyi birlikte düzeltmeyi ve korumayı öğrendiniz:</p>' },
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Belgeyi parolayla korumayı öğrendiniz:</p>' },
   ],
 };

@@ -24,13 +24,16 @@ const P = (t) => `<p>${t}</p>`;
 
 export const apartmanDuyuru = {
   id: 'apartman-duyuru', icon: '📢', title: 'Apartman duyurusu hazırlayalım', minutes: 40, stage: 'desktop',
-  desc: 'Başlık, renk, çerçeve; tek kâğıda sığdırıp yazdırma önizlemesi.',
+  desc: 'Başlık, renk, italik, çerçeve; yazdırma önizlemesi ve kopya sayısı.',
   summary: [
     ['Başlık', 'Ortalı, büyük (24–28 punto), kalın'],
     ['Önemli satır', 'Renk ya da kalın: gözün hemen gördüğü yer'],
-    ['Düzen → Sayfa kenarlığı', 'Sayfanın çevresine çerçeve çizer'],
-    ['Ctrl + P', 'Yazdırma önizlemesi: kâğıtta nasıl çıkacağını gösterir'],
-    ['Tek kâğıt', 'Önizlemede “tek kâğıda sığıyor” yazmalı; taşıyorsa yazıyı küçültün'],
+    ['Ctrl + I / Ctrl + U', 'İtalik (eğik, T düğmesi) / altı çizili (A düğmesi)'],
+    ['Tasarım → Sayfa Kenarlıkları', 'Sayfanın çevresine çerçeve çizer'],
+    ['Ctrl + P', 'Yazdır ekranı: solda ayarlar, yanında kâğıdın önizlemesi'],
+    ['◀ 1 / 1 ▶', 'Önizlemenin altındaki sayaç: belge kaç sayfa? Duyuru için 1 / 1 olmalı'],
+    ['Kopya', 'Aynı belgeden kaç tane basılacağı'],
+    ['← ya da Esc', 'Yazdır ekranından belgeye döner (sağ üstteki ✕ Word\'ü kapatır)'],
     ['Ctrl + S', 'Kaydet; adı anlaşılır olsun'],
   ],
   steps: [
@@ -57,7 +60,7 @@ export const apartmanDuyuru = {
       title: 'Başlığı büyütüp ortalayın',
       html: `<p>“DUYURU”ya üç kez tıklayıp seçin. Sonra:</p>
         <ul class="big-list"><li><b>Ortala</b> (${K('Ctrl', 'E')})</li><li>Yazı boyutunu <b>28</b> yapın</li><li><b>Kalın</b> (${K('Ctrl', 'B')})</li></ul>`,
-      hint: 'Boyut kutusu şeritte “11” yazan yer; açılır listeden 28\'i seçin.',
+      hint: 'Boyut kutusu şeritte “11” (ya da 12) yazan yer; açılır listeden 28\'i seçin.',
       on: when((c) => { const b = block(c, 'duyuru'); return b && b.align === 'center' && b.size >= 24 && b.bold; }),
       done: 'Büyük, kalın ve ortada: uzaktan okunur.',
     },
@@ -77,29 +80,40 @@ export const apartmanDuyuru = {
       done: 'Kırmızı satır dikkat çekiyor. Çok renk kullanmayın: bir ya da iki yeterli.',
     },
     {
+      title: 'İtalik ve altı çizili',
+      html: `<p>Son satır (<b>Katılımınızı rica ederiz.</b>) biraz farklı dursun.</p>
+        <ol class="steps"><li>Satırı üç tıkla seçin.</li><li><b>T</b> düğmesine (İtalik, ${K('Ctrl', 'I')}) basın: yazı sağa eğilir.</li><li><b>A</b> düğmesine (altı çizili, ${K('Ctrl', 'U')}) basın.</li></ol>`,
+      hint: 'İtalik ve altı çizili düğmeleri K (kalın) düğmesinin hemen sağındadır. Gerçek Word\'de de Türkçe adlarıyla K, T, A yazar.',
+      check: (c) => { const b = block(c, 'rica ederiz'); return !!b && b.italic && b.underline; },
+      on: when((c) => { const b = block(c, 'rica ederiz'); return !!b && b.italic && b.underline; }),
+      done: 'İtalik yazı imza, not ya da alıntı için kullanılır. Altı çizili yazıyı az kullanın: internette bağlantı sanılabilir.',
+    },
+    {
       title: 'Çerçeve ekleyin',
-      html: '<p><b>Düzen</b> sekmesine tıklayın, <b>Sayfa kenarlığı</b> yanındaki <b>▣ Kutu</b>\'ya tıklayın. Sayfanın çevresine çerçeve gelir.</p><p class="mut">Gerçek Word\'de <b>Sayfa Kenarlıkları</b> düğmesi <b>Tasarım</b> sekmesindedir (“Sayfa Arka Planı” grubu).</p>',
-      mouse: '🖱 Düzen → Sayfa kenarlığı → Kutu',
+      html: '<p>Üstteki <b>Tasarım</b> sekmesine tıklayın (Ekle\'nin sağında). <b>▣ Sayfa Kenarlıkları ▾</b> düğmesine, sonra <b>▣ Kutu</b>\'ya tıklayın. Sayfanın çevresine çerçeve gelir.</p><p class="mut">Gerçek Word\'de <b>Sayfa Kenarlıkları</b> bir pencere açar: solda <b>Kutu</b>\'yu seçip <b>Tamam</b>\'a basarsınız.</p>',
+      mouse: '🖱 Tasarım → Sayfa Kenarlıkları → Kutu',
       on: (ev) => ev.type === 'doc-layout' && ev.border === 'kutu',
       done: 'Çerçeve duyuruyu sayfadan ayırıyor. Bir de “Çift çizgi” seçeneği var.',
     },
     {
       title: 'Yazdırma önizlemesi',
-      html: `<p>${K('Ctrl', 'P')}'ye basın. Karşınıza <b>yazdırma önizlemesi</b> çıkar: kâğıtta nasıl görüneceğini küçük resimde görürsünüz. Altında <b>tek kâğıda sığıp sığmadığı</b> yazar.</p>`,
+      html: `<p>${K('Ctrl', 'P')}'ye basın. Belgenin yerine <b>Yazdır</b> ekranı gelir: kâğıtta nasıl görüneceğini küçük resimde görürsünüz.</p>
+        <p>Önizlemenin altındaki <b>◀ 1 / 1 ▶</b> sayacı belgenin kaç sayfa olduğunu gösterir. <b>1 / 2</b> yazsaydı duyuru iki kâğıda çıkardı.</p><p class="mut">Gerçek Word\'de yazdırma ekranı belgenin yerine açılır. Belgeye dönmek için sol üstteki <b>← (geri ok)</b> düğmesine ya da <b>Esc</b>\'ye basın. Sağ üstteki <b>✕</b>\'e basmayın: Word kapanır.</p>`,
       combo: ['Ctrl', 'KeyP'],
       on: (ev) => ev.type === 'doc-print-open',
-      done: 'Önizlemede duyuru çerçevesiyle birlikte görünüyor.',
+      done: 'Önizlemede duyuru çerçevesiyle birlikte görünüyor; sayaç 1 / 1.',
     },
     {
       title: 'Yazdırın',
-      html: '<p>Önizlemeyi inceleyin: belge tek kâğıda sığıyorsa <b>🖨 Yazdır</b>\'a tıklayın.</p>',
-      hint: 'Önizlemenin altındaki yazıda “tek kâğıda sığıyor” görünmeli. Taşıyorsa metni kısaltın.',
+      html: '<p>Apartmanın üç katına birer duyuru asılacak. <b>Kopya</b> kutusuna <b>3</b> yazın, sonra <b>🖨 Yazdır</b>\'a tıklayın.</p>',
+      hint: 'Kopya kutusu Yazıcı kutusunun hemen altındadır. Yazdır ekranını kapattıysanız yeniden Ctrl + P. Sayaç 1 / 1 göstermeli; taşıyorsa metni kısaltın.',
       on: (ev, c) => {
         if (ev.type !== 'doc-print') return false;
-        if (ev.pages > 1) c.warn(`Belge ${ev.pages} sayfa. Duyurunun tek kâğıda sığması gerekir; yazı boyutunu küçültüp yeniden yazdırın.`);
-        return ev.pages === 1;
+        if (ev.pages > 1) { c.warn(`Belge ${ev.pages} sayfa. Duyurunun tek kâğıda sığması gerekir; yazı boyutunu küçültüp yeniden yazdırın.`); return false; }
+        if (ev.copies !== 3) { c.note(`${ev.copies} kopya basıldı. Ctrl + P ile yeniden açıp Kopya kutusuna 3 yazın.`); return false; }
+        return true;
       },
-      done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse duyuru kâğıda çıkar; “PDF olarak kaydet” seçiliyse dosya olarak kaydedilir.',
+      done: 'Üç duyuru yazıcıya gitti. Gerçek Word\'de <b>Kopya</b> kutusu en üstte, büyük <b>Yazdır</b> düğmesinin yanındadır.',
     },
     {
       title: 'Kaydedin',
@@ -147,14 +161,16 @@ ${[
 
 export const sayfaDuzeni = {
   id: 'sayfa-duzeni', icon: '📄', title: 'Sayfa düzeni ve yazdırma hataları', minutes: 35, stage: 'desktop',
-  desc: 'Kâğıdı yatay/dikey yapmak, kenar boşlukları, filigran, yeni sayfa.',
+  desc: 'Kâğıdı yatay/dikey yapmak, kenar boşlukları (özel ölçü dahil), filigran, yeni sayfa, yalnızca bir sayfayı yazdırmak.',
   summary: [
-    ['Düzen → Kenar boşlukları', 'Dar yaparsanız sayfaya daha çok yazı sığar'],
+    ['Düzen → Kenar Boşlukları', 'Dar yaparsanız sayfaya daha çok yazı sığar'],
+    ['Kenar Boşlukları → Özel Kenar Boşlukları…', 'Üst, Alt, Sol, Sağ: ölçüyü cm ile yazarsınız'],
     ['Düzen → Yönlendirme', 'Dikey (mektup), Yatay (geniş tablo)'],
-    ['Yazı taştı', 'Önizlemede “2 sayfa” yazıyorsa boşluğu daraltın ya da yazıyı küçültün'],
-    ['Filigran', 'ÖRNEKTİR, ACİL gibi silik arka plan yazısı'],
+    ['Yazı taştı', 'Önizlemenin altındaki sayaç 1 / 2 diyorsa boşluğu daraltın ya da yazıyı küçültün'],
+    ['Tasarım → Filigran', 'ÖRNEKTİR, ACİL gibi silik arka plan yazısı'],
     ['Ctrl + Enter', 'Yeni sayfa açar; Enter\'a defalarca basmayın'],
-    ['Ctrl + P', 'Yazdırmadan önce hep önizlemeye bakın'],
+    ['Ctrl + P', 'Yazdırmadan önce hep önizlemeye bakın; ← ya da Esc ile belgeye dönün'],
+    ['Özel Yazdırma', 'Sayfalar kutusuna 2 yazınca yalnızca 2. sayfa basılır'],
   ],
   steps: [
     {
@@ -165,16 +181,18 @@ export const sayfaDuzeni = {
     },
     {
       title: 'Önizlemeye bakın',
-      html: `<p>${K('Ctrl', 'P')}'ye basın ve önizlemeyi okuyun: kaç sayfa? Sonra <b>İptal</b>'e basarak kapatın.</p>`,
+      html: `<p>${K('Ctrl', 'P')}'ye basın. Önizlemenin altındaki sayaca bakın: <b>◀ 1 / 2 ▶</b> yazıyorsa belge iki sayfadır. ▶ ile ikinci sayfaya da bakabilirsiniz.</p>
+        <p>Sonra sol üstteki <b>←</b> düğmesine ya da ${K('Esc')}'ye basarak belgeye dönün.</p><p class="mut">Gerçek Word\'de yazdırma ekranı belgenin yerine açılır. Belgeye dönmek için sol üstteki <b>← (geri ok)</b> düğmesine ya da <b>Esc</b>\'ye basın. Sağ üstteki <b>✕</b>\'e basmayın: Word kapanır.</p>`,
       combo: ['Ctrl', 'KeyP'],
       setup: (c) => openDoc(c, 'toplantı tutanağı.docx', TUTANAK),
-      on: (ev, c) => { if (ev.type === 'doc-print-open' && ev.pages === 1) c.note('Bu belge zaten tek sayfa. Belgeyi baştan açıp (ders başında) tekrar deneyin.'); return ev.type === 'doc-print-open'; },
+      hint: 'Yazdır ekranının sol üst köşesindeki yuvarlak ← düğmesi belgeye döndürür.',
+      on: (ev, c) => { if (ev.type === 'doc-print-open' && ev.pages === 1) c.note('Bu belge zaten tek sayfa. Belgeyi baştan açıp (ders başında) tekrar deneyin.'); return ev.type === 'doc-print-close'; },
       done: 'Belge birkaç satırla <b>ikinci sayfaya taşıyor</b>. Kâğıt israfı olmasın diye tek sayfaya sığdıralım.',
     },
     {
       title: 'Kenar boşluklarını daraltın',
-      html: '<p><b>Düzen</b> sekmesinde <b>Kenar boşlukları</b> yanındaki <b>Dar</b>\'a tıklayın. Kenar boşluğu azalınca sayfaya daha çok satır sığar.</p>',
-      hint: 'Düzen sekmesi, üstteki sekmelerde Ekle\'nin hemen sağındadır. Kenar boşlukları: Normal, Dar, Geniş.',
+      html: '<p><b>Düzen</b> sekmesinde <b>▤ Kenar Boşlukları ▾</b> düğmesine tıklayın ve listeden <b>Dar</b>\'ı seçin. Kenar boşluğu azalınca sayfaya daha çok satır sığar.</p>',
+      hint: 'Düzen sekmesi üstte, Ekle ve Tasarım sekmelerinden sonra gelir. Listede Normal, Dar, Geniş var.',
       on: (ev, c) => {
         if (ev.type !== 'doc-layout') return false;
         if (ev.margin !== 'dar') { c.note('Bu sefer “Dar”ı seçin.'); return false; }
@@ -185,14 +203,16 @@ export const sayfaDuzeni = {
     },
     {
       title: 'Önizlemeyle doğrulayın',
-      html: `<p>${K('Ctrl', 'P')} ile önizlemeyi yeniden açın. Şimdi <b>tek sayfa</b> yazmalı. Sonra <b>İptal</b>'e basarak kapatın.</p>
+      html: `<p>${K('Ctrl', 'P')} ile önizlemeyi yeniden açın. Sayaç şimdi <b>1 / 1</b> göstermeli. Sonra <b>←</b> ya da ${K('Esc')} ile belgeye dönün.</p>
         <p class="mut">Hâlâ iki sayfa yazıyorsa <b>Ctrl + A</b> ile hepsini seçip yazı boyutunu <b>10</b> yapın ve yine bakın. Yazıyı çok küçültmeyin; 10 punto okunur olmalı.</p>`,
       combo: ['Ctrl', 'KeyP'],
-      hint: 'Önizlemenin altında sayfa sayısı yazar. İki sayfa görünüyorsa önce Giriş → boyut 10 deneyin.',
+      hint: 'Önizlemenin altındaki sayaç sayfa sayısını gösterir. 1 / 2 görünüyorsa önce Giriş → boyut 10 deneyin.',
       on: (ev, c) => {
-        if (ev.type !== 'doc-print-open') return false;
-        if (ev.pages > 1) { c.note(`Önizleme ${ev.pages} sayfa. İptal'e basın, yazı boyutunu 10 yapın ve yine ${K('Ctrl', 'P')} ile bakın.`); return false; }
-        return true;
+        if (ev.type === 'doc-print-open') {
+          c.s.tek = ev.pages === 1;
+          if (ev.pages > 1) c.note(`Sayaç 1 / ${ev.pages}. ← ile belgeye dönün, yazı boyutunu 10 yapın ve yine ${K('Ctrl', 'P')} ile bakın.`);
+        }
+        return ev.type === 'doc-print-close' && !!c.s.tek;
       },
       done: 'Tek sayfa oldu. Önemli: önce kenar boşluğu, sonra yazı boyutu.',
     },
@@ -204,15 +224,29 @@ export const sayfaDuzeni = {
     },
     {
       title: 'Filigran',
-      html: '<p>Taslak bir belgenin her sayfasında silik bir yazı görünsün istiyorsunuz. <b>Düzen → Filigran → ÖRNEKTİR</b>\'e tıklayın.</p><p class="mut">Gerçek Word\'de <b>Filigran</b> düğmesi <b>Tasarım</b> sekmesindedir (“Sayfa Arka Planı” grubu).</p>',
+      html: '<p>Taslak bir belgenin her sayfasında silik bir yazı görünsün istiyorsunuz. Üstteki <b>Tasarım</b> sekmesine geçin, <b>Filigran ▾</b>\'a tıklayın ve <b>ÖRNEKTİR</b>\'i seçin.</p><p class="mut">Gerçek Word\'de Filigran listesinde hazır filigranlar ve kendi yazınızı yazmak için <b>Özel Filigran…</b> vardır.</p>',
       on: (ev) => ev.type === 'doc-layout' && ev.wm === 'ÖRNEKTİR',
       done: 'Sayfanın ortasında silik “ÖRNEKTİR” görünür; yazıyı etkilemez. Yazdırınca da çıkar. Kaldırmak için “Yok”.',
     },
     {
       title: 'Filigranı kaldırın',
-      html: '<p>Şimdi <b>Filigran</b> satırındaki <b>Yok</b>\'a tıklayarak filigranı kaldırın. (Yanlışlıkla <b>Sayfa kenarlığı</b> satırındaki Yok\'a basmayın.)</p>',
+      html: '<p>Şimdi filigranı kaldırın: <b>Tasarım → Filigran ▾ → Filigranı Kaldır</b>.</p>',
       on: (ev) => ev.type === 'doc-layout' && ev.wm === '',
       done: 'Filigran kalktı. İstediğiniz zaman yeniden ekleyebilirsiniz.',
+    },
+    {
+      title: 'Ölçü verilen kenar boşluğu',
+      html: `<p>Resmî yazılarda ve MEB sınavında kenar boşluğu ölçüyle istenir: “Üst 2,5 cm, sol 3 cm”.</p>
+        <ol class="steps"><li><b>Düzen → ▤ Kenar Boşlukları ▾</b>, listenin en altındaki <b>Özel Kenar Boşlukları…</b></li><li>Açılan <b>Sayfa Yapısı</b> penceresinde <b>Üst</b> kutusuna <b>2,5</b>, <b>Sol</b> kutusuna <b>3</b> yazın (öbür kutulara dokunmayın).</li><li><b>Tamam</b>.</li></ol>
+        <p class="mut">Gerçek Word\'de kutuların yanında küçük oklar da vardır: ölçüyü yazabilir ya da oklarla değiştirebilirsiniz. Ondalık için virgül kullanın: 2,5.</p>`,
+      hint: 'Kutuya tıklayınca içindeki ölçü seçilir; yeni ölçüyü yazınca eskisinin yerine geçer. “cm” yazmasanız da olur.',
+      check: (c) => { const l = info(c).layout; return l.margin === 'ozel' && l.mg?.top === 2.5 && l.mg?.left === 3; },
+      on: (ev, c) => {
+        if (ev.type !== 'doc-layout' || ev.margin !== 'ozel') return false;
+        if (ev.mg?.top !== 2.5 || ev.mg?.left !== 3) { c.note(`Üst ${String(ev.mg?.top).replace('.', ',')} cm, sol ${String(ev.mg?.left).replace('.', ',')} cm oldu. Pencereyi yeniden açıp Üst 2,5 ve Sol 3 yazın.`); return false; }
+        return true;
+      },
+      done: 'Sol kenar biraz genişledi: delgeç ya da zımba için yer kalır. Hazır listedeki Normal, Dar, Geniş yetmeyince ölçü hep bu pencereden yazılır.',
     },
     {
       title: 'Yeni sayfa: Ctrl + Enter',
@@ -222,6 +256,20 @@ export const sayfaDuzeni = {
       hint: 'Satırın başına gelmek için tıkladıktan sonra Home tuşuna basın.',
       on: (ev) => ev.type === 'doc-insert' && ev.what === 'pagebreak',
       done: 'Sayfa sonu eklendi. Gri “Sayfa sonu” çizgisi görünür; yazdırmada görünmez.',
+    },
+    {
+      title: 'Yalnızca 2. sayfayı yazdırın',
+      html: `<p>İmza sayfası yeniden basılacak; birinci sayfa için kâğıt harcamayalım.</p>
+        <ol class="steps"><li>${K('Ctrl', 'P')}.</li><li><b>Sayfalar</b> kutusunda <b>Tüm Sayfaları Yazdır</b> yazar; tıklayıp <b>Özel Yazdırma</b>\'yı seçin.</li><li>Altında açılan kutuya <b>2</b> yazın ve <b>🖨 Yazdır</b>.</li></ol>
+        <p class="mut">Gerçek Word\'de <b>Ayarlar</b> başlığının altında <b>Tüm Sayfaları Yazdır</b> kutusu, onun altında <b>Sayfalar:</b> kutusu vardır. Sayfalar kutusuna 2 yazınca Word kendisi Özel Yazdırma\'ya geçer.</p>`,
+      combo: ['Ctrl', 'KeyP'],
+      hint: 'Yazdırılacak kâğıt sayısı pencerenin altında yazar: “1 sayfa × 1 kopya”.',
+      on: (ev, c) => {
+        if (ev.type !== 'doc-print') return false;
+        if (!(ev.from === 2 && ev.to === 2)) { c.note('Bütün sayfalar yazdırıldı. Yeniden Ctrl + P, Özel Yazdırma, kutuya 2.'); return false; }
+        return true;
+      },
+      done: 'Yalnızca imza sayfası basıldı. “1-3” yazınca 1\'den 3\'e kadar, “1;3” yazınca 1 ve 3. sayfalar basılır.',
     },
     rehberSoru({
       title: 'Hangisi çözüm?',
@@ -239,15 +287,17 @@ const AIDAT = `<p><b>Daire aidat çizelgesi (Ekim)</b></p>
 
 export const tabloInce = {
   id: 'tablo-ince', icon: '📋', title: 'Tablo incelikleri: aidat ve nöbet çizelgesi', minutes: 35, stage: 'desktop',
-  desc: 'Tabloya satır ve sütun eklemek, hücreleri birleştirmek, çizgileri kalınlaştırmak.',
+  desc: 'Tabloya satır ve sütun eklemek, hücreleri birleştirmek, çizgileri kalınlaştırmak; başlığa gölgelendirme ve tablo stili.',
   summary: [
-    ['Tabloya tıklayın', 'Sekmelerin yanında “Tablo Düzeni” çıkar'],
+    ['Tabloya tıklayın', 'Sekmelerin sağında “Tablo Tasarımı” ve “Tablo Düzeni” çıkar'],
     ['↓ Alta ekle / ↑ Üste ekle', 'Yeni satır'],
     ['→ Sağa ekle / ← Sola ekle', 'Yeni sütun'],
     ['✕ Satırı sil, ✕ Sütunu sil', 'İşe yaramayanı kaldırır'],
     ['Hücreleri birleştir', 'Yan yana hücreleri sürükleyerek seçin, sonra düğme'],
     ['Çizgiler → Kalın', 'Yazdırınca çizgiler belirgin olur'],
     ['Hücre içi → Orta', 'Yazıyı hücrenin ortasına alır'],
+    ['Tablo Tasarımı → Gölgelendirme', 'Seçili hücrelerin arkasını boyar (başlık satırı)'],
+    ['Tablo Tasarımı → Tablo Stilleri', 'Tabloya tek tıkla hazır görünüş verir'],
   ],
   steps: [
     {
@@ -258,7 +308,7 @@ export const tabloInce = {
     },
     {
       title: 'Tablo Düzeni',
-      html: '<p>Tablonun <b>içine</b> (örneğin “Fatma Yıldız” yazan hücreye) tıklayın. Üstte sekmelerin sağında <b>Tablo Düzeni</b> çıkar. Ona tıklayın.</p>',
+      html: '<p>Tablonun <b>içine</b> (örneğin “Fatma Yıldız” yazan hücreye) tıklayın. Üstte sekmelerin sağında iki yeni sekme çıkar: <b>Tablo Tasarımı</b> ve <b>Tablo Düzeni</b>. <b>Tablo Düzeni</b>\'ne tıklayın.</p><p class="mut">Word 2016\'da bu iki sekmenin üstünde <b>Tablo Araçları</b> yazar, adları <b>Tasarım</b> ve <b>Düzen</b>\'dir.</p>',
       setup: (c) => openDoc(c, 'aidat çizelgesi.docx', AIDAT),
       hint: 'Tabloya tıklamadan sekme görünmez. Önce hücreye tıklayın.',
       on: (ev) => ev.type === 'doc-tab' && ev.tab === 'table',
@@ -279,7 +329,7 @@ export const tabloInce = {
     },
     {
       title: 'Fazlalığı silin',
-      html: '<p>Zeynep Aksoy taşındı. Onun satırında bir hücreye tıklayıp <b>✕ Satırı sil</b>\'e basın.</p>',
+      html: '<p>Zeynep Aksoy taşındı. Onun satırında bir hücreye tıklayıp <b>✕ Satırı sil</b>\'e basın.</p><p class="mut">Gerçek Word\'de: <b>Sil ▾</b> düğmesi → <b>Satırları Sil</b>.</p>',
       on: when((c) => { const t = info(c).table; return t && t.rows === 4 && !norm(info(c).text).includes('zeynep aksoy'); }),
       done: 'Satır silindi; tablo yeniden 3 daire.',
     },
@@ -293,14 +343,31 @@ export const tabloInce = {
     },
     {
       title: 'Çizgileri kalınlaştırın',
-      html: '<p>Tablodayken <b>Çizgiler → Kalın</b>\'a tıklayın. Fotokopide çizgilerin kaybolmaması için kalın çizgi iyidir.</p>',
+      html: '<p>Tablodayken <b>Çizgiler → Kalın</b>\'a tıklayın. Fotokopide çizgilerin kaybolmaması için kalın çizgi iyidir.</p><p class="mut">Gerçek Word\'de çizgi kalınlığı <b>Tablo Tasarımı</b> sekmesinden ayarlanır: <b>Kalem Kalınlığı</b>\'nı seçip <b>Kenarlıklar ▾ → Tüm Kenarlıklar</b>.</p>',
       on: when((c) => info(c).table?.thick),
     },
     {
       title: 'Hücre içini ortalayın',
-      html: '<p>Tablodaki hücrelerin üzerinden sürükleyerek tabloyu seçin (ya da bir hücreye tıklayın) ve <b>Hücre içi → ↕ Orta</b>\'ya tıklayın. Yazı hücrenin dikey ortasında durur.</p>',
+      html: '<p>Tablodaki hücrelerin üzerinden sürükleyerek tabloyu seçin (ya da bir hücreye tıklayın) ve <b>Hücre içi → ↕ Orta</b>\'ya tıklayın. Yazı hücrenin dikey ortasında durur.</p><p class="mut">Gerçek Word\'de <b>Düzen</b> sekmesinin <b>Hizalama</b> bölümünde dokuz küçük düğme vardır; ortadakine basılır.</p>',
       on: when((c) => info(c).table?.valign),
       done: 'Hücre içi hizalama, yüksek satırlarda düzgün görünüm sağlar.',
+    },
+    {
+      title: 'Başlığa gölgelendirme',
+      html: `<ol class="steps"><li>En üstteki <b>AİDAT ÇİZELGESİ</b> hücresine tıklayın.</li><li>Sekmelerin sağındaki <b>Tablo Tasarımı</b>\'na geçin.</li><li><b>🪣 Gölgelendirme ▾</b> → <b>Açık gri</b>.</li></ol>`,
+      mouse: '🖱 Başlık hücresi → Tablo Tasarımı → Gölgelendirme → Açık gri',
+      hint: 'Renklerin adı fareyle üzerine gelince görünür. Açık gri, ikinci kutudur.',
+      check: (c) => !!info(c).table?.headShade,
+      on: when((c) => !!info(c).table?.headShade),
+      done: 'Başlık satırı griye boyandı. Fotokopide de belli olur; MEB sınavında “başlık satırını gölgelendirin” diye sık istenir.',
+    },
+    {
+      title: 'Tablo stili',
+      html: '<p><b>Tablo Tasarımı</b> sekmesindeki <b>Tablo Stilleri</b> örneklerinden <b>şeritli satırlar</b> olanlardan birine tıklayın (üçüncü ya da dördüncü örnek).</p><p class="mut">Gerçek Word\'de Tablo Stilleri bir galeridir: fareyle bir örneğin üzerine gelince tablo o görünüşü gösterir, tıklayınca uygulanır. Galeriyi açmak için sağındaki küçük oka basın.</p>',
+      hint: 'Örneklerin adı fareyle üzerine gelince yazar. Birinci örnek (Tablo Kılavuzu) düz tablodur.',
+      check: (c) => ['serit', 'yesil'].includes(info(c).table?.style),
+      on: when((c) => ['serit', 'yesil'].includes(info(c).table?.style)),
+      done: 'Satırlar bir açık bir koyu oldu: uzun çizelgede göz satırı kaçırmaz. Sizin boyadığınız başlık rengi stile rağmen korundu.',
     },
     rehberSoru({
       title: 'Hangi düğme?',
@@ -341,8 +408,8 @@ export const simgeSekil = {
     },
     {
       title: 'Türk lirası',
-      html: '<p>Sayfaya <b>Ekmek 12</b> yazın, boşluk bırakın. <b>Ekle</b> sekmesi → <b>Ω Simge</b> → <b>₺</b>\'ye tıklayın.</p>',
-      hint: 'Simge düğmesi Ekle sekmesinde, Tarih\'in yanındaki grupta. Palet açılır.',
+      html: '<p>Sayfaya <b>Ekmek 12</b> yazın, boşluk bırakın. <b>Ekle</b> sekmesi → <b>Ω Simge</b> → <b>₺</b>\'ye tıklayın.</p><p class="mut">Gerçek Word\'de Simge listesi yalnızca son kullanılan işaretleri gösterir. ₺ listede yoksa en alttaki <b>Diğer Simgeler…</b>\'e basın. ₺ için kısayol: <b>AltGr + T</b>.</p>',
+      hint: 'Simge düğmesi Ekle sekmesinde, Tarih ve Saat\'in yanındaki grupta. Palet açılır.',
       on: when((c) => /ekmek 12\s*₺/i.test(info(c).text)),
       done: 'Ekmek 12 ₺. Simgenin yeri imlecin olduğu yerdir.',
     },
@@ -362,7 +429,7 @@ export const simgeSekil = {
       title: 'Şekil ekleyin',
       html: `<p>Önce ${K('Enter')} ile <b>yeni bir satıra</b> geçin (şekil yazının yanına yapışmasın). Sonra <b>Ekle → ◇ Şekil → ➜ Ok</b>'a tıklayın. Sayfaya yeşil bir ok kutusu gelir.</p>`,
       on: when((c) => info(c).shapes >= 1),
-      done: 'Şeklin içine tıklayıp yazı yazabilirsiniz.',
+      done: 'Şeklin içine tıklayıp yazı yazabilirsiniz. Gerçek Word\'de <b>Ekle → Şekiller</b>\'den şekli seçtikten sonra sayfada fareyle <b>sürükleyerek çizersiniz</b>; içinde yazı olmaz, şekle bir kez tıklayıp yazmaya başlarsınız.',
     },
     {
       title: 'Şeklin içine yazın',
@@ -402,9 +469,59 @@ export const dilekceParkur = {
     { title: '4. Konuyu yazın', html: '<p>Alt satıra <b>Konu: Sokak lambası hakkında</b> yazın. Satır ortalı geliyorsa önce <b>Sola Hizala</b>\'ya (Ctrl + L) basın.</p>', on: when((c) => block(c, 'konu: sokak lambası')) },
     { title: '5. Metin', html: '<p>Bir paragraf yazın (en az iki cümle): sokağınızdaki lambanın yanmadığını ve değiştirilmesini rica edin. Paragrafı şu cümleyle bitirin: <b>Gereğini saygılarımla arz ederim.</b></p>', hint: 'Satır sonlarında Enter\'a basmayın. Her cümlenin sonuna nokta koyun.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && norm(b.text).includes('lamba') && (b.text.match(/[.!?]/g) || []).length >= 2 && norm(b.text).includes('saygılarımla arz ederim'))) },
     { title: '6. İki yana yaslayın', html: '<p>Yazdığınız metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: 'Paragrafa üç tıkla; Ctrl + J.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && b.align === 'justify')) },
-    { title: '7. Tarih ve ad', html: '<p>Altına <b>bugünün tarihini</b> (Ekle → Tarih) ve <b>adınızı soyadınızı</b> yazıp ikisini <b>sağa hizalayın</b>.</p>', hint: 'Ekle → Tarih. İkisini birlikte seçip Ctrl + R.', on: when((c) => { const b = info(c).blocks.filter((x) => x.text); const i = b.findIndex((x) => x.text.includes(today())); return i >= 0 && b[i].align === 'right' && b.slice(i + 1).some((x) => x.align === 'right' && /\p{L}{2,}/u.test(x.text)); }) },
+    { title: '7. Tarih ve ad', html: '<p>Altına <b>bugünün tarihini</b> (Ekle → Tarih ve Saat) ve <b>adınızı soyadınızı</b> yazıp ikisini <b>sağa hizalayın</b>.</p>', hint: 'Ekle → Tarih ve Saat. İkisini birlikte seçip Ctrl + R.', on: when((c) => { const b = info(c).blocks.filter((x) => x.text); const i = b.findIndex((x) => x.text.includes(today())); return i >= 0 && b[i].align === 'right' && b.slice(i + 1).some((x) => x.align === 'right' && /\p{L}{2,}/u.test(x.text)); }) },
     { title: '8. Kaydedin', html: '<p>Belgeyi <b>dilekçe</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S.', on: (ev) => ev.type === 'doc-save' && ev.name.toLocaleLowerCase('tr').includes('dilek') },
     { title: '9. PDF yapın', html: '<p>Aynı belgeyi <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF. Resmî kuruma göndereceğiniz belgeyi PDF yollayın, Word dosyanızı da saklayın.)', on: (ev) => ev.type === 'doc-pdf' },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Bir dilekçeyi baştan sona hazırladınız.</p>' },
+  ],
+};
+
+// MEB uygulama sınavına benzeyen ölçülü görev: hazır yazıyı verilen ölçülere getirmek
+const PROVA = 'sınav provası.docx';
+const PROVA_HTML = `<p>Kurs bitirme sınavı hakkında</p>
+<p>Bilgisayar İşletmenliği kursunun bitirme sınavı kurs salonunda yapılacaktır. Sınavda her kursiyer bilgisayar başında kendisine verilen belgeyi istenen ölçülere göre düzenleyecektir.</p>
+<p>Sınava gelirken kimlik kartınızı yanınızda getiriniz. Sınav başladıktan sonra salona kimse alınmayacaktır. Süre bitince belgenizi kaydedip yerinizden kalkmadan bekleyiniz.</p>
+<p>Başarılı olan kursiyerlere kurs bitirme belgesi verilecektir. Sınav programı aşağıdaki çizelgede gösterilmiştir.</p>
+<table class="wd-t"><tr><td>Gün</td><td>Saat</td><td>Yer</td></tr><tr><td>Pazartesi</td><td>10.00</td><td>Bilgisayar salonu</td></tr><tr><td>Salı</td><td>14.00</td><td>Bilgisayar salonu</td></tr><tr><td>Çarşamba</td><td>10.00</td><td>Toplantı salonu</td></tr></table>
+<p>Halk Eğitim Merkezi Müdürlüğü</p>`;
+const GOVDE = ['bitirme sınavı kurs salonunda', 'kimlik kartınızı', 'başarılı olan kursiyerlere'];
+const govdeler = (c) => GOVDE.map((w) => block(c, w)).filter(Boolean);
+const metinler = (c) => info(c).blocks.filter((x) => x.text);
+const yaziTipi = (c) => metinler(c).length >= 5 && metinler(c).every((x) => x.fonts?.length && x.fonts.every((n) => n === 'Times New Roman'));
+const near = (a, b) => Math.abs(a - b) < 0.06;
+// Parkurda her belge olayından sonra koşula bakılır (biçim, paragraf, tablo, düzen…)
+const anyDoc = (test) => (ev, c) => ev.type.startsWith('doc-') && !!test(c);
+
+export const mebProva = {
+  id: 'meb-prova', icon: '🎓', title: 'MEB sınav provası: resmî yazı', minutes: 30, stage: 'desktop', parkur: true,
+  desc: 'MEB uygulama sınavındaki gibi ölçüleri verilen bir belge: Times New Roman 12, 1,5 satır aralığı, ilk satır girintisi 1,25 cm, kenar boşlukları 2,5 cm, gölgeli tablo başlığı, sayfa numarası, PDF. Süreler tutulur.',
+  setup: (c) => { if (!c.d.fs.find('docs', PROVA)) c.d.fs.create('docs', { type: 'file', name: PROVA, content: { html: PROVA_HTML, layout: { margin: 'dar' } } }); },
+  steps: [
+    {
+      title: 'Sınav provası',
+      html: `<p>MEB uygulama sınavında size hazır bir yazı ve bir <b>ölçü listesi</b> verilir. Bu parkurda aynısını yapacaksınız. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>
+        <table class="sum"><tr><td>Yazı tipi</td><td>Times New Roman, 12 punto</td></tr><tr><td>Başlık</td><td>Ortalı, kalın, 14 punto</td></tr><tr><td>Paragraflar</td><td>İki yana yaslı, ilk satır girintisi 1,25 cm, satır aralığı 1,5</td></tr>
+        <tr><td>Kenar boşlukları</td><td>Dört kenar 2,5 cm</td></tr><tr><td>Tablo</td><td>Başlık satırı gölgeli</td></tr><tr><td>Sayfa numarası</td><td>Sayfanın altında, ortada</td></tr><tr><td>Kayıt</td><td>PDF olarak</td></tr></table>`,  // Eğitmen notu: son ekranda her görevin süresi görünür.
+      setup: (c) => { desktopReady(c); c.d.closeAll(); },
+    },
+    { title: '1. Belgeyi açın', html: `<p><b>Belgeler</b> klasöründeki <b>${PROVA}</b> belgesini açın.</p>`, hint: 'Dosya Gezgini → Belgeler → dosyaya çift tık. Ya da Kelime İşlemci\'de Dosya → Aç.',
+      check: (c) => /sınav provası/i.test(info(c).fileName || ''), on: (ev, c) => !!W(c) && /sınav provası/i.test(info(c).fileName || '') },
+    { title: '2. Yazı tipi ve boyutu', html: '<p>Bütün belgeyi <b>Times New Roman</b>, <b>12 punto</b> yapın.</p>', hint: 'Ctrl + A ile hepsini seçin; Giriş sekmesinde yazı tipi kutusu ve yanındaki boyut kutusu.',
+      on: anyDoc((c) => yaziTipi(c) && metinler(c).every((x) => x.size === 12)) },
+    { title: '3. Başlık', html: '<p>İlk satırdaki başlığı <b>ortalı, kalın ve 14 punto</b> yapın.</p>', hint: 'Başlığa üç kez tıklayıp seçin; Ctrl + E, Ctrl + B ve boyut kutusundan 14.',
+      on: anyDoc((c) => { const b = block(c, 'sınavı hakkında'); return b && b.align === 'center' && b.bold && b.size >= 14; }) },
+    { title: '4. İki yana yaslayın', html: '<p>Üç metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: '“Bilgisayar İşletmenliği…” paragrafının başından “…gösterilmiştir.” sözcüğünün sonuna kadar sürükleyip seçin, Ctrl + J.',
+      on: anyDoc((c) => govdeler(c).length === 3 && govdeler(c).every((b) => b.align === 'justify')) },
+    { title: '5. İlk satır ve satır aralığı', html: '<p>Aynı üç paragrafa <b>ilk satır girintisi 1,25 cm</b> ve <b>1,5 satır aralığı</b> verin.</p>', hint: 'Üç paragraf seçiliyken Giriş → Paragraf bölümünün sağ altındaki küçük ok (↘). Özel: İlk satır, Ölçü: 1,25 cm; Satır aralığı: 1,5 satır; Tamam.',
+      on: anyDoc((c) => govdeler(c).length === 3 && govdeler(c).every((b) => near(b.first, 1.25) && near(b.lh, 1.5))) },
+    { title: '6. Kenar boşlukları', html: '<p>Belgenin kenar boşlukları dar. <b>Dört kenarı da 2,5 cm</b> yapın.</p>', hint: 'Düzen → Kenar Boşlukları ▾ → Özel Kenar Boşlukları…: Üst, Alt, Sol, Sağ kutularına 2,5 yazıp Tamam. (Hazır Normal de 2,5 cm\'dir.)',
+      on: (ev, c) => { if (ev.type !== 'doc-layout') return false; const l = info(c).layout; return l.margin === 'normal' || (l.margin === 'ozel' && ['top', 'bottom', 'left', 'right'].every((k) => l.mg?.[k] === 2.5)); } },
+    { title: '7. Tablo başlığı', html: '<p>Tablonun <b>ilk satırını</b> (Gün, Saat, Yer) <b>açık gri</b> ile gölgelendirin.</p>', hint: 'İlk satırın üç hücresini soldan sağa sürükleyerek seçin; Tablo Tasarımı → Gölgelendirme ▾ → Açık gri.',
+      on: anyDoc((c) => !!info(c).table?.headShade) },
+    { title: '8. Sayfa numarası', html: '<p>Sayfanın <b>altına, ortaya</b> sayfa numarası ekleyin.</p>', hint: 'Ekle → Sayfa Numarası ▾ → Sayfanın Altı → Düz Numara 2.',
+      on: (ev, c) => ev.type === 'doc-pagenum' && info(c).pageNum === 'orta' },
+    { title: '9. PDF', html: '<p>Belgeyi <b>Belgeler</b> klasörüne <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF.)',
+      on: (ev) => ev.type === 'doc-pdf' },
+    { final: true, title: 'Prova bitti! 🎉', html: '<p>Sınavda istenen ölçülerin hepsini uyguladınız. Gerçek sınavdan önce aynı işleri gerçek Word\'de de bir kez deneyin.</p>' },
   ],
 };

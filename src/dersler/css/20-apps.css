@@ -1314,6 +1314,16 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .wd-shpal { flex-direction: column; }
 .wd-shpal button { width: auto; height: auto; white-space: nowrap; text-align: left; padding: 0.3em 0.7em; }
 .dlg-pv { display: flex; flex-direction: column; align-items: center; gap: 0.4em; margin-bottom: 0.6em; }
+/* Fotoğraf yazdırma önizlemesi (dialog.js print photo): A4 sayfa ya da 10 × 15 kâğıt, üzerinde fotoğraf(lar) */
+.pz-pv { display: flex; flex-direction: column; align-items: center; gap: 0.4em; }
+.pz-pg { width: 9.5em; height: 13.4em; background: #fff; box-shadow: 0 1px 4px #0004; padding: 0.45em; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center; gap: 0.3em; }
+.pz-pg img { object-fit: cover; display: block; }
+.pz-tam img { width: 100%; height: 100%; }
+.pz-13x18 img { width: 62%; height: 60%; }
+.pz-10x15 img { width: 47%; height: 50%; }
+.pz-cuzdan img { width: 30%; height: 30%; }
+.pz-pg.pz-k10 { width: 7.4em; height: 11.1em; padding: 0; }
+.pz-k10 img { width: 100%; height: 100%; }
 .dlg-pvbox { width: 11em; height: 15.5em; overflow: hidden; border: 1px solid #888; background: #fff; box-shadow: 0 2px 6px #0003; position: relative; }
 .dlg-pvbox.yatay { width: 15.5em; height: 11em; }
 .dlg-pvp { width: 42em !important; min-height: 0 !important; margin: 0 !important; box-shadow: none !important; transform: scale(0.262); transform-origin: top left; pointer-events: none; font-size: 11pt; box-sizing: border-box; }
@@ -1570,3 +1580,40 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .xl-vl button:hover { background: #cfe3fa; }
 .xl-vnote { font-size: 0.85em; color: #555; margin: 0.2em 0; } .xl-vnote.bad { color: #b3261e; }
 .xl-sheet td, td.act { position: relative; }
+
+/* Cihazımı Bul (apps/siteler-bul.js): kaybolan telefonu haritada görmek, çaldırmak, kilitlemek */
+.cb { text-align: left; }
+.cb-head { background: #1a73e8; color: #fff; padding: 0.7em 1.2em; font-size: 1.25em; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+.cb-head span { font-size: 0.6em; font-weight: 400; }
+.cb-login { max-width: 26em; margin: 1.5em auto; display: flex; flex-direction: column; gap: 0.6em; }
+.cb-login h1 { font-size: 1.3em; margin: 0; }
+.wp .cb-acc { display: flex; align-items: center; gap: 0.8em; padding: 0.6em 0.9em; border: 1px solid #ccc; border-radius: 10px; background: #fff; cursor: pointer; text-align: left; font: inherit; }
+.cb-acc > b { font-size: 1.6em; }
+.cb-acc span { display: flex; flex-direction: column; }
+.cb-acc small { color: #555; }
+.wp .cb-acc:hover { background: #eef4ff; }
+.cb-body { display: flex; gap: 1em; padding: 1em; flex-wrap: wrap; }
+.cb-side { flex: 0 0 15em; display: flex; flex-direction: column; gap: 0.5em; }
+.cb-dev { border: 1px solid #ddd; border-radius: 10px; padding: 0.6em 0.8em; display: flex; flex-direction: column; gap: 0.15em; }
+.cb-dev small { color: #555; }
+.wp .cb-btn { display: flex; flex-direction: column; align-items: flex-start; padding: 0.55em 0.9em; border: 1px solid #c9d7f2; border-radius: 10px; background: #f4f8ff; font: inherit; font-weight: 700; cursor: pointer; text-align: left; }
+.cb-btn small { font-weight: 400; color: #555; font-size: 0.85em; }
+.wp .cb-btn:hover { background: #e3edff; }
+.wp .cb-btn.cb-del { background: #fff5f5; border-color: #f2c9c9; color: #a01818; }
+.cb-main { flex: 1 1 18em; min-width: 0; display: flex; flex-direction: column; gap: 0.5em; }
+.cb-panel { border: 1px solid #ccc; border-radius: 10px; padding: 0.7em 0.9em; background: #fff; }
+.cb-warn { background: #fff5f5; border-color: #e7a2a2; }
+.cb-panel p { margin: 0.4em 0 0; }
+.cb-panel input { min-width: 18em; }
+.ed-btn.cb-red { background: #c62828; margin-left: 0.5em; }
+.cb-map { position: relative; height: 15em; border-radius: 10px; overflow: hidden; background: #e8f0e3; border: 1px solid #cfd8c8; }
+.cb-map i { position: absolute; background: #fff; box-shadow: 0 0 0 1px #d6d6d6; }
+.cb-map .cb-r1 { left: 0; right: 0; top: 45%; height: 1.1em; }
+.cb-map .cb-r2 { top: 0; bottom: 0; left: 38%; width: 1.1em; }
+.cb-map .cb-r3 { top: 0; bottom: 0; left: 75%; width: 0.7em; transform: skewX(-12deg); }
+.cb-lbl { position: absolute; font-size: 0.75em; color: #555; background: #fffc; padding: 0 0.3em; border-radius: 3px; }
+.cb-lbl.l1 { left: 8%; top: 22%; } .cb-lbl.l2 { left: 41%; top: 70%; } .cb-lbl.l3 { left: 80%; top: 15%; }
+.cb-map .cb-lbl.l3 { color: #2e7d32; }
+.cb-pin { position: absolute; left: 45%; top: 26%; font-size: 1.8em; display: flex; flex-direction: column; align-items: center; }
+.cb-pin::before { content: ""; position: absolute; top: 0.3em; width: 2.6em; height: 2.6em; margin-top: -0.6em; border-radius: 50%; background: #1a73e833; border: 1px solid #1a73e888; z-index: -1; }
+.cb-pin small { font-size: 0.4em; background: #fff; padding: 0.1em 0.4em; border-radius: 4px; box-shadow: 0 1px 3px #0003; white-space: nowrap; }

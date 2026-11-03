@@ -7,17 +7,65 @@ import * as I from './isletim-simge.js';
 
 const fact = (rows) => `<dl class="tb-facts">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
 
+// Telefon: 960×600 ekran dar kutuda çok küçük kalır. “Tam ekran” düğmesi sahneyi bütün ekrana açar;
+// Android'de gerçek tam ekran + yatay kilit, iPhone'da sayfa içinde tam ekran ve “yan çevirin” notu.
+// Düğme ve üst çubuk yalnızca telefon CSS'inde görünür (35-isletim.css sonu); masaüstü görünümü değişmez.
+const BUYUK = '<button type="button" class="oss-big">⛶ Tam ekranda aç</button>';
+const FBAR = '<div class="oss-fbar"><b></b><button type="button" class="oss-gorev">📋 Görev</button><button type="button" class="oss-dev" hidden>✔ Devam ▶</button><button type="button" class="oss-kucuk">✕ Küçült</button><div class="oss-gpanel" hidden></div></div><p class="oss-cevir">📱↻ Daha büyük görmek için telefonu yan çevirin</p>';
+function buyut(el) {
+  const fbar = el.querySelector('.oss-fbar'), dev = el.querySelector('.oss-dev'), panel = el.querySelector('.oss-gpanel');
+  const ac = () => {
+    el.classList.add('oss-full');
+    document.body.classList.add('oss-fullon');
+    fbar.querySelector('b').textContent = document.querySelector('#stepTitle')?.textContent || '';
+    panel.innerHTML = document.querySelector('#stepBody')?.innerHTML || '';
+    panel.hidden = true;
+    durum();
+    const p = el.requestFullscreen?.({ navigationUI: 'hide' }) || el.webkitRequestFullscreen?.();
+    Promise.resolve(p).then(() => screen.orientation?.lock?.('landscape')).catch(() => {});
+  };
+  const kapat = () => {
+    el.classList.remove('oss-full');
+    document.body.classList.remove('oss-fullon');
+    try { screen.orientation?.unlock?.(); } catch {}
+    if (document.fullscreenElement === el) document.exitFullscreen().catch(() => {});
+    else if (document.webkitFullscreenElement === el) document.webkitExitFullscreen?.();
+  };
+  // Adım tamamlanınca (body.waiting kalkar) üst çubukta “Devam” çıkar
+  const durum = () => { dev.hidden = document.body.classList.contains('waiting'); fbar.classList.toggle('ok', !dev.hidden); };
+  // Tarayıcının geri/aşağı kaydırma hareketiyle tam ekrandan çıkılırsa görünüm de küçülsün
+  const fsc = () => { if (!document.fullscreenElement && !document.webkitFullscreenElement && el.classList.contains('oss-full') && (el.requestFullscreen || el.webkitRequestFullscreen)) kapat(); };
+  document.addEventListener('fullscreenchange', fsc);
+  document.addEventListener('webkitfullscreenchange', fsc);
+  // Sahne başka adıma geçince silinir: dinleyiciler de kaldırılır
+  const mo = new MutationObserver(() => {
+    if (el.isConnected) { durum(); return; }
+    mo.disconnect();
+    document.removeEventListener('fullscreenchange', fsc);
+    document.removeEventListener('webkitfullscreenchange', fsc);
+    if (!document.querySelector('.oss-full')) document.body.classList.remove('oss-fullon');
+  });
+  mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  el.querySelector('.oss-big').addEventListener('click', ac);
+  el.querySelector('.oss-kucuk').addEventListener('click', kapat);
+  el.querySelector('.oss-gorev').addEventListener('click', () => { panel.hidden = !panel.hidden; });
+  panel.addEventListener('click', () => { panel.hidden = true; });
+  dev.addEventListener('click', () => { kapat(); document.querySelector('#next')?.click(); });
+}
+
 // Sağdaki sahnede tek bir işletim sistemi açılır (bilgisayar açılıştan başlar)
 const osSahne = (id) => (el, c) => {
   el.className = 'sc sc-os';
-  el.innerHTML = '<div class="oss"></div>';
-  kur(el.firstElementChild, OSES[id], c);
+  el.innerHTML = `${BUYUK}${FBAR}<div class="oss"></div>`;
+  buyut(el);
+  kur(el.querySelector('.oss'), OSES[id], c);
 };
 // Serbest gezinti: üstteki düğmelerle sistemler arasında geçilir
 const LOGO = { w7: () => I.w7flag(), w8: () => I.w8logo('#2672ec'), w10: () => I.w8logo('#0078d7'), w11: () => I.w11logo(), lnx: () => I.ubuntu(), prd: () => I.pardus() };
 const osGezinti = (ids) => (el, c) => {
   el.className = 'sc sc-os';
-  el.innerHTML = `<div class="oss-tabs">${ids.map((id) => `<button type="button" data-os="${id}">${LOGO[id]()}${OSES[id].name}</button>`).join('')}</div><div class="oss"></div>`;
+  el.innerHTML = `${BUYUK}${FBAR}<div class="oss-tabs">${ids.map((id) => `<button type="button" data-os="${id}">${LOGO[id]()}${OSES[id].name}</button>`).join('')}</div><div class="oss"></div>`;
+  buyut(el);
   const box = el.querySelector('.oss');
   let stop;
   const go = (id) => {

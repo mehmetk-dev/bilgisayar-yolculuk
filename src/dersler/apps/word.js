@@ -25,7 +25,19 @@ const CASES = {
   upper: ['BÜYÜK HARF', trUp],
   title: ['Her Sözcüğün İlk Harfi Büyük', (t) => trLow(t).replace(/(^|\s)(\p{L})/gu, (m, a, b) => a + trUp(b))],
 };
-const SPACING = ['1,0', '1,15', '1,5', '2,0'];
+const SPACING = ['1,0', '1,15', '1,5', '2,0', '2,5', '3,0'];
+// Paragraf penceresi: Özel girinti ve Satır aralığı seçenekleri (Word'deki adlarıyla)
+const SPECIAL = [['', '(yok)'], ['first', 'İlk satır'], ['hang', 'Asılı']];
+const LHMODE = [['1', 'Tek'], ['1.5', '1,5 satır'], ['2', 'Çift'], ['multi', 'Birden çok']];
+// Tasarım → Sayfa Arka Planı: filigran yazıları ve sayfa rengi
+const WMARKS = ['ÖRNEKTİR', 'ACİL', 'TASLAK'];
+const PAGECOLORS = [['Açık sarı', '#fff8dc'], ['Açık mavi', '#e8f0fb'], ['Açık yeşil', '#eaf5e4'], ['Açık gri', '#f0f0f0'], ['Renk Yok', '']];
+// Tablo Tasarımı → Tablo Stilleri (ilki Word'ün varsayılanı “Tablo Kılavuzu”; ötekiler örnek görünüşler)
+const TSTYLES = [['kilavuz', 'Tablo Kılavuzu (düz çizgili)'], ['mavi', 'Mavi başlık satırı'], ['serit', 'Şeritli satırlar'], ['yesil', 'Yeşil başlık, şeritli satırlar']];
+// Ekle → Sayfa Numarası → Sayfanın Altı
+const PNPOS = [['sol', 'Düz Numara 1 (solda)'], ['orta', 'Düz Numara 2 (ortada)'], ['sag', 'Düz Numara 3 (sağda)']];
+// Gözden Geçir → Görüntülenecek İşaretleme (Word'ün varsayılanı Basit İşaretleme)
+const MARKUP = [['simple', 'Basit İşaretleme'], ['all', 'Tüm İşaretlemeler'], ['none', 'İşaretleme Yok'], ['orig', 'Özgün']];
 // Paragraf kenarlığı (Giriş → Kenarlıklar) ve gölgelendirme (Giriş → Gölgelendirme)
 const PBORDERS = [['box', '▢ Dış Kenarlıklar'], ['top', '▔ Üst Kenarlık'], ['bottom', '▁ Alt Kenarlık'], ['none', '✕ Kenarlık Yok']];
 const SHADES = [['Açık mavi', '#dbe5f1'], ['Açık gri', '#e7e6e6'], ['Açık sarı', '#fff2cc'], ['Açık yeşil', '#e2efd9'], ['Renk Yok', 'transparent']];
@@ -36,7 +48,22 @@ const WORDART = [['mavi', 'Mavi dolgu, gölgeli'], ['altin', 'Altın dolgu'], ['
 const TBOXES = [['basit', '▭ Basit Metin Kutusu'], ['sag', '▯ Sağa yaslı kutu (yazı yanından akar)']];
 const PH = 'Metninizi buraya yazın';
 const SYMBOLS = ['₺', '€', '$', '©', '®', '™', '°', '±', '×', '÷', '½', '¼', '²', '³', '✓', '✗', '★', '☎', '✉', '→', '•', '…', '«', '»', 'â', 'î', 'û', 'Â', 'Î', 'Û', '§', '¶'];
-const MARGINS = { normal: ['Normal', '2,5 cm', '2.5em 3em'], dar: ['Dar', '1,27 cm', '1.3em 1.5em'], genis: ['Geniş', '5 cm (yanlar)', '2.5em 5.5em'] };
+const MARGINS = { normal: ['Normal', 'Üst, alt, sol, sağ: 2,5 cm', '2.5em 3em'], dar: ['Dar', 'Dört kenar: 1,27 cm', '1.3em 1.5em'], genis: ['Geniş', 'Üst, alt: 2,54 cm · Sol, sağ: 5,08 cm', '2.5em 5.5em'] };
+// Hazır kenar boşluklarının santimetresi (Özel Kenar Boşlukları penceresinde gösterilir)
+const MARGIN_CM = { normal: [2.5, 2.5, 2.5, 2.5], dar: [1.27, 1.27, 1.27, 1.27], genis: [2.54, 2.54, 5.08, 5.08] };
+// Kâğıttaki boşluk: üst/alt 1 em, sol/sağ 1,2 em ≈ 1 cm (hazır boşluklarla aynı ölçek)
+const padOf = (l) => (l.margin === 'ozel' && l.mg ? `${l.mg.top}em ${l.mg.right * 1.2}em ${l.mg.bottom}em ${l.mg.left * 1.2}em` : (MARGINS[l.margin] || MARGINS.normal)[2]);
+// Sayı yazımı (1.25 → “1,25”) ve okunuşu (“1,25 cm” → 1.25)
+const fmt = (n) => String(+(+n).toFixed(2)).replace('.', ',');
+const num = (s) => { const m = String(s).match(/-?\d+(?:[.,]\d+)?/); return m ? parseFloat(m[0].replace(',', '.')) : 0; };
+// Ölçü kutusuna ilk tıklayınca içindeki yazı seçilir (yeni ölçü eskisinin yerine yazılır); sonraki tıklamalar imleci koyar
+const selectOnFocus = (i) => {
+  i.addEventListener('focus', () => { i.select(); i.dataset.fresh = '1'; });
+  i.addEventListener('mouseup', (e) => { if (i.dataset.fresh) { e.preventDefault(); i.select(); delete i.dataset.fresh; } });
+  i.addEventListener('keydown', () => { delete i.dataset.fresh; });
+};
+// Biçem değerini santimetreye çevirir ('1.25cm', '10pt', '20px')
+const toCm = (v) => { const n = parseFloat(v) || 0; return /cm$/.test(v) ? n : /pt$/.test(v) ? n / 28.35 : n / 37.8; };
 // Yazım denetimi: yetişkinlerin en sık karıştırdığı yazımlar (yanlış → doğru)
 const SPELL = {
   herkez: 'herkes', yanlız: 'yalnız', yanlızca: 'yalnızca', yalnış: 'yanlış', yalnışlık: 'yanlışlık', malesef: 'maalesef', birşey: 'bir şey',
@@ -65,47 +92,61 @@ export const TEMPLATES = {
 export function word({ desk, body, args, emit, setTitle }) {
   body.classList.add('wd');
   body.innerHTML = `
-    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="refs">Başvurular</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button><button type="button" data-tab="pic" class="wd-tabpic" hidden>Resim Biçimi</button></div>
+    <div class="wd-tabs"><button type="button" class="wd-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="design">Tasarım</button><button type="button" data-tab="layout">Düzen</button><button type="button" data-tab="refs">Başvurular</button><button type="button" data-tab="mail">Postalar</button><button type="button" data-tab="review">Gözden Geçir</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="tdesign" class="wd-tabtbl" hidden>Tablo Tasarımı</button><button type="button" data-tab="table" class="wd-tabtbl" hidden>Tablo Düzeni</button><button type="button" data-tab="pic" class="wd-tabpic" hidden>Resim Biçimi</button></div>
     <div class="wd-rib" data-tab="home">
       <div class="wd-grp"><button type="button" data-cmd="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-cmd="redo" title="Yinele (Ctrl + Y)">↷</button></div>
       <div class="wd-grp"><button type="button" class="wd-clip" data-clip="cut" title="Kes (Ctrl + X)">✂</button><button type="button" class="wd-clip" data-clip="copy" title="Kopyala (Ctrl + C)">⧉</button><button type="button" class="wd-clip" data-clip="paste" title="Yapıştır (Ctrl + V)">📋</button><button type="button" class="wd-painter" title="Biçim Boyacısı: seçili yazının biçimini kopyalar, sonra başka bir yazıyı seçin">🖌</button></div>
-      <div class="wd-grp"><select class="wd-font" title="Yazı tipi">${FONTS.map(([n]) => `<option>${n}</option>`).join('')}</select>
+      <div class="wd-grp wd-g2"><div class="wd-row"><select class="wd-font" title="Yazı tipi">${FONTS.map(([n]) => `<option>${n}</option>`).join('')}</select>
         <select class="wd-size" title="Yazı tipi boyutu">${SIZES.map((s) => `<option${s === 11 ? ' selected' : ''}>${s}</option>`).join('')}</select>
         <span class="wd-mmwrap"><button type="button" class="wd-casebtn" title="Büyük/küçük harf değiştir">Aa▾</button><span class="wd-mpop wd-cases" hidden>${Object.entries(CASES).map(([k, [l]]) => `<button type="button" data-case="${k}">${l}</button>`).join('')}</span></span></div>
-      <div class="wd-grp"><button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button><button type="button" data-cmd="underline" title="Altı çizili (Ctrl + U)"><u>A</u></button><button type="button" data-cmd="strikeThrough" title="Üstü çizili"><s>abc</s></button><button type="button" data-cmd="subscript" title="Alt simge (H₂O)">x₂</button><button type="button" data-cmd="superscript" title="Üst simge (m²)">x²</button>
+        <div class="wd-row"><button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button><button type="button" data-cmd="underline" title="Altı çizili (Ctrl + U)"><u>A</u></button><button type="button" data-cmd="strikeThrough" title="Üstü çizili"><s>abc</s></button><button type="button" data-cmd="subscript" title="Alt simge (H₂O)">x₂</button><button type="button" data-cmd="superscript" title="Üst simge (m²)">x²</button>
         <span class="wd-colorwrap"><button type="button" class="wd-hilite" title="Metin vurgu rengi (fosforlu kalem)"><span>🖍</span><i style="background:#fff176"></i></button><span class="wd-pal wd-hpal" hidden>${HILITE.map(([n, c]) => `<button type="button" data-hilite="${c}" title="${n}" style="background:${c}">${c === 'transparent' ? '∅' : ''}</button>`).join('')}</span></span>
         <span class="wd-colorwrap"><button type="button" class="wd-color" title="Yazı tipi rengi"><span>A</span><i style="background:#c00000"></i></button><span class="wd-pal" hidden>${COLORS.map(([n, c]) => `<button type="button" data-color="${c}" title="${n}" style="background:${c}"></button>`).join('')}</span></span>
-        <button type="button" data-cmd="removeFormat" title="Tüm biçimlendirmeyi temizle">A⌫</button></div>
-      <div class="wd-grp">${Object.entries(ALIGN).map(([c, t], i) => `<button type="button" data-cmd="${c}" title="${t} (Ctrl + ${'LERJ'[i]})" class="wd-al wd-${c}"><span></span><span></span><span></span></button>`).join('')}</div>
-      <div class="wd-grp"><button type="button" data-cmd="insertUnorderedList" title="Madde işaretleri">• ≡</button><button type="button" data-cmd="insertOrderedList" title="Numaralandırma">1. ≡</button><button type="button" data-cmd="outdent" title="Girintiyi azalt">⇤</button><button type="button" data-cmd="indent" title="Girintiyi artır">⇥</button>
-        <select class="wd-lh" title="Satır ve paragraf aralığı">${SPACING.map((v) => `<option${v === '1,15' ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
-      <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-tabsbtn" title="Sekmeler: Tab tuşunun gideceği yer (sekme durağı), hizası ve öncüsü (noktalı çizgi). Gerçek Word'de: Paragraf bölümünün sağ altındaki küçük ok → Sekmeler…">↹ Sekmeler…</button><span class="wd-tpop wd-tabpop" hidden><b>Sekmeler</b>
+        <button type="button" data-cmd="removeFormat" title="Tüm biçimlendirmeyi temizle">A⌫</button></div><small class="wd-gcap">Yazı Tipi</small></div>
+      <div class="wd-grp wd-g2 wd-gpar"><div class="wd-row"><button type="button" data-cmd="insertUnorderedList" title="Madde işaretleri">• ≡</button><button type="button" data-cmd="insertOrderedList" title="Numaralandırma">1. ≡</button><button type="button" data-cmd="outdent" title="Girintiyi azalt">⇤</button><button type="button" data-cmd="indent" title="Girintiyi artır">⇥</button>
+        <span class="wd-colorwrap"><button type="button" class="wd-tabsbtn" title="Sekmeler: Tab tuşunun gideceği yer (sekme durağı), hizası ve öncüsü (noktalı çizgi). Gerçek Word'de: Paragraf bölümünün sağ altındaki küçük ok → Sekmeler…">↹ Sekmeler…</button><span class="wd-tpop wd-tabpop" hidden><b>Sekmeler</b>
           <label>Sekme durağı konumu <span><input type="number" class="wd-tabpos" min="1" max="16" step="0.5" value="15"> cm</span></label>
           <label>Hizalama <select class="wd-tabal"><option value="left">Sol</option><option value="center">Orta</option><option value="right">Sağ</option></select></label>
           <label>Öncü (doldurma) <select class="wd-tablead">${LEADERS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label>
-          <span class="wd-tabrow"><button type="button" class="wd-tabok">Tamam</button><button type="button" class="wd-tabclr" title="Seçili paragraflardaki sekme duraklarını kaldırır">Tümünü Temizle</button></span></span></span>
-        <span class="wd-colorwrap"><button type="button" class="wd-bordbtn" title="Kenarlıklar: seçili paragrafın çevresine, üstüne ya da altına çizgi">▢ Kenarlık ▾</button><span class="wd-pal wd-bpal" hidden>${PBORDERS.map(([k, l]) => `<button type="button" data-pborder="${k}">${l}</button>`).join('')}</span></span>
-        <span class="wd-colorwrap"><button type="button" class="wd-shadebtn" title="Gölgelendirme: paragrafın arkasını boyar"><span>🪣</span><i style="background:#dbe5f1"></i></button><span class="wd-pal wd-gpal" hidden>${SHADES.map(([n, c]) => `<button type="button" data-shade="${c}" title="${n}" style="background:${c}">${c === 'transparent' ? '∅' : ''}</button>`).join('')}</span></span></div>
+          <span class="wd-tabrow"><button type="button" class="wd-tabok">Tamam</button><button type="button" class="wd-tabclr" title="Seçili paragraflardaki sekme duraklarını kaldırır">Tümünü Temizle</button></span></span></span></div>
+        <div class="wd-row">${Object.entries(ALIGN).map(([c, t], i) => `<button type="button" data-cmd="${c}" title="${t} (Ctrl + ${'LERJ'[i]})" class="wd-al wd-${c}"><span></span><span></span><span></span></button>`).join('')}
+        <span class="wd-colorwrap"><button type="button" class="wd-lhbtn" title="Satır ve Paragraf Aralığı"><b>↕\uFE0E</b><span class="wd-lhic"><i></i><i></i><i></i></span>▾</button><span class="wd-pal wd-dlist wd-lhpal" hidden>${SPACING.map((v) => `<button type="button" data-lh="${v}">${v}</button>`).join('')}<button type="button" class="wd-lhmore">Satır Aralığı Seçenekleri…</button></span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-shadebtn" title="Gölgelendirme: paragrafın arkasını boyar"><span>🪣</span><i style="background:#dbe5f1"></i></button><span class="wd-pal wd-gpal" hidden>${SHADES.map(([n, c]) => `<button type="button" data-shade="${c}" title="${n}" style="background:${c}">${c === 'transparent' ? '∅' : ''}</button>`).join('')}</span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-bordbtn" title="Kenarlıklar: seçili paragrafın çevresine, üstüne ya da altına çizgi">▢ Kenarlık ▾</button><span class="wd-pal wd-bpal" hidden>${PBORDERS.map(([k, l]) => `<button type="button" data-pborder="${k}">${l}</button>`).join('')}</span></span></div>
+        <small class="wd-gcap">Paragraf<button type="button" class="wd-parbtn" title="Paragraf Ayarları: girinti, ilk satır, önce/sonra aralık ve satır aralığı penceresi">↘</button></small>
+        <span class="wd-tpop wd-parpop" hidden><b>Paragraf</b><small>Girintiler ve Aralıklar</small>
+          <b class="wd-parh">Girinti</b>
+          <label>Sol: <input class="wd-pin" data-p="left"></label><label>Sağ: <input class="wd-pin" data-p="right"></label>
+          <label>Özel: <select class="wd-pspec">${SPECIAL.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label><label>Ölçü: <input class="wd-pin" data-p="by"></label>
+          <b class="wd-parh">Aralık</b>
+          <label>Önce: <input class="wd-pin" data-p="before"></label><label>Sonra: <input class="wd-pin" data-p="after"></label>
+          <label>Satır aralığı: <select class="wd-plh">${LHMODE.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></label><label>Aralık: <input class="wd-pin" data-p="at"></label>
+          <span class="wd-tabrow"><button type="button" class="wd-partabs">Sekmeler…</button><button type="button" class="wd-tabok wd-parok">Tamam</button><button type="button" class="wd-parno">İptal</button></span></span></div>
       <div class="wd-grp wd-styles">${STYLES.map(([k, n]) => `<button type="button" data-style="${k}" class="wd-st-${k}" title="Stil: ${n}">${n}</button>`).join('')}</div>
       <div class="wd-grp"><button type="button" class="wd-findbtn" title="Bul (Ctrl + F)">🔎 Bul</button><button type="button" class="wd-replbtn" title="Değiştir (Ctrl + H)">⇄ Değiştir</button></div>
     </div>
     <div class="wd-rib" data-tab="insert" hidden>
-      <div class="wd-grp"><button type="button" class="wd-table">▦ Tablo</button><span class="wd-tpop wd-tblpop" hidden><label>Satır <input type="number" class="wd-tr" min="1" max="10" value="3"></label><label>Sütun <input type="number" class="wd-tc" min="1" max="6" value="3"></label><button type="button" class="wd-tok">Ekle</button></span></div>
-      <div class="wd-grp"><button type="button" class="wd-picbtn">🖼 Resim</button><button type="button" class="wd-date">📅 Tarih</button></div>
+      <div class="wd-grp"><button type="button" class="wd-table">▦ Tablo</button><span class="wd-tpop wd-tblpop" hidden><b>Tablo Ekle</b><label>Sütun sayısı <input type="number" class="wd-tc" min="1" max="6" value="3"></label><label>Satır sayısı <input type="number" class="wd-tr" min="1" max="10" value="3"></label><button type="button" class="wd-tok">Tamam</button></span></div>
+      <div class="wd-grp"><button type="button" class="wd-picbtn">🖼 Resim</button><button type="button" class="wd-date" title="Bugünün tarihini imlecin olduğu yere yazar">📅 Tarih ve Saat</button></div>
       <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-sym" title="Simge: klavyede olmayan işaretler">Ω Simge</button><span class="wd-pal wd-spal" hidden>${SYMBOLS.map((c) => `<button type="button" data-sym="${c}">${c}</button>`).join('')}</span></span>
-        <span class="wd-colorwrap"><button type="button" class="wd-link" title="Bağlantı (Ctrl + K)">🔗 Bağlantı</button><span class="wd-tpop wd-lpop" hidden><label>Adres <input class="wd-lurl" placeholder="www.ornek.com.tr"></label><button type="button" class="wd-lok">Ekle</button></span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-link" title="Bağlantı (Ctrl + K)">🔗 Bağlantı</button><span class="wd-tpop wd-lpop" hidden><label>Adres <input class="wd-lurl" placeholder="www.ornek.com.tr"></label><button type="button" class="wd-lok">Tamam</button></span></span>
         <button type="button" class="wd-pb" title="Sayfa sonu (Ctrl + Enter): yazının kalanı yeni sayfadan başlar">⤓ Sayfa sonu</button>
         <span class="wd-colorwrap"><button type="button" class="wd-shbtn" title="Şekil: içine yazı yazılabilen kutu ve oklar">◇ Şekil</button><span class="wd-pal wd-shpal" hidden><button type="button" data-shape="kutu">▭ Kutu</button><button type="button" data-shape="yuvarlak">▢ Yuvarlak kutu</button><button type="button" data-shape="ok">➜ Ok</button></span></span></div>
       <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-tbbtn" title="Metin Kutusu: çerçeveli, ayrı bir yazı kutusu (duyurudaki “önemli not” gibi)">▭ Metin Kutusu ▾</button><span class="wd-pal wd-tbpal" hidden>${TBOXES.map(([k, l]) => `<button type="button" data-tbox="${k}">${l}</button>`).join('')}</span></span>
         <span class="wd-colorwrap"><button type="button" class="wd-wabtn" title="WordArt: süslü, gölgeli, renkli büyük başlık yazısı"><b class="wd-wa wd-wa-mavi">A</b> WordArt ▾</button><span class="wd-pal wd-wapal" hidden>${WORDART.map(([k, l]) => `<button type="button" data-wa="${k}" title="${l}"><b class="wd-wa wd-wa-${k}">A</b></button>`).join('')}</span></span></div>
-      <div class="wd-grp"><button type="button" class="wd-hdrbtn" title="Her sayfanın en üstünde tekrarlanan yazı">▔ Üst bilgi</button><button type="button" class="wd-ftrbtn" title="Her sayfanın en altında tekrarlanan yazı">▁ Alt bilgi</button><button type="button" class="wd-pnbtn" title="Alt bilgiye sayfa numarası ekler">#️ Sayfa numarası</button></div>
+      <div class="wd-grp"><button type="button" class="wd-hdrbtn" title="Her sayfanın en üstünde tekrarlanan yazı">▔ Üst Bilgi</button><button type="button" class="wd-ftrbtn" title="Her sayfanın en altında tekrarlanan yazı">▁ Alt Bilgi</button>
+        <span class="wd-colorwrap"><button type="button" class="wd-pnbtn" title="Alt bilgiye sayfa numarası ekler">#️ Sayfa Numarası ▾</button><span class="wd-pal wd-dlist wd-pnpal" hidden><b class="wd-dh">Sayfanın Altı</b>${PNPOS.map(([k, l]) => `<button type="button" data-pn="${k}">${l}</button>`).join('')}<button type="button" data-pn="">Sayfa Numaralarını Kaldır</button></span></span></div>
+    </div>
+    <div class="wd-rib" data-tab="design" hidden>
+      <div class="wd-grp"><small class="wd-vnote">Sayfa Arka Planı:</small>
+        <span class="wd-colorwrap"><button type="button" class="wd-wmbtn" title="Filigran: sayfanın arkasına silik yazı">Filigran ▾</button><span class="wd-pal wd-dlist wd-wmpal" hidden>${WMARKS.map((w) => `<button type="button" data-wm="${w}">${w}</button>`).join('')}<button type="button" data-wm="">Filigranı Kaldır</button></span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-pcbtn" title="Sayfa Rengi: ekranda kâğıdın arkasını boyar">Sayfa Rengi ▾</button><span class="wd-pal wd-pcpal" hidden>${PAGECOLORS.map(([n, c]) => `<button type="button" data-pcolor="${c}" title="${n}" style="background:${c || '#fff'}">${c ? '' : '∅'}</button>`).join('')}</span></span>
+        <span class="wd-colorwrap"><button type="button" class="wd-pbbtn" title="Sayfa Kenarlıkları: sayfanın çevresine çerçeve">▣ Sayfa Kenarlıkları ▾</button><span class="wd-pal wd-dlist wd-pbpal" hidden><button type="button" data-border="yok">Yok</button><button type="button" data-border="kutu" title="Sayfanın çevresine çerçeve">▣ Kutu</button><button type="button" data-border="cift" title="Çift çizgili çerçeve">▨ Çift çizgi</button></span></span></div>
     </div>
     <div class="wd-rib" data-tab="layout" hidden>
-      <div class="wd-grp">Kenar boşlukları: ${Object.entries(MARGINS).map(([k, [n, cm]]) => `<button type="button" data-margin="${k}" title="${cm}">${n}</button>`).join('')}</div>
+      <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-mgbtn" title="Kenar Boşlukları: kâğıdın kenarlarındaki boş alan">▤ Kenar Boşlukları ▾</button><span class="wd-pal wd-dlist wd-mgpal" hidden>${Object.entries(MARGINS).map(([k, [n, cm]]) => `<button type="button" data-margin="${k}"><b>${n}</b><small>${cm}</small></button>`).join('')}<button type="button" class="wd-mgcustom">Özel Kenar Boşlukları…</button></span></span></div>
       <div class="wd-grp">Yönlendirme: <button type="button" data-orient="dikey" title="Dikey (uzun kenar yukarıda)">▯ Dikey</button><button type="button" data-orient="yatay" title="Yatay (geniş kenar yukarıda)">▭ Yatay</button></div>
       <div class="wd-grp">Sütunlar: <button type="button" data-cols="1">▮ Bir</button><button type="button" data-cols="2">▮▮ İki</button></div>
-      <div class="wd-grp">Sayfa kenarlığı: <button type="button" data-border="yok">Yok</button><button type="button" data-border="kutu" title="Sayfanın çevresine çerçeve">▣ Kutu</button><button type="button" data-border="cift" title="Çift çizgili çerçeve">▨ Çift çizgi</button></div>
-      <div class="wd-grp">Filigran (arka plana silik yazı): <button type="button" data-wm="ÖRNEKTİR">ÖRNEKTİR</button><button type="button" data-wm="ACİL">ACİL</button><button type="button" data-wm="TASLAK">TASLAK</button><button type="button" data-wm="">Yok</button></div>
     </div>
     <div class="wd-rib" data-tab="refs" hidden>
       <div class="wd-grp"><button type="button" class="wd-tocbtn" title="İçindekiler Tablosu: Başlık 1, Başlık 2, Başlık 3 stilli satırlardan sayfa numaralarıyla bir liste yapar">📑 İçindekiler Tablosu</button><button type="button" class="wd-tocupd" title="Tabloyu Güncelleştir: başlık eklendiyse ya da sayfalar kaydıysa içindekiler tablosunu yeniler">⟳ Tabloyu Güncelleştir</button></div>
@@ -121,13 +162,18 @@ export function word({ desk, body, args, emit, setTitle }) {
     <div class="wd-rib" data-tab="review" hidden>
       <div class="wd-grp"><button type="button" class="wd-spell" title="Yazım denetimi (F7)">ABC✓ Yazım denetimi</button><button type="button" class="wd-count" title="Sözcük sayısı">123 Sözcük sayısı</button></div>
       <div class="wd-grp"><button type="button" class="wd-cmtbtn" title="Yeni Açıklama: seçili yazıya sağ kenarda bir not balonu ekler (yazının kendisi değişmez)">💬 Yeni Açıklama</button><button type="button" class="wd-cmtdel" title="Sil: imlecin olduğu ya da tıkladığınız açıklamayı siler">🗑 Sil</button></div>
-      <div class="wd-grp"><button type="button" class="wd-trackbtn" title="Değişiklikleri İzle (Ctrl + Shift + E): açıkken eklediğiniz yazı altı çizili renkli, sildiğiniz yazı üstü çizili görünür; belge sahibi her birini kabul eder ya da reddeder">📝 Değişiklikleri İzle</button></div>
+      <div class="wd-grp"><button type="button" class="wd-trackbtn" title="Değişiklikleri İzle (Ctrl + Shift + E): açıkken yaptığınız her değişiklik işaretlenir; belge sahibi her birini kabul eder ya da reddeder">📝 Değişiklikleri İzle</button>
+        <select class="wd-markup" title="Görüntülenecek İşaretleme: Basit İşaretleme'de değişiklikler yalnızca soldaki kırmızı çizgiyle belli olur; Tüm İşaretlemeler'de silinen yazı üstü çizili, eklenen yazı altı çizili renkli görünür">${MARKUP.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></div>
       <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-acc" title="Kabul Et ve Sonrakine Geç: değişikliği belgeye işler, sonrakini seçer">✔ Kabul Et</button><button type="button" class="wd-accm" title="Kabul Et seçenekleri">▾</button><span class="wd-pal wd-accpal" hidden><button type="button" data-rv="accept">✔ Kabul Et ve Sonrakine Geç</button><button type="button" data-rv="acceptAll">✔ Tüm Değişiklikleri Kabul Et</button></span></span>
         <span class="wd-colorwrap"><button type="button" class="wd-rej" title="Reddet ve Sonrakine Geç: değişikliği geri alır, sonrakini seçer">✖ Reddet</button><button type="button" class="wd-rejm" title="Reddet seçenekleri">▾</button><span class="wd-pal wd-rejpal" hidden><button type="button" data-rv="reject">✖ Reddet ve Sonrakine Geç</button><button type="button" data-rv="rejectAll">✖ Tüm Değişiklikleri Reddet</button></span></span>
         <button type="button" data-rv="prev" title="Önceki değişiklik">◀ Önceki</button><button type="button" data-rv="next" title="Sonraki değişiklik">Sonraki ▶</button></div>
     </div>
     <div class="wd-rib" data-tab="view" hidden>
       <div class="wd-grp"><label class="wd-chk"><input type="checkbox" class="wd-rulerchk"> Cetvel</label><small class="wd-vnote">Yakınlaştırma: sağ alttaki çubuk ya da Ctrl + fare tekerleği</small></div>
+    </div>
+    <div class="wd-rib" data-tab="tdesign" hidden>
+      <div class="wd-grp">Tablo Stilleri: ${TSTYLES.map(([k, n]) => `<button type="button" data-tstyle="${k}" title="${n}" class="wd-tsw wd-tsw-${k}"><i></i><i></i><i></i></button>`).join('')}</div>
+      <div class="wd-grp"><span class="wd-colorwrap"><button type="button" class="wd-tshbtn" title="Gölgelendirme: seçili hücrelerin arkasını boyar"><span>🪣</span><i style="background:#e7e6e6"></i> Gölgelendirme ▾</button><span class="wd-pal wd-tshpal" hidden>${SHADES.map(([n, c]) => `<button type="button" data-tshade="${c}" title="${n}" style="background:${c}">${c === 'transparent' ? '∅' : ''}</button>`).join('')}</span></span></div>
     </div>
     <div class="wd-rib" data-tab="table" hidden>
       <div class="wd-grp">Satır: <button type="button" data-tb="rowAbove">↑ Üste ekle</button><button type="button" data-tb="rowBelow">↓ Alta ekle</button><button type="button" data-tb="rowDel">✕ Satırı sil</button></div>
@@ -140,7 +186,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp">Metni kaydır: ${WRAPS.map(([k, l, ic]) => `<button type="button" data-pwrap="${k}">${ic} ${l}</button>`).join('')}</div>
       <div class="wd-grp"><button type="button" class="wd-pcrop" title="Resmin kenarlarındaki siyah çizgileri içeri çekerek istemediğiniz yerleri kesin">✂ Kırp</button><button type="button" class="wd-preset" title="Kırpmayı ve boyutu geri alır">↺ Resmi sıfırla</button></div>
     </div>
-    <div class="wd-find" hidden><b class="wd-fh">Bul ve Değiştir</b><label>Aranan <input class="wd-fq"></label><label class="wd-rrow">Yeni <input class="wd-rq"></label>
+    <div class="wd-find" hidden><b class="wd-fh">Bul ve Değiştir</b><label>Aranan <input class="wd-fq"></label><label class="wd-rrow">Yeni değer <input class="wd-rq"></label>
       <span class="wd-fn"></span><button type="button" data-f="next">Sonrakini bul</button><button type="button" data-f="repl" class="wd-rrow">Değiştir</button><button type="button" data-f="all" class="wd-rrow">Tümünü değiştir</button><button type="button" data-f="close" title="Kapat">✕</button></div>
     <div class="wd-spane" hidden></div>
     <div class="wd-menu" hidden><button type="button" data-file="new">📄 Yeni…</button><button type="button" data-file="open">📂 Aç…</button><button type="button" data-file="info">ℹ Bilgi <small>Belgeyi Koru</small></button><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="pdf">📕 PDF olarak kaydet…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button><button type="button" data-file="close">✕ Kapat</button></div>
@@ -154,10 +200,12 @@ export function word({ desk, body, args, emit, setTitle }) {
   const $ = (s) => body.querySelector(s);
   const page = $('.wd-page');
   let fileName = null, folder = 'docs', dirty = false, range = null;
-  const DEF_LAYOUT = { margin: 'normal', orient: 'dikey', cols: 1, border: 'yok', wm: '' };
+  // margin: 'normal' | 'dar' | 'genis' | 'ozel' (mg: { top, bottom, left, right } cm); pcolor: Tasarım → Sayfa Rengi
+  const DEF_LAYOUT = { margin: 'normal', orient: 'dikey', cols: 1, border: 'yok', wm: '', pcolor: '', mg: null };
   const layout = { ...DEF_LAYOUT };
   // Gözden Geçir ve Belgeyi Koru: izleme açık mı, açıklama balonları, belgenin parolası (dosyada { track, comments, pass })
   let track = false, docPass = '', locked = false, cmtSeq = 1, cmtOn = null;
+  let markup = 'simple'; // Görüntülenecek İşaretleme: Word gibi Basit İşaretleme ile başlar
   const cmtBox = $('.wd-cmts');
 
   const title = () => setTitle(`${dirty ? '*' : ''}${fileName || 'Belge1'} - Kelime İşlemci`);
@@ -190,15 +238,24 @@ export function word({ desk, body, args, emit, setTitle }) {
   const words = () => {
     const pc = pageCount();
     $('.wd-words').textContent = `Sayfa 1 / ${pc} · ${countWords()} sözcük`;
-    pn.textContent = `Sayfa 1 / ${pc}`;
+    pn.textContent = '1'; // Düz Numara: alt bilgide yalnızca sayfanın numarası
   };
   // Üst bilgi, alt bilgi ve sayfa numarası (dosyada { header, footer, pageNum } olarak durur)
+  // pageNum: false ya da numaranın yeri ('sol' | 'orta' | 'sag'; eski dosyalardaki true = sağ)
   function setHF({ header = '', footer = '', pageNum = false } = {}) {
     hdr.innerHTML = header; ftxt.innerHTML = footer; pn.hidden = !pageNum;
+    pn.dataset.pos = typeof pageNum === 'string' ? pageNum : 'sag';
     hdr.hidden = !header; ftr.hidden = !footer && !pageNum;
   }
+  // Ekle → Sayfa Numarası → Sayfanın Altı → Düz Numara 1/2/3 (pos boşsa: Sayfa Numaralarını Kaldır)
+  function setPageNum(pos) {
+    pn.hidden = !pos;
+    if (pos) pn.dataset.pos = pos;
+    ftr.hidden = !ftxt.textContent.trim() && pn.hidden;
+    words(); changed();
+    emit('doc-pagenum', { on: !pn.hidden, pos: pos || '' });
+  }
   function showHF(which) {
-    if (which === 'pn') { pn.hidden = !pn.hidden; ftr.hidden = !ftxt.textContent.trim() && pn.hidden; words(); changed(); emit('doc-pagenum', { on: !pn.hidden }); return; }
     const el = which === 'h' ? hdr : ftr;
     el.hidden = false;
     (which === 'h' ? hdr : ftxt).focus();
@@ -233,12 +290,30 @@ export function word({ desk, body, args, emit, setTitle }) {
   document.addEventListener('selectionchange', onSel);
   // Tablo Düzeni sekmesi yalnızca imleç bir tablonun içindeyken görünür
   const cellOf = (node) => { const el = node && (node.nodeType === 1 ? node : node.parentElement); const td = el?.closest('td'); return td && page.contains(td) ? td : null; };
+  // Tablo Tasarımı ve Tablo Düzeni sekmeleri yalnızca imleç bir tablonun içindeyken görünür
   function syncTableTab() {
     const inTable = !!cellOf(range?.startContainer);
-    const tab = $('.wd-tabtbl');
-    if (tab.hidden === !inTable) return;
-    tab.hidden = !inTable;
-    if (!inTable && tab.classList.contains('on')) $('.wd-tabs [data-tab="home"]').click();
+    const tabs = [...body.querySelectorAll('.wd-tabtbl')];
+    if (tabs[0].hidden === !inTable) return;
+    tabs.forEach((t) => { t.hidden = !inTable; });
+    if (!inTable && tabs.some((t) => t.classList.contains('on'))) $('.wd-tabs [data-tab="home"]').click();
+  }
+  // Tablo Tasarımı: tablo stili (bütün tablo) ve gölgelendirme (seçili hücreler; seçim yoksa imlecin olduğu hücre)
+  function tableLook(kind, v) {
+    const td = cellOf(range?.startContainer);
+    if (!td) return;
+    const table = td.closest('table');
+    let count = 1;
+    if (kind === 'style') { if (v === 'kilavuz') delete table.dataset.tstyle; else table.dataset.tstyle = v; }
+    else {
+      const cells = [...table.querySelectorAll('td')].filter((c) => range.intersectsNode(c));
+      const list = range.collapsed || !cells.length ? [td] : cells;
+      list.forEach((c) => { c.style.backgroundColor = v === 'transparent' ? '' : v; });
+      count = list.length;
+    }
+    restore();
+    changed();
+    emit('doc-table', { op: kind, value: v, count, ok: true, rows: table.rows.length, cols: table.rows[0]?.cells.length || 0 });
   }
   function tableOp(op) {
     const td = cellOf(range?.startContainer);
@@ -406,8 +481,12 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (c === 'print') {
       const pages = pageCount();
       emit('doc-print-open', { pages });
-      const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Belge1', preview: { html: cleanHtml() + (fnList.children.length ? `<hr style="width:30%;margin:1.5em 0 0.3em"><ol style="font-size:8pt;padding-left:1.4em;margin:0">${[...fnList.children].map((li) => `<li>${li.querySelector('.wd-fnt').innerHTML}</li>`).join('')}</ol>` : ''), pages, orient: layout.orient, border: layout.border, wm: layout.wm, padding: MARGINS[layout.margin][2] } });
+      const pr = desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Belge1', pages, preview: { html: cleanHtml() + (fnList.children.length ? `<hr style="width:30%;margin:1.5em 0 0.3em"><ol style="font-size:8pt;padding-left:1.4em;margin:0">${[...fnList.children].map((li) => `<li>${li.querySelector('.wd-fnt').innerHTML}</li>`).join('')}</ol>` : ''), pages, orient: layout.orient, border: layout.border, wm: layout.wm, padding: padOf(layout) } });
+      const back = desk.dialogs._last;
+      wordPrint(back, pages);
+      const r = await pr;
       if (r) { desk.toast('Yazdırılıyor', `“${esc(fileName || 'Belge1')}” → ${esc(r.printer)}`, '🖨'); emit('doc-print', { ...r, doc: fileName, pages }); }
+      else { page.focus({ preventScroll: true }); emit('doc-print-close', { pages, how: back.dataset.how || 'esc' }); }
       return;
     }
     if (c === 'pdf') {
@@ -418,6 +497,40 @@ export function word({ desk, body, args, emit, setTitle }) {
       desk.toast('PDF olarak kaydedildi', esc(r.name), '📕');
       emit('doc-pdf', { name: r.name, folder: r.folder });
     }
+  }
+
+  // Ortak yazdır penceresini Word'ün Yazdır ekranına benzetir: belgeye dönmek için sol üstte ← (ya da Esc),
+  // İptal ve ✕ yok (gerçek Word'de sağ üstteki ✕ Word'ü kapatır); önizlemenin altında ◀ 1 / 2 ▶ sayfa sayacı
+  function wordPrint(back, pages) {
+    if (!back) return;
+    const q = (s) => back.querySelector(s);
+    q('.dlg').classList.add('wd-prt');
+    q('.dlg-title').insertAdjacentHTML('afterbegin', '<button type="button" class="wd-prback" title="Belgeye dön (Esc)">←</button>');
+    q('.wd-prback').onclick = () => { back.dataset.how = 'back'; back.close(null); };
+    q('.dlg-x').hidden = true;
+    q('.dlg-cancel').hidden = true;
+    const pvp = q('.dlg-pvp'), note = q('.dlg-pv .dlg-pvnote');
+    if (pvp && note) {
+      let cur = 1;
+      const wide = pvp.classList.contains('yatay');
+      note.className = 'dlg-pvnote wd-prnav';
+      note.innerHTML = `<button type="button" data-pg="-1" title="Önceki sayfa">◀\uFE0E</button><span><b class="wd-prn">1</b> / ${pages}</span><button type="button" data-pg="1" title="Sonraki sayfa">▶\uFE0E</button>`;
+      note.onclick = (e) => {
+        const d = +e.target.closest('[data-pg]')?.dataset.pg;
+        if (!d) return;
+        cur = Math.min(pages, Math.max(1, cur + d));
+        pvp.style.transform = `scale(${wide ? 0.258 : 0.262}) translateY(${-(cur - 1) * pvp.offsetWidth * (wide ? 0.707 : 1.414)}px)`;
+        q('.wd-prn').textContent = cur;
+      };
+    }
+    // Word'deki adlar: Kopya, Tüm Sayfaları Yazdır, Geçerli Sayfayı Yazdır, Özel Yazdırma, Sayfalar
+    const lab = q('.dlg-copies')?.closest('.dlg-row')?.querySelector('span');
+    if (lab) lab.textContent = 'Kopya:';
+    const opt = (v, t) => { const o = q(`.dlg-range option[value="${v}"]`); if (o) o.textContent = t; };
+    opt('all', 'Tüm Sayfaları Yazdır'); opt('current', 'Geçerli Sayfayı Yazdır'); opt('custom', 'Özel Yazdırma');
+    const rl = q('.dlg-rng-row span');
+    if (rl) rl.textContent = 'Sayfalar:';
+    if (q('.dlg-rng')) q('.dlg-rng').placeholder = 'ör. 2 ya da 1-2';
   }
 
   // ---- Ekle ----
@@ -462,9 +575,10 @@ export function word({ desk, body, args, emit, setTitle }) {
     c.querySelectorAll('.wd-pic.on').forEach((x) => x.classList.remove('on'));
     c.querySelectorAll('.wd-field').forEach((x) => { x.textContent = `«${x.dataset.field}»`; x.classList.remove('pv'); }); // önizleme kaydedilmez
     c.querySelectorAll('.wd-cmt.on').forEach((x) => x.classList.remove('on'));
+    c.querySelectorAll('.wd-chg').forEach((x) => { x.classList.remove('wd-chg'); if (!x.className) x.removeAttribute('class'); });
     return c.innerHTML;
   }
-  const content = () => ({ html: cleanHtml(), layout: { ...layout }, header: hdr.hidden ? '' : hdr.innerHTML, footer: ftr.hidden ? '' : ftxt.innerHTML, pageNum: !pn.hidden, footnotes: [...fnList.children].map((li) => ({ id: li.dataset.fn, html: li.querySelector('.wd-fnt').innerHTML })),
+  const content = () => ({ html: cleanHtml(), layout: { ...layout }, header: hdr.hidden ? '' : hdr.innerHTML, footer: ftr.hidden ? '' : ftxt.innerHTML, pageNum: pn.hidden ? false : pn.dataset.pos || 'sag', footnotes: [...fnList.children].map((li) => ({ id: li.dataset.fn, html: li.querySelector('.wd-fnt').innerHTML })),
     ...(cmtBox.children.length ? { comments: [...cmtBox.children].map((b) => ({ id: b.dataset.cmt, author: b.dataset.author, html: b.querySelector('.wd-cbt').innerHTML })) } : {}),
     ...(track ? { track: true } : {}), ...(docPass ? { pass: docPass } : {}) });
 
@@ -504,6 +618,51 @@ export function word({ desk, body, args, emit, setTitle }) {
     changed();
     emit('doc-format', { cmd: 'lineHeight', value: lh });
     restore();
+  }
+
+  // ---- Paragraf penceresi (Giriş → Paragraf bölümünün sağ altındaki ↘) ----
+  // Girinti Sol/Sağ ve Özel (İlk satır / Asılı) cm ile, Aralık Önce/Sonra nk (punto) ile, Satır aralığı.
+  // Girinti paragrafta margin-left (cm), ilk satır text-indent; asılı girintide text-indent eksidir, margin-left ölçü kadar artar.
+  const parPop = $('.wd-parpop');
+  const pin = (k) => parPop.querySelector(`[data-p="${k}"]`);
+  const lhOf = (b) => (b?.style.lineHeight ? +(parseFloat(b.style.lineHeight) / 1.15).toFixed(2) : 1.15);
+  function openPara() {
+    body.querySelectorAll('.wd-pal, .wd-lpop, .wd-tabpop').forEach((x) => { x.hidden = true; });
+    const b = selectedBlocks()[0];
+    const ti = b ? toCm(b.style.textIndent) : 0, ml = b ? toCm(b.style.marginLeft) : 0;
+    const cs = b ? getComputedStyle(b) : null;
+    parPop.querySelector('.wd-pspec').value = ti > 0 ? 'first' : ti < 0 ? 'hang' : '';
+    pin('by').value = ti ? fmt(Math.abs(ti)) + ' cm' : '';
+    pin('left').value = fmt(ti < 0 ? ml + ti : ml) + ' cm';
+    pin('right').value = fmt(b ? toCm(b.style.marginRight) : 0) + ' cm';
+    pin('before').value = fmt(cs ? Math.round(parseFloat(cs.marginTop) * 0.75) : 0) + ' nk';
+    pin('after').value = fmt(cs ? Math.round(parseFloat(cs.marginBottom) * 0.75) : 0) + ' nk';
+    const lh = lhOf(b);
+    parPop.querySelector('.wd-plh').value = { 1: '1', 1.5: '1.5', 2: '2' }[lh] || 'multi';
+    pin('at').value = fmt(lh);
+    parPop.hidden = false;
+    emit('doc-para-open');
+  }
+  function applyPara() {
+    const spec = parPop.querySelector('.wd-pspec').value, mode = parPop.querySelector('.wd-plh').value;
+    const v = { left: num(pin('left').value), right: num(pin('right').value), by: num(pin('by').value), before: num(pin('before').value), after: num(pin('after').value) };
+    if (spec && !v.by) v.by = 1.25; // Özel seçilip ölçü yazılmadıysa Word gibi 1,25 cm
+    const lh = mode === 'multi' ? Math.min(5, Math.max(0.5, num(pin('at').value) || 1.15)) : +mode;
+    const blks = selectedBlocks();
+    blks.forEach((b) => {
+      const ml = v.left + (spec === 'hang' ? v.by : 0);
+      b.style.marginLeft = ml ? ml + 'cm' : '';
+      b.style.marginRight = v.right ? v.right + 'cm' : '';
+      b.style.textIndent = spec === 'first' ? v.by + 'cm' : spec === 'hang' ? -v.by + 'cm' : '';
+      b.style.marginTop = v.before + 'pt';
+      b.style.marginBottom = v.after + 'pt';
+      b.style.lineHeight = String(lh * 1.15);
+    });
+    parPop.hidden = true;
+    restore();
+    changed();
+    emit('doc-paragraph', { ...v, special: spec, lineHeight: lh, count: blks.length });
+    emit('doc-format', { cmd: 'paragraph' });
   }
 
   // ---- Paragraf: kenarlık, gölgelendirme ve sekme durakları ----
@@ -901,7 +1060,8 @@ export function word({ desk, body, args, emit, setTitle }) {
   // quiet: belge açılırken (dosyadaki düzen yüklenir, değişiklik sayılmaz)
   function setLayout(l, quiet) {
     if (quiet) Object.assign(layout, DEF_LAYOUT, l || {}); else Object.assign(layout, l);
-    page.style.padding = MARGINS[layout.margin][2];
+    page.style.padding = padOf(layout);
+    page.style.backgroundColor = layout.pcolor || '';
     page.classList.toggle('yatay', layout.orient === 'yatay');
     $('.wd-scroll').classList.toggle('yatay', layout.orient === 'yatay');
     page.style.columnCount = layout.cols > 1 ? layout.cols : '';
@@ -911,9 +1071,28 @@ export function word({ desk, body, args, emit, setTitle }) {
     body.querySelectorAll('[data-border]').forEach((b) => b.classList.toggle('on', b.dataset.border === layout.border));
     body.querySelectorAll('[data-wm]').forEach((b) => b.classList.toggle('on', b.dataset.wm === (layout.wm || '')));
     body.querySelectorAll('[data-margin]').forEach((b) => b.classList.toggle('on', b.dataset.margin === layout.margin));
+    $('.wd-mgcustom').classList.toggle('on', layout.margin === 'ozel');
+    body.querySelectorAll('[data-pcolor]').forEach((b) => b.classList.toggle('on', b.dataset.pcolor === (layout.pcolor || '')));
     body.querySelectorAll('[data-orient]').forEach((b) => b.classList.toggle('on', b.dataset.orient === layout.orient));
     body.querySelectorAll('[data-cols]').forEach((b) => b.classList.toggle('on', +b.dataset.cols === layout.cols));
     if (!quiet) { changed(); emit('doc-layout', { ...layout }); }
+  }
+
+  // Düzen → Kenar Boşlukları → Özel Kenar Boşlukları…: Sayfa Yapısı penceresinde dört kenar cm ile yazılır
+  async function customMargins() {
+    if (desk.dialogs.busy) return;
+    const cm = layout.margin === 'ozel' && layout.mg ? [layout.mg.top, layout.mg.bottom, layout.mg.left, layout.mg.right] : MARGIN_CM[layout.margin] || MARGIN_CM.normal;
+    const keys = [['top', 'Üst:'], ['bottom', 'Alt:'], ['left', 'Sol:'], ['right', 'Sağ:']];
+    emit('doc-margins-open');
+    const fp = desk.dialogs.form({ title: 'Sayfa Yapısı', icon: '▤', text: '<b>Kenar Boşlukları</b><br><small>Dört kenarın boşluğunu santimetre (cm) ile yazın, sonra Tamam.</small>',
+      fields: keys.map(([k, l], i) => ({ name: k, label: l, value: fmt(cm[i]) + ' cm' })),
+      check: (x) => (keys.every(([k]) => num(x[k]) >= 0 && num(x[k]) <= 10 && /\d/.test(x[k])) ? '' : 'Her kutuya 0 ile 10 arasında bir ölçü yazın (ör. 2,5 cm).') });
+    // Kutuya tıklayınca içindeki ölçü seçilsin: yeni ölçü yazınca eskisinin yerine geçer
+    desk.dialogs._last?.querySelectorAll('input[data-f]').forEach(selectOnFocus);
+    const v = await fp;
+    page.focus({ preventScroll: true });
+    if (!v) return;
+    setLayout({ margin: 'ozel', mg: Object.fromEntries(keys.map(([k]) => [k, num(v[k])])) });
   }
 
   // ---- Yakınlaştırma ----
@@ -1007,14 +1186,23 @@ export function word({ desk, body, args, emit, setTitle }) {
       x.className = `${x.tagName === 'INS' ? 'wd-ins' : 'wd-del'} wd-a${authors.indexOf(a) % 4}`;
       x.title = `${a}: ${x.tagName === 'INS' ? 'Eklendi' : 'Silindi'}`;
     }
+    // Basit İşaretleme: değişiklik olan paragrafın solunda kırmızı çizgi
+    page.querySelectorAll('.wd-chg').forEach((b) => b.classList.remove('wd-chg'));
+    revs().forEach((x) => blockOf(x)?.classList.add('wd-chg'));
     syncComments();
+  }
+  function setMarkup(v) {
+    markup = v;
+    page.dataset.mk = v;
+    $('.wd-markup').value = v;
+    emit('doc-markup', { view: v });
   }
   function syncTrack() { $('.wd-trackbtn').classList.toggle('on', track); $('.wd-trk').hidden = !track; }
   function setTrack(on) {
     track = !!on;
     syncTrack();
     changed();
-    desk.toast('Değişiklikleri İzle', track ? 'Açık: bundan sonra eklediğiniz yazı <u>altı çizili</u>, sildiğiniz yazı <s>üstü çizili</s> görünür.' : 'Kapalı: yaptığınız değişiklikler artık işaretlenmiyor.', '📝', 3000);
+    desk.toast('Değişiklikleri İzle', track ? (markup === 'all' ? 'Açık: bundan sonra eklediğiniz yazı <u>altı çizili</u>, sildiğiniz yazı <s>üstü çizili</s> görünür.' : 'Açık: değişiklikleriniz işaretleniyor. Görmek için yandaki kutudan <b>Tüm İşaretlemeler</b>\'i seçin.') : 'Kapalı: yaptığınız değişiklikler artık işaretlenmiyor.', '📝', 3500);
     emit('doc-track', { on: track });
     restore();
   }
@@ -1230,6 +1418,11 @@ export function word({ desk, body, args, emit, setTitle }) {
   cmtBox.addEventListener('focusin', (e) => { const b = e.target.closest('.wd-cbal'); if (b) activeCmt(b.dataset.cmt); });
   cmtBox.addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || ''); });
   page.addEventListener('click', (e) => { const a = e.target.closest('.wd-cmt'); if (a) activeCmt(a.dataset.cmt); });
+  // Basit İşaretleme'de paragrafın solundaki kırmızı çizgiye tıklamak Tüm İşaretlemeler'e geçirir (Word'deki gibi)
+  page.addEventListener('click', (e) => {
+    const b = e.target.closest?.('.wd-chg');
+    if (b && markup === 'simple' && e.clientX < b.getBoundingClientRect().left) setMarkup('all');
+  });
 
   // ---- Dosya → Bilgi → Belgeyi Koru → Parola ile Şifrele ----
   function showInfo(on) {
@@ -1322,8 +1515,10 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (!e.target.closest('.wd-colorwrap')) body.querySelectorAll('.wd-pal, .wd-lpop').forEach((x) => { x.hidden = true; });
     if (!e.target.closest('.wd-tpop, .wd-table')) $('.wd-tblpop').hidden = true;
     if (!e.target.closest('.wd-mmwrap')) body.querySelectorAll('.wd-mpop').forEach((x) => { x.hidden = true; });
-    if (!e.target.closest('.wd-tabpop, .wd-tabsbtn')) $('.wd-tabpop').hidden = true;
+    if (!e.target.closest('.wd-tabpop, .wd-tabsbtn, .wd-partabs')) $('.wd-tabpop').hidden = true;
+    if (!e.target.closest('.wd-parpop, .wd-parbtn, .wd-lhpal')) parPop.hidden = true;
   });
+  const closePals = () => body.querySelectorAll('.wd-pal, .wd-lpop').forEach((x) => { x.hidden = true; });
   body.addEventListener('click', (e) => {
     const t = e.target.closest('button');
     if (!t) return;
@@ -1345,15 +1540,33 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-findbtn')) return openFind(false);
     if (t.classList.contains('wd-replbtn')) return openFind(true);
     if (t.dataset.tb) return tableOp(t.dataset.tb);
-    if (t.dataset.margin) return setLayout({ margin: t.dataset.margin });
+    if (t.dataset.margin) { closePals(); return setLayout({ margin: t.dataset.margin, mg: null }); }
+    if (t.classList.contains('wd-mgcustom')) { closePals(); return customMargins(); }
+    if (t.dataset.pcolor !== undefined) { closePals(); return setLayout({ pcolor: t.dataset.pcolor }); }
     if (t.dataset.orient) return setLayout({ orient: t.dataset.orient });
     if (t.dataset.cols) return setCols(+t.dataset.cols);
-    if (t.dataset.border) return setLayout({ border: t.dataset.border });
-    if (t.dataset.wm !== undefined) return setLayout({ wm: t.dataset.wm });
+    if (t.dataset.border) { closePals(); return setLayout({ border: t.dataset.border }); }
+    if (t.dataset.wm !== undefined) { closePals(); return setLayout({ wm: t.dataset.wm }); }
     if (t.classList.contains('wd-spell')) return spellCheck();
     if (t.classList.contains('wd-count')) return wordCount();
     if (t.dataset.zoom) return setZoom(zoom + +t.dataset.zoom);
     const pal = (sel) => { const p = $(sel); const was = p.hidden; body.querySelectorAll('.wd-pal, .wd-lpop').forEach((x) => { x.hidden = true; }); p.hidden = !was; };
+    const menus = { 'wd-mgbtn': '.wd-mgpal', 'wd-wmbtn': '.wd-wmpal', 'wd-pcbtn': '.wd-pcpal', 'wd-pbbtn': '.wd-pbpal', 'wd-pnbtn': '.wd-pnpal', 'wd-tshbtn': '.wd-tshpal' };
+    const menu = Object.keys(menus).find((k) => t.classList.contains(k));
+    if (menu) return pal(menus[menu]);
+    if (t.classList.contains('wd-lhbtn')) {
+      const cur = fmt(lhOf(selectedBlocks()[0]));
+      body.querySelectorAll('[data-lh]').forEach((b) => b.classList.toggle('on', b.dataset.lh === cur));
+      return pal('.wd-lhpal');
+    }
+    if (t.dataset.lh) { closePals(); return setSpacing(t.dataset.lh); }
+    if (t.classList.contains('wd-lhmore') || t.classList.contains('wd-parbtn')) { if (!parPop.hidden && t.classList.contains('wd-parbtn')) { parPop.hidden = true; return; } return openPara(); }
+    if (t.classList.contains('wd-parok')) return applyPara();
+    if (t.classList.contains('wd-parno')) { parPop.hidden = true; restore(); return; }
+    if (t.classList.contains('wd-partabs')) { parPop.hidden = true; $('.wd-tabpop').hidden = false; return; }
+    if (t.dataset.pn !== undefined) { closePals(); return setPageNum(t.dataset.pn); }
+    if (t.dataset.tstyle) return tableLook('style', t.dataset.tstyle);
+    if (t.dataset.tshade) { closePals(); if (t.dataset.tshade !== 'transparent') $('.wd-tshbtn i').style.background = t.dataset.tshade; return tableLook('shade', t.dataset.tshade); }
     if (t.classList.contains('wd-hilite')) return pal('.wd-hpal');
     if (t.dataset.hilite) { $('.wd-hpal').hidden = true; if (t.dataset.hilite !== 'transparent') $('.wd-hilite i').style.background = t.dataset.hilite; return exec('hiliteColor', t.dataset.hilite); }
     if (t.classList.contains('wd-sym')) return pal('.wd-spal');
@@ -1383,7 +1596,6 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-pb')) return insertHtml('<hr class="wd-pb"><p><br></p>', 'pagebreak');
     if (t.classList.contains('wd-hdrbtn')) return showHF('h');
     if (t.classList.contains('wd-ftrbtn')) return showHF('f');
-    if (t.classList.contains('wd-pnbtn')) return showHF('pn');
     if (t.classList.contains('wd-color')) return pal('.wd-pal:not(.wd-hpal):not(.wd-spal)');
     if (t.dataset.color) { body.querySelectorAll('.wd-pal').forEach((x) => { x.hidden = true; }); $('.wd-color i').style.background = t.dataset.color; return exec('foreColor', t.dataset.color); }
     if (t.classList.contains('wd-table')) { $('.wd-tblpop').hidden = !$('.wd-tblpop').hidden; return; }
@@ -1417,9 +1629,14 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-picbtn')) return insertPicture();
     if (t.classList.contains('wd-date')) return insertHtml(esc(today()), 'date');
   });
-  $('.wd-font').addEventListener('change', (e) => exec('fontName', e.target.value));
+  // Yazı tipi yedekleriyle birlikte verilir (bilgisayarda yoksa benzeri görünür); adı yine seçilen yazı tipidir
+  $('.wd-font').addEventListener('change', (e) => exec('fontName', (FONTS.find(([nm]) => nm === e.target.value) || FONTS[0])[1]));
+  $('.wd-markup').addEventListener('change', (e) => { setMarkup(e.target.value); restore(); });
+  parPop.querySelectorAll('.wd-pin').forEach(selectOnFocus);
+  parPop.querySelector('.wd-plh').addEventListener('change', (e) => { if (e.target.value !== 'multi') pin('at').value = fmt(+e.target.value); });
+  parPop.querySelector('.wd-pspec').addEventListener('change', (e) => { if (e.target.value && !num(pin('by').value)) pin('by').value = '1,25 cm'; if (!e.target.value) pin('by').value = ''; });
+  parPop.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyPara(); } if (e.key === 'Escape') { e.preventDefault(); parPop.hidden = true; restore(); } });
   $('.wd-size').addEventListener('change', (e) => exec('fontSize', +e.target.value));
-  $('.wd-lh').addEventListener('change', (e) => setSpacing(e.target.value));
   $('.wd-lurl').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); $('.wd-lok').click(); } });
   // Üç tık: yalnızca tıklanan paragraf seçilir (tarayıcı kendi başına sonraki boş paragrafı da seçerdi; Ctrl + E ikisini de ortalardı)
   page.addEventListener('mousedown', (e) => {
@@ -1508,6 +1725,7 @@ export function word({ desk, body, args, emit, setTitle }) {
     if ((e.ctrlKey || e.metaKey) && !e.altKey && e.code === 'KeyS' && !page.contains(e.target)) { e.preventDefault(); save(e.shiftKey); }
   });
   document.execCommand('defaultParagraphSeparator', false, 'p');
+  setMarkup('simple');
   title();
 
   return {
@@ -1534,19 +1752,24 @@ export function word({ desk, body, args, emit, setTitle }) {
           items: b.tagName === 'UL' || b.tagName === 'OL' ? [...b.querySelectorAll('li')].map((li) => li.innerText.trim()) : null,
           cols: b.parentElement?.classList.contains('wd-cols') ? +b.parentElement.style.columnCount : 0,
           border: b.dataset?.pborder || '', shade: b.style?.backgroundColor || '', tabStop: b.dataset?.tabs || '', tabs: b.querySelectorAll('.wd-tab').length,
+          // Yazı tipi adları ve Paragraf penceresinin ölçüleri (girinti cm, ilk satır cm: eksi ise asılı, önce/sonra nk, satır aralığı)
+          fonts: [...new Set(texts.map((el) => FONTS.find(([nm]) => cs(el).fontFamily.includes(nm))?.[0] || cs(el).fontFamily))],
+          left: +toCm(b.style?.marginLeft || '').toFixed(2), first: +toCm(b.style?.textIndent || '').toFixed(2), right: +toCm(b.style?.marginRight || '').toFixed(2),
+          before: Math.round(parseFloat(cs(b).marginTop) * 0.75), after: Math.round(parseFloat(cs(b).marginBottom) * 0.75), lh: lhOf(b),
         };
       });
       return {
         pages: pageCount(), shapes: page.querySelectorAll('.wd-shape').length,
-        table: (() => { const t = page.querySelector('table'); return t && { rows: t.rows.length, cols: Math.max(...[...t.rows].map((r) => r.cells.length)), merged: [...t.querySelectorAll('td')].some((c) => c.colSpan > 1), thick: t.classList.contains('thick'), valign: [...t.querySelectorAll('td')].some((c) => c.style.verticalAlign === 'middle') }; })(),
+        table: (() => { const t = page.querySelector('table'); return t && { rows: t.rows.length, cols: Math.max(...[...t.rows].map((r) => r.cells.length)), merged: [...t.querySelectorAll('td')].some((c) => c.colSpan > 1), thick: t.classList.contains('thick'), valign: [...t.querySelectorAll('td')].some((c) => c.style.verticalAlign === 'middle'),
+          style: t.dataset.tstyle || 'kilavuz', headShade: [...(t.rows[0]?.cells || [])].every((c) => !!c.style.backgroundColor), shaded: [...t.querySelectorAll('td')].filter((c) => !!c.style.backgroundColor).length }; })(),
         blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, pics: pics.info(), fileName, dirty,
         fields: [...page.querySelectorAll('.wd-field')].map((x) => x.dataset.field), merge: mm && { list: mm.name, count: mm.rows.length, preview: mm.preview },
         ruler: !$('.wd-ruler').hidden, links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,
-        header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: !pn.hidden, footnotes: fnInfo(),
+        header: hdr.hidden ? '' : hdr.innerText.trim(), footer: ftr.hidden ? '' : ftxt.innerText.trim(), pageNum: pn.hidden ? false : pn.dataset.pos || 'sag', footnotes: fnInfo(),
         toc: page.querySelector('.wd-toc') ? tocInfo() : null, headings: headings().map((h) => ({ text: h.innerText.trim(), page: pageOf(h) })),
         linkList: [...page.querySelectorAll('a[href]')].map((a) => ({ url: a.getAttribute('href').replace(/^https?:\/\//, ''), text: a.innerText.trim() })),
-        track, revisions: revs().map((x) => ({ type: x.tagName === 'INS' ? 'ins' : 'del', text: x.textContent, author: x.dataset.author || '' })),
+        track, markup, revisions: revs().map((x) => ({ type: x.tagName === 'INS' ? 'ins' : 'del', text: x.textContent, author: x.dataset.author || '' })),
         comments: [...cmtBox.children].map((b) => ({ id: b.dataset.cmt, author: b.dataset.author, text: b.querySelector('.wd-cbt').innerText.trim(), anchor: page.querySelector(`.wd-cmt[data-cmt="${b.dataset.cmt}"]`)?.innerText.trim() || '' })),
         protected: !!docPass, locked, info: !$('.wd-info').hidden,
         textBoxes: [...page.querySelectorAll('.wd-tbox')].map((x) => ({ text: x.innerText.trim(), kind: x.dataset.tbox })),
