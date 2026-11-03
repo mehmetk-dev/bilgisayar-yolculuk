@@ -91,3 +91,51 @@
 .dk-dark .np-sw { border-color: #9a9a9a; }
 .dk-dark .np-sw:checked::before { background: #000; }
 .dk-dark .np-ta { color-scheme: dark; }
+
+/* ------------------------------------------------------------------ ortak: küçük Windows 11 uygulamaları (açık / koyu) */
+.wsn, .wnt, .wvr, .wck { --w-bg: #f3f3f3; --w-card: #fff; --w-fg: #1b1b1b; --w-mut: #5f5f5f; --w-line: #e0e0e0; --w-hov: #0000000d; --w-acc: var(--dk-acc, #0067c0); --w-accfg: #fff; background: var(--w-bg); color: var(--w-fg); }
+.dk-dark .wsn, .dk-dark .wnt, .dk-dark .wvr, .dk-dark .wck { --w-bg: #202020; --w-card: #2b2b2b; --w-fg: #fff; --w-mut: #b5b5b5; --w-line: #3d3d3d; --w-hov: #ffffff14; --w-acc: var(--dk-acc, #60cdff); --w-accfg: #000; }
+.wsn [hidden], .wnt [hidden], .wvr [hidden], .wck [hidden] { display: none !important; }
+.wsn button, .wnt button, .wvr button, .wck button { font: inherit; color: inherit; }
+
+/* ------------------------------------------------------------------ Ekran Alıntısı Aracı */
+.wsn-top { position: relative; display: flex; align-items: center; gap: 0.4em; padding: 0.5em 0.6em; background: var(--w-card); border-bottom: 1px solid var(--w-line); flex-wrap: wrap; }
+.wsn-top button, .wsn-tools button { border: 1px solid transparent; background: none; border-radius: 5px; padding: 0.3em 0.55em; display: inline-flex; align-items: center; gap: 0.4em; }
+.wsn-top button:hover, .wsn-tools button:hover:not(:disabled) { background: var(--w-hov); border-color: transparent; }
+.wsn-top .wsn-new { background: var(--w-acc); color: var(--w-accfg); border-color: var(--w-acc); font-weight: 600; padding: 0.35em 0.9em; }
+.wsn-top .wsn-new:hover { background: var(--w-acc); filter: brightness(1.1); border-color: var(--w-acc); }
+.wsn-dd { border-color: var(--w-line) !important; }
+.wsn-ddi { display: inline-flex; font-style: normal; }
+.wsn-chev { width: 0.8em; height: 0.8em; opacity: 0.7; }
+.wsn-fly { position: absolute; z-index: 5; background: var(--w-card); border: 1px solid var(--w-line); border-radius: 8px; box-shadow: 0 8px 24px #0004; padding: 0.3em; min-width: 12em; display: flex; flex-direction: column; }
+.wsn-fly button { width: 100%; text-align: left; padding: 0.4em 0.5em !important; }
+.wsn-fly span { flex: 1; white-space: nowrap; }
+.wsn-fchk { width: 1.2em; display: inline-flex; font-style: normal; }
+.wsn-fchk .wico { width: 0.9em; height: 0.9em; }
+.wsn-tools { display: flex; align-items: center; gap: 0.2em; padding: 0.35em 0.6em; background: var(--w-card); border-bottom: 1px solid var(--w-line); flex-wrap: wrap; }
+.wsn-tools button.on { background: color-mix(in srgb, var(--w-acc) 20%, transparent); border-color: var(--w-acc); }
+.wsn-tools button:disabled { opacity: 0.35; }
+.wsn-grow { flex: 1; }
+.wsn-sep { width: 1px; height: 1.4em; background: var(--w-line); margin: 0 0.3em; }
+.wsn-cols { display: inline-flex; gap: 0.25em; align-items: center; margin-left: 0.3em; }
+.wsn-cols button { width: 1.3em; height: 1.3em; padding: 0 !important; border-radius: 50%; background: var(--c) !important; border: 2px solid var(--w-card) !important; box-shadow: 0 0 0 1px #8a8a8a; }
+.wsn-cols button.on { box-shadow: 0 0 0 2px var(--w-acc); }
+.wsn-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 0.8em; }
+.wsn-cv { max-width: 100%; max-height: 100%; box-shadow: 0 2px 10px #0004; background: #fff; touch-action: none; }
+.wsn-cv.draw { cursor: crosshair; }
+.wsn-empty { text-align: center; color: var(--w-mut); max-width: 22em; }
+.wsn-empty p { margin: 0.6em 0 0.3em; color: var(--w-fg); }
+.wsn-big { width: 3.2em; height: 3.2em; margin: 0 auto; border-radius: 50%; background: var(--w-card); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px #0002; }
+.wsn-big .wico { width: 1.6em; height: 1.6em; color: var(--w-acc); }
+/* Alma ekranı */
+.wsn-ov { background: rgba(0, 0, 0, 0.42); }
+.wsn-ov.hole { background: transparent; }
+.wsn-pill { position: absolute; top: 0.7em; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 0.15em; background: #2b2b2bf2; border: 1px solid #ffffff30; border-radius: 10px; padding: 0.25em; box-shadow: 0 6px 20px #0006; cursor: default; }
+.wsn-pill button { width: 2.2em; height: 2.2em; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: none; color: #fff; padding: 0; }
+.wsn-pill button:hover { background: #ffffff22; border: 0; }
+.wsn-pill button.on { background: #60cdff44; box-shadow: inset 0 0 0 1px #60cdff; }
+.wsn-pill i { width: 1px; height: 1.4em; background: #ffffff44; margin: 0 0.2em; }
+.wsn-hint { position: absolute; top: 4em; left: 50%; transform: translateX(-50%); background: #2b2b2bee; color: #fff; padding: 0.3em 0.9em; border-radius: 6px; font-size: 0.9em; white-space: nowrap; max-width: 96%; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.wsn-rect { position: absolute; border: 2px solid #fff; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.42); pointer-events: none; }
+.wsn-freesvg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.wsn-ov.wsn-win { cursor: default; }

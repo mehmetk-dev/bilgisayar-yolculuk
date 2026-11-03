@@ -39,6 +39,4 @@
 .dk-dark .pdf-sep { background: #555; }
 .dk-dark .pdf-tool.on { background: #4c9be8; color: #111; }
 /* Ekran Alıntısı */
-.dk-dark .sn { background: #202020; color: #eee; }
-.dk-dark .sn button:not(.primary) { background: #3a3a3a; color: #eee; border-color: #555; }
 .dk-dark .sn-bar { background: #2b2b2b; color: #eee; }
