@@ -35,7 +35,7 @@ export const excelHata = {
     ['#SAYI/0!', 'Sıfıra ya da boş hücreye bölünüyor: bölen hücreyi doldurun'],
     ['#####', 'Hata değil: sütun dar; sütun çizgisine çift tıklayın'],
     ['Ekle → 🧮 Özet Tablo', 'Satırlar: neye göre gruplanacak; Değerler: neyin toplamı'],
-    ['Özet Tablo sayfası', 'Ana liste değişirse özet tabloyu yeniden oluşturun'],
+    ['Özet Tablo sayfası', 'Ana liste değişirse özet tabloya sağ tıklayıp Yenile deyin (bu alıştırmada yeniden oluşturun)'],
   ],
   setup: (c) => { put(c, 'docs', 'ekim harcamaları.xlsx', 'file', tablo()); },
   steps: [
@@ -47,7 +47,7 @@ export const excelHata = {
     },
     {
       title: '#DEĞER!: hücreye tıklayın',
-      html: '<p><b>F2</b> hücresine (Toplam + ile) tıklayın. Formül çubuğunun altında hatanın ne demek olduğu yazar; okuyun.</p>',
+      html: '<p><b>F2</b> hücresine (Toplam + ile) tıklayın. Bu alıştırmada formül çubuğunun altında hatanın ne demek olduğu yazar; okuyun.</p><p class="mut">Gerçek Excel\'de hücrenin yanında sarı, ünlemli küçük bir simge (⚠) çıkar; fareyi üzerine getirince açıklama yazar.</p>',
       on: (ev) => ev.type === 'xl-select' && ev.addr === 'F2',
       done: '“Sayı olması gereken yerde yazı”: formül toplanacak hücrelerden birinde rakam yerine yazı buldu.',
     },
@@ -86,7 +86,7 @@ export const excelHata = {
       html: `<p>Şimdi asıl soru: <b>hangi kategoriye ne kadar</b> harcadınız? Formül yazmadan iki tıkla bulalım.</p>
         <ol class="steps"><li>Soldaki tablonun içinde herhangi bir hücreye tıklayın (ör. <b>B3</b>).</li><li>Üstteki <b>🧮 Özet Tablo</b> düğmesine basın.</li>
         <li>Satırlar: <b>Kategori</b>, Değerler: <b>Toplam · Tutar</b> seçin ve <b>Oluştur</b>.</li></ol>`,
-      hint: 'Özet Tablo düğmesi, Filtre düğmesinin yanında. Önce A–C sütunlarındaki tablonun içine tıklamayı unutmayın.',
+      hint: 'Özet Tablo düğmesi, Filtre düğmesinin yanında. Önce A–C sütunlarındaki tablonun içine tıklamayı unutmayın. Gerçek Excel\'de: Ekle → Özet Tablo → Tamam; sonra sağdaki <b>Özet Tablo Alanları</b> listesinde Kategori ve Tutar kutularını işaretlersiniz. Excel sayı sütununu kendisi Değerler\'e koyar.',
       on: (ev, c) => {
         if (ev.type !== 'xl-pivot') return false;
         if (!/kategori/i.test(ev.rowField) || !/tutar/i.test(ev.valueField) || ev.fn !== 'sum') { c.note(`Özet tablo “${ev.rowField}”e göre oluştu. Satırlar: Kategori, Değerler: Toplam · Tutar seçerek yeniden deneyin.`); return false; }

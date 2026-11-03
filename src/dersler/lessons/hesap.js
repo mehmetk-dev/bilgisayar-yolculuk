@@ -29,7 +29,8 @@ export const hesap1 = {
     ['=', 'Formül her zaman = ile başlar: =B2+B3'],
     ['=TOPLA(B2:B5)', 'B2\'den B5\'e kadar toplar (iki nokta: “den…e kadar”)'],
     ['=ORTALAMA(B2:B5)', 'Ortalamayı bulur'],
-    ['∑ Otomatik Toplam', 'Üstteki sayıları toplayan formülü kendisi yazar'],
+    ['∑ Otomatik Toplam', 'Üstteki sayıları toplayan formülü önerir; Enter ile onaylanır'],
+    ['İşlev (fonksiyon)', 'Hazır hesap: TOPLA, ORTALAMA, MAK, MİN'],
   ],
   steps: [
     {
@@ -46,6 +47,14 @@ export const hesap1 = {
       check: (c) => !!c.d.find('sheet'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'sheet',
       done: 'Sol üstteki küçük kutu <b>Ad kutusu</b>dur: seçili hücrenin adresini gösterir. Şu an A1.',
+    },
+    {
+      title: 'Gerçek Excel\'in sekmeleri',
+      html: `<p>Bu alıştırma ekranında düğmelerin hepsi tek şeritte durur. Gerçek Excel'de ise düğmeler <b>sekmelere</b> dağılmıştır. Üstteki sekme adına tıklayınca o sekmenin düğmeleri görünür:</p>
+        <table class="sum"><tr><th>Dosya</th><td>Kaydet, Farklı Kaydet, Aç, Yazdır</td></tr><tr><th>Giriş</th><td>Yazı tipi, kalın, kenarlık, dolgu rengi, hizalama, para ve yüzde biçimi, ∑ Otomatik Toplam, Koşullu Biçimlendirme, Sırala ve Filtre Uygula</td></tr>
+        <tr><th>Ekle</th><td>Grafikler, Özet Tablo, resim</td></tr><tr><th>Sayfa Düzeni</th><td>Kâğıt yönü, kenar boşlukları, sığdırma</td></tr><tr><th>Formüller</th><td>İşlev listesi (TOPLA, EĞER…)</td></tr>
+        <tr><th>Veri</th><td>Sırala, Filtre, Veri Doğrulama (açılır liste), Alt Toplam</td></tr><tr><th>Gözden Geçir</th><td>Sayfayı Koru</td></tr><tr><th>Görünüm</th><td>Bölmeleri Dondur</td></tr></table>
+        <p class="mut">Derslerde “Gerçek Excel'de:” diye başlayan notlar, düğmenin gerçek Excel'de hangi sekmede olduğunu söyler.</p>`,
     },
     {
       title: 'Hücre adresi',
@@ -79,13 +88,16 @@ export const hesap1 = {
     {
       title: 'Sayı mı, yazı mı?',
       html: `<p>Sayılar hücrede <b>sağa</b>, yazılar <b>sola</b> yaslanır. Hesaba yalnızca sayılar girer.</p>
-        <ul class="big-list"><li>Ondalık için <b>virgül</b> yazın: <b>45,50</b>. Nokta ile <b>45.50</b> yazarsanız gerçek Excel bunu sayı saymaz; hücre sola yaslanır, toplam yanlış çıkar.</li><li>Bir sayı <b>sola</b> yaslıysa ve toplama girmiyorsa yazı sanılmıştır. Hücreyi silip virgülle yeniden yazın.</li><li>Telefon numarasının başındaki <b>0</b> silinir (0532 → 532). Önce hücreyi seçip <b>Giriş</b> sekmesindeki sayı biçimi listesinden <b>Metin</b>\'i seçin, sonra numarayı yazın.</li></ul>`,
+        <ul class="big-list"><li>Ondalık için <b>virgül</b> yazın: <b>45,50</b>. Nokta ile <b>45.50</b> yazarsanız Excel bunu sayı saymaz; hücre sola yaslanır, toplam yanlış çıkar. <b>12.5</b> yazarsanız Excel bunu <b>12 Mayıs</b> tarihi sanar.</li><li>Bir sayı <b>sola</b> yaslıysa ve toplama girmiyorsa yazı sanılmıştır. Hücreyi silip virgülle yeniden yazın.</li><li>Telefon numarasının başındaki <b>0</b> silinir (0532 → 532). Önce hücreyi seçip <b>Giriş</b> sekmesindeki sayı biçimi listesinden <b>Metin</b>\'i seçin, sonra numarayı yazın. Kısa yol: numaranın başına kesme işareti koyun: <b>'0532…</b></li></ul>`,
     },
     {
       title: 'Otomatik toplam',
-      html: `<ol class="steps"><li><b>A6</b>\'ya <b>Toplam</b> yazın.</li><li><b>B6</b> hücresine tıklayın (sayıların hemen altı).</li><li>Üstteki <b>∑ Otomatik Toplam</b> düğmesine tıklayın.</li></ol>`,
-      mouse: '🖱 B6 → ∑',
+      html: `<ol class="steps"><li><b>A6</b>\'ya <b>Toplam</b> yazın.</li><li><b>B6</b> hücresine tıklayın (sayıların hemen altı).</li><li>Üstteki <b>∑ Otomatik Toplam</b> düğmesine tıklayın.</li><li>Formül hücrede yazılı bekler: <b>=TOPLA(B2:B5)</b>. Toplanacak sayılar kesik çizgiyle çerçevelenir. Doğruysa ${K('Enter')}\'a basın.</li></ol>
+        <p class="mut">Enter\'a basmadan başka bir hücreye tıklarsanız formüldeki aralık o hücreyle değişir. Öyle olursa ${K('Esc')} ile vazgeçip yeniden ∑\'ye basın.</p>`,
+      mouse: '🖱 B6 → ∑ → Enter',
+      hint: 'Gerçek Excel\'de ∑ Otomatik Toplam, Giriş sekmesinin sağ tarafındadır. Formül çıkınca Enter\'a basmayı unutmayın.',
       on: (ev, c) => {
+        if (ev.type === 'xl-autosum' && ev.pending) c.note(`Formül hücrede yazılı: <b>${ev.formula}</b>. Aralık doğruysa <b>Enter</b>\'a basın.`);
         if (!editEvents.includes(ev.type)) return false;
         const b6 = cell(c, 'B6');
         if (ev.type === 'xl-edit' && ev.addr === 'B6' && near(b6.value, 10050) && !b6.raw.startsWith('=')) c.warn('Toplamı elle yazdınız. Doğru ama bir sayı değişince güncellenmez! B6\'ya tıklayıp ∑ düğmesini kullanın.');
@@ -123,12 +135,12 @@ export const hesap1 = {
         if (ev.type === 'xl-edit' && ev.addr === 'B7' && ev.error) c.warn(`Formülde bir hata var (${ev.error}). B7\'ye tıklayıp formül çubuğunda kontrol edin: =ORTALAMA(B2:B5)`);
         return when((x) => near(cell(x, 'B7').value, 2550) && cell(x, 'B7').raw.startsWith('='))(ev, c);
       },
-      done: 'Ortalama gider 2.550 TL. Diğer işlevler: <b>MAK</b> (en büyük), <b>MİN</b> (en küçük), <b>SAY</b> (kaç sayı var).',
+      done: 'Ortalama gider 2.550 TL. TOPLA ve ORTALAMA birer <b>işlev</b>dir (internette ve videolarda “fonksiyon” da denir). Diğer işlevler: <b>MAK</b> (en büyük), <b>MİN</b> (en küçük), <b>BAĞ_DEĞ_SAY</b> (kaç sayı var; Tarihler dersinde).',
     },
     {
       title: 'Dört işlem',
       html: `<p>Kiranın bir yıllık tutarını bulalım. <b>C1</b>\'e <b>Yıllık</b> yazın. <b>C2</b>\'ye şunu yazın:</p><div class="target">=B2*12</div><p class="mut">Hesap tablosunda çarpı <b>*</b>, bölü <b>/</b> işaretiyle yazılır.</p>`,
-      hint: '* işareti 0\'ın sağındaki tuştur.',
+      hint: '* işareti 0\'ın sağındaki tuştur. Bölü (/) Shift + 7, artı (+) Shift + 4 ile yazılır.',
       on: when((c) => near(cell(c, 'C2').value, 60000) && cell(c, 'C2').raw.startsWith('=')),
       done: 'Yıllık kira 60.000 TL. Formüller hücre adresleriyle yazılır, böylece kira değişirse yıllık tutar da değişir.',
     },
@@ -152,7 +164,7 @@ export const hesap2 = {
     ['₺', 'Para birimi biçimi: 5.000,00 ₺'],
     ['Durum çubuğu', 'Seçili sayıların toplamı ve ortalaması en altta görünür'],
     ['↓ Z→A', 'Etkin sütuna göre büyükten küçüğe sıralar'],
-    ['📊 Grafik', 'Seçili adlar ve sayılardan sütun grafiği'],
+    ['📊 Sütun grafiği', 'Seçili adlar ve sayılardan sütun grafiği (Excel\'de Ekle → Grafikler)'],
     ['Ctrl + P', 'Yazdır'],
   ],
   steps: [
@@ -174,11 +186,12 @@ export const hesap2 = {
       html: '<p><b>B2</b>\'den <b>B6</b>\'ya kadar sürükleyerek seçin ve <b>₺</b> düğmesine tıklayın.</p>',
       mouse: '🖱 B2 → B6 sürükle → ₺',
       on: when((c) => ['B2', 'B3', 'B4', 'B5', 'B6'].every((a) => cell(c, a).f === 'tl')),
+      hint: 'Gerçek Excel\'de: Giriş sekmesi → Sayı bölümündeki açılır liste → Para Birimi.',
       done: 'Tutarlar artık <b>5.000,00 ₺</b> gibi görünüyor. Sayının kendisi değişmedi, sadece görünüşü.',
     },
     {
       title: 'Durum çubuğu',
-      html: '<p>Hâlâ seçiliyken pencerenin <b>en altındaki</b> yeşil çubuğa bakın. Seçili sayıların toplamı ne kadar?</p><div class="rs-opts"></div>',
+      html: '<p>Hâlâ seçiliyken pencerenin <b>en altındaki</b> durum çubuğuna bakın. Seçili sayıların toplamı ne kadar?</p><div class="rs-opts"></div>',
       setup: (c) => {
         const opts = ['10.050', '20.100', '4.000'];
         const box = document.querySelector('#stepBody .rs-opts');
@@ -196,7 +209,7 @@ export const hesap2 = {
       title: 'Sıralayın',
       html: '<p>En büyük gider en üstte olsun. Tutar sütunundan başlayarak <b>B2</b>\'den <b>A5</b>\'e doğru sürükleyin (başlık satırı ve Toplam satırı seçilmesin). Sonra <b>↓ Z→A</b> (büyükten küçüğe) düğmesine basın.</p><p class="mut">Toplam satırı seçilmez, yoksa sıralamaya karışır. Excel, sürüklemeye başladığınız sütuna göre sıralar.</p>',
       mouse: '🖱 B2 → A5 sürükle → ↓ Z→A',
-      hint: 'Başlık satırını ve Toplam satırını seçmeyin. Fareyi B2\'ye basılı tutup A5\'e kadar sürükleyin: seçim A2:B5 olur ve sıralama B (Tutar) sütununa göre yapılır.',
+      hint: 'Başlık satırını ve Toplam satırını seçmeyin. Fareyi B2\'ye basılı tutup A5\'e kadar sürükleyin: seçim A2:B5 olur ve sıralama B (Tutar) sütununa göre yapılır. Gerçek Excel\'de daha güvenli bir yol da var: A2:B5\'i seçip <b>Veri → Sırala</b>; açılan pencerede Sıralama ölçütü: <b>Tutar</b>, Düzen: <b>Büyükten Küçüğe</b>.',
       on: (ev, c) => {
         if (ev.type !== 'xl-sort') return false;
         if (ev.single) { c.note('Tek hücreye tıkladınız. Bu benzetim Toplam satırını atladı ama <b>gerçek Excel atlamaz</b>: bitişik bütün alanı, Toplam satırını da sıralar. Ctrl + Z ile geri alın; B2\'den A5\'e doğru sürükleyerek seçip yeniden deneyin.'); return false; }
@@ -208,7 +221,7 @@ export const hesap2 = {
     },
     {
       title: 'Grafik',
-      html: '<p><b>A1</b>\'den <b>B5</b>\'e kadar sürükleyerek seçin (adlar ve tutarlar, toplam hariç) ve <b>📊 Grafik</b>\'e tıklayın.</p>',
+      html: '<p><b>A1</b>\'den <b>B5</b>\'e kadar sürükleyerek seçin (adlar ve tutarlar, toplam hariç) ve <b>📊 Sütun grafiği</b>\'ne tıklayın.</p><p class="mut">Gerçek Excel\'de: Ekle sekmesi → Grafikler bölümü → Sütun.</p>',
       mouse: '🖱 A1 → B5 sürükle → 📊',
       hint: 'Toplam satırını seçime katmayın; yoksa grafikte en büyük çubuk toplam olur.',
       on: (ev, c) => {
@@ -289,7 +302,7 @@ export const hesap3 = {
     {
       title: 'EĞER: Geçti mi, kaldı mı?',
       html: '<p>Ortalaması <b>50 ve üstü</b> olan geçer. <b>E2</b>\'ye yazın:</p><div class="target">=EĞER(D2>=50;"Geçti";"Kaldı")</div>',
-      hint: '; (noktalı virgül) Shift + virgül ile yazılır. Tırnak (") 1\'in solundaki tuştur. >= işareti: büyüktür (<) tuşunun Shift\'li hali, sonra =. Okunuşu: “D2, 50\'den büyük ya da eşitse Geçti, değilse Kaldı”.',
+      hint: '; (noktalı virgül) Shift + virgül ile yazılır. Tırnak (") 1\'in solundaki tuştur. >= için önce > yazın: Z\'nin solundaki < tuşuna Shift ile basın; sonra =. Okunuşu: “D2, 50\'den büyük ya da eşitse Geçti, değilse Kaldı”.',
       on: (ev, c) => {
         if (ev.type === 'xl-edit' && ev.addr === 'E2' && ev.error) c.warn(`Formülde hata var (${ev.error}). Tırnakları ve noktalı virgülleri kontrol edin.`);
         return when((x) => cell(x, 'E2').text === 'Geçti' && cell(x, 'E2').raw.startsWith('='))(ev, c);
@@ -306,7 +319,7 @@ export const hesap3 = {
     },
     {
       title: 'Kalanları kırmızı yapın',
-      html: '<ol class="steps"><li><b>E2</b>\'den <b>E7</b>\'ye kadar seçin.</li><li>Şeritteki <b>🎨 Koşullu Biçim</b>\'e tıklayın.</li><li><b>eşit olanları</b> seçin, kutuya <b>Kaldı</b> yazın, renk <b>Kırmızı</b>, <b>Uygula</b>.</li></ol>',
+      html: '<ol class="steps"><li><b>E2</b>\'den <b>E7</b>\'ye kadar seçin.</li><li>Şeritteki <b>🎨 Koşullu Biçim</b>\'e tıklayın.</li><li><b>eşit olanları</b> seçin, kutuya <b>Kaldı</b> yazın, renk <b>Kırmızı</b>, <b>Uygula</b>.</li></ol><p class="mut">Gerçek Excel\'de: Giriş → <b>Koşullu Biçimlendirme</b> → Hücre Vurgulama Kuralları → <b>Eşittir…</b> Sayılar için aynı listede <b>Büyüktür…</b> ve <b>Küçüktür…</b> var.</p>',
       mouse: '🖱 E2:E7 → 🎨',
       on: when((c) => cell(c, 'E3').color === 'kirmizi' && cell(c, 'E5').color === 'kirmizi' && !cell(c, 'E2').color),
       done: 'Kalanlar bir bakışta görünüyor. Bir not değişirse renk de kendiliğinden değişir.',
@@ -334,7 +347,7 @@ export const hesap3 = {
   ],
 };
 
-// ---- 4. ders: alışveriş ve faturalar. Yüzde, $ ile sabit başvuru, ETOPLA, filtre ----
+// ---- 4. ders: alışveriş ve faturalar. Yüzde, $ ile mutlak başvuru, ETOPLA, filtre ----
 const ALIS = [['Ekmek', 'Market', 10], ['Süt', 'Market', 35], ['Elektrik', 'Fatura', 750], ['Deterjan', 'Market', 120], ['Su', 'Fatura', 300], ['İnternet', 'Fatura', 400]];
 const alisData = () => {
   const cells = { A1: 'KDV oranı', B1: '%20', A3: 'Ürün', B3: 'Kategori', C3: 'Fiyat', D3: 'KDV\'li fiyat' };
@@ -344,14 +357,15 @@ const alisData = () => {
 const kdv = (i, o = 0.2) => ALIS[i][2] * (1 + o);
 
 export const hesap4 = {
-  id: 'hesap4', icon: '🧾', title: 'Hesap tablosu: sabit başvuru, ETOPLA, filtre', minutes: 35, stage: 'desktop',
-  desc: 'Fatura listesi: yüzde, sabit başvuru ($), ETOPLA ve filtre.',
+  id: 'hesap4', icon: '🧾', title: 'Hesap tablosu: mutlak başvuru ($), ETOPLA, filtre', minutes: 35, stage: 'desktop',
+  desc: 'Fatura listesi: yüzde, mutlak başvuru ($), ETOPLA ve filtre.',
   summary: [
     ['%20', 'Yüzde: hücreye %20 yazılır, hesapta 0,2 olarak kullanılır'],
-    ['$B$1', 'Sabit başvuru: formül kopyalanınca B1 değişmez'],
+    ['B2 → B3', 'Göreli başvuru: formül aşağı kopyalanınca kayar'],
+    ['$B$1', 'Mutlak (sabit) başvuru: formül kopyalanınca B1 hiç kaymaz'],
     ['F4 (gerçek Excel\'de)', 'Formülde hücre adresine $ işaretlerini koyar'],
     ['=ETOPLA(B4:B9;"Market";D4:D9)', 'Kategorisi Market olanların tutarlarını toplar'],
-    ['🔽 Filtre', 'Başlıklara ▾ ekler; seçilen değerlere göre satırları gizler'],
+    ['🔽 Filtre', 'Başlıklara ▾ ekler; seçilen değerlere göre satırları gizler (Excel\'de Veri → Filtre)'],
     ['🔽 Filtre (tekrar)', 'Filtreyi kaldırır, bütün satırlar görünür'],
   ],
   steps: [
@@ -362,16 +376,16 @@ export const hesap4 = {
       setup: (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'sheet', { data: alisData() }); },
     },
     {
-      title: 'Sabit başvuru: $',
+      title: 'Mutlak başvuru: $',
       html: `<p><b>D4</b>\'e ekmeğin KDV\'li fiyatını yazın:</p><div class="target">=C4*(1+$B$1)</div>
-        <p>Neden <b>$</b>? Formülü aşağı kopyalayınca C4 → C5, C6 olsun isteriz; ama KDV oranı hep <b>B1</b>\'de kalmalı. <b>$</b> işareti adresi “sabitler”.</p>`,
+        <p>Neden <b>$</b>? Formülü aşağı kopyalayınca C4 → C5, C6 olsun isteriz; ama KDV oranı hep <b>B1</b>\'de kalmalı. <b>$</b> işareti adresi “sabitler”. Buna <b>mutlak (sabit) başvuru</b> denir.</p>`,
       setup: (c) => sheetOpen(c, alisData()),
       hint: '$ işareti AltGr + 4 ile yazılır. Gerçek Excel\'de formülde B1 yazdıktan sonra F4\'e basmak da $B$1 yapar.',
       on: (ev, c) => {
         if (ev.type === 'xl-edit' && ev.addr === 'D4' && ev.error) c.warn(`Formülde hata var (${ev.error}). Parantezleri ve $ işaretlerini kontrol edin.`);
         return when((x) => near(cell(x, 'D4').value, kdv(0)) && /\$B\$1/i.test(cell(x, 'D4').raw))(ev, c);
       },
-      done: 'Ekmek KDV ile 12 TL.',
+      done: 'Ekmek KDV ile 12 TL. (Buradaki %20 örnek orandır; gerçekte ekmekte KDV daha düşüktür.)',
     },
     {
       title: 'Aşağı kopyalayın',
@@ -385,7 +399,7 @@ export const hesap4 = {
       html: '<p><b>D9</b>\'a tıklayıp formül çubuğuna bakın. Ne yazıyor?</p>',
       opts: ['=C4*(1+$B$1)', '=C9*(1+$B$1)', '=C9*(1+B6)'], ok: 1,
       wrong: 'D9\'a tıklayıp üstteki formül çubuğuna bakın.',
-      why: 'C4 → C9 oldu (göreli), ama $B$1 olduğu gibi kaldı (sabit). $ olmasaydı B1 → B6 olurdu ve boş bir hücreyle hesap yapılırdı.',
+      why: 'C4 → C9 oldu (göreli başvuru), ama $B$1 olduğu gibi kaldı (mutlak başvuru). $ olmasaydı B1 → B6 olurdu ve boş bir hücreyle hesap yapılırdı.',
     }),
     {
       title: 'Oran değişirse',
@@ -405,7 +419,7 @@ export const hesap4 = {
     },
     {
       title: 'Filtre',
-      html: '<ol class="steps"><li>Tablonun içinde bir hücreye tıklayın (ör. <b>A4</b>).</li><li>Şeritteki <b>🔽 Filtre</b>\'ye tıklayın: başlıklarda ▾ belirir.</li><li><b>Kategori</b> başlığındaki <b>▾</b>\'ye tıklayın, <b>Market</b>\'in işaretini kaldırıp <b>Tamam</b>.</li></ol>',
+      html: '<p class="mut">Gerçek Excel\'de: Veri sekmesi → <b>Filtre</b> (ya da Giriş → Sırala ve Filtre Uygula → Filtre).</p><ol class="steps"><li>Tablonun içinde bir hücreye tıklayın (ör. <b>A4</b>).</li><li>Şeritteki <b>🔽 Filtre</b>\'ye tıklayın: başlıklarda ▾ belirir.</li><li><b>Kategori</b> başlığındaki <b>▾</b>\'ye tıklayın, <b>Market</b>\'in işaretini kaldırıp <b>Tamam</b>.</li></ol>',
       mouse: '🖱 Filtre → Kategori ▾',
       on: when((c) => cell(c, 'A4').hidden && !cell(c, 'A6').hidden && cell(c, 'A5').hidden),
       done: 'Yalnızca faturalar görünüyor. Satırlar silinmedi, sadece gizlendi; en altta kaç kaydın gösterildiği yazar.',
@@ -416,6 +430,6 @@ export const hesap4 = {
       on: (ev, c) => ev.type === 'xl-filter-off' && !cell(c, 'A4').hidden,
       done: 'Filtre, uzun listelerde aradığınızı bulmanın en hızlı yoludur.',
     },
-    { final: true, title: 'Tebrikler! 🎉', html: '<p>Sabit başvuru, ETOPLA ve filtreyi öğrendiniz:</p>' },
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Mutlak başvuru, ETOPLA ve filtreyi öğrendiniz:</p>' },
   ],
 };

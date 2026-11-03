@@ -30,7 +30,7 @@ export const excelYazi = {
     ['=D2&" "&E2', 'BİRLEŞTİR ile aynı iş: & işareti (Shift + 6)'],
     ['=YUVARLA(B8/B9;2)', 'Sonucu 2 basamağa (kuruşa) yuvarlar; 0 yazılırsa tam liraya'],
     ['🔓 Hücre Kilidini Aç', 'Koruma açıkken de yazılabilecek hücreler'],
-    ['🔒 Sayfayı Koru', 'Öteki hücreler değiştirilemez; parola verirseniz bir yere yazın'],
+    ['🔒 Sayfayı Koru', 'Öteki hücreler değiştirilemez; parola verirseniz bir yere yazın (Excel\'de Gözden Geçir → Sayfayı Koru)'],
   ],
   setup: (c) => { put(c, 'docs', DOSYA, 'file', tablo()); },
   steps: [
@@ -94,6 +94,7 @@ export const excelYazi = {
     {
       title: 'Kuruşlu bölme',
       html: `<p>Kalorifer gideri 12.500 ₺, 7 daireye bölünecek. <b>B10</b> hücresine <b>=B8/B9</b> yazıp ${K('Enter')}. Sonuca bakın.</p>`,
+      hint: 'Bölü işareti (/) Shift + 7 ile yazılır.',
       target: '=B8/B9',
       on: (ev, c) => ev.type === 'xl-edit' && ev.addr === 'B10' && Math.abs(cell(c, 'B10').value - 12500 / 7) < 0.01,
       done: '1785,714286… Kuruşun da küçüğü çıktı; makbuza böyle yazılmaz.',
@@ -108,14 +109,15 @@ export const excelYazi = {
     {
       title: 'Hücre kilidini açın',
       html: `<p>Listeyi komşulara gösterirken kimse adları bozmasın; yalnızca <b>Ödendi mi?</b> sütunu doldurulabilsin istiyoruz.</p>
-        <p><b>H2</b>'den <b>H5</b>'e kadar seçin ve üstteki <b>🔓 Hücre Kilidini Aç</b>'a basın.</p>`,
+        <p><b>H2</b>'den <b>H5</b>'e kadar seçin ve üstteki <b>🔓 Hücre Kilidini Aç</b>'a basın.</p>
+        <p class="mut">Gerçek Excel'de böyle bir düğme yok. Hücreleri seçip sağ tıklayın → <b>Hücreleri Biçimlendir</b> → <b>Koruma</b> sekmesi → <b>Kilitli</b> kutusunun işaretini kaldırın → Tamam.</p>`,
       on: (ev, c) => ev.type === 'xl-unlock' && ev.open && ['H2', 'H3', 'H4', 'H5'].every((a) => X(c).unlocked(a)),
       done: 'Bu dört hücre, sayfa korunsa da değiştirilebilecek.',
     },
     {
       title: 'Sayfayı koruyun',
       html: '<p><b>🔒 Sayfayı Koru</b>\'ya basın. Parola kutusuna <b>Kermes2026</b> yazıp <b>Koru</b>.</p>',
-      hint: 'Gerçek hayatta parolayı unutmamak için bir yere yazın; unutursanız korumayı kaldıramazsınız.',
+      hint: 'Gerçek hayatta parolayı unutmamak için bir yere yazın; unutursanız korumayı kaldıramazsınız. Gerçek Excel\'de: Gözden Geçir sekmesi → <b>Sayfayı Koru</b> → parola → Tamam; Excel parolayı onay için <b>bir kez daha</b> ister.',
       on: (ev) => ev.type === 'xl-protect' && ev.on,
       done: 'Sayfa korunuyor. Açık yeşil hücreler dışında hiçbir şey değiştirilemez.',
     },

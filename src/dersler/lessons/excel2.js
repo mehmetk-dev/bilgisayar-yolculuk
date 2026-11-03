@@ -125,12 +125,13 @@ export const hucreInce = {
 
 export const doldurDondur = {
   id: 'doldur-dondur', icon: '📅', title: 'Otomatik doldurma ve üst satırı dondurma', minutes: 30, stage: 'desktop',
-  desc: 'Doldurma tutamacıyla listeleri doldurmak, Üst Satırı Dondur.',
+  desc: 'Doldurma tutamacıyla listeleri doldurmak, Üst Satırı Dondur ve Bölmeleri Çöz.',
   summary: [
     ['Doldurma tutamacı', 'Seçili hücrenin sağ alt köşesindeki küçük kare; sürükleyin'],
     ['Ocak → Şubat → Mart', 'Ay ve gün adları kendiliğinden devam eder'],
     ['1, 2 → 3, 4, 5…', 'İki sayı seçip çekerseniz aynı artışla devam eder'],
-    ['❄ Üst Satırı Dondur', 'Aşağı inerken en üstteki başlık satırı yerinde kalır'],
+    ['❄ Bölmeleri Dondur → Üst Satırı Dondur', 'Aşağı inerken en üstteki başlık satırı yerinde kalır (Excel\'de Görünüm sekmesi)'],
+    ['❄ Bölmeleri Dondur → Bölmeleri Çöz', 'Dondurmayı kaldırır'],
   ],
   steps: [
     {
@@ -161,8 +162,9 @@ export const doldurDondur = {
     },
     {
       title: 'Üst satırı dondurun',
-      html: '<p>Şeritteki <b>❄ Üst Satırı Dondur</b> düğmesine tıklayın. Sonra tabloyu yeniden aşağı kaydırın: başlık satırı yerinde kalır.</p>',
-      mouse: '🖱 ❄ Üst Satırı Dondur',
+      html: '<p>Şeritteki <b>❄ Bölmeleri Dondur</b> düğmesine tıklayın. Açılan listeden <b>Üst Satırı Dondur</b>\'u seçin. Sonra tabloyu yeniden aşağı kaydırın: başlık satırı yerinde kalır.</p>',
+      mouse: '🖱 ❄ Bölmeleri Dondur → Üst Satırı Dondur',
+      hint: 'Gerçek Excel\'de: Görünüm sekmesi → Bölmeleri Dondur → Üst Satırı Dondur.',
       on: (ev) => ev.type === 'xl-freeze' && ev.on,
       done: 'Başlık satırı artık sabit. Aşağıdaki 30 satır akıp gider, başlık yerinde kalır.',
     },
@@ -173,9 +175,10 @@ export const doldurDondur = {
     },
     {
       title: 'Dondurmayı kaldırın',
-      html: '<p>Dondurma bazen işi karıştırır. Aynı düğmeye (<b>❄ Üst Satırı Dondur</b>) yeniden tıklayarak kaldırın.</p>',
+      html: '<p>Dondurma bazen işi karıştırır. Yine <b>❄ Bölmeleri Dondur</b>\'a tıklayın; bu kez listede <b>Bölmeleri Çöz</b> var. Onu seçin.</p>',
+      hint: 'Gerçek Excel\'de de aynı yol: Görünüm → Bölmeleri Dondur → Bölmeleri Çöz. Üst Satırı Dondur\'a ikinci kez basmak dondurmayı kaldırmaz.',
       on: (ev) => ev.type === 'xl-freeze' && !ev.on,
-      done: 'Düğme bir kapı gibi: tıklayınca açılır, bir daha tıklayınca kapanır.',
+      done: 'Dondurma kalktı. Dondurmak ve çözmek aynı listededir: Bölmeleri Dondur.',
     },
     rehberSoru({
       title: 'Hangi kısayol?',
@@ -195,7 +198,7 @@ export const calismaSayfalari = {
     ['＋ (alt sekme çubuğunda)', 'Yeni çalışma sayfası ekler'],
     ['Sekmeye çift tık', 'Sayfanın adını değiştirir'],
     ['Sekmeye sağ tık', 'Yeniden adlandır, Sekme rengi, Taşı veya Kopyala, Sil'],
-    ['Taşı veya Kopyala → Kopya oluştur', 'Aynı tabloyu yeni sayfaya çoğaltır; asıl sayfa bozulmaz'],
+    ['Taşı veya Kopyala → ☑ Kopya oluştur → Tamam', 'Aynı tabloyu yeni sayfaya çoğaltır; asıl sayfa bozulmaz. Kutu işaretlenmezse sayfa yalnızca taşınır'],
     ['Her ay bir sayfa', 'Ocak, Şubat, Mart… tek dosyada, ayrı ayrı sekmelerde'],
   ],
   steps: [
@@ -220,10 +223,15 @@ export const calismaSayfalari = {
       done: 'Sekmenin altında renkli çizgi göründü. Renkler, sayfaları ayırmayı kolaylaştırır.',
     },
     {
-      title: 'Ocak\'u kopyalayın',
-      html: `<p>“Ocak” sekmesine yine <b>sağ tıklayın</b> ve <b>📑 Taşı veya Kopyala…</b>'yı seçin. Açılan pencerede <b>Kopya oluştur</b>'a tıklayın.</p>`,
-      on: (ev) => ev.type === 'xl-sheet' && ev.op === 'copy',
-      done: 'Ocak\'un birebir kopyası oluştu: “Ocak (2)”. İkisinin de içi aynı.',
+      title: 'Ocak\'ı kopyalayın',
+      html: `<p>“Ocak” sekmesine yine <b>sağ tıklayın</b> ve <b>📑 Taşı veya Kopyala…</b>'yı seçin. Açılan pencerede:</p>
+        <ol class="steps"><li>Alttaki <b>Kopya oluştur</b> kutusunu işaretleyin.</li><li><b>Tamam</b>'a basın.</li></ol>`,
+      hint: 'Kutuyu işaretlemeden Tamam derseniz sayfa kopyalanmaz, yalnızca yeri değişir. Gerçek Excel\'de de pencere aynıdır.',
+      on: (ev, c) => {
+        if (ev.type === 'xl-sheet' && ev.op === 'move') c.note('Sayfa kopyalanmadı, yalnızca taşındı: <b>Kopya oluştur</b> kutusu işaretli değildi. Yeniden sağ tıklayıp kutuyu işaretleyin.');
+        return ev.type === 'xl-sheet' && ev.op === 'copy';
+      },
+      done: 'Ocak\'ın birebir kopyası oluştu: “Ocak (2)”. İkisinin de içi aynı.',
     },
     {
       title: 'Kopyayı Şubat yapın',
@@ -253,8 +261,8 @@ export const calismaSayfalari = {
     rehberSoru({
       title: 'En doğru yol',
       html: '<p>Şubat tablonuzu, Ocak\'tan farkı yalnızca birkaç rakam olduğu hâlde sıfırdan mı yazarsınız?</p>',
-      opts: ['Evet, sıfırdan', 'Hayır; Ocak sayfasını Taşı veya Kopyala ile kopyalayıp rakamları güncellerim', 'Ocak\'u silip yerine Şubat yazarım'], ok: 1,
-      wrong: 'Bu çok zahmetli ve Ocak\'u kaybedersiniz. Sekmeye sağ tıklayınca daha kısa bir yol var.',
+      opts: ['Evet, sıfırdan', 'Hayır; Ocak sayfasını Taşı veya Kopyala ile kopyalayıp rakamları güncellerim', 'Ocak\'ı silip yerine Şubat yazarım'], ok: 1,
+      wrong: 'Bu çok zahmetli ve Ocak\'ı kaybedersiniz. Sekmeye sağ tıklayınca daha kısa bir yol var.',
       why: 'Doğru. Kopyalamak zaman kazandırır, formülleri korur ve eski ayı bozmaz.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Her ay bir sayfa:</p>' },
@@ -287,20 +295,20 @@ export const excelYazdir = {
     },
     {
       title: 'Tek sayfaya sığdırın',
-      html: '<p>Şeritteki <b>⤢ Tüm sütunları bir sayfaya sığdır</b>\'a tıklayın. Tablo küçülüp tek kâğıda girer.</p>',
+      html: '<p>Şeritteki <b>⤢ Tüm sütunları bir sayfaya sığdır</b>\'a tıklayın. Tablo küçülüp tek kâğıda girer.</p><p class="mut">Gerçek Excel\'de: Dosya → Yazdır → Ayarlar\'ın en altındaki <b>Ölçeklendirme Yok</b> listesinden <b>Tüm Sütunları Bir Sayfaya Sığdır</b>.</p>',
       mouse: '🖱 Tüm sütunları bir sayfaya sığdır',
       on: (ev) => ev.type === 'xl-page' && ev.fit,
       done: 'Düğme yeşil renkte (açık). Tablo biraz küçülecek ama bütün sütunlar tek kâğıtta olacak.',
     },
     {
       title: 'Yatay kâğıt',
-      html: '<p>Bir de başka çözüm var: kâğıdı <b>yan çevirmek</b>. Şeritte <b>▭ Yatay</b>\'a tıklayın.</p>',
+      html: '<p>Bir de başka çözüm var: kâğıdı <b>yan çevirmek</b>. Şeritte <b>▭ Yatay</b>\'a tıklayın.</p><p class="mut">Gerçek Excel\'de: Dosya → Yazdır → Ayarlar → <b>Yatay Yönlendirme</b> (ya da Sayfa Düzeni → Yönlendirme → Yatay).</p>',
       on: (ev) => ev.type === 'xl-page' && ev.orient === 'yatay',
       done: 'Yatay kâğıt geniş tablolar içindir: kâğıt yan döner, daha çok sütun sığar. “Bir sayfaya sığdır” açıkken de yazı daha az küçülür.',
     },
     {
       title: 'Tablo çizgileri',
-      html: `<p>Önizlemeye (${K('Ctrl', 'P')}) bakın: ekranda gördüğünüz <b>tablo çizgileri</b> kâğıtta yok! Excel çizgileri kendiliğinden yazdırmaz. <b>▦ Kılavuz çizgilerini yazdır</b>'a tıklayın.</p>`,
+      html: `<p>Önizlemeye (${K('Ctrl', 'P')}) bakın: ekranda gördüğünüz <b>tablo çizgileri</b> kâğıtta yok! Excel çizgileri kendiliğinden yazdırmaz. <b>▦ Kılavuz çizgilerini yazdır</b>'a tıklayın.</p><p class="mut">Gerçek Excel'de: Sayfa Düzeni sekmesi → Kılavuz Çizgileri → <b>Yazdır</b> kutusu. Tabloya <b>kenarlık</b> verirseniz (Tabloyu güzelleştirin dersi) çizgiler bu ayar olmadan da kâğıtta çıkar.</p>`,
       on: (ev) => ev.type === 'xl-page' && ev.grid,
       done: 'Artık çizgiler kâğıtta çıkacak. Önizlemede ızgara göründü.',
     },
@@ -344,7 +352,7 @@ export const tabloParkur = {
       setup: (c) => { if (!X(c)) sheetOpen(c); },
       on: when((c) => norm(cell(c, 'A1').raw) === 'domates' && near(cell(c, 'B1').value, 45) && near(cell(c, 'B2').value, 120.5) && near(cell(c, 'B3').value, 85) && near(cell(c, 'B4').value, 15) && near(cell(c, 'B5').value, 38.75)),
     },
-    { title: '3. Toplamı bulun', html: '<p><b>B6</b> hücresine pazarın <b>toplamını</b> hesaplatın.</p>', hint: 'B6\'ya tıklayıp ∑ Otomatik Toplam ya da =TOPLA(B1:B5) yazın.', on: when((c) => near(cell(c, 'B6').value, 304.25)) },
+    { title: '3. Toplamı bulun', html: '<p><b>B6</b> hücresine pazarın <b>toplamını</b> hesaplatın.</p>', hint: 'B6\'ya tıklayıp ∑ Otomatik Toplam\'a basın, sonra Enter. Ya da =TOPLA(B1:B5) yazın.', on: when((c) => near(cell(c, 'B6').value, 304.25)) },
     { title: '4. Toplamı kalın yapın', html: '<p>Toplam hücresini (B6) <b>kalın</b> yapın.</p>', hint: 'B6\'yı seçip K düğmesi ya da Ctrl + B.', on: when((c) => cell(c, 'B6').bold) },
     { title: '5. Para biçimi', html: '<p>B1\'den B6\'ya kadar fiyatları <b>₺ (para birimi)</b> biçiminde gösterin.</p>', hint: 'B1:B6\'yı fareyle sürükleyerek seçin, ₺ düğmesine tıklayın.', on: when((c) => ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'].every((a) => cell(c, a).f === 'tl')) },
     { title: '6. En pahalıdan sıralayın', html: '<p>A1:B5 aralığını fiyata göre <b>büyükten küçüğe</b> sıralayın. Toplam satırı yerinde kalmalı. Sürüklemeye fiyat sütunundan (B1) başlayın.</p>', hint: 'Fiyat sütunundan başlayın: B1\'e basılı tutup A5\'e doğru sürükleyin (B6, yani Toplam seçime girmesin), sonra ↓ Z→A. Excel, sürüklemeye başladığınız hücrenin sütununa göre sıralar. İlk satır Peynir olmalı.', on: when((c) => norm(cell(c, 'A1').raw) === 'peynir' && near(cell(c, 'B6').value, 304.25)) },
