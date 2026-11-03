@@ -62,6 +62,7 @@ import { sunuKurallar, sunuAni } from './sunu3.js';
 import { asilSlayt, sunuParkur } from './sunu4.js';
 import { sunuProva, sunuBaglanti } from './sunu5.js';
 import { animasyonBolmesi } from './sunu6.js';
+import { sunuSinav } from './sunu7.js';
 import { fotoBoyut } from './fotoboyut.js';
 import { harita } from './harita.js';
 import { sanalKart } from './odeme.js';
@@ -122,7 +123,7 @@ export const WEEKS = [
   { no: 9, title: 'E-posta', lessons: [eposta, gmailHotmail, epostaHesap, epostaIletme, eposta2, bulutPaylas, sifreSifirla, epostaTemizlik, epostaParkur, odev9, test9] },
   { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, kelimeDipnot, kelimeIcindekiler, kelimeBulten, kelimeIzle, kelimeParola, kelimeIlan, dilekceParkur, mebProva, belgeGonder, officeYoksa, odev10, test10] },
   { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, excelBicim, hucreInce, doldurDondur, hesap3, hesap4, excelYuzde, duseyara, excelHata, excelYazi, excelTarih, altToplam, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
-  { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, sunuBaglanti, animasyon, animasyonBolmesi, sunuAni, sunuProva, anıAlbumu, sunuParkur, odev12, test12] },
+  { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, sunuBaglanti, animasyon, animasyonBolmesi, sunuAni, sunuProva, anıAlbumu, sunuParkur, sunuSinav, odev12, test12] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukWeb, telefon, telefonTarama, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, fotoBoyut, harita, whatsappWeb, gunlukParkur, odev13, test13] },
   { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevletIlk, edevlet, randevu, alisveris, sanalKart, faturaOde, gorusme, eNabiz, kamuHizmet, ilanTuzak, eHizmetParkur, odev14, test14] },
   { no: 15, title: 'Bilgi güvenliği: yedek, iki adımlı doğrulama, sosyal medya, kişisel veriler', lessons: [yedekleme, ikiAdim, telefonKayip, sosyalMedya, kisiselVeri, torunGuvenlik, dolandirildim, guvenlikParkur, odev15, test15] },

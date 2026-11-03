@@ -1,6 +1,8 @@
 // Sunu: PowerPoint benzeri program. Slayt düzenleri (başlık, başlık ve içerik, yalnızca başlık), tasarım temaları,
-// resim ekleme, slayt geçişleri, slayt sırasını değiştirme ve silme, slayt gösterisi (F5); .pptx olarak kaydetme, yazdırma.
-// Asıl Slayt (yazı tipi, başlık rengi, logo, alt bilgi bütün slaytlara birden), slayda tablo ve grafik (sütun / pasta).
+// Arka Planı Biçimlendir (düz dolgu, resim), yazı tipi boyutu / rengi / hizalama, resim (Resim Biçimi: boyut, Kırp),
+// slayt geçişleri (Sonra: süresi, Tümüne Uygula), küçük resimlerde sağ tık (Slaytı Çoğalt / Sil / Gizle) ve sürükleyerek sıra,
+// slayt gösterisi (F5); .pptx / .ppsx olarak kaydetme, Dışarı Aktar (PDF, video), yazdırma.
+// Asıl Slayt (Yazı Tipleri; başlık rengi Giriş'ten, logo Ekle → Resim'den, alt bilgi kutusu), slayda tablo ve grafik (sütun / pasta).
 // Not Sayfası ve Okuma Görünümü, Zamanlamaları Prova Et, gösteride kalem / vurgulayıcı (Ctrl + P, E, sağ tık menüsü),
 // dinleyici notları ve not sayfası yazdırma; şekiller, WordArt, video, köprü (Ctrl + K), eylem düğmeleri, Üst Bilgi ve Alt Bilgi.
 // Nesne animasyonları: giriş, vurgu, çıkış; Animasyon Ekle, Animasyon Bölmesi (sıra, Oynat), Başlangıç / Süre / Gecikme.
@@ -12,7 +14,7 @@ const THEMES = [
   ['yesil', 'Bahar', 'linear-gradient(135deg,#e8f5e9,#a5d6a7)', '#1b5e20', '#2e7d32'],
   ['gece', 'Gece', 'linear-gradient(135deg,#1a1a2e,#3a3a6e)', '#f5f5f5', '#ff8a65'],
 ];
-const LAYOUTS = { title: 'Başlık slaytı', content: 'Başlık ve içerik', two: 'İki içerik', only: 'Yalnızca başlık', photo: 'Fotoğraf ve yazı', blank: 'Boş' };
+const LAYOUTS = { title: 'Başlık slaytı', content: 'Başlık ve içerik', two: 'İki içerik', only: 'Yalnızca başlık', photo: 'Resim Yazısı ile Resim', blank: 'Boş' };
 const ANIMS = [['none', 'Yok'], ['fade', 'Belirme'], ['left', 'Soldan gel'], ['zoom', 'Büyüme']];
 // Nesne animasyonu efektleri: [kimlik, ad, tür] (in: giriş, em: vurgu, out: çıkış); girişler eski slayt animasyonuyla aynıdır
 const FX = [['fade', 'Belirme', 'in'], ['left', 'Soldan gel', 'in'], ['zoom', 'Büyüme', 'in'], ['pulse', 'Darbe', 'em'], ['spin', 'Döndür', 'em'], ['grow', 'Büyüt/Küçült', 'em'], ['vanish', 'Kaybolma', 'out'], ['flyout', 'Uçarak Çıkma', 'out']];
@@ -24,7 +26,12 @@ const fxOf = (id) => FX.find((f) => f[0] === id);
 // Süre ve gecikme: 00,50 biçiminde (saniye)
 const fmtS = (v) => (v || 0).toFixed(2).padStart(5, '0').replace('.', ',');
 const ARTS = { liste: 'Liste (renkli kutular)', surec: 'Süreç (oklu adımlar)', agac: 'Soy ağacı / şema' };
-const SIZES = [['S', 'Küçük'], ['M', 'Orta'], ['L', 'Büyük']];
+// Giriş → Yazı Tipi Rengi (Standart Renkler) ve Tasarım → Arka Planı Biçimlendir → Düz dolgu renkleri
+const TCOLORS = [['#000000', 'Siyah'], ['#ffffff', 'Beyaz'], ['#c00000', 'Koyu Kırmızı'], ['#ff0000', 'Kırmızı'], ['#ffc000', 'Turuncu'], ['#ffff00', 'Sarı'], ['#92d050', 'Açık Yeşil'], ['#00b050', 'Yeşil'], ['#00b0f0', 'Açık Mavi'], ['#0070c0', 'Mavi'], ['#002060', 'Koyu Mavi'], ['#7030a0', 'Mor'], ['', 'Otomatik']];
+const BGCOLORS = [['#ffffff', 'Beyaz'], ['#fff2cc', 'Açık sarı'], ['#e2efda', 'Açık yeşil'], ['#ddebf7', 'Açık mavi'], ['#fce4d6', 'Açık turuncu'], ['#ededed', 'Açık gri'], ['#002060', 'Koyu Mavi'], ['#000000', 'Siyah']];
+const ALIGNS = [['left', 'Sola Hizala', 'Metni Sola Hizala'], ['center', 'Ortala', 'Ortala'], ['right', 'Sağa Hizala', 'Metni Sağa Hizala']];
+// Geçişler → Sonra: kutusu 00:03,00 biçiminde (dakika:saniye,salise)
+const fmtA = (sec) => `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')},00`;
 const ART_COLORS = ['#2e7d32', '#1565c0', '#e46c0a', '#7030a0', '#c62828', '#00838f'];
 const TRANS = [['none', 'Yok'], ['fade', 'Solma'], ['push', 'İtme'], ['zoom', 'Yakınlaştır']];
 const FONTS = [['calibri', 'Calibri', 'Calibri, Carlito, "Noto Sans", sans-serif'], ['georgia', 'Georgia', 'Georgia, "DejaVu Serif", serif'], ['verdana', 'Verdana', 'Verdana, "DejaVu Sans", sans-serif'], ['comic', 'Comic Sans', '"Comic Sans MS", "Comic Neue", cursive']];
@@ -39,6 +46,7 @@ const WARTS = [['wa1', 'Turuncu, gölgeli'], ['wa2', 'Mavi dış çizgi'], ['wa3
 const FILLS = [['#4472c4', 'Mavi'], ['#c00000', 'Kırmızı'], ['#ed7d31', 'Turuncu'], ['#70ad47', 'Yeşil'], ['#bf9000', 'Altın'], ['#7030a0', 'Mor']];
 const LINKS = [['next', 'Sonraki slayt'], ['prev', 'Önceki slayt'], ['first', 'İlk slayt'], ['last', 'Son slayt']];
 const WA_PH = 'Metninizi buraya yazın';
+const SAVE_TYPES = [['.pptx', 'PowerPoint Sunusu (*.pptx)'], ['.ppsx', 'PowerPoint Gösterisi (*.ppsx)'], ['.pdf', 'PDF (*.pdf)']];
 // Süre: 0:00:25 biçiminde
 const fmtT = (sec) => `${Math.floor(sec / 3600)}:${String(Math.floor(sec / 60) % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
 const bugun = () => { const t = new Date(); return `${String(t.getDate()).padStart(2, '0')}.${String(t.getMonth() + 1).padStart(2, '0')}.${t.getFullYear()}`; };
@@ -48,51 +56,58 @@ const PH = { title: 'Başlık eklemek için tıklayın', sub: 'Alt başlık ekle
 // Yazı boyutu (punto): slayt 960 pt genişliğinde sayılır, 1cqw = 9,6 pt. Boyut verilmemiş kutular CSS'teki varsayılanla çizilir.
 const FSIZES = [18, 20, 24, 28, 32, 36, 40, 44, 50, 54, 66];
 const fsDef = (s, k) => (k === 'title' ? (s.layout === 'title' ? 66 : 50) : 32);
-const fsStyle = (s, k) => (s.fs?.[k] ? ` style="font-size:${(s.fs[k] / 9.6).toFixed(2)}cqw"` : '');
+// Kutunun yazı boyutu, yazı rengi (fc) ve hizalaması (al)
+const fsStyle = (s, k) => {
+  const st = [s.fs?.[k] && `font-size:${(s.fs[k] / 9.6).toFixed(2)}cqw`, s.fc?.[k] && `color:${s.fc[k]}`, s.al?.[k] && `text-align:${s.al[k]}`].filter(Boolean);
+  return st.length ? ` style="${st.join(';')}"` : '';
+};
 const plain = (html) => { const d = document.createElement('div'); d.innerHTML = html || ''; return d.innerText.trim(); };
 
 export function slides({ desk, body, args, emit, setTitle }) {
   body.classList.add('pp');
   body.innerHTML = `
-    <div class="pp-tabs"><button type="button" class="pp-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="design">Tasarım</button><button type="button" data-tab="trans">Geçişler</button><button type="button" data-tab="anim">Animasyonlar</button><button type="button" data-tab="show">Slayt Gösterisi</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="master" class="pp-mtab" hidden>Asıl Slayt</button><button type="button" data-tab="shape" class="pp-stab" hidden>Şekil Biçimi</button></div>
-    <div class="pp-rib" data-tab="home"><span class="pp-newwrap"><button type="button" class="pp-new">➕ Yeni Slayt ▾</button><span class="pp-lay" hidden>${Object.entries(LAYOUTS).map(([k, v]) => `<button type="button" data-layout="${k}">${v}</button>`).join('')}</span></span>
-      <button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button><label class="pp-fsz" title="Yazı boyutu (punto): önce yazı kutusuna tıklayın">Yazı boyutu <select class="pp-fs">${FSIZES.map((n) => `<option>${n}</option>`).join('')}</select></label>
-      <button type="button" class="pp-dup" title="Seçili slaydın bir kopyasını hemen altına ekler">⧉ Slaytı Çoğalt</button><button type="button" class="pp-up" title="Slaytı yukarı taşı">▲ Yukarı</button><button type="button" class="pp-down" title="Slaytı aşağı taşı">▼ Aşağı</button><button type="button" class="pp-del" title="Slaytı sil">🗑 Sil</button></div>
+    <div class="pp-tabs"><button type="button" class="pp-file">Dosya</button><button type="button" data-tab="home" class="on">Giriş</button><button type="button" data-tab="insert">Ekle</button><button type="button" data-tab="design">Tasarım</button><button type="button" data-tab="trans">Geçişler</button><button type="button" data-tab="anim">Animasyonlar</button><button type="button" data-tab="show">Slayt Gösterisi</button><button type="button" data-tab="view">Görünüm</button><button type="button" data-tab="master" class="pp-mtab" hidden>Asıl Slayt</button><button type="button" data-tab="shape" class="pp-stab" hidden>Şekil Biçimi</button><button type="button" data-tab="pic" class="pp-stab pp-ptab" hidden>Resim Biçimi</button><button type="button" data-tab="audio" class="pp-stab pp-utab" hidden>Kayıttan Yürütme</button></div>
+    <div class="pp-rib" data-tab="home"><span class="pp-newwrap"><button type="button" class="pp-new">➕ Yeni Slayt ▾</button><span class="pp-lay" hidden>${Object.entries(LAYOUTS).map(([k, v]) => `<button type="button" data-layout="${k}">${v}</button>`).join('')}<b class="pp-laysub"></b><button type="button" data-dupsel>⧉ Seçili Slaytları Çoğalt</button></span></span><span class="pp-sep"></span>
+      <button type="button" data-cmd="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-cmd="italic" title="İtalik (Ctrl + I)"><i>T</i></button><label class="pp-fsz" title="Yazı Tipi Boyutu (punto): önce yazı kutusuna tıklayın">Yazı Tipi Boyutu <select class="pp-fs">${FSIZES.map((n) => `<option>${n}</option>`).join('')}</select></label>
+      <span class="pp-newwrap"><button type="button" class="pp-fcbtn" title="Yazı Tipi Rengi: önce yazı kutusuna tıklayın"><u>A</u> Yazı Tipi Rengi ▾</button><span class="pp-lay pp-fclist" hidden><b class="pp-laysub">Standart Renkler</b><span class="pp-fcgrid">${TCOLORS.map(([k, n]) => `<button type="button" class="pp-mcol" data-fcolor="${k}" title="${n}">${k ? `<i style="background:${k}"></i>` : 'Otomatik'}</button>`).join('')}</span></span></span><span class="pp-sep"></span>
+      ${ALIGNS.map(([k, n, tip]) => `<button type="button" data-align="${k}" title="${tip}">${n}</button>`).join('')}<span class="pp-sep"></span>
+      <span class="pp-newwrap"><button type="button" class="pp-sa" title="Seçili slaydın maddelerini şemaya çevirir">🔷 SmartArt'a Dönüştür ▾</button><span class="pp-lay pp-salist" hidden>${Object.entries(ARTS).map(([k, v]) => `<button type="button" data-art="${k}">${v}</button>`).join('')}<button type="button" data-art="none">↩ Metne Dönüştür</button></span></span></div>
     <div class="pp-rib" data-tab="insert" hidden><button type="button" class="pp-pic">🖼 Resim</button>
-      <span class="pp-sizes">Resim boyutu: ${SIZES.map(([k, n]) => `<button type="button" data-size="${k}">${n}</button>`).join('')}</span>
       <button type="button" class="pp-album" title="Resimler klasöründeki fotoğraflardan slaytlar oluşturur">📸 Fotoğraf Albümü</button>
-      <span class="pp-newwrap"><button type="button" class="pp-sa">🔷 SmartArt ▾</button><span class="pp-lay pp-salist" hidden>${Object.entries(ARTS).map(([k, v]) => `<button type="button" data-art="${k}">${v}</button>`).join('')}<button type="button" data-art="none">↩ Listeye geri dön</button></span></span>
+      <span class="pp-newwrap"><button type="button" class="pp-sains" title="Boş bir şema ekler">🔷 SmartArt ▾</button><span class="pp-lay pp-sailist" hidden>${Object.entries(ARTS).map(([k, v]) => `<button type="button" data-artins="${k}">${v}</button>`).join('')}</span></span>
       <span class="pp-newwrap"><button type="button" class="pp-tb">▦ Tablo ▾</button><span class="pp-lay pp-tblist" hidden>${TABLES.map(([c, r]) => `<button type="button" data-table="${c}x${r}">${c} sütun × ${r} satır</button>`).join('')}<button type="button" data-table="none">✖ Tabloyu kaldır</button></span></span>
       <span class="pp-newwrap"><button type="button" class="pp-ch">📊 Grafik ▾</button><span class="pp-lay pp-chlist" hidden>${CHARTS.map(([k, n]) => `<button type="button" data-chart="${k}">${n}</button>`).join('')}<button type="button" data-chart="edit">📝 Verileri düzenle</button><button type="button" data-chart="none">✖ Grafiği kaldır</button></span></span>
-      <button type="button" class="pp-num" title="Her slaydın sağ alt köşesine numara yazar">＃ Slayt numarası</button><button type="button" class="pp-music" title="Sunuya fon müziği ekler">🎵 Ses</button><span class="pp-musicname"></span>
+      <button type="button" class="pp-num" title="Üst Bilgi ve Alt Bilgi penceresini açar">＃ Slayt Numarası</button><button type="button" class="pp-music" title="Bilgisayardaki bir ses dosyasını slayda koyar">🔊 Ses</button><span class="pp-musicname"></span>
       <span class="pp-newwrap"><button type="button" class="pp-shbtn">⬟ Şekiller ▾</button><span class="pp-lay pp-shlist" hidden>${SHAPES.map(([k, ic, n]) => `<button type="button" data-shape="${k}">${ic} ${n}</button>`).join('')}<b class="pp-laysub">Eylem Düğmeleri</b>${ACTS.map(([k, ic, n]) => `<button type="button" data-shape="${k}"><span class="pp-actic">${ic}</span> ${n}</button>`).join('')}</span></span>
       <span class="pp-newwrap"><button type="button" class="pp-wa">𝒜 WordArt ▾</button><span class="pp-lay pp-walist" hidden>${WARTS.map(([k, n]) => `<button type="button" data-wa="${k}"><span class="pp-wa-s pp-${k}">Aa</span> ${n}</button>`).join('')}</span></span>
       <button type="button" class="pp-vid" title="Bilgisayardaki bir videoyu slayda koyar">🎬 Video</button><button type="button" class="pp-link" title="Seçili yazıya ya da şekle bağlantı (köprü) verir (Ctrl + K)">🔗 Bağlantı</button><button type="button" class="pp-act" title="Seçili şekle tıklanınca ne olacağını belirler">⚡ Eylem</button><button type="button" class="pp-hf" title="Tarih, slayt numarası ve alt bilgi">▤ Üst Bilgi ve Alt Bilgi</button></div>
     <div class="pp-rib" data-tab="shape" hidden><span class="pp-autos">Şekil Dolgusu: ${FILLS.map(([k, n]) => `<button type="button" class="pp-mcol" data-fill="${k}" title="${n}"><i style="background:${k}"></i></button>`).join('')}</span><span class="pp-sep"></span>
-      <button type="button" class="pp-link">🔗 Bağlantı</button><button type="button" class="pp-act">⚡ Eylem</button><button type="button" class="pp-shdel">🗑 Şekli sil</button><span class="pp-tnote">Şekli sürükleyerek yerini değiştirebilirsiniz</span></div>
-    <div class="pp-rib" data-tab="design" hidden>${THEMES.map(([id, n, bg, fg]) => `<button type="button" class="pp-theme" data-theme="${id}" title="${n}" style="background:${bg};color:${fg}">Aa<small>${n}</small></button>`).join('')}</div>
-    <div class="pp-rib" data-tab="trans" hidden>${TRANS.map(([id, n]) => `<button type="button" data-trans="${id}">${n}</button>`).join('')}<span class="pp-tnote">Seçili slayda uygulanır</span><span class="pp-autos">Kendiliğinden ilerle: ${[[0, 'Yok (tıklayınca)'], [3, '3 sn'], [5, '5 sn']].map(([k, n]) => `<button type="button" data-auto="${k}">${n}</button>`).join('')}<button type="button" data-autoall title="Seçili slaydın süresini bütün slaytlara uygular">Tüm slaytlara uygula</button></span></div>
+      <button type="button" class="pp-link">🔗 Bağlantı</button><button type="button" class="pp-act">⚡ Eylem</button><button type="button" class="pp-shdel" title="Gerçek PowerPoint'te şekle tıklayıp Delete tuşuna basılır">🗑 Şekli sil</button><span class="pp-tnote">Şekli sürükleyerek yerini değiştirebilirsiniz</span></div>
+    <div class="pp-rib" data-tab="pic" hidden><button type="button" class="pp-crop" title="Kenarlardaki siyah çizgileri içeri sürükleyin; bitince yeniden Kırp'a basın">✂ Kırp</button><span class="pp-sep"></span>
+      <span class="pp-autos">Genişlik: <button type="button" class="pp-spin" data-imgw="-1" title="Küçült">−</button><output class="pp-aval pp-imgwv"></output><button type="button" class="pp-spin" data-imgw="1" title="Büyüt">+</button></span><span class="pp-tnote">Resmin köşesindeki yuvarlaktan tutup sürükleyerek de büyütüp küçültebilirsiniz</span></div>
+    <div class="pp-rib" data-tab="audio" hidden><span class="pp-tnote">Ses Stilleri:</span><button type="button" class="pp-musnostyle" title="Ses yalnızca eklendiği slaytta çalar">Stil Yok</button><button type="button" class="pp-musbg" title="Ses bütün slaytlar boyunca çalar, simgesi gösteride gizlenir">🎵 Arka Planda Yürüt</button></div>
+    <div class="pp-rib" data-tab="design" hidden>${THEMES.map(([id, n, bg, fg]) => `<button type="button" class="pp-theme" data-theme="${id}" title="${n}" style="background:${bg};color:${fg}">Aa<small>${n}</small></button>`).join('')}<span class="pp-sep"></span><button type="button" class="pp-bgbtn" title="Seçili slaydın arka planı: düz renk ya da resim">🎨 Arka Planı Biçimlendir</button></div>
+    <div class="pp-rib" data-tab="trans" hidden>${TRANS.map(([id, n]) => `<button type="button" data-trans="${id}">${n}</button>`).join('')}<span class="pp-tnote">Seçili slayda uygulanır</span><span class="pp-sep"></span>
+      <span class="pp-autos">Sonraki Slayt: <label class="pp-tlab"><input type="checkbox" class="pp-tclick"> Fare Tıklatıldığında</label><label class="pp-tlab"><input type="checkbox" class="pp-tafter"> Sonra:</label><button type="button" class="pp-spin" data-tafter="-1" title="Azalt">−</button><output class="pp-aval pp-tafterv">00:00,00</output><button type="button" class="pp-spin" data-tafter="1" title="Artır">+</button></span>
+      <button type="button" class="pp-tall" title="Bu slaydın geçişini ve zamanlamasını bütün slaytlara uygular">⧉ Tümüne Uygula</button></div>
     <div class="pp-rib" data-tab="anim" hidden><button type="button" class="pp-aprev" title="Animasyonu bu slaytta oynat">▶ Önizleme</button><span class="pp-sep"></span>
       <span class="pp-fxg pp-fxg-in"><b>Giriş</b>${ANIMS.map(([id, n]) => `<button type="button" data-anim="${id}">${n}</button>`).join('')}</span>
       ${['em', 'out'].map((k) => `<span class="pp-fxg pp-fxg-${k}"><b>${FX_KIND[k][0]}</b>${FX.filter((f) => f[2] === k).map(([id, n]) => `<button type="button" data-fx="${id}">${n}</button>`).join('')}</span>`).join('')}<span class="pp-sep"></span>
       <span class="pp-newwrap"><button type="button" class="pp-aadd" title="Seçili nesneye ikinci bir animasyon ekler">✚ Animasyon Ekle ▾</button><span class="pp-lay pp-aaddlist" hidden>${['in', 'em', 'out'].map((k) => `<b class="pp-laysub">${FX_KIND[k][0]}</b>${FX.filter((f) => f[2] === k).map(([id, n]) => `<button type="button" data-addfx="${id}"><i class="pp-ap-star" style="color:${FX_KIND[k][1]}">★</i> ${n}</button>`).join('')}`).join('')}</span></span>
       <button type="button" class="pp-apbtn" title="Slayttaki bütün animasyonları sırasıyla listeler">☰ Animasyon Bölmesi</button><span class="pp-sep"></span>
-      <span class="pp-autos pp-aold">Başlangıç: <button type="button" data-astart="click">Tıklayınca</button><button type="button" data-astart="auto">Kendiliğinden</button></span>
-      <span class="pp-atime" hidden><span class="pp-autos">Başlangıç: ${STARTS.map(([k, n]) => `<button type="button" data-ast="${k}">${n}</button>`).join('')}</span>
+      <span class="pp-atime"><span class="pp-autos">Başlangıç: ${STARTS.map(([k, n]) => `<button type="button" data-ast="${k}">${n}</button>`).join('')}</span>
         <span class="pp-autos">Süre: <button type="button" class="pp-spin" data-adur="-1" title="Kısalt">−</button><output class="pp-aval pp-adur">00,50</output><button type="button" class="pp-spin" data-adur="1" title="Uzat">+</button></span>
         <span class="pp-autos">Gecikme: <button type="button" class="pp-spin" data-adel="-1" title="Azalt">−</button><output class="pp-aval pp-adel">00,00</output><button type="button" class="pp-spin" data-adel="1" title="Artır">+</button></span>
         <span class="pp-autos" title="Animasyonu Yeniden Sırala"><button type="button" data-amove="-1">▲ Önceye Taşı</button><button type="button" data-amove="1">▼ Sonraya Taşı</button></span></span>
-      <span class="pp-tnote pp-anote">Maddelere ve resme uygulanır; geçişten farklıdır</span></div>
+      <span class="pp-tnote pp-anote">Önce slayttaki bir nesneye tıklayın</span></div>
     <div class="pp-rib" data-tab="view" hidden><button type="button" data-view="normal">▭ Normal</button><button type="button" data-view="sorter">▦ Slayt Sıralayıcı</button><button type="button" data-view="notes" title="Slayt ve altında konuşmacı notu, kâğıt gibi">📄 Not Sayfası</button><button type="button" data-view="reading" title="Sunuyu pencerenin içinde, gösteri gibi okur">📖 Okuma Görünümü</button><button type="button" data-view="master" title="Bütün slaytların ortak görünüşü: yazı tipi, renk, logo, alt bilgi">🎨 Asıl Slayt</button><span class="pp-tnote">Sıralayıcıda slaytları sürükleyerek yerlerini değiştirin; çift tıklayınca slayt açılır</span></div>
-    <div class="pp-rib" data-tab="master" hidden><span class="pp-autos">Yazı tipi: ${FONTS.map(([k, n, f]) => `<button type="button" data-mfont="${k}" style="font-family:${esc(f)}">${n}</button>`).join('')}</span><span class="pp-sep"></span>
-      <span class="pp-autos">Başlık rengi: ${MCOLORS.map(([k, n]) => `<button type="button" class="pp-mcol" data-mcolor="${k}" title="${n}">${k ? `<i style="background:${k}"></i>` : 'Tema'}</button>`).join('')}</span><span class="pp-sep"></span>
-      <button type="button" class="pp-mlogo">🖼 Logo ekle</button><button type="button" class="pp-mnologo">✖ Logoyu kaldır</button><span class="pp-sep"></span>
-      <label class="pp-autos">Alt bilgi: <input class="pp-mfoot" placeholder="Her slaydın altına yazılacak yazı" spellcheck="false"></label>
+    <div class="pp-rib" data-tab="master" hidden><span class="pp-newwrap"><button type="button" class="pp-mfonts">Aa Yazı Tipleri ▾</button><span class="pp-lay pp-mfontlist" hidden>${FONTS.map(([k, n, f]) => `<button type="button" data-mfont="${k}" style="font-family:${esc(f)}">${n}</button>`).join('')}</span></span><span class="pp-sep"></span>
+      <span class="pp-tnote">Başlık rengi: asıl slayttaki başlığa tıklayın → Giriş → Yazı Tipi Rengi · Logo: Ekle → Resim · Alt bilgi: asıl slayttaki “Alt Bilgi” kutusuna yazın</span>
       <button type="button" class="pp-mclose">✖ Asıl Görünümü Kapat</button></div>
     <div class="pp-rib" data-tab="show" hidden><button type="button" class="pp-play">▶ Baştan başla <small>F5</small></button><button type="button" class="pp-play-cur">▶ Geçerli slayttan <small>Shift + F5</small></button><span class="pp-sep"></span><button type="button" class="pp-rehearse" title="Gösteriyi izlerken her slaytta ne kadar kaldığınızı ölçer">⏱ Zamanlamaları Prova Et</button></div>
-    <div class="pp-menu" hidden><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı kaydet…</button><button type="button" data-file="pdf">📕 PDF olarak kaydet…</button><button type="button" data-file="video">🎬 Video olarak kaydet (.mp4)…</button><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
+    <div class="pp-menu" hidden><button type="button" data-file="save">💾 Kaydet <small>Ctrl + S</small></button><button type="button" data-file="saveas">💾 Farklı Kaydet…</button><button type="button" data-file="export">📤 Dışarı Aktar ▸</button><span class="pp-expl" hidden><button type="button" data-file="pdf">📕 PDF/XPS Belgesi Oluştur</button><button type="button" data-file="video">🎬 Video Oluştur</button></span><button type="button" data-file="print">🖨 Yazdır… <small>Ctrl + P</small></button></div>
     <div class="pp-main"><div class="pp-thumbs" tabindex="0"></div><div class="pp-stage"><div class="pp-slide"></div></div><div class="pp-sorter" hidden tabindex="0"></div>
-      <div class="pp-master" hidden><div class="pp-mside"><b>Asıl Slayt</b><div class="pp-mini pp-mbig"></div><p>Burada yaptığınız her değişiklik <b>bütün slaytlara</b> birden uygulanır. Slaytlardaki yazılar değişmez.</p></div><div class="pp-mall"></div></div>
+      <div class="pp-master" hidden><div class="pp-mside"><b>Asıl Slayt</b><div class="pp-mini pp-mbig"></div><p>Burada yaptığınız her değişiklik <b>bütün slaytlara</b> birden uygulanır. Slaytlardaki yazılar değişmez. Alt bilginin slaytlarda görünmesi için <b>Ekle → Üst Bilgi ve Alt Bilgi</b>'de <b>Alt bilgi</b> işaretlenmelidir.</p></div><div class="pp-mall"></div></div>
       <div class="pp-npage" hidden><div class="pp-np-nav"><button type="button" class="pp-np-prev">◀ Önceki</button><span class="pp-np-no"></span><button type="button" class="pp-np-next">Sonraki ▶</button></div>
         <div class="pp-np-paper"><div class="pp-mini pp-np-sl"></div><textarea class="pp-npt" placeholder="Metin eklemek için tıklayın" spellcheck="false"></textarea></div></div>
       <div class="pp-cdata" hidden><div class="pp-cd-h">📊 Grafik verileri<button type="button" class="pp-cd-x" title="Kapat">✖</button></div>
@@ -102,7 +117,13 @@ export function slides({ desk, body, args, emit, setTitle }) {
       <div class="pp-apane" hidden><div class="pp-ap-h">Animasyon Bölmesi<button type="button" class="pp-ap-x" title="Kapat">✖</button></div>
         <div class="pp-ap-bar"><button type="button" class="pp-ap-play" title="Slaydın bütün animasyonlarını sırayla oynatır">▶ Oynat</button><span class="pp-ap-mv"><button type="button" data-amove="-1" title="Önceye Taşı">▲</button><button type="button" data-amove="1" title="Sonraya Taşı">▼</button></span></div>
         <div class="pp-ap-list"></div>
-        <div class="pp-ap-foot"><button type="button" class="pp-ap-del" title="Seçili animasyonu kaldırır">🗑 Kaldır</button><small>🖱 Tıklatıldığında<br>🕒 Öncekinden Sonra</small></div></div></div>
+        <div class="pp-ap-foot"><button type="button" class="pp-ap-del" title="Seçili animasyonu kaldırır">🗑 Kaldır</button><small>🖱 Tıklatıldığında<br>🕒 Öncekinden Sonra</small></div></div>
+      <div class="pp-bgpane" hidden><div class="pp-ap-h">Arka Planı Biçimlendir<button type="button" class="pp-bg-x" title="Kapat">✖</button></div>
+        <div class="pp-bg-b"><b>Dolgu</b><label><input type="radio" name="ppbg" value="solid"> Düz dolgu</label>
+          <div class="pp-bg-cols"><span>Renk:</span>${BGCOLORS.map(([k, n]) => `<button type="button" class="pp-mcol" data-bgcol="${k}" title="${n}"><i style="background:${k}"></i></button>`).join('')}</div>
+          <label><input type="radio" name="ppbg" value="pic"> Resim veya doku dolgusu</label>
+          <div class="pp-bg-cols"><span>Resim kaynağı:</span><button type="button" class="pp-bg-ins">Ekle…</button></div></div>
+        <div class="pp-ap-foot"><button type="button" class="pp-bg-all" title="Bu arka planı bütün slaytlara uygular">Tümüne Uygula</button><button type="button" class="pp-bg-reset">Arka Planı Sıfırla</button></div></div></div>
     <div class="pp-notes"><label>📝 Konuşmacı notları <small>(yalnızca siz görürsünüz; izleyiciye gösterilmez)</small></label><textarea class="pp-nt" placeholder="Bu slaytta söylemek istediklerinizi buraya yazın" spellcheck="false"></textarea></div>
     <div class="pp-status"><span class="pp-st"></span><span>Türkçe (Türkiye)</span></div>
     <div class="pp-show" hidden tabindex="0"></div>
@@ -111,8 +132,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
   const $ = (s) => body.querySelector(s);
   let deck, cur = 0, fileName = null, folder = 'docs', dirty = false;
   // anim: eski slayt animasyonu (bütün maddeler ve resim); anims: nesne animasyonları [{ t, effect, start, dur, delay }]
-  const blank = (layout) => ({ layout, title: '', sub: '', body: '', body2: '', img: null, trans: 'none', art: null, anim: { effect: 'none', start: 'click' }, anims: [], auto: 0, imgSize: 'M', notes: '', shapes: [], ink: [] });
+  const blank = (layout) => ({ layout, title: '', sub: '', body: '', body2: '', img: null, trans: 'none', art: null, anim: { effect: 'none', start: 'click' }, anims: [], auto: 0, imgSize: 'M', notes: '', shapes: [], ink: [], fc: {}, al: {}, bg: null, imgW: 0, crop: null, hidden: false, click: true });
   let view = 'normal';
+  // Resim seçili mi (Resim Biçimi sekmesi), Kırp açık mı, Arka Planı Biçimlendir bölmesi açık mı, Asıl Slayt'ta başlık seçili mi
+  let selImg = false, cropOn = false, bgOpen = false, masterSel = null;
   let lastK = null; // en son tıklanan yazı kutusu (Yazı boyutu bunu değiştirir)
   let selShape = -1; // seçili şeklin sırası (-1: yok)
   // Animasyon: seçili nesne ('title', 'sub', 'body', 'body2', 'img', 'shp:2' …), Animasyon Bölmesi'nde seçili satır, bölme açık mı
@@ -128,14 +151,25 @@ export function slides({ desk, body, args, emit, setTitle }) {
     return `<div class="pp-shp pp-shp-${act ? 'act' : o.kind}${o.style ? ' pp-' + o.style : ''}"${link} data-si="${i}" style="${pos};--fill:${o.fill || FILLS[0][0]}">${tx}</div>`;
   }
 
-  // SmartArt: maddeleri renkli kutulara, oklu adımlara ya da soy ağacına dönüştürür
-  function artHtml(kind, items, edit) {
+  // SmartArt: maddeleri renkli kutulara, oklu adımlara ya da soy ağacına dönüştürür.
+  // Düzenlerken şemanın solunda Metin Bölmesi durur: her satır bir kutudur (Enter yeni kutu açar).
+  function artHtml(kind, items, edit, s) {
     const box = (t, i) => `<div class="pp-ab" style="background:${ART_COLORS[i % ART_COLORS.length]}">${esc(t)}</div>`;
-    const note = edit ? '<small class="pp-artnote">SmartArt: yazıyı değiştirmek için Ekle → SmartArt → Listeye geri dön</small>' : '';
-    if (!items.length) return '<div class="pp-art"><div class="pp-artempty">SmartArt için önce madde yazın</div></div>';
-    if (kind === 'surec') return `<div class="pp-art pp-art-surec">${items.map((t, i) => `${box(t, i)}${i < items.length - 1 ? '<span class="pp-arrow">➜</span>' : ''}`).join('')}${note}</div>`;
-    if (kind === 'agac') return `<div class="pp-art pp-art-agac"><div class="pp-atop">${box(items[0], 0)}</div><div class="pp-alines"></div><div class="pp-akids">${items.slice(1).map((t, i) => `<div class="pp-akid">${box(t, i + 1)}</div>`).join('')}</div>${note}</div>`;
-    return `<div class="pp-art pp-art-liste">${items.map(box).join('')}${note}</div>`;
+    let art;
+    if (!items.length) art = '<div class="pp-art"><div class="pp-artempty">Metin Bölmesi\'ne yazın</div></div>';
+    else if (kind === 'surec') art = `<div class="pp-art pp-art-surec">${items.map((t, i) => `${box(t, i)}${i < items.length - 1 ? '<span class="pp-arrow">➜</span>' : ''}`).join('')}</div>`;
+    else if (kind === 'agac') art = `<div class="pp-art pp-art-agac"><div class="pp-atop">${box(items[0], 0)}</div><div class="pp-alines"></div><div class="pp-akids">${items.slice(1).map((t, i) => `<div class="pp-akid">${box(t, i + 1)}</div>`).join('')}</div></div>`;
+    else art = `<div class="pp-art pp-art-liste">${items.map(box).join('')}</div>`;
+    if (!edit || !s) return art;
+    return `<div class="pp-artwrap"><div class="pp-artpane"><b>Metin Bölmesi</b><ul class="pp-box pp-artul${plain(s.body) ? '' : ' empty'}" data-k="body" contenteditable="true" data-ph="[Metin]">${s.body || '<li><br></li>'}</ul></div>${art}</div>`;
+  }
+  // Metin Bölmesi'ne yazdıkça şema yenilenir (imleç bölmede kalır)
+  function refreshArt() {
+    const s = deck.slides[cur];
+    const old = $('.pp-slide .pp-artwrap > .pp-art');
+    if (!s.art || !old) return;
+    const items = [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean);
+    old.outerHTML = artHtml(s.art, items, false);
   }
   const theme = () => THEMES.find((t) => t[0] === deck.theme) || THEMES[0];
   // Grafik: sütun (yükseklik en büyük değere göre) ya da pasta (dilimler toplamın payı)
@@ -161,29 +195,38 @@ export function slides({ desk, body, args, emit, setTitle }) {
     const ce = edit ? 'contenteditable="true"' : '';
     const box = (k, cls) => `<div class="pp-box ${cls}${s[k] ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}"${fsStyle(s, k)}>${s[k] || ''}</div>`;
     const list = (k) => (edit ? `<ul class="pp-box pp-body${plain(s[k]) ? '' : ' empty'}" data-k="${k}" ${ce} data-ph="${PH[k]}"${fsStyle(s, k)}>${s[k] || '<li><br></li>'}</ul>` : `<ul class="pp-body" data-k="${k}"${fsStyle(s, k)}>${s[k]}</ul>`);
-    const img = (cls = '') => (s.img ? `<img class="pp-img pp-s${s.imgSize || 'M'} ${cls}" src="${pictureURL(s.img)}" alt="">` : '');
+    // Resim: genişlik (imgW, kabın yüzdesi) ve kırpma (crop: kenarlardan yüzde) verilmişse satır içi stil
+    const c = s.crop;
+    const imgSt = [s.imgW && `width:${s.imgW}%;max-width:none;max-height:none`, c && `clip-path:inset(${c.t}% ${c.r}% ${c.b}% ${c.l}%)`].filter(Boolean).join(';');
+    const img = (cls = '') => (s.img ? `<img class="pp-img pp-s${s.imgSize || 'M'} ${cls}" src="${pictureURL(s.img)}" alt=""${imgSt ? ` style="${imgSt}"` : ''}>` : '');
     const items = () => [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean);
     let inner = s.layout === 'blank' ? '' : box('title', s.layout === 'title' ? 'pp-t-big' : 'pp-t');
     if (s.layout === 'title') inner += box('sub', 'pp-sub');
     const extra = (s.table ? tableHtml(s.table, ce) : '') + (s.chart ? chartHtml(s.chart) : '');
-    if (s.layout === 'content') inner += `<div class="pp-row">${s.art ? artHtml(s.art, items(), edit) : extra && !plain(s.body) ? '' : list('body')}${extra}${img()}</div>`;
+    if (s.layout === 'content') inner += `<div class="pp-row">${s.art ? artHtml(s.art, items(), edit, s) : extra && !plain(s.body) ? '' : list('body')}${extra}${img()}</div>`;
     else if (extra && s.layout !== 'two' && s.layout !== 'photo') inner += `<div class="pp-row">${extra}</div>${img('pp-img-c')}`;
     else if (s.layout === 'two') inner += `<div class="pp-row">${list('body')}${list('body2')}</div>${img('pp-img-c')}`;
     else if (s.layout === 'photo') inner += `<div class="pp-photobox">${s.img ? img('pp-photo') : '<div class="pp-nophoto">Fotoğraf eklemek için Ekle → Resim</div>'}</div>${box('sub', 'pp-sub pp-cap').replace(PH.sub, PH.cap)}`;
     else if (s.img) inner += img('pp-img-c');
-    const num = deck.slideNum && s.layout !== 'title' && deck.slides.includes(s) ? `<span class="pp-num-b">${deck.slides.indexOf(s) + 1}</span>` : '';
     const logo = m.logo ? `<img class="pp-logo" src="${pictureURL(m.logo)}" alt="">` : '';
-    // Üst Bilgi ve Alt Bilgi: “Başlık slaydında gösterme” seçiliyse başlık slaydında alt bilgi ve tarih çıkmaz
+    // Üst Bilgi ve Alt Bilgi: “Başlık slaydında gösterme” seçiliyse başlık slaydında numara, alt bilgi ve tarih çıkmaz.
+    // Asıl Slayt'taki alt bilgi yazısı ancak pencerede “Alt bilgi” işaretliyse (hf.foot) slaytlarda görünür.
     const hf = deck.hf || {};
     const hfOff = hf.hideTitle && s.layout === 'title';
-    const foot = m.footer && !hfOff ? `<span class="pp-foot">${esc(m.footer)}</span>` : '';
+    const num = deck.slideNum && !hfOff && deck.slides.includes(s) ? `<span class="pp-num-b">${deck.slides.indexOf(s) + 1}</span>` : '';
+    const foot = m.footer && hf.foot && !hfOff ? `<span class="pp-foot">${esc(m.footer)}</span>` : '';
     const date = hf.date && !hfOff ? `<span class="pp-date">${esc(hf.fixed ? hf.dateText || '' : bugun())}</span>` : '';
     const shapes = (s.shapes || []).map((o, i) => shapeHtml(o, i, edit)).join('');
     const ink = !noInk && s.ink?.length ? inkSvg(s.ink) : '';
-    return `<div class="pp-sl pp-l-${s.layout}${m.color ? ' pp-mc' : ''}" style="background:${bg};color:${fg};--acc:${acc}${font ? `;font-family:${esc(font[2])}` : ''}">${inner}${shapes}${num}${logo}${foot}${date}${ink}</div>`;
+    // Ses simgesi: yalnızca düzenlerken, sesin eklendiği slaytta
+    const aud = edit && deck.music && deck.slides[deck.musicAt || 0] === s ? `<span class="pp-audio" title="${esc(deck.music)}">🔊</span>` : '';
+    // Arka Planı Biçimlendir: düz renk ya da resim, temanın arka planının yerine geçer
+    const back = s.bg?.color || (s.bg?.pic ? `center / cover no-repeat url('${pictureURL(s.bg.pic)}')` : bg);
+    return `<div class="pp-sl pp-l-${s.layout}${m.color ? ' pp-mc' : ''}" style="background:${back};color:${fg};--acc:${acc}${font ? `;font-family:${esc(font[2])}` : ''}">${inner}${shapes}${num}${logo}${foot}${date}${aud}${ink}</div>`;
   }
   function render() {
-    $('.pp-thumbs').innerHTML = deck.slides.map((s, i) => `<div class="pp-th${i === cur ? ' on' : ''}" data-i="${i}"><span>${i + 1}${s.trans !== 'none' ? ' ★' : ''}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
+    // Gizli slaydın numarası üstü çizili görünür
+    $('.pp-thumbs').innerHTML = deck.slides.map((s, i) => `<div class="pp-th${i === cur ? ' on' : ''}${s.hidden ? ' pp-hid' : ''}" data-i="${i}"><span>${s.hidden ? `<s>${i + 1}</s>` : i + 1}${s.trans !== 'none' ? ' ★' : ''}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
     $('.pp-slide').innerHTML = slideHtml(deck.slides[cur], true);
     $('.pp-thumbs').hidden = view !== 'normal';
     $('.pp-stage').hidden = view !== 'normal';
@@ -203,25 +246,47 @@ export function slides({ desk, body, args, emit, setTitle }) {
       const m = deck.master || {};
       const sample = { ...blank('content'), title: 'Asıl başlık stili', body: '<li>Birinci düzey madde</li><li>İkinci madde</li>' };
       $('.pp-mbig').innerHTML = slideHtml(sample, false);
+      // Asıl slayt: başlığa tıklanınca seçilir (rengi Giriş → Yazı Tipi Rengi ile); altta yazılabilir Alt Bilgi kutusu
+      const msl = $('.pp-mbig .pp-sl');
+      msl.querySelector('.pp-foot')?.remove();
+      msl.querySelector('[data-k="title"]')?.classList.toggle('pp-osel', masterSel === 'title');
+      msl.insertAdjacentHTML('beforeend', `<div class="pp-mfootph${m.footer ? '' : ' empty'}" contenteditable="true" data-ph="Alt Bilgi" spellcheck="false">${esc(m.footer || '')}</div>`);
       $('.pp-mall').innerHTML = deck.slides.map((s, i) => `<div class="pp-sth"><span>${i + 1}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
       body.querySelectorAll('[data-mfont]').forEach((b) => b.classList.toggle('on', b.dataset.mfont === (m.font || 'calibri')));
-      body.querySelectorAll('[data-mcolor]').forEach((b) => b.classList.toggle('on', b.dataset.mcolor === (m.color || '')));
-      if ($('.pp-mfoot') !== document.activeElement) $('.pp-mfoot').value = m.footer || '';
     }
     renderChartData();
     $('.pp-sorter').hidden = view !== 'sorter';
-    if (view === 'sorter') $('.pp-sorter').innerHTML = deck.slides.map((s, i) => `<div class="pp-sth${i === cur ? ' on' : ''}" data-i="${i}" draggable="true"><span>${i + 1}${s.trans !== 'none' ? ' ★' : ''}${s.anim?.effect !== 'none' || s.anims?.length ? ' ✦' : ''}${s.auto > 0 ? `<em class="pp-stime">${fmtT(s.auto).slice(2)}</em>` : ''}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
+    if (view === 'sorter') $('.pp-sorter').innerHTML = deck.slides.map((s, i) => `<div class="pp-sth${i === cur ? ' on' : ''}${s.hidden ? ' pp-hid' : ''}" data-i="${i}" draggable="true"><span>${s.hidden ? `<s>${i + 1}</s>` : i + 1}${s.trans !== 'none' ? ' ★' : ''}${s.anim?.effect !== 'none' || s.anims?.length ? ' ✦' : ''}${s.auto > 0 ? `<em class="pp-stime">${fmtT(s.auto).slice(2)}</em>` : ''}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
     body.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('on', b.dataset.view === view));
-    body.querySelectorAll('[data-size]').forEach((b) => b.classList.toggle('on', b.dataset.size === (deck.slides[cur].imgSize || 'M')));
-    body.querySelectorAll('[data-astart]').forEach((b) => b.classList.toggle('on', b.dataset.astart === deck.slides[cur].anim?.start));
     animUi();
-    body.querySelectorAll('[data-auto]').forEach((b) => b.classList.toggle('on', +b.dataset.auto === (deck.slides[cur].auto || 0)));
+    const s = deck.slides[cur];
+    // Geçişler → Zamanlama: Fare Tıklatıldığında, Sonra: (süre)
+    $('.pp-tclick').checked = s.click !== false;
+    $('.pp-tafter').checked = s.auto > 0;
+    $('.pp-tafterv').textContent = fmtA(s.auto || 0);
     $('.pp-musicname').textContent = deck.music ? `🔊 ${deck.music}` : '';
     $('.pp-st').textContent = `Slayt ${cur + 1} / ${deck.slides.length}`;
     if ($('.pp-nt').value !== (deck.slides[cur].notes || '')) $('.pp-nt').value = deck.slides[cur].notes || '';
-    body.querySelectorAll('.pp-num').forEach((b) => b.classList.toggle('on', !!deck.slideNum));
     body.querySelectorAll('[data-theme]').forEach((b) => b.classList.toggle('on', b.dataset.theme === deck.theme));
-    body.querySelectorAll('[data-trans]').forEach((b) => b.classList.toggle('on', b.dataset.trans === deck.slides[cur].trans));
+    body.querySelectorAll('[data-trans]').forEach((b) => b.classList.toggle('on', b.dataset.trans === s.trans));
+    // Bağlamsal sekmeler: Resim Biçimi (resim seçiliyken), Kayıttan Yürütme (sesin olduğu slaytta)
+    if (!s.img || view !== 'normal') { selImg = false; cropOn = false; }
+    $('.pp-ptab').hidden = !selImg;
+    $('.pp-utab').hidden = !(deck.music && view === 'normal' && (deck.musicAt || 0) === cur);
+    $('.pp-imgwv').textContent = `${imgCm()} cm`;
+    $('.pp-crop').classList.toggle('on', cropOn);
+    $('.pp-musbg').classList.toggle('on', !!deck.musicBg);
+    $('.pp-musnostyle').classList.toggle('on', !deck.musicBg);
+    body.querySelectorAll('.pp-tabs [data-tab]').forEach((b) => { if (b.hidden && b.classList.contains('on')) showTab('home'); });
+    // Arka Planı Biçimlendir bölmesi
+    const bp = $('.pp-bgpane');
+    bp.hidden = !(bgOpen && view === 'normal');
+    $('.pp-main').classList.toggle('bg-open', !bp.hidden);
+    bp.querySelector('[value="solid"]').checked = !!s.bg?.color;
+    bp.querySelector('[value="pic"]').checked = !!s.bg?.pic;
+    bp.querySelectorAll('[data-bgcol]').forEach((b) => b.classList.toggle('on', b.dataset.bgcol === s.bg?.color));
+    body.querySelectorAll('.pp-bgbtn').forEach((b) => b.classList.toggle('on', !bp.hidden));
+    drawImgSel();
     setTitle(`${dirty ? '*' : ''}${fileName || 'Sunu1'} - Sunu`);
   }
   // Düzenleme alanındaki yazıyı slayda kaydeder (küçük resmi de günceller)
@@ -244,6 +309,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     $('.pp-slide').innerHTML = slideHtml(deck.slides[cur], true);
     const th = $(`.pp-th[data-i="${cur}"] .pp-mini`);
     if (th) th.innerHTML = slideHtml(deck.slides[cur], false);
+    drawImgSel();
   }
   // Grafik veri kutusu: seçili slaytta grafik varsa ve açık bırakıldıysa görünür
   let chartOpen = false;
@@ -261,7 +327,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
   function setTable(sl, c, r) {
     sl.table = Array.from({ length: r }, () => Array(c).fill(''));
   }
-  function go(i) { pull(); cur = Math.max(0, Math.min(deck.slides.length - 1, i)); selShape = -1; selObj = null; selAnim = -1; render(); emit('ppt-select', { index: cur }); }
+  function go(i) { pull(); cur = Math.max(0, Math.min(deck.slides.length - 1, i)); selShape = -1; selObj = null; selAnim = -1; selImg = false; cropOn = false; render(); emit('ppt-select', { index: cur }); }
   // Seçili şeklin çerçevesi ve bağlamsal “Şekil Biçimi” sekmesi
   function markSel() {
     $('.pp-slide').querySelectorAll('.pp-shp').forEach((el) => el.classList.toggle('sel', +el.dataset.si === selShape));
@@ -269,6 +335,44 @@ export function slides({ desk, body, args, emit, setTitle }) {
     $('.pp-stab').hidden = !o;
     if (!o && $('.pp-stab').classList.contains('on')) showTab('home');
     body.querySelectorAll('[data-fill]').forEach((b) => b.classList.toggle('on', !!o && b.dataset.fill === o.fill));
+  }
+
+  // ---- Resim Biçimi: köşeden büyütme, Genişlik, Kırp ----
+  const imgEl = () => $('.pp-slide .pp-img');
+  // Resmin genişliği, kabının yüzdesi olarak (verilmemişse ekrandaki hâlinden ölçülür)
+  function curImgW() {
+    const s = deck.slides[cur], el = imgEl();
+    if (s.imgW) return s.imgW;
+    const pw = el?.parentElement.getBoundingClientRect().width;
+    return pw ? Math.round((el.getBoundingClientRect().width / pw) * 100) : 42;
+  }
+  // Genişlik santim olarak: slayt 33,87 cm genişliğinde (16:9) sayılır
+  function imgCm() {
+    const el = imgEl(), sl = $('.pp-slide .pp-sl');
+    const w = el && sl ? (el.getBoundingClientRect().width / sl.getBoundingClientRect().width) * 33.87 : 0;
+    return w.toFixed(1).replace('.', ',');
+  }
+  // Seçili resmin çerçevesi: köşelerde boyut tutamaçları; Kırp açıkken kenarlarda siyah kırpma çizgileri
+  function drawImgSel() {
+    $('.pp-slide .pp-imgsel')?.remove();
+    const el = imgEl(), sl = $('.pp-slide .pp-sl');
+    if (!selImg || !el || !sl || $('.pp-stage').hidden) return;
+    const r0 = sl.getBoundingClientRect(), r = el.getBoundingClientRect();
+    const c = deck.slides[cur].crop || { l: 0, t: 0, r: 0, b: 0 };
+    const box = document.createElement('div');
+    box.className = 'pp-imgsel' + (cropOn ? ' pp-cropping' : '');
+    Object.assign(box.style, { left: r.left - r0.left + 'px', top: r.top - r0.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    box.innerHTML = cropOn
+      ? `<i class="pp-croph" data-c="l" style="left:${c.l}%"></i><i class="pp-croph" data-c="r" style="right:${c.r}%"></i><i class="pp-croph" data-c="t" style="top:${c.t}%"></i><i class="pp-croph" data-c="b" style="bottom:${c.b}%"></i>`
+      : ['nw', 'ne', 'sw', 'se'].map((k) => `<i class="pp-imgh pp-imgh-${k}" data-h="${k}"></i>`).join('');
+    sl.append(box);
+  }
+  function setImgW(w, how) {
+    const s = deck.slides[cur];
+    const old = curImgW();
+    s.imgW = Math.max(10, Math.min(100, Math.round(w)));
+    changed(); render();
+    emit('ppt-imgsize', { w: s.imgW, grow: s.imgW > old, hasImg: !!s.img, index: cur, how });
   }
 
   // ---- Nesne animasyonları (Animasyonlar sekmesi, Animasyon Bölmesi) ----
@@ -355,16 +459,16 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (selAnim >= an.length || (selAnim >= 0 && selObj && an[selAnim].t !== selObj)) selAnim = -1;
     const a = an[selAnim];
     const ctx = !!(a || selObj);
-    body.querySelectorAll('[data-anim]').forEach((b) => b.classList.toggle('on', a ? b.dataset.anim === a.effect : ctx ? b.dataset.anim === 'none' : !an.length && b.dataset.anim === s.anim?.effect));
-    body.querySelectorAll('[data-fx]').forEach((b) => b.classList.toggle('on', !!a && b.dataset.fx === a.effect));
-    $('.pp-aold').hidden = ctx || an.length > 0;
-    $('.pp-atime').hidden = !$('.pp-aold').hidden;
+    // Gerçek PowerPoint'teki gibi: nesne seçilmeden efekt galerisi gri (kullanılamaz)
+    body.querySelectorAll('[data-anim]').forEach((b) => { b.classList.toggle('on', a ? b.dataset.anim === a.effect : ctx && b.dataset.anim === 'none'); b.disabled = !ctx; });
+    body.querySelectorAll('[data-fx]').forEach((b) => { b.classList.toggle('on', !!a && b.dataset.fx === a.effect); b.disabled = !ctx; });
+    body.querySelectorAll('.pp-aadd').forEach((b) => { b.disabled = !ctx; });
     $('.pp-atime').querySelectorAll('button').forEach((b) => { b.disabled = !a; });
     body.querySelectorAll('[data-ast]').forEach((b) => b.classList.toggle('on', !!a && b.dataset.ast === a.start));
     $('.pp-adur').textContent = fmtS(a ? a.dur : 0);
     $('.pp-adel').textContent = fmtS(a ? a.delay : 0);
     const who = selObj || a?.t;
-    $('.pp-anote').innerHTML = who ? `Seçili: <b>${esc(objName(s, who))}</b>` : an.length ? 'Önce slayttaki bir nesneye ya da bölmedeki bir satıra tıklayın' : 'Nesne seçili değilse giriş efekti maddelere ve resme uygulanır';
+    $('.pp-anote').innerHTML = who ? `Seçili: <b>${esc(objName(s, who))}</b>` : 'Önce slayttaki bir nesneye (başlık, maddeler, resim, şekil) tıklayın';
     // Animasyon Bölmesi
     const pane = $('.pp-apane');
     pane.hidden = !(paneOpen && view === 'normal' && $('.pp-cdata').hidden);
@@ -474,7 +578,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
     deck = data ? structuredClone(data) : { theme: 'beyaz', slides: [blank('title')] };
     deck.slides = deck.slides.map((x) => ({ ...blank(x.layout), ...x }));
     deck.master = { font: 'calibri', color: '', logo: null, footer: '', ...deck.master };
+    // Eski dosyalar: alt bilgi yazılmışsa “Alt bilgi” işaretli sayılır
+    deck.hf = { foot: !!deck.master.footer, ...deck.hf };
     view = 'normal'; chartOpen = false; selShape = -1; selObj = null; selAnim = -1;
+    selImg = false; cropOn = false; bgOpen = false; masterSel = null;
     cur = 0; fileName = name; folder = fld; dirty = false;
     render();
   }
@@ -534,7 +641,19 @@ export function slides({ desk, body, args, emit, setTitle }) {
     emit('ppt-anim-step', { n: seq.next - (seq.groups[0].click ? 0 : 1), total: seq.groups.filter((x) => x.click).length, index: showAt, clicks: seq.clicks });
     return true;
   }
-  function advance() { if (showAt >= deck.slides.length) return endShow(); const sh = $('.pp-show'); if (!(seq ? stepAnims() : revealNext(sh))) showSlide(showAt + 1); }
+  // Gizli slaytlar (sağ tık → Slaytı Gizle) gösteride atlanır
+  const nextShown = (i, d = 1) => { while (i >= 0 && i < deck.slides.length && deck.slides[i].hidden) i += d; return i; };
+  function advance() { if (showAt >= deck.slides.length) return endShow(); const sh = $('.pp-show'); if (!(seq ? stepAnims() : revealNext(sh))) showSlide(nextShown(showAt + 1)); }
+  // Ses: “Arka Planda Yürüt” seçiliyse bütün gösteri boyunca, değilse yalnızca eklendiği slaytta çalar
+  function syncMusic() {
+    const on = !!deck.music && showAt >= 0 && showAt < deck.slides.length && (deck.musicBg || showAt === (deck.musicAt || 0));
+    if (on === !!musicTimer) return false;
+    if (!on) { clearInterval(musicTimer); musicTimer = 0; emit('ppt-music-stop', { index: showAt }); return false; }
+    const audible = playTune(desk, [392, 440, 494, 523, 494, 440], 0.3) > 0;
+    musicTimer = setInterval(() => playTune(desk, [392, 440, 494, 523, 494, 440], 0.3), 1900);
+    emit('ppt-music-play', { index: showAt, bg: !!deck.musicBg });
+    return audible;
+  }
   function showSlide(i, dir = 1) {
     const sh = $('.pp-show');
     clearTimers();
@@ -542,10 +661,12 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (i >= deck.slides.length) {
       sh.innerHTML = '<div class="pp-end">Slayt gösterisinin sonu. Çıkmak için tıklayın ya da Esc.</div>';
       showAt = deck.slides.length; seq = null;
+      syncMusic();
       emit('ppt-show-end', { seen: true });
       return;
     }
     showAt = Math.max(0, i);
+    syncMusic();
     const s = deck.slides[showAt];
     seq = null;
     if (s.anims?.length) {
@@ -555,7 +676,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
       seq = { groups: animSeq(s, sh.firstElementChild), next: 0, run: null, clicks: 0 };
       const g0 = seq.groups[0] && !seq.groups[0].click ? seq.groups[0] : null;
       if (g0) playGroup(seq.next++, 'auto');
-      if (s.auto > 0 && !rehearse) timers.push(setTimeout(() => { if (!$('.pp-show').hidden && showAt === i) { emit('ppt-auto-advance', { index: i, secs: s.auto }); showSlide(i + 1); } }, s.auto * 1000 + (g0 ? g0.len : 0)));
+      if (s.auto > 0 && !rehearse) timers.push(setTimeout(() => { if (!$('.pp-show').hidden && showAt === i) { emit('ppt-auto-advance', { index: i, secs: s.auto }); showSlide(nextShown(i + 1)); } }, s.auto * 1000 + (g0 ? g0.len : 0)));
       emit('ppt-show-slide', { index: showAt, total: deck.slides.length, anim: 'nesne', auto: s.auto, steps: seq.groups.filter((x) => x.click).length });
       return;
     }
@@ -565,10 +686,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
     const tg = eff ? animTargets(sh) : [];
     revealTotal = tg.length;
     tg.forEach((el) => el.classList.add('pp-anim-hide'));
-    // Kendiliğinden başlayan animasyon: her öğe 1 saniye arayla gelir
+    // Eski dosyalardaki kendiliğinden başlayan slayt animasyonu: her öğe 1 saniye arayla gelir
     if (eff && s.anim.start === 'auto') tg.forEach((_, k) => timers.push(setTimeout(() => { if ($('.pp-show').hidden || showAt !== i) return; revealNext(sh); }, 700 + k * 1000)));
-    // Kendiliğinden ilerle: animasyon bittikten sonra belirlenen süre geçince sonraki slayda geçer
-    if (s.auto > 0 && !rehearse) timers.push(setTimeout(() => { if (!$('.pp-show').hidden && showAt === i) { emit('ppt-auto-advance', { index: i, secs: s.auto }); showSlide(i + 1); } }, (s.auto + (eff && s.anim.start === 'auto' ? revealTotal : 0)) * 1000));
+    // Geçişler → Sonra: animasyon bittikten sonra belirlenen süre geçince sonraki slayda geçer
+    if (s.auto > 0 && !rehearse) timers.push(setTimeout(() => { if (!$('.pp-show').hidden && showAt === i) { emit('ppt-auto-advance', { index: i, secs: s.auto }); showSlide(nextShown(i + 1)); } }, (s.auto + (eff && s.anim.start === 'auto' ? revealTotal : 0)) * 1000));
     emit('ppt-show-slide', { index: showAt, total: deck.slides.length, anim: eff, auto: s.auto });
   }
   function startShow(from = 0, opts = {}) {
@@ -581,10 +702,11 @@ export function slides({ desk, body, args, emit, setTitle }) {
     rehearse = opts.rehearse ? { times: deck.slides.map(() => 0), seen: new Set(), at: performance.now(), start: performance.now() } : null;
     $('.pp-rhbar').hidden = !rehearse;
     if (rehearse) { rhTick(); rhTimer = setInterval(rhTick, 250); }
-    const audible = deck.music ? playTune(desk, [392, 440, 494, 523, 494, 440], 0.3) > 0 : false;
-    if (deck.music) { musicTimer = setInterval(() => playTune(desk, [392, 440, 494, 523, 494, 440], 0.3), 1900); }
+    clearInterval(musicTimer); musicTimer = 0;
+    showAt = nextShown(from);
+    const audible = syncMusic();
     emit('ppt-show-start', { from, music: deck.music || null, audible, rehearse: !!rehearse });
-    showSlide(from);
+    showSlide(showAt);
   }
   function endShow() {
     const sh = $('.pp-show');
@@ -596,7 +718,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     sh.dataset.screen = ''; sh.classList.remove('pp-scr-b', 'pp-scr-w'); jumpBuf = '';
     setTool(null);
     clearTimers();
-    clearInterval(musicTimer);
+    clearInterval(musicTimer); musicTimer = 0;
     emit('ppt-show-exit', { at: showAt, finished: showAt >= deck.slides.length });
     showAt = -1; seq = null;
     $('.pp-thumbs').focus();
@@ -664,7 +786,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
       else if (v === 'arrow') setTool(null, 'menu');
       else if (v === 'clear') clearInk('menu');
       else if (v === 'next') advance();
-      else if (v === 'prev' && showAt > 0) showSlide(showAt - 1, -1);
+      else if (v === 'prev' && nextShown(showAt - 1, -1) >= 0) showSlide(nextShown(showAt - 1, -1), -1);
       else if (v === 'end') endShow();
       $('.pp-show').focus();
       return;
@@ -682,6 +804,9 @@ export function slides({ desk, body, args, emit, setTitle }) {
       emit('ppt-video-play', { name: deck.slides[showAt]?.shapes?.[+v.dataset.si]?.name, playing: on, index: showAt });
       return;
     }
+    // “Fare Tıklatıldığında” işaretsizse ve süre verilmişse tıklama slaydı ilerletmez (bekleyen tıklama animasyonu yoksa)
+    const cs = deck.slides[showAt];
+    if (cs && cs.click === false && cs.auto > 0 && !(seq && (seq.run || seq.next < seq.groups.length))) return;
     advance();
   }
   $('.pp-show').addEventListener('click', onShowClick);
@@ -754,7 +879,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (e.key === 'Home') { showSlide(0); return; }
     if (e.key === 'End') { showSlide(deck.slides.length - 1); return; }
     if (['ArrowRight', 'ArrowDown', ' ', 'Enter', 'PageDown'].includes(e.key)) return advance();
-    if (['ArrowLeft', 'ArrowUp', 'Backspace', 'PageUp'].includes(e.key) && showAt > 0) showSlide(showAt - 1, -1);
+    if (['ArrowLeft', 'ArrowUp', 'Backspace', 'PageUp'].includes(e.key) && nextShown(showAt - 1, -1) >= 0) showSlide(nextShown(showAt - 1, -1), -1);
   });
 
   // ---- Dosya ----
@@ -762,14 +887,17 @@ export function slides({ desk, body, args, emit, setTitle }) {
   async function save(asNew) {
     pull();
     if (desk.dialogs.busy) return false;
-    const r = fileName && !asNew ? { folder, name: fileName } : await desk.dialogs.file({ mode: 'save', fs: fsApi, folder, name: fileName || 'Sunu1.pptx', ext: '.pptx', typeLabel: 'PowerPoint Sunusu (*.pptx)' });
+    // Farklı Kaydet'te Kayıt türü: sunu (.pptx), PowerPoint Gösterisi (.ppsx: açılınca doğrudan gösteri başlar) ya da PDF
+    const r = fileName && !asNew ? { folder, name: fileName } : await desk.dialogs.file({ mode: 'save', fs: fsApi, folder, name: fileName || 'Sunu1.pptx', ext: '.pptx', types: SAVE_TYPES });
     if (!r) return false;
+    if (/\.pdf$/i.test(r.name)) { writePdf(r, 'saveas'); return true; }
     const quick = !!fileName && !asNew;
     desk.fs.write(r.folder, r.name, structuredClone(deck));
     fileName = r.name; folder = r.folder; dirty = false;
     render();
     if (quick) desk.toast('Kaydedildi', esc(fileName), '💾', 2500);
-    emit('ppt-save', { name: r.name, folder: r.folder, quick });
+    else if (/\.ppsx$/i.test(r.name)) desk.toast('PowerPoint Gösterisi olarak kaydedildi', `${esc(r.name)}: çift tıklanınca doğrudan slayt gösterisi olarak açılır.`, '📙', 5000);
+    emit('ppt-save', { name: r.name, folder: r.folder, quick, show: /\.ppsx$/i.test(r.name) });
     return true;
   }
   async function confirmDiscard() {
@@ -779,13 +907,13 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (a === 'save') return save();
     return a === 'no';
   }
-  // Yazdırma: önce düzen sorulur (tam sayfa, bir kâğıda 4 ya da 6 slayt, dinleyici notları, not sayfaları),
-  // önizlemede kaç kâğıt çıkacağı görünür
+  // Yazdırma: önce düzen sorulur (gerçek PowerPoint'te Ayarlar'daki “Tam Sayfa Slaytlar” düğmesinin listesi:
+  // Yazdırma Düzeni ve Dinleyici Notları), önizlemede kaç kâğıt çıkacağı görünür
   async function print() {
     pull();
     if (desk.dialogs.busy) return;
     const n = deck.slides.length;
-    const lay = await desk.dialogs.ask({ title: 'Yazdırma düzeni', icon: '🖨', text: `Sununuzda <b>${n} slayt</b> var. Kâğıda nasıl yazdırılsın?<br><small><b>Dinleyici notları:</b> slaytların yanında izleyicinin not alacağı çizgiler. <b>Not sayfaları:</b> her slaydın altında sizin konuşmacı notunuz.</small>`, buttons: [['1', 'Her slayt ayrı kâğıda', true], ['4', 'Bir kâğıda 4 slayt'], ['6', 'Bir kâğıda 6 slayt'], ['3', 'Dinleyici notları (3 slayt)'], ['notes', 'Not sayfaları'], ['cancel', 'İptal']] });
+    const lay = await desk.dialogs.ask({ title: 'Yazdırma Düzeni', icon: '🖨', text: `Sununuzda <b>${n} slayt</b> var. Kâğıda nasıl yazdırılsın?<br><small>Gerçek PowerPoint'te bu liste, Yazdır ekranında <b>Tam Sayfa Slaytlar</b> düğmesine basınca açılır. <b>Dinleyici Notları:</b> bir kâğıda birkaç slayt; 3 slaytlıkta yanında not alma çizgileri. <b>Not Sayfaları:</b> her slaydın altında sizin konuşmacı notunuz.</small>`, buttons: [['1', 'Tam Sayfa Slaytlar', true], ['notes', 'Not Sayfaları'], ['3', 'Dinleyici Notları: 3 Slayt'], ['4', 'Dinleyici Notları: 4 Slayt'], ['6', 'Dinleyici Notları: 6 Slayt'], ['cancel', 'İptal']] });
     if (!lay || lay === 'cancel') return;
     const kind = lay === 'notes' ? 'notes' : lay === '3' ? 'handout' : 'slides';
     const per = kind === 'notes' ? 1 : +lay, pages = Math.ceil(n / per);
@@ -794,13 +922,13 @@ export function slides({ desk, body, args, emit, setTitle }) {
     let grid, note;
     if (kind === 'handout') {
       grid = `<div class="pp-pvgrid pp-pv3">${deck.slides.slice(0, 3).map((s) => `<div class="pp-pvh">${pvSl(s)}<div class="pp-pvlines"><i></i><i></i><i></i><i></i></div></div>`).join('')}</div>`;
-      note = `<div class="dlg-pvnote ok">✔ Dinleyici notları: her kâğıtta 3 slayt ve yanında not alma çizgileri. ${n} slayt <b>${pages} kâğıda</b> çıkar.</div>`;
+      note = `<div class="dlg-pvnote ok">✔ Dinleyici Notları: her kâğıtta 3 slayt ve yanında not alma çizgileri. ${n} slayt <b>${pages} kâğıda</b> çıkar.</div>`;
     } else if (kind === 'notes') {
       grid = `<div class="pp-pvgrid pp-pvn">${pvSl(deck.slides[0])}<div class="pp-pvnote">${esc(deck.slides[0].notes || '(Bu slaytta not yok)')}</div></div>`;
-      note = `<div class="dlg-pvnote ok">ℹ Not sayfaları: her slayt kendi konuşmacı notuyla ayrı kâğıda; ${n} slayt <b>${pages} kâğıt</b>. Bu çıktı sizin içindir.</div>`;
+      note = `<div class="dlg-pvnote ok">ℹ Not Sayfaları: her slayt kendi konuşmacı notuyla ayrı kâğıda; ${n} slayt <b>${pages} kâğıt</b>. Bu çıktı sizin içindir.</div>`;
     } else {
       grid = `<div class="pp-pvgrid pp-pv${per}">${deck.slides.slice(0, per).map(pvSl).join('')}</div>`;
-      note = `<div class="dlg-pvnote ${per > 1 ? 'ok' : 'bad'}">${per > 1 ? `✔ ${n} slayt <b>${pages} kâğıda</b> sığıyor.` : `⚠ ${n} slayt <b>${pages} ayrı kâğıda</b> çıkacak. Kâğıt tasarrufu için “bir kâğıda 4 slayt” seçilebilir.`}</div>`;
+      note = `<div class="dlg-pvnote ${per > 1 ? 'ok' : 'bad'}">${per > 1 ? `✔ ${n} slayt <b>${pages} kâğıda</b> sığıyor.` : `⚠ ${n} slayt <b>${pages} ayrı kâğıda</b> çıkacak. Kâğıt tasarrufu için “Dinleyici Notları: 4 Slayt” seçilebilir.`}</div>`;
     }
     const pv = `<div class="dlg-pvbox big">${grid}</div>${note}`;
     const r = await desk.dialogs.print({ printers: desk.settings.printers, doc: fileName || 'Sunu1', pvHtml: pv });
@@ -925,22 +1053,23 @@ export function slides({ desk, body, args, emit, setTitle }) {
         <div class="pp-hf-sub"><label><input type="radio" name="hfd" value="auto" ${hf.fixed ? '' : 'checked'}> Otomatik olarak güncelleştir <small>(${bugun()})</small></label>
           <label><input type="radio" name="hfd" value="fixed" ${hf.fixed ? 'checked' : ''}> Sabit: <input class="dlg-name hf-fixed" value="${esc(hf.dateText || bugun())}" spellcheck="false"></label></div>
         <label><input type="checkbox" class="hf-num" ${deck.slideNum ? 'checked' : ''}> Slayt numarası</label>
-        <label><input type="checkbox" class="hf-foot" ${deck.master.footer ? 'checked' : ''}> Alt bilgi</label>
+        <label><input type="checkbox" class="hf-foot" ${hf.foot ? 'checked' : ''}> Alt bilgi</label>
         <div class="pp-hf-sub"><input class="dlg-name hf-ftext" value="${esc(deck.master.footer || '')}" placeholder="Her slaydın altına yazılacak yazı" spellcheck="false"></div>
         <label><input type="checkbox" class="hf-title" ${hf.hideTitle ? 'checked' : ''}> Başlık slaydında gösterme</label></div>
       <div class="dlg-btns"><button type="button" class="dlg-ok">Tümüne Uygula</button><button type="button" class="dlg-cancel">İptal</button></div>`, 'hf');
     const q = (x) => back.querySelector(x);
     q('.hf-ftext').addEventListener('input', () => { q('.hf-foot').checked = !!q('.hf-ftext').value.trim(); });
     q('.hf-fixed').addEventListener('input', () => { q('[value="fixed"]').checked = true; });
-    q('.dlg-ok').onclick = () => back.close({ date: q('.hf-date').checked, fixed: q('[value="fixed"]').checked, dateText: q('.hf-fixed').value.trim(), num: q('.hf-num').checked, footer: q('.hf-foot').checked ? q('.hf-ftext').value.trim() : '', hideTitle: q('.hf-title').checked });
+    q('.dlg-ok').onclick = () => back.close({ date: q('.hf-date').checked, fixed: q('[value="fixed"]').checked, dateText: q('.hf-fixed').value.trim(), num: q('.hf-num').checked, foot: q('.hf-foot').checked, text: q('.hf-ftext').value.trim(), hideTitle: q('.hf-title').checked });
     q('.dlg-cancel').onclick = () => back.close(null);
     const v = await p;
     if (!v) return;
-    deck.hf = { date: v.date, fixed: v.fixed, dateText: v.dateText, hideTitle: v.hideTitle };
+    // Alt bilgi yazısı Asıl Slayt'taki kutuyla aynıdır; işaret kaldırılınca yazı silinmez, yalnızca gizlenir
+    deck.hf = { date: v.date, fixed: v.fixed, dateText: v.dateText, hideTitle: v.hideTitle, foot: v.foot && !!v.text };
     deck.slideNum = v.num;
-    deck.master.footer = v.footer;
+    deck.master.footer = v.text;
     changed(); render();
-    emit('ppt-hf', { ...v });
+    emit('ppt-hf', { date: v.date, fixed: v.fixed, dateText: v.dateText, num: v.num, hideTitle: v.hideTitle, foot: deck.hf.foot, footer: deck.hf.foot ? v.text : '', index: cur });
   }
 
   // ---- Okuma Görünümü: sunu pencerenin içinde, gösteri gibi ----
@@ -977,19 +1106,23 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (['ArrowRight', 'ArrowDown', ' ', 'Enter', 'PageDown'].includes(e.key)) { e.preventDefault(); readNext(); return; }
     if (['ArrowLeft', 'ArrowUp', 'Backspace', 'PageUp'].includes(e.key)) { e.preventDefault(); if (readAt > 0) readShow(readAt - 1, -1); }
   });
+  // Dosya → Dışarı Aktar → PDF/XPS Belgesi Oluştur (ya da Farklı Kaydet → Kayıt türü: PDF)
   async function exportPdf() {
     pull();
-    const base = (fileName || 'Sunu1').replace(/\.pptx$/i, '');
+    const base = (fileName || 'Sunu1').replace(/\.pps?x$/i, '');
     const r = await desk.dialogs.file({ mode: 'save', fs: fsApi, folder, name: base + '.pdf', ext: '.pdf', typeLabel: 'PDF (*.pdf)' });
-    if (!r) return;
+    if (r) writePdf(r, 'export');
+  }
+  function writePdf(r, via) {
     const html = deck.slides.map((s) => `<div class="pdf-slide" style="container-type:inline-size;aspect-ratio:16/9;margin:0 0 .8em;box-shadow:0 1px 5px #0003">${slideHtml(s, false)}</div>`).join('');
     desk.fs.write(r.folder, r.name, { html, slides: deck.slides.length });
     desk.toast('PDF olarak kaydedildi', `${esc(r.name)}: bilgisayarı olmayanlar da açabilir.`, '📕');
-    emit('ppt-pdf', { name: r.name, folder: r.folder, slides: deck.slides.length });
+    emit('ppt-pdf', { name: r.name, folder: r.folder, slides: deck.slides.length, via });
   }
+  // Dosya → Dışarı Aktar → Video Oluştur
   async function exportVideo() {
     pull();
-    const base = (fileName || 'Sunu1').replace(/\.pptx$/i, '');
+    const base = (fileName || 'Sunu1').replace(/\.pps?x$/i, '');
     const r = await desk.dialogs.file({ mode: 'save', fs: fsApi, folder, name: base + '.mp4', ext: '.mp4', typeLabel: 'MPEG-4 Video (*.mp4)' });
     if (!r) return;
     const timed = deck.slides.every((s) => s.auto > 0);
@@ -998,7 +1131,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     await wait(2200);
     const [, , bg] = theme();
     desk.fs.write(r.folder, r.name, { emoji: '🎬', bg: ['#263238', '#546e7a'], video: true, slides: deck.slides.length, secs });
-    if (!timed) desk.toast('Süreler verilmemiş', 'Slaytlara süre vermediğiniz için her slayt 5 saniye gösterilecek. Geçişler sekmesinden “Kendiliğinden ilerle” seçebilirsiniz.', 'ℹ', 6000);
+    if (!timed) desk.toast('Süreler verilmemiş', 'Slaytlara süre vermediğiniz için her slayt 5 saniye gösterilecek. Geçişler sekmesinde “Sonra:” kutusuna süre verip Tümüne Uygula\'ya basabilirsiniz.', 'ℹ', 6000);
     else desk.toast('Video kaydedildi', esc(r.name), '🎬');
     emit('ppt-video', { name: r.name, folder: r.folder, slides: deck.slides.length, secs, timed });
   }
@@ -1008,12 +1141,16 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (e.target.closest('.pp-rib button, .pp-tabs button, .pp-rhbar button, .pp-apane button, .pp-ap-row')) e.preventDefault();
     if (!e.target.closest('.pp-menu, .pp-file')) $('.pp-menu').hidden = true;
     if (!e.target.closest('.pp-newwrap')) body.querySelectorAll('.pp-lay').forEach((x) => { x.hidden = true; });
+    if (!e.target.closest('.pp-thmenu')) closeThMenu();
   });
   body.addEventListener('click', async (e) => {
     // Slayttaki köprüler düzenlerken ve küçük resimlerde sayfayı değiştirmesin
     if (e.target.closest('a[href]') && !e.target.closest('.pp-show, .pp-read')) e.preventDefault();
+    // Küçük resimlerin sağ tık menüsü
+    const tm = e.target.closest('.pp-thmenu [data-thm]');
+    if (tm) { const v = tm.dataset.thm; closeThMenu(); thCommand(v); return; }
     const th = e.target.closest('.pp-th');
-    if (th) { go(+th.dataset.i); $('.pp-thumbs').focus(); return; }
+    if (th) { if (thDragged) { thDragged = false; return; } go(+th.dataset.i); $('.pp-thumbs').focus(); return; }
     // Animasyon Bölmesi'nde bir satır: o animasyon ve nesnesi seçilir
     const ar = e.target.closest('.pp-ap-row');
     if (ar) { const a = deck.slides[cur].anims[+ar.dataset.ai]; pickObj(a.t, +ar.dataset.ai); emit('ppt-anim-pick', { t: a.t, at: +ar.dataset.ai, index: cur }); return; }
@@ -1021,7 +1158,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (!t) return;
     if (t.dataset.tab) { showTab(t.dataset.tab); emit('ppt-tab', { tab: t.dataset.tab }); return; }
     if (t.classList.contains('pp-file')) { $('.pp-menu').hidden = !$('.pp-menu').hidden; return; }
-    if (t.dataset.file) { $('.pp-menu').hidden = true; if (t.dataset.file === 'print') return print(); if (t.dataset.file === 'pdf') return exportPdf(); if (t.dataset.file === 'video') return exportVideo(); return save(t.dataset.file === 'saveas'); }
+    if (t.dataset.file === 'export') { $('.pp-expl').hidden = !$('.pp-expl').hidden; t.classList.toggle('on', !$('.pp-expl').hidden); emit('ppt-file', { item: 'export' }); return; }
+    if (t.dataset.file) { $('.pp-menu').hidden = true; $('.pp-expl').hidden = true; body.querySelector('[data-file="export"]').classList.remove('on'); if (t.dataset.file === 'print') return print(); if (t.dataset.file === 'pdf') return exportPdf(); if (t.dataset.file === 'video') return exportVideo(); return save(t.dataset.file === 'saveas'); }
     if (t.classList.contains('pp-new')) { $('.pp-lay').hidden = !$('.pp-lay').hidden; return; }
     if (t.dataset.layout) {
       $('.pp-lay').hidden = true;
@@ -1034,34 +1172,35 @@ export function slides({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (t.dataset.cmd) { document.execCommand(t.dataset.cmd); pull(); changed(); emit('ppt-format', { cmd: t.dataset.cmd }); return; }
-    if (t.classList.contains('pp-up') || t.classList.contains('pp-down')) {
-      const to = cur + (t.classList.contains('pp-up') ? -1 : 1);
-      if (to < 0 || to >= deck.slides.length) return;
-      pull();
-      [deck.slides[cur], deck.slides[to]] = [deck.slides[to], deck.slides[cur]];
-      cur = to; changed(); render();
-      emit('ppt-move', { index: cur });
-      return;
-    }
-    if (t.classList.contains('pp-del')) return deleteSlide();
-    if (t.classList.contains('pp-dup')) {
-      pull();
-      deck.slides.splice(cur + 1, 0, structuredClone(deck.slides[cur]));
-      cur++;
-      changed(); render();
-      emit('ppt-dup', { index: cur, count: deck.slides.length });
-      return;
-    }
-    if (t.dataset.size) { pull(); deck.slides[cur].imgSize = t.dataset.size; changed(); render(); emit('ppt-imgsize', { size: t.dataset.size, hasImg: !!deck.slides[cur].img }); return; }
-    if (t.classList.contains('pp-num')) { pull(); deck.slideNum = !deck.slideNum; changed(); render(); emit('ppt-slidenum', { on: !!deck.slideNum }); return; }
+    if ('dupsel' in t.dataset) { $('.pp-lay').hidden = true; return dupSlide('newslide'); }
+    // Giriş → Yazı Tipi Rengi ve hizalama: en son tıklanan yazı kutusuna (Asıl Slayt'ta seçili asıl başlığa) uygulanır
+    if (t.classList.contains('pp-fcbtn')) { $('.pp-fclist').hidden = !$('.pp-fclist').hidden; return; }
+    if (t.dataset.fcolor !== undefined) { $('.pp-fclist').hidden = true; return setBoxStyle('fc', t.dataset.fcolor); }
+    if (t.dataset.align) return setBoxStyle('al', t.dataset.align);
+    // Ekle → Slayt Numarası: gerçek PowerPoint'teki gibi Üst Bilgi ve Alt Bilgi penceresini açar
+    if (t.classList.contains('pp-num')) { emit('ppt-slidenum-open', { index: cur }); return hfDialog(); }
     if (t.classList.contains('pp-sa')) { $('.pp-salist').hidden = !$('.pp-salist').hidden; return; }
+    if (t.classList.contains('pp-sains')) { $('.pp-sailist').hidden = !$('.pp-sailist').hidden; return; }
+    // Ekle → SmartArt: boş “Başlık ve içerik” slaydına [Metin] kutulu boş bir şema koyar; madde varsa Giriş'teki yolu söyler
+    if (t.dataset.artins) {
+      $('.pp-sailist').hidden = true;
+      pull();
+      const sl = deck.slides[cur];
+      if (sl.layout === 'content' && plain(sl.body)) { desk.toast('SmartArt', 'Bu slaytta maddeler var. Var olan maddeleri şemaya çevirmek için: <b>Giriş → SmartArt\'a Dönüştür</b>.', '🔷', 6000); emit('ppt-smartart', { kind: t.dataset.artins, ok: false, insert: true }); return; }
+      if (sl.layout !== 'content') { desk.toast('SmartArt', 'Şemayı “Başlık ve içerik” düzenindeki bir slayda ekleyin.', '🔷', 6000); emit('ppt-smartart', { kind: t.dataset.artins, ok: false, insert: true }); return; }
+      sl.body = '<li>[Metin]</li><li>[Metin]</li><li>[Metin]</li>';
+      sl.art = t.dataset.artins;
+      changed(); render();
+      emit('ppt-smartart', { kind: sl.art, ok: true, count: 3, insert: true });
+      return;
+    }
     if (t.dataset.art) {
       $('.pp-salist').hidden = true;
       pull();
       const sl = deck.slides[cur];
       if (t.dataset.art === 'none') { sl.art = null; changed(); render(); emit('ppt-smartart', { kind: null, ok: true }); return; }
       const n = [...new DOMParser().parseFromString(`<ul>${sl.body}</ul>`, 'text/html').querySelectorAll('li')].filter((li) => li.textContent.trim()).length;
-      if (sl.layout !== 'content' || n < 2) { desk.toast('SmartArt', 'Önce “Başlık ve içerik” düzenindeki bir slayda en az iki madde yazın; SmartArt o maddeleri şemaya çevirir.', '🔷', 6000); emit('ppt-smartart', { kind: t.dataset.art, ok: false }); return; }
+      if (sl.layout !== 'content' || n < 2) { desk.toast('SmartArt', 'Önce “Başlık ve içerik” düzenindeki bir slayda en az iki madde yazın; SmartArt\'a Dönüştür o maddeleri şemaya çevirir.', '🔷', 6000); emit('ppt-smartart', { kind: t.dataset.art, ok: false }); return; }
       sl.art = t.dataset.art;
       changed(); render();
       emit('ppt-smartart', { kind: sl.art, ok: true, count: n });
@@ -1083,9 +1222,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('pp-music')) {
       const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder: 'music', ext: '.mp3', typeLabel: 'Ses dosyaları (*.mp3)', accept: /\.(mp3|m4a|wav)$/i });
       if (!r) return;
-      deck.music = r.name;
-      changed(); render();
-      emit('ppt-music', { name: r.name });
+      // Ses seçili slayda eklenir; Kayıttan Yürütme sekmesi açılır (Arka Planda Yürüt seçilmezse yalnızca bu slaytta çalar)
+      deck.music = r.name; deck.musicAt = cur; deck.musicBg = false;
+      changed(); render(); showTab('audio');
+      emit('ppt-music', { name: r.name, index: cur });
       return;
     }
     if (t.dataset.view) {
@@ -1151,17 +1291,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
       return;
     }
     if (t.classList.contains('pp-mclose')) { view = 'normal'; render(); showTab('home'); emit('ppt-view', { view, from: 'master' }); return; }
-    if (t.dataset.mfont) { deck.master.font = t.dataset.mfont; changed(); render(); emit('ppt-master', { what: 'font', value: t.dataset.mfont }); return; }
-    if (t.dataset.mcolor !== undefined) { deck.master.color = t.dataset.mcolor; changed(); render(); emit('ppt-master', { what: 'color', value: t.dataset.mcolor }); return; }
-    if (t.classList.contains('pp-mnologo')) { deck.master.logo = null; changed(); render(); emit('ppt-master', { what: 'logo', value: null }); return; }
-    if (t.classList.contains('pp-mlogo')) {
-      const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder: 'pictures', ext: '.png', typeLabel: 'Resimler (*.png; *.jpg)', accept: /\.(png|jpe?g|bmp)$/i });
-      if (!r) return;
-      deck.master.logo = desk.fs.find(r.folder, r.name)?.content || { emoji: '🖼', bg: ['#ccc', '#999'] };
-      changed(); render();
-      emit('ppt-master', { what: 'logo', value: r.name });
-      return;
-    }
+    if (t.dataset.mfont) { $('.pp-mfontlist').hidden = true; deck.master.font = t.dataset.mfont; changed(); render(); emit('ppt-master', { what: 'font', value: t.dataset.mfont }); return; }
+    if (t.classList.contains('pp-mfonts')) { $('.pp-mfontlist').hidden = !$('.pp-mfontlist').hidden; return; }
     if (t.classList.contains('pp-tb')) { $('.pp-tblist').hidden = !$('.pp-tblist').hidden; return; }
     if (t.classList.contains('pp-ch')) { $('.pp-chlist').hidden = !$('.pp-chlist').hidden; return; }
     if (t.dataset.table) {
@@ -1193,14 +1324,14 @@ export function slides({ desk, body, args, emit, setTitle }) {
     }
     if (t.classList.contains('pp-cd-x')) { chartOpen = false; render(); return; }
     if (t.dataset.ctype) { const ch = deck.slides[cur].chart; if (!ch) return; ch.type = t.dataset.ctype; changed(); refreshSlide(); renderChartData(); emit('ppt-chart', { kind: ch.type, change: true, index: cur, ok: true }); return; }
-    // Nesne seçiliyse (ya da slaytta nesne animasyonları varsa) efekt yalnız o nesneye; değilse eski yol: bütün maddeler ve resim
-    if (t.dataset.anim && (selObj || selAnim >= 0 || deck.slides[cur].anims?.length)) return setFx(t.dataset.anim, false);
+    // Efekt yalnızca seçili nesneye verilir (nesne seçili değilken galeri düğmeleri kullanılamaz)
+    if (t.dataset.anim) return setFx(t.dataset.anim, false);
     if (t.dataset.fx) return setFx(t.dataset.fx, false);
     if (t.classList.contains('pp-aadd')) { $('.pp-aaddlist').hidden = !$('.pp-aaddlist').hidden; return; }
     if (t.dataset.addfx) { $('.pp-aaddlist').hidden = true; return setFx(t.dataset.addfx, true); }
     if (t.classList.contains('pp-apbtn') || t.classList.contains('pp-ap-x')) {
       paneOpen = t.classList.contains('pp-apbtn') ? !paneOpen : false;
-      if (paneOpen) chartOpen = false;
+      if (paneOpen) { chartOpen = false; bgOpen = false; render(); }
       renderChartData(); animUi();
       emit('ppt-anim-pane', { open: paneOpen });
       return;
@@ -1216,10 +1347,35 @@ export function slides({ desk, body, args, emit, setTitle }) {
       emit('ppt-anim-preview', { effect: 'nesne', pane: true, count: deck.slides[cur].anims.length });
       return;
     }
-    if (t.dataset.anim) { pull(); deck.slides[cur].anim = { ...(deck.slides[cur].anim || { start: 'click' }), effect: t.dataset.anim }; changed(); render(); emit('ppt-anim', { effect: t.dataset.anim, start: deck.slides[cur].anim.start, index: cur }); return; }
-    if (t.dataset.astart) { pull(); deck.slides[cur].anim = { ...(deck.slides[cur].anim || { effect: 'none' }), start: t.dataset.astart }; changed(); render(); emit('ppt-anim', { effect: deck.slides[cur].anim.effect, start: t.dataset.astart, index: cur }); return; }
-    if ('autoall' in t.dataset) { pull(); const v = deck.slides[cur].auto || 0; deck.slides.forEach((x) => { x.auto = v; }); changed(); render(); emit('ppt-autotime', { secs: v, index: cur, all: true }); return; }
-    if (t.dataset.auto) { pull(); deck.slides[cur].auto = +t.dataset.auto; changed(); render(); emit('ppt-autotime', { secs: +t.dataset.auto, index: cur }); return; }
+    // Geçişler → Sonra: kutusu (+ / − bir saniye; süre verilince kutu kendiliğinden işaretlenir) ve Tümüne Uygula
+    if (t.dataset.tafter) { pull(); const s = deck.slides[cur]; s.auto = Math.max(0, Math.min(600, (s.auto || 0) + +t.dataset.tafter)); changed(); render(); emit('ppt-autotime', { secs: s.auto, index: cur }); return; }
+    if (t.classList.contains('pp-tall')) {
+      pull();
+      const s = deck.slides[cur];
+      deck.slides.forEach((x) => { x.trans = s.trans; x.auto = s.auto || 0; x.click = s.click !== false; });
+      changed(); render();
+      emit('ppt-trans', { index: cur, trans: s.trans, all: true });
+      emit('ppt-autotime', { secs: s.auto || 0, index: cur, all: true, trans: s.trans });
+      return;
+    }
+    // Tasarım → Arka Planı Biçimlendir bölmesi
+    if (t.classList.contains('pp-bgbtn') || t.classList.contains('pp-bg-x')) { bgOpen = t.classList.contains('pp-bgbtn') ? !bgOpen : false; if (bgOpen) { paneOpen = false; chartOpen = false; } render(); emit('ppt-bg-pane', { open: bgOpen }); return; }
+    if (t.dataset.bgcol) { pull(); deck.slides[cur].bg = { color: t.dataset.bgcol }; changed(); render(); emit('ppt-bg', { kind: 'solid', color: t.dataset.bgcol, index: cur }); return; }
+    if (t.classList.contains('pp-bg-ins')) {
+      const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder: 'pictures', ext: '.jpg', typeLabel: 'Resimler (*.jpg; *.png)', accept: /\.(png|jpe?g|bmp)$/i });
+      if (!r) return;
+      pull(); deck.slides[cur].bg = { pic: desk.fs.find(r.folder, r.name)?.content || { emoji: '🖼', bg: ['#ccc', '#999'] } };
+      changed(); render();
+      emit('ppt-bg', { kind: 'pic', name: r.name, index: cur });
+      return;
+    }
+    if (t.classList.contains('pp-bg-all')) { pull(); const b = deck.slides[cur].bg; deck.slides.forEach((x) => { x.bg = b ? structuredClone(b) : null; }); changed(); render(); emit('ppt-bg', { kind: b?.pic ? 'pic' : b ? 'solid' : null, color: b?.color, index: cur, all: true }); return; }
+    if (t.classList.contains('pp-bg-reset')) { pull(); deck.slides[cur].bg = null; changed(); render(); emit('ppt-bg', { kind: null, index: cur }); return; }
+    // Resim Biçimi: Kırp, Genişlik
+    if (t.classList.contains('pp-crop')) { cropOn = !cropOn; render(); emit('ppt-crop-mode', { on: cropOn, index: cur }); return; }
+    if (t.dataset.imgw) { pull(); return setImgW(curImgW() + +t.dataset.imgw * 5, 'spin'); }
+    // Kayıttan Yürütme → Ses Stilleri
+    if (t.classList.contains('pp-musbg') || t.classList.contains('pp-musnostyle')) { deck.musicBg = t.classList.contains('pp-musbg'); changed(); render(); emit('ppt-music-bg', { bg: deck.musicBg }); return; }
     if (t.classList.contains('pp-aprev')) {
       const el = $('.pp-slide');
       if (deck.slides[cur].anims?.length) { pull(); previewAnims(); emit('ppt-anim-preview', { effect: 'nesne', count: deck.slides[cur].anims.length }); return; }
@@ -1234,6 +1390,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('pp-pic')) {
       const r = await desk.dialogs.file({ mode: 'open', fs: fsApi, folder: 'pictures', ext: '.jpg', typeLabel: 'Resimler (*.jpg; *.png)', accept: /\.(png|jpe?g|bmp)$/i });
       if (!r) return;
+      // Asıl Slayt görünümünde eklenen resim, bütün slaytlarda görünen logodur
+      if (view === 'master') { deck.master.logo = desk.fs.find(r.folder, r.name)?.content || { emoji: '🖼', bg: ['#ccc', '#999'] }; changed(); render(); emit('ppt-master', { what: 'logo', value: r.name }); return; }
       pull();
       deck.slides[cur].img = desk.fs.find(r.folder, r.name)?.content || { emoji: '🖼', bg: ['#ccc', '#999'] };
       changed(); render();
@@ -1268,7 +1426,161 @@ export function slides({ desk, body, args, emit, setTitle }) {
     body.querySelectorAll('.pp-tabs [data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
     body.querySelectorAll('.pp-rib').forEach((r) => { r.hidden = r.dataset.tab !== name; });
   }
-  $('.pp-mfoot').addEventListener('input', (e) => { deck.master.footer = e.target.value.trim(); changed(); render(); emit('ppt-master', { what: 'footer', value: deck.master.footer }); });
+  // Asıl Slayt: asıl başlığa tıklanınca seçilir; Alt Bilgi kutusuna yazılan yazı bütün slaytların alt bilgisidir
+  $('.pp-mbig').addEventListener('click', (e) => {
+    const tb = e.target.closest('[data-k="title"]');
+    if (e.target.closest('.pp-mfootph')) return;
+    masterSel = tb ? 'title' : null;
+    $('.pp-mbig [data-k="title"]')?.classList.toggle('pp-osel', !!tb);
+    emit('ppt-master-pick', { what: masterSel });
+  });
+  $('.pp-mbig').addEventListener('input', (e) => {
+    const ph = e.target.closest('.pp-mfootph');
+    if (!ph) return;
+    deck.master.footer = ph.textContent.trim();
+    ph.classList.toggle('empty', !deck.master.footer);
+    changed();
+    $('.pp-mall').innerHTML = deck.slides.map((s, i) => `<div class="pp-sth"><span>${i + 1}</span><div class="pp-mini">${slideHtml(s, false)}</div></div>`).join('');
+    emit('ppt-master', { what: 'footer', value: deck.master.footer, shown: !!deck.hf?.foot });
+  });
+  // Yazı Tipi Rengi (fc) ve hizalama (al): en son tıklanan yazı kutusunun bütününe uygulanır
+  function setBoxStyle(what, v) {
+    if (view === 'master') {
+      if (what !== 'fc' || masterSel !== 'title') { desk.toast('Asıl Slayt', 'Önce soldaki büyük asıl slaytta başlığa (“Asıl başlık stili”) tıklayın.', 'ℹ', 5000); return; }
+      deck.master.color = v; changed(); render();
+      emit('ppt-master', { what: 'color', value: v });
+      return;
+    }
+    if (!lastK) { desk.toast(what === 'fc' ? 'Yazı Tipi Rengi' : 'Hizalama', 'Önce değiştireceğiniz yazı kutusuna tıklayın.', 'ℹ'); return; }
+    pull();
+    const s = deck.slides[cur];
+    s[what] = { ...(s[what] || {}), [lastK]: v };
+    if (!v) delete s[what][lastK];
+    changed(); render();
+    emit(what === 'fc' ? 'ppt-fcolor' : 'ppt-align', { index: cur, box: lastK, value: v });
+  }
+  // Slaytı Çoğalt: seçili slaydın kopyası hemen altına gelir
+  function dupSlide(how) {
+    pull();
+    deck.slides.splice(cur + 1, 0, structuredClone(deck.slides[cur]));
+    cur++;
+    changed(); render();
+    emit('ppt-dup', { index: cur, count: deck.slides.length, how });
+  }
+  // Küçük resimlerde sağ tık menüsü: Yeni Slayt, Slaytı Çoğalt, Slaytı Sil, Slaytı Gizle
+  function closeThMenu() { body.querySelector('.pp-thmenu')?.remove(); }
+  function thCommand(v) {
+    if (v === 'new') { pull(); deck.slides.splice(cur + 1, 0, blank('content')); cur++; changed(); render(); emit('ppt-new-slide', { layout: 'content', index: cur, how: 'menu' }); return; }
+    if (v === 'dup') return dupSlide('menu');
+    if (v === 'del') return deleteSlide('menu');
+    if (v === 'hide') { pull(); const s = deck.slides[cur]; s.hidden = !s.hidden; changed(); render(); emit('ppt-hide', { index: cur, hidden: s.hidden }); }
+  }
+  $('.pp-thumbs').addEventListener('contextmenu', (e) => {
+    const th = e.target.closest('.pp-th');
+    if (!th) return;
+    e.preventDefault();
+    closeThMenu();
+    if (+th.dataset.i !== cur) go(+th.dataset.i);
+    const r = body.getBoundingClientRect();
+    const m = document.createElement('div');
+    m.className = 'pp-thmenu';
+    m.innerHTML = `<button type="button" data-thm="new">➕ Yeni Slayt</button><button type="button" data-thm="dup">⧉ Slaytı Çoğalt <small>Ctrl + D</small></button><button type="button" data-thm="del">🗑 Slaytı Sil</button><hr><button type="button" data-thm="hide"${deck.slides[cur].hidden ? ' class="on"' : ''}>🚫 Slaytı Gizle</button>`;
+    body.append(m);
+    m.style.left = Math.min(e.clientX - r.left, r.width - m.offsetWidth - 4) + 'px';
+    m.style.top = Math.min(e.clientY - r.top, r.height - m.offsetHeight - 4) + 'px';
+    emit('ppt-thmenu', { index: cur });
+  });
+  // Soldaki küçük resimler sürüklenerek yer değiştirir (bırakılan yerdeki slaydın yerine geçer)
+  let thDrag = null, thDragged = false;
+  $('.pp-thumbs').addEventListener('pointerdown', (e) => {
+    const th = e.target.closest('.pp-th');
+    if (!th || e.button !== 0) return;
+    thDrag = { from: +th.dataset.i, x: e.clientX, y: e.clientY, moved: false };
+  });
+  $('.pp-thumbs').addEventListener('pointermove', (e) => {
+    if (!thDrag) return;
+    if (!thDrag.moved && Math.hypot(e.clientX - thDrag.x, e.clientY - thDrag.y) < 8) return;
+    if (!thDrag.moved) { thDrag.moved = true; $('.pp-thumbs').setPointerCapture?.(e.pointerId); $(`.pp-th[data-i="${thDrag.from}"]`)?.classList.add('pp-thdrag'); }
+    const over = document.elementFromPoint(e.clientX, e.clientY)?.closest('.pp-th');
+    body.querySelectorAll('.pp-th.pp-drop').forEach((x) => x.classList.toggle('pp-drop', x === over));
+    if (over && !over.classList.contains('pp-thdrag')) over.classList.add('pp-drop');
+    e.preventDefault();
+  });
+  const thDrop = (e) => {
+    const d = thDrag;
+    thDrag = null;
+    if (!d?.moved) return;
+    thDragged = true;
+    setTimeout(() => { thDragged = false; }, 300);
+    const over = document.elementFromPoint(e.clientX, e.clientY)?.closest('.pp-th');
+    body.querySelectorAll('.pp-th').forEach((x) => x.classList.remove('pp-drop', 'pp-thdrag'));
+    if (!over || +over.dataset.i === d.from) return;
+    pull();
+    const to = +over.dataset.i;
+    const [m] = deck.slides.splice(d.from, 1);
+    deck.slides.splice(to, 0, m);
+    if (deck.musicAt === d.from) deck.musicAt = to;
+    cur = to;
+    changed(); render();
+    emit('ppt-move', { index: cur, from: d.from, thumbs: true });
+  };
+  $('.pp-thumbs').addEventListener('pointerup', thDrop);
+  $('.pp-thumbs').addEventListener('pointercancel', () => { thDrag = null; body.querySelectorAll('.pp-th').forEach((x) => x.classList.remove('pp-drop', 'pp-thdrag')); });
+  // Geçişler → Fare Tıklatıldığında / Sonra: onay kutuları
+  body.addEventListener('change', (e) => {
+    const c = e.target;
+    if (c.classList.contains('pp-tclick')) { pull(); deck.slides[cur].click = c.checked; changed(); render(); emit('ppt-click-adv', { on: c.checked, index: cur }); }
+    if (c.classList.contains('pp-tafter')) { pull(); const s = deck.slides[cur]; s.auto = c.checked ? Math.max(1, s.auto || 0) : 0; changed(); render(); emit('ppt-autotime', { secs: s.auto, index: cur }); }
+  });
+  // Resim Biçimi: köşe tutamacıyla boyut, Kırp açıkken kenar çizgileriyle kırpma
+  let imgDrag = null;
+  function imgHandleDown(e) {
+    const h = e.target.closest('.pp-imgh, .pp-croph');
+    const el = imgEl();
+    if (!h || !el) return false;
+    const r = el.getBoundingClientRect();
+    imgDrag = { h: h.dataset.h, c: h.dataset.c, x: e.clientX, y: e.clientY, r, w0: curImgW(), crop: { l: 0, t: 0, r: 0, b: 0, ...deck.slides[cur].crop } };
+    $('.pp-slide').setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+    return true;
+  }
+  function imgHandleMove(e) {
+    if (!imgDrag) return false;
+    const d = imgDrag, el = imgEl(), box = $('.pp-slide .pp-imgsel');
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (d.h) {
+      // Sağdaki köşeler sağa, soldakiler sola çekilince büyür
+      const sign = d.h.endsWith('e') ? 1 : -1;
+      d.w = Math.max(10, Math.min(100, d.w0 * (1 + (sign * dx) / d.r.width)));
+      el.style.width = d.w + '%'; el.style.maxWidth = 'none'; el.style.maxHeight = 'none';
+    } else {
+      const c = { ...d.crop };
+      const px = (v, size) => (v / size) * 100;
+      if (d.c === 'l') c.l = Math.max(0, Math.min(90 - c.r, d.crop.l + px(dx, d.r.width)));
+      if (d.c === 'r') c.r = Math.max(0, Math.min(90 - c.l, d.crop.r - px(dx, d.r.width)));
+      if (d.c === 't') c.t = Math.max(0, Math.min(90 - c.b, d.crop.t + px(dy, d.r.height)));
+      if (d.c === 'b') c.b = Math.max(0, Math.min(90 - c.t, d.crop.b - px(dy, d.r.height)));
+      d.now = c;
+      el.style.clipPath = `inset(${c.t}% ${c.r}% ${c.b}% ${c.l}%)`;
+      const bar = box?.querySelector(`[data-c="${d.c}"]`);
+      if (bar) bar.style[{ l: 'left', r: 'right', t: 'top', b: 'bottom' }[d.c]] = c[d.c] + '%';
+    }
+    e.preventDefault();
+    return true;
+  }
+  function imgHandleUp() {
+    const d = imgDrag;
+    imgDrag = null;
+    if (!d) return false;
+    if (d.h && d.w) setImgW(d.w, 'drag');
+    else if (d.now) {
+      const c = Object.fromEntries(Object.entries(d.now).map(([k, v]) => [k, Math.round(v)]));
+      deck.slides[cur].crop = c.l || c.t || c.r || c.b ? c : null;
+      changed(); render();
+      emit('ppt-crop', { ...c, index: cur });
+    }
+    return true;
+  }
   // Grafik verileri: yazdıkça grafik güncellenir
   $('.pp-cdata').addEventListener('input', () => {
     const ch = deck.slides[cur].chart;
@@ -1299,22 +1611,25 @@ export function slides({ desk, body, args, emit, setTitle }) {
     const r = document.createRange(); r.selectNodeContents(to);
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
   });
-  async function deleteSlide() {
+  async function deleteSlide(how) {
     if (deck.slides.length === 1) { desk.toast('Sunu', 'Sunuda en az bir slayt olmalı.', 'ℹ'); return; }
+    pull();
     deck.slides.splice(cur, 1);
+    if (deck.music && (deck.musicAt || 0) === cur) deck.music = null;
+    else if ((deck.musicAt || 0) > cur) deck.musicAt--;
     cur = Math.min(cur, deck.slides.length - 1);
     changed(); render();
-    emit('ppt-delete', { index: cur });
+    emit('ppt-delete', { index: cur, how: how || 'key' });
   }
   $('.pp-fs').addEventListener('change', (e) => {
-    if (!lastK) { desk.toast('Yazı boyutu', 'Önce boyutunu değiştireceğiniz yazı kutusuna tıklayın.', 'ℹ'); return; }
+    if (!lastK) { desk.toast('Yazı Tipi Boyutu', 'Önce boyutunu değiştireceğiniz yazı kutusuna tıklayın.', 'ℹ'); return; }
     pull();
     const s = deck.slides[cur], n = +e.target.value;
     s.fs = { ...(s.fs || {}), [lastK]: n };
     changed(); render();
     emit('ppt-fontsize', { index: cur, box: lastK, size: n });
   });
-  $('.pp-slide').addEventListener('input', () => { pull(); changed(); emit('ppt-input', { index: cur }); });
+  $('.pp-slide').addEventListener('input', (e) => { pull(); changed(); if (e.target.closest('.pp-artpane')) refreshArt(); emit('ppt-input', { index: cur }); });
   $('.pp-nt').addEventListener('input', (e) => { deck.slides[cur].notes = e.target.value; changed(); emit('ppt-notes', { index: cur, text: e.target.value, length: e.target.value.trim().length }); });
   $('.pp-slide').addEventListener('paste', (e) => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData?.getData('text/plain') || ''); });
   // Boş kutudaki yer tutucu yazıya tıklanınca Chrome imleci önceki kutuda bırakabilir: imleç kutunun içine konur
@@ -1334,7 +1649,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
     }
   });
   $('.pp-thumbs').addEventListener('keydown', (e) => {
-    if (e.key === 'Delete') { e.preventDefault(); deleteSlide(); }
+    if (e.key === 'Delete') { e.preventDefault(); deleteSlide('key'); }
+    if ((e.ctrlKey || e.metaKey) && e.code === 'KeyD') { e.preventDefault(); dupSlide('key'); }
     if (e.key === 'ArrowDown') { e.preventDefault(); go(cur + 1); }
     if (e.key === 'ArrowUp') { e.preventDefault(); go(cur - 1); }
   });
@@ -1357,6 +1673,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
   // Şekle tıklayınca seçilir; basılı tutup sürükleyince yeri değişir
   let drag = null;
   $('.pp-slide').addEventListener('pointerdown', (e) => {
+    if (imgHandleDown(e)) return;
+    // Resme tıklanınca Resim Biçimi sekmesi çıkar; başka yere tıklanınca resim seçimi ve Kırp kapanır
+    const onImg = !!e.target.closest('.pp-img');
+    if (onImg !== selImg) { selImg = onImg; if (!onImg) cropOn = false; $('.pp-ptab').hidden = !selImg; if (!selImg && $('.pp-ptab').classList.contains('on')) showTab('home'); drawImgSel(); if (onImg) emit('ppt-pic-pick', { index: cur }); }
     const sp = e.target.closest('.pp-shp');
     const i = sp ? +sp.dataset.si : -1;
     if (i !== selShape) { selShape = i; markSel(); }
@@ -1366,6 +1686,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (sp && e.button === 0) drag = { i, el: sp, x: e.clientX, y: e.clientY, r: $('.pp-slide').getBoundingClientRect(), moved: false };
   });
   $('.pp-slide').addEventListener('pointermove', (e) => {
+    if (imgHandleMove(e)) return;
     if (!drag) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (!drag.moved && Math.hypot(dx, dy) < 6) return;
@@ -1378,6 +1699,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
     e.preventDefault();
   });
   const dropShape = () => {
+    if (imgHandleUp()) return;
     const d = drag;
     drag = null;
     if (!d?.moved) return;
@@ -1398,9 +1720,9 @@ export function slides({ desk, body, args, emit, setTitle }) {
       pull();
       return {
         theme: deck.theme, showing: !$('.pp-show').hidden, fileName, slideNum: !!deck.slideNum, notes: deck.slides.map((x) => x.notes || ''),
-        music: deck.music || null, view, animPane: paneOpen, animSel: { t: selObj, at: selAnim }, master: { ...deck.master, logo: !!deck.master.logo }, hf: { ...deck.hf },
+        music: deck.music || null, musicAt: deck.musicAt || 0, musicBg: !!deck.musicBg, view, bgPane: bgOpen, picSel: selImg, crop: cropOn, animPane: paneOpen, animSel: { t: selObj, at: selAnim }, master: { ...deck.master, logo: !!deck.master.logo }, hf: { ...deck.hf },
         slides: deck.slides.map((s) => ({ layout: s.layout, title: plain(s.title), sub: plain(s.sub), items: [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean), img: !!s.img, trans: s.trans, art: s.art, anim: s.anim?.effect || 'none', animStart: s.anim?.start,
-          anims: (s.anims || []).map((a) => ({ t: a.t, name: objName(s, a.t), kind: fxOf(a.effect)?.[2], effect: a.effect, start: a.start, dur: a.dur, delay: a.delay })), auto: s.auto || 0, fs: { ...(s.fs || {}) }, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
+          anims: (s.anims || []).map((a) => ({ t: a.t, name: objName(s, a.t), kind: fxOf(a.effect)?.[2], effect: a.effect, start: a.start, dur: a.dur, delay: a.delay })), auto: s.auto || 0, click: s.click !== false, hidden: !!s.hidden, fs: { ...(s.fs || {}) }, fc: { ...(s.fc || {}) }, al: { ...(s.al || {}) }, bg: s.bg ? (s.bg.color ? { color: s.bg.color } : { pic: true }) : null, imgW: s.imgW || 0, imgCrop: s.crop ? { ...s.crop } : null, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
           shapes: (s.shapes || []).map((o) => ({ kind: o.kind, text: o.text || '', fill: o.fill || null, style: o.style || null, link: o.link || null, name: o.name || null })),
           links: [...new DOMParser().parseFromString(`${s.title}${s.sub}<ul>${s.body}</ul><ul>${s.body2}</ul>`, 'text/html').querySelectorAll('a[href]')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
           ink: (s.ink || []).length })),
