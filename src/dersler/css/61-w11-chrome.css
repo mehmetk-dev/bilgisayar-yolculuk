@@ -166,3 +166,13 @@
 .wp.xs .xs-card, .wp.xs .xs-card b { color: #202124; text-decoration: none; }
 .wp.xs .xs-card small { color: #5f6368; text-decoration: none; }
 .wp.xs .xs-head a { text-decoration: none; }
+
+/* ---- dar ekran (telefon): adres çubuğuna yer açmak için az kullanılan düğmeler gizlenir */
+@media (max-width: 600px) {
+  .br-cap, .br-prof, .br-home, .br-dl { display: none !important; }
+  .br-bar { padding: 0.3em 0.2em; }
+  .br-addr { margin: 0 0.1em; }
+  .br-tab { flex-basis: 9em; }
+  .gg-rh { flex-wrap: wrap; gap: 0.6em; }
+  .gg-box.sm { order: 3; flex-basis: 100%; max-width: none; }
+}

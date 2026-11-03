@@ -758,7 +758,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     $('.br-star').innerHTML = ic(on ? 'star' : 'starO', 18);
     $('.br-star').classList.toggle('on', on);
     $('.br-bm').hidden = !bms.length || s.bmBar === false;
-    $('.br-bm').innerHTML = bms.map((b, i) => `<button type="button" data-bm="${i}" title="${esc(b.url)}">${favicon(b.title, b.url.split('/')[0])}<span>${esc(b.title.slice(0, 24))}</span></button>`).join('');
+    $('.br-bm').innerHTML = bms.map((b, i) => `<button type="button" data-bm="${i}" title="${esc(b.url)}">${b.url.startsWith(SEARCH_HOST) ? '<span class="gg-fav g">G</span>' : favicon(b.title, b.url.split('/')[0])}<span>${esc(b.title.slice(0, 24))}</span></button>`).join('');
   }
   function toggleBmBar() {
     s.bmBar = s.bmBar === false;
