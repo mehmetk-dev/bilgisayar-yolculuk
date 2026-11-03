@@ -5,18 +5,7 @@
 .np-embedded .np-title { display: none; }
 .np-embedded .np-drop { top: 2em; }
 
-/* Hesap Makinesi */
-.calc { background: #f3f3f3; padding: 0.4em; gap: 0.3em; outline: none; }
-.ca-menu { font-weight: 600; padding: 0.2em 0.4em; }
-.ca-disp { text-align: right; padding: 0.3em 0.5em; }
-.ca-expr { color: #666; min-height: 1.3em; font-size: 0.9em; }
-.ca-val { font-size: 2.4em; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ca-keys { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
-.ca-keys button { font-size: 1.2em; background: #fff; border: 1px solid #e0e0e0; border-radius: 5px; display: flex; align-items: center; justify-content: center; padding: 0; }
-.ca-keys button.fn { background: #f9f9f9; }
-.ca-keys button.eq { background: #0a5dc2; color: #fff; border-color: #0a5dc2; }
-.ca-keys button:hover { filter: brightness(0.94); }
-.ca-keys button.hit { background: #cfe0f8; }
+/* Hesap Makinesi: 63-w11-hesap.css */
 
 /* Dosya Gezgini */
 .ex { outline: none; background: #fff; }
