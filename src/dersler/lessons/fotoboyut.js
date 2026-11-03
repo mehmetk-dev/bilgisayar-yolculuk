@@ -12,9 +12,9 @@ export const fotoBoyut = {
   desc: 'Sitelere fotoğraf yüklerken çıkan “2 MB\'den büyük olamaz” hatasını Paint\'te çözmek.',
   summary: [
     ['MB neden büyük?', 'Telefon fotoğrafı 4000 × 3000 = 12 milyon nokta (piksel); nokta azalınca dosya küçülür'],
-    ['Paint → ⤡ Yeniden boyutlandır', 'Yüzde: 50 → yarı en, yarı boy; dosya yaklaşık dörtte birine iner'],
+    ['Paint → Resim → Yeniden boyutlandır', 'Yüzde: 50 → yarı en, yarı boy; dosya yaklaşık dörtte birine iner'],
     ['En boy oranını koru', 'Açık kalsın; kapanırsa yüz basık ya da uzun görünür'],
-    ['⬚ Seç + ✂ Kırp', 'Kenarlardaki fazlalığı atar; vesikalık için yüzün çevresine dik bir dikdörtgen'],
+    ['Seçim + Kırp', 'Kenarlardaki fazlalığı atar; vesikalık için yüzün çevresine dik bir dikdörtgen'],
     ['Farklı kaydet', 'Küçük kopyayı yeni adla kaydedin; asıl fotoğraf bozulmasın'],
     [K('Ctrl', 'Z'), 'Yanlış kırptıysanız geri alın'],
     ['Durum çubuğu', 'Paint\'in altında piksel boyutu ve kayıtlı dosyanın MB\'si yazar'],
@@ -47,16 +47,16 @@ export const fotoBoyut = {
     }),
     {
       title: 'Paint\'te açın',
-      html: `<p>Tarayıcıyı kapatmayın. <b>Başlat → Paint</b>'i açın; <b>📂 Aç</b> düğmesiyle (ya da ${K('Ctrl', 'O')}) <b>Resimler</b>'deki <b>${FOTO}</b>'ı açın.</p>
+      html: `<p>Tarayıcıyı kapatmayın. <b>Başlat → Paint</b>'i açın; <b>Dosya</b> → <b>Aç</b> ile (ya da ${K('Ctrl', 'O')}) <b>Resimler</b>'deki <b>${FOTO}</b>'ı açın.</p>
         <p>Paint'in en altındaki çubuğa bakın: piksel boyutu ve dosyanın MB'si yazar.</p>`,
-      hint: 'Başlat\'a tıklayıp “paint” yazın. Paint açılınca sol üstteki 📂 klasör simgesi.',
+      hint: 'Başlat\'a tıklayıp “paint” yazın. Paint açılınca sol üstte Dosya menüsü, içinde Aç.',
       on: (ev) => ev.type === 'open' && isAsil(ev.name),
-      done: 'Altta “4000 × 3000 piksel” ve “Kayıtlı dosya: 4,8 MB” yazıyor. Fotoğraf ekrana sığsın diye küçük gösteriliyor.',
+      done: 'Altta “4000 × 3000px” ve “Kayıtlı dosya: 4,8 MB” yazıyor. Fotoğraf ekrana sığsın diye küçük gösteriliyor.',
     },
     {
       title: 'Yeniden boyutlandırın',
-      html: '<p><b>Resim</b> grubundaki <b>⤡ Boyutlandır</b>\'a tıklayın. <b>Yüzde</b> seçili kalsın; <b>Yatay</b> kutusuna <b>50</b> yazın. <b>En boy oranını koru</b> işaretli olduğu için Dikey de kendiliğinden 50 olur. <b>Tamam</b>.</p>',
-      hint: 'Boyutlandır düğmesi Kırp\'ın yanında. Pencerenin altında yeni boyut yazar: 2000 × 1500 piksel.',
+      html: '<p><b>Resim</b> grubundaki <b>Yeniden boyutlandır</b>\'a tıklayın. <b>Yüzde</b> seçili kalsın; <b>Yatay</b> kutusuna <b>50</b> yazın. <b>En boy oranını koru</b> işaretli olduğu için Dikey de kendiliğinden 50 olur. <b>Tamam</b>.</p>',
+      hint: 'Yeniden boyutlandır düğmesi Kırp\'ın altında. Pencerenin altında yeni boyut yazar: 2000 × 1500 piksel.',
       on: (ev, c) => {
         if (ev.type !== 'paint-resize') return false;
         if (Math.abs(ev.w / ev.h - 4 / 3) > 0.03) { c.warn('En boy oranı bozuldu: fotoğraf basık ya da uzun oldu. Ctrl + Z ile geri alın; “En boy oranını koru” işaretli olsun.'); return false; }
@@ -67,8 +67,8 @@ export const fotoBoyut = {
     },
     {
       title: 'Farklı kaydedin',
-      html: '<p>Asıl fotoğraf bozulmasın: <b>Farklı kaydet</b>\'e basın (Dosya grubunda). Ad olarak <b>vesikalık.jpg</b> yazıp <b>Resimler</b>\'e kaydedin.</p>',
-      hint: `Farklı kaydet düğmesi sol üstte, 📋'nin yanında. Kısayolu ${K('Ctrl', 'Shift', 'S')}.`,
+      html: '<p>Asıl fotoğraf bozulmasın: <b>Dosya</b> menüsünden <b>Farklı kaydet</b>\'e basın. Ad olarak <b>vesikalık.jpg</b> yazıp <b>Resimler</b>\'e kaydedin.</p>',
+      hint: `Farklı kaydet, sol üstteki Dosya menüsünde. Kısayolu ${K('Ctrl', 'Shift', 'S')}.`,
       on: (ev, c) => {
         if (ev.type !== 'save') return false;
         if (isAsil(ev.name)) c.note('Asıl fotoğrafın üstüne kaydettiniz. Bu sefer olur; ama genelde küçük kopyayı yeni bir adla saklamak daha güvenlidir.');
@@ -89,7 +89,7 @@ export const fotoBoyut = {
     },
     {
       title: 'Yüzü seçin',
-      html: '<p>Paint\'e dönün. <b>⬚ Seç</b>\'e tıklayın; fotoğraftaki yüzün çevresine, <b>enine göre daha uzun</b> (dik) bir dikdörtgen çizin: fareyi sol üstten sağ alta sürükleyin.</p>',
+      html: '<p>Paint\'e dönün. <b>Seçim</b> aracına (kesik çizgili kare) tıklayın; fotoğraftaki yüzün çevresine, <b>enine göre daha uzun</b> (dik) bir dikdörtgen çizin: fareyi sol üstten sağ alta sürükleyin.</p>',
       hint: 'Kesik çizgili bir çerçeve çıkar. Beğenmezseniz yeniden çizin; eskisi kaybolur.',
       on: (ev, c) => {
         if (ev.type !== 'paint-select') return false;
@@ -100,7 +100,7 @@ export const fotoBoyut = {
     },
     {
       title: 'Kırpın',
-      html: '<p><b>✂ Kırp</b>\'a basın.</p>',
+      html: '<p><b>Resim</b> grubundaki <b>Kırp</b>\'a basın.</p>',
       on: (ev, c) => {
         if (ev.type !== 'paint-crop') return false;
         if (ev.h <= ev.w) { c.warn(`Kırpılan resim yatay kaldı (${ev.w} × ${ev.h}). ${K('Ctrl', 'Z')} ile geri alın, daha uzun bir dikdörtgen seçin.`); return false; }

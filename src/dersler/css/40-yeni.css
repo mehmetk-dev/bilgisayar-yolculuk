@@ -158,8 +158,7 @@
 .pp-sl:has(> .pp-logo) > .pp-t, .pp-sl:has(> .pp-logo) > .pp-t-big { margin-right: 10cqw; }
 .pp-main.cd-open .pp-stage { padding-right: 20.5em; }
 
-/* Paint: Farklı kaydet, Yeniden boyutlandır penceresi */
-.pt-grp .pt-saveas { font-size: 0.78em; white-space: nowrap; }
+/* Paint: Yeniden boyutlandır penceresi */
 .pt-rs-by { display: flex; gap: 1em; align-items: center; margin-bottom: 0.4em; }
 .pt-rs-by label, .pt-rs-keep { display: inline-flex; align-items: center; gap: 0.3em; }
 .pt-rs-keep { margin-top: 0.3em; }

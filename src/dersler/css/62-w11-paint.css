@@ -1,0 +1,132 @@
+/* Paint: Windows 11'deki yeni Paint'e benzer görünüm. Sınıf öneki pnt-; gövde .pt (paint.js).
+   Menü satırı, tek satır araç şeridi (gruplar altta gri adlı), gri çalışma alanı, durum çubuğu.
+   Pencere daralınca şerit kendini toparlar (@container): Şekiller açılır listeye, Resim yalnız simgeye döner. */
+.pt { --pnt-bg: #f3f3f3; --pnt-rib: #f9f9f9; --pnt-fg: #1b1b1b; --pnt-mut: #6b6b6b; --pnt-line: #dcdcdc; --pnt-hov: #e8e8e8; --pnt-on: #cfe3f8; --pnt-onb: #7fb0ea; --pnt-pop: #fcfcfc; --pnt-area: #e4e4e4;
+  background: var(--pnt-bg); color: var(--pnt-fg); container-type: inline-size; container-name: pnt; font-size: 0.95em; user-select: none; -webkit-user-select: none; }
+.dk-dark .pt { --pnt-bg: #202020; --pnt-rib: #2b2b2b; --pnt-fg: #f1f1f1; --pnt-mut: #aaa; --pnt-line: #444; --pnt-hov: #3a3a3a; --pnt-on: #2f4a6b; --pnt-onb: #5b8fd0; --pnt-pop: #2f2f2f; --pnt-area: #191919; }
+.pt button { background: none; color: inherit; border: 1px solid transparent; border-radius: 4px; padding: 0; gap: 0.3em; cursor: pointer; font: inherit; line-height: 1.15; }
+.pt button:hover:not(:disabled) { background: var(--pnt-hov); border-color: transparent; }
+.pt button.on { background: var(--pnt-on); border-color: var(--pnt-onb); }
+.pt button:disabled { opacity: 0.35; cursor: default; }
+.pt button:focus-visible, .pt input:focus-visible { outline: 2px solid #0a5dc2; outline-offset: -1px; }
+.pnt-i { width: 1.65em; height: 1.65em; flex: none; display: block; }
+.pnt-ch { width: 0.75em; height: 0.75em; flex: none; }
+.pnt-ck-i { width: 1em; height: 1em; display: block; }
+
+/* Menü satırı */
+.pnt-menubar { display: flex; align-items: center; gap: 0.1em; padding: 0.15em 0.4em; background: var(--pnt-bg); flex: none; }
+.pnt-app .pnt-i { width: 1.4em; height: 1.4em; margin-right: 0.3em; }
+.pnt-mb { padding: 0.3em 0.8em !important; }
+.pnt-vsep { width: 1px; align-self: stretch; margin: 0.35em 0.4em; background: var(--pnt-line); }
+.pnt-ib { width: 2.1em; height: 2.1em; display: inline-flex; align-items: center; justify-content: center; }
+.pnt-ib .pnt-i { width: 1.35em; height: 1.35em; }
+
+/* Araç şeridi */
+.pnt-rib { display: flex; flex-wrap: wrap; align-items: stretch; row-gap: 0.2em; background: var(--pnt-rib); border-top: 1px solid var(--pnt-line); border-bottom: 1px solid var(--pnt-line); padding: 0.3em 0.3em 0.2em; flex: none; }
+.pnt-g { display: flex; flex-direction: column; justify-content: space-between; padding: 0 0.55em; border-right: 1px solid var(--pnt-line); }
+.pnt-g:last-child { border-right: 0; }
+.pnt-g > small { text-align: center; color: var(--pnt-mut); font-size: 0.78em; padding-top: 0.25em; white-space: nowrap; }
+.pnt-gb { display: flex; align-items: center; gap: 0.35em; flex: 1; min-height: 4.4em; }
+.pnt-col { flex-direction: column; justify-content: center; align-items: stretch; gap: 0.1em; }
+.pnt-b { display: inline-flex; align-items: center; justify-content: center; width: 3em; height: 3em; }
+.pnt-b .pnt-i { width: 2.1em; height: 2.1em; }
+.pnt-cv { height: 1.2em; width: 3em; display: inline-flex; align-items: center; justify-content: center; color: var(--pnt-mut); }
+.pnt-rows { align-items: stretch; gap: 0.05em; }
+.pnt-r { display: flex; align-items: center; justify-content: flex-start; height: 1.9em; padding: 0 0.5em 0 0.3em !important; text-align: left; white-space: nowrap; }
+.pnt-r .pnt-i { width: 1.4em; height: 1.4em; }
+.pnt-r .pnt-ch { margin-left: auto; color: var(--pnt-mut); }
+.pnt-tg { display: grid; grid-template-columns: repeat(3, 2.3em); grid-template-rows: repeat(2, 2.3em); gap: 0.15em; align-content: center; flex: none; }
+.pnt-s { display: inline-flex; align-items: center; justify-content: center; width: 2.3em; height: 2.3em; }
+.pnt-s .pnt-i { width: 1.5em; height: 1.5em; }
+.pnt-t .pnt-i { width: 1.65em; height: 1.65em; }
+
+/* Şekiller */
+.pnt-g-shapes .pnt-gb { gap: 0.5em; }
+.pnt-sg { display: grid; grid-template-columns: repeat(7, 1.95em); grid-auto-rows: 1.95em; gap: 0.05em; align-content: center; }
+.pnt-sg .pnt-s { width: 1.95em; height: 1.95em; }
+.pnt-sg .pnt-s .pnt-i { width: 1.35em; height: 1.35em; }
+.pnt-shbtn { display: none; }
+.pnt-ol { gap: 0.1em; }
+.pnt-ol .pnt-r { min-width: 5.4em; }
+
+/* Renkler */
+.pnt-g-col .pnt-gb { gap: 0.5em; }
+.pnt-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15em; width: 3.9em; height: 4.3em; font-size: 0.82em; }
+.pnt-slot { white-space: nowrap; }
+.pnt-slot i { display: block; flex: none; width: 2.6em; height: 2.6em; border-radius: 50%; border: 1px solid #0006; box-shadow: inset 0 0 0 1px #fff6; }
+.pnt-pal { display: grid; grid-template-columns: repeat(10, 1.6em); grid-template-rows: repeat(2, 1.6em); gap: 0.2em; align-content: center; }
+.pnt-sw { width: 1.6em; height: 1.6em; border-radius: 50% !important; border: 1px solid #0005 !important; padding: 0 !important; }
+.pnt-sw:hover:not(:disabled) { outline: 2px solid var(--pnt-onb); outline-offset: 1px; }
+.pnt-sw.on { outline: 2px solid #0a5dc2; outline-offset: 1px; background-clip: padding-box; }
+.pnt-edc { width: 2.6em; height: 2.6em; border-radius: 50% !important; }
+.pnt-edc .pnt-i { width: 2.2em; height: 2.2em; }
+
+/* Çalışma alanı: gri zemin, beyaz tuval, boyutlandırma tutamaçları */
+.pnt-area { flex: 1; overflow: auto; padding: 1.1em 1.4em 1.4em 1em; background: var(--pnt-area); min-height: 0; }
+.pnt-wrap { position: relative; width: max-content; box-shadow: 0 1px 6px #0004; margin-right: 1em; margin-bottom: 1em; }
+.pnt-cvs { display: block; background: #fff; }
+.pnt-ov { position: absolute; left: 0; top: 0; touch-action: none; }
+.pnt-ghost { position: absolute; left: 0; top: 0; border: 1px dashed #0a5dc2; background: #0a5dc214; pointer-events: none; }
+.pnt-hd { position: absolute; width: 0.55em; height: 0.55em; background: #fff; border: 1px solid #555; box-sizing: border-box; touch-action: none; }
+.pnt-hd::after { content: ""; position: absolute; inset: -0.5em; }
+.pnt-hd-e { right: -0.75em; top: calc(50% - 0.27em); cursor: ew-resize; }
+.pnt-hd-s { bottom: -0.75em; left: calc(50% - 0.27em); cursor: ns-resize; }
+.pnt-hd-se { right: -0.75em; bottom: -0.75em; cursor: nwse-resize; }
+.pnt-novirt .pnt-hd { display: none; }
+.pnt-text { position: absolute; border: 1px dashed #0a5dc2; background: #fff9; font-family: UISymC, UISymM, UISymD, "Segoe UI", sans-serif; padding: 0 0.2em; min-width: 8em; outline: none; user-select: text; -webkit-user-select: text; }
+
+/* Durum çubuğu */
+.pnt-status { display: flex; align-items: center; gap: 1.4em; padding: 0.15em 0.8em; background: var(--pnt-bg); border-top: 1px solid var(--pnt-line); font-size: 0.88em; flex: none; min-height: 2.2em; }
+.pnt-status[hidden] { display: none; }
+.pnt-st { display: inline-flex; align-items: center; gap: 0.4em; min-width: 7.5em; white-space: nowrap; }
+.pnt-st .pnt-i { width: 1.2em; height: 1.2em; color: var(--pnt-mut); }
+.pnt-st b { font-weight: 400; }
+.pnt-selst.pnt-off { opacity: 0.55; }
+.pnt-hint { flex: 1; min-width: 0; color: var(--pnt-mut); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pnt-fsize { color: var(--pnt-mut); white-space: nowrap; }
+.pnt-zoom { display: inline-flex; align-items: center; gap: 0.2em; margin-left: auto; }
+.pnt-zp { font-weight: 400; min-width: 3.2em; text-align: right; }
+.pnt-zb { width: 1.9em; height: 1.9em; }
+.pnt-zb .pnt-i { width: 1.1em; height: 1.1em; }
+.pnt-zr { width: 7.5em; accent-color: #0a5dc2; }
+
+/* Açılır listeler */
+.pnt-pop { position: absolute; z-index: 30; background: var(--pnt-pop); color: var(--pnt-fg); border: 1px solid var(--pnt-line); border-radius: 8px; box-shadow: 0 6px 22px #0004; padding: 0.3em; min-width: 12em; max-width: calc(100% - 8px); display: flex; flex-direction: column; gap: 0.05em; }
+.pnt-pop hr { border: 0; border-top: 1px solid var(--pnt-line); margin: 0.25em 0.2em; width: auto; }
+.pnt-mi { display: flex !important; align-items: center; gap: 0.5em !important; width: 100%; padding: 0.4em 0.6em 0.4em 0.3em !important; text-align: left; white-space: nowrap; }
+.pnt-mi.on { background: transparent; border-color: transparent; }
+.pnt-mi.on .pnt-ml { font-weight: 700; }
+.pnt-ck { width: 1.1em; flex: none; display: inline-flex; color: #0a5dc2; }
+.pnt-ml { flex: 1; }
+.pnt-mi kbd { border: 0; background: none; box-shadow: none; padding: 0; color: var(--pnt-mut); font: inherit; font-size: 0.85em; margin-left: 1.6em; }
+.pnt-mb2 .pnt-bs { width: 3.2em; height: 1.4em; flex: none; margin-left: 0.3em; }
+.pnt-pop-shapes, .pnt-pop-more { padding: 0.5em; }
+.pnt-pop-shapes .pnt-sg { grid-template-columns: repeat(7, 2.3em); grid-auto-rows: 2.3em; }
+.pnt-pop-shapes .pnt-sg .pnt-s { width: 2.3em; height: 2.3em; }
+.pnt-more { display: flex; flex-direction: column; gap: 0.5em; }
+.pnt-mg { display: grid; grid-template-columns: repeat(8, 1.9em); gap: 0.25em; }
+.pnt-mg .pnt-sw { width: 1.9em; height: 1.9em; }
+.pnt-cust { display: flex; align-items: center; gap: 0.5em; }
+.pnt-ci { width: 3em; height: 2em; padding: 0; border: 1px solid var(--pnt-line); background: none; cursor: pointer; }
+
+/* Dar pencere: Şekiller açılır liste olur, Resim yalnız simge */
+@container pnt (max-width: 1060px) {
+  .pnt-sgw, .pnt-ol { display: none; }
+  .pnt-shbtn { display: flex; }
+  .pnt-g-shapes .pnt-gb { min-width: 3em; }
+}
+@container pnt (max-width: 900px) {
+  .pnt-g-img .pnt-r span { display: none; }
+  .pnt-g-img .pnt-r { width: 3em; padding: 0 !important; justify-content: center; }
+  .pnt-g-img .pnt-r .pnt-ch { display: none; }
+  .pnt-g { padding: 0 0.4em; }
+  .pnt-pal { grid-template-columns: repeat(10, 1.45em); grid-template-rows: repeat(2, 1.45em); }
+  .pnt-sw { width: 1.45em; height: 1.45em; }
+  .pnt-hint, .pnt-fsize { display: none; }
+  .pnt-zoom { margin-left: auto; }
+}
+@container pnt (max-width: 560px) {
+  .pnt-st { min-width: 0; }
+  .pnt-zr { width: 4.5em; }
+  .pnt-status { gap: 0.8em; }
+}
