@@ -12,8 +12,8 @@ export const donatilar = {
   desc: 'Renkli notlar, konuşarak not almak, alarm ve zamanlayıcı kurmak.',
   summary: [
     ['🗒 Yapışkan Notlar', 'Kısa notlar; renkli kâğıtlar, kapatınca silinmez'],
-    ['＋ Yeni not', 'Boş bir kâğıt açar'],
-    ['🎙 Ses Kaydedici', 'Kırmızı ● ile başlar, ■ ile durur; kayıt Belgeler > Ses kayıtları klasörüne kaydedilir (alıştırmada Müzik klasörüne)'],
+    ['Yeni not', 'Boş bir kâğıt açar'],
+    ['🎙 Ses Kaydedici', 'Kırmızı mikrofon düğmesiyle başlar, kırmızı kare düğmeyle durur; kayıt Belgeler > Ses kayıtları klasörüne kaydedilir (alıştırmada Müzik klasörüne)'],
     ['⏰ Alarm', 'Belirli bir saatte çalar; adını yazın (İlaç saati)'],
     ['⏳ Zamanlayıcı', 'Şu andan belli bir süre sonra çalar (yemek, çay demi)'],
     ['🔊 Ses', 'Alarm ve kayıt için bilgisayarın sesi açık olmalı'],
@@ -35,23 +35,23 @@ export const donatilar = {
     },
     {
       title: 'Yeni bir not',
-      html: '<p><b>＋ Yeni not</b>\'a tıklayın, kâğıdın içine tıklayıp unutmamanız gereken bir şey yazın. Örneğin: <b>Cuma günü eczaneye git</b>.</p>',
-      hint: 'Önce ＋ Yeni not. Sonra çıkan sarı kâğıdın içine tıklayıp yazın.',
+      html: '<p><b>Yeni not</b>\'a tıklayın, kâğıdın içine tıklayıp unutmamanız gereken bir şey yazın. Örneğin: <b>Cuma günü eczaneye git</b>.</p>',
+      hint: 'Önce Yeni not (ya da bir notun üstündeki + simgesi). Sonra çıkan sarı kâğıdın içine tıklayıp yazın.',
       on: (ev) => ev.type === 'sticky-text' && ev.text.trim().length >= 5,
       done: 'Yazdıkça kendiliğinden kaydedilir; “Kaydet”e basmak gerekmez. Pencereyi kapatsanız da not durur.',
     },
     {
       title: 'Rengini değiştirin',
-      html: '<p>Notun üstündeki renkli noktalardan birine tıklayarak notun rengini değiştirin. Renkler, işleri ayırmanıza yardım eder: sarı alışveriş, pembe ilaç gibi.</p>',
-      mouse: '🖱 Notun üstündeki renkli nokta',
+      html: '<p>Notun sağ üstündeki <b>⋯</b> (üç nokta) simgesine tıklayın, çıkan menüden bir renk seçin. Renkler, işleri ayırmanıza yardım eder: sarı alışveriş, pembe ilaç gibi.</p>',
+      mouse: '🖱 Notun üstündeki ⋯ → renk',
       on: (ev) => ev.type === 'sticky-color',
       done: 'Renk, notları birbirinden ayırır.',
     },
     {
       title: 'İkinci not, sonra silin',
-      html: `<p>Bir not daha ekleyin (içine istediğinizi yazın). Sonra <b>ilk notu</b> silin: notun üstündeki <b>🗑</b> simgesine tıklayın.</p>
+      html: `<p>Bir not daha ekleyin (içine istediğinizi yazın). Sonra <b>ilk notu</b> silin: notun üstündeki <b>⋯</b> simgesine, sonra <b>Notu sil</b>'e, sorulunca da <b>Sil</b>'e tıklayın.</p>
         <p class="mut">Yapılan işin notunu silmek iyi bir alışkanlıktır; masa dağılmaz.</p>`,
-      hint: '🗑 simgesi her notun sağ üst köşesindedir. Önce ikinci notu ekleyin, sonra ilk notu silin.',
+      hint: '⋯ simgesi her notun sağ üst köşesindedir. Önce ikinci notu ekleyin, sonra ilk notu silin.',
       on: (ev) => ev.type === 'sticky-delete',
       done: 'Notlarınız bu kadar kolay.',
     },
@@ -63,18 +63,18 @@ export const donatilar = {
     },
     {
       title: 'Kayıt yapın',
-      html: `<ol class="steps"><li>Kırmızı <b>●</b> düğmesine tıklayın.</li><li>Sayaç ilerlerken birkaç saniye bekleyin. Gerçek bilgisayarda bu sırada konuşursunuz (örneğin “Yarın ilacı almayı unutma”).</li><li>Kırmızı <b>■</b> düğmesine tıklayarak durdurun.</li></ol>`,
-      hint: 'En az 2 saniye sürsün. Durdurmak için ■ düğmesine basın.',
+      html: `<ol class="steps"><li>Büyük kırmızı <b>mikrofon</b> düğmesine tıklayın.</li><li>Sayaç ilerlerken birkaç saniye bekleyin. Gerçek bilgisayarda bu sırada konuşursunuz (örneğin “Yarın ilacı almayı unutma”).</li><li>Kırmızı <b>kare</b> (durdur) düğmesine tıklayarak durdurun.</li></ol>`,
+      hint: 'En az 2 saniye sürsün. Durdurmak için kırmızı kare düğmeye basın.',
       on: (ev, c) => {
         if (ev.type !== 'rec-stop') return false;
-        if (ev.secs < 2) { c.warn('Kayıt çok kısa oldu. Bir daha deneyin: ● ile başlayın, birkaç saniye bekleyip ■ ile durdurun.'); return false; }
+        if (ev.secs < 2) { c.warn('Kayıt çok kısa oldu. Bir daha deneyin: kırmızı mikrofon düğmesiyle başlayın, birkaç saniye bekleyip kırmızı kare düğmeyle durdurun.'); return false; }
         return true;
       },
       done: (c) => { const r = c.d.fs.children('music').filter((n) => /^Kayıt.*\.m4a$/.test(n.name)).pop(); return `Kaydınız ${r ? `“${r.name}” adıyla ` : ''}<b>Müzik</b> klasörüne kaydedildi. Dosya Gezgini'nden de bulabilirsiniz. (Gerçek Windows'ta kayıtlar <b>Belgeler</b> içindeki <b>Ses kayıtları</b> klasörüne gider.)`; },
     },
     {
       title: 'Kaydı dinleyin',
-      html: '<p>Aşağıdaki <b>Kayıtlarınız</b> listesinde kaydı bulup <b>▶ Dinle</b>\'ye tıklayın. <small>(Alıştırmada örnek bir ses çalar.)</small></p>',
+      html: '<p>Aşağıdaki <b>Kayıtlar</b> listesinde kaydın sağındaki <b>▶</b> (Dinle) düğmesine tıklayın. <small>(Alıştırmada örnek bir ses çalar.)</small></p>',
       mouse: '🖱 ▶ Dinle',
       hint: 'Ses gelmiyorsa sağ alttaki 🔊 simgesine tıklayıp sesi açın.',
       on: (ev, c) => {
@@ -86,15 +86,15 @@ export const donatilar = {
     },
     {
       title: 'Saat uygulaması',
-      html: '<p>⊞ <b>Başlat</b> → <b>⏰ Saat</b>. Burada iki şey var: <b>Alarm</b> (belli saatte) ve <b>Zamanlayıcı</b> (şimdiden belli süre sonra).</p>',
+      html: '<p>⊞ <b>Başlat</b> → <b>⏰ Saat</b>. Solda bir liste var; biz <b>Alarm</b> (belli saatte) ve <b>Zamanlayıcı</b> (şimdiden belli süre sonra) bölümlerini kullanacağız.</p>',
       mouse: '🖱 Başlat → Saat',
       ...appOpen('saat'),
     },
     {
       title: 'Alarm kurun',
-      html: `<p><b>Alarm</b> sekmesinde saati ayarlayın, adına <b>İlaç saati</b> yazın ve <b>＋ Ekle</b>'ye tıklayın.</p>
+      html: `<p>Soldaki listeden <b>Alarm</b>'a tıklayın. Sağ üstteki <b>+</b> düğmesine basın, saati ayarlayın, adına <b>İlaç saati</b> yazın ve <b>Ekle</b>'ye tıklayın.</p>
         <p class="mut">Gerçek bilgisayarda alarmın çalması için bilgisayar açık olmalı ve sesi kapalı olmamalıdır.</p>`,
-      hint: 'Saat kutusundaki sayıları tıklayıp yazabilirsiniz. Adı “Alarm adı” kutusuna yazın.',
+      hint: 'Önce sağ üstteki + düğmesine basın. Saat kutusundaki sayıları tıklayıp yazabilirsiniz; adı “Alarm adı” kutusuna yazın.',
       on: (ev, c) => {
         if (ev.type !== 'alarm-add') return false;
         if ((ev.label || '').trim().length < 3) { c.warn('Alarma bir ad verin (örneğin İlaç saati) ve tekrar ekleyin; adsız alarmları sonra karıştırırsınız.'); return false; }
@@ -104,8 +104,8 @@ export const donatilar = {
     },
     {
       title: 'Zamanlayıcı',
-      html: `<p><b>⏳ Zamanlayıcı</b> sekmesine geçin ve <b>10 saniye</b>'yi seçin. Çay demlenirken ya da yemek fırındayken bu kullanılır.</p><p>Süre dolunca ekranın köşesinde uyarı çıkar ve ses çalar. Bekleyin.</p>`,
-      hint: 'Sekmeler üstte: ⏰ Alarm | ⏳ Zamanlayıcı. 10 saniye düğmesi en solda üstte.',
+      html: `<p>Soldaki listeden <b>Zamanlayıcı</b>'ya geçin ve <b>10 saniye</b> kutusundaki <b>▶</b> düğmesine tıklayın. Çay demlenirken ya da yemek fırındayken bu kullanılır.</p><p>Süre dolunca ekranın köşesinde uyarı çıkar ve ses çalar. Bekleyin.</p>`,
+      hint: 'Zamanlayıcı, soldaki listenin ikinci satırıdır. 10 saniye kutusu en solda üstte.',
       on: (ev) => ev.type === 'timer-ring',
       done: 'Süre doldu! Ses çaldı ve köşede uyarı çıktı. Gerçekte de böyle çalışır.',
     },
