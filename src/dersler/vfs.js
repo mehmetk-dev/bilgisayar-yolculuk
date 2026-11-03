@@ -1,12 +1,14 @@
 // Benzetim bilgisayarın dosya sistemi. Gerçek diske dokunmaz; her şey bellekte durur.
+import { SYS_ICONS } from './apps/appicons.js';
+
 // Düğüm: { id, name, type: 'folder'|'file'|'link', parent, content?, app?, target? (dosya/klasör kısayolu), icon?, deletedFrom? }
 
 export const ROOTS = [
-  ['desktop', 'Masaüstü', '🖥'],
-  ['docs', 'Belgeler', '📄'],
-  ['downloads', 'İndirilenler', '⬇'],
-  ['pictures', 'Resimler', '🖼'],
-  ['music', 'Müzik', '🎵'],
+  ['desktop', 'Masaüstü', SYS_ICONS['folder-desktop']],
+  ['docs', 'Belgeler', SYS_ICONS['folder-docs']],
+  ['downloads', 'İndirilenler', SYS_ICONS['folder-down']],
+  ['pictures', 'Resimler', SYS_ICONS['folder-pics']],
+  ['music', 'Müzik', SYS_ICONS['folder-music']],
 ];
 export const RECYCLE = 'recycle';
 export const USB = 'usb';
@@ -280,7 +282,7 @@ export class VFS {
 
   // Dosya kaydetme/açma pencerelerinin beklediği arayüz
   dialogApi() {
-    const roots = () => [...ROOTS, ...(this.usb ? [[USB, 'USB Bellek (E:)', '💾']] : []), ...(this.phone ? [[PHONE, 'Telefonum', '📱']] : [])];
+    const roots = () => [...ROOTS, ...(this.usb ? [[USB, 'USB Bellek (E:)', SYS_ICONS.usb]] : []), ...(this.phone ? [[PHONE, 'Telefonum', SYS_ICONS.phone]] : [])];
     return {
       folders: () => roots().map(([id, label, icon]) => ({ id, label, icon })),
       list: (id) => this.children(id).filter((n) => n.type !== 'link').map((n) => ({ id: n.id, name: n.name, folder: n.type === 'folder' })),

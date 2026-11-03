@@ -1,6 +1,8 @@
 // Windows tarzı ortak pencereler: "Farklı kaydet" / "Aç", "Kaydetmek istiyor musunuz?" sorusu ve "Yazdır".
 // Pencereler verilen kabın (host) içinde açılır; kabın position değeri relative/absolute olmalıdır.
 
+import { iconFor, fileIconSvg, SYS_ICONS, WIN_BTN, MONO } from './apps/appicons.js';
+
 const BAD_CHARS = /[\\/:*?"<>|]/;
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
@@ -23,7 +25,7 @@ export class Dialogs {
     return new Promise((resolve) => {
       const back = document.createElement('div');
       back.className = 'dlg-back';
-      back.innerHTML = `<div class="dlg ${cls}" role="dialog" aria-modal="true"><div class="dlg-title"><span>${esc(title)}</span><button type="button" class="dlg-x" title="Kapat">✕</button></div>${inner}</div>`;
+      back.innerHTML = `<div class="dlg ${cls}" role="dialog" aria-modal="true"><div class="dlg-title"><span>${esc(title)}</span><button type="button" class="dlg-x" title="Kapat">${WIN_BTN.close}</button></div>${inner}</div>`;
       this.host.append(back);
       this.open++;
       this.emit('dialog', { open: true, kind });
@@ -50,7 +52,7 @@ export class Dialogs {
   file({ mode, fs, folder, name = '', ext = '.txt', typeLabel = 'Metin Belgeleri (*.txt)', accept, types }) {
     const title = mode === 'save' ? 'Farklı kaydet' : 'Aç';
     const inner = `
-      <div class="dlg-path"><button type="button" class="dlg-up" title="Bir üst klasör">⬆</button><span class="dlg-crumb"></span></div>
+      <div class="dlg-path"><button type="button" class="dlg-up" title="Bir üst klasör">${MONO.chevup}</button><span class="dlg-crumb"></span></div>
       <div class="dlg-body"><ul class="dlg-side"></ul><ul class="dlg-files"></ul></div>
       <label class="dlg-row"><span>Dosya adı:</span><input class="dlg-name" autocomplete="off" spellcheck="false" autofocus></label>
       <div class="dlg-row"><span>Kayıt türü:</span>${types && mode === 'save' ? `<select class="dlg-type">${types.map(([e, l]) => `<option value="${e}">${esc(l)}</option>`).join('')}</select>` : `<span class="dlg-type">${esc(typeLabel)}</span>`}</div>
@@ -70,10 +72,10 @@ export class Dialogs {
     const render = () => {
       $('.dlg-crumb').textContent = ['Bu bilgisayar', ...trail.map((t) => t.label), fs.label(cur)].join(' › ');
       $('.dlg-up').disabled = !trail.length;
-      $('.dlg-side').innerHTML = fs.folders().map((f) => `<li><button type="button" data-folder="${f.id}" class="${f.id === cur ? 'on' : ''}">${f.icon} ${esc(f.label)}</button></li>`).join('');
+      $('.dlg-side').innerHTML = fs.folders().map((f) => `<li><button type="button" data-folder="${f.id}" class="${f.id === cur ? 'on' : ''}">${iconFor(f.icon)} ${esc(f.label)}</button></li>`).join('');
       const items = fs.list(cur).filter((it) => it.folder || acc.test(it.name) || mode === 'save');
       $('.dlg-files').innerHTML = items.length
-        ? items.map((it) => `<li><button type="button" ${it.folder ? `data-sub="${it.id}"` : `data-file="${esc(it.name)}"`}>${it.folder ? '📁' : fileIcon(it.name)} ${esc(it.name)}</button></li>`).join('')
+        ? items.map((it) => `<li><button type="button" ${it.folder ? `data-sub="${it.id}"` : `data-file="${esc(it.name)}"`}>${it.folder ? SYS_ICONS.folder : fileIcon(it.name)} ${esc(it.name)}</button></li>`).join('')
         : '<li class="dlg-empty">Bu klasör boş.</li>';
       $('.dlg-err').textContent = '';
       overwrite = null;
@@ -140,7 +142,7 @@ export class Dialogs {
 
   // buttons: [[değer, etiket, birincil?], ...]
   ask({ title, text, buttons, icon = '' }) {
-    const inner = `<div class="dlg-msg">${icon ? `<span class="dlg-icon">${icon}</span>` : ''}<div>${text}</div></div>
+    const inner = `<div class="dlg-msg">${icon ? `<span class="dlg-icon">${iconFor(icon)}</span>` : ''}<div>${text}</div></div>
       <div class="dlg-btns">${buttons.map(([v, l, primary]) => `<button type="button" data-v="${v}" class="${primary ? 'dlg-ok' : ''}">${esc(l)}</button>`).join('')}</div>`;
     const p = this.shell('dlg-ask', title, inner, 'ask');
     const back = this._last;
@@ -153,7 +155,7 @@ export class Dialogs {
 
   // Metin kutulu pencere. fields: [{ name, label, value }]. Tamam'da { name: değer } döner; check(değerler) hata metni dönerse kapanmaz.
   form({ title, text = '', fields, ok = 'Tamam', icon = '', check }) {
-    const inner = `${text ? `<div class="dlg-msg">${icon ? `<span class="dlg-icon">${icon}</span>` : ''}<div>${text}</div></div>` : ''}
+    const inner = `${text ? `<div class="dlg-msg">${icon ? `<span class="dlg-icon">${iconFor(icon)}</span>` : ''}<div>${text}</div></div>` : ''}
       <div class="dlg-pr">${fields.map((f, i) => `<label class="dlg-row"><span>${esc(f.label)}</span><input class="dlg-name" data-f="${f.name}" value="${esc(f.value || '')}" autocomplete="off" spellcheck="false" ${i ? '' : 'autofocus'}></label>`).join('')}</div>
       <div class="dlg-err"></div>
       <div class="dlg-btns"><button type="button" class="dlg-ok">${esc(ok)}</button><button type="button" class="dlg-cancel">İptal</button></div>`;
@@ -178,7 +180,7 @@ export class Dialogs {
   print({ printers, doc, preview, pvHtml, pvWide, pages, current = 1, photo }) {
     if (photo) pvHtml = `<div class="pz-pv"><div class="pz-pg"></div><div class="dlg-pvnote ok pz-note"></div></div>`;
     const pv = preview ? `<div class="dlg-pv"><div class="dlg-pvbox ${preview.orient === 'yatay' ? 'yatay' : ''}"><div class="wd-page dlg-pvp ${preview.border === 'kutu' ? 'bordered' : preview.border === 'cift' ? 'bordered2' : ''} ${preview.orient === 'yatay' ? 'yatay' : ''}" data-wm="${esc(preview.wm || '')}" style="padding:${preview.padding}">${preview.html}</div></div>
-        <div class="dlg-pvnote ${preview.pages > 1 ? 'bad' : 'ok'}">${preview.pages > 1 ? `⚠ Belge <b>${preview.pages} sayfa</b>; her sayfa ayrı kâğıda çıkar. Tek kâğıda sığdırmak için yazı boyutunu ya da kenar boşluklarını küçültün.` : '✔ Belge <b>tek kâğıda</b> sığıyor.'}<br><small>Kâğıt: A4, ${preview.orient === 'yatay' ? 'yatay' : 'dikey'}</small></div></div>` : '';
+        <div class="dlg-pvnote ${preview.pages > 1 ? 'bad' : 'ok'}">${preview.pages > 1 ? `${SYS_ICONS.warn} Belge <b>${preview.pages} sayfa</b>; her sayfa ayrı kâğıda çıkar. Tek kâğıda sığdırmak için yazı boyutunu ya da kenar boşluklarını küçültün.` : '✔ Belge <b>tek kâğıda</b> sığıyor.'}<br><small>Kâğıt: A4, ${preview.orient === 'yatay' ? 'yatay' : 'dikey'}</small></div></div>` : '';
     const inner = `${pvHtml ? `<div class="dlg-pv">${pvHtml}</div>` : pv}<div class="dlg-pr">
         <label class="dlg-row"><span>Yazıcı:</span><select class="dlg-printer">${printers.map((p) => `<option>${esc(p)}</option>`).join('')}</select></label>
         <label class="dlg-row"><span>Kopya sayısı:</span><input class="dlg-copies" type="number" min="1" max="9" value="1"></label>
@@ -191,7 +193,7 @@ export class Dialogs {
         <label class="dlg-row pz-size-row"><span>Fotoğraf boyutu:</span><select class="pz-size">${PH_SIZES.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select></label>
         <label class="dlg-row"><span>Kâğıt türü:</span><select class="pz-kind"><option value="duz">Düz kâğıt</option><option value="parlak">Parlak fotoğraf kâğıdı</option></select></label>` : ''}
         <div class="dlg-row"><span>Belge:</span><b>${esc(doc)}</b></div></div>
-      <div class="dlg-btns"><button type="button" class="dlg-ok">🖨 Yazdır</button><button type="button" class="dlg-cancel">İptal</button></div>`;
+      <div class="dlg-btns"><button type="button" class="dlg-ok">${SYS_ICONS.printer} Yazdır</button><button type="button" class="dlg-cancel">İptal</button></div>`;
     const p = this.shell('dlg-print', 'Yazdır', inner, 'print');
     const back = this._last;
     if (pvWide) back.querySelector('.dlg').style.width = 'min(62em, 100%)'; // geniş önizleme (Hesap Tablosu): yazı okunsun
@@ -212,7 +214,7 @@ export class Dialogs {
       q('.dlg-rng-row').hidden = q('.dlg-range').value !== 'custom';
       const sp = span(), copies = Math.max(1, +q('.dlg-copies').value || 1), duplex = q('.dlg-duplex').checked;
       const box = q('.dlg-sheets');
-      if (!sp) { box.className = 'dlg-pvnote bad dlg-sheets'; box.innerHTML = '⚠ Sayfa aralığını doğru yazın (ör. 1 ya da 1-2; belgede ' + pages + ' sayfa var).'; return; }
+      if (!sp) { box.className = 'dlg-pvnote bad dlg-sheets'; box.innerHTML = SYS_ICONS.warn + ' Sayfa aralığını doğru yazın (ör. 1 ya da 1-2; belgede ' + pages + ' sayfa var).'; return; }
       const n = sp[1] - sp[0] + 1, sheets = copies * Math.ceil(n / (duplex ? 2 : 1));
       box.className = 'dlg-pvnote ' + (sheets > 2 ? 'bad' : 'ok') + ' dlg-sheets';
       box.innerHTML = `${n} sayfa × ${copies} kopya${duplex ? ', iki yüzlü' : ''} = <b>${sheets} yaprak kâğıt</b>`;
@@ -255,17 +257,5 @@ export class Dialogs {
 }
 
 export function fileIcon(name) {
-  if (/\.txt$/i.test(name)) return '📝';
-  if (/\.(png|jpe?g|bmp)$/i.test(name)) return '🖼';
-  if (/\.docx?$/i.test(name)) return '📘';
-  if (/\.xlsx?$/i.test(name)) return '📗';
-  if (/\.pptx?$/i.test(name)) return '📙';
-  if (/\.pdf$/i.test(name)) return '📕';
-  if (/\.html?$/i.test(name)) return '🌐';
-  if (/\.gif$/i.test(name)) return '🖼';
-  if (/\.exe$/i.test(name)) return '💿';
-  if (/\.(mp3|wav|m4a)$/i.test(name)) return '🎵';
-  if (/\.zip$/i.test(name)) return '🗜';
-  if (/\.(mp4|avi|mov)$/i.test(name)) return '🎬';
-  return '📄';
+  return fileIconSvg(name);
 }
