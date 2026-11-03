@@ -360,3 +360,131 @@ export const tabloParkur = {
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Pazar listesini yazıp topladınız, biçimlendirdiniz ve sıraladınız.</p>' },
   ],
 };
+
+// ---- Tabloyu güzelleştirmek (MEB: hücre biçimlendirme): yazı tipi, boyut, renk, dolgu, hizalama, kenarlık, ondalık ----
+const fatura = () => {
+  const cells = { A1: 'EV FATURALARI', A3: 'Fatura', B3: 'Tutar', C3: 'Son ödeme', D3: 'Ödendi mi?', A9: 'Toplam', B9: '=TOPLA(B4:B8)', A11: 'Not: Tutarlar Kasım ayına aittir.' };
+  [['Elektrik', '1245,5', '15.11.2026', 'Evet'], ['Su', '387,25', '20.11.2026', 'Hayır'], ['Doğalgaz', '2100', '22.11.2026', 'Hayır'], ['İnternet', '650', '25.11.2026', 'Evet'], ['Telefon', '420,9', '28.11.2026', 'Evet']]
+    .forEach(([a, b, c, d], i) => Object.assign(cells, { ['A' + (i + 4)]: a, ['B' + (i + 4)]: b, ['C' + (i + 4)]: c, ['D' + (i + 4)]: d }));
+  const fmt = { A1: { b: true }, A9: { b: true } };
+  for (let r = 4; r <= 9; r++) fmt['B' + r] = { f: 'tl', ...(r === 9 ? { b: true } : {}) };
+  return { cells, fmt, colW: { 0: 10, 1: 10, 2: 9, 3: 9 } };
+};
+const F = (c, a) => X(c)?.fmtOf(a) || {};
+const area = (r1, r2, cols = 'ABCD') => { const out = []; for (let r = r1; r <= r2; r++) for (const k of cols) out.push(k + r); return out; };
+const bicimEv = ['xl-style', 'xl-format', 'xl-select', 'xl-edit'];
+const bicim = (test) => (ev, c) => bicimEv.includes(ev.type) && !!test(c);
+
+export const excelBicim = {
+  id: 'excel-bicim', icon: '🎨', title: 'Tabloyu güzelleştirin: kenarlık, dolgu, yazı tipi, hizalama', minutes: 30, stage: 'desktop',
+  desc: 'Yazı tipi ve boyutu, yazı rengi, dolgu rengi, ortalamak, tüm kenarlıklar, ondalık azaltmak.',
+  summary: [
+    ['Yazı Tipi / Yazı Tipi Boyutu', 'Şeridin solundaki iki kutu: Calibri, 11 → Arial, 16'],
+    ['K · T · A', 'Kalın · İtalik · Altı Çizili'],
+    ['Yazı Tipi Rengi (A ▾)', 'Yazının rengi; ▾ okuna basıp renk seçilir'],
+    ['Dolgu Rengi (🪣 ▾)', 'Hücrenin zemin rengi'],
+    ['Kenarlıklar (▦ ▾)', 'Tüm Kenarlıklar, Dış Kenarlıklar, Kalın Dış Kenarlık, Kenarlık Yok'],
+    ['Sola Hizala · Ortala · Sağa Hizala', 'Yazının hücre içindeki yeri'],
+    ['Üste · Ortaya · Alta Hizala', 'Yüksek satırlarda yazının dikey yeri'],
+    ['Ondalık Artır / Azalt', 'Virgülden sonra kaç basamak görüneceği; sayının kendisi değişmez'],
+    ['Gerçek Excel\'de', 'Hepsi Giriş sekmesinde: Yazı Tipi, Hizalama ve Sayı bölümleri. Hepsi bir arada: sağ tık → Hücreleri Biçimlendir (Ctrl + 1)'],
+    ['Kenarlık ve kâğıt', 'Kenarlıklar kâğıtta çıkar; gri kılavuz çizgileri çıkmaz'],
+  ],
+  steps: [
+    {
+      title: 'Düz bir tablo',
+      html: `<p>Önünüzde ev faturalarının tablosu var. Rakamlar doğru ama tablo <b>düz</b>: başlık küçük, çizgi yok, başlık satırı öbür satırlardan ayrılmıyor.</p>
+        <p>Bu derste tabloyu <b>okunur ve düzgün</b> hâle getireceğiz. MEB sınavında da hemen her zaman “tabloya kenarlık verin, başlığı renklendirin” istenir.</p>
+        <p class="mut">Gerçek Excel'de bu düğmelerin hepsi <b>Giriş</b> sekmesindedir.</p>`,
+      setup: (c) => { desktopReady(c); c.d.closeAll(); sheetOpen(c, fatura()); },
+    },
+    {
+      title: 'Başlığı büyütün',
+      html: '<p><b>A1</b> hücresine (EV FATURALARI) tıklayın. Şeridin solundaki <b>Yazı Tipi Boyutu</b> kutusunda <b>11</b> yazıyor. Kutuyu açıp <b>16</b>\'yı seçin.</p>',
+      mouse: '🖱 A1 → Yazı Tipi Boyutu → 16',
+      setup: (c) => { if (!X(c)) sheetOpen(c, fatura()); },
+      hint: 'Boyut kutusu, yazı tipi adının (Calibri) hemen sağındaki küçük kutudur.',
+      on: bicim((c) => F(c, 'A1').fs === 16),
+      done: 'Başlık büyüdü. Yazı boyutu “punto” ile ölçülür; Excel\'de yazılar 11 punto başlar.',
+    },
+    {
+      title: 'Yazı tipini değiştirin',
+      html: '<p>A1 seçiliyken <b>Yazı Tipi</b> kutusunu (Calibri yazan) açın ve <b>Arial</b>\'ı seçin.</p>',
+      hint: 'Yeni Excel sürümlerinde kutuda Calibri yerine Aptos yazabilir; ikisi de yazı tipi adıdır.',
+      on: bicim((c) => F(c, 'A1').fn === 'Arial'),
+      done: 'Başlığın yazı tipi Arial oldu. Bir tabloda en çok iki yazı tipi kullanın; fazlası karışık durur.',
+    },
+    {
+      title: 'Yazı rengi',
+      html: '<p>A1 seçiliyken <b>Yazı Tipi Rengi</b> düğmesinin (altı renkli <b>A</b>) yanındaki küçük <b>▾</b> okuna tıklayın. Açılan renklerden <b>Koyu Mavi</b>\'yi seçin.</p>',
+      mouse: '🖱 A ▾ → Koyu Mavi',
+      hint: 'Renklerin üzerine fareyle gelince adı yazar. Koyu Mavi, sondan ikinci renktir. Düğmenin kendisine (A) basmak son seçilen rengi uygular.',
+      on: bicim((c) => F(c, 'A1').fc === '#002060'),
+      done: 'Başlık koyu mavi oldu.',
+    },
+    {
+      title: 'Başlık satırını kalın yapın',
+      html: '<p><b>A3</b>\'ten <b>D3</b>\'e kadar sürükleyerek seçin (Fatura, Tutar, Son ödeme, Ödendi mi?) ve <b>K</b> (Kalın) düğmesine basın.</p>',
+      on: bicim((c) => area(3, 3).every((a) => F(c, a).b)),
+      done: 'Sütun başlıkları kalın.',
+    },
+    {
+      title: 'Dolgu rengi',
+      html: '<p>A3:D3 hâlâ seçiliyken <b>Dolgu Rengi</b> düğmesinin (🪣) yanındaki <b>▾</b> okuna tıklayın ve <b>Sarı</b>\'yı seçin.</p>',
+      mouse: '🖱 🪣 ▾ → Sarı',
+      hint: 'Dolgu, hücrenin zemin rengidir. Yanlış renk seçerseniz aynı listeden “Dolgu Yok” ile kaldırabilirsiniz.',
+      on: bicim((c) => area(3, 3).every((a) => F(c, a).bg === '#ffff00')),
+      done: 'Başlık satırı tablodan ayrıldı. Açık renkler seçin; koyu zeminde siyah yazı okunmaz.',
+    },
+    {
+      title: 'Ortalayın',
+      html: '<p>A3:D3 seçiliyken <b>Ortala</b> düğmesine basın (fareyle üzerine gelince adı “Ortala” yazar).</p>',
+      hint: 'Hizalama düğmeleri üçer üçer durur: önce Üste, Ortaya, Alta Hizala; sonra Sola Hizala, Ortala, Sağa Hizala.',
+      on: bicim((c) => area(3, 3).every((a) => F(c, a).al === 'c')),
+      done: 'Başlıklar hücrelerin ortasında. Sayı sütunlarında başlığı <b>Sağa Hizala</b> ile sayıların hizasına da getirebilirsiniz.',
+    },
+    {
+      title: 'Tüm kenarlıklar',
+      html: '<p><b>A3</b>\'ten <b>D9</b>\'a kadar bütün tabloyu seçin (Toplam satırı dahil). <b>Kenarlıklar</b> düğmesinin (▦) yanındaki <b>▾</b>\'ya tıklayın ve <b>Tüm Kenarlıklar</b>\'ı seçin.</p>',
+      mouse: '🖱 A3:D9 → ▦ ▾ → Tüm Kenarlıklar',
+      hint: 'A3\'e basılı tutup D9\'a kadar sürükleyin. Listede Alt Kenarlık, Kenarlık Yok, Tüm Kenarlıklar, Dış Kenarlıklar gibi seçenekler var.',
+      on: bicim((c) => area(3, 9).every((a) => { const b = F(c, a).bd || {}; return b.t && b.b && b.l && b.r; })),
+      done: 'Her hücrenin çevresinde ince siyah çizgi var. Bu çizgiler, gri kılavuz çizgilerinden farklı olarak <b>kâğıtta da çıkar</b>.',
+    },
+    {
+      title: 'Kalın dış kenarlık',
+      html: '<p>A3:D9 seçiliyken yine <b>▦ ▾</b> listesini açın ve <b>Kalın Dış Kenarlık</b>\'ı seçin.</p>',
+      hint: 'Dış Kenarlıklar yalnızca seçimin çevresine ince çizgi çeker; Kalın Dış Kenarlık kalın çizgi çeker. Bir yanlışlık olursa Kenarlık Yok ile hepsini silip yeniden başlayabilirsiniz.',
+      on: bicim((c) => F(c, 'A3').bd?.t === 2 && F(c, 'D9').bd?.r === 2 && F(c, 'A9').bd?.b === 2 && F(c, 'A5').bd?.l === 2),
+      done: 'Tablonun çevresi kalın çizgiyle çerçevelendi; içteki çizgiler ince kaldı.',
+    },
+    {
+      title: 'Kuruşları gizleyin',
+      html: '<p>Tutarlarda kuruş görünüyor (1.245,50 ₺). Tam lira görünsün: <b>B4</b>\'ten <b>B9</b>\'a kadar seçin ve <b>Ondalık Azalt</b> düğmesine (<b>,00→,0</b>) <b>iki kez</b> basın.</p>',
+      hint: 'Her basış virgülden sonra bir basamak azaltır: önce 1.245,5 ₺, sonra 1.246 ₺. Ondalık Artır (,0→,00) geri getirir.',
+      on: bicim((c) => area(4, 9, 'B').every((a) => F(c, a).dp === 0)),
+      done: 'Tutarlar tam lira görünüyor. Dikkat: sayının kendisi değişmedi; formül çubuğunda hâlâ 1245,5 yazar ve toplam kuruşlarıyla hesaplanır. Sayının kendisini yuvarlamak için YUVARLA işlevi kullanılır.',
+    },
+    {
+      title: 'İtalik not',
+      html: '<p>Tablonun altındaki not (<b>A11</b>) daha sönük dursun: A11\'e tıklayıp <b>T</b> (İtalik) düğmesine basın.</p>',
+      on: bicim((c) => F(c, 'A11').i),
+      done: 'Not eğik yazıldı. Altı Çizili (A) de aynı şekilde çalışır; bir daha basınca kalkar.',
+    },
+    {
+      title: 'Kâğıtta nasıl görünür?',
+      html: `<p>${K('Ctrl', 'P')}'ye basıp önizlemeye bakın. Sonra <b>İptal</b>'e basın.</p>`,
+      combo: ['Ctrl', 'KeyP'],
+      on: (ev) => ev.type === 'xl-print-open',
+      done: '“Kılavuz çizgilerini yazdır” kapalı olduğu hâlde tablonun çizgileri önizlemede var: onlar sizin verdiğiniz <b>kenarlıklar</b>. Renkler de kâğıda çıkar.',
+    },
+    rehberSoru({
+      title: 'Hangisi kâğıtta çıkar?',
+      html: '<p>Ekrandaki gri çizgiler ile Kenarlıklar düğmesiyle verdiğiniz çizgiler arasındaki fark nedir?</p>',
+      opts: ['Gri kılavuz çizgileri her zaman kâğıtta çıkar', 'Hiçbir çizgi kâğıtta çıkmaz', 'Kenarlıklar kâğıtta çıkar; gri kılavuz çizgileri ayrıca açılmazsa çıkmaz'], ok: 2,
+      wrong: 'Az önce önizlemede ne gördüğünüzü hatırlayın.',
+      why: 'Doğru. Gri çizgiler yalnızca ekranda yol gösterir. Kâğıtta çizgi istiyorsanız tabloya kenarlık verin.',
+    }),
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Tablonuzu biçimlendirdiniz:</p>' },
+  ],
+};

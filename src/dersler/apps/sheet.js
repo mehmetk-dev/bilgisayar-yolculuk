@@ -460,6 +460,13 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     meas.font = getComputedStyle(el).font;
     return meas.measureText(text).width > colPx(c) - 12;
   }
+  // Kenarlık: bir çizgi iki hücrenin ortak kenarıdır; komşusunda çizilmiş olsa da bu hücrede de çizilir
+  function edges(r, c) {
+    const bd = (rr, cc) => (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS.length && fmt[addr(rr, cc)]?.bd) || {};
+    const B = bd(r, c);
+    const side = (own, o) => { const k = own || o; return k ? `${k === 2 ? 2 : 1}px solid #000` : ''; };
+    return { t: side(B.t, bd(r - 1, c).b), b: side(B.b, bd(r + 1, c).t), l: side(B.l, bd(r, c - 1).r), r: side(B.r, bd(r, c + 1).l) };
+  }
   function render() {
     body.querySelectorAll('thead th').forEach((th, i) => { if (i) th.style.width = th.style.minWidth = th.style.maxWidth = colW[i - 1] ? colW[i - 1] + 'em' : ''; });
     // Birleştirilmiş hücreler: ilki yayılır, kapsadığı hücreler gizlenir
@@ -487,12 +494,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       el.style.fontSize = F.fs ? (F.fs / 11) + 'em' : '';
       el.style.fontStyle = F.i ? 'italic' : '';
       el.style.textDecoration = F.u ? 'underline' : '';
-      // Kenarlık: bir çizgi iki hücrenin ortak kenarıdır; komşusunda çizilmiş olsa da bu hücrede de çizilir
-      const bd = (rr, cc) => fmt[addr(rr, cc)]?.bd || {};
-      const side = (own, nr, nc, opp) => { const o = own || (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS.length ? bd(nr, nc)[opp] : 0); return o ? `${o === 2 ? 2 : 1}px solid #000` : ''; };
-      const B = F.bd || {};
-      el.style.borderTop = side(B.t, r - 1, c, 'b'); el.style.borderBottom = side(B.b, r + 1, c, 't');
-      el.style.borderLeft = side(B.l, r, c - 1, 'r'); el.style.borderRight = side(B.r, r, c + 1, 'l');
+      const E = edges(r, c);
+      el.style.borderTop = E.t; el.style.borderBottom = E.b; el.style.borderLeft = E.l; el.style.borderRight = E.r;
       el.classList.toggle('wrap', !!fmt[a]?.wrap);
       el.classList.toggle('err', !!s.err);
       el.classList.toggle('b', !!fmt[a]?.b);
@@ -1388,11 +1391,11 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       const a = addr(r, c);
       if (covered.has(a)) return '';
       const mg = spans[a], txt = td(a).textContent;
-      return `<td ${mg ? `colspan="${mg.c2 - mg.c1 + 1}" rowspan="${mg.r2 - mg.r1 + 1}"` : ''} style="width:${colEm(c)}em;${pageSet.grid ? 'border:1px solid #999;' : ''}${td(a).style.cssText.split(';').filter((x) => /^\s*(border-(top|bottom|left|right)|font-style|text-decoration|font-family|font-size|color)\s*:/.test(x)).join(';')};${fmt[a]?.bg ? `background:${fmt[a].bg};` : ''}${fmt[a]?.b ? 'font-weight:700;' : ''}${fmt[a]?.al === 'c' ? 'text-align:center;' : /^[-\d%₺]/.test(txt) ? 'text-align:right;' : ''}">${esc(txt)}</td>`;
+      return `<td ${mg ? `colspan="${mg.c2 - mg.c1 + 1}" rowspan="${mg.r2 - mg.r1 + 1}"` : ''} style="width:${colEm(c)}em;${pageSet.grid ? 'border:1px solid #999;' : ''}${(({ t, b, l, r: rr }) => `${t ? `border-top:${t};` : ''}${b ? `border-bottom:${b};` : ''}${l ? `border-left:${l};` : ''}${rr ? `border-right:${rr};` : ''}`)(edges(r, c))}${['fontStyle', 'textDecoration', 'fontFamily', 'fontSize', 'color'].map((k) => (td(a).style[k] ? `${k.replace(/[A-Z]/g, (x) => '-' + x.toLowerCase())}:${td(a).style[k]};` : '')).join('')}${fmt[a]?.bg ? `background:${fmt[a].bg};` : ''}${fmt[a]?.b ? 'font-weight:700;' : ''}${fmt[a]?.al === 'c' ? 'text-align:center;' : /^[-\d%₺]/.test(txt) ? 'text-align:right;' : ''}">${esc(txt)}</td>`;
     }).join('')}</tr>`).join('');
     const info = { pages, orient: pageSet.orient, fit: pageSet.fit, grid: pageSet.grid, totalEm: Math.round(totalEm), capEm };
     const notes = [pages > 1 ? `<span class="bad">⚠ Tablo <b>${pages} sayfaya</b> bölündü: son sütun(lar) ikinci kâğıda taşıyor. <b>Tüm sütunları bir sayfaya sığdır</b>'ı ya da <b>Yatay</b> kâğıdı deneyin.</span>` : '<span class="ok">✔ Tablo <b>tek sayfaya</b> sığıyor.</span>'];
-    if (!pageSet.grid) notes.push('<span class="inf">ℹ Tablo çizgileri kâğıtta çıkmayacak. Gerekirse <b>Kılavuz çizgilerini yazdır</b>\'ı açın.</span>');
+    if (!pageSet.grid) notes.push(Object.values(fmt).some((f) => f?.bd) ? '<span class="inf">ℹ Gri kılavuz çizgileri kâğıtta çıkmayacak; verdiğiniz <b>kenarlıklar</b> çıkacak.</span>' : '<span class="inf">ℹ Tablo çizgileri kâğıtta çıkmayacak. Gerekirse <b>Kılavuz çizgilerini yazdır</b>\'ı açın.</span>');
     const table = `<table class="xl-pvt" style="font-size:${k}em">${rowsHtml}</table>`;
     // Her sayfa ayrı kâğıt: i. kâğıt tablonun i. dilimini gösterir
     const sheets = Array.from({ length: pages }, (_, i) => `<small>Sayfa ${i + 1} / ${pages}</small><div style="flex:none;width:${W}em;max-height:${H}em;overflow:hidden;background:#fff;border:1px solid #888;box-shadow:0 2px 6px #0003;position:relative"><div style="margin-left:-${i * W}em;width:${pages * W}em">${table}</div></div>`).join('');
