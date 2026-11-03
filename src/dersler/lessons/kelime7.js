@@ -41,7 +41,7 @@ const pdosya = (c) => c.d.fs.find('docs', PDOSYA);
 const korunuyor = (c) => !!pdosya(c)?.content?.pass;
 
 export const kelimeIzle = {
-  id: 'kelime-izle', icon: '📝', title: 'Tutanak: değişiklikleri izle, açıklama ve parola', minutes: 40, stage: 'desktop',
+  id: 'kelime-izle', icon: '📝', title: 'Tutanak: değişiklikleri izle ve açıklama', minutes: 30, stage: 'desktop',
   desc: 'Bir belgede öneriyi iz bırakarak yapmak (Değişiklikleri İzle), değişiklikleri görmek (Tüm İşaretlemeler), kenara not düşmek (Yeni Açıklama), önerileri kabul ya da reddetmek.',
   summary: [
     ['Gözden Geçir → Basit İşaretleme ▾', 'Tüm İşaretlemeler\'i seçin: silinen yazı üstü çizili, eklenen yazı altı çizili renkli görünür'],
