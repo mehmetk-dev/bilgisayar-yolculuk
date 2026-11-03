@@ -452,7 +452,7 @@ export const test6 = test({
       why: 'Ctrl + X ile kesip Ctrl + V ile yapıştırmak da dosyayı taşır.',
     },
     { t: 'Tek tek seçmek', pic: 'Ctrl + 🖱', q: 'Klasördeki 50 fotoğraftan yalnızca 3\'ünü seçmek için ne yaparsınız?', opts: ['Ctrl\'yi basılı tutup istediklerime tek tek tıklarım', 'Shift\'i basılı tutup ilkine ve sonuncusuna tıklarım', 'Ctrl + A\'ya basarım'], ok: 0, why: 'Ctrl ile aradan istediklerinizi seçersiniz. Shift baştan sona aralık seçer, Ctrl + A hepsini seçer.' },
-    { t: 'Kayıp dosya', pic: '🕵️', q: 'Az önce kaydettiğiniz belgeyi bulamıyorsunuz. En hızlı yol?', opts: ['Dosya Gezgini → Giriş → Son kullanılan dosyalar', 'Bilgisayarı yeniden başlatmak', 'Belgeyi baştan yazmak'], ok: 0, why: 'Giriş sayfası son açılan ve kaydedilen dosyaları gösterir; sağ tık → Dosya konumunu aç ile klasörü de bulursunuz.' },
+    { t: 'Kayıp dosya', pic: '🕵️', q: 'Az önce kaydettiğiniz belgeyi bulamıyorsunuz. En hızlı yol?', opts: ['Dosya Gezgini → Giriş → Son kullanılanlar', 'Bilgisayarı yeniden başlatmak', 'Belgeyi baştan yazmak'], ok: 0, why: 'Giriş sayfası son açılan ve kaydedilen dosyaları gösterir; sağ tık → Dosya konumunu aç ile klasörü de bulursunuz.' },
   ],
 });
 

@@ -19,7 +19,7 @@ export const kursSinavi = {
       { t: '3. Geri al', pic: '↶', q: 'Yanlışlıkla bir paragrafı sildiniz. En hızlı çare?', opts: ['Ctrl + Z', 'Bilgisayarı kapatmak', 'Ctrl + P'], ok: 0, why: 'Ctrl + Z son yaptığınızı geri alır; birkaç kez basılırsa daha geriye gider.' },
       { t: '4. Kopyala yapıştır', pic: '📋', q: 'Bir yazıyı kopyalayıp başka yere koymanın kısayolları hangileri?', opts: ['Ctrl + C, sonra Ctrl + V', 'Ctrl + X, sonra Ctrl + S', 'Alt + F4'], ok: 0, why: 'Ctrl + C kopyalar, Ctrl + V yapıştırır. Ctrl + X keser (taşır).' },
       { t: '5. Yan yana', pic: '🪟🪟', q: 'Bir pencereyi ekranın sol yarısına yerleştirmek için?', opts: ['⊞ Windows tuşu + ← (sol ok)', 'Ctrl + Home', 'Pencereyi küçültmek'], ok: 0, why: 'Windows tuşu ve sol ok; sonra öbür pencereyi sağ yarıya seçersiniz.' },
-      { t: '6. Kayıp dosya', pic: '🕵️', q: 'Az önce kaydettiğiniz dosyanın yerini unuttunuz. Nereye bakarsınız?', opts: ['Dosya Gezgini → Giriş → Son kullanılan dosyalar', 'Geri Dönüşüm Kutusu', 'Denetim Masası'], ok: 0, why: 'Giriş sayfası son açtığınız ve kaydettiğiniz dosyaları listeler; sağ tıkla dosyanın konumu açılır.' },
+      { t: '6. Kayıp dosya', pic: '🕵️', q: 'Az önce kaydettiğiniz dosyanın yerini unuttunuz. Nereye bakarsınız?', opts: ['Dosya Gezgini → Giriş → Son kullanılanlar', 'Geri Dönüşüm Kutusu', 'Denetim Masası'], ok: 0, why: 'Giriş sayfası son açtığınız ve kaydettiğiniz dosyaları listeler; sağ tıkla dosyanın konumu açılır.' },
       { t: '7. Tek tek seçmek', pic: 'Ctrl + 🖱', q: '50 fotoğraftan yalnızca beğendiğiniz 5\'ini seçmek için?', opts: ['Ctrl\'yi basılı tutup tek tek tıklarım', 'Shift\'i basılı tutup ilk ve son fotoğrafa tıklarım', 'Hepsini silerim'], ok: 0, why: 'Ctrl ile aradan istediklerinizi seçersiniz; Shift ise baştan sona aralık seçer.' },
       { t: '8. İnternet yok', pic: '📶❌', q: 'Wi-Fi bağlı görünüyor ama hiçbir site açılmıyor. İlk ne yaparsınız?', opts: ['Modemi kapatıp 10 saniye bekler, yeniden açarım', 'Bilgisayarı satarım', 'Klavyeyi değiştiririm'], ok: 0, why: 'Çoğu bağlantı sorunu modemi yeniden başlatınca düzelir. Işıklar yanınca 1–2 dakika bekleyin.' },
       { t: '9. İngilizce pencere', pic: 'Allow · Block', q: 'Bir site “… wants to show notifications · Allow / Block” diyor. Bildirim istemiyorsanız?', opts: ['Block', 'Allow', 'Next'], ok: 0, why: 'Allow izin ver, Block engelle demektir. Gereksiz bildirimleri engelleyin.' },
@@ -67,7 +67,7 @@ export const buyukParkur = {
     },
     {
       title: '1. Klasör', html: '<p><b>Belgeler</b> klasörünün içinde <b>Doğum Günü</b> adında bir klasör oluşturun.</p>',
-      hint: 'Dosya Gezgini → Belgeler → ＋ Yeni klasör → adı yazıp Enter.',
+      hint: 'Dosya Gezgini → Belgeler → Yeni → Klasör → adı yazıp Enter.',
       ...durum(folder),
     },
     {
