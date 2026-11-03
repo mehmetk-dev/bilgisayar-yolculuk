@@ -1,9 +1,5 @@
 /* Masaüstündeki programların görünüşü */
 
-/* Not Defteri pencerenin içindeyken kendi başlığını ve çerçevesini göstermez */
-.np-win.np-embedded { border: 0; border-radius: 0; box-shadow: none; min-height: 0; font-size: 1em; }
-.np-embedded .np-title { display: none; }
-.np-embedded .np-drop { top: 2em; }
 
 /* Hesap Makinesi */
 .calc { background: #f3f3f3; padding: 0.4em; gap: 0.3em; outline: none; }

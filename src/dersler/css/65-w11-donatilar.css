@@ -1,0 +1,93 @@
+/* Windows 11 görünümlü Not Defteri, Ekran Alıntısı, Yapışkan Notlar, Ses Kaydedici, Saat, Ekran Klavyesi, Büyüteç.
+   Önekler: np- (Not Defteri), wsn- (Alıntı), wnt- (Notlar), wvr- (Ses Kaydedici), wck- (Saat), wok- (Klavye), wmg- (Büyüteç), wico (simge) */
+.wico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -0.2em; }
+
+/* ------------------------------------------------------------------ Not Defteri */
+.np-win { --np-chrome: #eceef2; --np-bar: #fbfbfb; --np-line: #e3e3e3; --np-fg: #1b1b1b; --np-mut: #5f5f5f; --np-hov: #0000000d; --np-fly: #fcfcfc; --np-edge: #d6d6d6; --np-ta: #fff; --np-card: #fff; --np-acc: var(--dk-acc, #0067c0);
+  position: relative; flex: 1 1 0; min-height: 12em; display: flex; flex-direction: column; background: var(--np-ta); color: var(--np-fg); border: 1px solid #9aa6b5; border-radius: 10px; box-shadow: 0 10px 30px #1c243022; overflow: hidden; font-size: 0.85em; }
+.np-win [hidden] { display: none !important; }
+.np-win button { font: inherit; color: inherit; }
+.np-embedded.np-win { border: 0; border-radius: 0; box-shadow: none; min-height: 0; font-size: 1em; }
+.np-embedded .np-ctl { display: none; }
+.np-grow { flex: 1; }
+/* Sekme şeridi */
+.np-tabs { display: flex; align-items: flex-end; gap: 0.15em; background: var(--np-chrome); padding: 0.35em 0 0 0.45em; min-height: 2.5em; flex: none; }
+.np-tab { display: flex; align-items: center; gap: 0.55em; background: var(--np-bar); border-radius: 8px 8px 0 0; padding: 0.5em 0.4em 0.5em 0.8em; min-width: 7em; max-width: 15em; box-shadow: 0 0 0 1px #0000000d; }
+.np-tico { width: 1.1em; height: 1.1em; }
+.np-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.np-tabx, .np-plus, .np-gear { border: 0; background: none; border-radius: 5px; padding: 0; width: 1.8em; height: 1.8em; display: inline-flex; align-items: center; justify-content: center; }
+.np-tabx { width: 1.5em; height: 1.5em; }
+.np-tabx .wico { width: 0.8em; height: 0.8em; }
+.np-tabx:hover, .np-plus:hover, .np-gear:hover { background: var(--np-hov); border: 0; }
+.np-plus { margin-bottom: 0.25em; }
+.np-ctl { display: flex; align-self: stretch; }
+.np-ctl i { font-style: normal; width: 3em; display: flex; align-items: center; justify-content: center; color: var(--np-fg); }
+.np-ctl i .wico { width: 0.85em; height: 0.85em; }
+.np-ctl i:last-child:hover { background: #c42b1c; color: #fff; }
+/* Menü satırı */
+.np-menu { display: flex; align-items: center; background: var(--np-bar); border-bottom: 1px solid var(--np-line); padding: 0.15em 0.4em; flex: none; }
+.np-menu > button:not(.np-gear) { border: 0; border-radius: 5px; padding: 0.3em 0.75em; background: none; }
+.np-menu > button:not(.np-gear):hover, .np-menu > button.on { background: var(--np-hov); border: 0; }
+.np-drop { position: absolute; z-index: 6; background: var(--np-fly); border: 1px solid var(--np-edge); border-radius: 8px; box-shadow: 0 8px 24px #0003; padding: 0.3em; min-width: 17em; max-width: calc(100% - 0.4em); }
+.np-mi { display: flex; align-items: center; width: 100%; gap: 0.2em; border: 0; border-radius: 4px; background: none; padding: 0.32em 0.4em; text-align: left; }
+.np-mi:hover:not(:disabled), .np-mi.open { background: var(--np-hov); border: 0; }
+.np-mi:disabled { opacity: 0.45; }
+.np-mi span { flex: 1; white-space: nowrap; }
+.np-mi kbd { border: 0; background: none; font: inherit; font-size: 0.92em; color: var(--np-mut); margin-left: 1.5em; }
+.np-mchk { width: 1.6em; display: inline-flex; justify-content: center; font-style: normal; }
+.np-mchk .wico { width: 0.9em; height: 0.9em; }
+.np-marr { display: inline-flex; font-style: normal; color: var(--np-mut); }
+.np-marr .wico { width: 0.8em; height: 0.8em; }
+.np-subl { padding-left: 1em; }
+.np-drop hr { border: 0; border-top: 1px solid var(--np-line); margin: 0.25em 0.3em; }
+/* Yazı alanı */
+.np-edit { position: relative; flex: 1; min-height: 0; display: flex; }
+.np-ta { flex: 1; width: 100%; border: 0; resize: none; padding: 0.55em 0.8em; background: var(--np-ta); font-family: Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; line-height: 1.4; color: var(--np-fg); outline: none; border-radius: 0; }
+.np-ta.np-nowrap { white-space: pre; overflow-x: auto; }
+.np-ta::selection { background: #3390ff; color: #fff; }
+.np-mirror { position: absolute; left: 0; top: 0; z-index: 2; overflow: hidden; pointer-events: none; color: transparent; overflow-wrap: break-word; word-break: normal; }
+.np-mirror mark { background: #3390ff66; color: transparent; border-radius: 2px; }
+/* Bul / Değiştir */
+.np-find { position: absolute; z-index: 4; top: 0.5em; right: 1.1em; width: min(25em, calc(100% - 1.4em)); background: var(--np-fly); border: 1px solid var(--np-edge); border-radius: 8px; box-shadow: 0 6px 20px #0003; padding: 0.35em; display: flex; flex-direction: column; gap: 0.3em; }
+.np-fr { display: flex; align-items: center; gap: 0.15em; }
+.np-fr input { flex: 1; min-width: 0; font: inherit; color: var(--np-fg); background: var(--np-card); border: 1px solid var(--np-edge); border-bottom: 2px solid #8a8a8a; border-radius: 5px; padding: 0.25em 0.5em; outline: none; }
+.np-fr input:focus { border-bottom-color: var(--np-acc); }
+.np-find.none .np-fi { border-bottom-color: #c42b1c; }
+.np-fcnt { font-size: 0.85em; color: var(--np-mut); white-space: nowrap; padding: 0 0.3em; }
+.np-fr button { border: 0; background: none; border-radius: 5px; min-width: 1.9em; height: 1.9em; padding: 0 0.3em; display: inline-flex; align-items: center; justify-content: center; }
+.np-fr button:hover { background: var(--np-hov); border: 0; }
+.np-aa { font-size: 0.9em; font-weight: 600; }
+.np-aa.on { background: #0067c022 !important; color: var(--np-acc); box-shadow: inset 0 0 0 1px var(--np-acc); }
+[data-f="wrap"].off { opacity: 0.4; }
+.np-rr button { padding: 0 0.7em; border: 1px solid var(--np-edge); background: var(--np-card); white-space: nowrap; }
+/* Ayarlar sayfası */
+.np-set { position: absolute; inset: 0; z-index: 5; background: var(--np-chrome); overflow: auto; }
+.np-seth { display: flex; align-items: center; gap: 0.6em; padding: 0.7em 1em; font-size: 1.15em; }
+.np-seth button { border: 0; background: none; border-radius: 5px; width: 2em; height: 2em; display: inline-flex; align-items: center; justify-content: center; }
+.np-seth button:hover { background: var(--np-hov); border: 0; }
+.np-setb { padding: 0 1em 1em; max-width: 36em; }
+.np-setb h4 { margin: 0.4em 0 0.5em; font-size: 1em; }
+.np-srow { display: flex; align-items: center; justify-content: space-between; gap: 1em; background: var(--np-card); border: 1px solid var(--np-line); border-radius: 6px; padding: 0.7em 1em; margin-bottom: 0.25em; }
+.np-srow select { font: inherit; color: var(--np-fg); background: var(--np-bar); border: 1px solid var(--np-edge); border-radius: 5px; padding: 0.25em 0.4em; min-width: 9em; }
+.np-sw { appearance: none; -webkit-appearance: none; position: relative; width: 2.5em; height: 1.25em; border-radius: 1em; border: 1px solid #6b6b6b; background: transparent; margin: 0; cursor: pointer; flex: none; }
+.np-sw::before { content: ""; position: absolute; top: 50%; left: 0.2em; width: 0.8em; height: 0.8em; margin-top: -0.4em; border-radius: 50%; background: #5a5a5a; transition: left 0.12s; }
+.np-sw:checked { background: var(--np-acc); border-color: var(--np-acc); }
+.np-sw:checked::before { left: calc(100% - 1em); background: #fff; }
+.np-snote { color: var(--np-mut); font-size: 0.9em; margin: 0.8em 0 0; }
+/* Durum çubuğu */
+.np-status { display: flex; align-items: stretch; background: var(--np-bar); border-top: 1px solid var(--np-line); font-size: 0.85em; color: var(--np-fg); flex: none; }
+.np-status span:not(.np-grow) { padding: 0.28em 1em; border-left: 1px solid var(--np-line); white-space: nowrap; }
+.np-status span:first-child { border-left: 0; padding-left: 0.8em; }
+.np-status .np-ins { cursor: pointer; font-weight: 700; color: #a4262c; }
+.np-status .np-ins:hover { background: #ffe3e3; }
+.np-status .np-cnt { border-left: 1px solid var(--np-line); }
+
+/* Koyu tema */
+.dk-dark .np-win { --np-chrome: #202020; --np-bar: #2b2b2b; --np-line: #3a3a3a; --np-fg: #fff; --np-mut: #b5b5b5; --np-hov: #ffffff14; --np-fly: #2c2c2c; --np-edge: #454545; --np-ta: #1f1f1f; --np-card: #333; --np-acc: var(--dk-acc, #60cdff); border-color: #555; }
+.dk-dark .np-aa.on { background: #60cdff33 !important; }
+.dk-dark .np-status .np-ins { color: #ff9b9b; }
+.dk-dark .np-status .np-ins:hover { background: #5a2226; }
+.dk-dark .np-sw::before { background: #cfcfcf; }
+.dk-dark .np-sw { border-color: #9a9a9a; }
+.dk-dark .np-sw:checked::before { background: #000; }
+.dk-dark .np-ta { color-scheme: dark; }
