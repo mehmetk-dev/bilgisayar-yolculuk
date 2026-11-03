@@ -109,9 +109,9 @@ export const kayipDosya = {
     }),
     {
       title: '4. yol: İnternetten indirdikleriniz',
-      html: `<p>İnternetten indirdiğiniz belge kaybolduysa tarayıcı da söyler. <b>🌐 İnternet</b>\'i açıp ${K('Ctrl', 'J')}'ye basın (ya da sağ üstteki <b>⋯</b> → <b>⬇ İndirilenler</b>).</p>`,
+      html: `<p>İnternetten indirdiğiniz belge kaybolduysa tarayıcı da söyler. <b>🌐 İnternet</b>\'i açıp ${K('Ctrl', 'J')}'ye basın (ya da sağ üstteki <b>⋮</b> → <b>⬇ İndirilenler</b>).</p>`,
       combo: ['Ctrl', 'KeyJ'],
-      hint: 'Ctrl + J çalışmazsa önce tarayıcı penceresine bir kez tıklayın ya da ⋯ menüsünü kullanın.',
+      hint: 'Ctrl + J çalışmazsa önce tarayıcı penceresine bir kez tıklayın ya da ⋮ menüsünü kullanın.',
       on: (ev) => ev.type === 'web-menu-cmd' && ev.cmd === 'downloads',
       done: 'İndirilenler listesi açıldı: bugün indirdiğiniz “SGK hizmet dökümü.pdf” orada.',
     },
