@@ -75,7 +75,7 @@ export const dosyaTurleri = {
 
 export const fotograflar = {
   id: 'fotograflar', icon: '🖼', title: 'Fotoğraflarla çalışmak', minutes: 25, stage: 'desktop',
-  desc: 'Fotoğraf açmak, yakınlaştırmak, Albüm klasörü oluşturup fotoğraf kopyalamak.',
+  desc: 'Fotoğraf açmak, yakınlaştırmak, yazdırmak, Albüm klasörü oluşturup fotoğraf kopyalamak.',
   setup: (c) => {
     put(c, 'pictures', 'torunum.jpg', 'file', PIC('👶', '#ffe0b2', '#f8bbd0'));
     put(c, 'pictures', 'bahçe.jpg', 'file', PIC('🌷', '#c8e6c9', '#fff59d'));
@@ -86,6 +86,7 @@ export const fotograflar = {
     ['◀ ▶', 'Önceki / sonraki fotoğraf'],
     ['＋ / －', 'Yakınlaştır / uzaklaştır'],
     ['Sağ tık → Arka plan olarak ayarla', 'Masaüstü resmi yapar'],
+    ['🖨 Yazdır', 'Kâğıt (A4 ya da 10 × 15), fotoğraf boyutu (tam sayfa, 10 × 15, cüzdan) ve kâğıt türü seçilir; önizlemeye bakın'],
     ['Ctrl + C → Ctrl + V', 'Fotoğrafı albüme kopyalar'],
   ],
   steps: [
@@ -132,6 +133,21 @@ export const fotograflar = {
       html: '<p>Beğendiğiniz fotoğrafı <b>masaüstü arka planı</b> yapın: Fotoğraflar penceresindeki <b>🖼 Arka plan yap</b> düğmesi ya da Dosya Gezgini\'nde fotoğrafa sağ tık → <b>Masaüstü arka planı olarak ayarla</b>.</p>',
       on: (ev) => ev.type === 'wallpaper' && ev.custom,
       done: 'Masaüstünüzde artık kendi fotoğrafınız var.',
+    },
+    {
+      title: 'Fotoğrafı yazdırın',
+      html: `<p><b>torunum</b> fotoğrafını kâğıda basalım. Fotoğraflar penceresinde <b>🖨 Yazdır</b>'a tıklayın ve şunları seçin:</p>
+        <ul><li><b>Kâğıt:</b> A4 (normal kâğıt boyu)</li><li><b>Fotoğraf boyutu:</b> 10 × 15 cm, 2 tane</li><li><b>Kâğıt türü:</b> Parlak fotoğraf kâğıdı</li></ul>
+        <p>Yazdır penceresinin üstündeki önizlemede kâğıda nasıl çıkacağını görün, sonra <b>🖨 Yazdır</b>.</p>`,
+      setup: (c) => { const n = c.d.fs.find('pictures', 'torunum.jpg'); if (n && !c.d.find('photos')) c.d.openNode(n); },
+      hint: 'Yazdır penceresinde açılır kutulara tıklayıp seçin. Önizleme her seçimde değişir.',
+      on: (ev, c) => {
+        if (ev.type !== 'photo-print') return false;
+        if (ev.size === '10x15' && ev.kind === 'parlak') return true;
+        c.note(ev.size !== '10x15' ? 'Fotoğraf boyutunu “10 × 15 cm, 2 tane” seçip yeniden yazdırın.' : 'Kâğıt türünü “Parlak fotoğraf kâğıdı” seçip yeniden yazdırın.');
+        return false;
+      },
+      done: 'Bir A4 kâğıda iki fotoğraf çıktı; makasla kesersiniz. Fotoğrafçı kâğıdı varsa (10 × 15) Kâğıt kutusundan onu seçin.',
     },
     {
       title: 'Albüm klasörü',

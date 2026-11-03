@@ -16,6 +16,18 @@ const val = (st, k) => esc(st.form?.[k] ?? '');
 
 export const KURS_TC = '12345678950';
 export const KURS_SIFRE = 'Kurs2026';
+// “İlk e-Devlet şifrenizi alın” dersi: state.ilk varken yalnızca zarftaki geçici şifre geçer, ardından yeni şifre istenir
+export const ZARF_SIFRE = '582047';
+// Yeni şifre kuralları (alıştırma): hata metni ya da ''
+export function yeniSifreHata(a, b) {
+  if (!a) return 'Yeni şifrenizi yazın.';
+  if (a.length < 8) return 'Şifre en az 8 karakter olmalı.';
+  if (!/\p{L}/u.test(a) || !/\d/.test(a)) return 'Şifrede hem harf hem rakam olmalı.';
+  if (a === ZARF_SIFRE || a.includes(ZARF_SIFRE)) return 'Zarftaki geçici şifreyi kullanmayın; yeni bir şifre seçin.';
+  if (a.includes(KURS_TC) || /1234|0123|abcd|qwer/i.test(a)) return 'Şifre çok kolay tahmin edilir (T.C. no, 1234, abcd gibi). Başka bir şifre seçin.';
+  if (a !== b) return 'İki kutuya yazdığınız şifreler aynı değil. İkisini de dikkatle yeniden yazın.';
+  return '';
+}
 export const TEST_KART = '4242 4242 4242 4242';
 
 // ======================================================================= e-Devlet
@@ -63,6 +75,15 @@ const EDEVLET = {
     const st = ctx.state, head = edHead(st);
     // En son bakılan hizmet ya da arama: üstteki “Giriş yap”la girilirse oraya dönülür
     if (path !== '/giris' && path !== '/onay') st.came = /^\/(ara|hizmet\/)/.test(path) ? [path, q] : null;
+    if (st.mustChange) {
+      return page('e-Devlet Kapısı: Yeni şifre', `${head}<form class="ed-login" data-act="newpass"><h1>🔑 Yeni şifrenizi belirleyin</h1>
+        <p>Zarftaki şifre <b>geçicidir</b>. Devam etmek için yalnızca sizin bileceğiniz yeni bir şifre belirleyin.</p>
+        <ul class="ed-small"><li>En az 8 karakter, harf ve rakam birlikte (12 ve üzeri daha iyi)</li><li>Doğum tarihiniz, T.C. numaranız, 1234 gibi kolay şeyler olmasın</li><li>Zarftaki şifreyle aynı olmasın</li></ul>
+        ${st.err?.yeni ? `<div class="wf-errtop">⚠ ${st.err.yeni}</div>` : ''}
+        <label>Yeni şifre<input name="s1" type="password" autocomplete="off"></label>
+        <label>Yeni şifre (tekrar)<input name="s2" type="password" autocomplete="off"></label>
+        <button class="ed-btn">Şifremi Değiştir</button><p class="ed-small">Alıştırma kuralları. Gerçek sitede kurallar bu ekranda yazar; onlara uyun.</p></form>`);
+    }
     if (path === '/onay') {
       if (!st.user || st.back !== 'enabiz') return page('e-Devlet Kapısı', `${head}<div class="ed"><h1>Bekleyen bir istek yok</h1><p>Başka bir uygulamadan gelen bir giriş isteği görünmüyor.</p></div>`);
       return page('e-Devlet Kapısı: Onay', `${head}<div class="ed"><h1>🩺 e-Nabız kimliğinizi öğrenmek istiyor</h1><p>e-Nabız uygulamasına giriş yapabilmeniz için aşağıdaki bilgileriniz <b>e-Devlet</b> tarafından e-Nabız'a aktarılacak:</p>
@@ -74,7 +95,7 @@ const EDEVLET = {
       return page('e-Devlet Kapısı: Giriş', `${head}<form class="ed-login" data-act="login">${geldi}<h1>Kimliğinizi doğrulayın</h1><p class="ed-tabs"><b>🔑 e-Devlet Şifresi</b> <span>📱 Mobil İmza</span> <span>💳 e-İmza</span></p>
         ${errTop(st)}<label>T.C. Kimlik No<input name="tc" inputmode="numeric" maxlength="11" autocomplete="off" value="${val(st, 'tc')}"></label>${errOf(st, 'tc')}
         <label>e-Devlet Şifresi<input name="sifre" type="password" autocomplete="off"></label>${errOf(st, 'sifre')}
-        <button class="ed-btn">Giriş Yap</button><p class="ed-small">Şifreniz yoksa kimliğinizle PTT\'den alabilirsiniz. Şifrenizi kimseyle paylaşmayın.</p></form>`);
+        <button class="ed-btn">Giriş Yap</button>${st.flash ? `<div class="ed-ok">${st.flash}</div>` : ''}<p class="ed-small">Şifreniz yoksa kimliğinizle PTT\'den alabilirsiniz. Şifrenizi kimseyle paylaşmayın.</p></form>`);
     }
     if (path === '/cikis') return page('e-Devlet Kapısı', `${head}<div class="ed"><h1>✅ Güvenli çıkış yaptınız</h1><p>Ortak kullanılan bilgisayarlarda işiniz bitince her zaman <b>Çıkış</b> yapın.</p></div>`);
     if (path === '/ara') {
@@ -122,8 +143,15 @@ const EDEVLET = {
       const tc = digits(v.tc);
       if (tc.length !== 11) st.err.tc = 'T.C. Kimlik Numarası 11 haneli olmalıdır.';
       if (!v.sifre) st.err.sifre = 'Şifrenizi yazın.';
-      else if (!st.err.tc && (tc !== KURS_TC || v.sifre !== KURS_SIFRE)) { st.err.sifre = 'T.C. Kimlik Numarası veya şifre hatalı. (Büyük-küçük harfe dikkat edin.)'; }
-      ctx.emit('edevlet-login', { ok: !Object.keys(st.err).length });
+      else if (!st.err.tc) {
+        // Dersin durumuna göre geçerli şifre: zarftaki (ilk giriş), kişinin belirlediği yeni şifre ya da kursun şifresi
+        const dogru = st.ilk ? ZARF_SIFRE : st.sifre || KURS_SIFRE;
+        if (st.sifre && v.sifre === ZARF_SIFRE) st.err.sifre = 'Bu, zarftaki geçici şifre; artık geçersiz. Kendi belirlediğiniz yeni şifreyi yazın.';
+        else if (tc !== KURS_TC || v.sifre !== dogru) st.err.sifre = 'T.C. Kimlik Numarası veya şifre hatalı. (Büyük-küçük harfe dikkat edin.)';
+      }
+      st.flash = '';
+      ctx.emit('edevlet-login', { ok: !Object.keys(st.err).length, zarf: !!st.ilk, yeni: !!st.sifre });
+      if (!Object.keys(st.err).length && st.ilk) { st.mustChange = true; st.form = {}; ctx.refresh(); return; }
       if (Object.keys(st.err).length) { ctx.refresh(); return; }
       st.user = true;
       st.userName = ctx.desk.settings.user;
@@ -142,7 +170,15 @@ const EDEVLET = {
       ctx.visit('enabiz.gov.tr', '/');
       return;
     }
-    if (a === 'logout') { st.user = false; st.back = null; ctx.emit('edevlet-logout'); ctx.go('/cikis'); return; }
+    if (a === 'newpass') {
+      const err = yeniSifreHata(v.s1 || '', v.s2 || '');
+      ctx.emit('edevlet-newpass', { ok: !err, err });
+      if (err) { st.err.yeni = err; ctx.refresh(); return; }
+      Object.assign(st, { sifre: v.s1, ilk: false, mustChange: false, user: true, userName: ctx.desk.settings.user, form: {} });
+      ctx.go('/');
+      return;
+    }
+    if (a === 'logout') { st.user = false; st.mustChange = false; st.back = null; ctx.emit('edevlet-logout'); ctx.go('/cikis'); return; }
     if (a === 'make') {
       if (!v.amac) { st.err.amac = 'Belgenin nereye verileceğini seçin.'; ctx.emit('edevlet-form-error'); ctx.refresh(); return; }
       const id = el.dataset.svc;

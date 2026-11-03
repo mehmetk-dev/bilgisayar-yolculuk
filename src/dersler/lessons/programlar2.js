@@ -312,7 +312,7 @@ export const butce = {
       title: 'Pasta grafiği',
       html: '<p>Giderlerin adlarını ve tutarlarını seçin: <b>A9</b>\'dan <b>B15</b>\'e kadar fareyle sürükleyin. Sonra şeritteki <b>🥧 Pasta grafiği</b>\'ne tıklayın.</p>',
       mouse: '🖱 A9:B15 seç → Pasta grafiği',
-      hint: 'A9 (Kira) hücresine basılı tutup B15 (ilaç tutarı) hücresine kadar sürükleyin. Toplam satırını seçmeyin.',
+      hint: 'A9 (Kira) hücresine basılı tutup B15 (ilaç tutarı) hücresine kadar sürükleyin. Toplam satırını seçmeyin. Gerçek Excel\'de: Ekle sekmesi → Grafikler → Pasta.',
       on: (ev) => ev.type === 'xl-chart' && ev.kind === 'pie' && /A9/.test(ev.range) && /B15/.test(ev.range),
       check: (c) => X(c)?.chart?.type === 'pie',
       done: 'Pastanın her dilimi bir gider; ne kadar büyükse bütçeden o kadar pay alıyor.',

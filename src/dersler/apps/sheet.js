@@ -15,7 +15,8 @@ export function parseAddr(a) {
   return { r: +m[2] - 1, c: COLS.indexOf(m[1]) };
 }
 
-// "1.250,50", "12,5", "750", "300 TL", "%18" → sayı; değilse null
+// "1.250,50", "12,5", "750", "300 TL", "%18" → sayı; değilse null.
+// Türkçe Excel gibi noktalı ondalık ("45.50", "12.5") sayı sayılmaz: yazı olarak kalır, sola yaslanır.
 export function parseNumber(s) {
   let t = String(s).trim().replace(/\s*(₺|TL)$/i, '');
   let pct = false;
@@ -23,7 +24,7 @@ export function parseNumber(s) {
   if (!t) return null;
   if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '').replace(',', '.');
   else if (/^-?\d+(,\d+)?$/.test(t)) t = t.replace(',', '.');
-  else if (!/^-?\d+(\.\d+)?$/.test(t)) return null;
+  else return null;
   const n = parseFloat(t);
   return isFinite(n) ? (pct ? n / 100 : n) : null;
 }
@@ -155,10 +156,14 @@ FUNCS.ALTTOPLAM = (a, num) => {
   if (!fn) throw new FErr('#DEĞER!');
   return FUNCS[fn](a.slice(1).map((x) => (isRange(x) && x.skip ? { ...x, vals: x.vals.filter((_, i) => !x.skip[i]) } : x)), num);
 };
-const ALIAS = { SUBTOTAL: 'ALTTOPLAM', PRODUCT: 'ÇARPIM', CARPIM: 'ÇARPIM', SAY: 'BAĞ_DEĞ_SAY', COUNT: 'BAĞ_DEĞ_SAY', BAG_DEG_SAY: 'BAĞ_DEĞ_SAY', COUNTA: 'BAĞ_DEĞ_DOLU_SAY', BAG_DEG_DOLU_SAY: 'BAĞ_DEĞ_DOLU_SAY', COUNTBLANK: 'BOŞLUKSAY', BOSLUKSAY: 'BOŞLUKSAY',
-  BUGUN: 'BUGÜN', TODAY: 'BUGÜN', TARIH: 'TARİH', DATE: 'TARİH', YEAR: 'YIL', MONTH: 'AY', GUN: 'GÜN', DAY: 'GÜN', ETARIHLI: 'ETARİHLİ', DATEDIF: 'ETARİHLİ',
-  VLOOKUP: 'DÜŞEYARA', DUSEYARA: 'DÜŞEYARA', SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', MIN: 'MİN', IF: 'EĞER', EGER: 'EĞER', ROUND: 'YUVARLA', COUNTIF: 'EĞERSAY', EGERSAY: 'EĞERSAY', SUMIF: 'ETOPLA',
-  BIRLESTIR: 'BİRLEŞTİR', CONCATENATE: 'BİRLEŞTİR', CONCAT: 'BİRLEŞTİR', BUYUKHARF: 'BÜYÜKHARF', UPPER: 'BÜYÜKHARF', KUCUKHARF: 'KÜÇÜKHARF', LOWER: 'KÜÇÜKHARF', 'YAZIM.DUZENI': 'YAZIM.DÜZENİ', PROPER: 'YAZIM.DÜZENİ' };
+// Türkçe harfsiz yazılışlar kabul edilir (EGER → EĞER). İngilizce adlar (SUM, IF…) ve “SAY” Türkçe Excel'de yoktur: #AD? verir.
+const ALIAS = { CARPIM: 'ÇARPIM', BAG_DEG_SAY: 'BAĞ_DEĞ_SAY', BAG_DEG_DOLU_SAY: 'BAĞ_DEĞ_DOLU_SAY', BOSLUKSAY: 'BOŞLUKSAY',
+  BUGUN: 'BUGÜN', TARIH: 'TARİH', GUN: 'GÜN', ETARIHLI: 'ETARİHLİ', DUSEYARA: 'DÜŞEYARA', MIN: 'MİN', EGER: 'EĞER', EGERSAY: 'EĞERSAY',
+  BIRLESTIR: 'BİRLEŞTİR', BUYUKHARF: 'BÜYÜKHARF', KUCUKHARF: 'KÜÇÜKHARF', 'YAZIM.DUZENI': 'YAZIM.DÜZENİ' };
+// İngilizce Excel'in adları: hata açıklamasında Türkçesi söylenir
+export const EN_NAMES = { SUM: 'TOPLA', AVERAGE: 'ORTALAMA', MAX: 'MAK', IF: 'EĞER', COUNT: 'BAĞ_DEĞ_SAY', COUNTA: 'BAĞ_DEĞ_DOLU_SAY', COUNTBLANK: 'BOŞLUKSAY', COUNTIF: 'EĞERSAY', SUMIF: 'ETOPLA',
+  ROUND: 'YUVARLA', VLOOKUP: 'DÜŞEYARA', TODAY: 'BUGÜN', DATE: 'TARİH', YEAR: 'YIL', MONTH: 'AY', DAY: 'GÜN', DATEDIF: 'ETARİHLİ', SUBTOTAL: 'ALTTOPLAM', PRODUCT: 'ÇARPIM',
+  CONCATENATE: 'BİRLEŞTİR', CONCAT: 'BİRLEŞTİR', UPPER: 'BÜYÜKHARF', LOWER: 'KÜÇÜKHARF', PROPER: 'YAZIM.DÜZENİ', SAY: 'BAĞ_DEĞ_SAY' };
 
 // Formül değerlendirici: get(addr) hücrenin değerini verir (sayı, yazı ya da hata fırlatır);
 // isSub(addr): hücrede ALTTOPLAM formülü var mı (ALTTOPLAM aralıktaki bu hücreleri atlar)
@@ -273,12 +278,16 @@ function evaluate(src, get, isSub) {
   return v;
 }
 
-const fmtNum = (n, f) => {
-  if (f === 'tl') return n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+// dp: Ondalık Artır / Azalt ile seçilen basamak sayısı (verilmemişse biçimin kendi basamağı)
+const fmtNum = (n, f, dp) => {
+  const d = (k) => (dp == null ? k : { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  if (f === 'tl') return n.toLocaleString('tr-TR', d({ minimumFractionDigits: 2, maximumFractionDigits: 2 })) + ' ₺';
   if (f === 'date') return n >= 1 && n < 2958466 ? fmtDate(n) : '#####';
-  if (f === 'pct') return (n * 100).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + '%';
-  return n.toLocaleString('tr-TR', { maximumFractionDigits: 6, useGrouping: Math.abs(n) >= 10000 });
+  if (f === 'pct') return (n * 100).toLocaleString('tr-TR', d({ maximumFractionDigits: 0 })) + '%';
+  return n.toLocaleString('tr-TR', { ...d({ maximumFractionDigits: 6 }), useGrouping: dp == null && Math.abs(n) >= 10000 });
 };
+// Gösterilen ondalık basamak sayısı (Ondalık Artır / Azalt bundan bir ekler ya da çıkarır)
+const shownDp = (n, f, dp) => (dp != null ? dp : f === 'tl' ? 2 : f === 'pct' ? 0 : f === 'date' ? 0 : Math.min(6, (String(+n.toFixed(6)).split('.')[1] || '').length));
 
 // Hazır şablon (Dosya → Yeni): aylık ev bütçesi. Rakamlar değiştirilince toplamlar ve kalan kendiliğinden hesaplanır.
 const BUTCE = (() => {
@@ -299,6 +308,11 @@ const ERRS = {
   '#BAŞV!': 'Formülün kullandığı <b>hücre artık yok</b> ya da geçersiz (silinen satır, tablonun dışına kopyalama).',
   '#YOK': 'Aranan değer listede <b>bulunamadı</b> (DÜŞEYARA).',
 };
+// Giriş sekmesindeki renk listeleri (Excel'in “Standart Renkler” satırı) ve kenarlık seçenekleri
+const COLORS = [['Koyu Kırmızı', '#c00000'], ['Kırmızı', '#ff0000'], ['Turuncu', '#ffc000'], ['Sarı', '#ffff00'], ['Açık Yeşil', '#92d050'], ['Yeşil', '#00b050'], ['Açık Mavi', '#00b0f0'], ['Mavi', '#0070c0'], ['Koyu Mavi', '#002060'], ['Mor', '#7030a0']];
+const BORDERS = [['bottom', 'Alt Kenarlık'], ['top', 'Üst Kenarlık'], ['left', 'Sol Kenarlık'], ['right', 'Sağ Kenarlık'], ['none', 'Kenarlık Yok'], ['all', 'Tüm Kenarlıklar'], ['outside', 'Dış Kenarlıklar'], ['thick', 'Kalın Dış Kenarlık']];
+const FONTS = ['Calibri', 'Aptos Narrow', 'Arial', 'Times New Roman', 'Verdana', 'Comic Sans MS'];
+const SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28];
 const PIE = ['#2e7d32', '#1565c0', '#e46c0a', '#7030a0', '#c62828', '#00838f', '#9e9d24', '#6d4c41', '#ad1457', '#455a64'];
 
 export function sheet({ desk, body, args, emit, setTitle }) {
@@ -307,13 +321,19 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     <div class="xl-tabs"><button type="button" class="xl-file">Dosya</button><span>Giriş</span></div>
     <div class="xl-rib">
       <button type="button" data-act="undo" title="Geri al (Ctrl + Z)">↶</button><button type="button" data-act="redo" title="Yinele (Ctrl + Y)">↷</button><span class="xl-sep"></span>
-      <button type="button" data-act="bold" title="Kalın (Ctrl + B)"><b>K</b></button>
-      <button type="button" data-act="tl" title="Para birimi biçimi">₺</button><button type="button" data-act="pct" title="Yüzde biçimi">%</button><button type="button" data-act="date" title="Tarih biçimi (gg.aa.yyyy)">📅</button><button type="button" data-act="plain" title="Genel biçim (biçimi kaldır)">123</button>
+      <select class="xl-font" title="Yazı Tipi" aria-label="Yazı Tipi">${FONTS.map((f) => `<option>${f}</option>`).join('')}</select><select class="xl-fsize" title="Yazı Tipi Boyutu" aria-label="Yazı Tipi Boyutu">${SIZES.map((n) => `<option ${n === 11 ? 'selected' : ''}>${n}</option>`).join('')}</select>
+      <button type="button" data-act="bold" title="Kalın (Ctrl + B)"><b>K</b></button><button type="button" data-act="italic" title="İtalik"><i style="font-family:serif">T</i></button><button type="button" data-act="under" title="Altı Çizili"><u>A</u></button>
+      <span class="xl-split"><button type="button" data-act="border" title="Kenarlıklar: son seçilen kenarlığı uygular">▦</button><button type="button" class="xl-dd" data-act="border-menu" title="Kenarlıklar listesi">▾</button></span>
+      <span class="xl-split"><button type="button" data-act="fill" title="Dolgu Rengi: son seçilen rengi uygular">🪣<i class="xl-swatch" data-sw="fill"></i></button><button type="button" class="xl-dd" data-act="fill-menu" title="Dolgu Rengi seçenekleri">▾</button></span>
+      <span class="xl-split"><button type="button" data-act="color" title="Yazı Tipi Rengi: son seçilen rengi uygular"><b>A</b><i class="xl-swatch" data-sw="color"></i></button><button type="button" class="xl-dd" data-act="color-menu" title="Yazı Tipi Rengi seçenekleri">▾</button></span>
+      <span class="xl-sep"></span><button type="button" data-act="va-t" title="Üste Hizala">⤒</button><button type="button" data-act="va-m" title="Ortaya Hizala">⇕</button><button type="button" data-act="va-b" title="Alta Hizala">⤓</button>
+      <button type="button" data-act="al-l" title="Sola Hizala">⇤</button><button type="button" data-act="al-c" title="Ortala">↔</button><button type="button" data-act="al-r" title="Sağa Hizala">⇥</button>
+      <span class="xl-sep"></span><button type="button" data-act="tl" title="Para birimi biçimi">₺</button><button type="button" data-act="pct" title="Yüzde Stili">%</button><button type="button" data-act="dec-up" title="Ondalık Artır">,0→,00</button><button type="button" data-act="dec-down" title="Ondalık Azalt">,00→,0</button><button type="button" data-act="date" title="Tarih biçimi (gg.aa.yyyy)">📅</button><button type="button" data-act="plain" title="Genel biçim (biçimi kaldır)">123</button>
       <span class="xl-sep"></span><button type="button" data-act="sum" title="Otomatik Toplam">∑ Otomatik Toplam</button>
       <span class="xl-sep"></span><button type="button" data-act="asc" title="Küçükten büyüğe sırala">↑ A→Z</button><button type="button" data-act="desc" title="Büyükten küçüğe sırala">↓ Z→A</button>
       <span class="xl-sep"></span><button type="button" data-act="chart" title="Seçili alandan sütun grafiği">📊 Sütun grafiği</button><button type="button" data-act="pie" title="Seçili alandan pasta grafiği: her parçanın bütünün ne kadarı olduğunu gösterir">🥧 Pasta grafiği</button>
-      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri doğrulama: hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button><button type="button" data-act="pivot" title="Özet Tablo: uzun listeyi formülsüz özetler (ör. her kategorinin toplamı)">🧮 Özet Tablo</button><button type="button" data-act="subtotal" title="Alt Toplam: sıralı listede her grubun altına toplam satırı ekler (Excel'de Veri sekmesi → Anahat)">🔢 Alt Toplam</button>
-      <span class="xl-sep"></span><button type="button" data-act="merge" title="Seçili hücreleri tek hücre yapar ve ortalar">⊞ Birleştir ve Ortala</button><button type="button" data-act="wrap" title="Uzun yazıyı hücre içinde alt satıra indirir">↲ Metni Kaydır</button><button type="button" data-act="freeze" title="Aşağı inerken en üst satır ekranda kalır">❄ Üst Satırı Dondur</button>
+      <span class="xl-sep"></span><button type="button" data-act="cond" title="Koşullu biçimlendirme: belli değerleri renklendir">🎨 Koşullu Biçim</button><button type="button" data-act="valid" title="Veri Doğrulama (Excel'de Veri sekmesinde): hücreye yalnızca listedeki seçenekler girilsin (açılır liste)">✔ Açılır Liste</button><button type="button" data-act="filter" title="Filtre: yalnızca istenen satırları göster">🔽 Filtre</button><button type="button" data-act="pivot" title="Özet Tablo: uzun listeyi formülsüz özetler (ör. her kategorinin toplamı)">🧮 Özet Tablo</button><button type="button" data-act="subtotal" title="Alt Toplam: sıralı listede her grubun altına toplam satırı ekler (Excel'de Veri sekmesi → Anahat)">🔢 Alt Toplam</button>
+      <span class="xl-sep"></span><button type="button" data-act="merge" title="Seçili hücreleri tek hücre yapar ve ortalar">⊞ Birleştir ve Ortala</button><button type="button" data-act="wrap" title="Uzun yazıyı hücre içinde alt satıra indirir">↲ Metni Kaydır</button><button type="button" data-act="freeze" title="Bölmeleri Dondur (Excel'de Görünüm sekmesinde): Üst Satırı Dondur, Bölmeleri Çöz">❄ Bölmeleri Dondur ▾</button>
       <span class="xl-sep"></span><button type="button" data-act="unlock" title="Hücre kilidini aç: sayfa korunsa da seçili hücrelere yazılabilsin">🔓 Hücre Kilidini Aç</button><button type="button" data-act="protect" class="xl-protbtn" title="Sayfayı Koru: kilidi açılmamış hücreler değiştirilemez">🔒 Sayfayı Koru</button>
       <span class="xl-sep"></span><span class="xl-lab">Yazdırma:</span><button type="button" data-act="orient" title="Kâğıdı yatay yapar">▭ Yatay</button><button type="button" data-act="fit" title="Bütün sütunları tek sayfaya sığdırır">⤢ Tüm sütunları bir sayfaya sığdır</button><button type="button" data-act="grid" title="Kâğıtta tablo çizgileri çıksın">▦ Kılavuz çizgilerini yazdır</button>
     </div>
@@ -367,7 +387,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   let curSheet = 0;
   const meas = document.createElement('canvas').getContext('2d');
   // Sütun genişlikleri “em” (yazı boyu) biriminde tutulur: yazı büyütülünce sütunlar da orantılı büyür
-  const emOf = () => parseFloat(getComputedStyle(body.querySelector('td')).fontSize) || 10;
+  const emOf = () => parseFloat(getComputedStyle(body.querySelector('tbody th')).fontSize) || 10; // td değil: hücrenin yazı boyutu değişebilir
   const DEF_EM = 7.5;
   const colEm = (c) => colW[c] ?? DEF_EM;
   const colPx = (c) => colEm(c) * emOf();
@@ -395,7 +415,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     return !!m && isDate(m[1].toUpperCase() + m[2], depth + 1);
   }
   function show(a) {
-    try { const v = value(a); return { v, text: typeof v === 'number' ? fmtNum(v, fmt[a]?.f ?? (isDate(a) ? 'date' : undefined)) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v) }; }
+    try { const v = value(a); return { v, text: typeof v === 'number' ? fmtNum(v, fmt[a]?.f ?? (isDate(a) ? 'date' : undefined), fmt[a]?.dp) : typeof v === 'boolean' ? (v ? 'DOĞRU' : 'YANLIŞ') : String(v) }; }
     catch (e) { return { v: null, err: true, text: e instanceof FErr ? e.message : '#DEĞER!' }; }
   }
 
@@ -440,6 +460,13 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     meas.font = getComputedStyle(el).font;
     return meas.measureText(text).width > colPx(c) - 12;
   }
+  // Kenarlık: bir çizgi iki hücrenin ortak kenarıdır; komşusunda çizilmiş olsa da bu hücrede de çizilir
+  function edges(r, c) {
+    const bd = (rr, cc) => (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS.length && fmt[addr(rr, cc)]?.bd) || {};
+    const B = bd(r, c);
+    const side = (own, o) => { const k = own || o; return k ? `${k === 2 ? 2 : 1}px solid #000` : ''; };
+    return { t: side(B.t, bd(r - 1, c).b), b: side(B.b, bd(r + 1, c).t), l: side(B.l, bd(r, c - 1).r), r: side(B.r, bd(r, c + 1).l) };
+  }
   function render() {
     body.querySelectorAll('thead th').forEach((th, i) => { if (i) th.style.width = th.style.minWidth = th.style.maxWidth = colW[i - 1] ? colW[i - 1] + 'em' : ''; });
     // Birleştirilmiş hücreler: ilki yayılır, kapsadığı hücreler gizlenir
@@ -458,14 +485,27 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       el.textContent = hash ? '#####' : s.text;
       if (hash) hashes++;
       el.dataset.hash = hash ? '1' : '';
-      el.classList.toggle('num', (isNum || !!s.err) && !fmt[a]?.al);
-      el.classList.toggle('ctr', fmt[a]?.al === 'c');
+      const F = fmt[a] || {};
+      el.classList.toggle('num', (isNum || !!s.err) && !F.al);
+      el.classList.toggle('ctr', F.al === 'c');
+      el.style.textAlign = F.al === 'l' ? 'left' : F.al === 'r' ? 'right' : '';
+      el.style.verticalAlign = { t: 'top', m: 'middle', b: 'bottom' }[F.va] || '';
+      el.style.fontFamily = F.fn ? `"${F.fn}", sans-serif` : '';
+      el.style.fontSize = F.fs ? (F.fs / 11) + 'em' : '';
+      el.style.fontStyle = F.i ? 'italic' : '';
+      el.style.textDecoration = F.u ? 'underline' : '';
+      const E = edges(r, c);
+      el.style.borderTop = E.t; el.style.borderBottom = E.b; el.style.borderLeft = E.l; el.style.borderRight = E.r;
       el.classList.toggle('wrap', !!fmt[a]?.wrap);
       el.classList.toggle('err', !!s.err);
       el.classList.toggle('b', !!fmt[a]?.b);
       el.classList.toggle('xl-open', !!prot && !!fmt[a]?.open);
       const col = condColor(a, r, c, s.v);
       el.dataset.cond = col || '';
+      // Dolgu ve yazı rengi; koşullu biçim varsa o geçerlidir (Excel'de de öyle)
+      el.classList.toggle('xl-bg', !!F.bg && !col);
+      if (F.bg && !col) el.style.setProperty('--xl-bg', F.bg); else el.style.removeProperty('--xl-bg');
+      el.style.color = F.fc && !col && !s.err ? F.fc : '';
     }
     wrap.classList.toggle('frozen', frozen);
     wrap.style.setProperty('--xl-th', body.querySelector('thead').offsetHeight + 'px');
@@ -496,7 +536,14 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const es = show(addr(act.r, act.c));
     const en = $('.xl-errnote');
     en.hidden = !es.err || !!editing;
-    if (es.err) en.innerHTML = `⚠ <b>${esc(es.text)}</b> ${ERRS[es.text] || 'Formülde bir hata var.'}`;
+    if (es.err) {
+      const en1 = es.text === '#AD?' && Object.keys(EN_NAMES).find((k) => new RegExp(`(^|[^A-ZÇĞİÖŞÜ_.])${k}\\s*\\(`, 'i').test(cells[addr(act.r, act.c)] || ''));
+      en.innerHTML = `⚠ <b>${esc(es.text)}</b> ${en1 ? `<b>${en1}</b> İngilizce Excel'in adıdır ya da Türkçe Excel'de yoktur. Türkçesi: <b>${EN_NAMES[en1]}</b>.` : ERRS[es.text] || 'Formülde bir hata var.'}`;
+    }
+    const F = fmt[addr(act.r, act.c)] || {};
+    $('.xl-font').value = F.fn || 'Calibri';
+    $('.xl-fsize').value = String(F.fs || 11);
+    for (const [k, on] of [['bold', F.b], ['italic', F.i], ['under', F.u], ['al-l', F.al === 'l'], ['al-c', F.al === 'c'], ['al-r', F.al === 'r'], ['va-t', F.va === 't'], ['va-m', F.va === 'm'], ['va-b', F.va === 'b']]) $(`[data-act="${k}"]`).classList.toggle('on', !!on);
     if (!editing) fbar.value = cells[addr(act.r, act.c)] || '';
     // Seçili sayılar için durum çubuğunda toplam ve ortalama (Excel'deki gibi)
     const nums = [];
@@ -526,7 +573,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (locked(a)) { lockedWarn(a); return; }
     raw = raw.trim();
     if (raw) cells[a] = raw; else delete cells[a];
-    if (/%/.test(raw) && !raw.startsWith('=') && parseNumber(raw) !== null) (fmt[a] ||= {}).f = 'pct';
+    if (/%/.test(raw) && !raw.startsWith('=') && parseNumber(raw) !== null) { (fmt[a] ||= {}).f = 'pct'; const k = (raw.split(',')[1] || '').replace(/\D/g, '').length; if (k) fmt[a].dp = k; else delete fmt[a].dp; }
     dirty = true;
     render();
     const s = show(a);
@@ -548,13 +595,67 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     editing = { input: inp, enterMode, a };
     inp.focus();
     inp.setSelectionRange(inp.value.length, inp.value.length);
-    inp.addEventListener('input', () => { fbar.value = inp.value; });
+    inp.addEventListener('input', () => { fbar.value = inp.value; if (editing) { editing.ref = null; editing.auto = false; } markRefs(); });
+    markRefs();
+  }
+  // ---- Formül yazarken fareyle başvuru eklemek ve F4 ile $ koymak (gerçek Excel gibi) ----
+  const field = () => (editing && document.activeElement === fbar ? fbar : editing?.input);
+  // İmleçten önce = ( ; işleç ya da iki nokta varsa tıklanan hücre formüle eklenir; yoksa tıklama formülü onaylar
+  function canPoint() {
+    const f = field();
+    if (!f || !f.value.startsWith('=')) return false;
+    if (editing.ref && f.selectionStart >= editing.ref.s && f.selectionEnd <= editing.ref.e) return true;
+    editing.ref = null;
+    return /[=(;,+\-*/^&<>:]$/.test(f.value.slice(0, f.selectionStart).replace(/\s+$/, ''));
+  }
+  function pointRef(r1, c1, r2, c2) {
+    const f = field(), v = f.value;
+    const txt = r1 === r2 && c1 === c2 ? addr(r1, c1) : `${addr(Math.min(r1, r2), Math.min(c1, c2))}:${addr(Math.max(r1, r2), Math.max(c1, c2))}`;
+    const { s: s0, e: e0 } = editing.ref || { s: f.selectionStart, e: f.selectionEnd };
+    editing.input.value = fbar.value = v.slice(0, s0) + txt + v.slice(e0);
+    editing.ref = { s: s0, e: s0 + txt.length };
+    f.setSelectionRange(editing.ref.e, editing.ref.e);
+    markRefs();
+    return txt;
+  }
+  // F4: imlecin olduğu (ya da hemen önündeki) başvuruyu sırayla değiştirir: B7 → $B$7 → B$7 → $B7 → B7
+  function toggleAbs() {
+    const f = field();
+    if (!f || !f.value.startsWith('=')) return;
+    const v = f.value, pos = f.selectionEnd;
+    const re = /(?<![A-Za-zÇĞİÖŞÜçğıöşü_$])(\$?)([A-Ha-h])(\$?)(\d{1,2})(?::(\$?)([A-Ha-h])(\$?)(\d{1,2}))?(?![\d(A-Za-zÇĞİÖŞÜçğıöşü_])/g;
+    let m, hit = null;
+    while ((m = re.exec(v))) if (m.index <= pos && pos <= m.index + m[0].length) hit = m;
+    if (!hit) return;
+    const st = hit[1] && hit[3] ? 1 : hit[3] ? 2 : hit[1] ? 3 : 0;
+    const [dc, dr] = [['', ''], ['$', '$'], ['', '$'], ['$', '']][(st + 1) % 4];
+    const one = (c, r) => `${dc}${c.toUpperCase()}${dr}${r}`;
+    const txt = one(hit[2], hit[4]) + (hit[6] ? ':' + one(hit[6], hit[8]) : '');
+    const s0 = hit.index;
+    editing.input.value = fbar.value = v.slice(0, s0) + txt + v.slice(s0 + hit[0].length);
+    if (editing.ref && editing.ref.s === s0) editing.ref.e = s0 + txt.length;
+    f.setSelectionRange(s0 + txt.length, s0 + txt.length);
+    markRefs();
+    emit('xl-f4', { addr: editing.a, ref: txt, formula: editing.input.value });
+  }
+  // Yazılan formüldeki başvurular kesik çizgiyle çerçevelenir
+  function markRefs() {
+    body.querySelectorAll('td.xl-ref').forEach((x) => x.classList.remove('xl-ref'));
+    const v = editing?.input.value || '';
+    if (!v.startsWith('=')) return;
+    const re = /(?<![A-Za-zÇĞİÖŞÜçğıöşü_$])\$?([A-Ha-h])\$?(\d{1,2})(?::\$?([A-Ha-h])\$?(\d{1,2}))?(?![\d(A-Za-zÇĞİÖŞÜçğıöşü_])/g;
+    for (const m of v.replace(/"[^"]*"/g, (q) => ' '.repeat(q.length)).matchAll(re)) {
+      const p = parseAddr(m[1] + m[2]), q = m[3] ? parseAddr(m[3] + m[4]) : p;
+      if (!p || !q) continue;
+      for (let r = Math.min(p.r, q.r); r <= Math.max(p.r, q.r); r++) for (let c = Math.min(p.c, q.c); c <= Math.max(p.c, q.c); c++) td(addr(r, c)).classList.add('xl-ref');
+    }
   }
   function commit(dr = 0, dc = 0) {
     if (!editing) return;
     const { input, a } = editing;
     editing = null;
     input.remove();
+    markRefs();
     const p = parseAddr(a), v = p && validAt(p.r, p.c), raw = input.value.trim();
     if (v && raw && !v.list.some((x) => low(x) === low(raw))) {
       render();
@@ -567,7 +668,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     select(act.r + dr, act.c + dc);
     wrap.focus({ preventScroll: true });
   }
-  function cancel() { if (!editing) return; editing.input.remove(); editing = null; render(); wrap.focus({ preventScroll: true }); }
+  function cancel() { if (!editing) return; editing.input.remove(); editing = null; markRefs(); render(); wrap.focus({ preventScroll: true }); }
 
   // ---- Komutlar ----
   function eachSel(fn) { const s = sel(); for (let r = s.r1; r <= s.r2; r++) for (let c = s.c1; c <= s.c2; c++) fn(addr(r, c), r, c); }
@@ -688,9 +789,9 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const t = sel();
     const b = $('[data-act="valid"]');
     const cur = validAt(t.r1, t.c1);
-    openPop(`<b>✔ Açılır Liste (Veri Doğrulama)</b><p>Seçili hücrelere (${selAddr()}) yalnızca şu seçenekler girilsin:</p>
-      <div class="xl-row"><input class="xl-vlist" placeholder="Ödendi, Ödenmedi, Kısmen" size="28" value="${esc(cur ? cur.list.join(', ') : '')}"></div>
-      <p class="xl-vnote">Seçenekleri virgülle ayırarak yazın.</p>
+    openPop(`<b>✔ Veri Doğrulama: Açılır Liste</b><p>Seçili hücrelere (${selAddr()}) yalnızca şu seçenekler girilsin.</p><div>İzin verilen: <b>Liste</b></div>
+      <div class="xl-row">Kaynak: <input class="xl-vlist" placeholder="Ödendi;Ödenmedi;Kısmen" size="24" value="${esc(cur ? cur.list.join(';') : '')}"></div>
+      <p class="xl-vnote">Seçenekleri noktalı virgülle (;) ayırın. Bazı bilgisayarlarda virgül (,) kullanılır; bu ekran ikisini de kabul eder.</p>
       <div class="xl-row"><button type="button" class="xl-vok primary">Uygula</button><button type="button" class="xl-vclr">Kaldır</button><button type="button" class="xl-px">İptal</button></div>`, b);
     pop.querySelector('.xl-vlist').focus();
   }
@@ -749,10 +850,10 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const out = { A1: rowName, B1: `${label} ${valName}` };
     const f = { A1: { b: true }, B1: { b: true } };
     const money = fn !== 'count' && /tutar|fiyat|₺|tl|ücret|para/i.test(valName + (fmt[addr(hr + 1, vc)]?.f || ''));
-    keys.forEach((k, i) => { out['A' + (i + 2)] = k; out['B' + (i + 2)] = String(+val(groups.get(k)).toFixed(2)); if (money) f['B' + (i + 2)] = { f: 'tl' }; });
+    keys.forEach((k, i) => { out['A' + (i + 2)] = k; out['B' + (i + 2)] = String(+val(groups.get(k)).toFixed(2)).replace('.', ','); if (money) f['B' + (i + 2)] = { f: 'tl' }; });
     const all = [...groups.values()].reduce((a, g) => ({ sum: a.sum + g.sum, n: a.n + g.n }), { sum: 0, n: 0 });
     const last = keys.length + 2;
-    out['A' + last] = 'Genel Toplam'; out['B' + last] = String(+val(all).toFixed(2));
+    out['A' + last] = 'Genel Toplam'; out['B' + last] = String(+val(all).toFixed(2)).replace('.', ',');
     f['A' + last] = { b: true }; f['B' + last] = { b: true, ...(money ? { f: 'tl' } : {}) };
     stash();
     sheets.push({ name: uniqueName('Özet Tablo'), color: '', data: { cells: out, fmt: f, colW: { 0: 14, 1: 14 } } });
@@ -911,6 +1012,64 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     render();
     emit('xl-format', { kind, range: selAddr() });
   }
+  // ---- Giriş sekmesi: yazı tipi, kenarlık, dolgu, hizalama, ondalık ----
+  let lastBorder = 'bottom', lastFill = '#ffff00', lastColor = '#ff0000'; // bölünmüş düğmenin sol yarısı son seçileni uygular (Excel gibi)
+  const swatches = () => { $('[data-sw="fill"]').style.background = lastFill; $('[data-sw="color"]').style.background = lastColor; };
+  // Aç/kapa biçimler (İtalik, hizalama): seçimin hepsinde zaten varsa kaldırılır
+  function toggleKey(key, val) {
+    let all = true;
+    eachSel((a) => { if (fmt[a]?.[key] !== val) all = false; });
+    eachSel((a) => { if (all) delete (fmt[a] ||= {})[key]; else (fmt[a] ||= {})[key] = val; });
+    return !all;
+  }
+  function applyBorder(k) {
+    const s = sel();
+    eachSel((a, r, c) => {
+      const b = { ...(fmt[a]?.bd || {}) };
+      const edge = { t: r === s.r1, b: r === s.r2, l: c === s.c1, r: c === s.c2 };
+      if (k === 'none') for (const x of 'tblr') delete b[x];
+      else if (k === 'all') for (const x of 'tblr') b[x] = 1;
+      else if (k === 'outside' || k === 'thick') { for (const x of 'tblr') if (edge[x]) b[x] = k === 'thick' ? 2 : 1; }
+      else { const x = { top: 't', bottom: 'b', left: 'l', right: 'r' }[k]; if (edge[x]) b[x] = 1; }
+      if (Object.keys(b).length) (fmt[a] ||= {}).bd = b; else if (fmt[a]) delete fmt[a].bd;
+    });
+    // Kenarlık Yok: seçimin dış çizgisi komşu hücrede çizilmişse o da kalkar
+    if (k === 'none') {
+      const clr = (r, c, x) => { const f = r >= 0 && r < ROWS && c >= 0 && c < COLS.length && fmt[addr(r, c)]; if (f?.bd) { delete f.bd[x]; if (!Object.keys(f.bd).length) delete f.bd; } };
+      for (let c = s.c1; c <= s.c2; c++) { clr(s.r1 - 1, c, 'b'); clr(s.r2 + 1, c, 't'); }
+      for (let r = s.r1; r <= s.r2; r++) { clr(r, s.c1 - 1, 'r'); clr(r, s.c2 + 1, 'l'); }
+    }
+  }
+  function style(kind, value) {
+    if (kind === 'italic') value = toggleKey('i', true);
+    else if (kind === 'under') value = toggleKey('u', true);
+    else if (/^al-/.test(kind)) value = toggleKey('al', kind.slice(3)) && kind.slice(3);
+    else if (/^va-/.test(kind)) value = toggleKey('va', kind.slice(3)) && kind.slice(3);
+    else if (kind === 'font') eachSel((a) => { (fmt[a] ||= {}).fn = value; if (value === 'Calibri') delete fmt[a].fn; });
+    else if (kind === 'size') eachSel((a) => { (fmt[a] ||= {}).fs = +value; if (+value === 11) delete fmt[a].fs; });
+    else if (kind === 'fill') { if (value) lastFill = value; eachSel((a) => { (fmt[a] ||= {}).bg = value; if (!value) delete fmt[a].bg; }); }
+    else if (kind === 'color') { if (value) lastColor = value; eachSel((a) => { (fmt[a] ||= {}).fc = value; if (!value) delete fmt[a].fc; }); }
+    else if (kind === 'border') { lastBorder = value; applyBorder(value); }
+    else if (kind === 'dec-up' || kind === 'dec-down') {
+      // Excel gibi: etkin hücrede görünen basamak sayısına göre bütün seçim bir basamak artar / azalır
+      const v = show(addr(act.r, act.c)).v, a0 = addr(act.r, act.c);
+      if (typeof v !== 'number') { desk.toast(kind === 'dec-up' ? 'Ondalık Artır' : 'Ondalık Azalt', 'Önce sayı olan bir hücreyi seçin.', 'ℹ'); return; }
+      value = Math.max(0, Math.min(10, shownDp(v, fmt[a0]?.f ?? (isDate(a0) ? 'date' : undefined), fmt[a0]?.dp) + (kind === 'dec-up' ? 1 : -1)));
+      eachSel((a) => { (fmt[a] ||= {}).dp = value; });
+    }
+    swatches();
+    dirty = true;
+    render();
+    emit('xl-style', { kind, value, range: selAddr() });
+  }
+  function menuPop(kind) {
+    const b = $(`[data-act="${kind}"]`);
+    if (kind === 'border-menu') openPop(`<b>Kenarlıklar</b><div class="xl-vl">${BORDERS.map(([k, n]) => `<button type="button" data-bd="${k}">${n}</button>`).join('')}</div>`, b);
+    else if (kind === 'fill-menu') openPop(`<b>Dolgu Rengi</b><div class="xl-pal">${COLORS.map(([n, h]) => `<button type="button" data-fill="${h}" title="${n}" aria-label="${n}" style="background:${h}"></button>`).join('')}</div><div class="xl-vl"><button type="button" data-fill="">Dolgu Yok</button></div>`, b);
+    else if (kind === 'color-menu') openPop(`<b>Yazı Tipi Rengi</b><div class="xl-pal">${COLORS.map(([n, h]) => `<button type="button" data-fc="${h}" title="${n}" aria-label="${n}" style="background:${h}"></button>`).join('')}</div><div class="xl-vl"><button type="button" data-fc="">Otomatik (siyah)</button></div>`, b);
+    else if (kind === 'freeze') openPop(`<b>Bölmeleri Dondur</b><div class="xl-vl">${frozen ? '<button type="button" data-fz="off">Bölmeleri Çöz</button>' : ''}<button type="button" data-fz="top">Üst Satırı Dondur</button></div><p class="xl-vnote">Gerçek Excel'de: Görünüm sekmesi → Bölmeleri Dondur</p>`, b);
+    emit('xl-menu', { menu: kind });
+  }
   // Birleştir ve Ortala: seçili dikdörtgen tek hücre olur, yazı ortalanır (tekrar basılırsa birleştirme kalkar)
   function mergeCells() {
     const t = sel();
@@ -976,9 +1135,18 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       if (c < act.c - 1) f = `=TOPLA(${addr(act.r, c + 1)}:${addr(act.r, act.c - 1)})`;
     }
     if (!f) { desk.toast('Otomatik Toplam', 'Toplanacak sayı bulunamadı. Sayıların hemen altındaki boş hücreye tıklayın.', '∑'); return; }
+    // Gerçek Excel gibi formül hemen onaylanmaz: hücrede yazılı bekler, önerilen aralık seçilidir.
+    // Enter onaylar; o sırada başka hücreler fareyle seçilirse aralık onlarla değişir.
     const a = addr(act.r, act.c);
-    setCell(a, f);
-    emit('xl-autosum', { addr: a, formula: f });
+    startEdit(f, true);
+    if (!editing) return;
+    const s0 = f.indexOf('(') + 1, e0 = f.indexOf(')');
+    editing.auto = true;
+    editing.ref = { s: s0, e: e0 };
+    editing.input.setSelectionRange(s0, e0);
+    fbar.value = f;
+    markRefs();
+    emit('xl-autosum', { addr: a, formula: f, pending: true });
   }
   function sort(desc) {
     // Sürüklemenin başladığı (etkin) hücrenin sütununa göre, başlık satırının altındaki veri satırlarını sıralar; gerçek Excel gibi. Tek hücrede Toplam satırında durur.
@@ -1119,21 +1287,31 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') end(true); if (e.key === 'Escape') end(false); e.stopPropagation(); });
     inp.addEventListener('blur', () => end(true));
   }
-  async function copySheet(i) {
-    const a = await desk.dialogs.ask({ title: 'Taşı veya Kopyala', icon: '📑', text: `<b>${esc(sheets[i].name)}</b> sayfası için ne yapılsın?<br>Bir sayfanın kopyası, o ayın hazır tablosunu bozmadan yeni aya çoğaltmanın yoludur.`, buttons: [['copy', '📑 Kopya oluştur', true], ['move', 'Sona taşı'], ['cancel', 'İptal']] });
-    if (!a || a === 'cancel') return;
+  // Taşı veya Kopyala penceresi (Excel gibi): “Sayfadan önce” listesi ve “Kopya oluştur” onay kutusu. Kutu işaretlenmezse sayfa yalnızca taşınır.
+  function copySheet(i) {
+    const tab = body.querySelector(`.xl-sh[data-i="${i}"]`) || $('.xl-shtabs');
+    openPop(`<b>📑 Taşı veya Kopyala</b><p>Seçili sayfayı (<b>${esc(sheets[i].name)}</b>) taşı.</p><div>Sayfadan önce:</div>
+      <select class="xl-mvlist" size="${Math.min(6, sheets.length + 1)}">${sheets.map((x, k) => `<option value="${k}">${esc(x.name)}</option>`).join('')}<option value="${sheets.length}" selected>(sona taşı)</option></select>
+      <label><input type="checkbox" class="xl-mvcopy"> Kopya oluştur</label>
+      <div class="xl-row"><button type="button" class="xl-mvok primary" data-i="${i}">Tamam</button><button type="button" class="xl-px">İptal</button></div>`, tab);
+    emit('xl-sheet-dialog', { name: sheets[i].name });
+  }
+  function moveCopy(i, before, copyIt) {
     stash();
-    if (a === 'copy') {
+    if (copyIt) {
       const d = structuredClone(sheets[i].data || snap());
-      sheets.splice(i + 1, 0, { name: uniqueName(`${sheets[i].name} (2)`), color: sheets[i].color, data: d });
+      const at = Math.max(0, Math.min(before, sheets.length));
+      const from = sheets[i].name;
+      sheets.splice(at, 0, { name: uniqueName(`${from} (2)`), color: sheets[i].color, data: d });
       dirty = true;
-      useSheet(i + 1, true);
-      emit('xl-sheet', { op: 'copy', name: sheets[curSheet].name, count: sheets.length, from: sheets[i].name });
+      useSheet(at, true);
+      emit('xl-sheet', { op: 'copy', name: sheets[curSheet].name, count: sheets.length, from });
     } else {
       const [m] = sheets.splice(i, 1);
-      sheets.push(m);
+      const at = Math.max(0, Math.min(before > i ? before - 1 : before, sheets.length));
+      sheets.splice(at, 0, m);
       dirty = true;
-      useSheet(sheets.length - 1, true);
+      useSheet(at, true);
       emit('xl-sheet', { op: 'move', name: m.name, count: sheets.length });
     }
   }
@@ -1213,11 +1391,11 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       const a = addr(r, c);
       if (covered.has(a)) return '';
       const mg = spans[a], txt = td(a).textContent;
-      return `<td ${mg ? `colspan="${mg.c2 - mg.c1 + 1}" rowspan="${mg.r2 - mg.r1 + 1}"` : ''} style="width:${colEm(c)}em;${pageSet.grid ? 'border:1px solid #999;' : ''}${fmt[a]?.b ? 'font-weight:700;' : ''}${fmt[a]?.al === 'c' ? 'text-align:center;' : /^[-\d%₺]/.test(txt) ? 'text-align:right;' : ''}">${esc(txt)}</td>`;
+      return `<td ${mg ? `colspan="${mg.c2 - mg.c1 + 1}" rowspan="${mg.r2 - mg.r1 + 1}"` : ''} style="width:${colEm(c)}em;${pageSet.grid ? 'border:1px solid #999;' : ''}${(({ t, b, l, r: rr }) => `${t ? `border-top:${t};` : ''}${b ? `border-bottom:${b};` : ''}${l ? `border-left:${l};` : ''}${rr ? `border-right:${rr};` : ''}`)(edges(r, c))}${['fontStyle', 'textDecoration', 'fontFamily', 'fontSize', 'color'].map((k) => (td(a).style[k] ? `${k.replace(/[A-Z]/g, (x) => '-' + x.toLowerCase())}:${td(a).style[k]};` : '')).join('')}${fmt[a]?.bg ? `background:${fmt[a].bg};` : ''}${fmt[a]?.b ? 'font-weight:700;' : ''}${fmt[a]?.al === 'c' ? 'text-align:center;' : /^[-\d%₺]/.test(txt) ? 'text-align:right;' : ''}">${esc(txt)}</td>`;
     }).join('')}</tr>`).join('');
     const info = { pages, orient: pageSet.orient, fit: pageSet.fit, grid: pageSet.grid, totalEm: Math.round(totalEm), capEm };
     const notes = [pages > 1 ? `<span class="bad">⚠ Tablo <b>${pages} sayfaya</b> bölündü: son sütun(lar) ikinci kâğıda taşıyor. <b>Tüm sütunları bir sayfaya sığdır</b>'ı ya da <b>Yatay</b> kâğıdı deneyin.</span>` : '<span class="ok">✔ Tablo <b>tek sayfaya</b> sığıyor.</span>'];
-    if (!pageSet.grid) notes.push('<span class="inf">ℹ Tablo çizgileri kâğıtta çıkmayacak. Gerekirse <b>Kılavuz çizgilerini yazdır</b>\'ı açın.</span>');
+    if (!pageSet.grid) notes.push(Object.values(fmt).some((f) => f?.bd) ? '<span class="inf">ℹ Gri kılavuz çizgileri kâğıtta çıkmayacak; verdiğiniz <b>kenarlıklar</b> çıkacak.</span>' : '<span class="inf">ℹ Tablo çizgileri kâğıtta çıkmayacak. Gerekirse <b>Kılavuz çizgilerini yazdır</b>\'ı açın.</span>');
     const table = `<table class="xl-pvt" style="font-size:${k}em">${rowsHtml}</table>`;
     // Her sayfa ayrı kâğıt: i. kâğıt tablonun i. dilimini gösterir
     const sheets = Array.from({ length: pages }, (_, i) => `<small>Sayfa ${i + 1} / ${pages}</small><div style="flex:none;width:${W}em;max-height:${H}em;overflow:hidden;background:#fff;border:1px solid #888;box-shadow:0 2px 6px #0003;position:relative"><div style="margin-left:-${i * W}em;width:${pages * W}em">${table}</div></div>`).join('');
@@ -1256,7 +1434,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   }
 
   // ---- Olaylar ----
-  let dragging = false;
+  let dragging = false, pointing = null; // pointing: formül yazarken fareyle seçilen aralığın başladığı hücre
   wrap.addEventListener('mousedown', (e) => {
     if (e.target.closest('.xl-fb')) { e.preventDefault(); filterDialog(+e.target.closest('.xl-fb').dataset.col); return; }
     if (e.target.closest('.xl-fh')) { e.preventDefault(); if (editing) commit(0, 0); if (prot) { lockedWarn(addr(act.r, act.c)); return; } fill = { s: sel(), dir: null, to: null }; return; }
@@ -1269,6 +1447,12 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     const cell = e.target.closest('td[data-a]');
     if (!cell || e.target.classList.contains('xl-in')) return;
     e.preventDefault();
+    if (editing && cell.dataset.a !== editing.a && canPoint()) {
+      const p = parseAddr(cell.dataset.a);
+      pointing = p;
+      emit('xl-point', { addr: editing.a, ref: pointRef(p.r, p.c, p.r, p.c) });
+      return;
+    }
     if (editing) commit();
     const p = parseAddr(cell.dataset.a);
     // Dokunmatik ekranda seçili hücreye bir kez daha dokunmak yazmayı başlatır (telefon klavyesi açılır)
@@ -1280,6 +1464,13 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     wrap.focus({ preventScroll: true });
   });
   wrap.addEventListener('mouseover', (e) => {
+    if (pointing) {
+      const cell = e.target.closest('td[data-a]');
+      if (!cell || !editing || !(e.buttons & 1)) return;
+      const p = parseAddr(cell.dataset.a);
+      pointRef(pointing.r, pointing.c, p.r, p.c);
+      return;
+    }
     if (fill) {
       const cell = e.target.closest('td[data-a]');
       if (!cell) return;
@@ -1297,6 +1488,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   });
   addEventListener('mouseup', function up() {
     if (!body.isConnected) { removeEventListener('mouseup', up); return; }
+    if (pointing) { pointing = null; if (editing?.ref) emit('xl-point', { addr: editing.a, ref: editing.input.value.slice(editing.ref.s, editing.ref.e), done: true }); return; }
     if (fill) {
       const f = fill;
       fill = null;
@@ -1336,6 +1528,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       if (k === 'Enter') { e.preventDefault(); const t = tabStart; commit(e.shiftKey ? -1 : 1, !e.shiftKey && t && t.r === act.r ? t.c - act.c : 0); }
       else if (k === 'Tab') { e.preventDefault(); const t = tabStart && tabStart.r === act.r ? tabStart : { r: act.r, c: act.c }; commit(0, e.shiftKey ? -1 : 1); tabStart = t; }
       else if (k === 'Escape') { e.preventDefault(); cancel(); }
+      else if (k === 'F4') { e.preventDefault(); toggleAbs(); }
       else if (editing.enterMode && /^Arrow/.test(k)) { e.preventDefault(); commit(...{ ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] }[k]); }
       return;
     }
@@ -1371,15 +1564,25 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   });
   // Formül çubuğu: tıklayıp oradan da yazılabilir
   fbar.addEventListener('focus', () => { if (!editing) { startEdit(null, false); fbar.focus(); } });
-  fbar.addEventListener('input', () => { if (editing) editing.input.value = fbar.value; });
+  fbar.addEventListener('input', () => { if (editing) { editing.input.value = fbar.value; editing.ref = null; editing.auto = false; markRefs(); } });
   fbar.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); if (editing) editing.input.value = fbar.value; commit(1, 0); }
     if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    if (e.key === 'F4') { e.preventDefault(); toggleAbs(); }
   });
   body.addEventListener('mousedown', (e) => {
     if (!e.target.closest('.xl-menu, .xl-file')) $('.xl-menu').hidden = true;
-    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], [data-act="subtotal"], [data-act="protect"], .xl-fb, .xl-vb')) pop.hidden = true;
+    if (!e.target.closest('.xl-pop, [data-act="cond"], [data-act="valid"], [data-act="pivot"], [data-act="subtotal"], [data-act="protect"], [data-act="freeze"], [data-act$="-menu"], .xl-fb, .xl-vb')) pop.hidden = true;
     if (e.target.closest('.xl-rib button')) e.preventDefault();
+  });
+  // Yazı tipi ve boyutu kutuları
+  body.querySelector('.xl-rib').addEventListener('change', (e) => {
+    const k = e.target.classList.contains('xl-font') ? 'font' : e.target.classList.contains('xl-fsize') ? 'size' : null;
+    if (!k) return;
+    if (editing) commit(0, 0);
+    if (prot) { lockedWarn(addr(act.r, act.c)); paintSel(); return; }
+    style(k, e.target.value);
+    wrap.focus({ preventScroll: true });
   });
   pop.addEventListener('change', (e) => {
     if (e.target.classList.contains('xl-fa')) pop.querySelectorAll('.xl-flist input').forEach((b) => { b.checked = e.target.checked; });
@@ -1392,6 +1595,25 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('xl-file')) { $('.xl-menu').hidden = !$('.xl-menu').hidden; return; }
     if (t.dataset.file) return fileCmd(t.dataset.file);
     if (t.classList.contains('xl-px')) { pop.hidden = true; return; }
+    if (t.dataset.bd || t.dataset.fill !== undefined || t.dataset.fc !== undefined) {
+      pop.hidden = true;
+      if (prot) { lockedWarn(addr(act.r, act.c)); return; }
+      if (t.dataset.bd) style('border', t.dataset.bd); else if (t.dataset.fill !== undefined) style('fill', t.dataset.fill); else style('color', t.dataset.fc);
+      wrap.focus({ preventScroll: true });
+      return;
+    }
+    if (t.dataset.fz) {
+      pop.hidden = true;
+      frozen = t.dataset.fz === 'top'; dirty = true; render(); emit('xl-freeze', { on: frozen, cmd: t.dataset.fz === 'top' ? 'Üst Satırı Dondur' : 'Bölmeleri Çöz' });
+      wrap.focus({ preventScroll: true });
+      return;
+    }
+    if (t.classList.contains('xl-mvok')) {
+      const i = +t.dataset.i, before = +pop.querySelector('.xl-mvlist').value, copyIt = pop.querySelector('.xl-mvcopy').checked;
+      pop.hidden = true;
+      moveCopy(i, before, copyIt);
+      return;
+    }
     if (t.classList.contains('xl-sok')) {
       applySubtotal(+t.dataset.hr, +pop.querySelector('.xl-sby').value, +pop.querySelector('.xl-sfn').value, [...pop.querySelectorAll('.xl-slist input:checked')].map((b) => +b.value),
         pop.querySelector('.xl-sbelow').checked, pop.querySelector('.xl-srep').checked);
@@ -1423,7 +1645,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     }
     if (t.classList.contains('xl-vok')) {
       const list = pop.querySelector('.xl-vlist').value.split(/[,;]/).map((x) => x.trim()).filter(Boolean);
-      if (list.length < 2) { pop.querySelector('.xl-vnote').textContent = 'En az iki seçenek yazın (ör. Ödendi, Ödenmedi).'; pop.querySelector('.xl-vnote').classList.add('bad'); return; }
+      if (list.length < 2) { pop.querySelector('.xl-vnote').textContent = 'En az iki seçenek yazın, aralarına noktalı virgül koyun (ör. Ödendi;Ödenmedi).'; pop.querySelector('.xl-vnote').classList.add('bad'); return; }
       const q = sel();
       valids = valids.filter((v) => v.r2 < q.r1 || v.r1 > q.r2 || v.c2 < q.c1 || v.c1 > q.c2);
       valids.push({ ...q, list });
@@ -1473,6 +1695,8 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     }
     const a = t.dataset.act;
     if (!a) return;
+    // ∑ önerisi açıkken ∑'ye yeniden basmak formülü onaylar (Enter gibi)
+    if (a === 'sum' && editing?.auto) { commit(0, 0); return; }
     if (editing) commit(0, 0);
     if (a === 'undo' || a === 'redo') { undo(a === 'undo' ? -1 : 1); wrap.focus({ preventScroll: true }); return; }
     if (a === 'protect') return protectDialog();
@@ -1487,6 +1711,11 @@ export function sheet({ desk, body, args, emit, setTitle }) {
       wrap.focus({ preventScroll: true });
       return;
     }
+    if (a === 'freeze' || a.endsWith('-menu')) return menuPop(a);
+    if (['italic', 'under', 'al-l', 'al-c', 'al-r', 'va-t', 'va-m', 'va-b', 'dec-up', 'dec-down'].includes(a)) { style(a); wrap.focus({ preventScroll: true }); return; }
+    if (a === 'border') { style('border', lastBorder); wrap.focus({ preventScroll: true }); return; }
+    if (a === 'fill') { style('fill', lastFill); wrap.focus({ preventScroll: true }); return; }
+    if (a === 'color') { style('color', lastColor); wrap.focus({ preventScroll: true }); return; }
     if (a === 'cond') return condDialog();
     if (a === 'valid') return validDialog();
     if (a === 'pivot') return pivotDialog();
@@ -1494,7 +1723,6 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     if (a === 'filter') { filterToggle(); wrap.focus({ preventScroll: true }); return; }
     if (a === 'merge') mergeCells();
     else if (a === 'wrap') wrapText();
-    else if (a === 'freeze') { frozen = !frozen; dirty = true; render(); emit('xl-freeze', { on: frozen }); }
     else if (['orient', 'fit', 'grid'].includes(a)) {
       if (a === 'orient') pageSet.orient = pageSet.orient === 'yatay' ? 'dikey' : 'yatay'; else pageSet[a] = !pageSet[a];
       dirty = true; render(); emit('xl-page', { ...pageSet });
@@ -1513,6 +1741,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
 
   const n = args.node && desk.fs.get(args.node);
   if (n) load(n.content, n.name, n.parent); else load(args.data);
+  swatches();
   if (args.data && !n) dirty = false;
 
   return {

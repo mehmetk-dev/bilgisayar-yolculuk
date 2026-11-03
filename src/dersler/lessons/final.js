@@ -29,7 +29,7 @@ export const kursSinavi = {
       { t: '13. Reklam postaları', pic: '📰', q: 'Her gün gelen reklam bültenlerinden kurtulmanın doğru yolu?', opts: ['Postanın içindeki “Abonelikten çık” bağlantısı', 'Bilgisayarı kapatmak', 'Her gün tek tek silmek'], ok: 0, why: 'Abonelikten çıkınca bülten gelmez; posta kutunuz dolmaz.' },
       { t: '14. Kaçan resim', pic: '🖼', q: 'Word\'de resim yazının arasında sıkışıyor, sürüklenmiyor. Ne yaparsınız?', opts: ['Düzen Seçenekleri → Metni kaydır: Kare ya da Sıkı', 'Resmi silerim', 'Yazıyı büyütürüm'], ok: 0, why: 'Kare/Sıkı seçilince resim yazının yanında serbestçe taşınır.' },
       { t: '15. Biçim boyacısı', pic: '🖌', q: 'Bir başlığın rengini ve boyutunu başka başlıklara tek tıkla kopyalamak için?', opts: ['Biçim Boyacısı', 'Ctrl + P', 'Satır aralığı'], ok: 0, why: 'Biçim Boyacısı biçimi alır; çift tıklarsanız birden çok yere sürebilirsiniz.' },
-      { t: '16. Excel toplam', pic: '∑', q: 'B2\'den B10\'a kadar olan sayıları Excel\'de toplamak için?', opts: ['=TOPLA(B2:B10)', '=B2-B10', 'TOPLA B2 B10'], ok: 0, why: 'Formül = ile başlar; TOPLA işlevi aralığı toplar. ∑ düğmesi de aynısını yazar.' },
+      { t: '16. Excel toplam', pic: '∑', q: 'B2\'den B10\'a kadar olan sayıları Excel\'de toplamak için?', opts: ['=TOPLA(B2:B10)', '=B2-B10', 'TOPLA B2 B10'], ok: 0, why: 'Formül = ile başlar; TOPLA işlevi aralığı toplar. ∑ düğmesi de aynısını yazar; formül çıkınca Enter\'a basılır.' },
       { t: '17. Excel hatası', pic: '#SAYI/0!', q: 'Bir hücrede #SAYI/0! yazıyor. Ne demek?', opts: ['Sıfıra ya da boş hücreye bölünüyor', 'Sütun dar', 'Yazı yerine sayı var'], ok: 0, why: 'Bölen hücreyi doldurunca düzelir. Dar sütun ##### olarak görünür.' },
       { t: '18. Asıl Slayt', pic: '🎨', q: '30 slaytlık sununun hepsine aynı logoyu eklemenin en hızlı yolu?', opts: ['Görünüm → Asıl Slayt\'ta bir kez eklemek', 'Her slayda tek tek eklemek', 'Sunuyu yazdırmak'], ok: 0, why: 'Asıl Slayt\'ta yapılan değişiklik bütün slaytlara uygulanır.' },
       { t: '19. Slayt gösterisi', pic: 'F5', q: 'Sunuyu baştan, tam ekran göstermek için hangi tuşa basılır?', opts: ['F5', 'F1', 'Esc'], ok: 0, why: 'F5 gösteriyi başlatır, Esc bitirir.' },
@@ -90,7 +90,7 @@ export const buyukParkur = {
     },
     {
       title: '4. Harcama tablosu', html: '<p>Hesap Tablosu\'nda A1:B3\'e harcamaları yazın: <b>Pasta 450 · Balon 120 · İçecek 200</b>. <b>B4</b>\'e formülle toplamı hesaplatın.</p>',
-      hint: 'Ürün adını yazıp Tab, fiyatı yazıp Enter. B4\'e =TOPLA(B1:B3) ya da ∑ düğmesi.',
+      hint: 'Ürün adını yazıp Tab, fiyatı yazıp Enter. B4\'e =TOPLA(B1:B3) yazın ya da ∑ Otomatik Toplam\'a basın; ∑ formülü önerir, sonra Enter\'a basın.',
       ...durum((c) => cell(c, 'B4').value === 770 && String(cell(c, 'B4').raw || '').startsWith('=')),
     },
     {
