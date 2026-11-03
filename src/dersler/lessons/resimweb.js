@@ -93,7 +93,7 @@ export const resimWeb = {
     },
     {
       title: 'Sayfanın arkasındaki yazı',
-      html: `<p>Sayfa açıkken ${K('Ctrl')} + ${K('U')} tuşlarına basın (ya da tarayıcının ⋯ menüsünden <b>Sayfa kaynağını görüntüle</b>). Yeni sekmede sayfanın <b>yazı hâli</b> görünür.</p>`,
+      html: `<p>Sayfa açıkken ${K('Ctrl')} + ${K('U')} tuşlarına basın (ya da tarayıcının ⋮ menüsünden <b>Sayfa kaynağını görüntüle</b>). Yeni sekmede sayfanın <b>yazı hâli</b> görünür.</p>`,
       hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın.',
       combo: ['Ctrl', 'KeyU'],
       on: (ev) => ev.type === 'web-source',

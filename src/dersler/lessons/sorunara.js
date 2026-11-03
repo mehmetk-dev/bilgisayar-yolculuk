@@ -7,7 +7,7 @@ const br = (c) => maxed(c, 'browser');
 // Türkçe harfleri sadeleştirip küçültür (çevrimdışı = cevrimdisi); tırnaklar da atılır
 const norm = (s) => String(s).toLocaleLowerCase('tr').replace(/[ıİ]/g, 'i').replace(/ç/g, 'c').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/["“”'‘’]/g, ' ');
 // Ortak uyarı: reklama tıklanınca
-const adWarn = (ev, c) => { if (ev.type === 'web-ad') c.warn('Bu “Reklam”dı. Reklamlar parayla yukarı çıkar; güvenilir olmak zorunda değildir. Altındaki gerçek sonuçlara bakın.'); };
+const adWarn = (ev, c) => { if (ev.type === 'web-ad') c.warn('Bu “Sponsorlu” bir reklamdı. Reklamlar parayla yukarı çıkar; güvenilir olmak zorunda değildir. Altındaki gerçek sonuçlara bakın.'); };
 
 export const sorunAra = {
   id: 'sorun-ara', icon: '🧭', title: 'Sorunu internette doğru aratın', minutes: 25, stage: 'desktop',
@@ -16,7 +16,7 @@ export const sorunAra = {
     ['Hata mesajını yazın', 'Ekranda ne yazıyorsa aynen aratın (gerekirse tırnak içinde): “yazıcı çevrimdışı”'],
     ['Ürün ve sürüm ekleyin', 'Program ya da cihaz adı + Windows sürümü: “Windows 11 yazıcı çevrimdışı”'],
     ['Kısa ve özel', '“Bilgisayarım bozuldu ne yapayım” değil, “Windows 11 ses gelmiyor”'],
-    ['Reklam', '“Reklam” ya da “Sponsorlu” yazan sonuç parayla en üste çıkar; çözüm sunmak zorunda değildir'],
+    ['Reklam', '“Sponsorlu” yazan sonuç parayla en üste çıkar; çözüm sunmak zorunda değildir'],
     ['Resmî kaynak', 'Üreticinin ya da Microsoft’un destek sayfası; adresi okuyun'],
     ['Tarihe bakın', 'Eski forum yanıtı eski sürüm içindir; bugünkü Windows’a uymaz'],
     ['İndirmeyin, aramayın', '“Her şeyi düzeltir” diyen programı indirmeyin; sayfadaki destek numarasını aramayın'],
@@ -36,7 +36,7 @@ export const sorunAra = {
       title: 'Önce kötü bir arama',
       html: '<p>Önce acemilerin sık yaptığı bir aramayı deneyin. <b>İnternet</b>\'i açın, kutuya <b>bilgisayarım bozuldu ne yapayım</b> yazıp <b>Enter</b>\'a basın.</p>',
       setup: br,
-      hint: 'Tarayıcı Bulalım sayfasıyla açılır. Kutuya tıklayıp yazın.',
+      hint: 'Tarayıcı Google sayfasıyla açılır. Kutuya tıklayıp yazın.',
       on: (ev) => ev.type === 'web-search' && /bozul/.test(norm(ev.q)),
       done: 'Sonuçlara bakın: <b>yazıcıdan</b> hiç söz yok. En üstte bir <b>Reklam</b> var, altında 2011 tarihli bir forum yazısı. Çünkü arama çok <b>genel</b>: bilgisayarın neresi bozuk, belli değil.',
     },
@@ -45,7 +45,7 @@ export const sorunAra = {
       html: `<p>Şimdi doğru aratın. Ekranda yazan hata mesajını <b>aynen</b> yazın, başına ürünü ve Windows sürümünü ekleyin:</p>
         <p style="font-size:1.15em"><b>Windows 11 yazıcı çevrimdışı</b></p>
         <p class="mut">İsterseniz hata mesajını tırnak içine alabilirsiniz: Windows 11 “yazıcı çevrimdışı”. Tırnak, sözcüklerin birlikte aranmasını sağlar.</p>`,
-      hint: 'Sonuç sayfasındaki arama kutusuna yazın ya da Bulalım ana sayfasına dönün.',
+      hint: 'Sonuç sayfasındaki arama kutusuna yazın ya da Google ana sayfasına dönün.',
       on: (ev, c) => {
         if (ev.type !== 'web-search') return false;
         const n = norm(ev.q);
@@ -66,7 +66,7 @@ export const sorunAra = {
     },
     {
       title: 'Resmî destek sayfasını açın',
-      html: '<p>Adresi <b>yazici-destek.com.tr</b> olan ve “Windows 11” yazan sonuca tıklayın: <b>Yazıcı “Çevrimdışı” görünüyor</b>. En üstteki “Reklam”a tıklamayın.</p>',
+      html: '<p>Adresi <b>yazici-destek.com.tr</b> olan ve “Windows 11” yazan sonuca tıklayın: <b>Yazıcı “Çevrimdışı” görünüyor</b>. En üstteki “Sponsorlu” sonuca tıklamayın.</p>',
       hint: 'Reklam kutusunun altındaki ilk gerçek sonuç.',
       on: (ev, c) => {
         adWarn(ev, c);
@@ -101,7 +101,7 @@ export const sorunAra = {
       title: 'Bir de siz deneyin: ses yok',
       html: `<p>Başka bir sorun: bilgisayardan ses gelmiyor. Bu sefer <b>kısa ve özel</b> aratın. Arama kutusuna şunu yazın:</p>
         <p style="font-size:1.15em"><b>Windows 11 ses gelmiyor</b></p>`,
-      hint: 'Sonuç sayfasındaki ya da Bulalım ana sayfasındaki kutuya yazın.',
+      hint: 'Sonuç sayfasındaki ya da Google ana sayfasındaki kutuya yazın.',
       on: (ev, c) => {
         if (ev.type !== 'web-search') return false;
         const n = norm(ev.q);

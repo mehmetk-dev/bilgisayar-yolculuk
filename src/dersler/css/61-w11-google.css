@@ -1,0 +1,124 @@
+/* Google (www.google.com) sayfaları: ana sayfa, sonuç sayfası, Görseller / Haberler / Videolar. Sınıflar gg- ile başlar.
+   Google yazısı (gg-logo) tarayıcının yeni sekme sayfasında ve işletim sistemi dersindeki küçük tarayıcıda da kullanılır. */
+
+/* ---- Google yazısı */
+.gg-logo { display: inline-flex; font: 500 4.8em/1 "Product Sans", "Google Sans", "Segoe UI", Arial, "Liberation Sans", sans-serif; letter-spacing: -0.045em; user-select: none; }
+.gg-logo b { font-weight: inherit; }
+.gg-logo .gb { color: #4285f4; } .gg-logo .gr { color: #ea4335; } .gg-logo .gy { color: #fbbc05; } .gg-logo .gn { color: #34a853; }
+.gg-logo.xl { font-size: 5.2em; }
+.gg-logo.sm { font-size: 1.9em; letter-spacing: -0.04em; }
+
+/* ---- sayfa */
+.br-page > .wp.gg { flex: 1 0 auto; }
+.wp.gg { display: flex; flex-direction: column; max-width: none; margin: 0; padding: 0; min-height: 100%; background: #fff; color: #202124; text-align: left; font-family: Arial, "Liberation Sans", "Noto Sans", sans-serif; box-sizing: border-box; }
+.wp.gg a { text-decoration: none; }
+.wp.gg a.gg-ib, .gg-ib { display: flex; align-items: center; justify-content: center; width: 2.4em; height: 2.4em; border: 0; border-radius: 50%; background: none; color: #5f6368; flex: none; cursor: pointer; }
+.gg-ib:hover { background: #0000000f; }
+.wp.gg a.gg-ib { color: #5f6368; }
+.wp.gg .gg-lnk { color: #1a0dab; }
+.gg-av { display: flex; align-items: center; justify-content: center; width: 2.1em; height: 2.1em; border-radius: 50%; background: #8430ce; color: #fff; font-size: 0.9em; font-weight: 600; flex: none; margin: 0 0.3em; }
+
+/* ---- ana sayfa */
+.gg-homepg { display: flex; flex-direction: column; flex: 1; }
+.gg-top { display: flex; align-items: center; justify-content: flex-end; gap: 0.3em; padding: 0.7em 1em; }
+.wp.gg .gg-tl { color: #202124; font-size: 0.85em; padding: 0.5em 0.6em; border-radius: 4px; cursor: pointer; }
+.wp.gg .gg-tl:hover { text-decoration: underline; }
+.gg-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 1em 7em; }
+.gg-frm { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.gg-box { display: flex; align-items: center; gap: 0.3em; box-sizing: border-box; background: #fff; border: 1px solid #dfe1e5; border-radius: 999px; }
+.gg-box.big { width: min(36em, 94%); height: 2.9em; padding: 0 0.7em 0 1em; margin-top: 1.5em; }
+.gg-box.big:hover, .gg-box.big:focus-within { box-shadow: 0 1px 6px #20212447; border-color: #dfe1e500; }
+.gg-box.sm { flex: 1; min-width: 8em; max-width: 42em; height: 2.7em; padding: 0 0.3em 0 1em; box-shadow: 0 1px 6px #20212429; border-color: #dfe1e500; }
+.gg-bi { display: flex; color: #9aa0a6; margin-right: 0.3em; }
+.gg-box input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: none; font: inherit; font-size: 1em; color: #202124; padding: 0; }
+.gg-sep { width: 1px; height: 1.5em; background: #dadce0; margin: 0 0.3em; flex: none; }
+.gg-box .gg-ib { width: 2.2em; height: 2.2em; }
+.gg-go { display: flex; align-items: center; justify-content: center; width: 2.7em; height: 2.2em; padding: 0 !important; border: 0 !important; border-radius: 0 999px 999px 0 !important; background: none; color: #4285f4; flex: none; }
+.gg-go:hover { background: #0000000a; }
+.gg-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8em; margin-top: 1.8em; }
+.gg-btn { background: #f8f9fa; border: 1px solid #f8f9fa; border-radius: 4px; color: #3c4043; font-family: inherit; font-size: 0.9em; padding: 0.7em 1.1em; min-height: 2.6em; }
+.gg-btn:hover { border: 1px solid #dadce0; box-shadow: 0 1px 1px #0000001a; color: #202124; background: #f8f9fa; }
+.gg-lang { margin: 1.8em 0 0; font-size: 0.85em; color: #4d5156; }
+.gg-tip { margin: 1em 0 0; font-size: 0.82em; color: #70757a; }
+.wp.gg .gg-tip a { color: #1a0dab; }
+.wp.gg .gg-tip a:hover { text-decoration: underline; }
+.gg-ft { background: #f2f2f2; border-top: 1px solid #dadce0; color: #70757a; font-size: 0.85em; }
+.gg-ft1 { padding: 0.9em 1.5em; border-bottom: 1px solid #dadce0; }
+.gg-ft2 { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 0.4em 1em; }
+.gg-ft2 > span { display: flex; flex-wrap: wrap; }
+.wp.gg .gg-ft2 .gg-lnk { color: #70757a; padding: 0.6em 0.8em; cursor: pointer; }
+.wp.gg .gg-ft2 .gg-lnk:hover { text-decoration: underline; }
+
+/* ---- sonuç sayfası */
+.gg-rh { display: flex; align-items: center; gap: 1.2em; padding: 1em 1.2em 0.5em; }
+.wp.gg .gg-home { display: flex; padding-right: 0.3em; }
+.gg-rr { display: flex; align-items: center; margin-left: auto; }
+.gg-tabs { display: flex; align-items: flex-end; gap: 0.2em; padding: 0 1.2em; border-bottom: 1px solid #dadce0; font-size: 0.88em; overflow-x: auto; }
+.gg-tabs button { display: flex; align-items: center; gap: 0.15em; height: 2.9em; box-sizing: border-box; padding: 0 0.8em; border: 0 !important; border-bottom: 3px solid transparent !important; border-radius: 0 !important; background: none; color: #5f6368; font: inherit; cursor: pointer; white-space: nowrap; }
+.gg-tabs button:hover { color: #202124; }
+.gg-tabs button.on { color: #1a73e8; border-bottom-color: #1a73e8 !important; font-weight: 600; }
+.wp.gg .gg-tabmore, .wp.gg .gg-tabtools { display: flex; align-items: center; height: 2.9em; box-sizing: border-box; padding: 0 0.8em; color: #5f6368; cursor: pointer; white-space: nowrap; }
+.gg-tabsp { flex: 1; }
+.gg-body { max-width: 44em; padding: 0.4em 1.2em 3em 1.6em; box-sizing: border-box; }
+.gg-body.wide { max-width: none; }
+.gg-count { margin: 0.6em 0 1.2em; color: #70757a; font-size: 0.85em; }
+.gg-note { margin: 0.8em 0; color: #70757a; font-size: 0.85em; }
+.gg-warn { margin: 1.2em 0; color: #5f6368; font-size: 0.85em; }
+.gg-r { margin: 0 0 1.6em; max-width: 40em; }
+.gg-r.ad { padding-bottom: 0.2em; }
+.gg-sp { margin-bottom: 0.2em; font-size: 0.85em; color: #202124; }
+.gg-rs { display: flex; align-items: center; gap: 0.7em; margin-bottom: 0.2em; }
+.gg-fav { display: flex; align-items: center; justify-content: center; width: 1.9em; height: 1.9em; border-radius: 50%; color: #fff; font: 700 0.8em/1 Arial, sans-serif; flex: none; font-style: normal; }
+.gg-fav.g { background: #fff; color: #4285f4; border: 1px solid #dadce0; box-sizing: border-box; }
+.gg-rs .gg-fav { background-clip: padding-box; }
+.gg-rn { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.gg-sn { font-size: 0.88em; color: #202124; }
+.gg-cite { font-style: normal; font-size: 0.78em; color: #4d5156; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wp.gg .gg-rt { display: block; font-size: 1.3em; line-height: 1.3; color: #1a0dab; cursor: pointer; }
+.wp.gg .gg-rt:hover { text-decoration: underline; }
+.gg-rd { margin: 0.25em 0 0; color: #4d5156; font-size: 0.9em; line-height: 1.55; }
+.gg-none { font-size: 1em; margin-top: 1.5em; }
+.gg-body ul { color: #4d5156; padding-left: 1.4em; line-height: 1.6; }
+
+/* Görseller */
+.gg-imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(9em, 1fr)); gap: 0.8em; margin: 0.6em 0; }
+.gg-imgs figure { margin: 0; }
+.gg-imgs figure > span { display: grid; place-items: center; height: 2.3em; font-size: 2.8em; border-radius: 0.3em; }
+.gg-imgs figcaption { display: flex; flex-direction: column; padding: 0.4em 0.1em; font-size: 0.8em; color: #202124; line-height: 1.3; }
+.gg-imgs figcaption small { color: #70757a; font-size: 0.9em; }
+
+/* Videolar */
+.gg-vid { display: flex; gap: 1em; margin-bottom: 1.4em; max-width: 40em; }
+.wp.gg .gg-vth { position: relative; display: grid; place-items: center; flex: none; width: 4.8em; height: 2.7em; background: linear-gradient(135deg, #cfd8dc, #90a4ae); border-radius: 0.25em; font-size: 2.2em; color: inherit; }
+.wp.gg .gg-vth span { font-size: 1em; }
+.gg-vth i { position: absolute; right: 6px; bottom: 6px; display: flex; width: 24px; height: 24px; border-radius: 50%; background: #000a; color: #fff; align-items: center; justify-content: center; font-style: normal; }
+.gg-vth i .gi { width: 14px; height: 14px; }
+.gg-vid .gg-rt { font-size: 1.1em; }
+
+/* ---- işletim sistemi dersindeki küçük tarayıcının Google sayfaları (px ile; osg- ile başlar) */
+.osg-home { display: flex; flex-direction: column; align-items: center; padding-top: 56px; gap: 20px; }
+.osg-home .gg-logo { font-size: 64px; }
+.osg-form { display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; }
+.osg-box { display: flex; align-items: center; gap: 8px; width: min(440px, 88%); height: 40px; box-sizing: border-box; padding: 0 12px 0 14px; border: 1px solid #dfe1e5; border-radius: 20px; background: #fff; color: #9aa0a6; }
+.osg-box:hover, .osg-box:focus-within { box-shadow: 0 1px 6px #20212447; border-color: transparent; }
+.osg-box input { all: unset; flex: 1; min-width: 0; color: #202124; font-size: 14px; }
+.osg-box svg { width: 18px !important; height: 18px !important; flex: none; }
+.osg-btns { display: flex; gap: 10px; }
+.osg-btn { padding: 0 14px; height: 36px; border-radius: 4px; background: #f8f9fa; border: 1px solid #f8f9fa; color: #3c4043; font-size: 13px; cursor: pointer; }
+.osg-btn:hover { border-color: #dadce0; box-shadow: 0 1px 1px #0000001a; }
+.osg-links { color: #70757a; font-size: 12px; }
+.osg-links a, .osg-r a { color: #1a0dab; cursor: pointer; }
+.osg-links a:hover, .osg-r a:hover { text-decoration: underline; }
+.osg-res { padding: 14px 24px; }
+.osg-head { display: flex; align-items: center; gap: 22px; margin-bottom: 10px; }
+.osg-head .gg-logo { font-size: 26px; }
+.osg-head .osg-box { width: 360px; max-width: 100%; height: 36px; box-shadow: 0 1px 6px #20212429; border-color: transparent; }
+.osg-n { color: #70757a; font-size: 12px; margin: 6px 0 14px !important; }
+.osg-r { margin-bottom: 16px; max-width: 540px; }
+.osg-r small { display: block; color: #4d5156; font-size: 12px; }
+.osg-r a { display: block; font-size: 17px; margin: 1px 0; }
+.osg-r p { margin-top: 2px; color: #4d5156; font-size: 12.5px; line-height: 1.5; }
+.osg-site { padding: 40px; text-align: center; color: #444; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.osg-site h3 { font-size: 18px; }
+.osg-site button { padding: 6px 14px; border-radius: 4px; background: #1a73e8; color: #fff; cursor: pointer; }
+.bz-fav.g { background: #fff; color: #4285f4; border: 1px solid #dadce0; box-sizing: border-box; font-size: 10px; }

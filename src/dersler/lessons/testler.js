@@ -536,8 +536,8 @@ export const test8 = test({
       why: 'Adresi biliyorsanız adres çubuğuna yazın; bilmiyorsanız aradığınızı kelimelerle yazın, sonuçlardan seçin.',
     },
     {
-      t: '“Reklam” yazan sonuç', pic: '<span class="ad-tag">Reklam</span>',
-      q: 'Arama sonuçlarının en üstünde “Reklam” yazan bir sonuç var. Bu ne demek?',
+      t: '“Sponsorlu” yazan sonuç', pic: '<span class="ad-tag">Sponsorlu</span>',
+      q: 'Arama sonuçlarının en üstünde “Sponsorlu” yazan bir sonuç var. Bu ne demek?',
       opts: ['En güvenilir sonuçtur', 'Para verilerek üste konmuştur; genellikle tıklanmaz', 'Devletin resmî sitesidir'], ok: 1,
       why: 'Reklamlar bazen asıl siteye benzeyen sahte ya da ücretli sayfalara götürür. Altındaki normal sonuçlara bakın.',
     },

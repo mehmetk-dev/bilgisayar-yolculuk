@@ -11,7 +11,7 @@ export const internet = {
     ['←', 'Bir önceki sayfaya dön'],
     ['＋', 'Yeni sekme'],
     ['Sekmedeki ✕', 'Sekmeyi kapat'],
-    ['“Reklam” yazan sonuçlar', 'Genellikle tıklanmaz'],
+    ['“Sponsorlu” yazan sonuçlar', 'Genellikle tıklanmaz'],
     ['Büyük yeşil “İNDİR” düğmeleri', 'Çoğunlukla reklamdır; programın adının yazdığı sade bağlantıyı kullanın'],
     ['İndirilenler klasörü', 'İndirdiğiniz her şey buraya gelir'],
   ],
@@ -32,7 +32,7 @@ export const internet = {
       html: `<p>Adres çubuğuna tıklayın, <b>börek tarifi</b> yazıp ${K('Enter')}'a basın.</p><p class="mut">Adresi bilmediğiniz şeyleri kelimelerle yazın; tarayıcı sizin için arar.</p>`,
       setup: (c) => brOpen(c),
       on: (ev) => ev.type === 'web-search' && /b[öo]rek/i.test(ev.q),
-      done: 'Arama sonuçları çıktı. Dikkat: en üstte <b>Reklam</b> yazanlar reklamdır.',
+      done: 'Arama sonuçları çıktı. Dikkat: en üstte <b>Sponsorlu</b> yazanlar reklamdır.',
     },
     {
       title: 'Sonuca tıklayın',

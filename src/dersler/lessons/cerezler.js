@@ -16,10 +16,10 @@ export const cerezler = {
     ['Birinci taraf çerez', 'Gezdiğiniz sitenin kendi çerezi: çoğu zaman yararlıdır'],
     ['Üçüncü taraf çerez', 'Sayfaya gömülü başka şirketin (reklam) çerezi: sizi siteden siteye izler'],
     ['Çerez penceresi', '“Yalnızca gerekli olanlar” en güvenlisi; “Tümünü kabul et” izlemeye de izin verir'],
-    ['Listeyi görmek', '⋯ menü → Ayarlar → Çerezler ya da Geçmiş sayfasından'],
+    ['Listeyi görmek', '⋮ menü → Ayarlar → Çerezler ya da Geçmiş sayfasından'],
     ['Üçüncü tarafı engelle', 'Çerez ayarında bir düğme; reklam takibi azalır'],
     ['Çerezleri silmek', 'Siteler sizi unutur: girişler ve sepetler silinir'],
-    ['Ortak bilgisayar', 'Çıkış yapın; gerekirse göz atma verilerini silin ya da gizli pencere kullanın'],
+    ['Ortak bilgisayar', 'Çıkış yapın; gerekirse tarama verilerini silin ya da gizli pencere kullanın'],
   ],
   steps: [
     {
@@ -65,7 +65,7 @@ export const cerezler = {
     }),
     {
       title: 'Çerez listesini açın',
-      html: '<p>Tarayıcının sağ üstündeki <b>⋯</b> menüsüne tıklayın, <b>Ayarlar</b>\'a gidin ve <b>🍪 Çerezler ve site verilerini gör</b> bağlantısına tıklayın (ya da üstteki <b>Çerezler</b> sekmesine).</p>',
+      html: '<p>Tarayıcının sağ üstündeki <b>⋮</b> menüsüne tıklayın, <b>Ayarlar</b>\'a gidin ve <b>Çerezler ve site verilerini gör</b> bağlantısına tıklayın (ya da üstteki <b>Çerezler</b> sekmesine).</p>',
       hint: 'Sayfanın sol tarafında Geçmiş, Uzantılar, Çerezler, Ayarlar sekmeleri var.',
       on: nav('tarayici', '/cerezler'),
       done: 'Tarayıcının sakladığı bütün çerezler listede: hangi sitenin, ne amaçla bıraktığı yazıyor.',
@@ -92,14 +92,14 @@ export const cerezler = {
     },
     {
       title: 'Sepet çerezini silin',
-      html: '<p>Çerez listesine dönün (⋯ → Ayarlar → Çerezler). <b>firsat-pazari.com.tr · sepet</b> satırının yanındaki <b>✕ Sil</b>\'e tıklayın.</p>',
+      html: '<p>Çerez listesine dönün (⋮ → Ayarlar → Çerezler). <b>firsat-pazari.com.tr · sepet</b> satırının yanındaki <b>✕ Sil</b>\'e tıklayın.</p>',
       hint: 'Liste boşsa alışveriş sitesine gidip sepete bir ürün ekleyin, sonra listeye dönün.',
       on: (ev) => ev.type === 'cookie-delete' && ev.name === 'sepet',
       done: 'Sepet çerezi silindi: site sizi artık hatırlamıyor, sepetiniz boşaldı. Giriş çerezini (oturum) silseydiniz oturumunuz kapanırdı.',
     },
     {
       title: 'Hepsini temizleyin',
-      html: '<p>Sayfadaki <b>🗑 Tümünü sil</b> düğmesine (ya da <b>Göz atma verilerini temizle</b>\'ye) tıklayın. Ortak bilgisayarda işiniz bitince yapılacak iyi bir iştir.</p>',
+      html: '<p>Sayfadaki <b>Tümünü sil</b> düğmesine (ya da <b>Tarama verilerini temizle</b>\'ye) tıklayın. Ortak bilgisayarda işiniz bitince yapılacak iyi bir iştir.</p>',
       on: (ev) => ev.type === 'cookie-clear-all' || ev.type === 'web-clear',
       done: 'Çerezler silindi. Siteler sizi unuttu: her yerde yeniden giriş yapmanız gerekir, çerez pencereleri de yeniden çıkar. İşte bunun bedeli budur; ortak bilgisayarda değerlidir, kendi bilgisayarınızda gereksizdir.',
     },
@@ -113,7 +113,7 @@ export const cerezler = {
     rehberSoru({
       title: 'Ortak bilgisayar',
       html: '<p>Kütüphanede ortak bir bilgisayarda e-postanıza girdiniz. Çıkarken en güvenli davranış hangisi?</p>',
-      opts: ['Sekmeyi açık bırakmak', '“Çıkış yap”a basmak ve göz atma verilerini silmek (ya da en baştan gizli pencere kullanmak)', 'Bilgisayarı kapatmadan kalkmak'], ok: 1,
+      opts: ['Sekmeyi açık bırakmak', '“Çıkış yap”a basmak ve tarama verilerini silmek (ya da en baştan gizli pencere kullanmak)', 'Bilgisayarı kapatmadan kalkmak'], ok: 1,
       wrong: 'Giriş çerezi hâlâ duruyorsa sonraki kişi oturumunuza girebilir.',
       why: 'Doğru. Giriş çerezi oturumu açık tutar; çıkış yapmak ve verileri silmek onu kaldırır. Gizli pencere ise kapanınca çerezleri kendiliğinden siler. Tarayıcı “Şifreyi kaydedeyim mi?” diye sorarsa <b>Hayır</b> deyin, giriş sayfalarındaki “Beni hatırla” kutusunu da işaretlemeyin.',
     }),
