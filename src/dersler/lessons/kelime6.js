@@ -55,7 +55,7 @@ export const kelimeBulten = {
       html: `<p>En üstteki <b>ÇINAR EMEKLİLER DERNEĞİ BÜLTENİ</b> satırına bir kez tıklayın.</p>
         <p><b>Giriş</b> sekmesinde <b>🪣 Gölgelendirme</b> düğmesine basın ve <b>açık mavi</b>yi seçin.</p>`,
       mouse: '🖱 Başlık → 🪣 → açık mavi',
-      hint: 'Boya kovası (🪣), satır aralığı kutusunun sağındaki Kenarlık düğmesinin hemen yanındadır. Gerçek Word\'de Paragraf bölümünün sağ alt köşesindedir.',
+      hint: 'Boya kovası (🪣), Paragraf bölümünün alt satırında, Satır ve Paragraf Aralığı düğmesinin hemen sağındadır. Gerçek Word\'de de yeri aynıdır.',
       check: golge,
       on: (ev, c) => ev.type === 'doc-para' && golge(c),
       done: 'Başlığın arkası boyandı: satırın bütün enince bir bant. Vurgu rengi (🖍) yalnızca yazının arkasını boyar, gölgelendirme bütün paragrafı.',
@@ -63,7 +63,7 @@ export const kelimeBulten = {
     {
       title: 'Başlığa kenarlık',
       html: '<p>İmleç başlıktayken <b>▢ Kenarlık ▾</b> düğmesine basın ve <b>Dış Kenarlıklar</b>\'ı seçin.</p>',
-      hint: 'Kenarlık düğmesi gölgelendirmenin solundadır. Sayfa kenarlığı (Düzen sekmesi) bütün sayfayı çerçeveler; bu yalnızca bir paragrafı.',
+      hint: 'Kenarlık düğmesi boya kovasının hemen sağındadır. Sayfa Kenarlıkları (Tasarım sekmesi) bütün sayfayı çerçeveler; bu yalnızca bir paragrafı.',
       check: cerceve,
       on: (ev, c) => ev.type === 'doc-para' && cerceve(c),
       done: 'Başlık çerçeveye alındı. Gerçek Word\'de en altta <b>Kenarlıklar ve Gölgelendirme…</b> seçeneği de vardır: çizginin kalınlığını, rengini, çift çizgiyi oradan seçersiniz.',
@@ -103,9 +103,10 @@ export const kelimeBulten = {
       html: `<p>Formun dört satırını seçin: <b>Adı Soyadı:</b>\'ndan <b>İmza:</b>\'ya kadar.</p>
         <p><b>Giriş</b> sekmesinde <b>↹ Sekmeler…</b>\'e basın. Açılan kutuda:</p>
         <ul class="big-list"><li><b>Sekme durağı konumu</b>: 15 cm</li><li><b>Öncü</b>: <b>2 ..........</b> (noktalar)</li></ul>
+        <p class="mut"><b>Sekme durağı</b>: Tab\'a basınca imlecin gideceği yer. <b>Öncü</b>: o boşluğu dolduran noktalar.</p>
         <p>sonra <b>Tamam</b>.</p>`,
       mouse: '🖱 Dört satır → ↹ Sekmeler… → 15, öncü 2 → Tamam',
-      hint: 'Gerçek Word\'de: Giriş → Paragraf bölümünün sağ altındaki küçük ok → açılan pencerenin altındaki Sekmeler… düğmesi. Konumu yazıp öncüyü seçtikten sonra önce Ayarla, sonra Tamam.',
+      hint: 'Burada da gerçek Word\'deki gibi: Giriş → Paragraf bölümünün sağ altındaki küçük ok (↘) → açılan pencerenin altındaki Sekmeler… düğmesi. Konumu yazıp öncüyü seçtikten sonra önce Ayarla, sonra Tamam.',
       check: duraklar,
       on: (ev, c) => {
         if (ev.type !== 'doc-tabstop') return false;
