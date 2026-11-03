@@ -1,0 +1,68 @@
+/* Hesap Makinesi: Windows 11 görünümü. Açık tema; koyu tema .dk-dark ile aşağıda. */
+.calc { --ca-bg: #f3f3f3; --ca-fg: #1a1a1a; --ca-mut: #5f5f5f; --ca-n: #fdfdfd; --ca-nh: #f0f0f0; --ca-f: #eeeeee; --ca-fh: #e0e0e0; --ca-bd: #0000000f; --ca-panel: #f9f9f9; --ca-eqc: #fff; --ca-sh: 0 1px 0 #00000012;
+  background: var(--ca-bg); color: var(--ca-fg); outline: none; position: relative; }
+.calc .ca-wrap { flex: 1; min-height: 0; display: flex; position: relative; }
+.calc .ca-main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 0.35em 0.4em 0.4em; gap: 0.2em; }
+.calc .ca-top { display: flex; align-items: center; gap: 0.3em; }
+.calc .ca-mode { flex: 1; font-size: 1.45em; font-weight: 600; padding-left: 0.1em; }
+.calc button.ca-ib { width: 2.3em; height: 2.3em; padding: 0; border: 0; background: none; color: inherit; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; }
+.calc button.ca-ib:hover { background: var(--ca-fh); }
+.calc button.ca-ib svg { width: 1.3em; height: 1.3em; }
+.calc .ca-disp { text-align: right; padding: 0.2em 0.5em 0; overflow: hidden; }
+.calc .ca-expr { color: var(--ca-mut); min-height: 1.5em; font-size: 0.95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; }
+.calc .ca-val { font-size: 2.6em; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; }
+.calc .ca-mem { display: flex; gap: 2px; }
+.calc .ca-mem button { flex: 1; padding: 0.35em 0; border: 0; background: none; color: inherit; font-size: 0.95em; font-weight: 600; border-radius: 4px; justify-content: center; }
+.calc .ca-mem button:hover:not(:disabled) { background: var(--ca-fh); }
+.calc .ca-mem button:disabled { opacity: 0.4; }
+.calc .ca-mem svg { margin-left: 1px; }
+.calc .ca-keys { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; gap: 2px; }
+.calc .ca-keys.sci { grid-template-columns: repeat(5, 1fr); }
+.calc .ca-keys button { min-width: 0; gap: 0; min-height: 0; padding: 0; font-size: 1.2em; font-weight: 500; color: inherit; border: 1px solid var(--ca-bd); border-radius: 4px; box-shadow: var(--ca-sh); display: flex; align-items: center; justify-content: center; }
+.calc .ca-keys.sci button { font-size: 1.05em; }
+.calc .ca-keys .ca-n { background: var(--ca-n); font-weight: 600; }
+.calc .ca-keys .ca-f { background: var(--ca-f); }
+.calc .ca-keys .ca-n:hover:not(:disabled) { background: var(--ca-nh); border-color: var(--ca-bd); }
+.calc .ca-keys .ca-f:hover:not(:disabled) { background: var(--ca-fh); border-color: var(--ca-bd); }
+.calc .ca-keys .ca-eq { background: var(--acc, #0067c0); color: var(--ca-eqc); border-color: var(--acc, #0067c0); }
+.calc .ca-keys .ca-eq:hover:not(:disabled) { background: var(--acc, #0067c0); filter: brightness(1.12); border-color: transparent; }
+.calc .ca-keys button.hit { filter: brightness(0.85); }
+.calc .ca-keys button:disabled { opacity: 0.45; }
+.calc .ca-keys sup, .calc .ca-keys sub { font-size: 0.6em; line-height: 0; }
+.calc .ca-keys .ca-deg { font-size: 0.8em; font-weight: 700; }
+.calc .ca-keys svg { width: 1.2em; height: 1.2em; }
+/* Geçmiş / Bellek paneli: dar pencerede alttan açılır, geniş pencerede sağda durur */
+.calc .ca-side { display: none; flex-direction: column; background: var(--ca-panel); min-height: 0; }
+.calc .ca-pan .ca-side { display: flex; position: absolute; left: 0; right: 0; bottom: 0; height: 60%; z-index: 3; border-top: 1px solid var(--ca-bd); box-shadow: 0 -4px 14px #0002; }
+.calc .ca-wide .ca-side, .calc .ca-wide.ca-pan .ca-side { display: flex; position: static; width: 18em; height: auto; flex: none; border-top: 0; border-left: 1px solid var(--ca-bd); box-shadow: none; }
+.calc .ca-wide .ca-hbtn { visibility: hidden; }
+.calc .ca-tabs { display: flex; gap: 0.3em; padding: 0.4em 0.6em 0; }
+.calc .ca-tabs button { border: 0; background: none; color: var(--ca-mut); font-weight: 600; padding: 0.3em 0.5em; border-bottom: 3px solid transparent; border-radius: 0; }
+.calc .ca-tabs button.on { color: var(--ca-fg); border-bottom-color: var(--acc, #0067c0); }
+.calc .ca-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0.3em 0.4em; display: flex; flex-direction: column; gap: 2px; }
+.calc .ca-empty { margin: 0.6em; color: var(--ca-mut); }
+.calc .ca-hi, .calc .ca-mi { border: 0; background: none; color: inherit; border-radius: 4px; padding: 0.4em 0.6em; display: flex; flex-direction: column; align-items: flex-end; gap: 0.1em; text-align: right; }
+.calc .ca-hi:hover, .calc .ca-mi:hover { background: var(--ca-fh); }
+.calc .ca-hi span { color: var(--ca-mut); font-size: 0.9em; }
+.calc .ca-hi b { font-size: 1.7em; }
+.calc .ca-mi { align-items: stretch; }
+.calc .ca-mi .ca-mv { border: 0; background: none; color: inherit; font-size: 1.7em; font-weight: 700; text-align: right; padding: 0; justify-content: flex-end; }
+.calc .ca-mi span { display: flex; justify-content: flex-end; gap: 2px; }
+.calc .ca-mi span button { border: 0; background: var(--ca-f); color: inherit; font-size: 0.85em; font-weight: 600; padding: 0.15em 0.5em; border-radius: 4px; }
+.calc .ca-mi span button:hover { background: var(--ca-fh); }
+.calc .ca-foot { display: flex; justify-content: flex-end; padding: 0.3em 0.5em; }
+.calc button.ca-trash:disabled { opacity: 0.35; }
+/* ☰ Gezinti menüsü */
+.calc .ca-nav { position: absolute; inset: 0; z-index: 5; background: #0000004d; }
+.calc .ca-nav[hidden], .calc .ca-note[hidden] { display: none; }
+.calc .ca-navp { width: 82%; max-width: 17em; height: 100%; overflow-y: auto; background: var(--ca-bg); display: flex; flex-direction: column; padding: 0.35em 0.3em; box-shadow: 4px 0 18px #0004; }
+.calc .ca-nh { padding: 0.5em 0.6em 0.2em; font-size: 0.9em; color: var(--ca-mut); }
+.calc .ca-navp .ca-nh:first-of-type { font-size: 1.2em; color: var(--ca-fg); }
+.calc .ca-ni { border: 0; background: none; color: inherit; border-radius: 4px; padding: 0.55em 0.8em; justify-content: flex-start; position: relative; text-align: left; font-size: 1.05em; }
+.calc .ca-ni:hover { background: var(--ca-fh); }
+.calc .ca-ni.on::before { content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px; border-radius: 2px; background: var(--acc, #0067c0); }
+.calc .ca-ni.off { color: var(--ca-mut); }
+.calc .ca-nset { margin-top: auto; gap: 0.6em; }
+.calc .ca-note { position: absolute; left: 0.6em; right: 0.6em; bottom: 0.6em; z-index: 6; background: #323232; color: #fff; border-radius: 6px; padding: 0.6em 0.8em; box-shadow: 0 4px 14px #0006; font-size: 0.95em; }
+/* Koyu tema */
+.dk-dark .calc { --ca-bg: #202020; --ca-fg: #fff; --ca-mut: #c5c5c5; --ca-n: #3b3b3b; --ca-nh: #323232; --ca-f: #323232; --ca-fh: #3b3b3b; --ca-bd: #ffffff0f; --ca-panel: #2b2b2b; --ca-eqc: #000; --ca-sh: none; }
