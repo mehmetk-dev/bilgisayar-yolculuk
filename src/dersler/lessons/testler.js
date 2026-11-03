@@ -692,7 +692,7 @@ export const test11 = test({
 
 export const test12 = test({
   id: 'test12', no: 12, title: '12. hafta testi',
-  desc: 'Sunu: slayt düzenleri, SmartArt, Asıl Slayt, tablo, geçiş, animasyon, prova ve gösteride kalem üzerine 17 soru.',
+  desc: 'Sunu: slayt düzenleri, SmartArt, Asıl Slayt, tablo, geçiş, animasyon, kaydetme biçimleri, prova ve gösteride kalem üzerine 21 soru.',
   qs: [
     { t: 'Slayt nedir?', pic: '📙', q: 'Bir sunudaki her bir sayfaya ne denir?', opts: ['Slayt', 'Hücre', 'Paragraf'], ok: 0, why: 'Sununun her sayfasına slayt denir. Kısa başlık, birkaç madde ve resim koyulur.' },
     { t: 'Az yazı', pic: '✍', q: 'Slaytlara yazı nasıl yazılmalıdır?', opts: ['Kısa maddelerle, az yazıyla', 'Uzun paragraflarla, bütün bilgiyi sığdırarak', 'En küçük punto ile'], ok: 0, why: 'Dinleyiciler okumaya değil sizi dinlemeye bakmalı. Slayta kısa maddeler ve resim koyulur.' },
@@ -711,6 +711,10 @@ export const test12 = test({
     { t: 'Gösteride kalem', pic: '▶ 🖊', q: 'Slayt gösterisi sırasında bir yazının çevresine daire çizmek istiyorsunuz. Hangi tuşlara basarsınız?', opts: ['F5', 'Ctrl + P', 'Ctrl + S'], ok: 1, why: 'Gösteride Ctrl + P fareyi kalem yapar. E harfi o slayttaki çizimleri siler, Ctrl + A fareyi yeniden ok yapar.' },
     { t: 'Sunum süresi', pic: '⏱', q: 'Konuşmanızın kaç dakika süreceğini ölçmek için ne kullanırsınız?', opts: ['Slayt Gösterisi → Zamanlamaları Prova Et', 'Görünüm → Okuma Görünümü', 'Görünüm → Not Sayfası'], ok: 0, why: 'Zamanlamaları Prova Et gösteriyi başlatır ve her slaytta geçen süreyi sayar. Süreler Slayt Sıralayıcı\'da görünür.' },
     { t: 'Slayt numarası', pic: '1 · 2 · 3', q: 'Bütün slaytlarda slayt numarası olsun ama kapak slaydında görünmesin istiyorsunuz. Ne yaparsınız?', opts: ['Numaraları her slayda elle yazarım', 'Kapak slaydını silerim', 'Ekle → Üst Bilgi ve Alt Bilgi\'de “Başlık slaydında gösterme”yi işaretlerim'], ok: 2, why: 'Üst Bilgi ve Alt Bilgi penceresinde Slayt numarası ve Başlık slaydında gösterme işaretlenip Tümüne Uygula denir.' },
+    { t: 'Bütün slaytlara geçiş', pic: '✨ ⧉', q: 'Sınavda “bütün slaytlara aynı geçişi verin” deniyor. En kısa yol hangisi?', opts: ['Her slayda tek tek tıklayıp geçişi seçmek', 'Geçişler sekmesinde geçişi seçip Tümüne Uygula\'ya basmak', 'Tasarım sekmesinden tema seçmek'], ok: 1, why: 'Geçiş seçilir, sonra Geçişler sekmesindeki <b>Tümüne Uygula</b>\'ya basılır. Sonra: kutusuna verilen süre de bununla bütün slaytlara geçer.' },
+    { t: 'PDF olarak kaydetmek', pic: '📕', q: 'Gerçek PowerPoint\'te sunuyu PDF yapmanın yolu hangisi?', opts: ['Dosya → Dışarı Aktar → PDF/XPS Belgesi Oluştur', 'Ekle → PDF', 'Giriş → PDF olarak kaydet'], ok: 0, why: 'Dosya → <b>Dışarı Aktar</b> → PDF/XPS Belgesi Oluştur. Başka yol: Dosya → Farklı Kaydet → Kayıt türü: PDF.' },
+    { t: 'Animasyon gri', pic: '✦ ?', q: 'Animasyonlar sekmesindeki efektlerin hepsi gri, tıklanmıyor. Neden?', opts: ['Bilgisayar bozuk', 'Slayttaki bir nesne (yazı, resim) seçili değil', 'Sunu kaydedilmemiş'], ok: 1, why: 'Animasyon bir nesneye verilir. Önce slayttaki yazı kutusuna ya da resme tıklayın; efektler o zaman seçilebilir.' },
+    { t: 'Gösteri dosyası', pic: '.ppsx', q: 'Çift tıklanınca düzenleme ekranı değil, doğrudan slayt gösterisi açılan dosya nasıl kaydedilir?', opts: ['Farklı Kaydet → Kayıt türü: PowerPoint Gösterisi (.ppsx)', 'Ctrl + S ile', 'Dosyanın adını “gösteri” yaparak'], ok: 0, why: '<b>PowerPoint Gösterisi (.ppsx)</b> açılır açılmaz gösteri olarak başlar. Düzenlemek için asıl .pptx dosyanızı da saklayın.' },
   ],
 });
 
