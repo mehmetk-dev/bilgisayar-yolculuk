@@ -90,7 +90,7 @@ export const buyukParkur = {
     },
     {
       title: '4. Harcama tablosu', html: '<p>Hesap Tablosu\'nda A1:B3\'e harcamaları yazın: <b>Pasta 450 · Balon 120 · İçecek 200</b>. <b>B4</b>\'e formülle toplamı hesaplatın.</p>',
-      hint: 'Ürün adını yazıp Tab, fiyatı yazıp Enter. B4\'e =TOPLA(B1:B3) ya da ∑ düğmesi.',
+      hint: 'Ürün adını yazıp Tab, fiyatı yazıp Enter. B4\'e =TOPLA(B1:B3) yazın ya da ∑ Otomatik Toplam\'a basın; ∑ formülü önerir, sonra Enter\'a basın.',
       ...durum((c) => cell(c, 'B4').value === 770 && String(cell(c, 'B4').raw || '').startsWith('=')),
     },
     {
