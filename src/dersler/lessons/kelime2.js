@@ -475,3 +475,53 @@ export const dilekceParkur = {
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Bir dilekçeyi baştan sona hazırladınız.</p>' },
   ],
 };
+
+// MEB uygulama sınavına benzeyen ölçülü görev: hazır yazıyı verilen ölçülere getirmek
+const PROVA = 'sınav provası.docx';
+const PROVA_HTML = `<p>Kurs bitirme sınavı hakkında</p>
+<p>Bilgisayar İşletmenliği kursunun bitirme sınavı kurs salonunda yapılacaktır. Sınavda her kursiyer bilgisayar başında kendisine verilen belgeyi istenen ölçülere göre düzenleyecektir.</p>
+<p>Sınava gelirken kimlik kartınızı yanınızda getiriniz. Sınav başladıktan sonra salona kimse alınmayacaktır. Süre bitince belgenizi kaydedip yerinizden kalkmadan bekleyiniz.</p>
+<p>Başarılı olan kursiyerlere kurs bitirme belgesi verilecektir. Sınav programı aşağıdaki çizelgede gösterilmiştir.</p>
+<table class="wd-t"><tr><td>Gün</td><td>Saat</td><td>Yer</td></tr><tr><td>Pazartesi</td><td>10.00</td><td>Bilgisayar salonu</td></tr><tr><td>Salı</td><td>14.00</td><td>Bilgisayar salonu</td></tr><tr><td>Çarşamba</td><td>10.00</td><td>Toplantı salonu</td></tr></table>
+<p>Halk Eğitim Merkezi Müdürlüğü</p>`;
+const GOVDE = ['bitirme sınavı kurs salonunda', 'kimlik kartınızı', 'başarılı olan kursiyerlere'];
+const govdeler = (c) => GOVDE.map((w) => block(c, w)).filter(Boolean);
+const metinler = (c) => info(c).blocks.filter((x) => x.text);
+const yaziTipi = (c) => metinler(c).length >= 5 && metinler(c).every((x) => x.fonts?.length && x.fonts.every((n) => n === 'Times New Roman'));
+const near = (a, b) => Math.abs(a - b) < 0.06;
+// Parkurda her belge olayından sonra koşula bakılır (biçim, paragraf, tablo, düzen…)
+const anyDoc = (test) => (ev, c) => ev.type.startsWith('doc-') && !!test(c);
+
+export const mebProva = {
+  id: 'meb-prova', icon: '🎓', title: 'MEB sınav provası: resmî yazı', minutes: 30, stage: 'desktop', parkur: true,
+  desc: 'MEB uygulama sınavındaki gibi ölçüleri verilen bir belge: Times New Roman 12, 1,5 satır aralığı, ilk satır girintisi 1,25 cm, kenar boşlukları 2,5 cm, gölgeli tablo başlığı, sayfa numarası, PDF. Süreler tutulur.',
+  setup: (c) => { if (!c.d.fs.find('docs', PROVA)) c.d.fs.create('docs', { type: 'file', name: PROVA, content: { html: PROVA_HTML, layout: { margin: 'dar' } } }); },
+  steps: [
+    {
+      title: 'Sınav provası',
+      html: `<p>MEB uygulama sınavında size hazır bir yazı ve bir <b>ölçü listesi</b> verilir. Bu parkurda aynısını yapacaksınız. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>
+        <table class="sum"><tr><td>Yazı tipi</td><td>Times New Roman, 12 punto</td></tr><tr><td>Başlık</td><td>Ortalı, kalın, 14 punto</td></tr><tr><td>Paragraflar</td><td>İki yana yaslı, ilk satır girintisi 1,25 cm, satır aralığı 1,5</td></tr>
+        <tr><td>Kenar boşlukları</td><td>Dört kenar 2,5 cm</td></tr><tr><td>Tablo</td><td>Başlık satırı gölgeli</td></tr><tr><td>Sayfa numarası</td><td>Sayfanın altında, ortada</td></tr><tr><td>Kayıt</td><td>PDF olarak</td></tr></table>`,  // Eğitmen notu: son ekranda her görevin süresi görünür.
+      setup: (c) => { desktopReady(c); c.d.closeAll(); },
+    },
+    { title: '1. Belgeyi açın', html: `<p><b>Belgeler</b> klasöründeki <b>${PROVA}</b> belgesini açın.</p>`, hint: 'Dosya Gezgini → Belgeler → dosyaya çift tık. Ya da Kelime İşlemci\'de Dosya → Aç.',
+      check: (c) => /sınav provası/i.test(info(c).fileName || ''), on: (ev, c) => !!W(c) && /sınav provası/i.test(info(c).fileName || '') },
+    { title: '2. Yazı tipi ve boyutu', html: '<p>Bütün belgeyi <b>Times New Roman</b>, <b>12 punto</b> yapın.</p>', hint: 'Ctrl + A ile hepsini seçin; Giriş sekmesinde yazı tipi kutusu ve yanındaki boyut kutusu.',
+      on: anyDoc((c) => yaziTipi(c) && metinler(c).every((x) => x.size === 12)) },
+    { title: '3. Başlık', html: '<p>İlk satırdaki başlığı <b>ortalı, kalın ve 14 punto</b> yapın.</p>', hint: 'Başlığa üç kez tıklayıp seçin; Ctrl + E, Ctrl + B ve boyut kutusundan 14.',
+      on: anyDoc((c) => { const b = block(c, 'sınavı hakkında'); return b && b.align === 'center' && b.bold && b.size >= 14; }) },
+    { title: '4. İki yana yaslayın', html: '<p>Üç metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: '“Bilgisayar İşletmenliği…” paragrafının başından “…gösterilmiştir.” sözcüğünün sonuna kadar sürükleyip seçin, Ctrl + J.',
+      on: anyDoc((c) => govdeler(c).length === 3 && govdeler(c).every((b) => b.align === 'justify')) },
+    { title: '5. İlk satır ve satır aralığı', html: '<p>Aynı üç paragrafa <b>ilk satır girintisi 1,25 cm</b> ve <b>1,5 satır aralığı</b> verin.</p>', hint: 'Üç paragraf seçiliyken Giriş → Paragraf bölümünün sağ altındaki küçük ok (↘). Özel: İlk satır, Ölçü: 1,25 cm; Satır aralığı: 1,5 satır; Tamam.',
+      on: anyDoc((c) => govdeler(c).length === 3 && govdeler(c).every((b) => near(b.first, 1.25) && near(b.lh, 1.5))) },
+    { title: '6. Kenar boşlukları', html: '<p>Belgenin kenar boşlukları dar. <b>Dört kenarı da 2,5 cm</b> yapın.</p>', hint: 'Düzen → Kenar Boşlukları ▾ → Özel Kenar Boşlukları…: Üst, Alt, Sol, Sağ kutularına 2,5 yazıp Tamam. (Hazır Normal de 2,5 cm\'dir.)',
+      on: (ev, c) => { if (ev.type !== 'doc-layout') return false; const l = info(c).layout; return l.margin === 'normal' || (l.margin === 'ozel' && ['top', 'bottom', 'left', 'right'].every((k) => l.mg?.[k] === 2.5)); } },
+    { title: '7. Tablo başlığı', html: '<p>Tablonun <b>ilk satırını</b> (Gün, Saat, Yer) <b>açık gri</b> ile gölgelendirin.</p>', hint: 'İlk satırın üç hücresini soldan sağa sürükleyerek seçin; Tablo Tasarımı → Gölgelendirme ▾ → Açık gri.',
+      on: anyDoc((c) => !!info(c).table?.headShade) },
+    { title: '8. Sayfa numarası', html: '<p>Sayfanın <b>altına, ortaya</b> sayfa numarası ekleyin.</p>', hint: 'Ekle → Sayfa Numarası ▾ → Sayfanın Altı → Düz Numara 2.',
+      on: (ev, c) => ev.type === 'doc-pagenum' && info(c).pageNum === 'orta' },
+    { title: '9. PDF', html: '<p>Belgeyi <b>Belgeler</b> klasörüne <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF.)',
+      on: (ev) => ev.type === 'doc-pdf' },
+    { final: true, title: 'Prova bitti! 🎉', html: '<p>Sınavda istenen ölçülerin hepsini uyguladınız. Gerçek sınavdan önce aynı işleri gerçek Word\'de de bir kez deneyin.</p>' },
+  ],
+};
