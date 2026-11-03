@@ -177,6 +177,7 @@ const SYS = {
 // ---- Tek renkli (currentColor) arayüz simgeleri: 24x24, ince çizgili, Fluent tarzı ----
 const M = (name, body, vb = '0 0 24 24') => `<svg class="wi wi-m" data-wi-m="${name}" viewBox="${vb}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${body}</svg>`;
 const MONO = {
+  eye: M('eye', '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>'),
   chevup: M('chevup', '<path d="M6 15l6-6 6 6"/>'),
   chevdown: M('chevdown', '<path d="M6 9l6 6 6-6"/>'),
   chevright: M('chevright', '<path d="M9 6l6 6-6 6"/>'),
@@ -250,6 +251,7 @@ const E2I = {
 };
 export function iconFor(x) {
   if (typeof x !== 'string') return x;
+  if (/^[a-z][a-z-]*$/.test(x)) return SYS[x] ?? APP[x] ?? x; // ad ile: 'warn', 'ok', 'usb', 'snip' ...
   return E2I[x.replace(/️/g, '')] ?? E2I[x] ?? x;
 }
 
