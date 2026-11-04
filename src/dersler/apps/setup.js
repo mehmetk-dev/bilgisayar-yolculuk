@@ -1,9 +1,10 @@
 // Kurulum sihirbazı: İleri, İleri… ama dikkat: lisans, kurulum yeri ve "ek yazılım" kutucukları.
 import { esc, progress } from './util.js';
+import { APP_ICONS, SYS_ICONS, MONO } from './appicons.js';
 
 const PRODUCTS = {
-  viewer: { name: 'Resim Gösterici', icon: '🌄', app: 'viewer', extras: true },
-  driver: { name: 'R-200 Yazıcı Sürücüsü', icon: '🖨', app: null, extras: false },
+  viewer: { name: 'Resim Gösterici', icon: APP_ICONS.viewer, app: 'viewer', extras: true },
+  driver: { name: 'R-200 Yazıcı Sürücüsü', icon: SYS_ICONS.printer, app: null, extras: false },
 };
 
 export function setup({ desk, body, args, emit, setTitle, close, dialogs }) {
@@ -29,7 +30,7 @@ export function setup({ desk, body, args, emit, setTitle, close, dialogs }) {
       <p class="su-small">Bu bileşenler isteğe bağlıdır ve kurulmaları gerekmez.</p>`;
     if (p === 'ready') h = `<h2>Kurulmaya hazır</h2><p><b>${P.name}</b> kurulmaya hazır. Başlamak için <b>Kur</b>'a tıklayın.</p>`;
     if (p === 'install') h = `<h2>Kuruluyor…</h2><div class="su-prog"></div>`;
-    if (p === 'done') h = `<h2>Kurulum tamamlandı ✔</h2><p><b>${P.name}</b> bilgisayarınıza kuruldu.</p>${P.app ? `<label class="su-opt"><input type="checkbox" data-opt="run" ${st.run ? 'checked' : ''}> ${P.name}'yi şimdi çalıştır</label>` : ''}`;
+    if (p === 'done') h = `<h2>Kurulum tamamlandı ${MONO.check}</h2><p><b>${P.name}</b> bilgisayarınıza kuruldu.</p>${P.app ? `<label class="su-opt"><input type="checkbox" data-opt="run" ${st.run ? 'checked' : ''}> ${P.name}'yi şimdi çalıştır</label>` : ''}`;
     const nextLabel = p === 'ready' ? 'Kur' : p === 'done' ? 'Son' : 'İleri >';
     body.innerHTML = `<div class="su-side">${P.icon}</div><div class="su-main"><div class="su-content">${h}</div>
       <div class="su-btns">${st.page > 0 && p !== 'install' && p !== 'done' ? '<button type="button" data-b="back">< Geri</button>' : ''}
@@ -56,7 +57,7 @@ export function setup({ desk, body, args, emit, setTitle, close, dialogs }) {
     if (!b || b.disabled) return;
     if (b.dataset.b === 'back') { st.page--; render(); return; }
     if (b.dataset.b === 'cancel') {
-      const a = await dialogs.ask({ title: 'Kurulum', icon: '❓', text: 'Kurulumdan çıkmak istediğinizden emin misiniz?', buttons: [['yes', 'Evet', true], ['no', 'Hayır']] });
+      const a = await dialogs.ask({ title: 'Kurulum', icon: 'info', text: 'Kurulumdan çıkmak istediğinizden emin misiniz?', buttons: [['yes', 'Evet', true], ['no', 'Hayır']] });
       if (a === 'yes') { emit('setup-cancel', { product: kind }); close(); }
       return;
     }
@@ -64,7 +65,7 @@ export function setup({ desk, body, args, emit, setTitle, close, dialogs }) {
       emit('setup-done', { product: kind, extras: Object.keys(st.extras).filter((k) => st.extras[k] && P.extras), shortcut: st.shortcut });
       close();
       if (P.app && st.run) desk.open(P.app);
-      if (st.extras.toolbar && P.extras) desk.toast('Hızlı Arama Araç Çubuğu kuruldu', 'Ek bileşen kutucuklarını boşaltmadığınız için istemediğiniz bir araç çubuğu da kuruldu.', '😬', 8000);
+      if (st.extras.toolbar && P.extras) desk.toast('Hızlı Arama Araç Çubuğu kuruldu', 'Ek bileşen kutucuklarını boşaltmadığınız için istemediğiniz bir araç çubuğu da kuruldu.', 'warn', 8000);
       return;
     }
     st.page++;
