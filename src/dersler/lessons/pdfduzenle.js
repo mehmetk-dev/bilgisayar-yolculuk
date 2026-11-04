@@ -11,10 +11,10 @@ export const pdfDuzenle = {
   desc: 'PDF formunu bilgisayarda doldurmak ve yalnızca gereken sayfayı yazdırmak.',
   summary: [
     ['⬇ PDF indir', 'Formu bilgisayara kaydeder: İndirilenler klasörü'],
-    ['T Yazı ekle', 'Boşluğa tıklayıp yazı yazın (formu elle doldurmanıza gerek kalmaz)'],
-    ['🖍 Vurgula', 'Fareyi sürükleyerek önemli yeri sarıya boyar'],
-    ['✍ İmza', 'İmza yerine tıklayın'],
-    ['💾 Kaydet', 'Doldurduğunuz hâli yeni bir dosya olarak saklar; asıl form bozulmaz'],
+    ['Yazı ekle', 'Boşluğa tıklayıp yazı yazın (formu elle doldurmanıza gerek kalmaz)'],
+    ['Vurgula', 'Fareyi sürükleyerek önemli yeri sarıya boyar'],
+    ['İmza', 'İmza yerine tıklayın'],
+    ['Kaydet', 'Doldurduğunuz hâli yeni bir dosya olarak saklar; asıl form bozulmaz'],
     ['Yazdırma → Sayfalar', 'Yalnızca gerekli sayfayı seçin: kâğıt ve mürekkep tasarrufu'],
     ['Kopya, iki yüz, renk', 'Kopya sayısı, kâğıdın iki yüzüne yazdırma, siyah-beyaz'],
     ['Asıl yazıyı değiştirmek', 'PDF\'in kendi yazısı değiştirilemez; asıl belge (Word) gerekir'],
@@ -45,22 +45,22 @@ export const pdfDuzenle = {
       html: '<p>Sağdaki indirme panelinde <b>Dosyayı aç</b>\'a tıklayın (kaçırdıysanız tarayıcıdaki ⬇ simgesine ya da Dosya Gezgini → İndirilenler\'e bakın). <b>PDF Okuyucu</b> açılır.</p>',
       check: (c) => !!c.d.find('pdf'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'pdf',
-      done: 'Form PDF Okuyucu\'da açıldı. Üstteki <b>✎ Düzenle</b> şeridini kullanacağız.',
+      done: 'Form PDF Okuyucu\'da açıldı. Üstteki <b>Düzenle</b> şeridini kullanacağız.',
     },
     {
       title: 'Yazı ekleyin',
-      html: `<p><b>T Yazı ekle</b> düğmesine tıklayın, sonra formda <b>“Adı soyadı”</b> yazısının yanındaki boşluğa tıklayıp adınızı yazın, <b>Enter</b>'a basın. Aynı şekilde <b>Adres</b> boşluğuna da bir adres yazın.</p>
+      html: `<p><b>Yazı ekle</b> düğmesine tıklayın, sonra formda <b>“Adı soyadı”</b> yazısının yanındaki boşluğa tıklayıp adınızı yazın, <b>Enter</b>'a basın. Aynı şekilde <b>Adres</b> boşluğuna da bir adres yazın.</p>
         <p class="mut">Gerçek kimlik ve telefon numaranızı yazmayın; alıştırma için uydurma bilgi yeterli.</p>`,
       hint: 'Düğme basılı kalır (mavi). Boşluk, “Adı soyadı:” yazısının sağındaki çizgidir. Yazdıktan sonra Enter.',
       on: (ev, c) => {
         if (ev.type === 'pdf-annot' && ev.kind === 'text') c.s.n = (c.s.n || 0) + 1;
         return (c.s.n || 0) >= 2;
       },
-      done: 'İki boşluğu doldurdunuz. Yazıyı yanlış yere koyduysanız <b>↶ Geri al</b> ile son eklediğinizi silebilirsiniz.',
+      done: 'İki boşluğu doldurdunuz. Yazıyı yanlış yere koyduysanız <b>Geri al</b> ile son eklediğinizi silebilirsiniz.',
     },
     {
       title: 'Önemli yeri vurgulayın',
-      html: '<p><b>🖍 Vurgula</b>\'ya tıklayın. Fareyi <b>“Başvuru ücreti: 150 ₺”</b> satırının üzerinde soldan sağa <b>basılı tutarak sürükleyin</b>. Satır sarıya boyanır.</p>',
+      html: '<p><b>Vurgula</b>\'ya tıklayın. Fareyi <b>“Başvuru ücreti: 150 ₺”</b> satırının üzerinde soldan sağa <b>basılı tutarak sürükleyin</b>. Satır sarıya boyanır.</p>',
       hint: 'Düğmeye bastıktan sonra farenin sol tuşunu satırın başında basılı tutun, sağa ve biraz aşağı sürükleyip bırakın.',
       on: (ev, c) => {
         if (ev.type !== 'pdf-annot' || ev.kind !== 'hl') return false;
@@ -71,13 +71,13 @@ export const pdfDuzenle = {
     },
     {
       title: 'İmzalayın',
-      html: '<p><b>✍ İmza</b>\'ya tıklayın, sonra formun altındaki <b>“İmza:”</b> yazısının yanındaki boşluğa tıklayın.</p>',
+      html: '<p><b>İmza</b>\'ya tıklayın, sonra formun altındaki <b>“İmza:”</b> yazısının yanındaki boşluğa tıklayın.</p>',
       on: (ev) => ev.type === 'pdf-annot' && ev.kind === 'sign',
       done: 'İmza yerleşti. Bu, belgeye <b>görüntü olarak</b> konan bir imzadır: kurumlar çoğu zaman yine de ıslak imza ister. Başvuru sayfasında “elektronik imza kabul edilir” yazıyorsa geçerlidir.',
     },
     {
       title: 'Kaydedin',
-      html: `<p>Doldurduğunuz formu saklayın: <b>💾 Kaydet</b>'e tıklayın. Açılan pencerede <b>Belgeler</b> klasörünü seçili bırakın, ad olarak kendiliğinden gelen <b>“… (doldurulmuş).pdf”</b>'yi kabul edip <b>Kaydet</b>'e basın.</p>`,
+      html: `<p>Doldurduğunuz formu saklayın: <b>Kaydet</b>'e tıklayın. Açılan pencerede <b>Belgeler</b> klasörünü seçili bırakın, ad olarak kendiliğinden gelen <b>“… (doldurulmuş).pdf”</b>'yi kabul edip <b>Kaydet</b>'e basın.</p>`,
       on: (ev, c) => {
         if (ev.type !== 'pdf-save') return false;
         if (ev.annots < 3) { c.note('Dosya kaydedildi ama içinde az bilgi var. Adı, adresi ve imzayı eklediğinizden emin olun.'); }
@@ -87,9 +87,9 @@ export const pdfDuzenle = {
     },
     {
       title: 'Yazdırma seçeneklerini açın',
-      html: `<p>Formu yazdıracağız. <b>🖨 Yazdır</b>'a (ya da ${K('Ctrl')} + ${K('P')}) tıklayın. Bu sefer pencerede <b>Sayfalar</b>, <b>Renk</b> ve <b>İki yüze</b> seçenekleri var; en altta da <b>kaç yaprak kâğıt</b> harcanacağı yazıyor.</p>`,
+      html: `<p>Formu yazdıracağız. <b>Yazdır</b>'a (ya da ${K('Ctrl')} + ${K('P')}) tıklayın. Bu sefer pencerede <b>Sayfalar</b>, <b>Renk</b> ve <b>İki yüze</b> seçenekleri var; en altta da <b>kaç yaprak kâğıt</b> harcanacağı yazıyor.</p>`,
       combo: ['Ctrl', 'KeyP'],
-      hint: 'Ctrl + P çalışmazsa önce belgeye bir kez tıklayın, ya da 🖨 Yazdır düğmesini kullanın.',
+      hint: 'Ctrl + P çalışmazsa önce belgeye bir kez tıklayın, ya da Yazdır düğmesini kullanın.',
       on: (ev) => ev.type === 'pdf-print-open',
       done: 'Yazdırma penceresi açıldı. Seçenekleri değiştirdikçe alttaki yaprak sayısı da değişir.',
     },

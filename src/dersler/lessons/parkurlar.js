@@ -112,7 +112,7 @@ export const gunlukParkur = {
     }),
     {
       title: '5. Tek sayfa yazdırın', html: '<p>Faturanın <b>yalnızca son ödeme tarihinin yazdığı sayfayı</b> yazdırın.</p>',
-      hint: 'PDF Okuyucu → 🖨 Yazdır → Sayfalar: Geçerli sayfa (2. sayfadayken) ya da Aralık yaz → 2.',
+      hint: 'PDF Okuyucu → Yazdır → Sayfalar: Geçerli sayfa (2. sayfadayken) ya da Aralık yaz → 2.',
       on: (ev, c) => {
         if (ev.type !== 'pdf-print') return false;
         if (ev.pagesPrinted !== 1 || ev.from !== 2) { c.note(`${ev.pagesPrinted} sayfa yazdırıldı (${ev.from}–${ev.to}). Yalnızca 2. sayfa çıkmalıydı: yeniden yazdırın.`); return false; }

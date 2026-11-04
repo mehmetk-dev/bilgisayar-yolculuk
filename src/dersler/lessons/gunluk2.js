@@ -140,7 +140,7 @@ export const whatsappWeb = {
     },
     {
       title: 'Açıp yazdırın',
-      html: '<p>Sağ üstte ya da sağ altta çıkan <b>İndirilenler</b> panelinde <b>Dosyayı aç</b>\'a tıklayın. Fotoğraf açılınca <b>🖨 Yazdır</b>\'a tıklayıp yazdırın.</p>',
+      html: '<p>Sağ üstte ya da sağ altta çıkan <b>İndirilenler</b> panelinde <b>Dosyayı aç</b>\'a tıklayın. Fotoğraf açılınca sağ üstteki <b>⋯</b> → <b>Yazdır</b>\'a tıklayıp yazdırın.</p>',
       hint: 'İndirme paneli kapandıysa tarayıcıdaki ⬇ simgesine tıklayın ya da Dosya Gezgini → İndirilenler.',
       on: (ev) => ev.type === 'photo-print',
       done: 'Yazdır\'a bastınız. Gerçek yazıcı seçiliyse kâğıt çıkar; “PDF olarak kaydet” seçiliyse fotoğraf dosya olarak kaydedilir.',

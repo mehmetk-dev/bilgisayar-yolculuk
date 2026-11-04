@@ -83,10 +83,10 @@ export const fotograflar = {
   summary: [
     ['🖼 Resimler', 'Fotoğrafların durduğu klasör'],
     ['Çift tık', 'Fotoğrafı Fotoğraflar uygulamasında açar'],
-    ['◀ ▶', 'Önceki / sonraki fotoğraf'],
-    ['＋ / －', 'Yakınlaştır / uzaklaştır'],
+    ['‹ ›', 'Önceki / sonraki fotoğraf (resmin iki yanındaki oklar, alttaki küçük resimler ya da klavyedeki sol-sağ ok tuşları)'],
+    ['Büyüteç (+ / −)', 'Yakınlaştır / uzaklaştır'],
     ['Sağ tık → Arka plan olarak ayarla', 'Masaüstü resmi yapar'],
-    ['🖨 Yazdır', 'Kâğıt (A4 ya da 10 × 15), fotoğraf boyutu (tam sayfa, 10 × 15, cüzdan) ve kâğıt türü seçilir; önizlemeye bakın'],
+    ['⋯ → Yazdır', 'Kâğıt (A4 ya da 10 × 15), fotoğraf boyutu (tam sayfa, 10 × 15, cüzdan) ve kâğıt türü seçilir; önizlemeye bakın'],
     ['Ctrl + C → Ctrl + V', 'Fotoğrafı albüme kopyalar'],
   ],
   steps: [
@@ -110,7 +110,7 @@ export const fotograflar = {
     },
     {
       title: 'Sonraki fotoğraf',
-      html: '<p>Pencerenin altındaki <b>▶</b> düğmesiyle sonraki fotoğraflara geçin. Hepsine bakın.</p>',
+      html: '<p>Fotoğrafın sağ kenarındaki <b>›</b> okuna (fareyi fotoğrafın üstüne getirince çıkar) ya da alttaki küçük resimlere tıklayarak sonraki fotoğraflara geçin. Hepsine bakın.</p>',
       on: (ev, c) => {
         if (ev.type !== 'photo-open') return false;
         c.s.n = (c.s.n || 0) + 1;
@@ -120,7 +120,7 @@ export const fotograflar = {
     },
     {
       title: 'Yakınlaştırın',
-      html: '<p>Fotoğrafı <b>＋</b> düğmesiyle büyütün, sonra <b>－</b> ile eski haline getirin.</p>',
+      html: '<p>Üstteki araç çubuğunda <b>büyüteç (+)</b> düğmesiyle fotoğrafı büyütün, sonra <b>büyüteç (−)</b> ile eski haline getirin.</p>',
       on: (ev, c) => {
         if (ev.type !== 'photo-zoom') return false;
         if (ev.zoom > 1) c.s.big = true;
@@ -130,13 +130,13 @@ export const fotograflar = {
     },
     {
       title: 'Arka plan yapın',
-      html: '<p>Beğendiğiniz fotoğrafı <b>masaüstü arka planı</b> yapın: Fotoğraflar penceresindeki <b>🖼 Arka plan yap</b> düğmesi ya da Dosya Gezgini\'nde fotoğrafa sağ tık → <b>Masaüstü arka planı olarak ayarla</b>.</p>',
+      html: '<p>Beğendiğiniz fotoğrafı <b>masaüstü arka planı</b> yapın: Fotoğraflar penceresinin sağ üstündeki <b>⋯</b> → <b>Farklı ayarla</b> → <b>Arka plan</b> ya da Dosya Gezgini\'nde fotoğrafa sağ tık → <b>Masaüstü arka planı olarak ayarla</b>.</p>',
       on: (ev) => ev.type === 'wallpaper' && ev.custom,
       done: 'Masaüstünüzde artık kendi fotoğrafınız var.',
     },
     {
       title: 'Fotoğrafı yazdırın',
-      html: `<p><b>torunum</b> fotoğrafını kâğıda basalım. Fotoğraflar penceresinde <b>🖨 Yazdır</b>'a tıklayın ve şunları seçin:</p>
+      html: `<p><b>torunum</b> fotoğrafını kâğıda basalım. Fotoğraflar penceresinin sağ üstündeki <b>⋯</b> düğmesine, sonra <b>Yazdır</b>'a tıklayın ve şunları seçin:</p>
         <ul><li><b>Kâğıt:</b> A4 (normal kâğıt boyu)</li><li><b>Fotoğraf boyutu:</b> 10 × 15 cm, 2 tane</li><li><b>Kâğıt türü:</b> Parlak fotoğraf kâğıdı</li></ul>
         <p>Yazdır penceresinin üstündeki önizlemede kâğıda nasıl çıkacağını görün, sonra <b>🖨 Yazdır</b>.</p>`,
       setup: (c) => { const n = c.d.fs.find('pictures', 'torunum.jpg'); if (n && !c.d.find('photos')) c.d.openNode(n); },

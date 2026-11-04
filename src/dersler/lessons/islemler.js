@@ -19,7 +19,7 @@ export const edevlet = {
     ['Başka giriş yolları', 'e-imza, mobil imza, çipli kimlik kartı, internet bankacılığı'],
     ['Hizmet ara', 'Kelimeyle arayın: ikametgâh, SGK, sabıka…'],
     ['Belge Oluştur → İndir', 'Belge PDF olarak İndirilenler klasörüne iner'],
-    ['PDF → 🖨 Yazdır', 'Belgeyi kâğıda basar'],
+    ['PDF → Yazdır', 'Belgeyi kâğıda basar'],
     ['Barkodlu Belge Doğrulama', 'Size verilen belgenin gerçek olup olmadığını kontrol eder'],
     ['⏻ Çıkış', 'Ortak bilgisayarda işiniz bitince mutlaka'],
   ],
@@ -77,7 +77,7 @@ export const edevlet = {
     },
     {
       title: 'Yazdırın',
-      html: `<p>PDF Okuyucu'nun üstündeki <b>🖨 Yazdır</b>'a basın (ya da ${K('Ctrl', 'P')}) ve yazdırın.</p>`,
+      html: `<p>PDF Okuyucu'nun üstündeki <b>Yazdır</b>'a basın (ya da ${K('Ctrl', 'P')}) ve yazdırın.</p>`,
       combo: ['Ctrl', 'KeyP'],
       on: (ev) => ev.type === 'pdf-print',
       done: 'Yazdır\'a bastınız. Gerçek bir yazıcıda belge kâğıda çıkar; yazıcı yerine “PDF olarak kaydet” seçiliyse belge dosya olarak kaydedilir. Bankaya kâğıdı ya da e-postayla PDF\'i verebilirsiniz.',
