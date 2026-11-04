@@ -520,5 +520,5 @@ export const GUNLUK_SITES = {
   'www.turkiye.gov.tr': EDEVLET,
   'www.mhrs.gov.tr': MHRS,
   'www.firsat-pazari.com.tr': SHOP,
-  'gorusme.bulalim.com': MEET,
+  'meet.google.com': MEET,
 };

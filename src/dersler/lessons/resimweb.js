@@ -30,7 +30,7 @@ export const resimWeb = {
     {
       title: 'Paint\'i açın ve çizin',
       html: '<p>⊞ Başlat → <b>🎨 Paint</b>. Kalemle basit bir <b>çiçek</b> çizin: önce <b>yeşil</b> renkle aşağı doğru bir sap, sonra <b>kırmızı</b> ya da <b>mor</b> renkle sapın tepesine yuvarlak yapraklar.</p>',
-      hint: 'Rengi üstteki renk kutularından seçin, sonra beyaz alanda sol tuşu basılı tutarak çizin.',
+      hint: 'Rengi sağdaki renk yuvarlaklarından seçin, sonra beyaz alanda sol tuşu basılı tutarak çizin.',
       setup: (c) => maxed(c, 'paint'),
       on: (ev, c) => {
         if (ev.type !== 'paint-draw') return false;
@@ -42,7 +42,7 @@ export const resimWeb = {
     },
     {
       title: 'PNG olarak kaydedin',
-      html: `<p>${K('Ctrl')} + ${K('S')} (ya da 💾) ile kaydedin. Pencerede ad olarak <b>çiçek</b> yazın ve <b>Kayıt türü</b>'nün <b>PNG</b> olduğundan emin olup <b>Kaydet</b>'e basın.</p>`,
+      html: `<p>${K('Ctrl')} + ${K('S')} (ya da üstteki disket simgesi) ile kaydedin. Pencerede ad olarak <b>çiçek</b> yazın ve <b>Kayıt türü</b>'nün <b>PNG</b> olduğundan emin olup <b>Kaydet</b>'e basın.</p>`,
       hint: 'Kaydet penceresinde Kayıt türü kutusu en altta. PNG seçili gelir; adı yazıp Kaydet.',
       on: (ev) => ev.type === 'save' && ev.format === 'png',
       done: '<b>çiçek.png</b> kaydedildi. PNG, çizim ve yazı içeren görseller için en uygunudur: kenarlar net kalır.',
@@ -93,7 +93,7 @@ export const resimWeb = {
     },
     {
       title: 'Sayfanın arkasındaki yazı',
-      html: `<p>Sayfa açıkken ${K('Ctrl')} + ${K('U')} tuşlarına basın (ya da tarayıcının ⋯ menüsünden <b>Sayfa kaynağını görüntüle</b>). Yeni sekmede sayfanın <b>yazı hâli</b> görünür.</p>`,
+      html: `<p>Sayfa açıkken ${K('Ctrl')} + ${K('U')} tuşlarına basın (ya da tarayıcının ⋮ menüsünden <b>Sayfa kaynağını görüntüle</b>). Yeni sekmede sayfanın <b>yazı hâli</b> görünür.</p>`,
       hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın.',
       combo: ['Ctrl', 'KeyU'],
       on: (ev) => ev.type === 'web-source',

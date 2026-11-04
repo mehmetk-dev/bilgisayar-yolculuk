@@ -311,8 +311,8 @@ export const alisveris = {
   ],
 };
 
-const permOk = (c) => { const p = c.d.sitePerms?.['bulalim.com']; return p?.camera === 'allow' && p?.mic === 'allow'; };
-const DAVET = { key: 'gorusme', from: 'elif@ornek.com', fromName: 'Elif (torunum)', subject: 'Bu akşam görüntülü görüşelim mi? 📹', url: 'gorusme.bulalim.com/aile', urlText: 'Görüşmeye katılmak için tıklayın',
+const permOk = (c) => { const p = c.d.sitePerms?.['google.com']; return p?.camera === 'allow' && p?.mic === 'allow'; };
+const DAVET = { key: 'gorusme', from: 'elif@ornek.com', fromName: 'Elif (torunum)', subject: 'Bu akşam görüntülü görüşelim mi? 📹', url: 'meet.google.com/xyk-mpda-qrs', urlText: 'Görüşmeye katılmak için tıklayın',
   body: 'Merhaba!\n\nBu akşam hep birlikte görüntülü görüşelim. Kardeşiniz Ahmet de gelecek. Aşağıdaki bağlantıya tıklamanız yeterli; hiçbir şey kurmanıza gerek yok.\n\nSevgiler,\nElif' };
 
 export const gorusme = {
@@ -334,13 +334,13 @@ export const gorusme = {
       mouse: '🖱 Başlat → E-posta → posta',
       setup: (c) => { desktopReady(c); c.d.closeAll(); deliverMail(c.d, DAVET); },
       on: (ev) => ev.type === 'mail-open' && ev.key === 'gorusme',
-      done: 'Postanın altında bir bağlantı ve onun <b>adresi</b> var: gorusme.bulalim.com. Bu davet tanıdık birinden geldi ve siz onu bekliyordunuz. Beklemediğiniz bir davet gelirse önce gönderene sorun.',
+      done: 'Postanın altında bir bağlantı ve onun <b>adresi</b> var: meet.google.com. Bu davet tanıdık birinden geldi ve siz onu bekliyordunuz. Beklemediğiniz bir davet gelirse önce gönderene sorun.',
     },
     {
       title: 'Bağlantıya tıklayın',
       html: '<p>Postadaki <b>👉 Görüşmeye katılmak için tıklayın</b> bağlantısına tıklayın.</p>',
       mouse: '🖱 Bağlantı',
-      on: nav('gorusme.bulalim.com'),
+      on: nav('meet.google.com'),
       done: 'Görüşme tarayıcıda açıldı ve tarayıcı bir şey soruyor.',
     },
     {
@@ -367,7 +367,7 @@ export const gorusme = {
       html: '<p>Görüşmede bazen mikrofon kapalı kalır, kimse sizi duyamaz. Elif sohbete bir şey yazacak. Mikrofonunuz kapalıysa alttaki <b>🔇 Sesi aç</b>\'a basın.</p>',
       setup: (c) => {
         // Mikrofonu kapalı başlat ki öğrenci açmayı öğrensin
-        const st = c.d.webState?.['bulalim.com'];
+        const st = c.d.webState?.['google.com'];
         if (st && st.mic && !st.toldMute) { st.mic = false; c.d.find('browser')?.api.refresh?.(); }
       },
       on: (ev) => ev.type === 'meet-toggle' && ev.what === 'mic' && ev.on,

@@ -72,13 +72,13 @@ export const adres = {
     },
     {
       title: 'Arama sonucunda reklam',
-      html: `<p>Adres çubuğuna <b>e-devlet</b> yazıp Enter (bu bir arama olur). Sonuçlardan <b>gerçek e-Devlet</b>\'e tıklayın.</p><p class="mut">İpucu: üstte “Reklam” yazan sonucun adresine dikkat edin.</p>`,
+      html: `<p>Adres çubuğuna <b>e-devlet</b> yazıp Enter (bu bir arama olur). Sonuçlardan <b>gerçek e-Devlet</b>\'e tıklayın.</p><p class="mut">İpucu: üstte “Sponsorlu” yazan sonucun adresine dikkat edin.</p>`,
       target: 'e-devlet',
       on: (ev, c) => {
         if (ev.type === 'web-ad') { c.warn('Bu bir <b>reklamdı</b>! Adresi turkiye-gov-giris.com, yani .gov.tr değil. Dolandırıcılar arama motorlarında reklam satın alabilir. Geri dönüp gerçek sonucu seçin.'); return false; }
         return ev.type === 'web-nav' && ev.host === 'www.turkiye.gov.tr' && ev.via === 'link';
       },
-      done: 'Doğru sonucu seçtiniz. Arama sonuçlarının en üstündeki “Reklam” etiketli bağlantılar parayla oraya konur; en güvenilir sonuç olmayabilir. Bankanızı, e-Devlet\'i sık kullanılanlara (☆) eklemek daha güvenlidir.',
+      done: 'Doğru sonucu seçtiniz. Arama sonuçlarının en üstündeki “Sponsorlu” etiketli bağlantılar parayla oraya konur; en güvenilir sonuç olmayabilir. Bankanızı, e-Devlet\'i yer işaretlerine (☆) eklemek daha güvenlidir.',
     },
     {
       title: 'Kilidi olan sahte site',
@@ -126,7 +126,7 @@ export const adres = {
       html: '<p>Adres çubuğuna yalnızca <b>lezz</b> yazın. Altta açılan önerilerden <b>www.lezzetli-tarifler.com.tr</b>\'ye tıklayın (ya da ↓ okla seçip Enter).</p>',
       mouse: '🖱 Öneriye tıklayın',
       setup: (c) => { const bi = c.d.find('browser')?.el.querySelector('.br-info'); if (bi) bi.hidden = true; },
-      hint: '🕘 saat simgeli öneriler geçmişten, ⭐ olanlar sık kullanılanlardan, 🔍 olan arama yapar.',
+      hint: '🕘 saat simgeli öneriler geçmişten, yıldızlı olanlar yer işaretlerinden, büyüteçli olan arama yapar.',
       on: (ev) => ev.type === 'web-nav' && ev.via === 'suggest' && ev.host === 'www.lezzetli-tarifler.com.tr',
       done: 'Uzun adresi baştan sona yazmadan açtınız. Önerilere de dikkat: yanlış bir öneriye tıklamak yanlış siteye götürür.',
     },

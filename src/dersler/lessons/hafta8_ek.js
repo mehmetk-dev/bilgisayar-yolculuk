@@ -11,7 +11,7 @@ export const aramaPratik = {
   desc: 'Orta seviye: aramayla hava durumu, tarif ve haber bulmak; sekmeler.',
   summary: [
     ['Kısa arama', '“izmir hava durumu”, “mercimek çorbası tarifi”: birkaç anahtar kelime yeter'],
-    ['Sonuçlar', 'Adrese (yeşil yazı) bakın; “Reklam” yazanları atlayın'],
+    ['Sonuçlar', 'Adrese (yeşil yazı) bakın; “Sponsorlu” yazanları atlayın'],
     ['Okumak', 'Sayfayı tekerlekle kaydırarak sonuna kadar'],
     ['＋ Yeni sekme', 'Açık sayfayı kaybetmeden başka bir şey aramak'],
     ['← Geri', 'Bir önceki sayfa'],
@@ -19,7 +19,7 @@ export const aramaPratik = {
   steps: [
     {
       title: 'İyi arama nasıl yapılır?',
-      html: `<ul class="big-list"><li>Uzun cümle yerine <b>birkaç anahtar kelime</b> yazın: “yarın izmirde hava nasıl olacak acaba” yerine <b>izmir hava durumu</b>.</li><li>Sonuçlarda başlığın üstündeki <b>adrese</b> bakın.</li><li>“Reklam” yazan sonuçları atlayın.</li></ul>
+      html: `<ul class="big-list"><li>Uzun cümle yerine <b>birkaç anahtar kelime</b> yazın: “yarın izmirde hava nasıl olacak acaba” yerine <b>izmir hava durumu</b>.</li><li>Sonuçlarda başlığın üstündeki <b>adrese</b> bakın.</li><li>“Sponsorlu” yazan sonuçları atlayın.</li></ul>
         <p>Bu derste bulduğunuz sayfaları <b>okuyup</b> sorulara cevap vereceksiniz.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); brOpen(c); },
     },
