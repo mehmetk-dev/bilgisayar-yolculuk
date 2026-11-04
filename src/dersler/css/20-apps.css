@@ -1279,58 +1279,6 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .yz-send { border: 0; background: #4527a0; color: #fff; border-radius: 8px; padding: 0 1.1em; cursor: pointer; font: inherit; font-weight: 700; }
 
 /* Denetim Masası */
-.cp { display: flex; flex-direction: column; background: #fff; color: #1b1b1b; font-size: 0.95em; }
-.cp-top { display: flex; align-items: center; gap: 0.5em; padding: 0.4em 0.6em; border-bottom: 1px solid #d8dde5; background: #f5f7fa; }
-.cp-top > button { border: 0; background: none; font-size: 1.2em; padding: 0 0.4em; cursor: pointer; }
-.cp-top > button:disabled { opacity: 0.35; cursor: default; }
-.cp-addr { flex: 1; display: flex; align-items: center; gap: 0.4em; background: #fff; border: 1px solid #c5ccd6; padding: 0.15em 0.6em; min-width: 0; white-space: nowrap; overflow: hidden; }
-.cp-addr i { font-style: normal; color: #667; }
-.cp-addr a, .cp a { color: #0b5cad; cursor: pointer; text-decoration: none; }
-.cp a:hover { text-decoration: underline; }
-.cp-search { display: flex; border: 1px solid #c5ccd6; background: #fff; }
-.cp-search input { border: 0; padding: 0.15em 0.5em; width: 15em; font: inherit; }
-.cp-search button { border: 0; background: none; cursor: pointer; }
-.cp-view { padding: 0.4em 0.8em; text-align: right; font-size: 1em; color: #556; }
-.cp-view select { font: inherit; }
-.cp-main { flex: 1; overflow: auto; padding: 0.4em 1.2em 1.2em; }
-.cp-main h2 { font-weight: 400; font-size: 1.4em; color: #1e3a8a; margin: 0.4em 0 0.8em; }
-.cp-cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.1em 1.5em; }
-.cp-cat { display: flex; gap: 0.7em; }
-.cp-cat > div { display: flex; flex-direction: column; gap: 0.1em; }
-.cp-ic { font-size: 2.2em; line-height: 1.1; }
-.cp-ct { font-size: 1.1em; font-weight: 600; }
-.cp-cat a:not(.cp-ct) { font-size: 1em; }
-.cp-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(11em, 1fr)); gap: 0.6em; }
-.cp-icons a { display: flex; align-items: center; gap: 0.5em; padding: 0.4em; }
-.cp-icons a span { font-size: 1.8em; }
-.cp-icons.small { grid-template-columns: repeat(auto-fill, minmax(15em, 1fr)); gap: 0.1em; }
-.cp-icons.small a span { font-size: 1.1em; }
-.cp-list { display: flex; flex-direction: column; gap: 0.9em; }
-.cp-row { display: flex; gap: 0.8em; align-items: flex-start; }
-.cp-row small { display: block; color: #556; font-size: 0.95em; }
-.cp-note { color: #445; font-size: 1em; }
-.cp-bar { display: flex; gap: 0.5em; margin: 0.5em 0; }
-.cp-bar button, .cp button.primary { font: inherit; border: 1px solid #b0b9c6; background: #f4f6f9; padding: 0.25em 0.9em; border-radius: 3px; cursor: pointer; }
-.cp-bar button:disabled { opacity: 0.45; cursor: default; }
-.cp button.primary { background: #0b5cad; border-color: #0b5cad; color: #fff; }
-.cp-tbl { width: 100%; border-collapse: collapse; font-size: 1em; }
-.cp-tbl th { text-align: left; font-weight: 600; border-bottom: 1px solid #c5ccd6; padding: 0.3em 0.5em; color: #445; }
-.cp-tbl td { padding: 0.35em 0.5em; border-bottom: 1px solid #eef1f5; }
-.cp-tbl tr[data-prog] { cursor: pointer; }
-.cp-tbl tr[data-prog]:hover td { background: #eaf2fb; }
-.cp-tbl tr.on td { background: #cfe3fa; }
-.cp-prog { margin: 0.6em 0; }
-.cp-box { border: 1px solid #d8dde5; border-radius: 4px; padding: 0.6em 0.9em; margin: 0.7em 0; }
-.cp-box h3 { font-size: 1em; color: #1e3a8a; margin: 0 0 0.3em; }
-.cp-box dl { display: grid; grid-template-columns: 12em 1fr; gap: 0.2em 0.8em; margin: 0; }
-.cp-box dt { color: #556; } .cp-box dd { margin: 0; }
-.cp-plans { display: flex; flex-direction: column; gap: 0.5em; }
-.cp-plans label { display: grid; grid-template-columns: auto 1fr; column-gap: 0.5em; }
-.cp-plans small { grid-column: 2; color: #556; }
-.cp-sel { display: flex; justify-content: space-between; align-items: center; gap: 1em; margin: 0.3em 0; }
-.cp-sel select { font: inherit; padding: 0.15em 0.3em; }
-.cp-clock { font-size: 2.4em; font-weight: 300; }
-.dk-dark .cp { background: #202020; color: #eee; }
 
 /* PDF düzenleme araçları */
 .pdf-edit { margin-top: -0.3em; padding: 0.25em 0.4em; background: #f1f5fb; border: 1px solid #d7e0ee; border-radius: 6px; font-size: 0.9em; }

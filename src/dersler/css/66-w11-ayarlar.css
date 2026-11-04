@@ -224,3 +224,88 @@
 }
 .ayr-flow > .ayr-sub { border: 0; padding: 0; background: none; }
 .ayr input:focus-visible, .ayr select:focus-visible { outline: 2px solid var(--ay-acc); outline-offset: 1px; }
+
+/* ===================== Denetim Masası ===================== */
+.dtm { --dt-bg: #fff; --dt-fg: #1b1b1b; --dt-mut: #555; --dt-link: #0b5cad; --dt-h: #1e3287; --dt-bd: #d9d9d9; --dt-pane: #eef3fa; --dt-hov: #e5f3ff; --dt-sel: #cce8ff; --dt-btn: #f3f3f3; --dt-field: #fff;
+  display: flex; flex-direction: column; background: var(--dt-bg); color: var(--dt-fg); font-size: 0.92em; container-type: inline-size; }
+.dk-dark .dtm { --dt-bg: #202020; --dt-fg: #eee; --dt-mut: #b5b5b5; --dt-link: #8cb8ff; --dt-h: #a8c8ff; --dt-bd: #444; --dt-pane: #272727; --dt-hov: #333; --dt-sel: #2f4a6b; --dt-btn: #3a3a3a; --dt-field: #2b2b2b; }
+.dtm .wi { font-size: 1.2em; }
+.dtm-top { display: flex; align-items: center; gap: 0.25em; padding: 0.4em 0.6em; border-bottom: 1px solid var(--dt-bd); }
+.dtm .dtm-top > button { width: 2.1em; height: 2.1em; padding: 0; border: 0; background: none; color: var(--dt-fg); border-radius: 4px; justify-content: center; cursor: pointer; }
+.dtm .dtm-top > button:hover:not(:disabled) { background: var(--dt-hov); border: 0; }
+.dtm .dtm-top > button:disabled { opacity: 0.35; }
+.dtm-addr { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.15em; margin: 0 0.4em; background: var(--dt-field); border: 1px solid var(--dt-bd); border-radius: 4px; padding: 0.2em 0.5em; white-space: nowrap; overflow: hidden; }
+.dtm-addr i { display: inline-flex; color: var(--dt-mut); } .dtm-addr i .wi { font-size: 0.9em; }
+.dtm-ai .wi { font-size: 1.3em; display: block; }
+.dtm-addr span { padding: 0 0.2em; }
+.dtm a { color: var(--dt-link); cursor: pointer; text-decoration: none; }
+.dtm a:hover { text-decoration: underline; color: #3399ff; }
+.dtm-addr a { padding: 0 0.2em; color: var(--dt-fg); } .dtm-addr a:hover { color: var(--dt-fg); background: var(--dt-hov); text-decoration: none; }
+.dtm-search { display: flex; align-items: center; border: 1px solid var(--dt-bd); border-radius: 4px; background: var(--dt-field); }
+.dtm-search input { border: 0; background: none; color: var(--dt-fg); padding: 0.25em 0.5em; width: 14em; font: inherit; min-width: 0; }
+.dtm-search input:focus { outline: none; }
+.dtm-search:focus-within { border-color: #3399ff; }
+.dtm .dtm-search button { border: 0; background: none; color: var(--dt-mut); padding: 0 0.5em; cursor: pointer; }
+.dtm-body { flex: 1; min-height: 0; display: flex; }
+.dtm-left { flex: none; width: 13em; background: var(--dt-pane); padding: 1em 0.9em; display: flex; flex-direction: column; gap: 0.7em; overflow-y: auto; border-right: 1px solid var(--dt-bd); }
+.dtm-main { flex: 1; min-width: 0; overflow: auto; padding: 0.5em 1.3em 1.2em; position: relative; }
+.dtm-view { text-align: right; color: var(--dt-mut); margin: 0.2em 0 -1.9em; position: relative; z-index: 1; }
+.dtm-view select { font: inherit; color: var(--dt-link); background: none; border: 0; cursor: pointer; padding: 0.1em; }
+.dtm-view select option { color: #000; }
+.dtm-hd h2 { font-weight: 400; font-size: 1.55em; color: var(--dt-h); margin: 0.5em 0 0.9em; line-height: 1.25; }
+.dtm-cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4em 1.5em; }
+.dtm-cat { display: flex; gap: 0.8em; align-items: flex-start; }
+.dtm-cat > div { display: flex; flex-direction: column; gap: 0.15em; min-width: 0; }
+.dtm-ic { flex: none; display: inline-flex; }
+.dtm-ic .wi { font-size: 2.2em; }
+.dtm-ic.big .wi { font-size: 3.6em; }
+.dtm-ic.s .wi { font-size: 1.5em; margin-right: 0.4em; }
+.dtm-ct { font-size: 1.2em; margin-bottom: 0.1em; }
+.dtm-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(11.5em, 1fr)); gap: 0.4em; }
+.dtm-icons a { display: flex; align-items: center; gap: 0.6em; padding: 0.35em 0.4em; border: 1px solid transparent; border-radius: 3px; }
+.dtm-icons a:hover { background: var(--dt-hov); text-decoration: none; }
+.dtm-icons a .wi { font-size: 2.1em; }
+.dtm-icons.small { grid-template-columns: repeat(auto-fill, minmax(15em, 1fr)); gap: 0.05em; }
+.dtm-icons.small a .wi { font-size: 1.2em; }
+.dtm-list { display: flex; flex-direction: column; gap: 1.1em; }
+.dtm-row { display: flex; gap: 0.9em; align-items: flex-start; }
+.dtm-row > div { display: flex; flex-direction: column; }
+.dtm-row small { color: var(--dt-mut); font-size: 0.95em; }
+.dtm-it { font-size: 1.1em; font-weight: 600; }
+.dtm-note { color: var(--dt-mut); margin: 0.6em 0; }
+.dtm-bar { display: flex; gap: 0.2em; margin: 0.6em 0 0.5em; padding-bottom: 0.5em; border-bottom: 1px solid var(--dt-bd); }
+.dtm-bar button, .dtm button.primary { font: inherit; color: var(--dt-fg); border: 1px solid transparent; background: none; padding: 0.25em 0.9em; border-radius: 4px; cursor: pointer; }
+.dtm-bar button:hover:not(:disabled) { background: var(--dt-hov); border-color: #99d1ff; }
+.dtm-bar button:disabled { opacity: 0.4; cursor: default; }
+.dtm .primary { background: var(--dt-link); border-color: var(--dt-link); color: #fff; }
+.dk-dark .dtm button.primary { color: #111; }
+.dtm .primary:hover { background: #084c9e; }
+.dtm-tw { overflow-x: auto; }
+.dtm-tbl { width: 100%; border-collapse: collapse; }
+.dtm-tbl th { text-align: left; font-weight: 400; color: var(--dt-mut); border-bottom: 1px solid var(--dt-bd); border-right: 1px solid var(--dt-bd); padding: 0.3em 0.6em; white-space: nowrap; }
+.dtm-tbl td { padding: 0.3em 0.6em; border-bottom: 1px solid transparent; white-space: nowrap; }
+.dtm-tbl td:first-child { display: flex; align-items: center; }
+.dtm-tbl td:nth-child(2) { white-space: normal; }
+.dtm-tbl th, .dtm-tbl td { padding-left: 0.5em; padding-right: 0.5em; }
+.dtm-tbl tr[data-prog] { cursor: default; }
+.dtm-tbl tr[data-prog]:hover td { background: var(--dt-hov); }
+.dtm-tbl tr.on td { background: var(--dt-sel); }
+.dtm-prog { margin: 0.6em 0; }
+.dtm-stat { display: flex; align-items: center; gap: 0.8em; background: var(--dt-pane); border: 1px solid var(--dt-bd); border-radius: 3px; padding: 0.5em 0.8em; margin: 0.8em 0; }
+.dtm-stat small { color: var(--dt-mut); }
+.dtm-stat .dtm-ic .wi { font-size: 2.2em; }
+.dtm-box { margin: 1em 0; }
+.dtm-box h3 { font-size: 1.05em; font-weight: 400; color: var(--dt-h); margin: 0 0 0.5em; padding-bottom: 0.15em; border-bottom: 1px solid var(--dt-bd); }
+.dtm-box dl { display: grid; grid-template-columns: 12em 1fr; gap: 0.25em 0.8em; margin: 0; }
+.dtm-box dt { color: var(--dt-mut); } .dtm-box dd { margin: 0; }
+.dtm-box p { margin: 0.3em 0; }
+.dtm-win { display: flex; align-items: center; gap: 1em; }
+.dtm-logo .wi { font-size: 3.6em; }
+.dtm-plans { display: flex; flex-direction: column; gap: 0.5em; }
+.dtm-plans label { display: grid; grid-template-columns: auto 1fr; column-gap: 0.5em; }
+.dtm-plans small { grid-column: 2; color: var(--dt-mut); }
+.dtm-sel { display: flex; justify-content: space-between; align-items: center; gap: 1em; margin: 0.4em 0; max-width: 30em; }
+.dtm-sel select { font: inherit; padding: 0.15em 0.3em; background: var(--dt-field); color: var(--dt-fg); border: 1px solid var(--dt-bd); border-radius: 3px; }
+.dtm-clock { font-size: 2.4em; font-weight: 300; }
+.dtm a:focus-visible { outline: 2px solid #3399ff; outline-offset: 1px; border-radius: 2px; }
+@container (max-width: 36em) { .dtm-cats { grid-template-columns: 1fr; } .dtm-left { width: 9.5em; } .dtm-search input { width: 7em; } .dtm-box dl { grid-template-columns: 8em 1fr; } }

@@ -10,17 +10,6 @@
 /* Ayarlar */
  .dk-dark .st-dl dt, .dk-dark .st-none  { color: #bbb; }
 /* Denetim Masası */
-.dk-dark .cp { background: #202020; color: #eee; }
-.dk-dark .cp-top { background: #2b2b2b; border-color: #444; }
-.dk-dark .cp-top > button, .dk-dark .cp-search button { color: #eee; }
-.dk-dark .cp-addr, .dk-dark .cp-search, .dk-dark .cp input, .dk-dark .cp select { background: #333; color: #eee; border-color: #555; }
-.dk-dark .cp-addr i, .dk-dark .cp-view, .dk-dark .cp-row small, .dk-dark .cp-note, .dk-dark .cp-tbl th, .dk-dark .cp-box dt, .dk-dark .cp-plans small { color: #bbb; }
-.dk-dark .cp-addr a, .dk-dark .cp a { color: #8cb8ff; }
-.dk-dark .cp-main h2, .dk-dark .cp-box h3 { color: #a8c8ff; }
-.dk-dark .cp-bar button { background: #3a3a3a; color: #eee; border-color: #555; }
-.dk-dark .cp-tbl th { border-color: #444; }
-.dk-dark .cp-tbl tr[data-prog]:hover td { background: #333; }
-.dk-dark .cp-tbl tr.on td { background: #2f4a6b; }
 /* Aygıt Yöneticisi */
 .dk-dark .dm-bar { color: #ddd; border-color: #444; }
 .dk-dark .dm-head { color: #eee; }

@@ -79,7 +79,19 @@ export const MI = {
   family: M('family', '<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9.5" r="2.2"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M14 20a3.5 3.5 0 0 1 7 0"/>'),
 };
 
-// Wi-Fi: sinyal gücü kadar yay dolu, gerisi soluk (0–4 çubuk); kilitli ağda küçük kilit
+// Denetim Masası öğe simgeleri (renkli, düz)
+export const CP = {
+  firewall: C('cp-firewall', '<rect x="2.5" y="4.5" width="19" height="15" rx="1.6" fill="#d9532b"/><path d="M2.5 9.5h19M2.5 14.5h19M9 4.5v5M15 9.5v5M9 14.5v5" stroke="#f6dcd2" stroke-width="1.2"/>'),
+  power: C('cp-power', '<rect x="2.5" y="7" width="16" height="10" rx="2" fill="#3aa655"/><rect x="18.5" y="10" width="2.6" height="4" rx="1" fill="#3aa655"/><path d="M11.4 8.6l-3.2 4h3l-1 3.2 4.2-4.6h-3.1z" fill="#fff"/>'),
+  sound: C('cp-sound', '<path d="M3 9.5h4l5-4v13l-5-4H3z" fill="#5b6b7d"/><path d="M15 9a4.5 4.5 0 0 1 0 6M17.8 6.4a8.2 8.2 0 0 1 0 11.2" fill="none" stroke="#0f78d4" stroke-width="1.9" stroke-linecap="round"/>'),
+  mouse: C('cp-mouse', '<rect x="6" y="2.5" width="12" height="19" rx="6" fill="#e9eef3" stroke="#5b6b7d" stroke-width="1.4"/><path d="M6.7 10V8.6A5.4 5.4 0 0 1 12 2.5V10z" fill="#0f78d4"/><path d="M12 2.5V10M6 10h12" stroke="#5b6b7d" stroke-width="1.4"/>'),
+  keyboard: C('cp-keyboard', '<rect x="2" y="6" width="20" height="12" rx="2" fill="#e9eef3" stroke="#5b6b7d" stroke-width="1.3"/><path d="M5.5 10h.1M8.5 10h.1M11.5 10h.1M14.5 10h.1M17.5 10h.1M7 14h10" stroke="#3b4655" stroke-width="1.8" stroke-linecap="round"/>'),
+  programs: C('cp-programs', '<path d="M3.5 8L12 3.8 20.5 8v9L12 21.2 3.5 17z" fill="#f2a31b"/><path d="M3.5 8L12 12.2 20.5 8M12 12.2v9" fill="none" stroke="#a86a00" stroke-width="1.2"/><path d="M12 12.2L20.5 8v9L12 21.2z" fill="#d98a0b"/>'),
+  region: C('cp-region', '<circle cx="12" cy="12" r="9.5" fill="#2f95e0"/><path d="M6 8.3c2-1.2 3.2 0 4 1s-1 3 0 4 3 0 2 3M14 5c1 2 3 2 4 3.2M16 14.2c1.3 0 2.2 1 2.4 2.3" fill="none" stroke="#5fc07a" stroke-width="2.2" stroke-linecap="round"/>'),
+  display: C('cp-display', '<rect x="2.5" y="4" width="19" height="12.5" rx="2" fill="#0f78d4"/><path d="M4 15l5-6 4 4 3-3 4 5z" fill="#5fc07a"/><circle cx="16.5" cy="8" r="1.4" fill="#ffe27a"/><path d="M9 20h6M12 16.5V20" stroke="#5b6b7d" stroke-width="1.8" stroke-linecap="round"/>'),
+};
+
+// Wi-Fi: sinyal gücü kadar yay dolu, gerisi soluk (0–4 çubuk)
 export const wifiBars = (n = 4) => {
   const on = Math.max(1, Math.min(4, n));
   const arc = (d, i) => `<path d="${d}" opacity="${on >= i ? 1 : 0.28}"/>`;
