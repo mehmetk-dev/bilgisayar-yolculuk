@@ -1,5 +1,5 @@
 // 13. hafta ek ders: tarayıcıyı ustaca kullanmak. Uzantılar (uzantı mağazası, izinler, reklam engelleyici, zararlı
-// uzantıyı kaldırmak), ⋯ menüsü, geçmiş ve göz atma verilerini temizlemek, gizli pencere, sayfada bul.
+// uzantıyı kaldırmak), ⋮ menüsü, geçmiş ve tarama verilerini temizlemek, gizli pencere, sayfada bul.
 import { K, desktopReady, maxed } from './common.js';
 import { rehberSoru } from './kalip.js';
 
@@ -9,11 +9,11 @@ export const tarayici = {
   id: 'tarayici', icon: '🧩', title: 'Tarayıcı: uzantılar, geçmiş, gizli pencere', minutes: 40, stage: 'desktop',
   desc: 'Uzantı eklemek, geçmişi temizlemek, gizli pencere, sayfada bul (Ctrl + F).',
   summary: [
-    ['🧩 → Yeni uzantılar bul', 'Uzantı mağazasını açar'],
+    ['🧩 → Chrome Web Mağazası’nı ziyaret et', 'Uzantı mağazasını açar'],
     ['Uzantı eklemeden önce', 'Doğrulanmış yayımcı ✔, kullanıcı sayısı, puan ve izinler'],
-    ['⋯ → Uzantılar', 'Uzantıları kapatma ve kaldırma'],
+    ['⋮ → Uzantılar', 'Uzantıları kapatma ve kaldırma'],
     ['Ctrl + H', 'Geçmiş: gezdiğiniz sayfalar'],
-    ['Ctrl + Shift + Delete', 'Göz atma verilerini temizle'],
+    ['Ctrl + Shift + Delete', 'Tarama verilerini temizle'],
     ['Ctrl + Shift + N', 'Gizli pencere: geçmiş tutulmaz (ama görünmez olmazsınız)'],
     ['Ctrl + F', 'Sayfada bul: uzun sayfada bir kelimeyi bulur'],
   ],
@@ -25,16 +25,16 @@ export const tarayici = {
       setup: (c) => { desktopReady(c); c.d.closeAll(); br(c); },
     },
     {
-      title: 'Uzantı mağazası',
-      html: '<p>Adres çubuğunun sağındaki <b>🧩</b> düğmesine tıklayın, sonra <b>Yeni uzantılar bul</b>\'a tıklayın.</p>',
-      mouse: '🖱 🧩 → Yeni uzantılar bul',
-      on: (ev) => ev.type === 'web-nav' && ev.host === 'uzantilar.bulalim.com',
-      done: 'Uzantı mağazası açıldı. Sarı kutudaki üç soruyu aklınızda tutun: yayımcı doğrulanmış mı, kaç kişi kullanıyor, hangi izinleri istiyor?',
+      title: 'Chrome Web Mağazası',
+      html: '<p>Adres çubuğunun sağındaki <b>🧩</b> düğmesine tıklayın, sonra <b>Chrome Web Mağazası’nı ziyaret et</b>\'a tıklayın.</p>',
+      mouse: '🖱 🧩 → Chrome Web Mağazası’nı ziyaret et',
+      on: (ev) => ev.type === 'web-nav' && ev.host === 'chromewebstore.google.com',
+      done: 'Chrome Web Mağazası açıldı. Sarı kutudaki üç soruyu aklınızda tutun: yayımcı doğrulanmış mı, kaç kişi kullanıyor, hangi izinleri istiyor?',
     },
     {
       title: 'Reklam engelleyici ekleyin',
-      html: `<ol class="steps"><li><b>🛡 Reklam Kalkanı</b>\'na tıklayın. Yayımcının yanında <b>✔ Doğrulanmış yayımcı</b> yazdığını, 10 milyon kişinin kullandığını görün.</li><li><b>Tarayıcıya ekle</b>\'ye tıklayın, izinleri okuyun ve <b>Uzantı ekle</b> deyin.</li></ol>`,
-      mouse: '🖱 Reklam Kalkanı → Tarayıcıya ekle → Uzantı ekle',
+      html: `<ol class="steps"><li><b>🛡 Reklam Kalkanı</b>\'na tıklayın. Yayımcının yanında <b>✔ Doğrulanmış yayımcı</b> yazdığını, 10 milyon kişinin kullandığını görün.</li><li><b>Chrome’a ekle</b>\'ye tıklayın, izinleri okuyun ve <b>Uzantı ekle</b> deyin.</li></ol>`,
+      mouse: '🖱 Reklam Kalkanı → Chrome’a ekle → Uzantı ekle',
       on: (ev) => ev.type === 'ext-add' && ev.id === 'adblock',
       done: 'Adres çubuğunun yanında 🛡 simgesi çıktı.',
     },
@@ -47,11 +47,11 @@ export const tarayici = {
     },
     {
       title: 'Şüpheli uzantı',
-      html: '<p>🧩 → <b>Yeni uzantılar bul</b> → <b>⚡ Süper İndirici PRO</b> sayfasını açın. Ekleme! Yalnızca bakın.</p>',
-      mouse: '🖱 🧩 → Yeni uzantılar bul → Süper İndirici PRO',
+      html: '<p>🧩 → <b>Chrome Web Mağazası’nı ziyaret et</b> → <b>⚡ Süper İndirici PRO</b> sayfasını açın. Ekleme! Yalnızca bakın.</p>',
+      mouse: '🖱 🧩 → Chrome Web Mağazası’nı ziyaret et → Süper İndirici PRO',
       on: (ev, c) => {
         if (ev.type === 'ext-ask' && ev.fake && ev.answer === 'add') c.warn('Eklediniz! Bir sonraki adımda onu kaldırmayı öğreneceğiz.');
-        return ev.type === 'web-nav' && ev.host === 'uzantilar.bulalim.com' && ev.path === '/fake';
+        return ev.type === 'web-nav' && ev.host === 'chromewebstore.google.com' && ev.path === '/fake';
       },
       done: 'Sayfa açıldı. İşaretlere bakalım.',
     },
@@ -66,37 +66,37 @@ export const tarayici = {
     {
       title: 'Zararlı uzantıyı kaldırın',
       html: `<p>Diyelim ki bir yakınınız bilmeden bu uzantıyı eklemiş: tarayıcıya sarı bir reklam çubuğu gelmiş.</p>
-        <ol class="steps"><li>Sağ üstteki <b>⋯</b> (Ayarlar ve diğer) menüsünü açın, <b>🧩 Uzantılar</b>\'a tıklayın.</li><li>Kırmızı çerçeveli <b>Süper İndirici PRO</b>\'nun yanındaki <b>Kaldır</b>\'a basın.</li></ol>`,
-      mouse: '🖱 ⋯ → Uzantılar → Kaldır',
+        <ol class="steps"><li>Sağ üstteki <b>⋮</b> (Google Chrome’u özelleştir ve yönet) menüsünü açın, <b>Uzantılar</b>\'a tıklayın.</li><li>Kırmızı çerçeveli <b>Süper İndirici PRO</b>\'nun yanındaki <b>Kaldır</b>\'a basın.</li></ol>`,
+      mouse: '🖱 ⋮ → Uzantılar → Kaldır',
       setup: (c) => {
         const s = c.d.settings;
         if (s.ext.fake === undefined) { s.ext.fake = true; c.d.setSetting('toolbar', true); }
         c.d.wins.filter((w) => w.app === 'browser').forEach((w) => w.api.refresh?.());
       },
       on: (ev) => ev.type === 'ext-remove' && ev.fake,
-      done: 'Uzantı ve reklam çubuğu gitti. Tarayıcınız kendiliğinden değiştiyse ⋯ → Ayarlar → <b>Ayarları varsayılanlarına sıfırla</b> da işe yarar.',
+      done: 'Uzantı ve reklam çubuğu gitti. Tarayıcınız kendiliğinden değiştiyse ⋮ → Ayarlar → <b>Ayarları varsayılanlarına sıfırla</b> da işe yarar.',
     },
     {
       title: 'Geçmiş',
-      html: `<p>${K('Ctrl', 'H')}\'ye basın ya da <b>⋯ → 🕘 Geçmiş</b>. Bugün gezdiğiniz sayfaları saatleriyle görün.</p>`,
+      html: `<p>${K('Ctrl', 'H')}\'ye basın ya da <b>⋮ → 🕘 Geçmiş</b>. Bugün gezdiğiniz sayfaları saatleriyle görün.</p>`,
       combo: ['Ctrl', 'KeyH'],
       hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın, sonra yeniden deneyin.',
       on: (ev) => ev.type === 'web-nav' && ev.host === 'tarayici' && ev.path === '/gecmis',
       done: 'Dün bulduğunuz bir tarifi kaybettiyseniz geçmişten bulabilirsiniz. Satırın yanındaki ✕ yalnızca o sayfayı siler.',
     },
     {
-      title: 'Göz atma verilerini temizleyin',
+      title: 'Tarama verilerini temizleyin',
       html: `<p>Ortak kullanılan bir bilgisayarda (kütüphane, iş yeri) işiniz bitince izlerinizi silin. Kısayolu bütün tarayıcılarda aynıdır: ${K('Ctrl', 'Shift', 'Delete')}. Açılan pencerede <b>Şimdi temizle</b>.</p>`,
       combo: ['Ctrl', 'Shift', 'Delete'],
-      hint: 'Kısayol çalışmazsa önce sayfaya bir kez tıklayın. Geçmiş sayfasındaki <b>🧹 Göz atma verilerini temizle</b> düğmesi de aynı pencereyi açar.',
+      hint: 'Kısayol çalışmazsa önce sayfaya bir kez tıklayın. Geçmiş sayfasındaki <b>Tarama verilerini temizle</b> düğmesi de aynı pencereyi açar.',
       on: (ev) => ev.type === 'web-clear',
-      done: 'Geçmiş ve çerezler silindi; sitelerdeki oturumlarınız da kapandı. İndirilen dosyalar ve sık kullanılanlar yerinde durur.',
+      done: 'Geçmiş ve çerezler silindi; sitelerdeki oturumlarınız da kapandı. İndirilen dosyalar ve yer işaretleri yerinde durur.',
     },
     {
       title: 'Gizli pencere',
-      html: `<p><b>⋯ → 🕶 Yeni gizli pencere</b>\'yi açın. Kısayolu: Chrome ve Edge\'de ${K('Ctrl', 'Shift', 'N')}, Firefox\'ta ${K('Ctrl', 'Shift', 'P')}. Açılan mor pencerede yazanları okuyun.</p>`,
-      mouse: '🖱 ⋯ → Yeni gizli pencere',
-      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋯ menüsünü kullanın.',
+      html: `<p><b>⋮ → Yeni Gizli pencere</b>\'yi açın. Kısayolu: Chrome ve Edge\'de ${K('Ctrl', 'Shift', 'N')}, Firefox\'ta ${K('Ctrl', 'Shift', 'P')}. Açılan koyu renkli pencerede yazanları okuyun.</p>`,
+      mouse: '🖱 ⋮ → Yeni gizli pencere',
+      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋮ menüsünü kullanın.',
       on: (ev) => ev.type === 'web-private' || (ev.type === 'app-open' && ev.app === 'browser' && ev.args?.private),
       done: 'Gizli pencerede gezdikleriniz geçmişe yazılmaz. Başkasının bilgisayarında e-postanıza bakarken işe yarar.',
     },
@@ -110,7 +110,7 @@ export const tarayici = {
     }),
     {
       title: 'Sayfada bul',
-      html: `<p>Gizli pencereyi kapatın. Ana pencerede <b>www.lezzetli-tarifler.com.tr/borek</b> adresine gidin. Uzun tarifte <b>fırın</b> kelimesini aramak için ${K('Ctrl', 'F')}\'ye basın (ya da <b>⋯ → Sayfada bul</b>) ve <b>fırın</b> yazın.</p>`,
+      html: `<p>Gizli pencereyi kapatın. Ana pencerede <b>www.lezzetli-tarifler.com.tr/borek</b> adresine gidin. Uzun tarifte <b>fırın</b> kelimesini aramak için ${K('Ctrl', 'F')}\'ye basın (ya da <b>⋮ → Bul...</b>) ve <b>fırın</b> yazın.</p>`,
       combo: ['Ctrl', 'KeyF'],
       hint: 'Bulunan yerler sarıyla boyanır; Enter sonrakine geçer, Esc kutuyu kapatır. Ctrl + F çalışmazsa önce sayfaya bir kez tıklayın.',
       on: (ev) => ev.type === 'web-find' && /fır/i.test(ev.q) && ev.count > 0,

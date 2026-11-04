@@ -12,11 +12,11 @@ export const evCiz = {
   id: 'ev-ciz', icon: '🏠', title: 'Paint ile ev çizelim', minutes: 25, stage: 'desktop',
   desc: 'Şekil araçlarıyla bir ev çizmek: gövde, çatı, kapı, güneş, çimen.',
   summary: [
-    ['▭ Dikdörtgen', 'Bir köşeden karşı köşeye sürükleyin'],
-    ['╱ Çizgi', 'Başlangıçtan bitişe sürükleyin'],
-    ['◯ Elips', 'Shift basılıyken tam daire'],
-    ['🪣 Doldur', 'Kapalı şeklin içine tıklayın'],
-    ['🖌 Fırça', 'Kalın ve yumuşak çizgi'],
+    ['Şekiller: Dikdörtgen', 'Bir köşeden karşı köşeye sürükleyin'],
+    ['Şekiller: Çizgi', 'Başlangıçtan bitişe sürükleyin'],
+    ['Şekiller: Oval', 'Shift basılıyken tam daire'],
+    ['Dolgu (boya kovası)', 'Kapalı şeklin içine tıklayın'],
+    ['Fırçalar', 'Kalın ve yumuşak çizgi'],
     ['Ctrl + Z', 'Beğenmediğinizi geri alın'],
   ],
   steps: [
@@ -27,7 +27,7 @@ export const evCiz = {
     },
     {
       title: 'Evin gövdesi',
-      html: '<p><b>▭ Dikdörtgen</b> aracını seçin. Tuvalin ortasında, sol üstten sağ alta doğru sürükleyerek <b>büyük</b> bir dikdörtgen çizin.</p>',
+      html: '<p><b>Şekiller</b> bölümünden <b>Dikdörtgen</b>\'i seçin. Tuvalin ortasında, sol üstten sağ alta doğru sürükleyerek <b>büyük</b> bir dikdörtgen çizin.</p>',
       setup: paintOpen,
       on: (ev, c) => {
         if (shape('rect')(ev) && (ev.w < 120 || ev.h < 80)) c.note('Biraz daha büyük çizin; içine kapı ve pencere sığacak.');
@@ -37,7 +37,7 @@ export const evCiz = {
     },
     {
       title: 'Çatı',
-      html: '<p><b>╱ Çizgi</b> aracını seçin. Gövdenin sol üst köşesinden yukarı-ortaya, oradan sağ üst köşeye <b>iki çizgi</b> çekerek üçgen bir çatı yapın.</p>',
+      html: '<p><b>Şekiller</b> bölümünden <b>Çizgi</b>\'yi seçin. Gövdenin sol üst köşesinden yukarı-ortaya, oradan sağ üst köşeye <b>iki çizgi</b> çekerek üçgen bir çatı yapın.</p>',
       setup: paintOpen,
       on: (ev, c) => {
         if (!shape('line')(ev)) return false;
@@ -66,24 +66,24 @@ export const evCiz = {
     },
     {
       title: 'Güneş',
-      html: '<p>Rengi <b>sarı</b> yapın, <b>◯ Elips</b> aracıyla sağ üst köşeye bir güneş çizin. Sonra <b>🪣 Doldur</b> ile içine tıklayıp sarıya boyayın.</p>',
+      html: '<p>Rengi <b>sarı</b> yapın, <b>Şekiller</b>\'den <b>Oval</b>\'i seçip sağ üst köşeye bir güneş çizin. Sonra <b>Dolgu</b> (boya kovası) ile içine tıklayıp sarıya boyayın.</p>',
       setup: paintOpen,
       on: (ev, c) => {
-        if (shape('ellipse')(ev)) { c.s.e = true; c.note('Güneş çizildi. Şimdi Doldur aracıyla içine tıklayın.'); }
+        if (shape('ellipse')(ev)) { c.s.e = true; c.note('Güneş çizildi. Şimdi Dolgu aracıyla içine tıklayın.'); }
         return !!c.s.e && ev.type === 'paint-fill';
       },
       done: '☀ Güneş parlıyor.',
     },
     {
       title: 'Gövdeyi boyayın',
-      html: '<p>Bir renk seçin (örneğin turuncu) ve <b>🪣 Doldur</b> ile evin gövdesine, kapı ve pencerelerin dışında bir yere tıklayın.</p>',
+      html: '<p>Bir renk seçin (örneğin turuncu) ve <b>Dolgu</b> (boya kovası) ile evin gövdesine, kapı ve pencerelerin dışında bir yere tıklayın.</p>',
       hint: 'Boya bütün tuvale taştıysa çizgilerde boşluk vardır: Ctrl + Z ile geri alın ve boşluğu kapatın.',
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-fill',
     },
     {
       title: 'Çimen',
-      html: '<p><b>🖌 Fırça</b> aracını ve <b>yeşil</b> rengi seçin. Evin altına sola-sağa sürükleyerek çimen çizin.</p>',
+      html: '<p><b>Fırçalar</b>\'dan fırçayı ve <b>yeşil</b> rengi seçin. Evin altına sola-sağa sürükleyerek çimen çizin.</p>',
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-draw' && ev.tool === 'brush' && ev.len > 100,
       done: 'Resminiz tamam!',
@@ -103,9 +103,9 @@ export const tebrikKarti = {
   id: 'tebrik-karti', icon: '🎂', title: 'Paint ile tebrik kartı', minutes: 25, stage: 'desktop',
   desc: 'Orta seviye: arka plan, şekil, yazı, fırça, kaydetme.',
   summary: [
-    ['🪣 Boş tuvale Doldur', 'Bütün arka planı boyar'],
-    ['A Metin', 'Tıklayın, yazın, Enter'],
-    ['Kalınlık', 'Fırçanın ve çizgilerin kalınlığı'],
+    ['Boş tuvale Dolgu', 'Bütün arka planı boyar'],
+    ['Metin (A)', 'Tıklayın, yazın, Enter'],
+    ['Boyut', 'Fırçanın ve çizgilerin kalınlığı'],
     ['Ctrl + Z', 'Geri al'],
     ['Sağ tık → Masaüstü arka planı', 'Kartı masaüstüne koyar'],
   ],
@@ -118,7 +118,7 @@ export const tebrikKarti = {
     {
       title: 'Arka plan rengi',
       html: '<p>Açık bir renk seçip (sarı, pembe…) <b>boş tuvali baştan sona boyayın</b>.</p>',
-      hint: 'Doldur (🪣) aracını seçip boş tuvalin herhangi bir yerine bir kez tıklayın.',
+      hint: 'Araçlardan Dolgu (boya kovası) aracını seçip boş tuvalin herhangi bir yerine bir kez tıklayın.',
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-fill' && ev.pixels < 20000) c.note('Küçük bir alan boyandı. Boş, beyaz bir yere tıklayın.');
@@ -128,7 +128,7 @@ export const tebrikKarti = {
     {
       title: 'Bir balon',
       html: '<p>Kartın <b>sol üst</b> tarafına büyükçe bir <b>balon</b> çizin: boyu eninden biraz uzun bir elips. Sonra içini kırmızı ya da mavi boyayın.</p>',
-      hint: '◯ Elips ile sürükleyin, sonra renk seçip Doldur ile içine tıklayın.',
+      hint: 'Şekiller\'den Oval ile sürükleyin, sonra renk seçip Dolgu ile içine tıklayın.',
       setup: paintOpen,
       on: (ev, c) => {
         if (shape('ellipse', (e) => e.w > 40)(ev)) c.s.e = true;
@@ -137,15 +137,15 @@ export const tebrikKarti = {
     },
     {
       title: 'Balonun ipi',
-      html: '<p>Balonun altından aşağı doğru bir ip çizin. Kalınlığı inceltmeyi unutmayın.</p>',
-      hint: 'Kalem ya da Çizgi aracı. Kalınlık seçenekleri araçların yanında.',
+      html: '<p>Balonun altından aşağı doğru bir ip çizin. <b>Boyut</b>\'tan <b>İnce</b>\'yi seçmeyi unutmayın.</p>',
+      hint: 'Kalem ya da Çizgi aracı. Boyut düğmesi şeridin ortasındadır.',
       setup: paintOpen,
       on: (ev) => shape('line')(ev) || (ev.type === 'paint-draw' && ev.len > 40),
     },
     {
       title: 'Pasta',
-      html: '<p>Kartın <b>alt kısmına</b> bir doğum günü pastası çizin: <b>kahverengi</b> bir dikdörtgen (pasta) ve üstüne dik <b>3 mum</b> (kısa çizgiler). İsterseniz pastanın içini Doldur ile boyayın.</p>',
-      hint: '▭ Dikdörtgen ile pastayı çizin. Sonra ╱ Çizgi aracıyla pastanın üst kenarından yukarı doğru üç kısa çizgi çekin.',
+      html: '<p>Kartın <b>alt kısmına</b> bir doğum günü pastası çizin: <b>kahverengi</b> bir dikdörtgen (pasta) ve üstüne dik <b>3 mum</b> (kısa çizgiler). İsterseniz pastanın içini Dolgu ile boyayın.</p>',
+      hint: 'Şekiller\'den Dikdörtgen ile pastayı çizin. Sonra Çizgi aracıyla pastanın üst kenarından yukarı doğru üç kısa çizgi çekin.',
       setup: paintOpen,
       on: (ev, c) => {
         if (shape('rect', (e) => e.w > 60)(ev)) { c.s.pasta = true; c.note('Pasta hazır. Şimdi üstüne üç mum.'); return false; }
@@ -158,7 +158,7 @@ export const tebrikKarti = {
     },
     {
       title: 'Yazı',
-      html: '<p><b>A Metin</b> aracıyla kartın ortasına <b>İyi ki doğdun!</b> yazın.</p>',
+      html: '<p><b>Metin</b> (A harfi) aracıyla kartın ortasına <b>İyi ki doğdun!</b> yazın.</p>',
       hint: 'Metin aracını seçin, tuvale tıklayın, yazıp Enter\'a basın.',
       setup: paintOpen,
       on: (ev, c) => {
@@ -170,7 +170,7 @@ export const tebrikKarti = {
     },
     {
       title: 'Süsleyin ve geri alın',
-      html: `<p>Fırçanın <b>kalınlığını değiştirin</b> ve kartın kenarlarına süs çizin. Sonra son çizdiğinizi ${K('Ctrl', 'Z')} ile geri alıp yeniden çizin.</p>`,
+      html: `<p>Fırçanın <b>kalınlığını değiştirin</b> (Boyut düğmesi) ve kartın kenarlarına süs çizin. Sonra son çizdiğinizi ${K('Ctrl', 'Z')} ile geri alıp yeniden çizin.</p>`,
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-size') c.s.size = true;
@@ -235,7 +235,7 @@ export const alintiPratik = {
     },
     {
       title: 'Sorunlu yeri işaretleyin',
-      html: '<p><b>Kırmızı</b> rengi ve <b>◯ Elips</b> aracını seçip hata yazısının çevresine bir daire çizin.</p>',
+      html: '<p><b>Kırmızı</b> rengi ve <b>Şekiller</b>\'den <b>Oval</b>\'i seçip hata yazısının çevresine bir daire çizin.</p>',
       on: (ev, c) => {
         if (shape('ellipse')(ev) && ev.colorName !== 'Kırmızı') c.note(`Daire ${ev.colorName.toLowerCase()} oldu. Kırmızı daha dikkat çeker: Ctrl + Z, kırmızıyı seçip yeniden çizin.`);
         return shape('ellipse', (e) => e.colorName === 'Kırmızı')(ev);

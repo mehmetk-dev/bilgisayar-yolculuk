@@ -559,17 +559,17 @@ export const kelimeHarf = {
   ],
 };
 
-// ------------------------------------------------------------------ Tarayıcı: Yapışkan Not uzantısı, sık kullanılanlar çubuğu
+// ------------------------------------------------------------------ Tarayıcı: Yapışkan Not uzantısı, yer işaretleri çubuğu
 const brN = (c, url) => maxed(c, 'browser', url ? { url } : {});
 
 export const tarayiciNot = {
-  id: 'tarayici-not', icon: '🗒', title: 'Tarayıcı: sayfaya not ve sık kullanılanlar çubuğu', minutes: 25, stage: 'desktop',
-  desc: 'Yapışkan Not uzantısıyla bir sayfaya kendinize not bırakmak, sık kullanılanlar çubuğunu açıp kapatmak.',
+  id: 'tarayici-not', icon: '🗒', title: 'Tarayıcı: sayfaya not ve yer işaretleri çubuğu', minutes: 25, stage: 'desktop',
+  desc: 'Yapışkan Not uzantısıyla bir sayfaya kendinize not bırakmak, yer işaretleri çubuğunu açıp kapatmak.',
   summary: [
-    ['🧩 → Yeni uzantılar bul → Yapışkan Not', 'Sayfaya not bırakan güvenli, doğrulanmış bir uzantı'],
+    ['🧩 → Chrome Web Mağazası’nı ziyaret et → Yapışkan Not', 'Sayfaya not bırakan güvenli, doğrulanmış bir uzantı'],
     ['Araç çubuğundaki 🗒', 'Tıklayınca o sayfa için notunuz açılır; not sayfaya göre saklanır'],
-    ['Ctrl + D (☆)', 'Sayfayı sık kullanılanlara ekler'],
-    ['Ctrl + Shift + B', 'Sık kullanılanlar çubuğunu gösterir ya da gizler (⋯ menüsünden de olur)'],
+    ['Ctrl + D (☆)', 'Sayfayı yer işaretlerine ekler'],
+    ['Ctrl + Shift + B', 'Yer işaretleri çubuğunu gösterir ya da gizler (⋮ menüsünden de olur)'],
     ['Uzantı eklerken', 'Yayımcıya, kullanıcı sayısına ve istenen izinlere bakın'],
   ],
   steps: [
@@ -580,8 +580,8 @@ export const tarayiciNot = {
     },
     {
       title: 'Yapışkan Not\'u ekleyin',
-      html: '<ol class="steps"><li>Adres çubuğunun sağındaki <b>🧩</b> → <b>Yeni uzantılar bul</b>.</li><li><b>🗒 Yapışkan Not</b>\'a tıklayın. Yayımcıya ve izinlere bakın.</li><li><b>Tarayıcıya ekle</b> → <b>Uzantı ekle</b>.</li></ol>',
-      mouse: '🖱 🧩 → Yeni uzantılar bul → Yapışkan Not → Tarayıcıya ekle',
+      html: '<ol class="steps"><li>Adres çubuğunun sağındaki <b>🧩</b> → <b>Chrome Web Mağazası’nı ziyaret et</b>.</li><li><b>🗒 Yapışkan Not</b>\'a tıklayın. Yayımcıya ve izinlere bakın.</li><li><b>Chrome’a ekle</b> → <b>Uzantı ekle</b>.</li></ol>',
+      mouse: '🖱 🧩 → Chrome Web Mağazası’nı ziyaret et → Yapışkan Not → Chrome’a ekle',
       check: (c) => c.d.settings.ext.note === true,
       on: (ev) => ev.type === 'ext-add' && ev.id === 'note',
       done: 'Adres çubuğunun yanında 🗒 simgesi çıktı. Yalnızca “Notlarınızı bu bilgisayarda saklama” izni istiyor: zararsız.',
@@ -600,21 +600,21 @@ export const tarayiciNot = {
       done: 'Not kaydedildi; 🗒 simgesinde küçük bir nokta var. Not, yalnızca bu sayfa için saklanır: başka sitede kutu boş açılır.',
     },
     {
-      title: 'Sayfayı sık kullanılanlara ekleyin',
-      html: `<p>${K('Ctrl', 'D')} tuşlarına basın ya da adres çubuğundaki <b>☆</b>\'a tıklayın. Adres çubuğunun hemen altında <b>sık kullanılanlar çubuğu</b> çıkar.</p>`,
-      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋯ menüsünü kullanın.',
+      title: 'Sayfayı yer işaretlerine ekleyin',
+      html: `<p>${K('Ctrl', 'D')} tuşlarına basın ya da adres çubuğundaki <b>☆</b>\'a tıklayın. Adres çubuğunun hemen altında <b>yer işaretleri çubuğu</b> çıkar.</p>`,
+      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋮ menüsünü kullanın.',
       setup: (c) => { c.d.settings.ext.note = true; brN(c); },
       on: (ev) => ev.type === 'web-bookmark' && !ev.removed,
-      done: 'Sayfa sık kullanılanlara eklendi; çubukta ⭐ ile görünür. Tıklayınca o sayfa açılır.',
+      done: 'Sayfa yer işaretlerine eklendi; çubukta sitenin simgesiyle görünür. Tıklayınca o sayfa açılır.',
     },
     {
       title: 'Çubuğu gizleyin',
-      html: `<p>Sık kullanılanlar çubuğu yer kaplıyorsa gizleyebilirsiniz: ${K('Ctrl', 'Shift', 'B')} ya da <b>⋯</b> → <b>Sık kullanılanlar çubuğunu göster/gizle</b>.</p>`,
-      mouse: '🖱 ⋯ → Sık kullanılanlar çubuğunu göster/gizle',
-      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋯ menüsünü kullanın.',
+      html: `<p>Yer işaretleri çubuğu yer kaplıyorsa gizleyebilirsiniz: ${K('Ctrl', 'Shift', 'B')} ya da <b>⋮</b> → <b>Yer işaretleri çubuğunu göster/gizle</b>.</p>`,
+      mouse: '🖱 ⋮ → Yer işaretleri çubuğunu göster/gizle',
+      hint: 'Tuşlar çalışmazsa önce sayfaya bir kez tıklayın ya da ⋮ menüsünü kullanın.',
       setup: (c) => { c.d.settings.ext.note = true; brN(c); },
       on: (ev) => ev.type === 'web-bmbar' && !ev.on,
-      done: 'Çubuk gizlendi. Sık kullanılanlarınız silinmedi; yalnızca görünmüyor.',
+      done: 'Çubuk gizlendi. Yer işaretleriniz silinmedi; yalnızca görünmüyor.',
     },
     {
       title: 'Çubuğu geri getirin',

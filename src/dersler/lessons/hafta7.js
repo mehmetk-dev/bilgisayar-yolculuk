@@ -7,11 +7,11 @@ export const paint = {
   id: 'paint', icon: '🎨', title: 'Paint ile resim', minutes: 25, stage: 'desktop',
   desc: 'Kalem, renk, fırça, şekiller, yazı, silgi, kaydetme, arka plan yapma.',
   summary: [
-    ['✏ Kalem / 🖌 Fırça', 'Sol tuşu basılı tutup çizin'],
+    ['Kalem / Fırçalar', 'Sol tuşu basılı tutup çizin'],
     ['Renkler', 'Önce renge tıklayın, sonra çizin'],
-    ['▭ ◯ ╱ Şekiller', 'Çapraz sürükleyerek çizilir'],
-    ['🪣 Doldur', 'Kapalı bir alanın içini boyar'],
-    ['A Metin', 'Resme yazı ekler'],
+    ['Şekiller', 'Çapraz sürükleyerek çizilir'],
+    ['Dolgu (boya kovası)', 'Kapalı bir alanın içini boyar'],
+    ['Metin (A)', 'Resme yazı ekler'],
     ['Ctrl + Z', 'Son yaptığınızı geri alır'],
     ['Ctrl + S', 'Kaydet (Resimler klasörüne)'],
   ],
@@ -29,7 +29,7 @@ export const paint = {
     },
     {
       title: 'Kalemle sap çizin',
-      html: '<p>Kalem seçili. Üstteki renklerden <b>yeşile</b> tıklayın. Sonra tuvalin <b>ortasında</b>, sol tuşu <b>basılı tutarak</b> yukarıdan aşağıya uzun bir çizgi çizin: bu, çiçeğin <b>sapı</b>.</p>',
+      html: '<p>Kalem seçili. Sağdaki <b>Renkler</b> bölümünden <b>yeşile</b> tıklayın. Sonra tuvalin <b>ortasında</b>, sol tuşu <b>basılı tutarak</b> yukarıdan aşağıya uzun bir çizgi çizin: bu, çiçeğin <b>sapı</b>.</p>',
       hint: 'Tuvalin üst yarısının ortasından başlayın, aşağıya doğru çekin; altta saksıya yer kalsın.',
       mouse: '🖱 Bas, tut, çiz',
       setup: paintOpen,
@@ -54,7 +54,7 @@ export const paint = {
     },
     {
       title: 'Fırça ile yapraklar',
-      html: '<p><b>🖌 Fırça</b>\'yı seçin, kalınlıktan <b>Kalın</b>\'ı seçin, rengi yeniden <b>yeşil</b> yapın. Sapın iki yanına birer <b>yaprak</b> çizin.</p>',
+      html: '<p><b>Fırçalar</b> bölümündeki fırça simgesine tıklayın, sonra <b>Boyut</b>\'a tıklayıp <b>Kalın</b>\'ı seçin, rengi yeniden <b>yeşil</b> yapın. Sapın iki yanına birer <b>yaprak</b> çizin.</p>',
       hint: 'Yaprak için sapın ortasından yana doğru kısa, kalın bir çizgi yeter.',
       setup: paintOpen,
       on: (ev, c) => {
@@ -64,14 +64,14 @@ export const paint = {
     },
     {
       title: 'Dikdörtgenle saksı',
-      html: '<p>Rengi <b>kahverengi</b> yapın ve <b>▭ Dikdörtgen</b>\'i seçin. Sapın <b>alt ucuna</b> bir saksı çizin: saksının sol üst köşesinden başlayıp sol tuşu basılı tutarak sağ alta doğru <b>çapraz</b> sürükleyin, bırakın.</p>',
+      html: '<p>Rengi <b>kahverengi</b> yapın ve <b>Şekiller</b> bölümünden <b>Dikdörtgen</b>\'i (boş kare) seçin. Sapın <b>alt ucuna</b> bir saksı çizin: saksının sol üst köşesinden başlayıp sol tuşu basılı tutarak sağ alta doğru <b>çapraz</b> sürükleyin, bırakın.</p>',
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-shape' && ev.shape === 'rect',
-      done: 'Saksı yerinde. ◯ Elips ve ╱ Çizgi de aynı şekilde, çapraz sürükleyerek çizilir.',
+      done: 'Saksı yerinde. Oval ve Çizgi de aynı şekilde, çapraz sürükleyerek çizilir.',
     },
     {
       title: 'Saksıyı boyayın',
-      html: '<p><b>🪣 Doldur</b>\'u seçin, <b>turuncu</b> renge tıklayın, sonra saksının <b>içine</b> tıklayın.</p>',
+      html: '<p><b>Araçlar</b> bölümünden <b>Dolgu</b>\'yu (boya kovası) seçin, <b>turuncu</b> renge tıklayın, sonra saksının <b>içine</b> tıklayın.</p>',
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-fill' && ev.pixels > 200000) c.note('Bütün sayfa boyandı: dikdörtgenin <b>dışına</b> tıkladınız. Ctrl + Z ile geri alıp içine tıklayın.');
@@ -89,19 +89,19 @@ export const paint = {
     },
     {
       title: 'Yazı ekleyin',
-      html: `<p><b>A Metin</b> aracını seçin, saksının <b>altına</b> tıklayın, adınızı yazıp ${K('Enter')}'a basın. Resminizin imzası olsun.</p>`,
+      html: `<p><b>Metin</b> (A harfi) aracını seçin, saksının <b>altına</b> tıklayın, adınızı yazıp ${K('Enter')}'a basın. Resminizin imzası olsun.</p>`,
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-text',
     },
     {
       title: 'Silgi',
-      html: '<p><b>🧽 Silgi</b>\'yi seçin. Taşan bir çizgi ya da beğenmediğiniz bir yer varsa silin (yoksa boş bir köşede deneyin).</p>',
+      html: '<p><b>Araçlar</b> bölümünden <b>Silgi</b>\'yi (pembe) seçin. Taşan bir çizgi ya da beğenmediğiniz bir yer varsa silin (yoksa boş bir köşede deneyin).</p>',
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-draw' && ev.tool === 'eraser',
     },
     {
       title: 'Kaydedin',
-      html: `<ol class="steps"><li>${K('Ctrl', 'S')}'ye basın (ya da 💾).</li><li><b>Resimler</b> klasörü seçili; dosya adına <b>çiçeğim</b> yazın.</li><li><b>Kaydet</b>'e tıklayın.</li></ol>`,
+      html: `<ol class="steps"><li>${K('Ctrl', 'S')}'ye basın (ya da pencerenin üstündeki disket simgesi).</li><li><b>Resimler</b> klasörü seçili; dosya adına <b>çiçeğim</b> yazın.</li><li><b>Kaydet</b>'e tıklayın.</li></ol>`,
       combo: ['Ctrl', 'KeyS'],
       setup: paintOpen,
       on: (ev, c) => { if (ev.type === 'save' && ev.app === 'paint') { c.L.pic = ev.name; return true; } return false; },
@@ -151,14 +151,14 @@ export const alinti = {
     },
     {
       title: 'Paint\'e yapıştırın',
-      html: `<p>Paint\'i açın ve ${K('Ctrl', 'V')}'ye basın (ya da 📋 düğmesi).</p>`,
+      html: `<p>Paint\'i açın ve ${K('Ctrl', 'V')}'ye basın (ya da <b>Düzenle</b> → <b>Yapıştır</b>).</p>`,
       combo: ['Ctrl', 'KeyV'],
       on: (ev) => ev.type === 'paint-paste',
       done: 'Alıntı Paint\'te!',
     },
     {
       title: 'Önemli yeri işaretleyin',
-      html: '<p>Resmi birine gösterirken önemli yeri işaretlemek işi kolaylaştırır. <b>Kırmızı</b> rengi ve <b>◯ Elips</b> aracını seçip bugünkü sıcaklığın çevresine bir daire çizin.</p>',
+      html: '<p>Resmi birine gösterirken önemli yeri işaretlemek işi kolaylaştırır. <b>Kırmızı</b> rengi ve <b>Şekiller</b>\'den <b>Oval</b>\'i seçip bugünkü sıcaklığın çevresine bir daire çizin.</p>',
       on: (ev, c) => {
         if (ev.type !== 'paint-shape' || ev.shape !== 'ellipse') return false;
         if (ev.colorName !== 'Kırmızı') { c.note(`Daire ${ev.colorName.toLowerCase()} oldu. Kırmızı daha dikkat çeker: Ctrl + Z, kırmızıyı seçip yeniden çizin.`); return false; }

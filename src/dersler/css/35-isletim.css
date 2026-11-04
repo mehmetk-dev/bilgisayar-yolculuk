@@ -982,29 +982,6 @@
 .bz-edge .bz-addr { border-radius: 14px; background: #f1f3f4; border-color: transparent; }
 .bz-ff .bz-bar { background: #f9f9fb; }
 .bz-ff .bz-addr { background: #f0f0f4; border-color: transparent; }
-.bl-home { display: flex; flex-direction: column; align-items: center; padding-top: 60px; gap: 18px; }
-.bl-logo { font: 700 48px/1 "Segoe UI", "Noto Sans", sans-serif; letter-spacing: -1px; }
-.bl-logo.sm { font-size: 22px; }
-.bl-form { display: flex; gap: 8px; }
-.bl-form input { width: 340px; height: 36px; border: 1px solid #ccc; border-radius: 18px; padding: 0 16px; outline: none; background: #fff; }
-.bl-form input:focus { border-color: #2d6bd6; box-shadow: 0 1px 6px #2d6bd640; }
-.bl-form button { padding: 0 14px; height: 36px; border-radius: 4px; background: #f3f3f3; border: 1px solid #ddd; display: flex; align-items: center; cursor: pointer; }
-.bl-form button:hover { border-color: #bbb; }
-.bl-links { color: #555; font-size: 12px; }
-.bl-links a, .bl-r a { color: #1a0dab; cursor: pointer; }
-.bl-links a:hover, .bl-r a:hover { text-decoration: underline; }
-.bl-res { padding: 14px 24px; }
-.bl-form.sm { align-items: center; gap: 12px; margin-bottom: 8px; }
-.bl-form.sm input { width: 300px; height: 32px; }
-.bl-form.sm button { height: 32px; }
-.bl-n { color: #777; font-size: 11.5px; margin: 6px 0 14px !important; }
-.bl-r { margin-bottom: 14px; max-width: 520px; }
-.bl-r small { color: #188038; }
-.bl-r a { display: block; font-size: 16px; }
-.bl-r p { margin-top: 2px; color: #4d5156; font-size: 12px; }
-.bl-site { padding: 40px; text-align: center; color: #444; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.bl-site h3 { font-size: 18px; }
-.bl-site button { padding: 6px 14px; border-radius: 4px; background: #2d6bd6; color: #fff; cursor: pointer; }
 
 /* ---- hesap makinesi */
 .kh { display: flex; flex-direction: column; background: #f3f3f3; }

@@ -8,6 +8,7 @@
 // Derse giden olaylar (c.emit): os-ready (masaüstüne girildi), os-start (Başlat açıldı; W8'de { fromDesk }),
 // os-open { app }, os-about (sürüm bilgisi görüldü), os-yaz { len }, os-power { action }, os-overview.
 import * as I from './isletim-simge.js';
+import { ic, icMic, icLens, gLogo } from '../apps/google-ui.js';
 
 export const SW = 960, SH = 600;
 export const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -481,22 +482,23 @@ APPS.notepad = (api, A, arg) => {
 // ---- Tarayıcı: Internet Explorer (W7, W8), Edge (W10, W11), Firefox (Linux)
 APPS.browser = (api, A) => {
   const v = A.v;
-  const fav = '<i class="bz-fav">B</i>';
-  const tabs = `<div class="bz-tabs" data-nodrag><div class="bz-tab on">${fav}<span class="bz-tt">Bulalım</span><em>${I.ln.close}</em></div><button type="button" class="bz-new" data-mi="Yeni sekme" title="Yeni sekme">${I.ln.plus}</button></div>`;
+  const fav = '<i class="bz-fav g">G</i>';
+  const tabs = `<div class="bz-tabs" data-nodrag><div class="bz-tab on">${fav}<span class="bz-tt">Google</span><em>${I.ln.close}</em></div><button type="button" class="bz-new" data-mi="Yeni sekme" title="Yeni sekme">${I.ln.plus}</button></div>`;
   const head = v === 'ie' ? { title: '' } : { left: v === 'edge' ? `<span class="ow-ic bz-prof">${I.ln.user}</span>${tabs}` : tabs, title: '' };
-  const url = '<input class="bz-url" value="www.bulalim.com.tr" spellcheck="false">';
+  const url = '<input class="bz-url" value="www.google.com" spellcheck="false">';
   const bar = v === 'ie'
-    ? `<div class="bz-bar"><button type="button" class="bz-b bz-round" data-br="back" title="Geri">${I.ln.back}</button><button type="button" class="bz-b bz-round sm" data-br="fwd" title="İleri">${I.ln.fwd}</button><div class="bz-addr">${url}<button type="button" data-br="go" title="Git">${I.ln.search}</button><button type="button" data-br="home" title="Yenile">${I.ln.refresh}</button></div><div class="bz-tab on">${fav}<span class="bz-tt">Bulalım</span><em>${I.ln.close}</em></div><span class="bz-sp"></span><button type="button" class="bz-b" data-br="home" title="Giriş sayfası">${I.ln.home}</button><button type="button" class="bz-b" data-mi="Sık Kullanılanlar" title="Sık Kullanılanlar">${I.ln.star}</button><button type="button" class="bz-b" data-mi="Araçlar" title="Araçlar">${I.ln.gear}</button></div>`
+    ? `<div class="bz-bar"><button type="button" class="bz-b bz-round" data-br="back" title="Geri">${I.ln.back}</button><button type="button" class="bz-b bz-round sm" data-br="fwd" title="İleri">${I.ln.fwd}</button><div class="bz-addr">${url}<button type="button" data-br="go" title="Git">${I.ln.search}</button><button type="button" data-br="home" title="Yenile">${I.ln.refresh}</button></div><div class="bz-tab on">${fav}<span class="bz-tt">Google</span><em>${I.ln.close}</em></div><span class="bz-sp"></span><button type="button" class="bz-b" data-br="home" title="Giriş sayfası">${I.ln.home}</button><button type="button" class="bz-b" data-mi="Sık Kullanılanlar" title="Sık Kullanılanlar">${I.ln.star}</button><button type="button" class="bz-b" data-mi="Araçlar" title="Araçlar">${I.ln.gear}</button></div>`
     : `<div class="bz-bar"><button type="button" class="bz-b" data-br="back" title="Geri">${I.ln.back}</button><button type="button" class="bz-b" data-br="fwd" title="İleri">${I.ln.fwd}</button><button type="button" class="bz-b" data-br="home" title="Yenile">${I.ln.refresh}</button>${v === 'edge' ? `<button type="button" class="bz-b" data-br="home" title="Giriş">${I.ln.home}</button>` : ''}<div class="bz-addr"><i class="bz-lock">${I.ln.lock}</i>${url}${v === 'edge' ? `<i>${I.ln.star}</i>` : ''}</div>${v === 'ff' ? '' : `<button type="button" class="bz-b" data-mi="Sık kullanılanlar" title="Sık kullanılanlar">${I.ln.star}</button>`}<button type="button" class="bz-b" data-mi="Menü" title="Menü">${v === 'ff' ? I.ln.menu : I.ln.dots}</button></div>`;
-  const logo = (sm) => `<div class="bl-logo${sm ? ' sm' : ''}"><b style="color:#2d6bd6">B</b><b style="color:#e2452f">u</b><b style="color:#f2b200">l</b><b style="color:#2d6bd6">a</b><b style="color:#2f9a4a">l</b><b style="color:#e2452f">ı</b><b style="color:#2d6bd6">m</b></div>`;
-  const home = () => `<div class="bl-home">${logo()}<form class="bl-form"><input name="q" placeholder="Bulalım'da arayın" autocomplete="off"><button>Bulalım'da Ara</button></form><p class="bl-links"><a data-q="hava durumu">Hava durumu</a> · <a data-q="haberler">Haberler</a> · <a data-q="namaz vakitleri">Namaz vakitleri</a> · <a data-q="döviz kurları">Döviz kurları</a></p></div>`;
-  const results = (qq) => `<div class="bl-res"><form class="bl-form sm">${logo(true)}<input name="q" value="${esc(qq)}" autocomplete="off"><button>Ara</button></form><p class="bl-n">Yaklaşık 1.240.000 sonuç bulundu</p>${[
+  // Arama motoru Google'dır (büyük harfle yazı, yuvarlak arama kutusu, "Google'da Ara" düğmesi)
+  const gbox = (val) => `<div class="osg-box">${ic('search', 18)}<input name="q" value="${esc(val || '')}" placeholder="Google'da arayın" autocomplete="off" spellcheck="false" aria-label="Ara">${icMic(18)}${icLens(18)}</div>`;
+  const home = () => `<div class="osg-home">${gLogo()}<form class="osg-form">${gbox('')}<div class="osg-btns"><button class="osg-btn">Google'da Ara</button><button type="button" class="osg-btn" data-lucky="1">Kendimi Şanslı Hissediyorum</button></div></form><p class="osg-links">Deneyin: <a data-q="hava durumu">Hava durumu</a> · <a data-q="haberler">Haberler</a> · <a data-q="namaz vakitleri">Namaz vakitleri</a> · <a data-q="döviz kurları">Döviz kurları</a></p></div>`;
+  const results = (qq) => `<div class="osg-res"><form class="osg-head">${gLogo()}${gbox(qq)}</form><p class="osg-n">Yaklaşık 1.240.000 sonuç bulundu (0,38 saniye)</p>${[
     [`${qq} nedir? Anlamı ve kullanımı`, 'sozluk.example.com', `“${qq}” ile ilgili kısa ve anlaşılır bilgiler, örnekler.`],
     [`${qq} - Özgür Ansiklopedi`, 'ansiklopedi.example.org', `${qq} hakkında ayrıntılı makale: tarihçe, özellikler ve kaynaklar.`],
     [`${qq} ile ilgili son haberler`, 'haber.example.com', 'Güncel gelişmeleri ve haberleri buradan takip edebilirsiniz.'],
     [`${qq} nasıl yapılır? Adım adım`, 'nasil.example.net', 'Resimli ve kolay anlatım. Yeni başlayanlar için.'],
-  ].map(([t, u, s]) => `<div class="bl-r"><small>${u}</small><a data-site="${esc(u)}">${esc(t)}</a><p>${esc(s)}</p></div>`).join('')}</div>`;
-  const site = (u) => `<div class="bl-site"><h3>${esc(u)}</h3><p>Bu benzetimde internete bağlanılmaz. Gerçek tarayıcıyı 8. haftanın internet derslerinde kullanacaksınız.</p><button type="button" data-br="back">‹ Geri dön</button></div>`;
+  ].map(([t, u, s]) => `<div class="osg-r"><small>https://${u}</small><a data-site="${esc(u)}">${esc(t)}</a><p>${esc(s)}</p></div>`).join('')}</div>`;
+  const site = (u) => `<div class="osg-site"><h3>${esc(u)}</h3><p>Bu benzetimde internete bağlanılmaz. Gerçek tarayıcıyı 8. haftanın internet derslerinde kullanacaksınız.</p><button type="button" data-br="back">‹ Geri dön</button></div>`;
   return {
     head,
     html: `<div class="bz bz-${v}">${bar}<div class="bz-page"></div><div class="bz-st"></div></div>`,
@@ -505,8 +507,8 @@ APPS.browser = (api, A) => {
       const page = b.querySelector('.bz-page'), urlEl = b.querySelector('.bz-url');
       const show = (p) => {
         page.innerHTML = p.k === 'home' ? home() : p.k === 'res' ? results(p.q) : site(p.u);
-        urlEl.value = p.k === 'home' ? 'www.bulalim.com.tr' : p.k === 'res' ? `www.bulalim.com.tr/ara?q=${encodeURIComponent(p.q)}` : p.u;
-        const t = p.k === 'home' ? 'Bulalım' : p.k === 'res' ? `${p.q} - Bulalım'da Ara` : p.u;
+        urlEl.value = p.k === 'home' ? 'www.google.com' : p.k === 'res' ? `www.google.com/search?q=${p.q.trim().replace(/ /g, '+')}` : p.u;
+        const t = p.k === 'home' ? 'Google' : p.k === 'res' ? `${p.q} - Google Arama` : p.u;
         w.el.querySelectorAll('.bz-tt').forEach((x) => { x.textContent = t; });
         w.setTitle(v === 'ie' ? `${t} - Internet Explorer` : v === 'edge' ? `${t} - Microsoft Edge` : `${t} — Mozilla Firefox`);
         if (p.k === 'home') setTimeout(() => page.querySelector('input')?.focus({ preventScroll: true }), 30);
@@ -514,9 +516,10 @@ APPS.browser = (api, A) => {
       const go = (p) => { hist = hist.slice(0, i + 1); hist.push(p); i++; show(p); };
       go({ k: 'home' });
       b.addEventListener('submit', (e) => { e.preventDefault(); const qq = e.target.q.value.trim(); if (qq) go({ k: 'res', q: qq }); });
-      urlEl.addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const t = urlEl.value.trim(); if (!t) return; if (/bulalim/.test(t) && !/\?/.test(t)) go({ k: 'home' }); else if (/\.[a-z]{2,}/i.test(t) && !/\s/.test(t)) go({ k: 'site', u: t }); else go({ k: 'res', q: t }); });
+      urlEl.addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const t = urlEl.value.trim(); if (!t) return; if (/^(https?:\/\/)?(www\.)?google\.com(\.tr)?\/?$/i.test(t)) go({ k: 'home' }); else if (/\.[a-z]{2,}/i.test(t) && !/\s/.test(t)) go({ k: 'site', u: t }); else go({ k: 'res', q: t }); });
       w.el.addEventListener('click', (e) => {
         const a = e.target.closest('[data-q]'); if (a) { go({ k: 'res', q: a.dataset.q }); return; }
+        if (e.target.closest('[data-lucky]')) { const qq = w.el.querySelector('.osg-form input')?.value.trim(); if (qq) go({ k: 'site', u: 'sozluk.example.com' }); return; }
         const s = e.target.closest('[data-site]'); if (s) { go({ k: 'site', u: s.dataset.site }); return; }
         const br = e.target.closest('[data-br]'); if (!br) return;
         const k = br.dataset.br;

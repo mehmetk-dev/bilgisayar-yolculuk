@@ -178,7 +178,7 @@ export const bulutPaylas = {
       hint: 'Posta penceresini kapattıysanız yeniden açıp Yeni posta yazın. Bağlantıyı yapıştıramazsanız Bulut Depo\'daki “✉ E-postayla gönder” düğmesini kullanın.',
       on: (ev, c) => {
         if (ev.type === 'mail-too-big') { c.note('Video hâlâ ekli. Ekin yanındaki ✕ ile çıkarın; bağlantı yeterli.'); return false; }
-        return ev.type === 'mail-send' && /bulut\.bulalim\.com\/s\//.test(ev.body) && !ev.attachments.length;
+        return ev.type === 'mail-send' && /drive\.google\.com\/s\//.test(ev.body) && !ev.attachments.length;
       },
       done: 'Gönderildi! Elif bağlantıya tıklayınca videoyu izleyip indirebilecek. Posta küçük kaldı, video bulutta.',
     },
@@ -186,8 +186,8 @@ export const bulutPaylas = {
       title: 'Bağlantıyı deneyin',
       html: '<p>Bulut Depo\'da paylaş penceresindeki bağlantıyı kopyaladınız; aynısını tarayıcıda açalım. <b>🌐 İnternet</b>\'i açın, adres çubuğuna tıklayıp <b>Ctrl + V</b> ve Enter.</p>',
       combo: ['Ctrl', 'KeyV'],
-      hint: 'Pano boşaldıysa adresi Bulut Depo\'nun paylaş penceresinden okuyup yazabilirsiniz: bulut.bulalim.com/s/…',
-      on: (ev) => ev.type === 'web-nav' && ev.host === 'bulut.bulalim.com',
+      hint: 'Pano boşaldıysa adresi Bulut Depo\'nun paylaş penceresinden okuyup yazabilirsiniz: drive.google.com/s/…',
+      on: (ev) => ev.type === 'web-nav' && ev.host === 'drive.google.com',
       done: 'Paylaşılan dosyanın sayfası açıldı. Sayfada kimlerin açabileceği yazıyor. İşiniz bitince Bulut Depo\'dan <b>🔒 Paylaşımı kapat</b> diyebilirsiniz.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Büyük dosya paylaşmak:</p>' },

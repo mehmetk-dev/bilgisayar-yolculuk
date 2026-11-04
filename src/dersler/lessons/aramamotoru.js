@@ -13,8 +13,8 @@ export const aramaMotorlari = {
     ['Arama motoru', 'Siteleri sürekli tarayan dev bir fihrist: Google, Bing, Yandex, DuckDuckGo'],
     ['Tarayıcı değil', 'Chrome, Edge gibi tarayıcının içinde açılan bir sitedir'],
     ['Sonuç satırı', 'Mavi başlık = tıklanan bağlantı; altındaki gri = sitenin adresi; kısa açıklama'],
-    ['Reklam', '“Reklam” yazan sonuçlar parayla yukarı çıkar; doğru ya da güvenli olmak zorunda değil'],
-    ['Sekmeler', 'Tümü, Görseller, Haberler: aynı aramayı farklı biçimde gösterir'],
+    ['Reklam', '“Sponsorlu” yazan sonuçlar parayla yukarı çıkar; doğru ya da güvenli olmak zorunda değil'],
+    ['Sekmeler', 'Tümü, Görseller, Haberler, Videolar: aynı aramayı farklı biçimde gösterir'],
     ['İyi arama', 'Konu + yer + ne istediğiniz: “Ankara belediyesi su abonelik formu”'],
     ['Tırnak', 'Tırnak içine yazılan cümle olduğu gibi aranır: “su abonelik başvuru formu”'],
     ['Adrese bakın', '.gov.tr, .bel.tr, .com.tr: sonuca tıklamadan önce adresi okuyun'],
@@ -24,17 +24,17 @@ export const aramaMotorlari = {
     {
       title: 'Arama motoru nedir?',
       html: `<p>İnternette milyonlarca site var. Aradığınızı nasıl bulursunuz? <b>Arama motoruyla.</b> Arama motoru, internetin <b>dev bir fihristidir</b>: siteleri gece gündüz gezip not alır; siz bir şey yazınca o notlardan uygun olanları sıralar.</p>
-        <p>Bilinen arama motorları: <b>Google</b>, <b>Bing</b> (Microsoft), <b>Yandex</b>, <b>DuckDuckGo</b>. Bu derste <b>Bulalım</b> adlı alıştırma arama motorunu kullanacağız. Gerçek arama motorları da buna çok benzer çalışır.</p>
+        <p>Bilinen arama motorları: <b>Google</b>, <b>Bing</b> (Microsoft), <b>Yandex</b>, <b>DuckDuckGo</b>. Bu derste <b>Google</b>’ın alıştırma için hazırlanmış bir kopyasını kullanacağız: sonuçlar hazırdır, internete bağlanılmaz. Gerçek Google da buna çok benzer.</p>
         <p class="mut">Arama motoru, tarayıcı <b>değildir</b>: tarayıcının (Edge, Chrome) içinde açılan bir sitedir.</p>`,
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     {
       title: 'Bir arama yapın',
-      html: '<p><b>İnternet</b>\'i açın. Ortadaki arama kutusuna <b>börek tarifi</b> yazıp <b>🔍 Ara</b>\'ya ya da <b>Enter</b>\'a basın.</p>',
+      html: '<p><b>İnternet</b>\'i açın. Ortadaki arama kutusuna <b>börek tarifi</b> yazıp <b>Google\'da Ara</b>\'ya ya da <b>Enter</b>\'a basın.</p>',
       setup: br,
-      hint: 'Tarayıcı Bulalım sayfasıyla açılır. Kutuya tıklayıp yazın.',
+      hint: 'Tarayıcı Google sayfasıyla açılır. Kutuya tıklayıp yazın.',
       on: searched(/b[öo]rek/i),
-      done: 'Sonuçlar geldi. “Yaklaşık … sonuç bulundu” yazıyor: binlerce sayfa. Arama motoru bunları <b>uygunluk sırasına</b> dizer.',
+      done: 'Sonuçlar geldi. “Yaklaşık … sonuç bulundu (… saniye)” yazıyor: milyonlarca sayfa, saniyenin altında. Arama motoru bunları <b>uygunluk sırasına</b> dizer.',
     },
     {
       title: 'Sonuç satırını okuyun',
@@ -44,22 +44,22 @@ export const aramaMotorlari = {
     },
     {
       title: 'Reklam sonucu',
-      html: '<p>Şimdi <b>resim gösterici program indir</b> diye arayın. Sonuçların en üstünde <b>“Reklam”</b> yazan bir kutu çıkacak.</p>',
+      html: '<p>Şimdi <b>resim gösterici program indir</b> diye arayın. Sonuçların en üstünde <b>“Sponsorlu”</b> yazan bir sonuç çıkacak.</p>',
       on: searched(/indir|program/i),
-      done: 'En üstte <b>Reklam</b> yazan bir sonuç var. Reklamlar parayla yukarı çıkar: gerçeğine benzeyebilir ama güvenilir olmak zorunda değildir.',
+      done: 'En üstte <b>Sponsorlu</b> yazan bir sonuç var. Reklamlar parayla yukarı çıkar: gerçeğine benzeyebilir ama güvenilir olmak zorunda değildir.',
     },
     {
       title: 'Doğru sonuca tıklayın',
-      html: '<p>“Reklam” yazan kutuya <b>tıklamayın</b>. Altındaki gerçek sonuçlardan <b>Resim Gösterici: Ücretsiz İndir</b> başlığına tıklayın. Adresi <b>program-indir.com.tr</b> olan.</p>',
+      html: '<p>“Sponsorlu” yazan sonuca <b>tıklamayın</b>. Altındaki gerçek sonuçlardan <b>Resim Gösterici: Ücretsiz İndir</b> başlığına tıklayın. Adresi <b>program-indir.com.tr</b> olan.</p>',
       on: (ev, c) => {
-        if (ev.type === 'web-ad') c.warn('Reklama tıkladınız. “Reklam” yazan kutu parayla çıkar; altındaki normal sonuca tıklayın.');
+        if (ev.type === 'web-ad') c.warn('Reklama tıkladınız. “Sponsorlu” yazan sonuç parayla çıkar; altındaki normal sonuca tıklayın.');
         return ev.type === 'web-nav' && ev.host === 'www.program-indir.com.tr';
       },
       done: 'Doğru. Reklamın adresi <b>super-hizlandirici.xyz</b> gibi bir şeydi: tanımadığınız ve .xyz ile biten adres uyarı işaretidir. Gerçekte bir programı indirirken en güvenlisi, programın üreticisinin resmî sitesini kullanmaktır.',
     },
     {
       title: 'Görseller sekmesi',
-      html: '<p>Aynı aramayı resim olarak görmek için üstteki <b>Görseller</b> sekmesi vardır. Önce <b>manzara</b> diye arayın, sonra <b>🖼 Görseller</b> sekmesine tıklayın.</p>',
+      html: '<p>Aynı aramayı resim olarak görmek için üstteki <b>Görseller</b> sekmesi vardır (Tümü, Görseller, Haberler, Videolar… sekmeleri). Önce <b>manzara</b> diye arayın, sonra <b>Görseller</b> sekmesine tıklayın.</p>',
       hint: 'Önce arama kutusuna manzara yazıp Enter; sonuç sayfasında Tümü yanındaki Görseller.',
       setup: br,
       on: (ev) => ev.type === 'search-tab' && ev.tab === 'img',
@@ -67,7 +67,7 @@ export const aramaMotorlari = {
     },
     {
       title: 'Haberler sekmesi',
-      html: '<p>Şimdi <b>📰 Haberler</b> sekmesine tıklayın. Burada yalnızca <b>haber siteleri</b> gösterilir ve <b>yenisi üstte</b>.</p>',
+      html: '<p>Şimdi <b>Haberler</b> sekmesine tıklayın. Burada yalnızca <b>haber siteleri</b> gösterilir ve <b>yenisi üstte</b>.</p>',
       on: (ev) => ev.type === 'search-tab' && ev.tab === 'news',
       done: 'Güncel bir olayı arıyorsanız Haberler sekmesi daha uygundur: tarihe göre sıralar. Yine de haberin <b>tarihine</b> ve kaynağına bakın.',
     },

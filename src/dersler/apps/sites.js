@@ -12,14 +12,23 @@ import { YZ_SITES } from './siteler-yz.js';
 import { BELGE_SITES } from './siteler-belge.js';
 import { AG_SITES } from './siteler-ag.js';
 import { FOTO_SITES } from './siteler-foto.js';
-import { HARITA_SITES } from './siteler-harita.js';
+import { HARITA_SITES, HARITA_HOST } from './siteler-harita.js';
 import { BANKA_SITES } from './siteler-banka.js';
 import { KAMU_SITES } from './siteler-kamu.js';
 import { BUL_SITES } from './siteler-bul.js';
 import { SOSYAL_SITES } from './siteler-sosyal.js';
+import { googleSite } from './siteler-google.js';
 import { SORUN_SITES, sorunSonuc, yaziciSayfa, forumSayfa, hizlandiriciSayfa } from './siteler-sorun.js';
 
-export const SEARCH_HOST = 'www.bulalim.com';
+export const SEARCH_HOST = 'www.google.com';
+// Uzantı mağazası, yapay zekâ yardımcısı, bulut depo ve görüntülü görüşme de Google'ın alt adresleridir
+export const EXT_HOST = 'chromewebstore.google.com';
+// Eski (uydurma arama motoru) adresler yeni karşılıklarına yönlendirilir: geçmişte ve yer işaretlerinde kalmış olabilir
+const OLD_HOSTS = {
+  'bulalim.com': SEARCH_HOST, 'www.bulalim.com': SEARCH_HOST, 'www.bulalim.com.tr': SEARCH_HOST,
+  'uzantilar.bulalim.com': EXT_HOST, 'yardimci.bulalim.com': 'gemini.google.com', 'bulut.bulalim.com': 'drive.google.com', 'gorusme.bulalim.com': 'meet.google.com',
+  'google.com': SEARCH_HOST, 'google.com.tr': SEARCH_HOST, 'www.google.com.tr': SEARCH_HOST,
+};
 
 // Ücretsiz fotoğraf sitesindeki resimler: indirilince dosyanın içeriği bu olur
 export const PHOTOS = {
@@ -40,7 +49,7 @@ const RESULTS = [
   { keys: ['resim', 'gösterici', 'gosterici', 'program', 'indir', 'fotoğraf'], title: 'Resim Gösterici: Ücretsiz İndir', url: 'www.program-indir.com.tr/resim-gosterici', snip: 'Fotoğraflarınızı kolayca açın, büyütün, döndürün. Ücretsiz ve güvenli indirme.' },
   { keys: ['yazıcı', 'yazici', 'sürücü', 'surucu', 'r-200', 'r200', 'driver'], title: 'Renkli Yazıcı R-200 Sürücüleri', url: 'www.yazici-destek.com.tr/r-200', snip: 'Yazıcınızın resmî sürücü ve yazılım indirme sayfası.' },
   { keys: ['fotoğraf', 'fotograf', 'manzara', 'duvar', 'kağıdı', 'arka', 'plan', 'resim', 'resimler', 'ücretsiz'], title: 'Ücretsiz Fotoğraflar: Manzara, Doğa, Hayvanlar', url: 'www.ucretsiz-fotograflar.com.tr', snip: 'Telif ücreti olmayan, indirip kullanabileceğiniz binlerce fotoğraf ve duvar kâğıdı.' },
-  { keys: ['uzantı', 'uzanti', 'eklenti', 'reklam', 'engelle', 'engelleyici', 'sesli', 'okuma', 'karanlık', 'gece'], title: 'Uzantı Mağazası: tarayıcınıza yeni özellikler ekleyin', url: 'uzantilar.bulalim.com', snip: 'Reklam engelleyici, gece okuma modu, sesli okuyucu ve daha fazlası.' },
+  { keys: ['uzantı', 'uzanti', 'eklenti', 'reklam', 'engelle', 'engelleyici', 'sesli', 'okuma', 'karanlık', 'gece'], title: 'Chrome Web Mağazası: tarayıcınıza yeni özellikler ekleyin', url: EXT_HOST, snip: 'Reklam engelleyici, gece okuma modu, sesli okuyucu ve daha fazlası.' },
   { keys: ['banka', 'bankam'], title: 'Bankam: İnternet Şubesi', url: 'www.bankam.com.tr', snip: 'İnternet şubesine güvenli giriş.' },
   { keys: ['e-devlet', 'edevlet', 'devlet', 'türkiye', 'turkiye', 'barkodlu', 'belge'], title: 'e-Devlet Kapısı', url: 'www.turkiye.gov.tr', snip: 'Kamu hizmetlerine tek noktadan, güvenli erişim.' },
   { keys: ['meb', 'milli', 'eğitim', 'egitim', 'okul', 'kurs'], title: 'Millî Eğitim Bakanlığı', url: 'www.meb.gov.tr', snip: 'Bakanlığın resmî sitesi: duyurular, haberler, hayat boyu öğrenme kursları.' },
@@ -50,7 +59,7 @@ const RESULTS = [
   { keys: ['whatsapp', 'mesajlaş', 'mesajlas', 'sohbet', 'karekod', 'qr', 'mesaj'], title: 'Mesajlaş Web: mesajlarınız bilgisayarınızda', url: 'web.mesajlas.com', snip: 'Telefondaki mesajlaşma uygulamasını karekodla bilgisayarda açın.' },
   { keys: ['enabız', 'e-nabız', 'nabız', 'reçete', 'tahlil', 'aile hekimi', 'sağlık'], title: 'e-Nabız: reçete ve tahlil sonuçlarınız', url: 'enabiz.gov.tr', snip: 'Reçetelerinize, tahlil sonuçlarınıza ve aile hekiminize bakın.' },
   { keys: ['ilan', 'kiralık', 'kiralik', 'emlak', 'ev', 'daire', 'satılık'], title: 'İlan Pazarı: kiralık ve satılık evler', url: 'www.ilan-pazari.com.tr', snip: 'Kiralık daire ilanlarını il, oda ve fiyata göre arayın.' },
-  { keys: ['yapay', 'zeka', 'zekâ', 'yardımcı', 'yardimci', 'sohbet', 'asistan', 'özetle'], title: 'Dijital Yardımcı: yapay zekâ ile yazışın', url: 'yardimci.bulalim.com', snip: 'Yazı özetletin, tarif ve gezi planı isteyin (alıştırma sürümü).' },
+  { keys: ['yapay', 'zeka', 'zekâ', 'yardımcı', 'yardimci', 'sohbet', 'asistan', 'özetle'], title: 'Gemini: yapay zekâ ile yazışın (Dijital Yardımcı)', url: 'gemini.google.com', snip: 'Yazı özetletin, tarif ve gezi planı isteyin (alıştırma sürümü).' },
   { keys: ['belediye', 'form', 'dilekçe', 'dilekce', 'başvuru', 'basvuru', 'su abonelik', 'abonelik', 'pdf'], title: 'Örnek Belediyesi: form ve dilekçeler', url: 'www.ornek-belediyesi.bel.tr', snip: 'Su abonelik başvuru formu ve diğer formları PDF olarak indirin.' },
   { keys: ['dostlarım', 'dostlarim', 'sosyal', 'medya', 'arkadaş', 'paylaşım'], title: 'Dostlarım: aileniz ve arkadaşlarınızla bağlantıda kalın', url: 'www.dostlarim.com.tr', snip: 'Fotoğraf ve haber paylaşın, mesajlaşın (alıştırma sitesi).' },
   { keys: ['cihazımı', 'cihazimi', 'cihaz', 'kayıp', 'kayip', 'kayboldu', 'telefonumu bul'], title: 'Cihazımı Bul: kaybolan telefonu bulun, çaldırın, kilitleyin', url: 'www.cihazimi-bul.com', snip: 'Telefonunuzun son yerini haritada görün. Hesabınızla girin.' },
@@ -86,47 +95,7 @@ const BOREK_STEPS = [
 ];
 
 export const SITES = {
-  [SEARCH_HOST]: {
-    name: 'Bulalım', secure: true,
-    act(a, v, ctx, el) {
-      if (a !== 'tab') return;
-      ctx.state.tab = el.dataset.v;
-      ctx.state.tabQ = ctx.loc.q;
-      ctx.emit('search-tab', { tab: el.dataset.v });
-      ctx.refresh();
-    },
-    render(path, q, ctx) {
-      if (path.startsWith('/ara')) {
-        const tab = ctx && ctx.state.tabQ === q ? ctx.state.tab || 'all' : 'all';
-        const tabs = `<div class="se-tabs">${[['all', 'Tümü'], ['img', '🖼 Görseller'], ['news', '📰 Haberler']].map(([k, l]) => `<button type="button" data-act="tab" data-v="${k}" class="${tab === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
-        if (tab === 'img') {
-          const ws = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
-          const all = Object.values(PHOTOS), pick = all.filter((p) => ws.some((w) => (p.title + ' ' + p.name).toLocaleLowerCase('tr').includes(w)));
-          const list = pick.length ? pick : all;
-          return page(`${q} - Görseller - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>${tabs}
-            <p class="se-count">“${esc(q)}” için görseller${pick.length ? '' : ' (tam eşleşme yok, benzerleri gösteriliyor)'}</p><div class="se-imgs">${list.map((p) => `<figure><span style="background:linear-gradient(135deg,${p.bg[0]},${p.bg[1]})">${p.emoji}</span><figcaption>${esc(p.title)}</figcaption></figure>`).join('')}</div>
-            <p class="mut">Görsellerin çoğunun <b>telif hakkı</b> vardır: izinsiz kullanmayın; serbest kullanım yazan sitelerden alın.</p>`, 'se');
-        }
-        if (tab === 'news') {
-          return page(`${q} - Haberler - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>${tabs}
-            <p class="se-count">“${esc(q)}” için son haberler</p>${[['Belediyeden yaşlılara ücretsiz bilgisayar kursu', 'Günün Haberleri · 2 saat önce'], ['Kış lastiği uygulaması yarın başlıyor', 'Günün Haberleri · 5 saat önce'], ['Dolandırıcılara karşı uyarı: kodunuzu kimseyle paylaşmayın', 'Günün Haberleri · dün']].map(([t, m]) => `<div class="se-res"><cite>${m}</cite><a data-href="www.gunun-haberleri.com.tr">${t}</a></div>`).join('')}
-            <p class="mut">Haber sonuçları tarihe göre sıralanır; yine de haberin asıl kaynağına ve tarihine bakın.</p>`, 'se');
-        }
-        const words = q.toLocaleLowerCase('tr').split(/\s+/).filter(Boolean);
-        const sk = sorunSonuc(q);
-        const hits = sk ? sk.hits : RESULTS.map((r) => ({ r, score: words.filter((w) => r.keys.some((k) => k.includes(w) || w.includes(k))).length })).filter((x) => x.score).sort((a, b) => b.score - a.score).map((x) => x.r);
-        const devlet = words.some((w) => w.includes('devlet'));
-        const ad = sk ? sk.ad : devlet ? AD_DEVLET : AD;
-        const showAd = sk || devlet || words.some((w) => ['indir', 'program', 'yavaş', 'hızlandır', 'resim'].some((k) => w.includes(k)));
-        return page(`${q} - Bulalım'da ara`, `<div class="se-top"><span class="se-logo small">Bulalım</span><form class="se-form" data-search><input name="q" value="${escAttr(q)}"><button>🔍</button></form></div>
-          ${tabs}<p class="se-count">Yaklaşık ${hits.length ? hits.length * 1240 : 0} sonuç bulundu</p>
-          ${showAd ? `<div class="se-res ad"><small class="ad-tag">Reklam</small><a data-href="${ad.url}" data-ad="1">${ad.title}</a><cite>${ad.url}</cite><p>${ad.snip}</p></div>` : ''}
-          ${hits.map((r) => `<div class="se-res"><cite>${r.url.split('/')[0]}</cite><a data-href="${r.url}">${r.title}</a><p>${r.snip}</p></div>`).join('') || '<p>Aramanızla eşleşen sonuç bulunamadı. Farklı kelimelerle deneyin.</p>'}`, 'se');
-      }
-      return page('Bulalım', `<div class="se-home"><div class="se-logo">Bulalım</div><form class="se-form big" data-search><input name="q" placeholder="Ne aramak istersiniz?" autocomplete="off"><button>🔍 Ara</button></form>
-        <p class="se-tip">Örnek: <a data-q="börek tarifi">börek tarifi</a> · <a data-q="hava durumu">hava durumu</a> · <a data-q="haberler">haberler</a></p></div>`, 'se');
-    },
-  },
+  [SEARCH_HOST]: googleSite({ SEARCH_HOST, RESULTS, AD, AD_DEVLET, PHOTOS, sorunSonuc, getSites: () => SITES, HARITA_HOST, GUN_HOST: 'www.gunun-haberleri.com.tr' }),
   'www.lezzetli-tarifler.com.tr': {
     name: 'Lezzetli Tarifler', secure: true,
     act(a, v, ctx, el) {
@@ -277,22 +246,35 @@ export const SITES = {
 
 Object.assign(SITES, GUNLUK_SITES, BULUT_SITE, MEDYA_SITES, HESAP_SITES, MESAJ_SITES, HIZMET_SITES, YZ_SITES, BELGE_SITES, AG_SITES, FOTO_SITES, HARITA_SITES, BANKA_SITES, KAMU_SITES, SOSYAL_SITES, SORUN_SITES, BUL_SITES);
 
-function escAttr(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
+
+// Adres çubuğunda arama sözcüğü: boşluk "+" olarak gösterilir (www.google.com/search?q=börek+tarifi)
+export const encQ = (q) => String(q).replace(/%/g, '%25').replace(/\+/g, '%2B').replace(/&/g, '%26').replace(/ /g, '+');
+export const decQ = (q) => { const t = String(q).replace(/\+/g, ' '); try { return decodeURIComponent(t); } catch { return t; } };
+
+// Tarayıcının kendi sayfaları: Chrome'daki gibi chrome://history, chrome://extensions, chrome://settings
+const CHROME_PAGES = { history: 'gecmis', extensions: 'uzantilar', settings: 'ayarlar', 'settings/cookies': 'cerezler' };
+export const chromeName = (path) => Object.entries(CHROME_PAGES).find(([, v]) => '/' + v === path)?.[0] || path.slice(1);
 
 // Adres çubuğuna yazılanı çözümler: site adresi mi, arama mı?
 export function resolve(input) {
   let t = input.trim();
   if (!t) return null;
-  const looksUrl = !/\s/.test(t) && (/\.[a-zçğıöşü]{2,}/i.test(t) || /^tarayici:\/\//i.test(t) || /^(https?:\/\/)?\d{1,3}(\.\d{1,3}){3}(\/|$)/i.test(t));
-  if (!looksUrl) return { host: SEARCH_HOST, path: '/ara', q: t, search: true };
-  if (/^tarayici:\/\//i.test(t)) return { host: 'tarayici', path: '/' + t.slice(11).replace(/^\/+/, ''), q: '' };
+  const looksUrl = !/\s/.test(t) && (/\.[a-zçğıöşü]{2,}/i.test(t) || /^(tarayici|chrome):\/\//i.test(t) || /^(https?:\/\/)?\d{1,3}(\.\d{1,3}){3}(\/|$)/i.test(t));
+  if (!looksUrl) return { host: SEARCH_HOST, path: '/search', q: t, search: true };
+  const ch = t.match(/^(?:tarayici|chrome):\/\/+(.*)$/i);
+  if (ch) { const k = ch[1].replace(/\/+$/, '').toLocaleLowerCase('tr'); return { host: 'tarayici', path: '/' + (CHROME_PAGES[k] || k), q: '' }; }
   t = t.replace(/^https?:\/\//i, '');
   const slash = t.indexOf('/');
   let host = (slash < 0 ? t : t.slice(0, slash)).toLocaleLowerCase('tr');
-  const path = slash < 0 ? '/' : t.slice(slash) || '/';
+  let path = slash < 0 ? '/' : t.slice(slash) || '/';
+  host = OLD_HOSTS[host] || host;
   if (!SITES[host] && SITES['www.' + host]) host = 'www.' + host;
-  // Geçmişten ya da sık kullanılanlardan gelen arama adresleri: www.bulalim.com/ara?q=börek
-  const m = path.match(/^(.*)\?q=(.*)$/);
-  if (m) return { host, path: m[1] || '/', q: m[2], search: host === SEARCH_HOST && m[1] === '/ara' };
+  // Geçmişten ya da yer işaretlerinden gelen arama adresleri: www.google.com/search?q=börek+tarifi (eski: /ara?q=…)
+  const m = path.match(/^(.*?)\?q=([^&]*)/);
+  if (m) {
+    const p = host === SEARCH_HOST && m[1] === '/ara' ? '/search' : m[1] || '/';
+    return { host, path: p, q: decQ(m[2]), search: host === SEARCH_HOST && p === '/search' };
+  }
+  if (host === SEARCH_HOST && path === '/ara') path = '/';
   return { host, path, q: '' };
 }

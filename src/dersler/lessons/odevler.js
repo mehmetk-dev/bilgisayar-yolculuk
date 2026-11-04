@@ -99,7 +99,7 @@ export const odev7 = odev(7, 'Paint, ekran alıntısı ve ayarlar', '🎨', [
 ]);
 
 export const odev8 = odev(8, 'internet, güvenlik ve bakım', '🌐', [
-  ['Arama yapın', 'Tarayıcıyı açın ve <b>bugünün hava durumu</b> diye aratın. İlk sonuç <b>reklam</b> mı (“Reklam” yazıyor mu)? Hangi siteye girdiniz? Adresi okuyun.', 'Adres çubuğundaki adrese bakın: .com.tr, .gov.tr…', '🔎'],
+  ['Arama yapın', 'Tarayıcıyı açın ve <b>bugünün hava durumu</b> diye aratın. İlk sonuç <b>reklam</b> mı (“Sponsorlu” yazıyor mu)? Hangi siteye girdiniz? Adresi okuyun.', 'Adres çubuğundaki adrese bakın: .com.tr, .gov.tr…', '🔎'],
   ['Kilidi kontrol edin', 'Adres çubuğunun solundaki <b>🔒 kilide</b> tıklayın. “Bağlantı güvenli” yazıyor mu? Sitenin asıl adını bulun.', 'Kilit, sitenin dürüst olduğunu göstermez; yalnızca bağlantının şifreli olduğunu.', '🔒'],
   ['Yüklü programlar', '<b>Ayarlar → Uygulamalar → Yüklü uygulamalar</b>\'ı açın (Windows 10\'da <b>Ayarlar → Uygulamalar</b>). Listede tanımadığınız ya da hiç kullanmadığınız programları kâğıda yazın; <b>kaldırmadan önce</b> güvendiğiniz birine sorun.', 'Bazı programlar bilgisayarın çalışması için gereklidir; tanımadığınızı hemen silmeyin.', '📦'],
   ['Resim indirin', 'Güvendiğiniz bir siteden bir fotoğraf indirin (sağ tık → Resmi farklı kaydet). Kaydet penceresinde klasör olarak <b>İndirilenler</b>\'i seçin. Sonra Dosya Gezgini\'nde <b>İndirilenler</b> klasöründe bulun.', 'İndirdiğiniz dosyayı hemen kendi klasörünüze taşıyın.', '⬇'],
@@ -178,7 +178,7 @@ export const odev14 = odev(14, 'e-Devlet, randevu ve internette işlemler', '�
   ['e-Nabız\'a bakın', '<b>e-Devlet ile giriş</b> yoluyla e-Nabız\'a girin ve reçete ya da tahlil listenize bakın. <b>Şifreyi e-Nabız sayfasında değil, e-Devlet sayfasında</b> yazdığınızı kontrol edin.', 'Sağlık bilgileriniz özeldir; işiniz bitince çıkış yapın.', '🩺'],
   ['Kayıtlı hatlar', 'e-Devlet\'te “<b>Mobil Hat Sorgulama</b>”yı açıp adınıza kayıtlı hatlara bakın. Tanımadığınız bir hat var mı?', 'Bilmediğiniz bir hat varsa operatörüne başvurup kapattırın.', '📱'],
   ['Kart ayarları', 'Bankanızın mobil uygulamasında ya da internet şubesinde kartınızın <b>internet alışverişi</b> ayarını ve <b>sanal kart</b> seçeneğini bulun. Değiştirmeniz gerekmez; yerini öğrenin.', 'Şifrenizi yalnızca bankanın kendi uygulamasına yazın; SMS kodunu kimseye söylemeyin.', '💳'],
-  ['Çıkış yapın', 'Bütün sitelerden <b>Çıkış</b> yapın. Sonra tarayıcıda <b>Ctrl + Shift + Del</b> ile göz atma verilerini temizlemeyi düşünün (ortak bilgisayardaysanız).', 'Oturum açık kalırsa sonraki kişi girebilir.', '🚪'],
+  ['Çıkış yapın', 'Bütün sitelerden <b>Çıkış</b> yapın. Sonra tarayıcıda <b>Ctrl + Shift + Del</b> ile tarama verilerini temizlemeyi düşünün (ortak bilgisayardaysanız).', 'Oturum açık kalırsa sonraki kişi girebilir.', '🚪'],
 ]);
 
 export const odev15 = odev(15, 'bilgi güvenliği', '🛡', [

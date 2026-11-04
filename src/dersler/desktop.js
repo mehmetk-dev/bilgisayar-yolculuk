@@ -7,6 +7,7 @@ import { APPS, START_APPS } from './apps/index.js';
 import { pictureURL, playTune } from './apps/util.js';
 import { osInstall } from './apps/osinstall.js';
 import { online } from './apps/modem.js';
+import { APP_ICONS, SYS_ICONS, MONO, WIN_BTN, WIN_LOGO, iconFor, iconImage, warmIcons } from './apps/appicons.js';
 
 export const WALLPAPERS = {
   mavi: ['Mavi', 'radial-gradient(ellipse at 30% 120%, #9fd3ff 0%, #3d8fe0 35%, #0b3c8c 75%, #061d4a 100%)', ['#3d8fe0', '#061d4a']],
@@ -98,14 +99,15 @@ export class Desktop {
         <div class="dk-taskbar">
           <div class="tb-center">
             <button type="button" class="tb-start" title="Başlat">${startLogo()}</button>
-            <button type="button" class="tb-search"><span>🔍</span> Ara</button>
-            <button type="button" class="tb-tv" title="Görev Görünümü: açık pencereler ve sanal masaüstleri (⊞ + Tab)"><i></i><i></i></button>
+            <button type="button" class="tb-search" title="Ara">${MONO.search}<span>Ara</span></button>
+            <button type="button" class="tb-tv" title="Görev Görünümü: açık pencereler ve sanal masaüstleri (⊞ + Tab)">${MONO.taskview}</button>
             <div class="tb-apps"></div>
           </div>
           <div class="tb-tray">
-            <button type="button" class="tb-usb" hidden title="USB Bellek: güvenle kaldır">💾</button>
+            <button type="button" class="tb-hid" title="Gizli simgeleri göster">${MONO.chevup}</button>
+            <button type="button" class="tb-usb" hidden title="USB Bellek: güvenle kaldır">${SYS_ICONS.usb}</button>
             <button type="button" class="tb-lang" title="Giriş dili ve klavye düzeni"></button>
-            <button type="button" class="tb-net" title="Ağ ve ses"><span class="tb-wifi"></span><span class="tb-vol"></span></button>
+            <button type="button" class="tb-net" title="Ağ ve ses"><span class="tb-wifi"></span><span class="tb-vol"></span><span class="tb-bat">${MONO.battery}</span></button>
             <button type="button" class="tb-clock"><span class="tb-time"></span><span class="tb-date"></span></button>
             <button type="button" class="tb-showdesk" title="Masaüstünü göster"></button>
           </div>
@@ -153,6 +155,7 @@ export class Desktop {
     this.renderIcons();
     this.renderTaskbar();
     this.setPower('desktop', true);
+    warmIcons(); // ekran görüntüsü alınırken simgeler hazır olsun
   }
 
   emit(type, data = {}) { this.emitRaw({ ...data, type }); }
@@ -216,11 +219,11 @@ export class Desktop {
         for (const w of [...this.wins]) this.destroy(w);
         o.innerHTML = `<div class="pw-room">
             <div class="pw-monitor"><div class="pw-glass"></div><div class="pw-stand"></div><button type="button" class="pw-mbtn" title="Ekranın düğmesi"></button></div>
-            <div class="pw-tower"><div class="pw-grill"></div><button type="button" class="pw-btn" title="Bilgisayarın güç düğmesi">⏻</button><span class="pw-led"></span></div>
+            <div class="pw-tower"><div class="pw-grill"></div><button type="button" class="pw-btn" title="Bilgisayarın güç düğmesi">${MONO.power}</button><span class="pw-led"></span></div>
           </div><p class="pw-say">Bilgisayar kapalı.</p>`;
         o.querySelector('.pw-btn').onclick = () => { this.emit('power-button'); this.setPower('boot'); };
         o.querySelector('.pw-mbtn').onclick = () => {
-          o.querySelector('.pw-say').innerHTML = 'Bu, <b>ekranın</b> düğmesi: yalnızca ekranı açıp kapatır. Bilgisayarı açmak için <b>kasadaki ⏻ düğmesine</b> basın.';
+          o.querySelector('.pw-say').innerHTML = `Bu, <b>ekranın</b> düğmesi: yalnızca ekranı açıp kapatır. Bilgisayarı açmak için <b>kasadaki ${MONO.power} düğmesine</b> basın.`;
           this.emit('monitor-button');
         };
         break;
@@ -236,8 +239,8 @@ export class Desktop {
         break;
       case 'login': {
         o.innerHTML = `<div class="pw-login" style="background:${this.wallCss()}"><div class="pw-card">
-            <div class="pw-avatar">👤</div><div class="pw-user">${esc(this.settings.user)}</div>
-            <div class="pw-pass"><input type="password" placeholder="${this.settings.pin ? 'PIN ya da şifre' : 'Şifre'}" autocomplete="off" aria-label="Şifre"><button type="button" class="pw-eye" title="Şifreyi göster">👁</button><button type="button" class="pw-go" title="Giriş">➜</button></div>
+            <div class="pw-avatar">${SYS_ICONS.user}</div><div class="pw-user">${esc(this.settings.user)}</div>
+            <div class="pw-pass"><input type="password" placeholder="${this.settings.pin ? 'PIN ya da şifre' : 'Şifre'}" autocomplete="off" aria-label="Şifre"><button type="button" class="pw-eye" title="Şifreyi göster">${MONO.eye}</button><button type="button" class="pw-go" title="Giriş">${MONO.chevright}</button></div>
             <div class="pw-err"></div><div class="pw-hint">Alıştırma şifresi: <b>${esc(this.settings.password)}</b>${this.settings.pin ? ` · PIN: <b>${esc(this.settings.pin)}</b>` : ''}</div></div></div>`;
         const inp = o.querySelector('input');
         const go = () => {
@@ -255,7 +258,7 @@ export class Desktop {
         break;
       }
       case 'welcome':
-        o.innerHTML = `<div class="pw-login" style="background:${this.wallCss()}"><div class="pw-card"><div class="pw-avatar">👤</div><div class="pw-user">Hoş geldiniz</div><div class="pw-spin small"><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
+        o.innerHTML = `<div class="pw-login" style="background:${this.wallCss()}"><div class="pw-card"><div class="pw-avatar">${SYS_ICONS.user}</div><div class="pw-user">Hoş geldiniz</div><div class="pw-spin small"><i></i><i></i><i></i><i></i><i></i></div></div></div>`;
         later(1400, 'desktop');
         break;
       case 'sleep':
@@ -293,10 +296,10 @@ export class Desktop {
     this.root.style.setProperty('--dk-scale', s.textScale / 100);
     this.root.querySelector('.dk-dim').style.opacity = (100 - s.brightness) / 140;
     const noNet = s.netSim && s.wifi && s.network && !online(this); // Wi-Fi'ye bağlı ama internet yok
-    this.root.querySelector('.tb-wifi').textContent = s.airplane ? '✈' : s.wifi && s.network ? (noNet ? '🌐' : '📶') : '🚫';
+    this.root.querySelector('.tb-wifi').innerHTML = s.airplane ? MONO.airplane : s.wifi && s.network ? (noNet ? MONO.nonet : MONO.wifi) : MONO.wifioff;
     this.root.querySelector('.tb-net').title = noNet ? `${s.network}: İnternet erişimi yok` : 'Ağ ve ses';
     this.root.querySelector('.tb-net').classList.toggle('nonet', !!noNet);
-    this.root.querySelector('.tb-vol').textContent = s.muted || !s.volume ? '🔇' : s.volume < 40 ? '🔈' : '🔊';
+    this.root.querySelector('.tb-vol').innerHTML = s.muted || !s.volume ? MONO.vol0 : s.volume < 40 ? MONO.vol1 : MONO.vol2;
     this.root.classList.toggle('dk-dark', !!s.dark);
     this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
     this.root.classList.toggle('tb-left', !!s.taskbarLeft);
@@ -354,7 +357,7 @@ export class Desktop {
     if (!bar) {
       bar = document.createElement('div');
       bar.className = 'dk-magbar';
-      bar.innerHTML = '<span>🔍 Büyüteç</span><button type="button" data-m="-" title="Uzaklaştır">−</button><b></b><button type="button" data-m="+" title="Yakınlaştır">＋</button><button type="button" data-m="x" title="Büyüteci kapat">✕</button>';
+      bar.innerHTML = `<span>${APP_ICONS.magnifier} Büyüteç</span><button type="button" data-m="-" title="Uzaklaştır">−</button><b></b><button type="button" data-m="+" title="Yakınlaştır">＋</button><button type="button" data-m="x" title="Büyüteci kapat">${MONO.close}</button>`;
       bar.onclick = (e) => {
         const m = e.target.closest('[data-m]')?.dataset.m;
         if (!m) return;
@@ -394,9 +397,9 @@ export class Desktop {
     bar.className = 'dk-dict';
     bar.style.cssText = 'position:absolute;left:50%;top:0.6em;transform:translateX(-50%);z-index:8500;background:#202124f2;color:#fff;border-radius:1.6em;padding:0.45em 0.9em;display:flex;align-items:center;gap:0.7em;font-size:0.95em;box-shadow:0 4px 14px #0007;max-width:96%;flex-wrap:wrap;justify-content:center';
     const bs = 'border:0;border-radius:1.4em;padding:0.4em 0.9em;font:inherit;cursor:pointer;color:#fff;background:#ffffff2e';
-    bar.innerHTML = `<button type="button" class="dd-mic" title="Mikrofon: durdurmak için tıklayın (⊞ + H)" style="border:0;border-radius:50%;width:2.4em;height:2.4em;font-size:1em;cursor:pointer;background:#d13438;color:#fff">🎤</button>
+    bar.innerHTML = `<button type="button" class="dd-mic" title="Mikrofon: durdurmak için tıklayın (⊞ + H)" style="border:0;border-radius:50%;width:2.4em;height:2.4em;font-size:1em;cursor:pointer;background:#d13438;color:#fff">${MONO.mic}</button>
       <div style="min-width:12em"><b class="dd-st">Dinliyor…</b><div class="dd-cap" style="font-size:0.85em;opacity:0.85;min-height:1.2em"></div></div>
-      <button type="button" class="dd-say" style="${bs}">🗣 Konuş (benzetim)</button>
+      <button type="button" class="dd-say" style="${bs}">${MONO.speak} Konuş (benzetim)</button>
       <div style="flex-basis:100%;text-align:center;font-size:0.78em;opacity:0.75">Bu bir benzetimdir: gerçek bilgisayarda mikrofona konuşursunuz.</div>`;
     // Düğmelere basınca yazı alanı odağı kaybetmesin
     bar.addEventListener('mousedown', (e) => e.preventDefault());
@@ -440,14 +443,14 @@ export class Desktop {
     this.emit('dictation', { on: true, field: !!live() });
   }
 
-  // Sesle yazma dersi için görev çubuğunda 🎤 düğmesi (tarayıcı ⊞ + H tuşunu alamazsa buradan açılır)
+  // Sesle yazma dersi için görev çubuğunda mikrofon düğmesi (tarayıcı ⊞ + H tuşunu alamazsa buradan açılır)
   dictationButton(show) {
     const tray = this.root.querySelector('.tb-tray');
     let b = tray.querySelector('.tb-mic');
     if (!show) { b?.remove(); return; }
     if (b) return;
     b = document.createElement('button');
-    b.type = 'button'; b.className = 'tb-mic'; b.textContent = '🎤';
+    b.type = 'button'; b.className = 'tb-mic'; b.innerHTML = MONO.mic;
     b.title = 'Sesle yazma (⊞ + H)';
     b.addEventListener('mousedown', (e) => e.preventDefault());
     b.onclick = () => this.dictation();
@@ -485,7 +488,7 @@ export class Desktop {
     for (const a of [...(this.alarms || [])]) {
       if (!a.on || a.time !== hm || a.last === `${d.getDate()}${hm}`) continue;
       a.last = `${d.getDate()}${hm}`;
-      this.ring(a.label || 'Alarm', a.time, '⏰', a);
+      this.ring(a.label || 'Alarm', a.time, 'saat', a);
       if (a.once) this.alarms = this.alarms.filter((x) => x !== a); // ertelenen alarm bir kez çalar
       this.emit('alarm-ring', { time: a.time, label: a.label });
     }
@@ -498,14 +501,14 @@ export class Desktop {
       if (nowMs < start - e.remind * 60000) continue;
       e.fired = true;
       if (nowMs > start + 60000) continue;
-      this.ring(e.title, e.remind ? `${e.time} · ${e.remind} dakika sonra` : `${e.time} · şimdi`, '📅');
+      this.ring(e.title, e.remind ? `${e.time} · ${e.remind} dakika sonra` : `${e.time} · şimdi`, 'takvim');
       this.emit('cal-remind', { title: e.title, time: e.time });
     }
     const now = Date.now();
     for (const t of [...(this.timers || [])]) {
       if (t.end > now) continue;
       this.timers.splice(this.timers.indexOf(t), 1);
-      this.ring(t.label, 'Süre doldu', '⏳');
+      this.ring(t.label, 'Süre doldu', 'hourglass');
       this.emit('timer-ring', { label: t.label });
     }
     this.wins.forEach((w) => w.api?.onAlarm?.());
@@ -513,7 +516,7 @@ export class Desktop {
 
   // alarm verilirse bildirimde "Ertele (5 dk)" düğmesi çıkar: aynı alarm 5 dakika sonra bir kez daha çalar
   ring(title, text, icon, alarm) {
-    const t = this.toast(title, `${text}${alarm ? '<div class="to-btns"><button type="button" data-snooze="1">💤 Ertele (5 dk)</button></div>' : ''}`, icon, alarm ? 45000 : 12000);
+    const t = this.toast(title, `${text}${alarm ? '<div class="to-btns"><button type="button" data-snooze="1">${MONO.moon} Ertele (5 dk)</button></div>' : ''}`, icon, alarm ? 45000 : 12000);
     playTune(this, [880, 660, 880, 660, 880], 0.22);
     if (alarm) {
       t.addEventListener('click', (e) => {
@@ -537,8 +540,8 @@ export class Desktop {
   // ------------------------------------------------------------------ Masaüstü simgeleri
   desktopItems() {
     return [
-      { id: 'sys:pc', name: 'Bu Bilgisayar', icon: '💻', sys: true },
-      { id: 'sys:recycle', name: 'Geri Dönüşüm Kutusu', icon: this.fs.children(RECYCLE).length ? '🗑️' : '🗑', sys: true, drop: RECYCLE },
+      { id: 'sys:pc', name: 'Bu Bilgisayar', icon: SYS_ICONS.pc, sys: true },
+      { id: 'sys:recycle', name: 'Geri Dönüşüm Kutusu', icon: this.fs.children(RECYCLE).length ? SYS_ICONS['recycle-full'] : SYS_ICONS.recycle, sys: true, drop: RECYCLE },
       ...this.fs.children('desktop').map((n) => ({ id: n.id, name: n.type === 'file' ? n.name : n.name, icon: nodeIcon(n), node: n, link: n.type === 'link', drop: n.type === 'folder' ? n.id : null })),
     ];
   }
@@ -560,7 +563,7 @@ export class Desktop {
     this.iconsEl.innerHTML = items.map((it) => {
       const p = this.iconPos[it.id];
       return `<div class="dk-icon${this.selected === it.id ? ' sel' : ''}" data-id="${it.id}" ${it.drop ? `data-drop="folder:${it.drop}"` : ''} style="left:${p.c * CELL_W + 0.4}em;top:${p.r * CELL_H + 0.4}em">
-        <span class="di-img">${it.icon}${it.link ? '<i class="di-arrow">↗</i>' : ''}</span>
+        <span class="di-img">${it.icon}${it.link ? `<i class="di-arrow">${SYS_ICONS.arrow}</i>` : ''}</span>
         ${renaming === it.id ? `<textarea class="di-rename" rows="2" spellcheck="false">${esc(it.name)}</textarea>` : `<span class="di-name">${esc(it.name)}</span>`}</div>`;
     }).join('');
     if (renaming) {
@@ -637,13 +640,13 @@ export class Desktop {
 
   desktopMenu(e) {
     const items = [
-      { cmd: 'view', label: 'Görünüm', sub: [{ cmd: 'big', label: 'Büyük simgeler' }, { cmd: 'mid', label: 'Orta boy simgeler' }] },
-      { cmd: 'refresh', label: 'Yenile' },
+      { cmd: 'view', label: 'Görünüm', ic: MONO.view, sub: [{ cmd: 'big', label: 'Büyük simgeler' }, { cmd: 'mid', label: 'Orta boy simgeler' }] },
+      { cmd: 'refresh', label: 'Yenile', ic: MONO.refresh },
       '-',
-      { cmd: 'paste', label: 'Yapıştır', key: 'Ctrl+V', disabled: !this.fileClip },
-      { cmd: 'new', label: 'Yeni', sub: [{ cmd: 'newFolder', label: '📁 Klasör' }, { cmd: 'newText', label: '📝 Metin Belgesi' }] },
+      { cmd: 'paste', label: 'Yapıştır', ic: MONO.copy, key: 'Ctrl+V', disabled: !this.fileClip },
+      { cmd: 'new', label: 'Yeni', ic: MONO.plus, sub: [{ cmd: 'newFolder', label: 'Klasör', ic: SYS_ICONS.folder }, { cmd: 'newText', label: 'Metin Belgesi', ic: SYS_ICONS['file-txt'] }] },
       '-',
-      { cmd: 'personalize', label: 'Kişiselleştir' },
+      { cmd: 'personalize', label: 'Kişiselleştir', ic: MONO.personalize },
     ];
     const rect = this.iconsEl.getBoundingClientRect();
     const at = this.cellAt(e.clientX - rect.left, e.clientY - rect.top);
@@ -705,7 +708,7 @@ export class Desktop {
       const old = node.name;
       if (save && v && v !== old) {
         const err = this.fs.rename(id, v);
-        if (err) { this.toast('Ad değiştirilemedi', err, '⚠'); this.renderIcons(); }
+        if (err) { this.toast('Ad değiştirilemedi', err, 'warn'); this.renderIcons(); }
         else this.emit('rename', { id, name: v, old });
       } else this.renderIcons();
     };
@@ -723,7 +726,7 @@ export class Desktop {
     if (!n) return;
     const name = n.name;
     const err = this.fs.remove(id);
-    if (err) return this.toast('Silinemedi', err, '⚠');
+    if (err) return this.toast('Silinemedi', err, 'warn');
     if (this.selected === id) this.selected = null;
     this.emit('delete', { id, name });
   }
@@ -731,7 +734,7 @@ export class Desktop {
   emptyRecycle() {
     const n = this.fs.children(RECYCLE).length;
     if (!n) return;
-    this.dialogs.ask({ title: 'Öğeleri sil', icon: '🗑', text: `Bu ${n} öğeyi <b>kalıcı olarak</b> silmek istediğinizden emin misiniz?`, buttons: [['yes', 'Evet', true], ['no', 'Hayır']] })
+    this.dialogs.ask({ title: 'Öğeleri sil', icon: 'recycle', text: `Bu ${n} öğeyi <b>kalıcı olarak</b> silmek istediğinizden emin misiniz?`, buttons: [['yes', 'Evet', true], ['no', 'Hayır']] })
       .then((a) => { if (a === 'yes') { this.fs.emptyRecycle(); this.emit('recycle-empty'); } });
   }
 
@@ -761,7 +764,7 @@ export class Desktop {
     if (n.type === 'link' && n.target) {
       // Dosya ya da klasör kısayolu: asıl öğeyi açar. Asıl öğe silinmişse kısayol çalışmaz.
       const t = this.fs.get(n.target);
-      if (!t || this.fs.inRecycle(t.id)) { this.toast('Kısayol sorunu', `“${esc(n.name)}” kısayolunun gösterdiği öğe silinmiş. Kısayol yalnızca bir yol gösterici; asıl dosya gidince açılmaz.`, '⚠', 7000); this.emit('shortcut-broken', { name: n.name }); return null; }
+      if (!t || this.fs.inRecycle(t.id)) { this.toast('Kısayol sorunu', `“${esc(n.name)}” kısayolunun gösterdiği öğe silinmiş. Kısayol yalnızca bir yol gösterici; asıl dosya gidince açılmaz.`, 'warn', 7000); this.emit('shortcut-broken', { name: n.name }); return null; }
       this.emit('shortcut-open', { name: n.name, target: t.name });
       return this.openNode(t);
     }
@@ -784,7 +787,7 @@ export class Desktop {
     }
     if (/\.html?$/.test(name)) return this.open('browser', { file: n.id });
     if (/\.(mp3|m4a|wav)$/.test(name)) return this.open('music', { node: n.id });
-    this.toast('Açılamadı', 'Bu dosyayı açacak bir program yok.', '⚠');
+    this.toast('Açılamadı', 'Bu dosyayı açacak bir program yok.', 'warn');
     return null;
   }
 
@@ -792,7 +795,7 @@ export class Desktop {
   async extractZip(n, opened) {
     const list = n.content?.zip || [];
     const into = n.name.replace(/\.zip$/i, '');
-    const a = await this.dialogs.ask({ title: 'Sıkıştırılmış (zip) Klasörleri Ayıkla', icon: '🗜', text: `${opened ? `<b>${esc(n.name)}</b> sıkıştırılmış bir klasördür. İçindekileri rahatça kullanmak için önce ayıklayın.<br><br>` : ''}İçindekiler (${list.length}): ${list.map((x) => esc(x.name)).join(', ')}<br><br>Dosyalar şu klasöre çıkarılacak:<br><b>${esc(this.fs.path(n.parent).map((x) => x.name).join(' › '))} › ${esc(into)}</b>`, buttons: [['yes', 'Ayıkla', true], ['no', 'İptal']] });
+    const a = await this.dialogs.ask({ title: 'Sıkıştırılmış (zip) Klasörleri Ayıkla', icon: 'folder-zip', text: `${opened ? `<b>${esc(n.name)}</b> sıkıştırılmış bir klasördür. İçindekileri rahatça kullanmak için önce ayıklayın.<br><br>` : ''}İçindekiler (${list.length}): ${list.map((x) => esc(x.name)).join(', ')}<br><br>Dosyalar şu klasöre çıkarılacak:<br><b>${esc(this.fs.path(n.parent).map((x) => x.name).join(' › '))} › ${esc(into)}</b>`, buttons: [['yes', 'Ayıkla', true], ['no', 'İptal']] });
     this.emit('zip-ask', { name: n.name, answer: a });
     if (a !== 'yes') return null;
     const f = this.fs.extract(n.id, n.parent, this.fs.uniqueName(n.parent, into));
@@ -871,8 +874,8 @@ export class Desktop {
       if (folder === node.parent) { this.emit('drop', { id, name, to: folder, same: true }); return; }
       if (folder === RECYCLE) { ids.forEach((x) => this.deleteNode(x)); this.emit('drop', { id, name, ids, count: ids.length, to: RECYCLE, toName: 'Geri Dönüşüm Kutusu', op: 'delete' }); return; }
       const op = this.crossDrive(node.parent, folder) ? 'copy' : 'move';
-      for (const x of ids) { const err = op === 'copy' ? (this.fs.copy(x, folder), '') : this.fs.move(x, folder); if (err) { this.toast('Taşınamadı', err, '⚠'); return; } }
-      if (op === 'copy') this.toast('Kopyalandı', `${ids.length} öğe → ${this.fs.label(folder)}`, '📋');
+      for (const x of ids) { const err = op === 'copy' ? (this.fs.copy(x, folder), '') : this.fs.move(x, folder); if (err) { this.toast('Taşınamadı', err, 'warn'); return; } }
+      if (op === 'copy') this.toast('Kopyalandı', `${ids.length} öğe → ${this.fs.label(folder)}`, 'clipboard');
       this.emit('drop', { id, name, ids, count: ids.length, names: ids.map((x) => this.fs.get(x)?.name), to: folder, toName: this.fs.label(folder), op });
       return;
     }
@@ -880,8 +883,8 @@ export class Desktop {
     if (folder === RECYCLE) { this.deleteNode(id); this.emit('drop', { id, name, to: RECYCLE, toName: 'Geri Dönüşüm Kutusu', op: 'delete' }); return; }
     const op = this.crossDrive(node.parent, folder) ? 'copy' : 'move';
     const err = op === 'copy' ? (this.fs.copy(id, folder), '') : this.fs.move(id, folder);
-    if (err) { this.toast('Taşınamadı', err, '⚠'); return; }
-    if (op === 'copy') this.toast('Kopyalandı', `“${name}” → ${this.fs.label(folder)}`, '📋');
+    if (err) { this.toast('Taşınamadı', err, 'warn'); return; }
+    if (op === 'copy') this.toast('Kopyalandı', `“${name}” → ${this.fs.label(folder)}`, 'clipboard');
     this.emit('drop', { id, name, to: folder, toName: this.fs.label(folder), op });
   }
 
@@ -894,7 +897,7 @@ export class Desktop {
     this.closeMenus();
     const scr = this.screen.getBoundingClientRect();
     const build = (list) => `<div class="dk-menu">${list.map((it) => it === '-' ? '<hr>'
-      : `<button type="button" data-cmd="${it.cmd}" ${it.disabled ? 'disabled' : ''} class="${it.bold ? 'b' : ''}${it.sub ? ' has-sub' : ''}"><span>${it.label}</span>${it.key ? `<kbd>${it.key}</kbd>` : ''}${it.sub ? '<i>›</i>' : ''}</button>${it.sub ? build(it.sub).replace('dk-menu', 'dk-menu dk-sub') : ''}`).join('')}</div>`;
+      : `<button type="button" data-cmd="${it.cmd}" ${it.disabled ? 'disabled' : ''} class="${it.bold ? 'b' : ''}${it.sub ? ' has-sub' : ''}"><span>${it.ic ? `<em class="mic">${it.ic}</em>` : ''}${it.label}</span>${it.key ? `<kbd>${it.key}</kbd>` : ''}${it.sub ? `<i>${MONO.chevright}</i>` : ''}</button>${it.sub ? build(it.sub).replace('dk-menu', 'dk-menu dk-sub') : ''}`).join('')}</div>`;
     const wrap = document.createElement('div');
     wrap.className = 'dk-ctx';
     wrap.innerHTML = build(items);
@@ -939,7 +942,7 @@ export class Desktop {
   bindTaskbar() {
     const $ = (s) => this.root.querySelector(s);
     this.screen.addEventListener('pointerdown', (e) => {
-      if (!e.target.closest('.dk-ctx, .dk-start, .tb-start, .tb-search, .dk-winx, .dk-quick, .tb-net, .tb-clock')) this.closeMenus();
+      if (!e.target.closest('.dk-ctx, .dk-start, .tb-start, .tb-search, .tb-hid, .dk-winx, .dk-quick, .tb-net, .tb-clock')) this.closeMenus();
       if (!e.target.closest('.dk-assist')) this.closeAssist();
       if (!e.target.closest('.dk-layouts, .wb-max')) this.hideLayouts();
     });
@@ -954,18 +957,33 @@ export class Desktop {
       this.emit('show-desktop', { hidden: vis.length });
     };
     $('.tb-net').onclick = () => this.toggleQuick();
+    // ^ (gizli simgeler): Windows 11'deki gibi küçük bir tepsi açılır
+    $('.tb-hid').onclick = () => {
+      if (this.screen.querySelector('.dk-ctx .tb-hidden')) { this.closeMenus(); return; }
+      this.closeMenus();
+      const wrap = document.createElement('div');
+      wrap.className = 'dk-ctx';
+      const tray = [['bulut', 'OneDrive'], ['guvenlik', 'Windows Güvenliği'], ['osk', 'Ekran Klavyesi']];
+      wrap.innerHTML = `<div class="dk-menu tb-hidden">${tray.map(([a, n]) => `<button type="button" data-app="${a}" title="${esc(n)}">${APP_ICONS[a]}</button>`).join('')}</div>`;
+      this.screen.append(wrap);
+      const r = $('.tb-hid').getBoundingClientRect(), scr = this.screen.getBoundingClientRect();
+      wrap.style.left = Math.max(2, Math.min(r.left - scr.left + r.width / 2 - wrap.offsetWidth / 2, scr.width - wrap.offsetWidth - 4)) + 'px';
+      wrap.style.top = (r.top - scr.top - wrap.offsetHeight - 6) + 'px';
+      wrap.addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) { this.closeMenus(); this.open(b.dataset.app); } });
+      this.emit('tray-more', { open: true });
+    };
     $('.tb-usb').onclick = () => {
       this.menu($('.tb-usb').getBoundingClientRect().left, $('.tb-usb').getBoundingClientRect().top - 60,
-        [{ cmd: 'eject', label: '⏏ USB Belleği çıkar' }], () => this.ejectUsb(), 'usb');
+        [{ cmd: 'eject', label: 'USB Belleği çıkar', ic: MONO.eject }], () => this.ejectUsb(), 'usb');
     };
     $('.tb-clock').onclick = () => this.toggleCalendar();
     $('.tb-clock').oncontextmenu = (e) => {
       e.preventDefault();
-      this.menu(e.clientX - 60, e.clientY - 56, [{ cmd: 'time', label: '🕒 Tarih ve saati ayarla' }], () => this.open('settings', { page: 'time' }), 'clock');
+      this.menu(e.clientX - 60, e.clientY - 56, [{ cmd: 'time', label: 'Tarih ve saati ayarla', ic: MONO.clock }], () => this.open('settings', { page: 'time' }), 'clock');
     };
     $('.tb-lang').onclick = () => {
       const r = $('.tb-lang').getBoundingClientRect();
-      this.menu(r.left - 150, r.top - (this.settings.kbList.length * 40 + 12), this.settings.kbList.map((id) => ({ cmd: id, label: `${this.settings.kbLayout === id ? '✔' : '\u2003'} <b>${KB[id][0]}</b> ${KB[id][1]}` })), (id) => this.setKbLayout(id, 'menu'), 'lang');
+      this.menu(r.left - 150, r.top - (this.settings.kbList.length * 40 + 12), this.settings.kbList.map((id) => ({ cmd: id, label: `${this.settings.kbLayout === id ? MONO.check : '<i class="wi"></i>'} <b>${KB[id][0]}</b> ${KB[id][1]}` })), (id) => this.setKbLayout(id, 'menu'), 'lang');
     };
     // Görev çubuğuna sağ tık: boş yerde Görev Yöneticisi, uygulama düğmesinde pencereyi kapat
     $('.dk-taskbar').addEventListener('contextmenu', (e) => {
@@ -974,12 +992,12 @@ export class Desktop {
       const b = e.target.closest('.tb-apps [data-app]');
       if (b) {
         const app = b.dataset.app, list = this.wins.filter((w) => w.app === app);
-        this.menu(e.clientX, e.clientY - (list.length ? 110 : 75), [{ cmd: 'open', label: `${APPS[app].icon} ${APPS[app].name}` }, '-',
-          ...(list.length ? [{ cmd: 'close', label: list.length > 1 ? 'Tüm pencereleri kapat' : 'Pencereyi kapat' }] : []), { cmd: 'taskmgr', label: '📊 Görev Yöneticisi' }],
+        this.menu(e.clientX, e.clientY - (list.length ? 110 : 75), [{ cmd: 'open', label: APPS[app].name, ic: APPS[app].icon }, '-',
+          ...(list.length ? [{ cmd: 'close', label: list.length > 1 ? 'Tüm pencereleri kapat' : 'Pencereyi kapat' }] : []), { cmd: 'taskmgr', label: 'Görev Yöneticisi', ic: MONO.taskmgr }],
         (c) => (c === 'open' ? this.open(app) : c === 'taskmgr' ? this.open('taskmgr') : list.forEach((w) => this.close(w))), 'taskbar-app', { app });
         return;
       }
-      this.menu(e.clientX, e.clientY - 75, [{ cmd: 'taskmgr', label: '📊 Görev Yöneticisi' }, { cmd: 'settings', label: '⚙ Görev çubuğu ayarları' }],
+      this.menu(e.clientX, e.clientY - 75, [{ cmd: 'taskmgr', label: 'Görev Yöneticisi', ic: MONO.taskmgr }, { cmd: 'settings', label: 'Görev çubuğu ayarları', ic: MONO.gear }],
         (c) => (c === 'taskmgr' ? this.open('taskmgr') : this.open('settings', { page: 'personal' })), 'taskbar');
     });
     $('.tb-apps').addEventListener('click', (e) => {
@@ -1011,11 +1029,24 @@ export class Desktop {
     this.closeMenus();
     const el = this.startEl;
     const list = START_APPS.filter((a) => !APPS[a].installable || this.settings.installed.includes(a));
-    el.innerHTML = `<input class="st-search" placeholder="Uygulama ara (ör. hesap)" aria-label="Ara">
-      <div class="st-head">Sabitlenmiş</div>
-      <div class="st-grid">${list.map((a) => `<button type="button" data-app="${a}"><span>${APPS[a].icon}</span>${APPS[a].name}</button>`).join('')}</div>
+    // Önerilenler: son açılan dosyalar; hiç yoksa Belgeler'deki ilk dosyalar
+    let rec = (this.recent || []).map((id) => this.fs.get(id)).filter((n) => n && n.type === 'file' && !this.fs.inRecycle(n.id));
+    if (!rec.length) rec = this.fs.children('docs').filter((n) => n.type === 'file');
+    rec = rec.slice(0, 6);
+    const allList = Object.keys(APPS).filter((a) => !APPS[a].hidden && !APPS[a].launch && (!APPS[a].installable || this.settings.installed.includes(a)))
+      .sort((x, y) => APPS[x].name.localeCompare(APPS[y].name, 'tr'));
+    let lastL = '';
+    el.innerHTML = `<label class="st-sbox">${MONO.search}<input class="st-search" placeholder="Uygulamaları, ayarları ve belgeleri aramak için buraya yazın" aria-label="Ara"></label>
+      <div class="st-home">
+        <div class="st-sec"><div class="st-head">Sabitlenmiş</div><button type="button" class="st-all" data-st="all">Tüm uygulamalar ${MONO.chevright}</button></div>
+        <div class="st-grid">${list.map((a) => `<button type="button" data-app="${a}"><span>${APPS[a].icon}</span>${APPS[a].name}</button>`).join('')}</div>
+        <div class="st-sec"><div class="st-head st-rhead">Önerilenler</div></div>
+        <div class="st-rec">${rec.length ? rec.map((n) => `<button type="button" data-rec="${n.id}"><span>${nodeIcon(n)}</span><b>${esc(n.name)}</b><small>${esc(this.fs.label(n.parent))}</small></button>`).join('') : '<p class="st-none">Son kullandığınız dosyalar burada görünür.</p>'}</div>
+      </div>
       <div class="st-results" hidden></div>
-      <div class="st-foot"><span class="st-user">👤 ${esc(this.settings.user)}</span><button type="button" class="st-power" title="Güç">⏻</button></div>`;
+      <div class="st-alist" hidden><div class="st-sec"><button type="button" class="st-all st-back" data-st="home">${MONO.chevleft} Geri</button><div class="st-head">Tüm uygulamalar</div></div>
+        <div class="st-az">${allList.map((a) => { const L = APPS[a].name[0].toLocaleUpperCase('tr'); const h = L !== lastL ? `<h6>${L}</h6>` : ''; lastL = L; return `${h}<button type="button" data-app="${a}"><span>${APPS[a].icon}</span>${APPS[a].name}</button>`; }).join('')}</div></div>
+      <div class="st-foot"><span class="st-user"><i class="st-av">${MONO.user}</i>${esc(this.settings.user)}</span><button type="button" class="st-power" title="Güç">${MONO.power}</button></div>`;
     el.hidden = false;
     this.emit('start', { open: true });
     const input = el.querySelector('.st-search');
@@ -1038,7 +1069,8 @@ export class Desktop {
     input.addEventListener('input', () => {
       const q = input.value;
       this.emit('start-search', { text: q });
-      el.querySelector('.st-grid').hidden = el.querySelector('.st-head').hidden = !!q.trim();
+      el.querySelector('.st-home').hidden = !!q.trim();
+      el.querySelector('.st-alist').hidden = true;
       results.hidden = !q.trim();
       const m = match(q);
       results.innerHTML = m.length ? `<div class="st-head">En iyi eşleşme</div>${m.map((a, i) => `<button type="button" data-app="${a}" class="${i ? '' : 'best'}"><span>${APPS[a].icon}</span>${APPS[a].name}${i ? '' : '<small>Uygulama · Açmak için Enter</small>'}</button>`).join('')}`
@@ -1054,17 +1086,27 @@ export class Desktop {
       if (e.key === 'Escape') this.closeMenus();
       else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) input.focus({ preventScroll: true });
     };
-    el.addEventListener('click', (e) => {
+    // onclick: Başlat her açılışta kurulur; addEventListener olsaydı dinleyiciler birikir, bir uygulama birkaç kez açılırdı
+    el.onclick = (e) => {
+      const st = e.target.closest('[data-st]');
+      if (st) {
+        const all = st.dataset.st === 'all';
+        el.querySelector('.st-home').hidden = all; el.querySelector('.st-alist').hidden = !all;
+        this.emit('start-all', { open: all });
+        return;
+      }
+      const rc = e.target.closest('[data-rec]');
+      if (rc) { const n = this.fs.get(rc.dataset.rec); this.closeMenus(); this.emit('start-open', { file: n?.name, via: 'recommended' }); this.openNode(n); return; }
       const b = e.target.closest('[data-app]');
       if (b) { this.closeMenus(); this.emit('start-open', { app: b.dataset.app, via: 'click' }); this.open(b.dataset.app); return; }
       if (e.target.closest('.st-power')) this.powerMenu(e.target.closest('.st-power'));
       const um = e.target.closest('.st-user');
       if (um) {
         const r = um.getBoundingClientRect();
-        this.menu(r.left, r.top - 60, [{ cmd: 'settings', label: '⚙ Hesap ayarlarını değiştir' }, { cmd: 'lock', label: '🔒 Kilitle' }],
+        this.menu(r.left, r.top - 60, [{ cmd: 'settings', label: 'Hesap ayarlarını değiştir', ic: MONO.gear }, { cmd: 'lock', label: 'Kilitle', ic: MONO.lock }],
           (cmd) => { this.startEl.hidden = true; if (cmd === 'lock') this.lockScreen('start'); else this.open('settings', { page: 'accounts' }); }, 'startuser');
       }
-    });
+    };
     // Windows'ta olduğu gibi Başlat açıkken doğrudan yazmaya başlamak arama yapar.
     // Dokunmatik ekranda ise kutu kendiliğinden seçilmez: yoksa her açılışta telefon klavyesi ekranı kaplar.
     if (touchOnly()) el.tabIndex = -1;
@@ -1076,13 +1118,13 @@ export class Desktop {
     const r = btn.getBoundingClientRect();
     const keep = this.startEl;
     this.emit('power-menu');
-    const items = [{ cmd: 'sleep', label: '🌙 Uyku' }, { cmd: 'shutdown', label: '⏻ Kapat' }, { cmd: 'restart', label: '🔄 Yeniden başlat' }];
+    const items = [{ cmd: 'sleep', label: 'Uyku', ic: MONO.sleep }, { cmd: 'shutdown', label: 'Kapat', ic: MONO.power }, { cmd: 'restart', label: 'Yeniden başlat', ic: MONO.restart }];
     // Başlat menüsünü kapatmadan güç menüsünü açıyoruz
     const wasHidden = keep.hidden;
     this.screen.querySelectorAll('.dk-ctx').forEach((m) => m.remove());
     const wrap = document.createElement('div');
     wrap.className = 'dk-ctx';
-    wrap.innerHTML = `<div class="dk-menu">${items.map((it) => `<button type="button" data-cmd="${it.cmd}"><span>${it.label}</span></button>`).join('')}</div>`;
+    wrap.innerHTML = `<div class="dk-menu">${items.map((it) => `<button type="button" data-cmd="${it.cmd}"><span><em class="mic">${it.ic}</em>${it.label}</span></button>`).join('')}</div>`;
     this.screen.append(wrap);
     const scr = this.screen.getBoundingClientRect();
     wrap.style.left = Math.min(r.left - scr.left - 80, scr.width - 200) + 'px';
@@ -1140,7 +1182,7 @@ export class Desktop {
     q.innerHTML = `<div class="ck-time">${this.root.querySelector('.tb-time').textContent}<small>${d.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small></div>
       <div class="ck-head">${d.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })}</div>
       <div class="ck-grid">${['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((n) => `<b>${n}</b>`).join('')}${cells}</div>
-      <button type="button" class="qk-all">🕒 Tarih ve saat ayarları</button>`;
+      <button type="button" class="qk-all">${MONO.clock} Tarih ve saat ayarları</button>`;
     q.hidden = false;
     this.emit('calendar', { open: true });
     q.querySelector('.qk-all').onclick = () => { q.hidden = true; this.open('settings', { page: 'time' }); };
@@ -1152,7 +1194,7 @@ export class Desktop {
     this.settings.kbLayout = id;
     this.applySettings();
     this.wins.forEach((w) => w.api?.onSettings?.());
-    const t = this.toast(`${KB[id][0]}`, KB[id][1], '⌨', 1800);
+    const t = this.toast(`${KB[id][0]}`, KB[id][1], APP_ICONS.osk, 1800);
     t.classList.add('dk-osd');
     this.emit('kb-layout', { layout: id, lang: KB[id][0], via });
   }
@@ -1178,12 +1220,12 @@ export class Desktop {
     this.closeMenus();
     q.classList.remove('qk-cal');
     const s = this.settings;
-    q.innerHTML = `<div class="qk-row"><button type="button" class="qk-wifi ${s.wifi ? 'on' : ''}">📶<span>${s.wifi ? (s.network ? s.network + (s.netSim && !online(this) ? ' · İnternet yok' : '') : 'Bağlı değil') : 'Wi-Fi kapalı'}</span></button>
-        <button type="button" class="qk-bt ${s.bluetooth ? 'on' : ''}">🔵<span>${s.bluetooth ? 'Bluetooth açık' : 'Bluetooth kapalı'}</span></button>
-        <button type="button" class="qk-air ${s.airplane ? 'on' : ''}">✈<span>Uçak modu</span></button></div>
-      <label class="qk-sl">☀ <input type="range" class="qk-bri" min="20" max="100" value="${s.brightness}"></label>
-      <label class="qk-sl"><button type="button" class="qk-mute" title="Sesi kapat/aç">${s.muted ? '🔇' : '🔊'}</button><input type="range" class="qk-vol" min="0" max="100" value="${s.volume}"><b class="qk-vv">${s.volume}</b></label>
-      <button type="button" class="qk-all">⚙ Tüm ayarlar</button>`;
+    q.innerHTML = `<div class="qk-row"><button type="button" class="qk-wifi ${s.wifi ? 'on' : ''}">${MONO.wifi}<span>${s.wifi ? (s.network ? s.network + (s.netSim && !online(this) ? ' · İnternet yok' : '') : 'Bağlı değil') : 'Wi-Fi kapalı'}</span></button>
+        <button type="button" class="qk-bt ${s.bluetooth ? 'on' : ''}">${MONO.bluetooth}<span>${s.bluetooth ? 'Bluetooth açık' : 'Bluetooth kapalı'}</span></button>
+        <button type="button" class="qk-air ${s.airplane ? 'on' : ''}">${MONO.airplane}<span>Uçak modu</span></button></div>
+      <label class="qk-sl">${MONO.brightness} <input type="range" class="qk-bri" min="20" max="100" value="${s.brightness}"></label>
+      <label class="qk-sl"><button type="button" class="qk-mute" title="Sesi kapat/aç">${s.muted ? MONO.vol0 : MONO.vol2}</button><input type="range" class="qk-vol" min="0" max="100" value="${s.volume}"><b class="qk-vv">${s.volume}</b></label>
+      <button type="button" class="qk-all">${MONO.gear} Tüm ayarlar</button>`;
     q.hidden = false;
     this.emit('quick', { open: true });
     q.querySelector('.qk-wifi').onclick = () => { this.setSetting('wifi', !s.wifi); if (!s.wifi) this.settings.network = null; else this.settings.network = this.settings.knownNetworks[0] || null; this.applySettings(); q.hidden = true; this.toggleQuick(); };
@@ -1191,7 +1233,7 @@ export class Desktop {
     q.querySelector('.qk-air').onclick = () => { this.setAirplane(!s.airplane); q.hidden = true; this.toggleQuick(); };
     q.querySelector('.qk-bri').oninput = (e) => this.setSetting('brightness', +e.target.value);
     q.querySelector('.qk-vol').oninput = (e) => { this.setSetting('volume', +e.target.value); q.querySelector('.qk-vv').textContent = e.target.value; if (s.muted) this.setSetting('muted', false); };
-    q.querySelector('.qk-mute').onclick = (e) => { this.setSetting('muted', !s.muted); e.target.textContent = s.muted ? '🔇' : '🔊'; };
+    q.querySelector('.qk-mute').onclick = (e) => { this.setSetting('muted', !s.muted); e.currentTarget.innerHTML = s.muted ? MONO.vol0 : MONO.vol2; };
     q.querySelector('.qk-all').onclick = () => { q.hidden = true; this.open('settings'); };
   }
 
@@ -1218,7 +1260,7 @@ export class Desktop {
     el.className = 'win';
     el.dataset.app = app;
     el.innerHTML = `<div class="win-bar"><span class="win-ico">${def.icon}</span><span class="win-title"></span>
-        <button type="button" class="wb-min" title="Simge durumuna küçült">—</button><button type="button" class="wb-max" title="Ekranı kapla">☐</button><button type="button" class="wb-close" title="Kapat">✕</button></div>
+        <button type="button" class="wb-min" title="Simge durumuna küçült">${WIN_BTN.min}</button><button type="button" class="wb-max" title="Ekranı kapla">${WIN_BTN.max}</button><button type="button" class="wb-close" title="Kapat">${WIN_BTN.close}</button></div>
       <div class="win-body"></div><div class="win-grip" title="Boyutlandır"></div>`;
     win.el = el;
     this.winsEl.append(el);
@@ -1316,7 +1358,7 @@ export class Desktop {
   layout(win) {
     const s = win.el.style;
     win.el.classList.toggle('max', win.max);
-    win.el.querySelector('.wb-max').textContent = win.max ? '❐' : '☐';
+    win.el.querySelector('.wb-max').innerHTML = win.max ? WIN_BTN.restore : WIN_BTN.max;
     win.el.querySelector('.wb-max').title = win.max ? 'Önceki boyutuna getir' : 'Ekranı kapla';
     win.el.classList.toggle('snap', !!win.snap && !win.max);
     if (win.max) { s.left = s.top = '0'; s.width = s.height = '100%'; }
@@ -1442,7 +1484,7 @@ export class Desktop {
   async close(win) {
     if (win.hung) {
       // Yanıt vermeyen program kapatılmak istenince Windows sorar
-      const a = await this.dialogs.ask({ title: win.title, icon: '⏳', text: `<b>${esc(APPS[win.app].name)} yanıt vermiyor</b><br>Programı kapatırsanız kaydedilmemiş bilgiler kaybolabilir.`, buttons: [['close', 'Programı kapat'], ['wait', 'Programın yanıt vermesini bekle', true]] });
+      const a = await this.dialogs.ask({ title: win.title, icon: 'hourglass', text: `<b>${esc(APPS[win.app].name)} yanıt vermiyor</b><br>Programı kapatırsanız kaydedilmemiş bilgiler kaybolabilir.`, buttons: [['close', 'Programı kapat'], ['wait', 'Programın yanıt vermesini bekle', true]] });
       this.emit('hung-answer', { app: win.app, answer: a });
       if (a === 'close') { this.destroy(win); this.emit('win-close', { app: win.app, win: win.id, hung: true }); }
       return;
@@ -1608,7 +1650,7 @@ export class Desktop {
 
   // ------------------------------------------------------------------ Sanal masaüstleri ve Görev Görünümü
   newDesk(quiet) {
-    if (this.vdesks.length >= 4) { this.toast('Sanal masaüstü', 'Bu alıştırmada en çok 4 masaüstü açılabilir.', '🖥', 3000); return; }
+    if (this.vdesks.length >= 4) { this.toast('Sanal masaüstü', 'Bu alıştırmada en çok 4 masaüstü açılabilir.', SYS_ICONS.pc, 3000); return; }
     this.vdesks.push(`Masaüstü ${this.vdesks.length + 1}`);
     this.switchDesk(this.vdesks.length - 1, true);
     if (!quiet) this.emit('vd-new', { count: this.vdesks.length });
@@ -1661,9 +1703,9 @@ export class Desktop {
     this.closeMenus();
     if (!tv) { tv = document.createElement('div'); tv.className = 'dk-tv'; this.screen.append(tv); }
     const here = this.wins.filter((w) => w.vd === this.vd && !APPS[w.app].top);
-    tv.innerHTML = `<div class="tv-wins">${here.length ? here.map((w) => `<button type="button" class="tv-win" data-tvwin="${w.id}"><span class="tv-ttl">${w.icon} ${esc(w.title)}</span><span class="tv-big">${w.icon}</span><i data-tvclose="${w.id}" title="Kapat">✕</i></button>`).join('') : '<p class="tv-empty">Bu masaüstünde açık pencere yok.</p>'}</div>
+    tv.innerHTML = `<div class="tv-wins">${here.length ? here.map((w) => `<button type="button" class="tv-win" data-tvwin="${w.id}"><span class="tv-ttl">${w.icon} ${esc(w.title)}</span><span class="tv-big">${w.icon}</span><i data-tvclose="${w.id}" title="Kapat">${WIN_BTN.close}</i></button>`).join('') : '<p class="tv-empty">Bu masaüstünde açık pencere yok.</p>'}</div>
       <p class="tv-tip">Bir pencereyi başka masaüstüne taşımak için üzerine <b>sağ tıklayın</b>.</p>
-      <div class="tv-desks">${this.vdesks.map((n, i) => `<button type="button" class="tv-desk ${i === this.vd ? 'on' : ''}" data-tvdesk="${i}"><span class="tv-thumb" style="background:${this.wallCss()}">${this.wins.filter((w) => w.vd === i).slice(0, 4).map((w) => `<i>${w.icon}</i>`).join('')}</span><span>${esc(n)}</span>${this.vdesks.length > 1 ? `<i data-tvdel="${i}" title="Masaüstünü kapat">✕</i>` : ''}</button>`).join('')}
+      <div class="tv-desks">${this.vdesks.map((n, i) => `<button type="button" class="tv-desk ${i === this.vd ? 'on' : ''}" data-tvdesk="${i}"><span class="tv-thumb" style="background:${this.wallCss()}">${this.wins.filter((w) => w.vd === i).slice(0, 4).map((w) => `<i>${w.icon}</i>`).join('')}</span><span>${esc(n)}</span>${this.vdesks.length > 1 ? `<i data-tvdel="${i}" title="Masaüstünü kapat">${WIN_BTN.close}</i>` : ''}</button>`).join('')}
         <button type="button" class="tv-desk tv-new" data-tvnew="1"><span class="tv-thumb">＋</span><span>Yeni masaüstü</span></button></div>`;
     if (!refresh) {
       this.emit('taskview', { open: true });
@@ -1703,7 +1745,7 @@ export class Desktop {
   toast(title, text, icon = 'ℹ', ms = 5000) {
     const t = document.createElement('div');
     t.className = 'dk-toast';
-    t.innerHTML = `<span class="to-ico">${icon}</span><div><b>${esc(title)}</b><div>${text}</div></div><button type="button" class="to-x" title="Kapat">✕</button>`;
+    t.innerHTML = `<span class="to-ico">${iconFor(icon)}</span><div><b>${esc(title)}</b><div>${text}</div></div><button type="button" class="to-x" title="Kapat">${WIN_BTN.close}</button>`;
     this.root.querySelector('.dk-toasts').append(t);
     const rm = () => t.remove();
     t.querySelector('.to-x').onclick = rm;
@@ -1717,7 +1759,7 @@ export class Desktop {
       o.className = 'dk-uac';
       o.innerHTML = `<div class="uac-box"><div class="uac-head">Kullanıcı Hesabı Denetimi</div>
         <h3>Bu uygulamanın cihazınızda değişiklik yapmasına izin vermek istiyor musunuz?</h3>
-        <div class="uac-app"><span>🛡</span><b>${esc(appName)}</b></div>
+        <div class="uac-app"><span>${APP_ICONS.guvenlik}</span><b>${esc(appName)}</b></div>
         <p>Doğrulanmış yayımcı: Örnek Yazılım A.Ş.<br>Dosya kaynağı: Bu bilgisayardaki sabit sürücü</p>
         <div class="uac-btns"><button type="button" data-v="1" class="primary">Evet</button><button type="button" data-v="0">Hayır</button></div></div>`;
       this.screen.append(o);
@@ -1737,7 +1779,7 @@ export class Desktop {
   plugUsb() {
     if (this.fs.usb) return;
     this.fs.plugUsb(true);
-    const t = this.toast('USB Bellek (E:)', 'Yeni bir sürücü takıldı. <u>Dosyaları görmek için tıklayın.</u>', '💾', 8000);
+    const t = this.toast('USB Bellek (E:)', 'Yeni bir sürücü takıldı. <u>Dosyaları görmek için tıklayın.</u>', 'usb', 8000);
     t.style.cursor = 'pointer';
     t.addEventListener('click', (e) => { if (!e.target.closest('.to-x')) { t.remove(); this.open('explorer', { folder: USB }); } });
     this.emit('usb', { on: true });
@@ -1753,12 +1795,12 @@ export class Desktop {
     let mode = 'charge', open = false;
     const draw = () => {
       el.innerHTML = `<div class="ph-cable"></div><div class="ph-body"><div class="ph-notch"></div><div class="ph-screen">
-        <div class="ph-time">${pad(this.now().getHours())}:${pad(this.now().getMinutes())} 🔋⚡</div>
+        <div class="ph-time">${pad(this.now().getHours())}:${pad(this.now().getMinutes())} ${MONO.battchg}</div>
         ${open ? `<div class="ph-sheet"><b>USB tercihleri</b><small>USB ile bağlanan cihaz: bu bilgisayar</small>
           ${[['charge', 'Yalnızca şarj'], ['files', 'Dosya aktarımı'], ['ptp', 'Fotoğraf aktarımı (PTP)']].map(([k, l]) => `<label class="ph-opt"><input type="radio" name="phm" value="${k}" ${mode === k ? 'checked' : ''}> ${l}</label>`).join('')}
           <button type="button" class="ph-done">Tamam</button></div>`
-        : `<div class="ph-note" role="button" tabindex="0"><b>⚡ Bu cihaz USB ile şarj ediliyor</b><small>${mode === 'charge' ? 'Diğer seçenekler için dokunun.' : 'Dosya aktarımı açık. Değiştirmek için dokunun.'}</small></div>`}
-        </div></div><button type="button" class="ph-unplug" title="Kabloyu çıkar">🔌 Kabloyu çıkar</button>`;
+        : `<div class="ph-note" role="button" tabindex="0"><b>${MONO.battchg} Bu cihaz USB ile şarj ediliyor</b><small>${mode === 'charge' ? 'Diğer seçenekler için dokunun.' : 'Dosya aktarımı açık. Değiştirmek için dokunun.'}</small></div>`}
+        </div></div><button type="button" class="ph-unplug" title="Kabloyu çıkar">${SYS_ICONS.plug} Kabloyu çıkar</button>`;
     };
     draw();
     el.addEventListener('click', (e) => {
@@ -1772,7 +1814,7 @@ export class Desktop {
       if (mode === 'charge') { if (this.fs.phone) { this.leavePhone(); this.fs.plugPhone(false); } return; }
       if (!this.fs.phone) {
         this.fs.plugPhone(true);
-        const t = this.toast('Telefonum', 'Bu cihazla ne yapmak istediğinizi seçin.<div class="to-acts"><button type="button" data-ph="import">🖼 Fotoğrafları içeri aktar</button><button type="button" data-ph="open">📂 Dosyaları görmek için cihazı aç</button></div>', '📱', 20000);
+        const t = this.toast('Telefonum', `Bu cihazla ne yapmak istediğinizi seçin.<div class="to-acts"><button type="button" data-ph="import">${APP_ICONS.photos} Fotoğrafları içeri aktar</button><button type="button" data-ph="open">${SYS_ICONS.folder} Dosyaları görmek için cihazı aç</button></div>`, 'phone', 20000);
         t.addEventListener('click', (ev) => {
           const k = ev.target.closest('[data-ph]')?.dataset.ph;
           if (!k) return;
@@ -1799,13 +1841,13 @@ export class Desktop {
   // Telefondaki bütün fotoğrafları Resimler içinde tarihli bir klasöre kopyalar
   async importPhotos() {
     const photos = Object.values(this.fs.nodes).filter((n) => n.type === 'file' && this.fs.isInside(n.id, PHONE) && /\.jpe?g$/i.test(n.name));
-    const t = this.toast('İçeri aktarılıyor', `<div class="prg"><i></i></div><small>${photos.length} fotoğraf kopyalanıyor…</small>`, '🖼', 60000);
+    const t = this.toast('İçeri aktarılıyor', `<div class="prg"><i></i></div><small>${photos.length} fotoğraf kopyalanıyor…</small>`, 'photos', 60000);
     const bar = t.querySelector('.prg i');
     for (let i = 0; i <= 20; i++) { bar.style.width = i * 5 + '%'; await new Promise((r) => setTimeout(r, 70)); }
     t.remove();
     const folder = this.fs.create('pictures', { type: 'folder', name: `Telefondan ${this.now().toLocaleDateString('tr-TR')}` });
     for (const p of photos) this.fs.copy(p.id, folder.id);
-    const d = this.toast('İçeri aktarma tamamlandı', `${photos.length} fotoğraf <b>Resimler › ${esc(folder.name)}</b> klasörüne kopyalandı. Telefondakiler yerinde duruyor.`, '✅', 8000);
+    const d = this.toast('İçeri aktarma tamamlandı', `${photos.length} fotoğraf <b>Resimler › ${esc(folder.name)}</b> klasörüne kopyalandı. Telefondakiler yerinde duruyor.`, 'ok', 8000);
     d.style.cursor = 'pointer';
     d.addEventListener('click', () => this.open('explorer', { folder: folder.id }));
     this.emit('phone-import', { count: photos.length, folder: folder.id });
@@ -1815,7 +1857,7 @@ export class Desktop {
     if (!this.fs.usb) return;
     for (const w of this.wins.filter((x) => x.app === 'explorer')) w.api?.leaveUsb?.();
     this.fs.plugUsb(false);
-    this.toast('Donanımı güvenle kaldırın', 'USB Bellek artık bilgisayardan çıkarılabilir.', '✅', 6000);
+    this.toast('Donanımı güvenle kaldırın', 'USB Bellek artık bilgisayardan çıkarılabilir.', 'ok', 6000);
     this.emit('usb', { on: false, safe: true });
   }
 
@@ -1825,7 +1867,7 @@ export class Desktop {
     this.closeMenus();
     const o = document.createElement('div');
     o.className = 'dk-snip';
-    o.innerHTML = '<div class="sn-bar">✂ Fareyle almak istediğiniz alanın üzerinde sürükleyin · Vazgeçmek için Esc</div><div class="sn-rect" hidden></div>';
+    o.innerHTML = `<div class="sn-bar">${APP_ICONS.snip} Fareyle almak istediğiniz alanın üzerinde sürükleyin · Vazgeçmek için Esc</div><div class="sn-rect" hidden></div>`;
     this.screen.append(o);
     this.emit('snip-start');
     const rect = o.querySelector('.sn-rect');
@@ -1852,9 +1894,9 @@ export class Desktop {
         const x = ev.clientX - scr.left, y = ev.clientY - scr.top;
         const r = { x: Math.min(x, sx), y: Math.min(y, sy), w: Math.abs(x - sx), h: Math.abs(y - sy) };
         end();
-        if (r.w < 20 || r.h < 20) { this.toast('Ekran Alıntısı', 'Alan çok küçüktü. Tekrar deneyin ve biraz daha büyük sürükleyin.', '✂'); this.emit('snip-cancel', { small: true }); return; }
+        if (r.w < 20 || r.h < 20) { this.toast('Ekran Alıntısı', 'Alan çok küçüktü. Tekrar deneyin ve biraz daha büyük sürükleyin.', 'snip'); this.emit('snip-cancel', { small: true }); return; }
         this.imageClip = this.renderScreen(r);
-        const t = this.toast('Ekran alıntısı panoya kopyalandı', `<img class="to-img" src="${this.imageClip.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, '✂', 9000);
+        const t = this.toast('Ekran alıntısı panoya kopyalandı', `<img class="to-img" src="${this.imageClip.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, 'snip', 9000);
         t.classList.add('wide');
         this.emit('snip', { w: Math.round(r.w), h: Math.round(r.h) });
       };
@@ -1868,7 +1910,7 @@ export class Desktop {
   printScreen() {
     const s = this.screen.getBoundingClientRect();
     this.imageClip = this.renderScreen({ x: 0, y: 0, w: s.width, h: s.height });
-    this.toast('Ekran görüntüsü panoya kopyalandı', `<img class="to-img" src="${this.imageClip.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, '📸', 8000);
+    this.toast('Ekran görüntüsü panoya kopyalandı', `<img class="to-img" src="${this.imageClip.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, 'camera', 8000);
     this.emit('printscreen');
   }
 
@@ -1910,6 +1952,11 @@ function paintNode(g, el) {
   if (bw && cs.borderTopStyle !== 'none' && !/rgba\(.*,\s*0\)$/.test(cs.borderTopColor)) {
     g.strokeStyle = cs.borderTopColor; g.lineWidth = bw;
     g.strokeRect(b.left + bw / 2, b.top + bw / 2, b.width - bw, b.height - bw);
+  }
+  if (el.tagName.toLowerCase() === 'svg') {
+    const im = el.dataset?.wi && iconImage(el.dataset.wi);
+    if (im?.complete && im.naturalWidth) { try { g.drawImage(im, b.left, b.top, b.width, b.height); } catch { /* boş */ } }
+    return;
   }
   if (el.tagName === 'CANVAS') { try { g.drawImage(el, b.left, b.top, b.width, b.height); } catch { /* boş */ } return; }
   if (el.tagName === 'IMG' && el.complete) { try { g.drawImage(el, b.left, b.top, b.width, b.height); } catch { /* boş */ } return; }
@@ -1954,12 +2001,13 @@ function paintText(g, node, cs) {
   }
 }
 
+const ROOT_ICON = { desktop: 'folder-desktop', docs: 'folder-docs', downloads: 'folder-down', pictures: 'folder-pics', music: 'folder-music', usb: 'usb', phone: 'phone', recycle: 'recycle' };
 export function nodeIcon(n) {
-  if (n.type === 'folder') return '📁';
-  if (n.type === 'link') return n.icon || APPS[n.app]?.icon || '📄';
+  if (n.type === 'folder') return SYS_ICONS[ROOT_ICON[n.id]] || (/\.zip$/i.test(n.name) ? SYS_ICONS['folder-zip'] : SYS_ICONS.folder);
+  if (n.type === 'link') return n.icon || APPS[n.app]?.icon || SYS_ICONS.file;
   return fileIcon(n.name);
 }
 
 function startLogo() {
-  return '<span class="logo4"><i></i><i></i><i></i><i></i></span>';
+  return WIN_LOGO;
 }

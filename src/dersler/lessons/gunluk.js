@@ -1,5 +1,5 @@
 // 13. hafta: günlük işler. Aynı işler iki yerde ayrı ayrı: bilgisayarın kendisinde (masaüstü, Dosya Gezgini)
-// ve internet tarayıcısında. Ekran görüntüsü, fotoğraf kaydetme, arka plan, kopyalama, yakınlaştırma, sık kullanılanlar.
+// ve internet tarayıcısında. Ekran görüntüsü, fotoğraf kaydetme, arka plan, kopyalama, yakınlaştırma, yer işaretleri.
 import { K, desktopReady, maxed } from './common.js';
 import { rehberSoru } from './kalip.js';
 
@@ -97,7 +97,7 @@ export const gunlukWeb = {
     ['Ctrl + Shift + S / ✂', 'Web yakalama: yalnızca sayfanın resmi'],
     ['PrtSc (Print Screen)', 'Bütün ekranın resmini panoya alır; Paint\'te Ctrl + V'],
     ['Ctrl + / Ctrl − / Ctrl + 0', 'Sayfayı büyüt / küçült / eski haline getir'],
-    ['☆ / Ctrl + D', 'Sayfayı sık kullanılanlara ekler'],
+    ['☆ / Ctrl + D', 'Sayfayı yer işaretlerine ekler'],
   ],
   steps: [
     {
@@ -110,7 +110,7 @@ export const gunlukWeb = {
       title: 'Fotoğraf sitesini bulun',
       html: '<p>Tarayıcıda <b>ücretsiz manzara fotoğrafı</b> diye aratın ve <b>Ücretsiz Fotoğraflar</b> sitesini açın.</p>',
       on: (ev) => ev.type === 'web-nav' && ev.host === PHOTO_SITE,
-      hint: 'Sonuçlarda “Reklam” yazanı atlayın; adresin ucretsiz-fotograflar.com.tr olduğuna bakın.',
+      hint: 'Sonuçlarda “Sponsorlu” yazanı atlayın; adresin ucretsiz-fotograflar.com.tr olduğuna bakın.',
       done: 'Bu sitedeki fotoğraflar ücretsizdir. Her sitedeki fotoğrafı izinsiz kullanmak doğru değildir; “ücretsiz” ya da “telifsiz” yazan sitelerden indirin.',
     },
     {
@@ -191,11 +191,11 @@ export const gunlukWeb = {
       done: 'Büyütme yalnızca sayfayı etkiler; bilgisayarın diğer yazıları değişmez. Bilgisayardaki bütün yazılar için Ayarlar → Yazı boyutu kullanılır.',
     },
     {
-      title: 'Sık kullanılanlara ekleyin',
+      title: 'Yer işaretlerine ekleyin',
       html: `<p>Sık girdiğiniz sayfayı kaydedin: adres çubuğunun sağındaki <b>☆</b> yıldıza tıklayın ya da ${K('Ctrl', 'D')}.</p>`,
       combo: ['Ctrl', 'KeyD'],
       on: (ev) => ev.type === 'web-bookmark' && !ev.removed,
-      done: 'Sayfa, adres çubuğunun altındaki <b>sık kullanılanlar çubuğuna</b> eklendi. Bir dahaki sefere adres yazmadan tek tıkla açılır.',
+      done: 'Sayfa, adres çubuğunun altındaki <b>yer işaretleri çubuğuna</b> eklendi. Bir dahaki sefere adres yazmadan tek tıkla açılır.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Tarayıcıdaki günlük işler:</p>' },
   ],
