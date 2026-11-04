@@ -34,7 +34,7 @@ export const cokluSecim = {
     [K('Shift') + ' + tık', 'İlk tıkladığınızdan ikinciye kadar aradaki hepsini seçer'],
     ['Boş yerden sürükleyin', 'Çerçevenin içine giren her şey seçilir'],
     [K('Ctrl', 'A'), 'Klasördeki her şeyi seçer'],
-    ['☐ Onay kutuları', 'Her dosyanın köşesinde kutucuk çıkar; Ctrl\'ye basmadan tek tek işaretlersiniz'],
+    ['Öğe onay kutuları', 'Görüntüle → Göster ile her dosyanın köşesinde kutucuk çıkar; Ctrl\'ye basmadan tek tek işaretlersiniz'],
     ['Boş bir yere tık', 'Bütün seçimi kaldırır'],
   ],
   setup: (c) => {
@@ -69,7 +69,7 @@ export const cokluSecim = {
     },
     {
       title: 'Üçünü birden USB\'ye',
-      html: `<p>USB bellek takıldı. Seçim bozulmadan ${K('Ctrl', 'C')}'ye basın (ya da üstteki <b>⧉ Kopyala</b>). Sonra soldan <b>💾 USB Bellek (E:)</b>'ye geçip ${K('Ctrl', 'V')}'ye basın (ya da <b>📋 Yapıştır</b>).</p>`,
+      html: `<p>USB bellek takıldı. Seçim bozulmadan ${K('Ctrl', 'C')}'ye basın (ya da üstteki <b>Kopyala</b> simgesi: üst üste iki kâğıt). Sonra soldan <b>💾 USB Bellek (E:)</b>'ye geçip ${K('Ctrl', 'V')}'ye basın (ya da <b>Yapıştır</b> simgesi: pano).</p>`,
       combo: ['Ctrl', 'KeyC'],
       hint: 'Seçim bozulduysa önceki adımdaki gibi Ctrl ile üçünü yeniden seçin. Yapıştırmadan önce soldaki listeden USB Bellek\'e tıklamayı unutmayın.',
       setup: (c) => { if (!c.d.fs.usb) c.d.plugUsb(); },
@@ -97,7 +97,7 @@ export const cokluSecim = {
     },
     {
       title: 'Bulanıkları silin',
-      html: `<p>Seçim duruyorken ${K('Delete')} tuşuna basın (ya da üstteki <b>🗑 Sil</b>). Dördü birden Geri Dönüşüm Kutusu'na gider.</p>`,
+      html: `<p>Seçim duruyorken ${K('Delete')} tuşuna basın (ya da üstteki <b>Sil</b> simgesi: çöp kutusu). Dördü birden Geri Dönüşüm Kutusu'na gider.</p>`,
       keys: ['Delete'],
       hint: 'Seçim bozulduysa 11\'e tıklayıp Shift ile 14\'e tıklayın, sonra Delete.',
       check: (c) => silindi(c),
@@ -118,14 +118,14 @@ export const cokluSecim = {
     },
     {
       title: 'Ctrl + A: hepsi',
-      html: `<p>Klasördeki <b>her şeyi</b> seçmek için bir dosyaya ya da boş bir yere tıklayıp ${K('Ctrl', 'A')}'ya basın (ya da üstteki <b>☑ Tümünü seç</b>).</p>`,
+      html: `<p>Klasördeki <b>her şeyi</b> seçmek için bir dosyaya ya da boş bir yere tıklayıp ${K('Ctrl', 'A')}'ya basın (ya da üstteki <b>⋯</b> → <b>Tümünü seç</b>).</p>`,
       combo: ['Ctrl', 'KeyA'],
       on: (ev) => ev.type === 'ex-select' && ev.how === 'all',
       done: 'Hepsi seçildi. Not Defteri\'nde ve Word\'de de Ctrl + A bütün yazıyı seçer.',
     },
     {
       title: 'Tuşsuz yol: onay kutuları',
-      html: '<p>Ctrl\'yi basılı tutmak zor geliyorsa kutucuklar var. Sağ üstteki <b>☐ Onay kutuları</b> düğmesine tıklayın. Her dosyanın köşesinde bir kutu çıkar.</p>',
+      html: '<p>Ctrl\'yi basılı tutmak zor geliyorsa kutucuklar var. Üstteki <b>Görüntüle</b> düğmesine tıklayın, <b>Göster</b>\'in üzerine gelip <b>Öğe onay kutuları</b>\'nı seçin. Her dosyanın köşesinde bir kutu çıkar.</p>',
       check: (c) => !!c.d.settings.exBoxes,
       on: (ev) => ev.type === 'ex-checkboxes' && ev.on,
       done: 'Kutucuklar çıktı.',

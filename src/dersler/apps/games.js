@@ -1,6 +1,6 @@
 // Fare alıştırma oyunları: Hedef (tık / çift tık / sağ tık), Mayın Tarlası, Kart Dizme (sürükle-bırak).
 // Görünüm Microsoft Minesweeper / Solitaire Collection havasında (renkli taşlar, yeşil çuha); tüm simgeler SVG.
-import { ic } from './w11ikon.js';
+import { ic } from '../w11ikon.js';
 
 const SVGF = (body) => `<svg class="wi" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${body}</svg>`;
 const FACE = {

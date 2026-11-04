@@ -570,7 +570,7 @@ export const dosyaParkur = {
     },
     {
       title: '1. Sağlık klasörü', html: '<p>Belgeler\'in içinde <b>Sağlık</b> adında yeni bir klasör oluşturun.</p>',
-      hint: `Üstteki <b>＋ Yeni klasör</b>\'e tıklayın, adı seçiliyken <b>Sağlık</b> yazın, ${K('Enter')}.`,
+      hint: `Üstteki <b>Yeni</b> düğmesine tıklayıp <b>Klasör</b>\'ü seçin, adı seçiliyken <b>Sağlık</b> yazın, ${K('Enter')}.`,
       setup: explorerAt('docs'),
       check: (c) => !!saglik(c),
       on: (ev, c) => ev.type === 'rename' && !!saglik(c),
@@ -596,14 +596,14 @@ export const dosyaParkur = {
     },
     {
       title: '4. Eski notu silin', html: '<p><b>eski not</b> dosyasını silin.</p>',
-      hint: `Dosyaya bir kez tıklayın ve ${K('Delete')} tuşuna basın (ya da üstteki 🗑 Sil).`,
+      hint: `Dosyaya bir kez tıklayın ve ${K('Delete')} tuşuna basın (ya da üstteki Sil simgesi: çöp kutusu).`,
       setup: explorerAt(),
       check: (c) => parentOf(c, 'eski not.txt') === RECYCLE,
       on: (ev, c) => ev.type === 'fs' && parentOf(c, 'eski not.txt') === RECYCLE,
     },
     {
       title: '5. Yanlışlıkla silinen', html: '<p>Eyvah! Biri <b>telefon numaraları</b> dosyasını yanlışlıkla silmiş. Onu <b>eski yerine</b> geri getirin.</p>',
-      hint: 'Soldan 🗑 Geri Dönüşüm Kutusu\'na gidin, dosyayı seçip üstteki ♻ Geri yükle\'ye tıklayın.',
+      hint: 'Soldan 🗑 Geri Dönüşüm Kutusu\'na gidin, dosyayı seçip üstteki Seçili öğeleri geri yükle\'ye tıklayın.',
       setup: (c) => {
         const n = nodeNamed(c, 'telefon numaraları.txt');
         if (n && n.parent !== RECYCLE) c.d.fs.remove(n.id);
@@ -621,7 +621,7 @@ export const dosyaParkur = {
     },
     {
       title: '7. Masaüstüne kopyalayın', html: '<p><b>Faturalar</b> klasöründeki <b>elektrik faturası</b>nı Masaüstü\'ne <b>kopyalayın</b>. Aslı Faturalar\'da kalsın.</p>',
-      hint: `Faturalar\'ı açın, dosyayı seçip ${K('Ctrl', 'C')} (ya da ⧉ Kopyala). Soldan Masaüstü\'ne gidip ${K('Ctrl', 'V')} (ya da 📋 Yapıştır).`,
+      hint: `Faturalar\'ı açın, dosyayı seçip ${K('Ctrl', 'C')} (ya da Kopyala simgesi). Soldan Masaüstü\'ne gidip ${K('Ctrl', 'V')} (ya da Yapıştır simgesi).`,
       setup: explorerAt(),
       on: (ev, c) => {
         if (ev.type !== 'fs') return false;

@@ -3,7 +3,7 @@
 // Performans sayfasında küçük grafikli kartlar ve büyük canlı grafik, Başlangıç uygulamaları (açılışta kendiliğinden çalışanlar).
 import { esc } from './util.js';
 import { APP_ICONS, SYS_ICONS } from './appicons.js';
-import { ic } from './w11ikon.js';
+import { ic } from '../w11ikon.js';
 
 const TABS = [['proc', 'tmproc', 'İşlemler'], ['perf', 'tmperf', 'Performans'], ['apphist', 'tmhist', 'Uygulama geçmişi'], ['startup', 'tmstart', 'Başlangıç uygulamaları'],
   ['users', 'users', 'Kullanıcılar'], ['details', 'tmdetails', 'Ayrıntılar'], ['services', 'tmserv', 'Hizmetler']];

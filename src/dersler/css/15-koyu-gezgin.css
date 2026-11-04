@@ -1,12 +1,10 @@
 /* Koyu tema: Gezgin, Ayarlar, sistem uygulamaları, diyaloglar */
-/* Dosya Gezgini */
-.dk-dark .ex-nav, .dk-dark .ex-main, .dk-dark .ex-body, .dk-dark .ex-top { background: #202020; color: #eee; }
-.dk-dark .ex-h { color: #ddd; }
-.dk-dark .ex-grp { color: #8cb8ff; border-color: #3a3a3a; }
-.dk-dark .ex-quick button { background: #2b2b2b; color: #eee; border-color: #444; }
-.dk-dark .ex-addr i, .dk-dark .ex-recent td.ex-loc, .dk-dark .ex-hint { color: #aaa; }
-.dk-dark .ex-cmd button.on { background: #2f4a6b; }
-.dk-dark .ex-bar { background: #444; }
+/* Dosya Gezgini: renkler değişkenlerle (kurallar 64-w11-gezgin.css'te) */
+.dk-dark .ex { --gx-bg: #202020; --gx-fg: #f0f0f0; --gx-mut: #a8a8a8; --gx-line: #383838; --gx-line2: #4d4d4d; --gx-hov: #2d2d2d; --gx-act: #3a3a3a; --gx-sel: #334a66; --gx-selh: #3b5877; --gx-fld: #2b2b2b; --gx-bd: #4d4d4d; --gx-grp: #8cb8ff; --gx-bar: #4a4a4a; --gx-tile: #2a2a2a; }
+.dk-dark .gx-tab.on { background: #202020; color: #fff; }
+.dk-dark .gx-tab:not(.on):hover { background: #ffffff1f; }
+.dk-dark .win[data-app="explorer"] .gx-tabs .gx-tabx:hover, .dk-dark .win[data-app="explorer"] .gx-tabs .gx-tabn:hover { background: #ffffff26; }
+.dk-dark .ex .gx-c.ex-hl { background: #5a4a14; color: #fff; }
 /* Ayarlar */
 .dk-dark .st input:not([type=range]):not([type=checkbox]):not([type=radio]), .dk-dark .st select { background: #333; color: #eee; border-color: #555; }
 .dk-dark .st-tog b, .dk-dark .st-dl dt, .dk-dark .st-clock small, .dk-dark .st-upd small, .dk-dark .st-none { color: #bbb; }
@@ -69,4 +67,3 @@
 .dk-dark .dlg-pvnote .bad { color: #ffab70; }
 .dk-dark .st-about dt, .dk-dark .kp-sys dt { color: #bbb; }
 .dk-dark .su button:not(.primary) { background: #3a3a3a; color: #eee; border-color: #555; }
-.dk-dark .ex select { background: #333; color: #eee; border-color: #555; }

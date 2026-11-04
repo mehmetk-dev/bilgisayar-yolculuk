@@ -454,8 +454,8 @@ export const telefon = {
     },
     {
       title: 'Hepsini birden aktarın',
-      html: '<p>Dosya Gezgini\'nde yeniden telefonun içine girin. Üstte <b>🖼 Fotoğrafları içeri aktar</b> düğmesi var; ona basın.</p>',
-      mouse: '🖱 Telefonum → 🖼 Fotoğrafları içeri aktar',
+      html: '<p>Dosya Gezgini\'nde yeniden telefonun içine girin. Üstte <b>Fotoğrafları içeri aktar</b> düğmesi var; ona basın.</p>',
+      mouse: '🖱 Telefonum → Fotoğrafları içeri aktar',
       on: (ev) => ev.type === 'phone-import',
       done: 'Bütün fotoğraflar <b>Resimler</b> içinde tarihli yeni bir klasöre kopyalandı. Bildirime tıklayarak klasörü açabilirsiniz.',
     },

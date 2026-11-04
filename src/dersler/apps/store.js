@@ -4,7 +4,7 @@ import { esc, progress } from './util.js';
 import { THEMES, WALLPAPERS } from '../desktop.js';
 import { APPS } from './index.js';
 import { APP_ICONS, SYS_ICONS } from './appicons.js';
-import { ic, WX } from './w11ikon.js';
+import { ic, WX } from '../w11ikon.js';
 
 const PAGES = [['home', 'home', 'Giriş'], ['apps', 'apps', 'Uygulamalar'], ['games', 'gamepad', 'Oyun'], ['themes', 'palette', 'Temalar'], ['library', 'library', 'Kitaplık']];
 

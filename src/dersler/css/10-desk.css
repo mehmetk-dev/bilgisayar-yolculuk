@@ -273,11 +273,6 @@
 .dk-dark .st-btn { background: #3a3a3a; color: #eee; border-color: #555 !important; }
 .dk-dark .st-item { border-color: #3a3a3a; }
 .dk-dark .st-note, .dk-dark .st-item small, .dk-dark .st-me small { color: #aaa; }
-.dk-dark .ex, .dk-dark .ex-cmd, .dk-dark .ex-drive, .dk-dark .ex-addr, .dk-dark .ex-search { background: #202020; color: #eee; border-color: #3a3a3a !important; }
-.dk-dark .ex-top, .dk-dark .ex-cmd, .dk-dark .ex-nav, .dk-dark .ex-status { border-color: #3a3a3a; }
-.dk-dark .ex-item:hover, .dk-dark .ex-nav button:hover, .dk-dark .ex-top > button:hover:not(:disabled), .dk-dark .ex-cmd button:hover:not(:disabled) { background: #333; }
-.dk-dark .ex-item.sel, .dk-dark .ex-nav button.on { background: #2f4a6b; border-color: #4a6b94; }
-.dk-dark .ex-status, .dk-dark .ei-loc, .dk-dark .ex-empty { color: #aaa; }
 
 /* Ortak ilerleme çubuğu */
 .prg-l { font-size: 0.9em; margin-bottom: 0.3em; }

@@ -156,7 +156,7 @@ export const ekTasi = {
     },
     {
       title: 'Adını anlaşılır yapın',
-      html: '<p>Sağlık klasöründeki dosyaya <b>sağ tık → Yeniden adlandır</b> deyip adını <b>tahlil sonucu ekim 2026.pdf</b> yapın. Bir yıl sonra bile ne olduğunu hatırlarsınız.</p>',
+      html: '<p>Sağlık klasöründeki dosyaya <b>sağ tık</b> → menünün üstündeki <b>Yeniden adlandır</b> simgesine tıklayıp adını <b>tahlil sonucu ekim 2026.pdf</b> yapın. Bir yıl sonra bile ne olduğunu hatırlarsınız.</p>',
       hint: 'Dosyayı seçip F2 tuşuna da basabilirsiniz. Uzantıyı (.pdf) silmeyin.',
       on: (ev, c) => (ev.type === 'fs') && c.d.fs.children('docs').some((n) => n.type === 'folder' && /^sağlık$/i.test(n.name) && c.d.fs.children(n.id).some((f) => /ekim 2026/i.test(f.name) && /\.pdf$/i.test(f.name))),
       done: 'Tarihli, açık adlar bulmayı kolaylaştırır.',

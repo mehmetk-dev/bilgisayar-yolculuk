@@ -114,12 +114,12 @@ export const dosyalar = {
   setup: (c) => put(c, 'docs', 'torun fotoğrafı.jpg', 'file', PIC('👧', '#f8bbd0', '#ce93d8')),
   summary: [
     ['📁 Dosya Gezgini', 'Bilgisayardaki bütün dosya ve klasörler'],
-    ['＋ Yeni klasör', 'Boş klasör; adını hemen yazın'],
+    ['＋ Yeni → Klasör', 'Boş klasör; adını hemen yazın'],
     ['F2', 'Seçili dosyanın adını değiştir'],
     ['Sürükle-bırak', 'Dosyayı klasöre taşı (USB\'ye sürüklemek kopyalar)'],
     ['Ctrl + C → Ctrl + V', 'Dosyayı kopyala-yapıştır'],
     ['Delete', 'Sil (Geri Dönüşüm Kutusu\'na gider)'],
-    ['♻ Geri yükle', 'Silineni eski yerine geri koyar'],
+    ['Seçili öğeleri geri yükle', 'Silineni eski yerine geri koyar'],
     ['⏏ Çıkar', 'USB belleği çekmeden önce'],
   ],
   steps: [
@@ -146,7 +146,7 @@ export const dosyalar = {
     },
     {
       title: 'Yeni klasör oluşturun',
-      html: `<ol class="steps"><li>Üstteki <b>＋ Yeni klasör</b>\'e tıklayın.</li><li>Adı mavi seçili gelir: hemen <b>Torunlarım</b> yazın.</li><li>${K('Enter')}'a basın.</li></ol>`,
+      html: `<ol class="steps"><li>Üstteki <b>Yeni</b> düğmesine, açılan listeden <b>Klasör</b>\'e tıklayın.</li><li>Adı mavi seçili gelir: hemen <b>Torunlarım</b> yazın.</li><li>${K('Enter')}'a basın.</li></ol>`,
       setup: (c) => { const w = c.d.ensure('explorer'); if (w.api.folder !== 'docs') w.api.go('docs'); },
       check: (c) => !!c.d.fs.find('docs', 'Torunlarım'),
       on: (ev, c) => {
@@ -158,7 +158,7 @@ export const dosyalar = {
     },
     {
       title: 'Ad değiştirin: F2',
-      html: `<ol class="steps"><li><b>alışveriş listesi</b> dosyasına <b>bir kez</b> tıklayın.</li><li>${K('F2')} tuşuna basın (ya da sağ tık → Yeniden adlandır).</li><li><b>market listesi</b> yazıp ${K('Enter')}'a basın.</li></ol>`,
+      html: `<ol class="steps"><li><b>alışveriş listesi</b> dosyasına <b>bir kez</b> tıklayın.</li><li>${K('F2')} tuşuna basın (ya da sağ tık → menünün üstündeki <b>Yeniden adlandır</b> simgesi).</li><li><b>market listesi</b> yazıp ${K('Enter')}'a basın.</li></ol>`,
       combo: ['F2'],
       setup: (c) => { const w = c.d.ensure('explorer'); if (w.api.folder !== 'docs') w.api.go('docs'); },
       on: (ev) => ev.type === 'rename' && /alışveriş/.test(ev.old || ''),
@@ -194,7 +194,7 @@ export const dosyalar = {
     },
     {
       title: 'Kopyalayın',
-      html: `<ol class="steps"><li><b>telefon numaraları</b> dosyasına bir kez tıklayın.</li><li>Üstteki <b>⧉ Kopyala</b>\'ya tıklayın (ya da ${K('Ctrl', 'C')}).</li><li>Soldan <b>🖥 Masaüstü</b>\'ne gidin.</li><li><b>📋 Yapıştır</b>\'a tıklayın (ya da ${K('Ctrl', 'V')}).</li></ol>`,
+      html: `<ol class="steps"><li><b>telefon numaraları</b> dosyasına bir kez tıklayın.</li><li>Üstteki <b>Kopyala</b> simgesine (üst üste iki kâğıt) tıklayın (ya da ${K('Ctrl', 'C')}).</li><li>Soldan <b>🖥 Masaüstü</b>\'ne gidin.</li><li>Üstteki <b>Yapıştır</b> simgesine (pano) tıklayın (ya da ${K('Ctrl', 'V')}).</li></ol>`,
       setup: (c) => { const w = c.d.ensure('explorer'); if (w.api.folder !== 'docs') w.api.go('docs'); },
       on: (ev, c) => {
         if (ev.type === 'file-clip' && ev.op === 'copy') c.note('Kopyalandı. Şimdi soldan <b>Masaüstü</b>\'ne gidip <b>Yapıştır</b>\'a tıklayın.');
@@ -204,14 +204,14 @@ export const dosyalar = {
     },
     {
       title: 'Silin',
-      html: `<p>Yapıştırdığınız kopyayı seçin ve ${K('Delete')} tuşuna basın (ya da üstteki 🗑 Sil).</p>`,
+      html: `<p>Yapıştırdığınız kopyayı seçin ve ${K('Delete')} tuşuna basın (ya da üstteki <b>Sil</b> simgesi: çöp kutusu).</p>`,
       combo: ['Delete'],
       on: (ev) => ev.type === 'delete',
       done: 'Dosya silindi… ama tamamen değil!',
     },
     {
       title: 'Geri Dönüşüm Kutusu\'ndan geri yükleyin',
-      html: '<p>Soldan <b>🗑 Geri Dönüşüm Kutusu</b>\'na gidin. Sildiğiniz dosyayı seçin ve üstteki <b>♻ Geri yükle</b>\'ye tıklayın.</p>',
+      html: '<p>Soldan <b>🗑 Geri Dönüşüm Kutusu</b>\'na gidin. Sildiğiniz dosyayı seçin ve üstteki <b>Seçili öğeleri geri yükle</b>\'ye tıklayın.</p>',
       setup: (c) => c.d.ensure('explorer'),
       on: (ev) => ev.type === 'restore',
       done: (c) => 'Dosya eski yerine döndü. Yanlışlıkla silmeler için bu kutu bir can simididir. Kutuyu <b>boşaltırsanız</b> içindekiler tamamen silinir.',

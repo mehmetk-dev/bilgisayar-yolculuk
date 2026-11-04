@@ -113,28 +113,6 @@ body:not([data-stage="notepad"]) #np, body:not([data-stage="notepad"]) #pano { d
 body:not(.with-kb) .under { display: none; }
 #manual { font-size: 1.1em; padding: 0.5em 1em; justify-content: center; background: var(--ok); border-color: var(--ok); }
 
-/* Not Defteri penceresi */
-.np-win { position: relative; flex: 1 1 0; min-height: 12em; display: flex; flex-direction: column; background: #fff; border: 1px solid #9aa6b5; border-radius: 10px; box-shadow: 0 10px 30px #1c243022; overflow: hidden; font-size: 0.85em; }
-.np-title { display: flex; align-items: center; gap: 0.5em; background: #f3f3f3; padding: 0.3em 0 0.3em 0.7em; font-size: 0.95em; }
-.np-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.np-ctl { display: flex; }
-.np-ctl i { font-style: normal; width: 2.6em; text-align: center; color: #444; }
-.np-ctl i:last-child { color: #b00; }
-.np-menu { display: flex; background: #fff; border-bottom: 1px solid #e3e3e3; padding: 0 0.3em; }
-.np-menu button { border: 0; border-radius: 4px; padding: 0.2em 0.7em; font-size: 0.95em; background: none; }
-.np-menu button:hover, .np-menu button.on { background: #e6eef9; }
-.np-drop { position: absolute; top: 3.9em; z-index: 5; background: #fff; border: 1px solid #c9c9c9; border-radius: 8px; box-shadow: 0 8px 24px #0003; padding: 0.3em; min-width: 16em; }
-.np-drop button { display: flex; width: 100%; justify-content: space-between; gap: 2em; border: 0; border-radius: 4px; background: none; padding: 0.3em 0.7em; font-size: 0.95em; }
-.np-drop button:hover { background: #e6eef9; }
-.np-drop kbd { border: 0; background: none; font-weight: 400; color: var(--mut); }
-.np-drop hr { border: 0; border-top: 1px solid #e3e3e3; margin: 0.2em 0; }
-.np-ta { flex: 1; width: 100%; border: 0; resize: none; padding: 0.5em 0.7em; font-family: Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; line-height: 1.45; color: #111; outline: none; }
-.np-ta::selection { background: #3390ff; color: #fff; }
-.np-status { display: flex; gap: 0; background: #f3f3f3; border-top: 1px solid #e3e3e3; font-size: 0.8em; color: #333; }
-.np-status span { padding: 0.15em 1em; border-left: 1px solid #dcdcdc; }
-.np-status span:first-child { flex: 1; border: 0; }
-.np-status .np-ins { cursor: pointer; font-weight: 700; color: #8a1c1c; }
-.np-status .np-ins:hover { background: #ffe3e3; }
 
 /* Pano ve klavye */
 .under { display: flex; gap: 1em; align-items: stretch; flex-wrap: wrap; flex: none; }

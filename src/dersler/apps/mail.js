@@ -5,7 +5,7 @@ import { fmtSize } from './explorer.js';
 import { esc, pictureURL, isImage } from './util.js';
 import { fileIcon } from '../dialog.js';
 import { APP_ICONS, SYS_ICONS } from './appicons.js';
-import { ic } from './w11ikon.js';
+import { ic } from '../w11ikon.js';
 
 export const ME = 'ogrenci@ornek.com';
 

@@ -3,7 +3,7 @@
 // PDF okuyucu (Edge PDF görünümüne benzer araç çubuğu) ve Müzik Çalar (Media Player) de bu dosyadadır.
 import { esc, pictureURL, isImage, playTune } from './util.js';
 import { SYS_ICONS, APP_ICONS } from './appicons.js';
-import { ic } from './w11ikon.js';
+import { ic } from '../w11ikon.js';
 
 const monthOf = (t) => new Date(t || Date.now()).toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
 
