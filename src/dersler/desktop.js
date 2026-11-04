@@ -58,6 +58,8 @@ const CELL_W = 6.2, CELL_H = 5.7; // em
 const PINNED = ['explorer', 'browser'];
 
 import { KB, mapKey } from './keymap.js';
+import { ico } from './w11ikon.js';
+import { captureScreen } from './apps/snip.js';
 // Dokunmatik ekranda (dokunmatik.js body'ye 'touch' koyar) yazı kutuları kendiliğinden seçilmez
 const touchOnly = () => document.body.classList.contains('touch');
 
@@ -357,14 +359,24 @@ export class Desktop {
     if (!bar) {
       bar = document.createElement('div');
       bar.className = 'dk-magbar';
-      bar.innerHTML = `<span>${APP_ICONS.magnifier} Büyüteç</span><button type="button" data-m="-" title="Uzaklaştır">−</button><b></b><button type="button" data-m="+" title="Yakınlaştır">＋</button><button type="button" data-m="x" title="Büyüteci kapat">${MONO.close}</button>`;
+      bar.innerHTML = `<span class="mgb-name">${APP_ICONS.magnifier} Büyüteç</span><button type="button" data-m="-" title="Uzaklaştır" aria-label="Uzaklaştır">${ico('minus')}</button><b></b><button type="button" data-m="+" title="Yakınlaştır" aria-label="Yakınlaştır">${ico('plus')}</button>
+        <span class="mgb-wrap"><button type="button" class="mgb-views" data-m="views" title="Görünümler" aria-haspopup="true">Görünümler ${ico('chevD')}</button>
+          <div class="mgb-menu" hidden><button type="button" data-m="full"><i class="mgb-chk">${ico('check')}</i>Tam ekran<small>Ctrl + Alt + F</small></button><button type="button" disabled title="Bu benzetimde yok"><i class="mgb-chk"></i>Büyüteç<small>Ctrl + Alt + L</small></button><button type="button" disabled title="Bu benzetimde yok"><i class="mgb-chk"></i>Yerleştirilmiş<small>Ctrl + Alt + D</small></button></div></span>
+        <button type="button" data-m="gear" title="Ayarlar" aria-label="Ayarlar">${ico('gear')}</button><button type="button" data-m="x" title="Büyüteci kapat" aria-label="Büyüteci kapat">${MONO.close}</button>`;
+      const menu = bar.querySelector('.mgb-menu');
       bar.onclick = (e) => {
         const m = e.target.closest('[data-m]')?.dataset.m;
+        if (m !== 'views') menu.hidden = true;
         if (!m) return;
-        if (m === 'x') this.setSetting('magnifier', false);
-        else this.setSetting('magZoom', Math.max(150, Math.min(400, this.settings.magZoom + (m === '+' ? 50 : -50))));
+        if (m === 'views') menu.hidden = !menu.hidden;
+        else if (m === 'gear') { this.open('settings', { page: 'access' }); return; }
+        else if (m === 'x') this.setSetting('magnifier', false);
+        else if (m === '+' || m === '-') this.setSetting('magZoom', Math.max(150, Math.min(400, this.settings.magZoom + (m === '+' ? 50 : -50))));
+        else return; // 'full': zaten seçili tek görünüm
         this.emit('magnifier', { on: this.settings.magnifier, zoom: this.settings.magZoom });
       };
+      const away = (e) => { if (!bar.isConnected) this.root.removeEventListener('pointerdown', away, true); else if (!e.target.closest('.mgb-wrap')) menu.hidden = true; };
+      this.root.addEventListener('pointerdown', away, true);
       this.root.append(bar);
     }
     bar.querySelector('b').textContent = '%' + s.magZoom;
@@ -516,7 +528,7 @@ export class Desktop {
 
   // alarm verilirse bildirimde "Ertele (5 dk)" düğmesi çıkar: aynı alarm 5 dakika sonra bir kez daha çalar
   ring(title, text, icon, alarm) {
-    const t = this.toast(title, `${text}${alarm ? '<div class="to-btns"><button type="button" data-snooze="1">${MONO.moon} Ertele (5 dk)</button></div>' : ''}`, icon, alarm ? 45000 : 12000);
+    const t = this.toast(title, `${text}${alarm ? `<div class="to-btns"><button type="button" data-snooze="1">${MONO.clock} Ertele (5 dk)</button></div>` : ''}`, icon, alarm ? 45000 : 12000);
     playTune(this, [880, 660, 880, 660, 880], 0.22);
     if (alarm) {
       t.addEventListener('click', (e) => {
@@ -1248,14 +1260,16 @@ export class Desktop {
     }
     const scr = this.winsEl.getBoundingClientRect();
     const W = scr.width || 800, H = scr.height || 500;
-    const w = Math.min(W - 20, Math.round(W * (def.w || 0.6)));
-    const h = Math.min(H - 20, Math.round(H * (def.h || 0.65)));
+    // minW / minH (piksel): oran küçük ekranda pencereyi fazla daraltmasın (ör. Hesap Makinesi başlığı kesilmesin); yine de masaüstüne sığar
+    const w = Math.min(W - 20, Math.max(def.minW || 0, Math.round(W * (def.w || 0.6))));
+    const h = Math.min(H - 20, Math.max(def.minH || 0, Math.round(H * (def.h || 0.65))));
     const n = this.wins.length;
     const win = {
       id: 'w' + this.seq++, app, title: def.name, icon: def.icon, vd: this.vd,
       x: Math.round((W - w) / 2 + (n % 5) * 24 - 40), y: Math.max(6, Math.round((H - h) / 2 + (n % 5) * 22 - 30)), w, h, min: false, max: !!def.max || W < 600, args, // dar ekranda (telefon) pencereler tam ekran açılır
     };
     win.x = Math.max(4, Math.min(win.x, W - w - 4));
+    win.y = Math.max(4, Math.min(win.y, H - h - 4)); // alt kenardan taşmasın
     const el = document.createElement('div');
     el.className = 'win';
     el.dataset.app = app;
@@ -1573,6 +1587,7 @@ export class Desktop {
       if (this.power === 'lock') { e.preventDefault(); this.setPower('login'); return; }
       if (this.power === 'sleep' && Date.now() - this.sleepAt > 900) { this.emit('wake'); this.setPower('lock'); return; }
       if (e.metaKey && e.code === 'KeyL') { e.preventDefault(); this.lockScreen('key'); return; }
+      if (e.metaKey && e.shiftKey && !e.ctrlKey && e.code === 'KeyS' && this.power === 'desktop') { e.preventDefault(); if (!e.repeat) this.snip(); return; }
       // Alt + Shift: Windows'taki gibi tuşlar bırakılınca dil değişir; arada başka tuşa (ör. Tab) basıldıysa değişmez
       if (e.key === 'Shift' || e.key === 'Alt') { if ((e.altKey && e.shiftKey)) this.kbArm = true; } else this.kbArm = false;
       if (e.metaKey && e.code === 'Space') { e.preventDefault(); if (!e.repeat) this.cycleKb('key'); return; }
@@ -1861,48 +1876,9 @@ export class Desktop {
     this.emit('usb', { on: false, safe: true });
   }
 
+  // ⊞ + Shift + S: Windows 11 Ekran Alıntısı kip çubuğu (Dikdörtgen, Serbest biçim, Pencere, Tam ekran). Katman apps/snip.js'te
   snip() {
-    if (this.snipping) return;
-    this.snipping = true;
-    this.closeMenus();
-    const o = document.createElement('div');
-    o.className = 'dk-snip';
-    o.innerHTML = `<div class="sn-bar">${APP_ICONS.snip} Fareyle almak istediğiniz alanın üzerinde sürükleyin · Vazgeçmek için Esc</div><div class="sn-rect" hidden></div>`;
-    this.screen.append(o);
-    this.emit('snip-start');
-    const rect = o.querySelector('.sn-rect');
-    const scr = this.screen.getBoundingClientRect();
-    let sx, sy;
-    const end = () => {
-      this.snipping = false;
-      o.remove();
-      document.removeEventListener('keydown', key, true);
-      setTimeout(() => this.wins.forEach((w) => w.api?.onSnip?.()), 0);
-    };
-    const key = (e) => { if (e.key === 'Escape') { end(); this.emit('snip-cancel'); } };
-    document.addEventListener('keydown', key, true);
-    o.addEventListener('pointerdown', (e) => {
-      sx = e.clientX - scr.left; sy = e.clientY - scr.top;
-      rect.hidden = false;
-      const move = (ev) => {
-        const x = ev.clientX - scr.left, y = ev.clientY - scr.top;
-        Object.assign(rect.style, { left: Math.min(x, sx) + 'px', top: Math.min(y, sy) + 'px', width: Math.abs(x - sx) + 'px', height: Math.abs(y - sy) + 'px' });
-      };
-      const up = (ev) => {
-        document.removeEventListener('pointermove', move);
-        document.removeEventListener('pointerup', up);
-        const x = ev.clientX - scr.left, y = ev.clientY - scr.top;
-        const r = { x: Math.min(x, sx), y: Math.min(y, sy), w: Math.abs(x - sx), h: Math.abs(y - sy) };
-        end();
-        if (r.w < 20 || r.h < 20) { this.toast('Ekran Alıntısı', 'Alan çok küçüktü. Tekrar deneyin ve biraz daha büyük sürükleyin.', 'snip'); this.emit('snip-cancel', { small: true }); return; }
-        this.imageClip = this.renderScreen(r);
-        const t = this.toast('Ekran alıntısı panoya kopyalandı', `<img class="to-img" src="${this.imageClip.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, 'snip', 9000);
-        t.classList.add('wide');
-        this.emit('snip', { w: Math.round(r.w), h: Math.round(r.h) });
-      };
-      document.addEventListener('pointermove', move);
-      document.addEventListener('pointerup', up);
-    });
+    captureScreen(this, (type, data = {}) => this.emit(type, data), this.snipMode);
   }
 
   // Ekranın bir bölümünün resmini çizer. Tarayıcı ekran görüntüsü alamadığı için masaüstündeki

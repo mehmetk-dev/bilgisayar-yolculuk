@@ -7,6 +7,126 @@ const MODES = [['rect', 'Dikdörtgen', 'rect', 'Alınacak alanı fareyle sürük
 const DELAYS = [[0, 'Gecikme yok'], [3, '3 saniye'], [5, '5 saniye'], [10, '10 saniye']];
 const COLORS = [['#d13438', 'Kırmızı'], ['#0067c0', 'Mavi'], ['#111111', 'Siyah'], ['#107c10', 'Yeşil'], ['#f7b500', 'Sarı']];
 
+// ---- Alma: Ekran Alıntısı penceresi açık olsun olmasın çalışır (Yeni düğmesi ve ⊞ + Shift + S aynı katmanı kullanır) ----
+
+export function captureScreen(desk, emit, startMode) {
+  startMode ||= 'rect';
+  const finish = (canvas, mode, small) => {
+    if (canvas) {
+      desk.imageClip = canvas;
+      const t = desk.toast('Ekran alıntısı panoya kopyalandı', `<img class="to-img" src="${canvas.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, ico('copy'), 9000);
+      t.classList.add('wide');
+      emit('snip', { w: canvas.width, h: canvas.height, mode });
+    } else {
+      if (small) { desk.toast('Ekran Alıntısı Aracı', 'Alan çok küçüktü. Tekrar deneyin ve biraz daha büyük sürükleyin.', ico('rect')); }
+      emit('snip-cancel', small ? { small: true } : {});
+    }
+    // Tüm Ekran Alıntısı pencereleri (bu pencere dahil) alıntıyı alır ve gerekirse açılır
+    setTimeout(() => desk.wins.forEach((w) => w.api?.onSnip?.()), 0);
+  };
+
+  const fullShot = () => {
+    const s = desk.screen.getBoundingClientRect();
+    return desk.renderScreen({ x: 0, y: 0, w: s.width, h: s.height });
+  };
+  if (desk.snipping) return;
+  desk.snipping = true;
+  desk.closeMenus?.();
+  let mode = startMode;
+  const scr = desk.screen.getBoundingClientRect();
+  const ov = document.createElement('div');
+  ov.className = 'dk-snip wsn-ov';
+  ov.innerHTML = `<div class="wsn-pill">${MODES.map(([k, l, i]) => `<button type="button" data-m="${k}" title="${l}">${ico(i)}</button>`).join('')}<i></i><button type="button" data-m="x" title="Kapat (Esc)">${ico('x')}</button></div>
+    <div class="wsn-hint"></div><div class="wsn-rect" hidden></div>
+    <svg class="wsn-freesvg" hidden><path d="" fill="#ffffff26" stroke="#fff" stroke-width="2" stroke-dasharray="6 4"/></svg>`;
+  desk.screen.append(ov);
+  emit('snip-start');
+  const rect = ov.querySelector('.wsn-rect'), svg = ov.querySelector('.wsn-freesvg'), path = svg.querySelector('path'), hint = ov.querySelector('.wsn-hint');
+  const setRect = (x, y, w, h) => { Object.assign(rect.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); rect.hidden = false; ov.classList.add('hole'); };
+  const clearSel = () => { rect.hidden = true; svg.hidden = true; ov.classList.remove('hole'); };
+  const setMode = (m) => {
+    mode = m;
+    if (m !== 'full') desk.snipMode = m; // son seçilen kip hatırlanır (⊞ + Shift + S aynı kipte başlar)
+    clearSel();
+    ov.querySelectorAll('[data-m]').forEach((b) => b.classList.toggle('on', b.dataset.m === m));
+    hint.textContent = MODES.find((x) => x[0] === m)[3];
+    ov.classList.toggle('wsn-win', m === 'window');
+  };
+  const end = () => { desk.snipping = false; ov.remove(); document.removeEventListener('keydown', key, true); };
+  const key = (e) => { if (e.key === 'Escape') { end(); finish(null); } };
+  document.addEventListener('keydown', key, true);
+  setMode(mode);
+  // Tam ekran: seçilir seçilmez alınır
+  const goFull = () => { end(); finish(fullShot(), 'full'); };
+
+  ov.querySelector('.wsn-pill').addEventListener('pointerdown', (e) => e.stopPropagation());
+  ov.querySelector('.wsn-pill').addEventListener('click', (e) => {
+    const m = e.target.closest('[data-m]')?.dataset.m;
+    if (!m) return;
+    if (m === 'x') { end(); finish(null); } else if (m === 'full') { setMode('full'); setTimeout(goFull, 120); } else setMode(m);
+  });
+  let sx = 0, sy = 0, down = false, pts = [], hoverWin = null;
+  const rel = (e) => [e.clientX - scr.left, e.clientY - scr.top];
+  // Pencere kipi: fare hangi pencerenin üzerindeyse onu çerçeveler
+  const winAt = (e) => {
+    ov.style.pointerEvents = 'none';
+    const el = document.elementFromPoint(e.clientX, e.clientY)?.closest('.win');
+    ov.style.pointerEvents = '';
+    if (!el || el.classList.contains('min')) return null;
+    const r = el.getBoundingClientRect();
+    return { x: Math.max(0, r.left - scr.left), y: Math.max(0, r.top - scr.top), w: Math.min(r.width, scr.width), h: Math.min(r.height, scr.height) };
+  };
+  ov.addEventListener('pointermove', (e) => {
+    if (mode === 'window' && !down) { hoverWin = winAt(e); if (hoverWin) setRect(hoverWin.x, hoverWin.y, hoverWin.w, hoverWin.h); else clearSel(); return; }
+    if (!down) return;
+    const [x, y] = rel(e);
+    if (mode === 'rect') setRect(Math.min(x, sx), Math.min(y, sy), Math.abs(x - sx), Math.abs(y - sy));
+    else if (mode === 'free') { pts.push([x, y]); path.setAttribute('d', 'M' + pts.map((p) => p.join(' ')).join('L') + 'Z'); }
+  });
+  ov.addEventListener('pointerdown', (e) => {
+    if (mode === 'full') return;
+    down = true;
+    [sx, sy] = rel(e);
+    pts = [[sx, sy]];
+    ov.setPointerCapture(e.pointerId);
+    if (mode === 'free') { svg.hidden = false; path.setAttribute('d', ''); }
+  });
+  ov.addEventListener('pointerup', (e) => {
+    if (!down && mode !== 'window') return;
+    const [x, y] = rel(e);
+    if (mode === 'window') {
+      const w = winAt(e);
+      if (!w) return;
+      end();
+      finish(desk.renderScreen(w), 'window');
+      return;
+    }
+    down = false;
+    if (mode === 'rect') {
+      const r = { x: Math.min(x, sx), y: Math.min(y, sy), w: Math.abs(x - sx), h: Math.abs(y - sy) };
+      end();
+      if (r.w < 20 || r.h < 20) return finish(null, 'rect', true);
+      finish(desk.renderScreen(r), 'rect');
+    } else if (mode === 'free') {
+      const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+      const r = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+      end();
+      if (r.w < 20 || r.h < 20) return finish(null, 'free', true);
+      const shot = desk.renderScreen(r);
+      const out = document.createElement('canvas');
+      out.width = shot.width; out.height = shot.height;
+      const g = out.getContext('2d');
+      g.beginPath();
+      pts.forEach((p, i) => (i ? g.lineTo(p[0] - r.x, p[1] - r.y) : g.moveTo(p[0] - r.x, p[1] - r.y)));
+      g.closePath();
+      g.clip();
+      g.drawImage(shot, 0, 0);
+      finish(out, 'free');
+    }
+  });
+  if (mode === 'full') setTimeout(goFull, 120);
+}
+
 export function snip({ desk, win, body, emit, dialogs, setTitle }) {
   body.classList.add('wsn');
   setTitle?.('Ekran Alıntısı Aracı');
@@ -88,129 +208,11 @@ export function snip({ desk, win, body, emit, dialogs, setTitle }) {
   stage.addEventListener('pointerup', endDraw);
   stage.addEventListener('pointercancel', endDraw);
 
-  // ---- Alma ----
-  const finish = (canvas, mode, small) => {
-    if (canvas) {
-      desk.imageClip = canvas;
-      const t = desk.toast('Ekran alıntısı panoya kopyalandı', `<img class="to-img" src="${canvas.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, ico('copy'), 9000);
-      t.classList.add('wide');
-      emit('snip', { w: canvas.width, h: canvas.height, mode });
-    } else {
-      if (small) { desk.toast('Ekran Alıntısı Aracı', 'Alan çok küçüktü. Tekrar deneyin ve biraz daha büyük sürükleyin.', ico('rect')); }
-      emit('snip-cancel', small ? { small: true } : {});
-    }
-    // Tüm Ekran Alıntısı pencereleri (bu pencere dahil) alıntıyı alır ve gerekirse açılır
-    setTimeout(() => desk.wins.forEach((w) => w.api?.onSnip?.()), 0);
-  };
-
-  const fullShot = () => {
-    const s = desk.screen.getBoundingClientRect();
-    return desk.renderScreen({ x: 0, y: 0, w: s.width, h: s.height });
-  };
-
-  function capture(startMode) {
-    if (desk.snipping) return;
-    desk.snipping = true;
-    desk.closeMenus?.();
-    let mode = startMode;
-    const scr = desk.screen.getBoundingClientRect();
-    const ov = document.createElement('div');
-    ov.className = 'dk-snip wsn-ov';
-    ov.innerHTML = `<div class="wsn-pill">${MODES.map(([k, l, i]) => `<button type="button" data-m="${k}" title="${l}">${ico(i)}</button>`).join('')}<i></i><button type="button" data-m="x" title="Kapat (Esc)">${ico('x')}</button></div>
-      <div class="wsn-hint"></div><div class="wsn-rect" hidden></div>
-      <svg class="wsn-freesvg" hidden><path d="" fill="#ffffff26" stroke="#fff" stroke-width="2" stroke-dasharray="6 4"/></svg>`;
-    desk.screen.append(ov);
-    emit('snip-start');
-    const rect = ov.querySelector('.wsn-rect'), svg = ov.querySelector('.wsn-freesvg'), path = svg.querySelector('path'), hint = ov.querySelector('.wsn-hint');
-    const setRect = (x, y, w, h) => { Object.assign(rect.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' }); rect.hidden = false; ov.classList.add('hole'); };
-    const clearSel = () => { rect.hidden = true; svg.hidden = true; ov.classList.remove('hole'); };
-    const setMode = (m) => {
-      mode = m;
-      clearSel();
-      ov.querySelectorAll('[data-m]').forEach((b) => b.classList.toggle('on', b.dataset.m === m));
-      hint.textContent = MODES.find((x) => x[0] === m)[3];
-      ov.classList.toggle('wsn-win', m === 'window');
-    };
-    const end = () => { desk.snipping = false; ov.remove(); document.removeEventListener('keydown', key, true); };
-    const key = (e) => { if (e.key === 'Escape') { end(); finish(null); } };
-    document.addEventListener('keydown', key, true);
-    setMode(mode);
-    // Tam ekran: seçilir seçilmez alınır
-    const goFull = () => { end(); finish(fullShot(), 'full'); };
-
-    ov.querySelector('.wsn-pill').addEventListener('pointerdown', (e) => e.stopPropagation());
-    ov.querySelector('.wsn-pill').addEventListener('click', (e) => {
-      const m = e.target.closest('[data-m]')?.dataset.m;
-      if (!m) return;
-      if (m === 'x') { end(); finish(null); } else if (m === 'full') { setMode('full'); setTimeout(goFull, 120); } else setMode(m);
-    });
-    let sx = 0, sy = 0, down = false, pts = [], hoverWin = null;
-    const rel = (e) => [e.clientX - scr.left, e.clientY - scr.top];
-    // Pencere kipi: fare hangi pencerenin üzerindeyse onu çerçeveler
-    const winAt = (e) => {
-      ov.style.pointerEvents = 'none';
-      const el = document.elementFromPoint(e.clientX, e.clientY)?.closest('.win');
-      ov.style.pointerEvents = '';
-      if (!el || el.classList.contains('min')) return null;
-      const r = el.getBoundingClientRect();
-      return { x: Math.max(0, r.left - scr.left), y: Math.max(0, r.top - scr.top), w: Math.min(r.width, scr.width), h: Math.min(r.height, scr.height) };
-    };
-    ov.addEventListener('pointermove', (e) => {
-      if (mode === 'window' && !down) { hoverWin = winAt(e); if (hoverWin) setRect(hoverWin.x, hoverWin.y, hoverWin.w, hoverWin.h); else clearSel(); return; }
-      if (!down) return;
-      const [x, y] = rel(e);
-      if (mode === 'rect') setRect(Math.min(x, sx), Math.min(y, sy), Math.abs(x - sx), Math.abs(y - sy));
-      else if (mode === 'free') { pts.push([x, y]); path.setAttribute('d', 'M' + pts.map((p) => p.join(' ')).join('L') + 'Z'); }
-    });
-    ov.addEventListener('pointerdown', (e) => {
-      if (mode === 'full') return;
-      down = true;
-      [sx, sy] = rel(e);
-      pts = [[sx, sy]];
-      ov.setPointerCapture(e.pointerId);
-      if (mode === 'free') { svg.hidden = false; path.setAttribute('d', ''); }
-    });
-    ov.addEventListener('pointerup', (e) => {
-      if (!down && mode !== 'window') return;
-      const [x, y] = rel(e);
-      if (mode === 'window') {
-        const w = winAt(e);
-        if (!w) return;
-        end();
-        finish(desk.renderScreen(w), 'window');
-        return;
-      }
-      down = false;
-      if (mode === 'rect') {
-        const r = { x: Math.min(x, sx), y: Math.min(y, sy), w: Math.abs(x - sx), h: Math.abs(y - sy) };
-        end();
-        if (r.w < 20 || r.h < 20) return finish(null, 'rect', true);
-        finish(desk.renderScreen(r), 'rect');
-      } else if (mode === 'free') {
-        const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-        const r = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
-        end();
-        if (r.w < 20 || r.h < 20) return finish(null, 'free', true);
-        const shot = desk.renderScreen(r);
-        const out = document.createElement('canvas');
-        out.width = shot.width; out.height = shot.height;
-        const g = out.getContext('2d');
-        g.beginPath();
-        pts.forEach((p, i) => (i ? g.lineTo(p[0] - r.x, p[1] - r.y) : g.moveTo(p[0] - r.x, p[1] - r.y)));
-        g.closePath();
-        g.clip();
-        g.drawImage(shot, 0, 0);
-        finish(out, 'free');
-      }
-    });
-    if (mode === 'full') setTimeout(goFull, 120);
-  }
-
   const startNew = () => {
     if (desk.snipping) return;
     emit('snip-new');
     desk.minimize(win, true);
-    const go = () => capture(st.mode);
+    const go = () => captureScreen(desk, emit, st.mode);
     if (st.delay) { desk.toast('Ekran Alıntısı Aracı', `${st.delay} saniye sonra alıntı başlayacak. Almak istediğiniz ekranı hazırlayın.`, ico('timer'), st.delay * 1000); setTimeout(go, 350 + st.delay * 1000); } else setTimeout(go, 350);
   };
 

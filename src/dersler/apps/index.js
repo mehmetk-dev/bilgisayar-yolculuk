@@ -22,15 +22,15 @@ import { sheet } from './sheet.js';
 import { slides } from './slides.js';
 import { hedef, mayin, kartlar } from './games.js';
 import { esc } from './util.js';
-import { APP_ICONS } from './appicons.js';
+import { APP_ICONS, SYS_ICONS } from './appicons.js';
 
 function notepad({ desk, win, body, args, setTitle }) {
   const np = new Notepad(body, (ev) => {
-    if (ev.type === 'print') desk.toast('Yazdırılıyor', `“${esc(ev.doc)}” → ${esc(ev.printer)}`, '🖨');
+    if (ev.type === 'print') desk.toast('Yazdırılıyor', `“${esc(ev.doc)}” → ${esc(ev.printer)}`, SYS_ICONS.printer);
     desk.emit(ev.type, { ...ev, win: win.id });
   }, {
     fs: desk.fs.dialogApi(), dialogs: desk.dialogs, embedded: true, onTitle: setTitle,
-    printers: () => desk.settings.printers, onExit: () => desk.close(win),
+    printers: () => desk.settings.printers, onExit: () => desk.close(win), onNewWindow: () => desk.open('notepad'),
   });
   const n = args.node && desk.fs.get(args.node);
   if (n) np.setText(typeof n.content === 'string' ? n.content : '', n.name, n.parent);
@@ -45,7 +45,7 @@ function notepad({ desk, win, body, args, setTitle }) {
 // w, h: masaüstüne göre pencere boyutu (oran). single: tek pencere açılır. hidden: aramada çıkmaz.
 export const APPS = {
   notepad: { name: 'Not Defteri', icon: APP_ICONS.notepad, w: 0.62, h: 0.7, keywords: ['not', 'metin', 'yazı'], create: notepad },
-  calc: { name: 'Hesap Makinesi', icon: APP_ICONS.calc, w: 0.34, h: 0.8, keywords: ['hesap', 'toplama', 'calculator'], create: calc },
+  calc: { name: 'Hesap Makinesi', icon: APP_ICONS.calc, w: 0.34, h: 0.85, minW: 330, minH: 480, keywords: ['hesap', 'toplama', 'calculator'], create: calc },
   explorer: { name: 'Dosya Gezgini', icon: APP_ICONS.explorer, w: 0.8, h: 0.8, keywords: ['dosya', 'klasör', 'gezgin', 'belgeler'], create: explorer },
   paint: { name: 'Paint', icon: APP_ICONS.paint, w: 0.9, h: 0.9, keywords: ['resim', 'çizim', 'boya'], create: paint },
   settings: { name: 'Ayarlar', icon: APP_ICONS.settings, w: 0.86, h: 0.88, single: true, keywords: ['ayar', 'arka plan', 'wifi', 'wi-fi', 'ses', 'yazıcı', 'saat', 'ekran'], create: settings },
