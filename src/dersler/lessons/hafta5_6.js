@@ -158,7 +158,7 @@ export const dosyalar = {
     },
     {
       title: 'Ad değiştirin: F2',
-      html: `<ol class="steps"><li><b>alışveriş listesi</b> dosyasına <b>bir kez</b> tıklayın.</li><li>${K('F2')} tuşuna basın (ya da sağ tık → Yeniden adlandır).</li><li><b>market listesi</b> yazıp ${K('Enter')}'a basın.</li></ol>`,
+      html: `<ol class="steps"><li><b>alışveriş listesi</b> dosyasına <b>bir kez</b> tıklayın.</li><li>${K('F2')} tuşuna basın (ya da sağ tık → menünün üstündeki <b>Yeniden adlandır</b> simgesi).</li><li><b>market listesi</b> yazıp ${K('Enter')}'a basın.</li></ol>`,
       combo: ['F2'],
       setup: (c) => { const w = c.d.ensure('explorer'); if (w.api.folder !== 'docs') w.api.go('docs'); },
       on: (ev) => ev.type === 'rename' && /alışveriş/.test(ev.old || ''),

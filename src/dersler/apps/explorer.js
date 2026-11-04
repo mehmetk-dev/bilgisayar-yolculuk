@@ -241,7 +241,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
     setTitle(label(cur));
     drawTabs();
     if (!editAddr) {
-      const ids = cur === 'home' || cur === RECYCLE ? [cur] : cur === 'pc' ? ['pc'] : ['pc', ...(cur === 'c' || cur === 'gallery' || cur === 'videos' || cur === 'net' ? [cur] : fs.path(cur).map((n) => n.id))];
+      const ids = ['home', 'gallery', 'net', RECYCLE, 'pc'].includes(cur) ? [cur] : ['pc', ...(cur === 'c' || cur === 'videos' ? [cur] : fs.path(cur).map((n) => n.id))];
       $('.ex-addr').innerHTML = crumbs(ids);
       $('.ex-addr').scrollLeft = 1e5;
     }
@@ -287,7 +287,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
     } else {
       const big3 = m === 'xl' || m === 'lg' || m === 'icons';
       box.innerHTML = list.map((n, i) => `${groupHead(list, i, (g) => `<div class="ex-grp">${g}</div>`)}<div class="ex-item${picked.has(n.id) ? ' sel' : ''}" data-id="${n.id}" ${n.type === 'folder' && !inRecycle ? `data-drop="folder:${n.id}"` : ''}>
-          ${boxes ? '<span class="ei-chk" title="Seç"></span>' : ''}<span class="ei-img">${big3 && thumb(n) ? `<img class="ei-thumb" src="${thumb(n)}" alt="">` : nodeIcon(n)}</span>
+          ${boxes ? '<span class="ei-chk" title="Seç"></span>' : ''}<span class="ei-img">${big3 && thumb(n) ? `<img class="ei-thumb" src="${thumb(n)}" alt="" draggable="false">` : nodeIcon(n)}</span>
           <span class="ei-txt">${renaming === n.id ? `<input class="ei-rename" value="${esc(n.name)}" spellcheck="false">` : `<span class="ei-name">${esc(n.name)}</span>`}
           ${m === 'tiles' ? `<small class="ei-loc">${esc(typeName(n))}</small>${n.type === 'folder' ? '' : `<small class="ei-loc">${fmtSize(fs.sizeOf(n))}</small>`}` : ''}
           ${query ? `<small class="ei-loc">${esc(fs.label(n.parent))}</small>` : ''}
@@ -327,9 +327,12 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       { k: 'paste', ic: I.paste, t: 'Yapıştır', tip: 'Yapıştır (Ctrl + V)', dis: !(desk.fileClip && !sp) },
       { k: 'rename', ic: I.rename, t: 'Yeniden adlandır', tip: 'Yeniden adlandır (F2)', dis: !(s && !many) }, { k: 'share', ic: I.share, t: 'Paylaş', tip: 'Paylaş', dis: !s },
       { k: 'delete', ic: I.trash, t: 'Sil', tip: 'Sil (Delete)', dis: !s }, { sep: 1 }, ...sortView, { k: 'filter', pop: 'filter', ic: I.filter, t: 'Filtre', on: !!filt });
-    if (hasInUsb()) d.push({ sep: 1 }, { k: 'eject', ic: I.eject, t: 'Çıkar', txt: 1 });
-    if (hasInPhone()) d.push({ sep: 1 }, { k: 'import', ic: I.import, t: 'Fotoğrafları içeri aktar', txt: 1 });
-    if (s && !many && /\.zip$/i.test(s.name)) d.push({ sep: 1 }, { k: 'extract', ic: I.zip, t: 'Tümünü ayıkla', txt: 1, hl: 1 });
+    // Bağlama özgü düğmeler (Çıkar, içeri aktar, Tümünü ayıkla) başta durur: dar pencerede en son gizlenir
+    const lead = [];
+    if (hasInUsb()) lead.push({ k: 'eject', ic: I.eject, t: 'Çıkar', txt: 1 });
+    if (hasInPhone()) lead.push({ k: 'import', ic: I.import, t: 'Fotoğrafları içeri aktar', txt: 1 });
+    if (s && !many && /\.zip$/i.test(s.name)) lead.push({ k: 'extract', ic: I.zip, t: 'Tümünü ayıkla', txt: 1, hl: 1 });
+    if (lead.length) return [...lead, { sep: 1 }, ...d];
     return d;
   }
 
@@ -369,7 +372,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
     }
     if (prev?.classList.contains('gx-sp')) prev.hidden = true;
   }
-  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => fitCmd()).observe($('.ex-cmd'));
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => { fitCmd(); const ad = $('.ex-addr'); if (ad && !editAddr) ad.scrollLeft = 1e5; }).observe($('.ex-cmd'));
 
   function bindRename() {
     const inp = $('.ei-rename');
@@ -403,7 +406,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
   }
 
   // ---- Adres çubuğu: boş yerine tıklayınca yazılabilir olur
-  const pathText = () => (cur === 'home' ? 'Giriş' : cur === RECYCLE ? 'Geri Dönüşüm Kutusu' : cur === 'pc' ? 'Bu Bilgisayar' : cur === 'c' || cur === 'gallery' || cur === 'videos' || cur === 'net' ? `Bu Bilgisayar\\${label(cur)}` : pathNames(cur).join('\\'));
+  const pathText = () => (cur === 'home' ? 'Giriş' : cur === RECYCLE ? 'Geri Dönüşüm Kutusu' : cur === 'pc' ? 'Bu Bilgisayar' : cur === 'gallery' || cur === 'net' ? label(cur) : cur === 'c' || cur === 'videos' ? `Bu Bilgisayar\\${label(cur)}` : pathNames(cur).join('\\'));
   function startAddr() {
     if (editAddr) return;
     editAddr = true;
@@ -664,7 +667,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       case 'onedrive': desk.open('bulut'); return;
       case 'share': {
         if (!n) return;
-        return desk.dialogs.ask({ title: 'Paylaş', icon: I.share, text: `<b>${esc(n.name)}</b> dosyasını nasıl paylaşmak istersiniz?<br><br>Gerçek bilgisayarda burada E-posta, Yakındaki Paylaşım ve Bluetooth gibi seçenekler görünür. Bu benzetimde e-posta ile paylaşabilirsiniz.`, buttons: [['mail', 'E-posta', true], ['no', 'Vazgeç']] })
+        return desk.dialogs.ask({ title: 'Paylaş', icon: I.share, text: `${picked.size > 1 ? `<b>${picked.size} öğe</b>yi` : `<b>${esc(n.name)}</b> ${n.type === 'folder' ? 'klasörünü' : 'dosyasını'}`} nasıl paylaşmak istersiniz?<br><br>Gerçek bilgisayarda burada E-posta, Yakındaki Paylaşım ve Bluetooth gibi seçenekler görünür. Bu benzetimde e-posta ile paylaşabilirsiniz.`, buttons: [['mail', 'E-posta', true], ['no', 'Vazgeç']] })
           .then((a) => { emit('ex-share', { name: n.name, answer: a }); if (a === 'mail') desk.open('mail'); });
       }
       case 'copypath': if (n) { const p = `Bu Bilgisayar\\${[...fs.path(n.id)].map((x) => x.name).join('\\')}`; navigator.clipboard?.writeText?.(p).catch(() => {}); desk.toast('Yol kopyalandı', esc(p), I.path, 3500); emit('ex-copypath', { name: n.name }); } return;
