@@ -278,7 +278,7 @@ export const ayarlarParkur = {
     { title: '6. Yazıları büyütün', html: '<p>Metin boyutunu <b>%130</b> yapıp uygulayın.</p>', hint: 'Erişilebilirlik → Metin boyutu çubuğu → Uygula.', setup: settingsAt(), on: (ev) => ev.type === 'text-scale' && ev.value === 130 },
     { title: '7. Eski boyuta dönün', html: '<p>Metin boyutunu yeniden <b>%100</b> yapın.</p>', setup: settingsAt(), on: (ev) => ev.type === 'text-scale' && ev.value === 100 },
     {
-      title: '8. Açık ağa bağlanın', html: '<p>Bir kafedesiniz: <b>Kafe_Ücretsiz</b> ağına bağlanın.</p>', hint: 'Ağ ve İnternet → Kafe_Ücretsiz → Bağlan. Çıkan uyarıyı okuyun.', setup: settingsAt(),
+      title: '8. Açık ağa bağlanın', html: '<p>Bir kafedesiniz: <b>Kafe_Ücretsiz</b> ağına bağlanın.</p>', hint: 'Ağ ve internet → Kafe_Ücretsiz → Bağlan. Çıkan uyarıyı okuyun.', setup: settingsAt(),
       on: (ev) => ev.type === 'wifi-connect' && ev.ok && /Kafe/.test(ev.name),
       done: 'Bağlandınız; ama bu ağ şifresiz ve güvensiz. Burada banka işlemi yapmayın!',
     },

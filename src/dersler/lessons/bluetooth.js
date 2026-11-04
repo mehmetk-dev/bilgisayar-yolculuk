@@ -83,7 +83,7 @@ export const bluetooth = {
     },
     {
       title: 'İnternet yok! (Uçak modu)',
-      html: `<p>Bir komşunuzun bilgisayarında sağ altta <b>✈</b> simgesi var ve internet çalışmıyor. Bunu siz yaratın: <b>Ayarlar → Ağ ve İnternet</b> sayfasında <b>✈ Uçak modu</b>'nu açın.</p>`,
+      html: `<p>Bir komşunuzun bilgisayarında sağ altta <b>✈</b> simgesi var ve internet çalışmıyor. Bunu siz yaratın: <b>Ayarlar → Ağ ve internet</b> sayfasında <b>✈ Uçak modu</b>'nu açın.</p>`,
       setup: ayarlarda('network'),
       on: (ev) => ev.type === 'airplane' && ev.on,
       done: 'Uçak modu Wi-Fi\'yi ve Bluetooth\'u birlikte kapattı. Sağ altta ✈ görünüyor. Yanlışlıkla açılınca “bilgisayar bozuldu” sanılır.',

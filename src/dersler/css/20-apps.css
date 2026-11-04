@@ -68,76 +68,8 @@ tr.ex-grp td { font-weight: 600; color: #1d4f91; padding-top: 0.6em; border-bott
 .pt { outline: none; }
 
 /* Ayarlar */
-.st { flex-direction: row !important; background: #f3f5f8; }
-.st-nav { width: 14em; flex: none; padding: 0.6em; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
-.st-me { display: flex; flex-direction: column; padding: 0.5em; margin-bottom: 0.4em; }
-.st-me small { color: #666; }
-.st-nav button { border: 0 !important; background: none; text-align: left; padding: 0.45em 0.6em !important; border-radius: 5px !important; display: block; width: 100%; }
-.st-nav button:hover { background: #e6ebf2; }
-.st-nav button.on { background: #fff; font-weight: 700; box-shadow: inset 3px 0 0 var(--dk-acc, #0a5dc2); }
-.st-page { flex: 1; overflow-y: auto; padding: 0.8em 1.2em 1.5em; }
-.st-page h2 { font-size: 1.5em; margin-bottom: 0.5em; }
-.st-page section { background: #fff; border: 1px solid #e3e7ee; border-radius: 8px; padding: 0.8em 1em; margin-bottom: 0.8em; }
-.st-page h3 { font-size: 1.05em; margin-bottom: 0.5em; }
-.st-row { display: flex; align-items: center; gap: 0.8em; padding: 0.4em 0; flex-wrap: wrap; }
-.st-row input[type="range"] { flex: 1; min-width: 8em; accent-color: var(--dk-acc, #0a5dc2); }
-.st-row select { font: inherit; padding: 0.2em 0.4em; }
-.st-tog { position: relative; display: flex; align-items: center; gap: 0.6em; padding: 0.5em 0; cursor: pointer; }
-.st-tog span { flex: 1; }
-.st-tog input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.st-tog i { width: 2.6em; height: 1.35em; border-radius: 999px; border: 1px solid #777; position: relative; transition: background 0.2s; }
-.st-tog i::after { content: ""; position: absolute; top: 0.18em; left: 0.2em; width: 0.9em; height: 0.9em; border-radius: 50%; background: #555; transition: left 0.2s; }
-.st-tog input:checked + i { background: var(--dk-acc, #0a5dc2); border-color: var(--dk-acc, #0a5dc2); }
-.st-tog input:checked + i::after { left: 1.45em; background: #fff; }
-.st-tog input:focus-visible + i { outline: 2px solid var(--dk-acc, #0a5dc2); outline-offset: 2px; }
-.st-tog b { width: 3.5em; font-weight: 400; color: #555; }
-.st-btn { background: #fff; border: 1px solid #c4cad3 !important; padding: 0.35em 0.9em !important; }
-.st-btn:hover:not(:disabled) { background: #f0f4fa; }
-.st-btn.primary { background: var(--dk-acc, #0a5dc2); color: #fff; border-color: var(--dk-acc, #0a5dc2) !important; }
-.st-btn:disabled { opacity: 0.45; }
-.st-list { display: flex; flex-direction: column; gap: 0.3em; margin-bottom: 0.6em; }
-.st-item { display: flex; align-items: center; gap: 0.7em; padding: 0.5em 0.6em; border: 1px solid #e3e7ee; border-radius: 6px; flex-wrap: wrap; }
-.st-item > span { font-size: 1.4em; }
-.st-item > div { flex: 1; display: flex; flex-direction: column; }
-.st-item > b { flex: 1; }
-.st-item small { color: #666; }
-.st-item.con { border-color: var(--dk-acc, #0a5dc2); background: #eef4fd; }
-.st-pass { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 0.5em; align-items: flex-end; padding: 0.4em 0 0 2.2em; }
-.st-pass label { display: flex; flex-direction: column; gap: 0.2em; }
-.st-pass input { font: inherit; padding: 0.3em 0.5em; border: 1px solid #999; border-radius: 4px; }
-.st-err { flex-basis: 100%; color: #b00020; font-weight: 600; }
-.st-warn { background: #fff3d6; padding: 0.4em 0.6em; border-radius: 6px; margin: 0; }
-.st-note { color: #555; margin: 0; }
-.st-searching { padding: 0.6em 0; }
-.st-preview { height: 8em; border-radius: 8px; margin-bottom: 0.6em; border: 1px solid #ccc; }
-.st-walls { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5em, 1fr)); gap: 0.4em; margin-bottom: 0.7em; }
-.st-walls button { height: 4.2em; border-radius: 6px !important; border: 2px solid transparent !important; display: flex; align-items: flex-end; justify-content: center; padding: 0.2em !important; }
-.st-walls button span { background: #0008; color: #fff; font-size: 0.8em; padding: 0 0.4em; border-radius: 3px; }
-.st-walls button.on { border-color: var(--dk-acc, #0a5dc2) !important; outline: 2px solid var(--dk-acc, #0a5dc2); }
-.st-clock { font-size: 2.4em; font-weight: 300; display: flex; flex-direction: column; margin-bottom: 0.3em; }
-.st-clock small { font-size: 0.4em; color: #555; }
-.st-time { display: flex; gap: 0.5em; flex-wrap: wrap; padding: 0.4em 0; }
-.st-time input { font: inherit; padding: 0.3em; }
-.st-sample { padding: 0.5em; background: #f4f7fb; border-radius: 6px; margin-bottom: 0.4em; }
-.st-upd { display: flex; flex-direction: column; gap: 0.2em; padding: 0.5em 0 0.8em; font-size: 1.05em; }
-.st-upd small { color: #555; }
-.st-prog { padding: 0.5em 0; }
 
 /* Ayarlar: temalar ve vurgu rengi */
-.st-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5em, 1fr)); gap: 0.5em; margin-bottom: 0.7em; }
-.st-themes button { display: flex; flex-direction: column; gap: 0.3em; align-items: stretch; background: none; border: 2px solid transparent !important; padding: 0.25em !important; border-radius: 8px !important; font-size: 0.9em; }
-.st-themes button:hover { background: #0000000d; }
-.st-themes button.on { border-color: var(--dk-acc, #0a5dc2) !important; }
-.st-mini { display: block; height: 4.4em; border-radius: 5px; position: relative; overflow: hidden; }
-.st-mini i, .st-prevdesk i { position: absolute; left: 0; right: 0; bottom: 0; height: 0.8em; display: flex; justify-content: center; align-items: center; }
-.st-mini b, .st-prevdesk b { width: 0.6em; height: 0.35em; border-radius: 1px; }
-.st-prevdesk { position: relative; overflow: hidden; }
-.st-prevdesk i { height: 1.2em; background: #eef2f7e8; }
-.st-prevdesk i.dark { background: #202020e8; }
-.st-prevdesk b { width: 1em; height: 0.6em; }
-.st-accents { display: flex; flex-wrap: wrap; gap: 0.4em; margin: 0.4em 0; }
-.st-accents button { width: 2.2em; height: 2.2em; border-radius: 6px !important; border: 2px solid transparent !important; padding: 0 !important; }
-.st-accents button.on { outline: 3px solid #fff; box-shadow: 0 0 0 5px currentColor; }
 
 /* Görev Yöneticisi */
 .tm { flex-direction: row !important; background: #f3f3f3; font-size: 0.95em; }
@@ -1109,10 +1041,6 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .sa-big { font-size: 3em; text-align: center; font-variant-numeric: tabular-nums; }
 .sa-count { text-align: center; }
 .dk-dark .sk, .dk-dark .rc, .dk-dark .sa { background: #2b2b2b; color: #eee; }
-.st-dbl { display: flex; gap: 0.8em; flex-wrap: wrap; margin-top: 0.4em; }
-.st-dbl-box { flex: 1; min-width: 10em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3em; padding: 0.8em; border: 2px dashed #9bb; border-radius: 8px; background: #f7fafc; text-align: center; user-select: none; }
-.st-dbl-box span { font-size: 2.4em; }
-.st-swatch i { display: inline-block; width: 0.9em; height: 0.9em; border-radius: 50%; border: 1px solid #666; margin-right: 0.35em; vertical-align: -0.1em; }
 /* İzleyelim (video, radyo) ve Gazete Oku */
 .wp.iz { text-align: left; padding: 0; position: relative; min-height: 100%; background: #fff; }
 .iz-head { display: flex; align-items: center; gap: 1em; padding: 0.5em 0.9em; border-bottom: 1px solid #ddd; background: #fafafa; }
@@ -1403,8 +1331,6 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .cp-sel select { font: inherit; padding: 0.15em 0.3em; }
 .cp-clock { font-size: 2.4em; font-weight: 300; }
 .dk-dark .cp { background: #202020; color: #eee; }
-.st-about { display: grid; grid-template-columns: 9em 1fr; gap: 0.2em 0.8em; margin: 0.3em 0; }
-.st-about dt { color: #667; } .st-about dd { margin: 0; }
 
 /* PDF düzenleme araçları */
 .pdf-edit { margin-top: -0.3em; padding: 0.25em 0.4em; background: #f1f5fb; border: 1px solid #d7e0ee; border-radius: 6px; font-size: 0.9em; }

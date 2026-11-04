@@ -188,7 +188,7 @@ export const odev15 = odev(15, 'bilgi güvenliği', '🛡', [
   ['Gizlilik ayarları', 'Kullandığınız sosyal medya hesabında profilinizi <b>“Başkası nasıl görüyor?”</b> gibi bir seçenekle inceleyin. Telefon numaranızı ve doğum tarihinizi yalnızca size görünür yapın; gönderileriniz yalnızca arkadaşlara açık olsun.', 'Ayarlar → Gizlilik bölümüne bakın.', '🔒'],
   ['Arkadaş listesine bakın', 'Arkadaş listenizde aynı kişiden <b>iki hesap</b> var mı, tanımadığınız biri var mı bakın. Şüphelendiğiniz hesabı arkadaşlıktan çıkarın ya da gerçek kişiye telefonla sorun.', 'Yeni açılmış, ortak arkadaşı olmayan hesaplara dikkat.', '🤝'],
   ['Oturum açılan cihazlar', 'E-posta ya da sosyal medya hesabınızın güvenlik sayfasında <b>oturum açık cihazlar</b> listesine bakın. Tanımadığınız bir cihaz varsa oturumunu kapatıp şifrenizi değiştirin.', 'Listede kendi telefonunuz ve bilgisayarınız olmalı.', '💻'],
-  ['Ortak Wi-Fi', 'Bir kafede ya da hastanede şifresiz Wi-Fi\'ye bağlanırsanız Windows\'un sorusuna <b>Hayır (Ortak ağ)</b> deyin. O ağda banka ve e-Devlet işlemi yapmayın.', 'Ayarlar → Ağ ve İnternet → Wi-Fi → ağın özellikleri: Ağ profili türü.', '📶'],
+  ['Ortak Wi-Fi', 'Bir kafede ya da hastanede şifresiz Wi-Fi\'ye bağlanırsanız Windows\'un sorusuna <b>Hayır (Ortak ağ)</b> deyin. O ağda banka ve e-Devlet işlemi yapmayın.', 'Ayarlar → Ağ ve internet → Wi-Fi → ağın özellikleri: Ağ profili türü.', '📶'],
   ['Acil numaraları yazın', 'Bankanızın kartın arkasında yazan numarasını ve acil durum numaralarını (155, 156, 112) telefon rehberinize ve bir kâğıda yazın. Kartınız çalınırsa ilk arayacağınız yer burası.', 'Bankanın numarasını mesajlardan değil, kartın arkasından ya da bankanın kendi sitesinden alın.', '🆘'],
 ]);
 
