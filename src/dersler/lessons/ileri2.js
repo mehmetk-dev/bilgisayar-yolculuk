@@ -30,7 +30,7 @@ export const takvimRandevu = {
       mouse: '🖱 Başlat → Takvim',
       check: (c) => !!c.d.find('takvim'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'takvim',
-      done: 'Bugünün tarihi renkli kutuda. ‹ › ile aylar arasında gezilir; kırmızı günler resmî tatildir.',
+      done: 'Bugünün tarihi renkli kutuda. Sağ üstteki yukarı ve aşağı oklarla aylar arasında gezilir; kırmızı günler resmî tatildir.',
     },
     {
       title: 'Randevu ekleyin',

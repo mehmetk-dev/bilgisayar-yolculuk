@@ -50,7 +50,7 @@ export const temalar = {
       title: 'Mağaza\'dan yeni tema',
       html: `<ol class="steps"><li>Temaların altındaki <b>🛍 Mağaza'dan daha fazla tema alın</b>\'a tıklayın.</li><li>Mağaza\'da <b>Kapadokya</b> temasına tıklayın ve <b>Al</b>\'a basın.</li></ol>`,
       mouse: '🖱 Mağaza\'dan daha fazla tema alın → Kapadokya → Al',
-      hint: 'Mağaza\'yı Başlat menüsünden de açabilirsiniz: 🛍 Mağaza → soldaki 🎨 Temalar.',
+      hint: 'Mağaza\'yı Başlat menüsünden de açabilirsiniz: Mağaza → soldaki Temalar.',
       on: (ev) => ev.type === 'store-install' && ev.kind === 'theme',
       done: 'Tema indirildi. Mağaza\'daki temalar ücretsizdir ve denetlenmiştir.',
     },
@@ -65,7 +65,7 @@ export const temalar = {
     {
       title: 'Mağaza\'dan uygulama',
       html: `<p>Programları internetteki rastgele sitelerden değil, mümkünse <b>Mağaza</b>'dan indirmek daha güvenlidir: reklam ve istenmeyen araç çubuğu gelmez.</p>
-        <ol class="steps"><li>Mağaza'nın solundaki <b>🧩 Uygulamalar</b>\'a tıklayın.</li><li><b>📅 Takvim</b>\'e tıklayın, <b>Al</b>\'a basın.</li></ol>`,
+        <ol class="steps"><li>Mağaza'nın solundaki <b>🧩 Uygulamalar</b>\'a tıklayın.</li><li><b>Takvim</b>\'e tıklayın, <b>Al</b>\'a basın.</li></ol>`,
       mouse: '🖱 Uygulamalar → Takvim → Al',
       setup: (c) => c.d.ensure('store'),
       on: (ev) => ev.type === 'store-install' && ev.id === 'takvim',
