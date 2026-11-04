@@ -549,3 +549,67 @@ tr.w11tm-grp[data-grp] td { color: var(--wa-fg); }
 .w11hv-off { margin: auto; text-align: center; color: var(--wa-sub); max-width: 22em; padding: 2em 0; }
 .w11hv-off .wx { width: 5em; height: 5em; }
 .w11hv-off b { color: var(--wa-fg); font-size: 1.2em; }
+
+/* =============================== Oyunlar =============================== */
+/* Mayın Tarlası (Microsoft Minesweeper havası) */
+.w11mt { align-items: center; padding: 0; gap: 0; background: #1b3a6b; color: #fff; overflow-y: auto; }
+.w11mt-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0.6em 1em; background: #12284d; }
+.w11mt-cnt { display: inline-flex; align-items: center; gap: 0.4em; font-size: 1.3em; font-weight: 600; min-width: 3.6em; }
+.w11mt-cnt .wi { font-size: 1.3em; }
+.w11mt-tm { justify-content: flex-end; }
+.w11a .w11mt-face { font-size: 2.2em; width: 1.4em; height: 1.4em; justify-content: center; padding: 0; border-radius: 50% !important; background: #ffffff1f; }
+.w11mt-face:hover { background: #ffffff33 !important; }
+.w11mt-face .wi { font-size: 1em; }
+.w11mt-msg { min-height: 1.6em; padding: 0.3em 1em 0; color: #ffd84a; font-weight: 600; text-align: center; }
+.w11mt-tip { font-size: 0.85em; text-align: center; padding: 0.4em 1em 0.6em; color: #c9d7ee; }
+.w11mt-grid { display: grid; gap: 0; width: min(24em, calc(100% - 1.6em)); aspect-ratio: 1; margin: 0.3em auto 1em; border-radius: 6px; overflow: hidden; box-shadow: 0 4px 14px #0006; }
+.w11a .w11mt-grid button { aspect-ratio: 1; padding: 0; border-radius: 0; display: grid; place-items: center; font-weight: 800; font-size: 1.5em; background: #4ba3ea; transition: background 0.08s; }
+.w11mt-grid button:nth-child(odd) { background: #3f96dd; }
+.w11a .w11mt-grid button:hover:not(.o) { background: #7dbcf2; }
+.w11a .w11mt-grid button.o { background: #e8d9bf; }
+.w11a .w11mt-grid button.o:nth-child(odd) { background: #dfcfb3; }
+.w11a .w11mt-grid button.boom { background: #ef5350; }
+.w11mt-grid .wi { font-size: 0.9em; }
+.w11mt-grid .n1 { color: #1976d2; } .w11mt-grid .n2 { color: #2e7d32; } .w11mt-grid .n3 { color: #d32f2f; } .w11mt-grid .n4 { color: #6a1b9a; }
+.w11mt-grid .n5 { color: #ff8f00; } .w11mt-grid .n6 { color: #00838f; } .w11mt-grid .n7 { color: #333; } .w11mt-grid .n8 { color: #757575; }
+/* Kart Dizme (Solitaire Collection havası: yeşil çuha) */
+.w11kd { background: radial-gradient(ellipse at 50% 30%, #1a8a4a, #0b5a30 75%); color: #fff; padding: 0.9em 1em; gap: 1em; overflow-y: auto; }
+.w11kd-tip { text-align: center; text-shadow: 0 1px 2px #0006; }
+.w11kd-deck, .w11kd-slots { display: flex; gap: 0.9em; justify-content: center; flex-wrap: wrap; }
+.w11kd-slots { margin-top: auto; }
+.w11kd-card, .w11kd-slot { width: 4.8em; height: 6.8em; border-radius: 7px; }
+.w11kd-card { position: relative; background: #fff; color: #c62828; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: grab; box-shadow: 0 2px 6px #0006, inset 0 0 0 1px #0002; user-select: none; touch-action: none; transition: transform 0.1s; }
+.w11kd-card:hover { transform: translateY(-3px); }
+.w11kd-card b { position: absolute; left: 0.4em; top: 0.25em; font-size: 1.15em; line-height: 1; }
+.w11kd-card em { position: absolute; right: 0.4em; bottom: 0.25em; font-style: normal; font-weight: 700; font-size: 1.15em; line-height: 1; transform: rotate(180deg); }
+.w11kd-s { width: 2.4em; height: 2.4em; }
+.w11kd-card.lift { opacity: 0.3; }
+.w11kd-card.done { cursor: default; box-shadow: 0 1px 3px #0006, inset 0 0 0 1px #0002; transform: none; }
+.w11kd-ghost { position: fixed; z-index: 99999; pointer-events: none; transform: rotate(4deg); box-shadow: 0 10px 24px #0008; opacity: 0.95; }
+.w11kd-slot { border: 2px dashed #ffffff8c; background: #ffffff14; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.w11kd-slot small { font-size: 1.6em; opacity: 0.55; font-weight: 700; }
+.w11kd-slot.no { background: #ef535066; border-color: #ef5350; }
+.w11kd-slot .w11kd-card { box-shadow: 0 1px 4px #0007; }
+.w11kd-msg { text-align: center; min-height: 2.4em; font-weight: 600; text-shadow: 0 1px 2px #0006; display: flex; align-items: center; justify-content: center; gap: 0.5em; }
+.w11kd-msg .wi { color: #b9f6ca; font-size: 1.2em; }
+.w11kd-again { text-shadow: none; }
+/* Hedef oyunu */
+.w11hg { background: linear-gradient(160deg, #0f3d5e, #0a2540); color: #fff; }
+.w11hg-bar { display: flex; justify-content: space-between; align-items: center; gap: 0.6em; flex-wrap: wrap; padding: 0.6em 0.9em; background: #ffffff12; }
+.w11hg-modes { display: inline-flex; padding: 0.2em; gap: 0.15em; border-radius: 7px; background: #00000040; flex-wrap: wrap; }
+.w11a .w11hg-modes button { height: 2.1em; padding: 0 1em; border-radius: 5px; justify-content: center; color: #d6e6f5; }
+.w11hg-modes button:hover { background: #ffffff1f; }
+.w11a .w11hg-modes button.on { background: #fff; color: #0a2540; font-weight: 600; }
+.w11hg-score { font-weight: 600; color: #cfe8ff; }
+.w11hg-tip { text-align: center; padding: 0.6em 1em; font-weight: 600; color: #b9f6ca; }
+.w11hg-tip.shake { animation: shake 0.4s; color: #ffb4a8; }
+.w11hg-field { flex: 1; position: relative; min-height: 0; margin: 0 0.8em 0.8em; border-radius: 10px; background: radial-gradient(circle at 50% 40%, #174b72, #0b2d4a); box-shadow: inset 0 0 0 1px #ffffff1a; overflow: hidden; }
+.w11a .w11hg-t { position: absolute; padding: 0; border-radius: 50% !important; border: 0 !important; justify-content: center; transition: transform 0.2s, opacity 0.2s; cursor: pointer; box-shadow: 0 3px 10px #0007; }
+.w11hg-t.left { background: radial-gradient(circle, #fff 0 14%, #43a047 15% 34%, #fff 35% 46%, #2e7d32 47% 66%, #fff 67% 76%, #1b5e20 77%); }
+.w11hg-t.right { background: radial-gradient(circle, #fff 0 14%, #fb8c00 15% 34%, #fff 35% 46%, #ef6c00 47% 66%, #fff 67% 76%, #bf360c 77%); }
+.w11a .w11hg-t.dbl { background: none; box-shadow: none; border-radius: 0 !important; font-size: 1em; }
+.w11hg-t.dbl .wi { width: 100%; height: 100%; filter: drop-shadow(0 3px 5px #0006); }
+.w11hg-t.pop { transform: scale(1.5); opacity: 0; }
+.w11hg-done { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6em; text-align: center; font-size: 1.1em; }
+.w11hg-done .wi { font-size: 3em; color: #b9f6ca; }
+.w11hg-done b { font-size: 1.4em; }
