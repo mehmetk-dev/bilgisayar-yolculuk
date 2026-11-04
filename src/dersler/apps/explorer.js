@@ -5,6 +5,7 @@
 import { ROOTS, RECYCLE, USB, PHONE } from '../vfs.js';
 import { esc, pictureURL, isImage } from './util.js';
 import { nodeIcon } from '../desktop.js';
+import { SYS_ICONS, APP_ICONS, iconFor } from './appicons.js';
 
 export const fmtSize = (b) => (b >= 1e9 ? `${(b / 1e9).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} GB` : b >= 1e6 ? `${(b / 1e6).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} MB` : `${Math.max(1, Math.round(b / 1e3))} KB`);
 const fmtDate = (t) => (t ? new Date(t).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '');
@@ -77,20 +78,13 @@ const NAVSYM = {
   net: '<circle cx="8" cy="8" r="5.8" fill="#e8f2fd" stroke="#2b7fd6" stroke-width="1.1"/><path d="M2.4 8h11.2M8 2.2c-2.2 2.4-2.2 9.2 0 11.6M8 2.2c2.2 2.4 2.2 9.2 0 11.6" fill="none" stroke="#2b7fd6" stroke-width="1"/>',
   recycle: '<path d="M3.6 4.6h8.8l-.8 8.4H4.4z" fill="#e8f2fd" stroke="#2b7fd6" stroke-width="1.1"/><path d="M2.6 4.6h10.8M6.2 4.6V3h3.6v1.6M6.6 7v4M9.4 7v4" fill="none" stroke="#2b7fd6" stroke-width="1.1"/>',
 };
-const nav16 = (k) => `<svg class="gx-s gx-nv" viewBox="0 0 16 16" aria-hidden="true">${NAVSYM[k] || NAVSYM.folder}</svg>`;
+// Klasör, sürücü ve sistem simgeleri ortak kitaplıktan (appicons.js); Giriş, Galeri, Ağ gibi kitaplıkta olmayanlar burada çizilir
+const SYSKEY = { desktop: 'folder-desktop', docs: 'folder-docs', downloads: 'folder-down', pictures: 'folder-pics', music: 'folder-music', videos: 'folder-video', folder: 'folder', pc: 'pc', disk: 'drive', usb: 'usb', phone: 'phone', recycle: 'recycle' };
+const nav16 = (k) => (k === 'cloud' ? APP_ICONS.bulut : SYS_ICONS[SYSKEY[k]] || `<svg class="gx-s gx-nv" viewBox="0 0 16 16" aria-hidden="true">${NAVSYM[k] || NAVSYM.folder}</svg>`);
 const ROOTKIND = { desktop: 'desktop', docs: 'docs', downloads: 'downloads', pictures: 'pictures', music: 'music', videos: 'videos', home: 'home', gallery: 'gallery', pc: 'pc', c: 'disk', net: 'net' };
 const idKind = (id) => ROOTKIND[id] || (id === USB ? 'usb' : id === PHONE ? 'phone' : id === RECYCLE ? 'recycle' : 'folder');
-// Giriş ve Bu Bilgisayar sayfalarındaki büyük simgeler (32×32)
-const BIGDRIVE = {
-  disk: '<rect x="3" y="11" width="26" height="12" rx="3" fill="#e6e9ee" stroke="#6b7686" stroke-width="1.4"/><path d="M7 17h10" stroke="#6b7686" stroke-width="1.6"/><circle cx="24" cy="17" r="1.6" fill="#2da44e"/><path d="M9 7h6v3H9zM17 7h6v3h-6z" fill="#2b7fd6" opacity=".0"/>',
-  usb: '<rect x="9" y="3" width="14" height="15" rx="2" fill="#e6e9ee" stroke="#6b7686" stroke-width="1.4"/><path d="M13 7v3M19 7v3" stroke="#6b7686" stroke-width="1.6"/><rect x="10.5" y="18" width="11" height="9" rx="1.6" fill="#2b7fd6"/>',
-  phone: '<rect x="9" y="2.5" width="14" height="27" rx="3" fill="#e8f2fd" stroke="#2b7fd6" stroke-width="1.6"/><path d="M14 25.5h4" stroke="#2b7fd6" stroke-width="1.6"/>',
-};
-const big = (id) => {
-  const k = idKind(id);
-  if (BIGDRIVE[k]) return `<svg class="gx-big" viewBox="0 0 32 32" aria-hidden="true">${BIGDRIVE[k]}</svg>`;
-  return `<svg class="gx-big" viewBox="0 0 16 16" aria-hidden="true">${NAVSYM[k] || NAVSYM.folder}</svg>`;
-};
+// Giriş ve Bu Bilgisayar sayfalarındaki büyük simgeler
+const big = (id) => `<span class="gx-big">${nav16(idKind(id))}</span>`;
 
 // Görünümler (Görüntüle menüsü): kod → ad
 const VIEWS = [['xl', 'Çok büyük simgeler'], ['lg', 'Büyük simgeler'], ['icons', 'Orta simgeler'], ['sm', 'Küçük simgeler'], ['list', 'Liste'], ['details', 'Ayrıntılar'], ['tiles', 'Döşemeler']];
@@ -391,7 +385,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       const old = node.name;
       if (save && v && v !== old) {
         const err = fs.rename(id, v);
-        if (err) { desk.toast('Ad değiştirilemedi', esc(err), I.info); render(); }
+        if (err) { desk.toast('Ad değiştirilemedi', esc(err), iconFor('warn')); render(); }
         else emit('rename', { id, name: v, old });
       } else render();
       body.focus({ preventScroll: true });
@@ -444,7 +438,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       if (node) id = node.id;
     }
     if (!id) {
-      desk.dialogs.ask({ title: 'Dosya Gezgini', icon: I.info, text: `Windows “${esc(text.trim())}” öğesini bulamıyor. Adı doğru yazdığınızdan emin olun ve yeniden deneyin.`, buttons: [['ok', 'Tamam', true]] });
+      desk.dialogs.ask({ title: 'Dosya Gezgini', icon: iconFor('info'), text: `Windows “${esc(text.trim())}” öğesini bulamıyor. Adı doğru yazdığınızdan emin olun ve yeniden deneyin.`, buttons: [['ok', 'Tamam', true]] });
       emit('ex-address', { path: text, found: false });
       return false;
     }
@@ -642,7 +636,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
         const ids = picked.has(id) && picked.size > 1 ? chosen() : [id];
         desk.fileClip = { op: c, id: ids[0], ids };
         emit('file-clip', { op: c, id: ids[0], name: fs.get(ids[0]).name, count: ids.length, names: ids.map((x) => fs.get(x).name) });
-        desk.toast(c === 'cut' ? 'Kesildi' : 'Kopyalandı', `${ids.length > 1 ? `<b>${ids.length} öğe</b>` : `“${esc(n.name)}”`} panoya alındı. Şimdi gideceği klasörü açıp <b>Yapıştır</b>'a basın.`, c === 'cut' ? I.cut : I.copy, 4000);
+        desk.toast(c === 'cut' ? 'Kesildi' : 'Kopyalandı', `${ids.length > 1 ? `<b>${ids.length} öğe</b>` : `“${esc(n.name)}”`} panoya alındı. Şimdi gideceği klasörü açıp <b>Yapıştır</b>'a basın.`, iconFor('clipboard'), 4000);
         return render();
       }
       case 'paste': if (!isSpecial(cur)) { desk.pasteFile(cur); select(null); render(); } return;
@@ -670,8 +664,8 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
         return desk.dialogs.ask({ title: 'Paylaş', icon: I.share, text: `${picked.size > 1 ? `<b>${picked.size} öğe</b>yi` : `<b>${esc(n.name)}</b> ${n.type === 'folder' ? 'klasörünü' : 'dosyasını'}`} nasıl paylaşmak istersiniz?<br><br>Gerçek bilgisayarda burada E-posta, Yakındaki Paylaşım ve Bluetooth gibi seçenekler görünür. Bu benzetimde e-posta ile paylaşabilirsiniz.`, buttons: [['mail', 'E-posta', true], ['no', 'Vazgeç']] })
           .then((a) => { emit('ex-share', { name: n.name, answer: a }); if (a === 'mail') desk.open('mail'); });
       }
-      case 'copypath': if (n) { const p = `Bu Bilgisayar\\${[...fs.path(n.id)].map((x) => x.name).join('\\')}`; navigator.clipboard?.writeText?.(p).catch(() => {}); desk.toast('Yol kopyalandı', esc(p), I.path, 3500); emit('ex-copypath', { name: n.name }); } return;
-      case 'options': return desk.dialogs.ask({ title: 'Klasör Seçenekleri', icon: I.info, text: 'Gerçek bilgisayarda burada Dosya Gezgini\'nin davranışını ayarlarsınız: dosyaları tek tıkla açmak, gizli dosyaları göstermek, dosya uzantılarını göstermek gibi.', buttons: [['ok', 'Tamam', true]] });
+      case 'copypath': if (n) { const p = `Bu Bilgisayar\\${[...fs.path(n.id)].map((x) => x.name).join('\\')}`; navigator.clipboard?.writeText?.(p).catch(() => {}); desk.toast('Yol kopyalandı', esc(p), iconFor('clipboard'), 3500); emit('ex-copypath', { name: n.name }); } return;
+      case 'options': return desk.dialogs.ask({ title: 'Klasör Seçenekleri', icon: iconFor('info'), text: 'Gerçek bilgisayarda burada Dosya Gezgini\'nin davranışını ayarlarsınız: dosyaları tek tıkla açmak, gizli dosyaları göstermek, dosya uzantılarını göstermek gibi.', buttons: [['ok', 'Tamam', true]] });
       case 'compress': {
         if (!n || isSpecial(cur)) return;
         const ids = picked.has(id) ? chosen() : [id];
@@ -679,7 +673,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
         const z = fs.compress(ids, cur, fs.uniqueName(cur, n.name.replace(/\.[^.]+$/, '') + '.zip'));
         select(z.id);
         render();
-        desk.toast('Sıkıştırıldı', `${ids.length > 1 ? `${ids.length} öğe` : `“${esc(n.name)}”`} → <b>${esc(z.name)}</b> (${fmtSize(before)} → ${fmtSize(fs.sizeOf(z))})`, I.zip, 5000);
+        desk.toast('Sıkıştırıldı', `${ids.length > 1 ? `${ids.length} öğe` : `“${esc(n.name)}”`} → <b>${esc(z.name)}</b> (${fmtSize(before)} → ${fmtSize(fs.sizeOf(z))})`, SYS_ICONS['folder-zip'], 5000);
         emit('zip-make', { name: z.name, from: n.name, count: ids.length });
         return;
       }
@@ -687,7 +681,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       case 'shortcut': {
         if (!n || n.type === 'link') return;
         const l = fs.create('desktop', { type: 'link', name: `${n.name} - Kısayol`, target: n.id, icon: nodeIcon(n) });
-        desk.toast('Kısayol oluşturuldu', `Masaüstünde <b>${esc(l.name)}</b> var. Asıl ${n.type === 'folder' ? 'klasör' : 'dosya'} yerinde duruyor.`, I.shortcut, 4000);
+        desk.toast('Kısayol oluşturuldu', `Masaüstünde <b>${esc(l.name)}</b> var. Asıl ${n.type === 'folder' ? 'klasör' : 'dosya'} yerinde duruyor.`, iconFor('ok'), 4000);
         emit('shortcut', { name: l.name, target: n.name, folder: n.type === 'folder' });
         return;
       }

@@ -5,7 +5,7 @@
 .ex button { font: inherit; color: inherit; background: none; border: 0; border-radius: 5px; padding: 0; cursor: default; gap: 0; text-align: left; }
 .ex button:focus-visible { outline: 2px solid var(--gx-acc); outline-offset: -2px; }
 .ex button:disabled { opacity: 0.38; }
-.ex .gx-s { width: 1.15em; height: 1.15em; flex: none; }
+.gx-s { width: 1.15em; height: 1.15em; flex: none; }
 .ex .gx-chev { width: 0.8em; height: 0.8em; }
 
 /* Başlık çubuğundaki sekmeler */
@@ -19,7 +19,7 @@
 .win[data-app="explorer"] .gx-tabs .gx-tabx { justify-content: center; width: 1.75em; height: 1.75em; flex: none; border-radius: 4px !important; justify-content: center; margin-right: 0.3em; align-self: center; padding: 0 !important; }
 .win[data-app="explorer"] .gx-tabs .gx-tabx:hover, .win[data-app="explorer"] .gx-tabs .gx-tabn:hover { background: #0000001a; }
 .win[data-app="explorer"] .gx-tabs .gx-tabn { width: 2em; height: 2em; flex: none; border-radius: 4px !important; justify-content: center; align-self: center; padding: 0 !important; }
-.gx-tabs .gx-s { width: 1.1em; height: 1.1em; flex: none; }
+.gx-tabs .gx-s, .gx-tabs .wi { width: 1.1em; height: 1.1em; flex: none; }
 .gx-tabx .gx-s { width: 0.8em; height: 0.8em; }
 .gx-tl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-tabfill { flex: 1; align-self: stretch; }
@@ -34,7 +34,7 @@
 .gx-ab { flex: 1; min-width: 0; display: flex; align-items: center; height: 2.25em; margin: 0 0.3em; border: 1px solid var(--gx-bd); border-radius: 5px; background: var(--gx-fld); }
 .gx-ab:focus-within { box-shadow: inset 0 -2px 0 var(--gx-acc); }
 .ex-addr { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; padding-left: 0.45em; overflow: hidden; white-space: nowrap; cursor: text; }
-.gx-ai { display: inline-flex; margin-right: 0.15em; flex: none; }
+.gx-ai { display: inline-flex; font-size: 1.2em; margin-right: 0.15em; flex: none; }
 .gx-cs { display: inline-flex; color: var(--gx-mut); font-style: normal; flex: none; }
 .ex .gx-cb { height: 1.85em; padding: 0 0.45em; flex: none; display: inline-flex; align-items: center; }
 .ex .gx-cv { height: 1.85em; width: 1.3em; flex: none; display: inline-flex; align-items: center; justify-content: center; color: var(--gx-mut); }
@@ -70,7 +70,9 @@
 .ex .gx-n:hover { background: var(--gx-hov); }
 .ex .gx-n.on { background: var(--gx-act); }
 .ex .gx-n.on::before { content: ''; position: absolute; left: 0; top: 24%; bottom: 24%; width: 3px; border-radius: 2px; background: var(--gx-acc); }
-.gx-ni { display: inline-flex; flex: none; }
+.gx-ni { display: inline-flex; flex: none; font-size: 1.2em; }
+.gx-ni .wi, .gx-ai .wi, .gx-mi .wi { width: 1em; height: 1em; }
+.gx-ni .gx-s, .gx-ai .gx-s { width: 1em; height: 1em; }
 .gx-nl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-pin { display: inline-flex; color: var(--gx-mut); }
 .gx-pin .gx-s { width: 0.85em; height: 0.85em; }
@@ -146,7 +148,8 @@ tr.ex-grp td { font-weight: 600; color: var(--gx-grp); padding-top: 0.6em; borde
 .gx-tile > span { display: flex; flex-direction: column; min-width: 0; }
 .gx-tile small { display: flex; align-items: center; gap: 0.3em; color: var(--gx-mut); font-size: 0.82em; }
 .gx-tile small .gx-s { width: 0.85em; height: 0.85em; }
-.gx-big { width: 2.7em; height: 2.7em; flex: none; }
+.gx-big { display: inline-flex; font-size: 2.7em; flex: none; }
+.gx-big .wi, .gx-big .gx-s { width: 1em; height: 1em; }
 .ex-drives { display: flex; gap: 0.45em; flex-wrap: wrap; margin-bottom: 1em; }
 .ex .ex-drive { display: flex; gap: 0.75em; align-items: center; padding: 0.65em 1em 0.65em 0.7em; width: 19.5em; background: var(--gx-tile); border: 1px solid transparent; border-radius: 6px; }
 .ex-drive > div { flex: 1; min-width: 0; }
