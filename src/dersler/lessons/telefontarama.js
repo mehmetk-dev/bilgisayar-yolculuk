@@ -121,7 +121,7 @@ export const telefonTarama = {
     },
     {
       title: 'Belgeler klasörüne taşıyın',
-      html: `<p>İndirilenler klasörü zamanla karışır. Önemli belgeyi <b>Belgeler</b>'e alın: dosyayı sürükleyip soldaki <b>Belgeler</b>'in üzerine bırakın. Ya da dosyaya tıklayıp <b>✂ Kes</b>, <b>Belgeler</b>'e gidip <b>📋 Yapıştır</b>.</p>`,
+      html: `<p>İndirilenler klasörü zamanla karışır. Önemli belgeyi <b>Belgeler</b>'e alın: dosyayı sürükleyip soldaki <b>Belgeler</b>'in üzerine bırakın. Ya da dosyaya tıklayıp <b>Kes</b> simgesine (makas), <b>Belgeler</b>'e gidip <b>Yapıştır</b> simgesine (pano) tıklayın.</p>`,
       setup: (c) => exGo(c, 'downloads'),
       on: (ev, c) => {
         const kopya = 'Kopyaladınız; dosya İndirilenler\'de de duruyor. Taşımak için Kes (Ctrl + X) kullanın ya da sürükleyin.';
