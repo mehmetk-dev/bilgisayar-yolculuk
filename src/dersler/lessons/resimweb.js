@@ -56,7 +56,7 @@ export const resimWeb = {
     },
     {
       title: 'İkisini karşılaştırın',
-      html: '<p>⊞ Başlat → <b>📁 Dosya Gezgini</b> → <b>Resimler</b> klasörüne bakın. Liste ayrıntılı açılır; açılmazsa üstteki <b>☰ Ayrıntılar</b> düğmesine tıklayın. <b>çiçek.png</b> ve <b>çiçek.jpg</b> dosyalarının <b>türü</b> ve <b>boyutuna</b> bakın. Hangisi daha küçük?</p><p class="mut">Boyutlar farklı çıkar. Resmi yakınlaştırıp bakarsanız PNG’de çizgi kenarlarının <b>net</b>, JPG’de çevrelerinde hafif <b>bulanıklık</b> olduğunu görürsünüz. <b>Fotoğraflarda</b> ise JPG, PNG’den çok daha küçüktür; bu yüzden telefonla çekilen fotoğraflar çoğunlukla JPG’dir (bazı iPhone’larda HEIC).</p>',
+      html: '<p>⊞ Başlat → <b>📁 Dosya Gezgini</b> → <b>Resimler</b> klasörüne bakın. Liste ayrıntılı açılır; açılmazsa üstteki <b>Görüntüle</b> düğmesinden <b>Ayrıntılar</b>\'ı seçin. <b>çiçek.png</b> ve <b>çiçek.jpg</b> dosyalarının <b>türü</b> ve <b>boyutuna</b> bakın. Hangisi daha küçük?</p><p class="mut">Boyutlar farklı çıkar. Resmi yakınlaştırıp bakarsanız PNG’de çizgi kenarlarının <b>net</b>, JPG’de çevrelerinde hafif <b>bulanıklık</b> olduğunu görürsünüz. <b>Fotoğraflarda</b> ise JPG, PNG’den çok daha küçüktür; bu yüzden telefonla çekilen fotoğraflar çoğunlukla JPG’dir (bazı iPhone’larda HEIC).</p>',
       manual: 'Baktım ✔',
       setup: (c) => { const e = c.d.find('explorer'); if (e) c.d.close(e); c.d.open('explorer', { folder: 'pictures', view: 'details' }); },
       done: 'Dosya türü, ne tür resim sakladığınıza göre seçilir. Boyut farkı, fotoğraf sayısı arttıkça disk dolmasına ve e-postaya ek göndermeye de yansır.',

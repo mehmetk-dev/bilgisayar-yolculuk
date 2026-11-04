@@ -9,7 +9,7 @@ export const windowsAraclar = {
   id: 'windows-araclar', icon: '🧰', title: 'Kısayol, ekran ayarı ve geri yükleme', minutes: 30, stage: 'desktop',
   desc: 'Masaüstüne kısayol koymak; çözünürlük ve ölçek; Sistem Geri Yükleme ve Dosya Geçmişi ne işe yarar.',
   summary: [
-    ['Sağ tık → Gönder → Masaüstü (kısayol oluştur)', 'Sık açılan klasör ya da dosyanın masaüstünde bir “yol göstericisi” olur'],
+    ['Sağ tık → Diğer seçenekleri göster → Gönder → Masaüstü (kısayol oluştur)', 'Sık açılan klasör ya da dosyanın masaüstünde bir “yol göstericisi” olur'],
     ['Kısayol simgesindeki küçük ok ↗', 'Bu bir kısayoldur; silmek asıl dosyayı silmez'],
     ['Ayarlar → Sistem → Ekran', 'Çözünürlük: “Önerilen” kalsın. Yazılar küçükse Ölçek’i %125 ya da %150 yapın'],
     ['Sistem Geri Yükleme', 'Bilgisayarı bozulmadan önceki bir güne döndürür: programlar ve ayarlar geri gelir, belgeler ve fotoğraflar değişmez'],
@@ -24,9 +24,9 @@ export const windowsAraclar = {
     },
     {
       title: 'Masaüstüne kısayol gönderin',
-      html: '<p>Her ay <b>Faturalar</b> klasörünü açıyorsunuz ama her seferinde Dosya Gezgini → Belgeler → Faturalar diye aramak zahmetli. Masaüstüne bir <b>kısayol</b> koyacağız.</p><p>Yandaki Dosya Gezgini’nde <b>Belgeler</b> açık. <b>Faturalar</b> klasörüne <b>sağ tıklayın</b>; menüde <b>Gönder</b>’in üzerine gelin ve yandan açılan <b>🖥 Masaüstü (kısayol oluştur)</b>’a tıklayın.</p><p class="mut">Gerçek Windows 11’de menüde <b>Gönder</b> görünmüyorsa en alttaki <b>Diğer seçenekleri göster</b>’e tıklayın (ya da sağ tıklarken ' + K('Shift') + ' tuşunu basılı tutun). Gönder orada.</p>',
-      mouse: '🖱 Faturalar → sağ tık → Gönder ›',
-      hint: 'Faturalar klasörüne sağ tık → Gönder › → Masaüstü (kısayol oluştur).',
+      html: '<p>Her ay <b>Faturalar</b> klasörünü açıyorsunuz ama her seferinde Dosya Gezgini → Belgeler → Faturalar diye aramak zahmetli. Masaüstüne bir <b>kısayol</b> koyacağız.</p><p>Yandaki Dosya Gezgini’nde <b>Belgeler</b> açık. <b>Faturalar</b> klasörüne <b>sağ tıklayın</b>; menünün en altındaki <b>Diğer seçenekleri göster</b>’e tıklayın (ya da sağ tıklarken ' + K('Shift') + ' tuşunu basılı tutun). Eski tip menüde <b>Gönder</b>’in üzerine gelin ve yandan açılan <b>Masaüstü (kısayol oluştur)</b>’a tıklayın.</p><p class="mut">Windows 11’in yeni menüsünde <b>Gönder</b> yoktur; o hâlâ eski tip menüde durur.</p>',
+      mouse: '🖱 Faturalar → sağ tık → Diğer seçenekleri göster → Gönder ›',
+      hint: 'Faturalar klasörüne sağ tık → Diğer seçenekleri göster → Gönder › → Masaüstü (kısayol oluştur).',
       setup: docs,
       check: (c) => !!link(c),
       on: (ev) => ev.type === 'shortcut' && /Faturalar/.test(ev.target),

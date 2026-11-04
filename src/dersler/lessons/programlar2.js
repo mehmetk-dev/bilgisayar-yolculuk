@@ -4,17 +4,17 @@
 import { K, desktopReady, maxed, norm } from './common.js';
 import { rehberSoru } from './kalip.js';
 
-const ex = (c, folder) => maxed(c, 'explorer', { folder });
+const ex = (c, folder) => maxed(c, 'explorer', { folder, view: 'icons' }); // başlangıçta simgeler; Ayrıntılar'ı öğrenci seçer
 
 export const zip = {
   id: 'zip', icon: '🗜', title: 'Sıkıştırılmış (zip) dosyalar ve ayrıntılar', minutes: 30, stage: 'desktop',
   desc: 'Dosya Gezgini görünümleri, sıralama; zip dosyasını açmak ve klasörü sıkıştırmak.',
   summary: [
-    ['☰ Ayrıntılar', 'Dosyaların boyutu, tarihi ve türü sütun sütun'],
+    ['Görüntüle → Ayrıntılar', 'Dosyaların boyutu, tarihi ve türü sütun sütun'],
     ['Sütun başlığına tık', 'O sütuna göre sıralar (bir daha tık: ters)'],
     ['.zip (🗜)', 'İçinde birden çok dosya olan, küçültülmüş paket'],
     ['Tümünü ayıkla', 'Zip\'in içindekileri normal bir klasöre çıkarır'],
-    ['Sağ tık → Sıkıştırılmış (zip) klasöre gönder', 'Klasörü tek dosya yapar (e-postayla göndermek için)'],
+    ['Sağ tık → ZIP dosyasına sıkıştır', 'Klasörü tek dosya yapar (e-postayla göndermek için)'],
     ['Ara kutusu', 'Klasörün içinde (alt klasörler dahil) dosya bulur'],
   ],
   steps: [
@@ -25,8 +25,8 @@ export const zip = {
     },
     {
       title: 'Ayrıntılar görünümü',
-      html: '<p>Komut çubuğunun sağındaki <b>☰ Ayrıntılar</b>\'a tıklayın.</p>',
-      mouse: '🖱 ☰ Ayrıntılar',
+      html: '<p>Komut çubuğundaki <b>Görüntüle</b> düğmesine tıklayıp <b>Ayrıntılar</b>\'ı seçin (sağ alttaki küçük çizgili düğme de aynı işi yapar).</p>',
+      mouse: '🖱 Görüntüle → Ayrıntılar',
       on: (ev) => ev.type === 'ex-view' && ev.mode === 'details',
       done: 'Artık her dosyanın <b>değiştirme tarihi</b>, <b>türü</b> ve <b>boyutu</b> görünüyor. KB < MB < GB: yaklaşık 1000 KB bir MB, yaklaşık 1000 MB bir GB eder (tam olarak 1024).',
     },
@@ -55,8 +55,8 @@ export const zip = {
     },
     {
       title: 'Klasörü sıkıştırın',
-      html: '<p>Faturalarınızı muhasebeciye tek dosya olarak göndereceksiniz. <b>Belgeler</b>\'e gidin, <b>Faturalar</b> klasörüne <b>sağ tıklayın</b> ve <b>🗜 Sıkıştırılmış (zip) klasöre gönder</b>\'i seçin.</p>',
-      mouse: '🖱 Belgeler → Faturalar (sağ tık) → Sıkıştırılmış (zip) klasöre gönder',
+      html: '<p>Faturalarınızı muhasebeciye tek dosya olarak göndereceksiniz. <b>Belgeler</b>\'e gidin, <b>Faturalar</b> klasörüne <b>sağ tıklayın</b> ve <b>ZIP dosyasına sıkıştır</b>\'ı seçin.</p>',
+      mouse: '🖱 Belgeler → Faturalar (sağ tık) → ZIP dosyasına sıkıştır',
       on: (ev) => ev.type === 'zip-make' && /fatura/i.test(ev.name),
       done: '<b>Faturalar.zip</b> oluştu; asıl klasör de yerinde duruyor. E-postaya klasör eklenemez ama zip dosyası eklenebilir.',
     },

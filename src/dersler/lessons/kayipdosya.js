@@ -33,7 +33,7 @@ export const kayipDosya = {
     ['📁 → 🏠 Giriş', 'Son açtığınız ve kaydettiğiniz dosyalar en üstte; yanında konumu yazar'],
     ['Sağ tık → Dosya konumunu aç', 'Dosyanın durduğu klasörü açar'],
     ['Bu Bilgisayar → Ara kutusu', 'Adının bir parçasını yazın; bütün klasörlere bakar'],
-    ['Sırala: Tarih', 'En yeni en üstte; “Bugün”, “Dün” diye gruplanır'],
+    ['Sırala → Değiştirme tarihi', 'En yeni en üstte; “Bugün”, “Dün” diye gruplanır'],
     [K('Ctrl', 'J'), 'Tarayıcıda İndirilenler; “Klasörde göster” dosyanın yerini açar'],
     ['OneDrive yazıyorsa', 'Belgeler internetteki hesaba bağlı: ☁ yalnızca internette, ✔ bilgisayarda'],
     ['Kaydederken', 'Kaydet penceresinin üstündeki klasör adına bakın; emin değilseniz Belgeler\'i seçin'],
@@ -53,7 +53,7 @@ export const kayipDosya = {
       hint: 'Dosya Gezgini, görev çubuğunda sarı klasör simgesi. Açılınca sol listede en üstte 🏠 Giriş var.',
       check: (c) => ex(c)?.api.folder === 'home',
       on: (ev) => ev.type === 'nav' && ev.folder === 'home',
-      done: '“Son kullanılan dosyalar” listesinin en üstünde dilekçe duruyor. Yanındaki <b>Konum</b> sütunu nerede olduğunu söylüyor.',
+      done: '“Son kullanılanlar” listesinin en üstünde dilekçe duruyor. Yanındaki <b>Konum</b> sütunu nerede olduğunu söylüyor.',
     },
     {
       title: 'Dosyanın yerini açın',
@@ -94,9 +94,9 @@ export const kayipDosya = {
     },
     {
       title: '3. yol: Tarihe göre sıralayın',
-      html: `<p>Adını da hatırlamıyorsanız <b>ne zaman</b> kaydettiğinizi hatırlarsınız. Soldan <b>📄 Belgeler</b>\'e gidin. Sağ üstteki <b>Sırala:</b> kutusundan <b>Tarih</b>\'i seçin.</p>
+      html: `<p>Adını da hatırlamıyorsanız <b>ne zaman</b> kaydettiğinizi hatırlarsınız. Soldan <b>📄 Belgeler</b>\'e gidin. Üstteki <b>Sırala</b> düğmesine tıklayıp <b>Değiştirme tarihi</b>\'ni seçin (ya da <b>Değiştirme tarihi</b> sütun başlığına tıklayın).</p>
         <p>En yeni dosyalar en üste gelir ve <b>Bugün</b>, <b>Dün</b> diye gruplanır.</p>`,
-      hint: 'Önce arama kutusunu temizleyin ya da soldan Belgeler\'e tıklayın. “Sırala:” kutusu komut çubuğunun sağında.',
+      hint: 'Önce arama kutusunu temizleyin ya da soldan Belgeler\'e tıklayın. “Sırala” düğmesi komut çubuğunda, Kes-Kopyala simgelerinin sağında.',
       on: (ev, c) => ev.type === 'ex-sort' && ev.by === 'date' && ex(c)?.api.folder === 'docs',
       done: 'Belgeler tarihe göre sıralandı; en üstte “Bugün” grubu var.',
     },

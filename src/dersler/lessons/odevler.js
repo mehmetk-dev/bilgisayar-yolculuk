@@ -86,7 +86,7 @@ export const odev6 = odev(6, 'dosyalar ve klasörler', '📁', [
   ['Uzantıları gösterin', 'Dosya Gezgini\'nde <b>Görünüm → Göster → Dosya adı uzantıları</b>\'nı işaretleyin. Dosyaların sonundaki .txt, .jpg, .pdf yazılarını okuyun.', 'Sahte dosya hilesini (belge.pdf.exe) bu ayar sayesinde görürsünüz.', '🏷'],
   ['Bellekten kopyalayın', 'Varsa bir <b>USB bellek</b> takın; içindeki bir dosyayı <b>Belgeler</b>\'e kopyalayın. Sonra belleği tepsideki <b>⏏ Güvenle kaldır</b> ile çıkarın.', 'Belleği çekmeden önce mutlaka güvenle kaldırın.', '💾'],
   ['Birkaç dosya seçin', 'Resimler klasöründe <b>Ctrl</b>\'yi basılı tutup üç fotoğrafa tek tek tıklayın; üçü birden seçilsin. Sağ tıklayıp <b>Kopyala</b>, sonra yeni bir klasöre <b>Yapıştır</b>.', 'Shift ile tıklarsanız aradaki hepsi seçilir. Yanlış seçerseniz boş bir yere tıklayıp yeniden başlayın.', '🖱'],
-  ['Son kullanılanlar', 'Dosya Gezgini\'ni açın; soldaki <b>Giriş</b> (ya da Hızlı Erişim) sayfasında <b>son açtığınız dosyalara</b> bakın. Birine sağ tıklayıp <b>Dosya konumunu aç</b>\'ı seçin.', 'Nereye kaydettiğinizi unuttuğunuz dosyayı en hızlı buradan bulursunuz.', '🕵️'],
+  ['Son kullanılanlar', 'Dosya Gezgini\'ni açın; soldaki <b>Giriş</b> sayfasında (<b>Hızlı erişim</b> ve <b>Son kullanılanlar</b> burada) <b>son açtığınız dosyalara</b> bakın. Birine sağ tıklayıp <b>Dosya konumunu aç</b>\'ı seçin.', 'Nereye kaydettiğinizi unuttuğunuz dosyayı en hızlı buradan bulursunuz.', '🕵️'],
 ]);
 
 export const odev7 = odev(7, 'Paint, ekran alıntısı ve ayarlar', '🎨', [

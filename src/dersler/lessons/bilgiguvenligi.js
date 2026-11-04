@@ -49,7 +49,7 @@ export const yedekleme = {
     },
     {
       title: 'Yedek klasörü',
-      html: `<p>Dosya Gezgini'nde soldan <b>💾 USB Bellek (E:)</b>'e tıklayın. Üstteki <b>＋ Yeni klasör</b> ile <b>Yedek</b> adında bir klasör oluşturun.</p>`,
+      html: `<p>Dosya Gezgini'nde soldan <b>💾 USB Bellek (E:)</b>'e tıklayın. Üstteki <b>Yeni</b> → <b>Klasör</b> ile <b>Yedek</b> adında bir klasör oluşturun.</p>`,
       hint: `Yeni klasörün adı seçili gelir: hemen <b>Yedek</b> yazıp ${K('Enter')}'a basın.`,
       setup: explorerAt(),
       check: (c) => !!yedek(c),

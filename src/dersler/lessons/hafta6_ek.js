@@ -280,7 +280,7 @@ export const copKutusu = {
     ['Sürükle → 🗑', 'Silmenin fareyle yolu'],
     ['Delete', 'Seçili dosyayı siler'],
     ['Sağ tık → Sil', 'Menüyle silmek'],
-    ['♻ Geri yükle', 'Dosyayı eski yerine koyar'],
+    ['Seçili öğeleri geri yükle', 'Dosyayı eski yerine koyar'],
     ['Kutuyu boşalt', 'İçindekiler tamamen silinir: geri gelmez'],
   ],
   steps: [
@@ -314,7 +314,7 @@ export const copKutusu = {
     },
     {
       title: 'Geri yükleyin',
-      html: '<p>Fikrinizi değiştirdiniz: <b>deneme</b> dosyasını seçip üstteki <b>♻ Geri yükle</b>\'ye tıklayın.</p>',
+      html: '<p>Fikrinizi değiştirdiniz: <b>deneme</b> dosyasını seçip üstteki <b>Seçili öğeleri geri yükle</b>\'ye tıklayın.</p>',
       setup: explorerAt(RECYCLE),
       on: (ev) => ev.type === 'restore' && /deneme/.test(ev.name),
       done: (c) => `Dosya eski yerine döndü: <b>${c.d.fs.find('desktop', 'deneme.txt') ? 'Masaüstü' : 'eski klasörü'}</b>. Masaüstüne bakın.`,

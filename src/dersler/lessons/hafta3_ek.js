@@ -263,7 +263,7 @@ export const kaydetPratik = {
     },
     {
       title: 'Yeni sayfa',
-      html: '<p><b>Dosya → Yeni</b> ile boş bir sayfa açın.</p>',
+      html: '<p><b>Dosya → Yeni sekme</b> ile boş bir sayfa açın.</p>',
       on: (ev) => ev.type === 'new',
     },
     {
@@ -301,7 +301,7 @@ export const kopyaOyun = {
     ['Ctrl + V', 'Yapıştır: Pano\'dakini koyar'],
     ['Ctrl + Z', 'Geri al'],
     ['Dosya menüsü', 'Yeni, Aç, Kaydet, Yazdır'],
-    ['Düzen menüsü', 'Geri al, Kes, Kopyala, Yapıştır, Tümünü seç'],
+    ['Düzenle menüsü', 'Geri al, Kes, Kopyala, Yapıştır, Tümünü seç'],
   ],
   steps: [
     { title: 'Ne yapacağız?', html: '<p>Not Defteri\'nde öğrendiklerimizi kartlar ve sorularla tekrar edeceğiz.</p>', scene: info('<div class="sc-big">📋 ✂ 📌</div><p>Kısayol eşleştirme</p>') },
@@ -324,15 +324,15 @@ export const kopyaOyun = {
     ayir({
       title: 'Hangi menüde?',
       html: '<p>Not Defteri\'nin üstündeki menülerde bu komutlar nerede? Kartları doğru menüye sürükleyin.</p>',
-      bins: [{ id: 'dosya', label: 'Dosya', icon: '📄' }, { id: 'duzen', label: 'Düzen', icon: '✏' }, { id: 'gorunum', label: 'Görünüm', icon: '🔍' }],
+      bins: [{ id: 'dosya', label: 'Dosya', icon: '📄' }, { id: 'duzen', label: 'Düzenle', icon: '✏' }, { id: 'gorunum', label: 'Görünüm', icon: '🔍' }],
       items: [
         { label: 'Kaydet', icon: '💾', bin: 'dosya', why: 'Dosyayla ilgili işler Dosya menüsündedir.' },
         { label: 'Aç', icon: '📂', bin: 'dosya', why: 'Dosya → Aç.' },
-        { label: 'Yeni', icon: '🆕', bin: 'dosya', why: 'Dosya → Yeni.' },
+        { label: 'Yeni sekme', icon: '🆕', bin: 'dosya', why: 'Dosya → Yeni sekme.' },
         { label: 'Yazdır', icon: '🖨', bin: 'dosya', why: 'Dosya → Yazdır.' },
-        { label: 'Geri al', icon: '↶', bin: 'duzen', why: 'Yazıyı düzenleme işleri Düzen menüsündedir.' },
-        { label: 'Kopyala', icon: '⧉', bin: 'duzen', why: 'Düzen → Kopyala.' },
-        { label: 'Tümünü seç', icon: '▦', bin: 'duzen', why: 'Düzen → Tümünü seç.' },
+        { label: 'Geri al', icon: '↶', bin: 'duzen', why: 'Yazıyı düzenleme işleri Düzenle menüsündedir.' },
+        { label: 'Kopyala', icon: '⧉', bin: 'duzen', why: 'Düzenle → Kopyala.' },
+        { label: 'Tümünü seç', icon: '▦', bin: 'duzen', why: 'Düzenle → Tümünü seç.' },
         { label: 'Yakınlaştır', icon: '🔍', bin: 'gorunum', why: 'Görünüm, yazının ekranda nasıl göründüğünü değiştirir.' },
         { label: 'Uzaklaştır', icon: '🔎', bin: 'gorunum', why: 'Görünüm → Uzaklaştır.' },
       ],
