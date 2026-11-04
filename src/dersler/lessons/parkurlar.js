@@ -32,7 +32,7 @@ export const epostaParkur = {
     },
     {
       title: '4. Hocaya yanıt', html: '<p>Bilgisayar Hocası\'nın <b>“Bu haftaki ders”</b> postasını <b>yanıtlayın</b>: derse geleceğinizi yazın.</p>',
-      hint: 'Postayı açın → ↩ Yanıtla. Kime ve Konu kendiliğinden dolar; yalnızca mesajı yazıp ➤ Gönder.',
+      hint: 'Postayı açın → Yanıtla. Kime ve Konu kendiliğinden dolar; yalnızca mesajı yazıp Gönder.',
       on: (ev, c) => {
         if (ev.type === 'mail-send' && ev.replyKey === 'hoca' && ev.body.trim().length < 25) c.note('Gönderildi ama mesaj çok kısa görünüyor. Bir dahaki sefere birkaç kelime yazın.');
         return ev.type === 'mail-send' && ev.replyKey === 'hoca';
@@ -40,7 +40,7 @@ export const epostaParkur = {
     },
     {
       title: '5. Bilgi (Cc) ile iletin', html: '<p>Mahalle Eczanesi\'nin <b>“İlacınız hazır”</b> postasını <b>Ahmet\'e iletin</b>; Elif de <b>Bilgi (Cc)</b> olarak eklensin.</p>',
-      hint: 'Postayı açın → ↪ İlet. Kime: ahmet@ornek.com. “Bilgi / Gizli” düğmesine basıp Bilgi (Cc) kutusuna elif@ornek.com yazın.',
+      hint: 'Postayı açın → İlet. Kime: ahmet@ornek.com. “Bilgi / Gizli” düğmesine basıp Bilgi (Cc) kutusuna elif@ornek.com yazın.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send' || keyOf(c, ev.forwardOf) !== 'eczane') return false;
         const to = ev.toList.map(lower), cc = ev.cc.map(lower);
@@ -53,13 +53,13 @@ export const epostaParkur = {
       if (ev.type === 'mail-link') c.warn('Sahte postadaki bağlantıya tıkladınız! Gerçek hayatta bu tehlikeli olurdu. Postayı silin.');
       return (ev.type === 'mail-delete' || ev.type === 'mail-spam') && ev.key === 'banka';
     } },
-    { title: '7. Kaçan posta', html: '<p>Belediyenin <b>su kesintisi</b> duyurusu yanlışlıkla bir yere düşmüş. Bulun ve <b>Gelen Kutusu\'na</b> alın.</p>', hint: 'Soldan ⚠ İstenmeyen klasörüne bakın; postayı açıp ✔ İstenmeyen değil.', on: (ev) => ev.type === 'mail-notspam' && ev.key === 'belediye' },
+    { title: '7. Kaçan posta', html: '<p>Belediyenin <b>su kesintisi</b> duyurusu yanlışlıkla bir yere düşmüş. Bulun ve <b>Gelen Kutusu\'na</b> alın.</p>', hint: 'Soldan Önemsiz E-posta klasörüne bakın; postayı açıp Önemsiz değil.', on: (ev) => ev.type === 'mail-notspam' && ev.key === 'belediye' },
     {
       title: '8. Ekli posta gönderin', html: '<p>Elif\'e yeni bir posta yazın; konusu <b>Çiçekler</b> olsun ve <b>Resimler</b>\'deki <b>çiçekler.jpg</b>\'yi ekleyin.</p>',
-      hint: '✏ Yeni posta → Kime: elif@ornek.com, Konu: Çiçekler → 📎 Dosya ekle → Resimler → çiçekler.jpg → Aç → ➤ Gönder.',
+      hint: 'Yeni posta → Kime: elif@ornek.com, Konu: Çiçekler → Dosya ekle → Resimler → çiçekler.jpg → Aç → Gönder.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send' || !ev.toList.map(lower).includes('elif@ornek.com')) return false;
-        if (!ev.attachments.some((a) => /çiçek/i.test(a))) { c.warn('Posta gitti ama çiçekler.jpg ekli değildi. Yeniden gönderin; 📎 Dosya ekle\'yi kullanın.'); return false; }
+        if (!ev.attachments.some((a) => /çiçek/i.test(a))) { c.warn('Posta gitti ama çiçekler.jpg ekli değildi. Yeniden gönderin; Dosya ekle\'yi kullanın.'); return false; }
         return true;
       },
     },

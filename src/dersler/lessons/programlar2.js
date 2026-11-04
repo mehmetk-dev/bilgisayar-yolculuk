@@ -73,29 +73,29 @@ export const zip = {
 
 export const eposta2 = {
   id: 'eposta2', icon: '👥', title: 'E-posta: kişiler, imza ve istenmeyenler', minutes: 30, stage: 'desktop',
-  desc: 'İstenmeyen klasöründeki postayı kurtarmak, adres defteri, imza oluşturmak.',
+  desc: 'Önemsiz E-posta klasöründeki postayı kurtarmak, adres defteri, imza oluşturmak.',
   summary: [
-    ['⚠ İstenmeyen', 'Şüpheli postalar buraya düşer; ara sıra kontrol edin'],
-    ['✔ İstenmeyen değil', 'Yanlışlıkla oraya düşen postayı Gelen Kutusu\'na alır'],
+    ['Önemsiz E-posta klasörü', 'Şüpheli postalar buraya düşer; ara sıra kontrol edin'],
+    ['Önemsiz değil', 'Yanlışlıkla oraya düşen postayı Gelen Kutusu\'na alır'],
     ['👥 Kişiler', 'Adres defteri: ad ve e-posta adresi'],
     ['Kime: ilk harfler', 'Kayıtlı adres önerilir'],
     ['⚙ Ayarlar → İmza', 'Her postanın sonuna kendiliğinden eklenen yazı'],
   ],
   steps: [
     {
-      title: 'İstenmeyen klasörü',
-      html: '<p><b>✉ E-posta</b>\'yı açın ve soldaki <b>⚠ İstenmeyen</b> klasörüne tıklayın. Buraya şüpheli postalar kendiliğinden düşer.</p><p class="mut">Aynı klasörün adı Gmail\'de <b>Spam</b>, Outlook\'ta <b>Önemsiz E-posta</b>; bu alıştırmadaki programda <b>İstenmeyen</b>. Üçü de aynı işe yarar.</p>',
-      mouse: '🖱 E-posta → İstenmeyen',
+      title: 'Önemsiz E-posta klasörü',
+      html: '<p><b>E-posta</b>\'yı açın ve soldaki <b>Önemsiz E-posta</b> klasörüne tıklayın. Buraya şüpheli postalar kendiliğinden düşer.</p><p class="mut">Aynı klasörün adı Gmail\'de <b>Spam</b>, Outlook\'ta ve bu alıştırmadaki programda <b>Önemsiz E-posta</b>. İkisi de aynı işe yarar.</p>',
+      mouse: '🖱 E-posta → Önemsiz E-posta',
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
       on: (ev) => ev.type === 'mail-folder' && ev.folder === 'spam',
       done: 'İçinde iki posta var: biri gerçekten dolandırıcılık (“1.000.000 TL KAZANDINIZ!!!”), diğeri ise belediyeden gelen gerçek bir duyuru.',
     },
     {
       title: 'Gerçek postayı kurtarın',
-      html: '<p><b>Perşembe günü planlı su kesintisi</b> postasını açın. Gönderen adresi <b>belediye.bel.tr</b> (.bel.tr belediyelere verilir). Üstteki <b>✔ İstenmeyen değil</b>\'e basın.</p>',
-      mouse: '🖱 Su kesintisi postası → İstenmeyen değil',
+      html: '<p><b>Perşembe günü planlı su kesintisi</b> postasını açın. Gönderen adresi <b>belediye.bel.tr</b> (.bel.tr belediyelere verilir). Üstteki <b>Önemsiz değil</b>\'e basın.</p>',
+      mouse: '🖱 Su kesintisi postası → Önemsiz değil',
       on: (ev) => ev.type === 'mail-notspam' && ev.key === 'belediye',
-      done: 'Posta Gelen Kutusu\'na taşındı. Önemli bir posta bekliyorsanız ve gelmediyse önce İstenmeyen klasörüne bakın.',
+      done: 'Posta Gelen Kutusu\'na taşındı. Önemli bir posta bekliyorsanız ve gelmediyse önce Önemsiz E-posta klasörüne bakın.',
     },
     {
       title: 'Kişi ekleyin',
@@ -113,7 +113,7 @@ export const eposta2 = {
     },
     {
       title: 'Kayıtlı kişiye yazın',
-      html: '<p><b>✏ Yeni posta</b>\'ya basın. <b>Kime</b> kutusuna yalnızca <b>fat</b> yazın ve çıkan öneriden Fatma Teyze\'nin adresini seçin. Konuya <b>Merhaba</b> yazın. Metne kısa bir selam yazın: mesajınızı imzanın üstüne yazın, imza altta kalsın. Sonra gönderin.</p>',
+      html: '<p><b>Yeni posta</b>\'ya basın. <b>Kime</b> kutusuna yalnızca <b>fat</b> yazın ve çıkan öneriden Fatma Teyze\'nin adresini seçin. Konuya <b>Merhaba</b> yazın. Metne kısa bir selam yazın: mesajınızı imzanın üstüne yazın, imza altta kalsın. Sonra gönderin.</p>',
       mouse: '🖱 Yeni posta → Kime: fat… → öneri',
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
@@ -140,7 +140,7 @@ export const bulutPaylas = {
   steps: [
     {
       title: 'Video e-postaya sığmıyor',
-      html: '<p>Torununuz Elif\'in düğün videosunu ona göndermek istiyorsunuz. <b>✉ E-posta</b>\'yı açın, <b>✏ Yeni posta</b>, <b>Kime</b>: elif@ornek.com. <b>📎 Dosya ekle</b> ile <b>Resimler</b>\'deki <b>torunumun düğünü.mp4</b>\'ü ekleyip <b>Gönder</b>\'e basın.</p>',
+      html: '<p>Torununuz Elif\'in düğün videosunu ona göndermek istiyorsunuz. <b>E-posta</b>\'yı açın, <b>Yeni posta</b>, <b>Kime</b>: elif@ornek.com. <b>Dosya ekle</b> ile <b>Resimler</b>\'deki <b>torunumun düğünü.mp4</b>\'ü ekleyip <b>Gönder</b>\'e basın.</p>',
       mouse: '🖱 E-posta → Yeni posta → Dosya ekle → Gönder',
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
       on: (ev) => ev.type === 'mail-too-big',
@@ -173,7 +173,7 @@ export const bulutPaylas = {
     },
     {
       title: 'Postaya yapıştırıp gönderin',
-      html: `<p>Görev çubuğundan <b>✉ E-posta</b> penceresine dönün. Ekteki videoyu <b>✕</b> ile çıkarın. Metin kutusuna tıklayıp ${K('Ctrl', 'V')} ile bağlantıyı yapıştırın, konuya <b>Düğün videosu</b> yazıp <b>Gönder</b>.</p>`,
+      html: `<p>Görev çubuğundan <b>E-posta</b> penceresine dönün. Ekteki videoyu <b>✕</b> ile çıkarın. Metin kutusuna tıklayıp ${K('Ctrl', 'V')} ile bağlantıyı yapıştırın, konuya <b>Düğün videosu</b> yazıp <b>Gönder</b>.</p>`,
       combo: ['Ctrl', 'KeyV'],
       hint: 'Posta penceresini kapattıysanız yeniden açıp Yeni posta yazın. Bağlantıyı yapıştıramazsanız Bulut Depo\'daki “✉ E-postayla gönder” düğmesini kullanın.',
       on: (ev, c) => {

@@ -1,5 +1,5 @@
 // 9. hafta ek dersi: e-posta kutusu doldu! Arama çubuğuyla eski postayı bulmak (kelime, ek:var, kimden:),
-// bültenlerden “Abonelikten çık” ile kurtulmak, büyük ekli postaları silip Çöp Kutusu'nu boşaltarak yer açmak.
+// bültenlerden “Abonelikten çık” ile kurtulmak, büyük ekli postaları silip Silinmiş Öğeler klasörünü boşaltarak yer açmak.
 import { desktopReady, maxed } from './common.js';
 import { rehberSoru } from './kalip.js';
 import { deliverMail, mailBox, QUOTA } from '../apps/mail.js';
@@ -22,7 +22,7 @@ function kur(c) {
   posta({ key: 'buyuk4', from: 'elif@ornek.com', fromName: 'Elif (torunum)', subject: 'Bayram fotoğrafları (hepsi)', time: '12.04.2024', body: 'Bütün fotoğraflar zip içinde.', attachments: [{ name: 'bayram fotoğrafları.zip', size: 21 * MB, content: { zip: [] } }] });
   posta({ key: 'buyuk5', from: 'ahmet@ornek.com', fromName: 'Ahmet (oğlum)', subject: 'Tatil fotoğrafları', time: '25.08.2024', body: 'Tatilden hepsi.', attachments: [{ name: 'tatil.zip', size: 22 * MB, content: { zip: [] } }] });
   posta({ key: 'fat2026', from: 'fatura@elektrik-dagitim.com.tr', fromName: 'Elektrik Dağıtım', subject: 'Eylül 2026 elektrik faturanız', time: '12.09.2026', body: 'Eylül 2026 faturanız: 988,40 TL', attachments: [{ name: 'eylül 2026 elektrik faturası.pdf', size: 186e3 }] });
-  // Kutu neredeyse dolu: büyükler silinip Çöp Kutusu boşaltılınca %99'un altına iner
+  // Kutu neredeyse dolu: büyükler silinip Silinmiş Öğeler boşaltılınca %99'un altına iner
   const mb = mailBox(d);
   mb.storageBase = 0;
   const now = mb.mails.reduce((t, m) => t + 30e3 + m.attachments.reduce((a, x) => a + (x.size || 0), 0), 0);
@@ -40,7 +40,7 @@ export const epostaTemizlik = {
     ['kimden:ad', 'Bir kişinin ya da firmanın postaları (Gmail\'de: from:ad)'],
     ['büyük:10mb', 'Ekleri 10 MB\'tan büyük olanlar (Gmail\'de: larger:10M)'],
     ['Abonelikten çık', 'Reklam bültenleri bir daha gelmez; postanın üstündeki düğmeyi kullanın'],
-    ['Çöp Kutusu\'nu boşaltın', 'Silinen posta boşaltılana kadar yer kaplamaya devam eder'],
+    ['Silinmiş Öğeler\'i boşaltın', 'Silinen posta boşaltılana kadar yer kaplamaya devam eder'],
   ],
   setup: kur,
   steps: [
@@ -99,14 +99,14 @@ export const epostaTemizlik = {
     },
     {
       title: 'Büyükleri silin',
-      html: '<p>Listenin üstündeki <b>🗑 Bulunan … postanın hepsini sil</b> düğmesine basın.</p>',
+      html: '<p>Listenin üstündeki <b>Bulunan … postanın hepsini sil</b> düğmesine basın.</p>',
       hint: 'Düğme, “Arama: büyük:10mb” başlığının hemen altında. Göremiyorsanız aramayı yeniden yapın.',
       on: (ev) => ev.type === 'mail-delete-many' && ev.size > 50e6,
-      done: 'Postalar Çöp Kutusu\'na taşındı. Ama sol alttaki çubuğa bakın: hâlâ kırmızı!',
+      done: 'Postalar Silinmiş Öğeler\'e taşındı. Ama sol alttaki çubuğa bakın: hâlâ kırmızı!',
     },
     {
-      title: 'Çöp Kutusu\'nu boşaltın',
-      html: '<p>Silinen postalar Çöp Kutusu\'nda 30 gün bekler ve <b>yer kaplamaya devam eder</b>. Soldan <b>🗑 Çöp Kutusu</b>\'na girin, <b>Çöp Kutusunu şimdi boşalt</b>\'a basıp onaylayın.</p>',
+      title: 'Silinmiş Öğeler\'i boşaltın',
+      html: '<p>Silinen postalar Silinmiş Öğeler klasöründe 30 gün bekler ve <b>yer kaplamaya devam eder</b>. Soldan <b>Silinmiş Öğeler</b> klasörüne girin, <b>Klasörü boşalt</b>\'a basıp onaylayın.</p>',
       check: (c) => usedNow(c) / QUOTA < 0.99,
       on: (ev, c) => ev.type === 'mail-empty-trash' && usedNow(c) / QUOTA < 0.99,
       done: (c) => `Yer açıldı: ${(usedNow(c) / 1e9).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} GB. Çubuk artık kırmızı değil; yeni postalar gelebilir.`,
@@ -114,9 +114,9 @@ export const epostaTemizlik = {
     rehberSoru({
       title: 'Dikkat: sahte bülten',
       html: '<p>Tanımadığınız, <b>“Hesabınızı doğrulayın”</b> diyen şüpheli bir postanın en altında “abonelikten çıkmak için tıklayın” bağlantısı var. Ne yaparsınız?</p>',
-      opts: ['Bağlantıya tıklayıp abonelikten çıkarım', 'Tıklamam; postayı İstenmeyen\'e taşırım', 'Cevap yazıp beni listeden çıkarın derim'], ok: 1,
+      opts: ['Bağlantıya tıklayıp abonelikten çıkarım', 'Tıklamam; postayı Önemsiz E-posta\'ya taşırım', 'Cevap yazıp beni listeden çıkarın derim'], ok: 1,
       wrong: 'Dolandırıcı postadaki bağlantı ya da cevap, adresinizin gerçek olduğunu onlara bildirir.',
-      why: 'Doğru. “Abonelikten çık” yalnızca tanıdığınız firmaların bültenlerinde güvenlidir. Şüpheli postayı İstenmeyen\'e taşıyın.',
+      why: 'Doğru. “Abonelikten çık” yalnızca tanıdığınız firmaların bültenlerinde güvenlidir. Şüpheli postayı Önemsiz E-posta\'ya taşıyın.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Posta kutunuzu düzenli tutabiliyorsunuz:</p>' },
   ],

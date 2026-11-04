@@ -15,10 +15,10 @@ export const eposta = {
     ['📎', 'Postada ek (dosya) var'],
     ['⬇ İndir', 'Eki bilgisayara kaydeder (İndirilenler klasörü)'],
     ['İndirilenler', 'Her indirme önce buraya düşer; önemli belgeyi kendi klasörünüze taşıyın'],
-    ['↩ Yanıtla', 'Gönderene cevap; Kime kutusu kendiliğinden dolar'],
-    ['↪ İlet', 'Postayı başka birine gönder'],
-    ['📎 Dosya ekle', 'Postaya fotoğraf ya da belge ekler'],
-    ['⚠ İstenmeyen', 'Sahte ve reklam postaları; bağlantısına tıklamayın'],
+    ['Yanıtla', 'Gönderene cevap; Kime kutusu kendiliğinden dolar'],
+    ['İlet', 'Postayı başka birine gönder'],
+    ['Dosya ekle', 'Postaya fotoğraf ya da belge ekler'],
+    ['Önemsiz', 'Sahte ve reklam postaları; bağlantısına tıklamayın'],
   ],
   steps: [
     {
@@ -77,37 +77,37 @@ export const eposta = {
     {
       title: 'Yanıtlayın',
       setup: mailOpen,
-      html: `<ol class="steps"><li>Üstteki <b>↩ Yanıtla</b> düğmesine tıklayın. <b>Kime</b> ve <b>Konu</b> kendiliğinden dolar.</li>
+      html: `<ol class="steps"><li>Üstteki <b>Yanıtla</b> düğmesine tıklayın. <b>Kime</b> ve <b>Konu</b> kendiliğinden dolar.</li>
         <li>Büyük beyaz alanın <b>en üstüne</b> kısa bir cevap yazın, örneğin: <b>Teşekkürler Elif, fotoğraf çok güzel!</b></li>
-        <li><b>➤ Gönder</b>'e tıklayın.</li></ol>`,
+        <li><b>Gönder</b>'e tıklayın.</li></ol>`,
       hint: 'Mesaj alanında alttaki çizgili kısım Elif\'in eski postasıdır; ona dokunmayın, cevabınızı onun üstüne yazın.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
-        if (ev.replyKey !== 'elif') { c.warn('Posta gönderildi ama bu, Elif\'in postasına bir yanıt değil. Elif\'in postasını açıp ↩ Yanıtla\'ya tıklayın.'); return false; }
-        if (ownText(ev.body).length < 3) { c.warn('Yanıt gitti ama içine bir şey yazmamışsınız. Bir daha deneyin: Elif\'in postasını açın, ↩ Yanıtla, kısa bir cevap yazın.'); return false; }
+        if (ev.replyKey !== 'elif') { c.warn('Posta gönderildi ama bu, Elif\'in postasına bir yanıt değil. Elif\'in postasını açıp Yanıtla\'ya tıklayın.'); return false; }
+        if (ownText(ev.body).length < 3) { c.warn('Yanıt gitti ama içine bir şey yazmamışsınız. Bir daha deneyin: Elif\'in postasını açın, Yanıtla, kısa bir cevap yazın.'); return false; }
         return true;
       },
-      done: 'Yanıtınız gönderildi. Gönderdiğiniz postalar soldaki <b>📤 Gönderilenler</b> klasöründe durur.',
+      done: 'Yanıtınız gönderildi. Gönderdiğiniz postalar soldaki <b>Gönderilmiş Öğeler</b> klasöründe durur.',
     },
     {
       title: 'Cevap geldi',
-      html: '<p>Birkaç saniye içinde Elif cevap yazacak. Ekranın sağ altında “Yeni posta” bildirimi çıkınca <b>📥 Gelen Kutusu</b>\'na tıklayın ve en üstteki yeni postayı açın.</p>',
+      html: '<p>Birkaç saniye içinde Elif cevap yazacak. Ekranın sağ altında “Yeni posta” bildirimi çıkınca <b>Gelen Kutusu</b>\'na tıklayın ve en üstteki yeni postayı açın.</p>',
       mouse: '🖱 Gelen Kutusu → yeni posta',
       on: (ev) => ev.type === 'mail-open' && !!ev.replyOf,
       done: 'Elif sizden bir fotoğraf istiyor. Şimdi postaya fotoğraf ekleyeceğiz.',
     },
     {
       title: 'Fotoğraf gönderin',
-      html: `<ol class="steps"><li>Soldaki <b>✏ Yeni posta</b>'ya tıklayın.</li><li><b>Kime</b>: <b>elif@ornek.com</b></li><li><b>Konu</b>: <b>Bahçemiz</b></li>
-        <li><b>📎 Dosya ekle</b>'ye tıklayın, <b>Resimler</b> klasöründen <b>çiçekler.jpg</b>'yi seçip <b>Aç</b>'a basın.</li><li>Kısa bir mesaj yazıp <b>➤ Gönder</b>.</li></ol>`,
+      html: `<ol class="steps"><li>Soldaki <b>Yeni posta</b>'ya tıklayın.</li><li><b>Kime</b>: <b>elif@ornek.com</b></li><li><b>Konu</b>: <b>Bahçemiz</b></li>
+        <li><b>Dosya ekle</b>'ye tıklayın, <b>Resimler</b> klasöründen <b>çiçekler.jpg</b>'yi seçip <b>Aç</b>'a basın.</li><li>Kısa bir mesaj yazıp <b>Gönder</b>.</li></ol>`,
       hint: `@ işareti için ${K('AltGr', 'Q')}. Adreste Türkçe harf yok: elif@ornek.com. Dosya seçme penceresinde soldan “Resimler”e tıklayın.`,
       on: (ev, c) => {
         if (ev.type === 'mail-attach') c.note(`Eklendi: <b>${ev.name}</b>. Şimdi mesajınızı yazıp Gönder'e basın.`);
         if (ev.type !== 'mail-send' || ev.to.toLowerCase() !== 'elif@ornek.com') return false;
-        if (!ev.attachments.includes('çiçekler.jpg')) { c.warn('Posta gitti ama içinde çiçekler.jpg yok. Yeni bir posta açıp önce 📎 Dosya ekle\'ye tıklayın.'); return false; }
+        if (!ev.attachments.includes('çiçekler.jpg')) { c.warn('Posta gitti ama içinde çiçekler.jpg yok. Yeni bir posta açıp önce Dosya ekle\'ye tıklayın.'); return false; }
         return true;
       },
-      done: 'Ekli postanız gönderildi. Fotoğraf, belge, fatura… her türlü dosya böyle gönderilir. Gönderdiğiniz postanın bir kopyası <b>📤 Gönderilenler</b> klasöründe durur (Gmail\'de “Gönderilmiş”, Outlook\'ta “Gönderilmiş Öğeler”). Postanın gidip gitmediğinden emin olmak için oraya bakın. Gmail\'de gönderdikten hemen sonra altta kısa süre <b>Geri al</b> çıkar; yanlış gönderdiyseniz hemen basın. E-postalarda ek boyutu sınırlıdır (yaklaşık 20–25 MB); çok fotoğraf ya da video sığmayabilir.',
+      done: 'Ekli postanız gönderildi. Fotoğraf, belge, fatura… her türlü dosya böyle gönderilir. Gönderdiğiniz postanın bir kopyası <b>Gönderilmiş Öğeler</b> klasöründe durur (Gmail\'de “Gönderilmiş”, Outlook\'ta “Gönderilmiş Öğeler”). Postanın gidip gitmediğinden emin olmak için oraya bakın. Gmail\'de gönderdikten hemen sonra altta kısa süre <b>Geri al</b> çıkar; yanlış gönderdiyseniz hemen basın. E-postalarda ek boyutu sınırlıdır (yaklaşık 20–25 MB); çok fotoğraf ya da video sığmayabilir.',
     },
     rehberSoru({
       title: 'Hangi adres doğru?',
@@ -119,13 +119,13 @@ export const eposta = {
     {
       title: 'Sahte posta',
       html: `<p>Gelen Kutusu'nda <b>“ACİL: Hesabınız askıya alındı!”</b> diye bir posta var. Açıp okuyun.</p>
-        <p>Bu bir <b>dolandırıcılık</b> postasıdır: bankalar e-postayla şifre ya da kart numarası istemez. Bağlantısına <b>tıklamayın</b>; üstteki <b>⚠ İstenmeyen</b> düğmesine basın.</p>`,
-      mouse: '🖱 Postayı açın → ⚠ İstenmeyen',
+        <p>Bu bir <b>dolandırıcılık</b> postasıdır: bankalar e-postayla şifre ya da kart numarası istemez. Bağlantısına <b>tıklamayın</b>; üstteki <b>Önemsiz</b> düğmesine basın.</p>`,
+      mouse: '🖱 Postayı açın → Önemsiz',
       hint: 'Gönderenin adresine bakın: bankaniz-dogrulama.xyz. Gerçek bir bankanın adresi değil. Gönderenin yazan adı (“Banka”) kolayca taklit edilir; asıl adrese bakın.',
       setup: (c) => { if (!c.d.find('mail')) mailOpen(c); },
       on: (ev, c) => {
-        if (ev.type === 'mail-link') c.warn('Gerçek hayatta bu bağlantıya tıklamak tehlikelidir! Sahte bir siteye gider ve şifrenizi çalabilir. Şimdi ⚠ İstenmeyen\'e basın.');
-        if (ev.type === 'mail-open' && ev.key === 'banka') c.note('Gönderenin adresine bakın: <b>bankaniz-dogrulama.xyz</b>. Şimdi ⚠ İstenmeyen\'e basın.');
+        if (ev.type === 'mail-link') c.warn('Gerçek hayatta bu bağlantıya tıklamak tehlikelidir! Sahte bir siteye gider ve şifrenizi çalabilir. Şimdi Önemsiz\'e basın.');
+        if (ev.type === 'mail-open' && ev.key === 'banka') c.note('Gönderenin adresine bakın: <b>bankaniz-dogrulama.xyz</b>. Şimdi Önemsiz\'e basın.');
         return (ev.type === 'mail-spam' || ev.type === 'mail-delete') && ev.key === 'banka';
       },
       done: 'Sahte posta kaldırıldı. Şüphelendiğiniz bir postada bankanızı <b>kartın arkasındaki numaradan</b> kendiniz arayın. Bir ipucu daha: bağlantıya <b>tıklamadan</b> farenin okunu üstüne getirirseniz ekranın alt köşesinde bağlantının gerçek adresi görünür. Yazıda “bankam.com.tr” diyor ama altta başka bir şey yazıyorsa tıklamayın. Bankanın sitesini adresi kendiniz yazarak açın.',
@@ -133,7 +133,7 @@ export const eposta = {
     {
       title: 'Hocanıza yazın',
       html: '<p>Şimdi kendi başınıza: hocanıza bir posta gönderin. Adresi: <b>hoca@ornek.com</b></p><p>Konuya ve mesaja ne yazacağınız size kalmış.</p>',
-      hint: 'Soldaki ✏ Yeni posta → Kime, Konu, mesaj → ➤ Gönder.',
+      hint: 'Soldaki Yeni posta → Kime, Konu, mesaj → Gönder.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
         if (ev.to.toLowerCase() !== 'hoca@ornek.com') { c.warn(`Posta <b>${ev.to}</b> adresine gitti. Hocanın adresi: hoca@ornek.com`); return false; }
