@@ -196,7 +196,7 @@ export const guvenlikParkur = {
     },
     {
       title: '8. Kafe ağı', html: '<p><b>Kafe_Ücretsiz</b> ağına bağlanıp onu <b>Ortak ağ</b> yapın; sonra bağlantıyı kesin.</p>',
-      hint: 'Başlat → Ayarlar → Ağ ve İnternet → Kafe_Ücretsiz → Bağlan → Yine de bağlan → Hayır (Ortak ağ) → Bağlantıyı kes.',
+      hint: 'Başlat → Ayarlar → Ağ ve internet → Kafe_Ücretsiz → Bağlan → Yine de bağlan → Hayır (Ortak ağ) → Bağlantıyı kes.',
       on: (ev, c) => {
         if (ev.type === 'net-profile' && ev.name === 'Kafe_Ücretsiz') c.s.prof = ev.profile;
         if (ev.type !== 'wifi-disconnect' || ev.name !== 'Kafe_Ücretsiz') return false;

@@ -71,7 +71,7 @@ export const denetimMasasi = {
     },
     {
       title: 'Kaldırın',
-      html: '<p>Üstteki <b>🗑 Kaldır</b>\'a tıklayın. “Emin misiniz?” sorusuna <b>Evet</b> deyin.</p>',
+      html: '<p>Üstteki <b>Kaldır</b>\'a tıklayın. “Emin misiniz?” sorusuna <b>Evet</b> deyin.</p>',
       mouse: '🖱 Kaldır → Evet',
       on: (ev) => ev.type === 'uninstall' && ev.via === 'cp' && ev.app === 'hava',
       done: 'Hava Durumu kaldırıldı ve listeden silindi. Programı yalnızca <b>ne işe yaradığını bildiğiniz</b> ve artık kullanmadığınız zaman kaldırın. Windows\'un kendi parçalarına dokunmayın.',
