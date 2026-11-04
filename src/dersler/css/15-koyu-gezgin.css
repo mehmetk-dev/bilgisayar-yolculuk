@@ -6,33 +6,9 @@
 .dk-dark .win[data-app="explorer"] .gx-tabs .gx-tabx:hover, .dk-dark .win[data-app="explorer"] .gx-tabs .gx-tabn:hover { background: #ffffff26; }
 .dk-dark .ex .gx-c.ex-hl { background: #5a4a14; color: #fff; }
 /* Ayarlar */
-.dk-dark .st input:not([type=range]):not([type=checkbox]):not([type=radio]), .dk-dark .st select { background: #333; color: #eee; border-color: #555; }
-.dk-dark .st-tog b, .dk-dark .st-dl dt, .dk-dark .st-clock small, .dk-dark .st-upd small, .dk-dark .st-none { color: #bbb; }
-.dk-dark .st-tog i { border-color: #aaa; }
-.dk-dark .st-tog i::after { background: #ccc; }
-.dk-dark .st-item.con { background: #2f4a6b; }
-.dk-dark .st-warn { background: #4a3c1a; color: #f3e2b0; }
-.dk-dark .st-sample { background: #333; color: #eee; }
-.dk-dark .st-err { color: #ff8a8a; }
+ .dk-dark .st-dl dt, .dk-dark .st-none  { color: #bbb; }
 /* Denetim Masası */
-.dk-dark .cp { background: #202020; color: #eee; }
-.dk-dark .cp-top { background: #2b2b2b; border-color: #444; }
-.dk-dark .cp-top > button, .dk-dark .cp-search button { color: #eee; }
-.dk-dark .cp-addr, .dk-dark .cp-search, .dk-dark .cp input, .dk-dark .cp select { background: #333; color: #eee; border-color: #555; }
-.dk-dark .cp-addr i, .dk-dark .cp-view, .dk-dark .cp-row small, .dk-dark .cp-note, .dk-dark .cp-tbl th, .dk-dark .cp-box dt, .dk-dark .cp-plans small { color: #bbb; }
-.dk-dark .cp-addr a, .dk-dark .cp a { color: #8cb8ff; }
-.dk-dark .cp-main h2, .dk-dark .cp-box h3 { color: #a8c8ff; }
-.dk-dark .cp-bar button { background: #3a3a3a; color: #eee; border-color: #555; }
-.dk-dark .cp-tbl th { border-color: #444; }
-.dk-dark .cp-tbl tr[data-prog]:hover td { background: #333; }
-.dk-dark .cp-tbl tr.on td { background: #2f4a6b; }
 /* Aygıt Yöneticisi */
-.dk-dark .dm-bar { color: #ddd; border-color: #444; }
-.dk-dark .dm-head { color: #eee; }
-.dk-dark .dm-head:hover { background: #333; }
-.dk-dark .dm-item.warn { color: #ffc266; }
-.dk-dark .dm-item.sel { background: #2f4a6b; }
-.dk-dark .dm-prog { background: #2b2b2b; color: #eee; border-color: #555; }
 /* Görev Yöneticisi */
 .dk-dark .tm-t th small { color: #eee; }
 .dk-dark .tm-t th.tm-sort:hover { background: #333; }
@@ -75,6 +51,6 @@
 .dk-dark .dlg-err { color: #ff8a8a; }
 .dk-dark .dlg-pvnote.ok { background: #1f3d24; }
 .dk-dark .dlg-pvnote .bad { color: #ffab70; }
-.dk-dark .st-about dt, .dk-dark .kp-sys dt { color: #bbb; }
+ .dk-dark .kp-sys dt  { color: #bbb; }
 .dk-dark .tm-t td[style] { box-shadow: inset 0 0 0 99em #0000008c; }
 .dk-dark .su button:not(.primary) { background: #3a3a3a; color: #eee; border-color: #555; }

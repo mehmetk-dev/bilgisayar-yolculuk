@@ -53,7 +53,7 @@ export const kisiselVeri = {
     }),
     {
       title: 'Kafede Wi-Fi',
-      html: `<p>Şimdi bir kafede (ya da hastane bekleme salonunda) olduğunuzu düşünün. <b>⚙ Ayarlar → 📶 Ağ ve İnternet</b> sayfası açık. Listede <b>${KAFE}</b> var; yanında “Açık ağ” yazıyor. <b>Bağlan</b>'a basın, uyarıyı okuyun ve <b>Yine de bağlan</b>.</p>`,
+      html: `<p>Şimdi bir kafede (ya da hastane bekleme salonunda) olduğunuzu düşünün. <b>⚙ Ayarlar → 📶 Ağ ve internet</b> sayfası açık. Listede <b>${KAFE}</b> var; yanında “Açık ağ” yazıyor. <b>Bağlan</b>'a basın, uyarıyı okuyun ve <b>Yine de bağlan</b>.</p>`,
       hint: 'Açık ağ şifre istemez. Şifresizse herkes bağlanabilir ve gönderdikleriniz başkalarınca görülebilir.',
       setup: (c) => { if (c.d.settings.network !== KAFE) { c.d.settings.network = null; c.d.applySettings(); } settingsNet(c); },
       on: (ev) => ev.type === 'wifi-connect' && ev.ok && ev.name === KAFE,

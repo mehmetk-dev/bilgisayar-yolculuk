@@ -102,7 +102,7 @@ export const internetKesildi = {
     },
     {
       title: 'Bilgisayarı telefona bağlayın',
-      html: `<p>Bilgisayardan bu ağa bağlanın: <b>⚙ Ayarlar → Ağ ve İnternet</b>. Listede <b>📱 ${HOTSPOT.name}</b> çıktı. <b>Bağlan</b>'a basın, telefondaki şifreyi yazıp <b>İleri</b>.</p>`,
+      html: `<p>Bilgisayardan bu ağa bağlanın: <b>⚙ Ayarlar → Ağ ve internet</b>. Listede <b>📱 ${HOTSPOT.name}</b> çıktı. <b>Bağlan</b>'a basın, telefondaki şifreyi yazıp <b>İleri</b>.</p>`,
       hint: `Şifre telefonun ekranında: ${HOTSPOT.pass}. Telefon ya da modem pencereyi kapatıyorsa üstlerindeki ▾ Küçült düğmesine basın. Ayarlar'ı Başlat menüsünden ya da sağ alttaki simge → Tüm ayarlar'dan açabilirsiniz.`,
       check: (c) => c.d.settings.network === HOTSPOT.name,
       on: (ev, c) => {

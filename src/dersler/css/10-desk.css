@@ -267,12 +267,11 @@
 .dk-dark .qk-row button { background: #3a3a3a; }
 .dk-dark .win { border-color: #555; }
 /* Windows'un kendi uygulamaları da koyulaşır: Ayarlar, Dosya Gezgini, Görev Yöneticisi, Mağaza, Takvim, Hava Durumu */
-.dk-dark .st, .dk-dark .tm, .dk-dark .ms, .dk-dark .tk, .dk-dark .hv, .dk-dark .dm { background: #202020; color: #eee; }
-.dk-dark .st-page section, .dk-dark .st-nav button.on, .dk-dark .tm-nav button.on, .dk-dark .ms-nav button.on, .dk-dark .ms-card, .dk-dark .ms-page section, .dk-dark .ms-row, .dk-dark .tm-main, .dk-dark .tk-day { background: #2b2b2b; border-color: #3a3a3a; color: #eee; }
-.dk-dark .st-nav button:hover, .dk-dark .tm-nav button:hover, .dk-dark .ms-nav button:hover { background: #333; }
-.dk-dark .st-btn, .dk-dark .ms-btn, .dk-dark .tm-btn, .dk-dark .ms-q, .dk-dark .tk-head button, .dk-dark .tk-note, .dk-dark .hv-city { background: #3a3a3a; color: #eee; border-color: #555 !important; }
-.dk-dark .st-item { border-color: #3a3a3a; }
-.dk-dark .st-note, .dk-dark .st-item small, .dk-dark .st-me small, .dk-dark .ms-card small, .dk-dark .ms-mut, .dk-dark .tm-boot small { color: #aaa; }
+ .dk-dark .tm, .dk-dark .ms, .dk-dark .tk, .dk-dark .hv  { background: #202020; color: #eee; }
+ .dk-dark .tm-nav button.on, .dk-dark .ms-nav button.on, .dk-dark .ms-card, .dk-dark .ms-page section, .dk-dark .ms-row, .dk-dark .tm-main, .dk-dark .tk-day  { background: #2b2b2b; border-color: #3a3a3a; color: #eee; }
+ .dk-dark .tm-nav button:hover, .dk-dark .ms-nav button:hover  { background: #333; }
+ .dk-dark .ms-btn, .dk-dark .tm-btn, .dk-dark .ms-q, .dk-dark .tk-head button, .dk-dark .tk-note, .dk-dark .hv-city  { background: #3a3a3a; color: #eee; border-color: #555 !important; }
+ .dk-dark .ms-card small, .dk-dark .ms-mut, .dk-dark .tm-boot small  { color: #aaa; }
 .dk-dark .tm-t th { background: #2b2b2b; color: #ddd; border-color: #3a3a3a; }
 .dk-dark .tm-t td { border-color: #333; color: #eee; }
 .dk-dark .tm-t tr.sel td { background: #2f4a6b !important; }

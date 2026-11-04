@@ -45,12 +45,6 @@
 
 /* Vurgu rengi ve görünüm ayarları: Başlat menüsü ve görev çubuğu, başlık çubuğu, saydamlık */
 .dk { --acc: var(--dk-acc, #0a5dc2); --acc-bg: color-mix(in srgb, var(--dk-acc, #0a5dc2) 14%, #fff); }
-.st-nav button.on { box-shadow: inset 3px 0 0 var(--acc); }
-.st-row input[type="range"] { accent-color: var(--acc); }
-.st-tog input:checked + i { background: var(--acc); border-color: var(--acc); }
-.st-tog input:focus-visible + i { outline-color: var(--acc); }
-.st-btn.primary { background: var(--acc); border-color: var(--acc) !important; }
-.st-item.con { border-color: var(--acc); background: var(--acc-bg); }
 .dk-acctitle .win.active .win-bar { background: var(--dk-acc); color: #fff; }
 .dk-acctitle .win.active .win-bar button { color: #fff; }
 .dk-acctitle .win.active .win-bar button:hover { background: #ffffff33; }

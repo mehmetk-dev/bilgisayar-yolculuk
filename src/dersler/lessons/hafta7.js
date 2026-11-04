@@ -189,7 +189,7 @@ export const ayarlar = {
   summary: [
     ['Ayarlar → Kişiselleştirme', 'Arka plan, açık/koyu mod'],
     ['Ayarlar → Sistem', 'Ses düzeyi, ekran parlaklığı'],
-    ['Ayarlar → Ağ ve İnternet', 'Wi-Fi açma, ağa bağlanma (şifre modemin altında)'],
+    ['Ayarlar → Ağ ve internet', 'Wi-Fi açma, ağa bağlanma (şifre modemin altında)'],
     ['Ayarlar → Saat ve dil', '“Saati otomatik olarak ayarla” açık olmalı'],
     ['Ayarlar → Erişilebilirlik', 'Metin boyutu: yazıları büyütür'],
     ['Ayarlar → Windows Update', 'Güncelleştirmeleri denetle; ertelemeyin'],
@@ -253,7 +253,7 @@ export const ayarlar = {
     },
     {
       title: 'Wi-Fi\'yi açın',
-      html: '<p>Soldan <b>📶 Ağ ve İnternet</b>\'e gidin. <b>Wi-Fi</b> anahtarı kapalı: tıklayıp açın.</p><p class="mut">Bilgisayarınız modeme kablolu bağlıysa Wi-Fi görünmeyebilir.</p>',
+      html: '<p>Soldan <b>📶 Ağ ve internet</b>\'e gidin. <b>Wi-Fi</b> anahtarı kapalı: tıklayıp açın.</p><p class="mut">Bilgisayarınız modeme kablolu bağlıysa Wi-Fi görünmeyebilir.</p>',
       setup: (c) => c.d.ensure('settings'),
       check: (c) => c.d.settings.wifi,
       on: (ev) => ev.type === 'toggle' && ev.key === 'wifi' && ev.on,

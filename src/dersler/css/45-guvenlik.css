@@ -72,8 +72,6 @@ div.ds-ok { background: #e8f5e9; padding: 0.4em 0.7em; border-radius: 6px; margi
 .ds-msg small { display: block; font-size: 0.75em; color: #778; text-align: right; }
 .ds-send { display: flex; gap: 0.4em; } .ds-send input { flex: 1; }
 /* Ayarlar → Wi-Fi: ağ profili (Ortak / Özel) */
-.st-item > .st-prof { flex: 1 1 100%; flex-direction: row; flex-wrap: wrap; gap: 0.4em; align-items: center; padding: 0.3em 0 0 2.2em; }
-.st-item > .st-prof p { flex-basis: 100%; margin: 0; }
 /* Kelime İşlemci: dipnotlar (sayfanın altında, alt bilginin üstünde) */
 .wd-fnref { color: #1f4e9c; font-weight: 700; padding: 0 0.1em; cursor: default; }
 .wd-fns { width: min(42em, 100%); margin: 0 auto; background: #fff; padding: 0 3em 0.8em; font-family: Calibri, Carlito, "Noto Sans", sans-serif; font-size: 9pt; color: #222; box-shadow: 0 1px 6px #0003; clip-path: inset(0 -10px -10px -10px); }
