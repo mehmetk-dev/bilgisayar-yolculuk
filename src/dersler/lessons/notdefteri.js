@@ -27,7 +27,7 @@ export const notdefteri = {
     ['Ctrl + Y', 'Yinele (geri aldığını geri getir)'],
     ['Ctrl + S', 'Kaydet'],
     ['Ctrl + O', 'Aç (kaydettiğiniz dosyayı)'],
-    ['Dosya → Yeni', 'Boş bir sayfa'],
+    ['Dosya → Yeni sekme', 'Boş bir sayfa'],
     ['Sağ tık', 'Kes, Kopyala, Yapıştır menüsü'],
   ],
   steps: [
@@ -210,9 +210,9 @@ export const notdefteri = {
     },
     {
       title: 'Yeni bir sayfa',
-      html: `<p>Şimdi boş bir sayfa açalım. Not Defteri penceresinin üstündeki <b>Dosya</b> menüsüne tıklayın, sonra <b>Yeni</b>'yi seçin.</p>
+      html: `<p>Şimdi boş bir sayfa açalım. Not Defteri penceresinin üstündeki <b>Dosya</b> menüsüne tıklayın, sonra <b>Yeni sekme</b>'yi seçin.</p>
         <p class="mut">Gerçek Not Defteri'nde ${K('Ctrl', 'N')} de aynı işi yapar. Bu sayfada Ctrl+N tarayıcıda yeni pencere açabileceği için menüyü kullanıyoruz.</p>`,
-      mouse: '🖱 Dosya → Yeni',
+      mouse: '🖱 Dosya → Yeni sekme',
       on: (ev, c) => {
         if (ev.type === 'ask') c.note(ev.answer === 'discard' ? 'Kaydetmeden devam ettiniz.' : 'Tamam.');
         return ev.type === 'new';

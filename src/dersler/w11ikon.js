@@ -1,0 +1,72 @@
+// Windows 11 tarzı çizgi simgeler (Not Defteri, Ekran Alıntısı, Yapışkan Notlar, Ses Kaydedici, Saat, Ekran Klavyesi, Büyüteç).
+// Hepsi satır içi SVG; emoji yok (bazı bilgisayarlarda görünmüyor). Rengi yazı rengi (currentColor) belirler.
+// Kullanım: ico('plus') → <svg class="wico">…</svg>
+const F = 'fill="currentColor" stroke="none"';
+const P = {
+  x: '<path d="M4 4l8 8M12 4l-8 8"/>',
+  plus: '<path d="M8 3v10M3 8h10"/>',
+  minus: '<path d="M3 8h10"/>',
+  maximize: '<rect x="3" y="3" width="10" height="10" rx="1.2"/>',
+  gear: '<circle cx="8" cy="8" r="2.1"/><circle cx="8" cy="8" r="4.4"/><path d="M8 1.6v2M8 12.4v2M1.6 8h2M12.4 8h2M3.5 3.5l1.4 1.4M11.1 11.1l1.4 1.4M12.5 3.5l-1.4 1.4M4.9 11.1l-1.4 1.4"/>',
+  chevR: '<path d="M6 3.5L10.5 8 6 12.5"/>',
+  chevD: '<path d="M3.5 6L8 10.5 12.5 6"/>',
+  chevU: '<path d="M3.5 10L8 5.5 12.5 10"/>',
+  check: '<path d="M3 8.5l3.2 3.2L13 4.8"/>',
+  arrowUp: '<path d="M8 13V3M4 7l4-4 4 4"/>',
+  arrowDown: '<path d="M8 3v10M4 9l4 4 4-4"/>',
+  dots: `<g ${F}><circle cx="3.5" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="12.5" cy="8" r="1.2"/></g>`,
+  notepad: '<rect x="2.5" y="1.8" width="11" height="12.6" rx="1.6" fill="#7cc0f2" stroke="#2f76b8"/><path d="M5 5.2h6M5 8h6M5 10.8h3.6" stroke="#fff"/><path d="M5 1v1.6M8 1v1.6M11 1v1.6" stroke="#2f76b8"/>',
+  search: '<circle cx="7" cy="7" r="4.4"/><path d="M10.3 10.3L14 14"/>',
+  eye: '<path d="M1.5 8c2-3.4 4.2-5 6.5-5s4.5 1.6 6.5 5c-2 3.4-4.2 5-6.5 5S3.5 11.4 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
+  swap: '<path d="M3 5.5h9.5M10 3l2.5 2.5L10 8M13 10.5H3.5M6 8l-2.5 2.5L6 13"/>',
+  // Ekran Alıntısı
+  rect: '<rect x="2.5" y="3.5" width="11" height="9" rx="1" stroke-dasharray="2.2 1.6"/>',
+  window: '<rect x="2.5" y="3" width="11" height="10" rx="1.4"/><path d="M2.5 6h11"/>',
+  screen: '<path d="M2.5 6V3.5H5M11 3.5h2.5V6M13.5 10v2.5H11M5 12.5H2.5V10"/>',
+  free: '<path d="M2.5 10.5c.5-4 2.5-6.5 5-6.5 2.2 0 1.2 3.5 3 3.5 1.4 0 2.2-1.2 2.5-2.5" stroke-dasharray="2.2 1.6"/><path d="M3 13.5h10"/>',
+  timer: '<circle cx="8" cy="9" r="5"/><path d="M8 6.2V9l1.8 1.3M6.3 1.8h3.4"/>',
+  pen: '<path d="M2.8 13.2l.7-3L11 2.7a1.5 1.5 0 012.1 2.1L5.6 12.4z"/><path d="M9.8 4l2.1 2.1"/>',
+  highlighter: '<path d="M9.6 2.6l3.8 3.8-5.4 5.4L4.3 11 4 7.4z"/><path d="M2 14h5"/>',
+  eraser: '<path d="M3 10.5l5.2-6.3 4.6 3.8-3.6 4.5H6z"/><path d="M6 12.5h7.5"/>',
+  save: '<path d="M3 2.5h8.2l2.3 2.3v8.7H3z"/><path d="M5.5 2.5v3.3h5V2.5M5 13.5V9.5h6v4"/>',
+  copy: '<rect x="5.5" y="5.5" width="8" height="8" rx="1.3"/><path d="M10.5 5.5v-2a1 1 0 00-1-1h-6a1 1 0 00-1 1v6a1 1 0 001 1h2"/>',
+  undo: '<path d="M4 6h5.5a3.5 3.5 0 010 7H6M6.5 3.5L4 6l2.5 2.5"/>',
+  redo: '<path d="M12 6H6.5a3.5 3.5 0 000 7H10M9.5 3.5L12 6 9.5 8.5"/>',
+  // Yapışkan Notlar
+  bold: '<path d="M5 3h3.2a2.2 2.2 0 010 4.5H5zM5 7.5h3.8a2.3 2.3 0 010 4.6H5z"/>',
+  italic: '<path d="M7 3h4.5M4.5 13H9M9.8 3l-3.6 10"/>',
+  underline: '<path d="M4.8 2.5v5a3.2 3.2 0 006.4 0v-5M3.5 14h9"/>',
+  strike: '<path d="M2.5 8h11M10.8 4.8c-.4-1.1-1.4-1.8-2.9-1.8-1.7 0-3 .9-3 2.2 0 1.1.8 1.7 2 2M5.2 11.3c.5 1 1.6 1.7 3 1.7 1.8 0 3-.9 3-2.2"/>',
+  list: `<path d="M6.2 4h7M6.2 8h7M6.2 12h7"/><g ${F}><circle cx="3" cy="4" r="1"/><circle cx="3" cy="8" r="1"/><circle cx="3" cy="12" r="1"/></g>`,
+  image: '<rect x="2.5" y="3" width="11" height="10" rx="1.4"/><path d="M2.8 11.5l3.2-3.2 2.5 2.5 1.6-1.6 3 3"/><circle cx="10.5" cy="6.2" r="1"/>',
+  trash: '<path d="M2.8 4.5h10.4M6.3 4.5V3h3.4v1.5M4.2 4.5l.7 8.8h6.2l.7-8.8M6.8 7v4M9.2 7v4"/>',
+  palette: '<path d="M8 2a6 6 0 100 12c1 0 1.4-.7 1.1-1.5-.4-1 .2-1.8 1.2-1.8H12a2 2 0 002-2C14 4.9 11.4 2 8 2z"/><g ' + F + '><circle cx="5" cy="7" r="1"/><circle cx="8" cy="5" r="1"/><circle cx="11" cy="7" r="1"/></g>',
+  note: '<path d="M3 2.5h10v7.5l-3.5 3.5H3z"/><path d="M13 10H9.5v3.5"/>',
+  // Ses Kaydedici
+  mic: '<rect x="6" y="1.5" width="4" height="8" rx="2"/><path d="M3.5 7.5a4.5 4.5 0 009 0M8 12v2.5M5.5 14.5h5"/>',
+  record: `<circle cx="8" cy="8" r="5.5" ${F}/>`,
+  stop: `<rect x="3.5" y="3.5" width="9" height="9" rx="1.5" ${F}/>`,
+  play: `<path d="M4.5 2.8l8.5 5.2-8.5 5.2z" ${F}/>`,
+  pause: `<g ${F}><rect x="3.8" y="3" width="3" height="10" rx="1"/><rect x="9.2" y="3" width="3" height="10" rx="1"/></g>`,
+  flag: '<path d="M4 14.5V2M4 2.8h8.2l-2 3.2 2 3.2H4"/>',
+  share: '<path d="M8 10V2.5M5 5l3-2.5L11 5M3.5 8.5v5h9v-5"/>',
+  edit: '<path d="M3 13l.7-3L11 2.7a1.5 1.5 0 012.1 2.1L5.8 12.3z"/>',
+  // Saat
+  focus: '<circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.6"/><circle cx="8" cy="8" r=".6" ' + F + '/>',
+  hourglass: '<path d="M4 2h8M4 14h8M4.8 2c0 3.2 3.2 3.8 3.2 6s-3.2 2.8-3.2 6M11.2 2c0 3.2-3.2 3.8-3.2 6s3.2 2.8 3.2 6"/>',
+  bell: '<path d="M8 2a4 4 0 00-4 4v2.5L2.8 11h10.4L12 8.5V6a4 4 0 00-4-4zM6.5 13a1.6 1.6 0 003 0"/>',
+  stopwatch: '<circle cx="8" cy="9" r="5.2"/><path d="M8 5.8v3.4l2 1.2M6.5 1.8h3M12.3 3.6l.9.9"/>',
+  globe: '<circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c2 2 2.5 4 2.5 6S10 12 8 14C6 12 5.5 10 5.5 8S6 4 8 2z"/>',
+  reset: '<path d="M3 3.5v3.3h3.3M3.4 6.4A5.2 5.2 0 118 13.2"/>',
+  // Ekran Klavyesi
+  backspace: '<path d="M5.8 3.5h7.7v9H5.8L2 8z"/><path d="M8.2 6l3 4M11.2 6l-3 4"/>',
+  shift: '<path d="M8 2.5l5.5 5.8h-3.2v4.7H5.7V8.3H2.5z"/>',
+  enter: '<path d="M13 3v5.2H4.2M6.8 5.6L4.2 8.2l2.6 2.6"/>',
+  tab: '<path d="M2.5 8h9M8.5 5l3 3-3 3M13.5 3.5v9"/>',
+  winlogo: `<g ${F}><rect x="2.5" y="2.5" width="5" height="5" rx=".6"/><rect x="8.5" y="2.5" width="5" height="5" rx=".6"/><rect x="2.5" y="8.5" width="5" height="5" rx=".6"/><rect x="8.5" y="8.5" width="5" height="5" rx=".6"/></g>`,
+  arrowL: '<path d="M13 8H3M7 4L3 8l4 4"/>',
+  arrowR: '<path d="M3 8h10M9 4l4 4-4 4"/>',
+  keyboard: '<rect x="1.8" y="3.5" width="12.4" height="9" rx="1.5"/><path d="M4.5 6.3h.1M7 6.3h.1M9.4 6.3h.1M11.7 6.3h.1M4.5 8.6h.1M11.7 8.6h.1M6 10.6h4"/>',
+};
+
+export const ico = (name, cls = '') => `<svg class="wico${cls ? ' ' + cls : ''}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`;

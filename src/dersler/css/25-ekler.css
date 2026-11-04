@@ -29,14 +29,6 @@
 .tv-new .tv-thumb { border: 2px dashed #fff8; background: none; font-size: 2em; }
 .dk-vdflash { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); background: #1c2430e6; color: #fff; padding: 0.8em 2em; border-radius: 10px; font-size: 1.3em; z-index: 7000; pointer-events: none; animation: fadein 0.2s; }
 
-/* Ekran Klavyesi */
-.osk { background: #1f2329 !important; padding: 0.4em; gap: 0.3em; justify-content: center; user-select: none; }
-.osk-row { display: flex; gap: 0.3em; flex: 1; min-height: 0; }
-.osk button { flex: 1; min-width: 0; border: 1px solid #3a414b !important; background: #2d333c; color: #fff; border-radius: 5px !important; font-size: 1.05em; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
-.osk button:hover { background: #3b434f; }
-.osk button:active { background: var(--acc); }
-.osk .osk-sp { font-size: 0.8em; color: #c9d1dc; }
-.osk .osk-sp.on { background: var(--acc); color: #fff; }
 
 /* Adres mektup birleştirme */
 .wd-field { background: #e3e8ef; border-radius: 3px; padding: 0 0.15em; color: #1f3d6b; }

@@ -320,7 +320,7 @@ export const masaustuHarita = {
         { label: 'Ayarlar ⚙', icon: '⚙', bin: 'baslat', why: 'Başlat menüsünde (⊞ + I).' },
         { label: 'Küçült — ve kapat ✕', icon: '✕', bin: 'pencere', why: 'Pencerenin sağ üstünde.' },
         { label: 'Programın ve dosyanın adı', icon: '🏷', bin: 'pencere', why: 'Pencerenin başlık çubuğunda.' },
-        { label: 'Dosya, Düzen menüleri', icon: '📄', bin: 'pencere', why: 'Pencerenin üst kısmında.' },
+        { label: 'Dosya, Düzenle menüleri', icon: '📄', bin: 'pencere', why: 'Pencerenin üst kısmında.' },
       ],
       done: 'Masaüstünün haritası kafanızda!',
     }),

@@ -1,5 +1,9 @@
 // Erişilebilirlik araçları: Ekran Klavyesi ve Büyüteç'in başlatıcısı (Büyüteç'in kendisi desktop.js'te, Ayarlar'daki düğmeyle aynı).
 import { esc } from './util.js';
+import { ico } from '../w11ikon.js';
+
+const OSK_ICON = { Backspace: 'backspace', Tab: 'tab', Shift: 'shift', Enter: 'enter', Left: 'arrowL', Right: 'arrowR', Close: 'x' };
+const OSK_TITLE = { Backspace: 'Geri sil', Tab: 'Sekme', Shift: 'Shift', Enter: 'Enter', Left: 'Sola', Right: 'Sağa', Close: 'Klavyeyi kapat' };
 
 // ------------------------------------------------------------------ Ekran Klavyesi (Türkçe Q)
 const ROWS = [
@@ -30,7 +34,7 @@ export function osk({ desk, win, body, emit }) {
       if (Array.isArray(k)) {
         const [code, l, w] = k;
         const on = (code === 'Shift' && st.shift) || (code === 'Caps' && st.caps) || (code === 'AltGr' && st.altgr);
-        return `<button type="button" data-k="${code}" class="osk-sp ${on ? 'on' : ''}" style="flex:${w}">${l}</button>`;
+        return `<button type="button" data-k="${code}" class="osk-sp ${on ? 'on' : ''}${code === 'Close' ? ' osk-x' : ''}" style="flex:${w}" ${OSK_TITLE[code] ? `title="${OSK_TITLE[code]}" aria-label="${OSK_TITLE[code]}"` : ''}>${OSK_ICON[code] ? ico(OSK_ICON[code]) : l}</button>`;
       }
       return `<button type="button" data-k="${esc(k)}">${esc(label(k))}</button>`;
     }).join('')}</div>`).join('');
@@ -49,7 +53,7 @@ export function osk({ desk, win, body, emit }) {
     if (k === 'Close') { desk.close(win); return; }
     if (k === 'Ctrl' || k === 'Alt') return;
     const t = target();
-    if (!t) { desk.toast('Ekran Klavyesi', 'Önce yazı yazacağınız yere (Not Defteri, arama kutusu…) bir kez tıklayın.', '⌨', 4000); return; }
+    if (!t) { desk.toast('Ekran Klavyesi', 'Önce yazı yazacağınız yere (Not Defteri, arama kutusu…) bir kez tıklayın.', ico('keyboard'), 4000); return; }
     const field = t.matches('input, textarea');
     if (k === 'Backspace') document.execCommand('delete');
     else if (k === 'Enter') {
@@ -66,6 +70,7 @@ export function osk({ desk, win, body, emit }) {
     }
     emit('osk-key', { key: k });
   }
+  body.addEventListener('mousedown', (e) => e.preventDefault()); // yazı yerinin odağı gitmesin
   body.addEventListener('click', (e) => { const b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
   render();
   return { press };
