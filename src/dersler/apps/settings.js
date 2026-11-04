@@ -228,7 +228,7 @@ export function settings({ desk, body, args, emit, dialogs }) {
         <div class="ayr-hn"><b>${checking ? 'Güncelleştirmeler denetleniyor…' : avail ? 'Güncelleştirmeler var' : 'Güncelsiniz'}</b>${flow.update ? `<div class="ayr-ustat">${flow.update}</div>` : `<small>${avail ? 'İsteğe bağlı güncelleştirme: <b>Ses kartı sürücüsü</b> (Yüksek Tanımlı Ses Aygıtı)' : 'Son denetleme: bugün'}</small>`}</div>
         <div class="ayr-hb2">${flow.updateBtns ?? btn('checkUpdate', 'Güncelleştirmeleri denetle', 'primary')}</div></div>`;
       h += exp('hist', MI.history, 'Güncelleştirme geçmişi', 'Yüklenen güncelleştirmelerin listesi', `${R({ t: 'Windows güvenlik güncelleştirmesi', d: 'Başarıyla yüklendi · 12.10.2026' })}${R({ t: 'Microsoft Defender virüs tanımları', d: 'Başarıyla yüklendi · 14.10.2026' })}${R({ t: 'Aygıt sürücüsü güncelleştirmesi', d: 'Başarıyla yüklendi · 08.09.2025' })}`);
-      h += note('Güncelleştirmeler, güvenlik açıklarını kapatır. Bilgisayarı kapatırken “güncelleştir ve kapat” çıkarsa erteleyin değil, kabul edin.');
+      h += note('Güncelleştirmeler, güvenlik açıklarını kapatır. Bilgisayarı kapatırken “güncelleştir ve kapat” çıkarsa ertelemeyin, kabul edin.');
     }
     pg.innerHTML = h;
   }

@@ -76,6 +76,8 @@
 /* Düğmeler, bağlantılar, alanlar */
 .ayr .ayr-btn { font: inherit; color: var(--ay-fg); background: var(--ay-ctl); border: 1px solid var(--ay-ctlbd); border-bottom-color: #bdbdbd; border-radius: 5px; padding: 0.3em 1.1em; min-height: 2.15em; cursor: pointer; justify-content: center; gap: 0.4em; }
 .dk-dark .ayr .ayr-btn { border-bottom-color: var(--ay-ctlbd); }
+.dk-dark .ayr .ayr-btn.primary { color: #111; }
+.dk-dark .wgz .wgz-btn.primary { color: #111; }
 .ayr .ayr-btn:hover:not(:disabled) { background: var(--ay-hov); border-color: var(--ay-ctlbd); }
 .ayr .ayr-btn.primary { background: var(--ay-acc); color: #fff; border-color: var(--ay-acc); font-weight: 400; }
 .ayr .ayr-btn.primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ay-acc) 88%, #000); border-color: var(--ay-acc); }
@@ -443,4 +445,4 @@
   .wgz-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@container (max-width: 36em) { .dtm-cats { grid-template-columns: 1fr; } .dtm-left { width: 9.5em; } .dtm-search input { width: 7em; } .dtm-box dl { grid-template-columns: 8em 1fr; } }
+@container (max-width: 36em) { .dtm-view { margin: 0.2em 0 0; } .dtm-cats { grid-template-columns: 1fr; } .dtm-left { width: 9.5em; } .dtm-search input { width: 7em; } .dtm-box dl { grid-template-columns: 8em 1fr; } }
