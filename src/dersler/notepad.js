@@ -4,6 +4,7 @@
 // Tek sekme vardır: "Yeni sekme" kaydedilmemiş yazıyı sorup sayfayı boşaltır (derslerin akışı buna bağlı).
 import { esc } from './dialog.js';
 import { ico } from './w11ikon.js';
+import { SYS_ICONS, APP_ICONS } from './apps/appicons.js';
 
 const isCtrl = (e) => e.ctrlKey || e.metaKey;
 
@@ -19,7 +20,7 @@ const SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 36];
 const pad2 = (n) => String(n).padStart(2, '0');
 
 // Tek başına (masaüstü olmadan) kullanılan basit dosya deposu
-const SIMPLE_FOLDERS = [['Masaüstü', ico('window')], ['Belgeler', ico('note')], ['İndirilenler', ico('arrowDown')], ['Resimler', ico('image')]];
+const SIMPLE_FOLDERS = [['Masaüstü', SYS_ICONS['folder-desktop']], ['Belgeler', SYS_ICONS['folder-docs']], ['İndirilenler', SYS_ICONS['folder-down']], ['Resimler', SYS_ICONS['folder-pics']]];
 const SIMPLE_SEED = { Masaüstü: [], Belgeler: [{ name: 'alışveriş listesi.txt', content: 'Ekmek\nSüt\nYumurta' }, { name: 'telefon numaraları.txt', content: 'Eczane: 0212 000 33 44' }], İndirilenler: [{ name: 'fatura.pdf' }], Resimler: [{ name: 'tatil.jpg' }] };
 
 export function simpleFs(data = structuredClone(SIMPLE_SEED)) {
@@ -61,7 +62,7 @@ export class Notepad {
     root.classList.add('np-win');
     if (opts.embedded) root.classList.add('np-embedded');
     root.innerHTML = `
-      <div class="np-tabs"><div class="np-tab" title="Not Defteri">${ico('notepad', 'np-tico')}<span class="np-name"></span><button type="button" class="np-tabx" title="Sekmeyi kapat" aria-label="Sekmeyi kapat">${ico('x')}</button></div>
+      <div class="np-tabs"><div class="np-tab" title="Not Defteri"><span class="np-tico">${APP_ICONS.notepad}</span><span class="np-name"></span><button type="button" class="np-tabx" title="Sekmeyi kapat" aria-label="Sekmeyi kapat">${ico('x')}</button></div>
         <button type="button" class="np-plus" title="Yeni sekme" aria-label="Yeni sekme">${ico('plus')}</button><span class="np-grow"></span>
         <span class="np-ctl" title="Bu pencere bir alıştırma penceresidir"><i>${ico('minus')}</i><i>${ico('maximize')}</i><i>${ico('x')}</i></span></div>
       <div class="np-menu">${Object.keys(MENUS).map((m) => `<button type="button" data-menu="${m}">${m}</button>`).join('')}<span class="np-grow"></span><button type="button" class="np-gear" title="Ayarlar" aria-label="Ayarlar">${ico('gear')}</button></div>

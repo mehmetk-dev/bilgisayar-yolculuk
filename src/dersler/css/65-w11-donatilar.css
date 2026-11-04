@@ -13,7 +13,7 @@
 /* Sekme şeridi */
 .np-tabs { display: flex; align-items: flex-end; gap: 0.15em; background: var(--np-chrome); padding: 0.35em 0 0 0.45em; min-height: 2.5em; flex: none; }
 .np-tab { display: flex; align-items: center; gap: 0.55em; background: var(--np-bar); border-radius: 8px 8px 0 0; padding: 0.5em 0.4em 0.5em 0.8em; min-width: 7em; max-width: 15em; box-shadow: 0 0 0 1px #0000000d; }
-.np-tico { width: 1.1em; height: 1.1em; }
+.np-tico { display: inline-flex; font-size: 1.15em; }
 .np-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .np-tabx, .np-plus, .np-gear { border: 0; background: none; border-radius: 5px; padding: 0; width: 1.8em; height: 1.8em; display: inline-flex; align-items: center; justify-content: center; }
 .np-tabx { width: 1.5em; height: 1.5em; }
@@ -266,3 +266,27 @@
 .wck-laps small { color: var(--w-mut); }
 .wck-city { font-size: 1.1em; font-weight: 600; }
 .wck-wt { font-size: 1.6em; font-weight: 300; font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------------ Ekran Klavyesi (Windows 11 dokunmatik klavye) */
+.osk { background: #202020ee !important; padding: 0.5em 0.6em; gap: 0.35em; justify-content: center; user-select: none; }
+.osk-row { display: flex; gap: 0.35em; flex: 1; min-height: 0; }
+.osk button { flex: 1; min-width: 0; border: 0 !important; background: #3b3b3b; color: #fff; border-radius: 6px !important; font: inherit; font-size: 1.05em; padding: 0 !important; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 0 #00000080; transition: background 0.05s; }
+.osk button:hover { background: #484848; }
+.osk button:active { background: #5a5a5a; transform: scale(0.97); }
+.osk .osk-sp { background: #2f2f2f; font-size: 0.82em; color: #e6e6e6; }
+.osk .osk-sp:hover { background: #3a3a3a; }
+.osk .osk-sp.on { background: var(--dk-acc, #60cdff); color: #000; }
+.osk .osk-x:hover { background: #c42b1c; color: #fff; }
+.osk .wico { width: 1.35em; height: 1.35em; }
+
+/* ------------------------------------------------------------------ Büyüteç araç çubuğu (Windows 11: − %200 + ve görünüm) */
+.dk-magbar { gap: 0.3em; background: #2b2b2bf2; border: 1px solid #ffffff2e; border-radius: 10px; padding: 0.25em 0.4em 0.25em 0.8em; box-shadow: 0 6px 20px #0007; font-size: 0.95em; }
+.dk-magbar > span { font-size: 0; display: inline-flex; align-items: center; margin-right: 0.3em; }
+.dk-magbar > span::before { content: "Büyüteç"; font-size: 0.95rem; padding-left: 1.7em; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-width='1.3' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='4.4'/%3E%3Cpath d='M10.3 10.3L14 14M5 7h4M7 5v4'/%3E%3C/svg%3E") left center / 1.3em no-repeat; }
+.dk-magbar button { border-radius: 6px; width: 2em; height: 2em; background: transparent; font-size: 1.1em; line-height: 1; }
+.dk-magbar button:hover { background: #ffffff22; }
+.dk-magbar button[data-m="x"] { font-size: 1em; }
+.dk-magbar button[data-m="x"]:hover { background: #c42b1c; }
+.dk-magbar b { min-width: 3em; text-align: center; font-weight: 600; }
+.dk-magbar::after { content: "Tam ekran"; margin-left: 0.2em; padding: 0.35em 0.7em; border-radius: 6px; background: #ffffff1a; font-size: 0.9em; order: 5; }
+.dk-magbar button[data-m="x"] { order: 6; }
