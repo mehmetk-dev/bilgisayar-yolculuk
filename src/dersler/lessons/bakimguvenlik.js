@@ -9,7 +9,7 @@ export const bakimGuvenlik = {
   desc: 'Virüs taraması, güvenlik duvarı ve gereksiz dosyaları silip yer açmak.',
   summary: [
     ['Windows Güvenliği', 'Windows\'un kendi virüs programı; ek program indirmeye gerek yok'],
-    ['⚡ Hızlı tarama', 'Bilgisayarı birkaç dakikada tarar'],
+    ['Hızlı tarama', 'Bilgisayarı birkaç dakikada tarar'],
     ['USB belleği tara', 'Başkasından aldığınız belleği açmadan önce'],
     ['Güvenlik duvarı', 'Açık kalmalı; internetten gelen izinsiz bağlantıyı durdurur'],
     ['Disk Temizleme', 'Geçici dosyaları siler, yer açar'],
@@ -30,18 +30,18 @@ export const bakimGuvenlik = {
       mouse: '🖱 Başlat → Windows Güvenliği',
       check: (c) => !!c.d.find('guvenlik'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'guvenlik',
-      done: 'Soldaki menüde virüs koruması, güvenlik duvarı ve Disk Temizleme bölümleri var. Şimdilik “Virüs ve tehdit koruması” açık.',
+      done: 'Giriş sayfasında “Güvenlik bir bakışta” kutucukları var: yeşil tik sorun olmadığını, sarı ünlem dikkat gerektiğini gösterir. Soldaki menüde virüs koruması, güvenlik duvarı ve Disk Temizleme bölümleri de var.',
     },
     {
       title: 'Hızlı tarama',
-      html: '<p><b>⚡ Hızlı tarama</b>\'ya tıklayın ve bitmesini bekleyin. Tarama sırasında bilgisayarı kullanmaya devam edebilirsiniz.</p>',
+      html: '<p>Soldan <b>Virüs ve tehdit koruması</b>\'na gidin, <b>Hızlı tarama</b>\'ya tıklayın ve bitmesini bekleyin. Tarama sırasında bilgisayarı kullanmaya devam edebilirsiniz.</p>',
       setup: ws('virus'),
       on: (ev) => ev.type === 'scan-done' && ev.kind === 'quick',
       done: 'Tehdit bulunamadı. Bilgisayar güvenli. Ayda bir tarama yapmak yeterlidir; Windows zaten arka planda kendisi de tarar.',
     },
     {
       title: 'Güvenlik duvarı',
-      html: '<p>Soldan <b>🧱 Güvenlik duvarı</b>\'na tıklayın ve okuyun. Durumun <b>açık</b> olduğunu görün.</p>',
+      html: '<p>Soldan <b>Güvenlik duvarı ve ağ koruması</b>\'na tıklayın ve okuyun. Durumun <b>açık</b> olduğunu görün.</p>',
       mouse: '🖱 Güvenlik duvarı',
       setup: ws('virus'),
       on: (ev) => ev.type === 'ws-page' && ev.page === 'duvar',
@@ -71,7 +71,7 @@ export const bakimGuvenlik = {
     },
     {
       title: 'USB belleği tarayın',
-      html: `<p>Windows Güvenliği\'nde <b>Virüs ve tehdit koruması</b>\'na dönün ve <b>💾 USB belleği tara</b>\'ya tıklayın.</p>
+      html: `<p>Windows Güvenliği\'nde <b>Virüs ve tehdit koruması</b>\'na dönün ve <b>USB belleği tara</b>\'ya tıklayın.</p>
         <p class="mut">Bu bir alıştırma penceresidir. Gerçek Windows\'ta USB belleği taramak için Dosya Gezgini\'nde sürücüye sağ tıklayıp <b>Microsoft Defender ile tara</b> seçin.</p>`,
       setup: ws('virus'),
       on: (ev, c) => {
@@ -89,7 +89,7 @@ export const bakimGuvenlik = {
     },
     {
       title: 'Disk Temizleme',
-      html: `<p>Bilgisayarınızın diski neredeyse dolmuş. Soldan <b>🧹 Disk Temizleme</b>\'ye tıklayın; üstteki çubuğa ve boş alana bakın.</p>
+      html: `<p>Bilgisayarınızın diski neredeyse dolmuş. Soldan <b>Disk Temizleme</b>\'ye tıklayın; üstteki çubuğa ve boş alana bakın.</p>
         <p class="mut">Bu bir alıştırma penceresidir. Gerçek Windows\'ta Disk Temizleme ayrı bir programdır: Başlat\'a <b>Disk Temizleme</b> yazıp açın.</p>`,
       setup: ws('virus'),
       on: (ev) => ev.type === 'ws-page' && ev.page === 'disk',
@@ -97,7 +97,7 @@ export const bakimGuvenlik = {
     {
       title: 'Güvenle temizleyin',
       html: `<p>Listede ön seçili olanlar (<b>geçici dosyalar, güncelleme artıkları, küçük resimler</b>) güvenle silinir. <b>İndirilenler</b> klasörü sarı: kendi dosyalarınız orada, <b>işaretlemeyin</b>.</p>
-        <p>🗑 <b>Temizle</b>'ye tıklayın.</p>`,
+        <p><b>Temizle</b>'ye tıklayın.</p>`,
       hint: 'İndirilenler satırının yanındaki kutu boş kalmalı. Sadece Temizle düğmesine basın.',
       setup: ws('disk'),
       on: (ev, c) => {

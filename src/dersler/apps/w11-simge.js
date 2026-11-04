@@ -76,6 +76,10 @@ export const MI = {
   folderopen: M('folderopen', '<path d="M3.5 7a2 2 0 0 1 2-2h4l2 2.2h7a2 2 0 0 1 2 2V10M3.5 7v10a2 2 0 0 0 2 2h12.3a2 2 0 0 0 1.9-1.4L21.5 11a1 1 0 0 0-1-1.3H8.4a2 2 0 0 0-1.9 1.4L3.5 17"/>'),
   eyeoff: M('eyeoff', '<path d="M2.5 12S6 5.5 12 5.5c1.5 0 2.9.4 4 1M21.5 12S18 18.5 12 18.5c-1.5 0-2.9-.4-4-1"/><path d="M4 4l16 16"/>'),
   tools: M('tools', '<path d="M14.5 6.5a4 4 0 0 0 5 5L9.5 21.5l-3-3z"/><path d="M14.5 6.5L17 4l3 3-2.5 2.5"/>'),
+  home: M('home', '<path d="M3.5 11L12 4l8.5 7M6 9.5V20h12V9.5M10 20v-5h4v5"/>'),
+  pulse: M('pulse', '<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/><path d="M5.5 12.5h3l1.5-3 3 6 1.5-3h4"/>'),
+  laptop: M('laptop', '<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M2.5 19h19"/>'),
+  accountcheck: M('accountcheck', '<circle cx="10" cy="8" r="3.6"/><path d="M3.5 20a6.5 6.5 0 0 1 11-4.6M15 17.5l2 2 4-4.5"/>'),
   family: M('family', '<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9.5" r="2.2"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M14 20a3.5 3.5 0 0 1 7 0"/>'),
 };
 

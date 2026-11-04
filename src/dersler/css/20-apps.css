@@ -1086,28 +1086,6 @@ ul.pp-box.empty::before { display: block; margin-left: -1em; }
 .gz-small { color: #777; font-size: 0.85em; }
 .gz-nav a { cursor: pointer; color: #1565c0; }
 /* Windows Güvenliği ve Bakım */
-.ws { flex-direction: row !important; background: #f6f8fb; }
-.ws-nav { width: 13em; background: #eef2f7; padding: 0.6em; display: flex; flex-direction: column; gap: 0.3em; border-right: 1px solid #dde3ea; }
-.ws-nav button { text-align: left; padding: 0.6em 0.7em; border: 0; border-radius: 6px; background: none; }
-.ws-nav button.on { background: #fff; font-weight: 700; box-shadow: 0 1px 3px #0002; }
-.ws-page { flex: 1; overflow: auto; padding: 0.8em 1.2em; }
-.ws-page h2 { margin: 0 0 0.5em; }
-.ws-card { display: flex; flex-direction: column; gap: 0.2em; padding: 0.8em 1em; border-radius: 8px; margin: 0.6em 0; border: 1px solid #cfd8dc; background: #fff; }
-.ws-card.ok { border-color: #81c784; background: #f1f8e9; } .ws-card.bad { border-color: #e57373; background: #ffebee; }
-.ws-card small, .ws-cat small { color: #666; font-size: 0.85em; }
-.ws-btns { display: flex; gap: 0.6em; flex-wrap: wrap; margin: 0.6em 0; }
-.ws-btn { padding: 0.5em 1.1em; border: 1px solid #90a4ae; background: #fff; border-radius: 6px; }
-.ws-btn.primary { background: #0a5dc2; color: #fff; border-color: #0a5dc2; } .ws-btn:disabled { opacity: 0.5; }
-.ws-note { color: #455a64; }
-.ws-thr { padding: 0.3em 0; color: #b71c1c; }
-.ws-bar { height: 1em; background: #dfe6ec; border-radius: 1em; overflow: hidden; } .ws-bar i { display: block; height: 100%; background: linear-gradient(90deg, #1976d2, #c62828); }
-.ws-disk { margin-bottom: 0.8em; }
-.ws-list { display: flex; flex-direction: column; gap: 0.4em; }
-.ws-cat { display: flex; gap: 0.7em; align-items: center; padding: 0.55em 0.7em; background: #fff; border: 1px solid #dde3ea; border-radius: 6px; }
-.ws-cat span { flex: 1; display: flex; flex-direction: column; } .ws-cat em { font-style: normal; font-variant-numeric: tabular-nums; }
-.ws-cat.risk { border-color: #ffb74d; background: #fff8e1; } .ws-cat.gone { opacity: 0.55; }
-.ws-tog { display: inline-flex; align-items: center; gap: 0.6em; }
-.ws-prog { margin: 0.6em 0; }
 .pm-ccbtn { border: 0; background: none; color: #0a5dc2; text-decoration: underline; cursor: pointer; font: inherit; white-space: nowrap; margin-left: 0.4em; }
 /* Word: sayfa kenarlığı, filigran, şekiller, kalın tablo, yazdırma önizlemesi */
 .wd-page.bordered { border: 3px solid #1f4e9c; }
