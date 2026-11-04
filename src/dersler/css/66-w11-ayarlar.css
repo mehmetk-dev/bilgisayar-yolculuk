@@ -308,4 +308,47 @@
 .dtm-sel select { font: inherit; padding: 0.15em 0.3em; background: var(--dt-field); color: var(--dt-fg); border: 1px solid var(--dt-bd); border-radius: 3px; }
 .dtm-clock { font-size: 2.4em; font-weight: 300; }
 .dtm a:focus-visible { outline: 2px solid #3399ff; outline-offset: 1px; border-radius: 2px; }
+
+/* ===================== Aygıt Yöneticisi ===================== */
+.agy { --ag-bg: #fff; --ag-fg: #1b1b1b; --ag-bd: #dcdcdc; --ag-hov: #e5f3ff; --ag-sel: #cce8ff; --ag-bar: #f3f3f3; --ag-mut: #666;
+  display: flex; flex-direction: column; background: var(--ag-bg); color: var(--ag-fg); font-size: 0.92em; position: relative; }
+.dk-dark .agy { --ag-bg: #202020; --ag-fg: #eee; --ag-bd: #444; --ag-hov: #333; --ag-sel: #2f4a6b; --ag-bar: #2b2b2b; --ag-mut: #aaa; }
+.agy .wi { font-size: 1.2em; }
+.agy-menu { display: flex; background: var(--ag-bar); border-bottom: 1px solid var(--ag-bd); padding: 0 0.3em; }
+.agy .agy-menu button { border: 1px solid transparent; background: none; color: var(--ag-fg); padding: 0.2em 0.7em; border-radius: 0; font: inherit; }
+.agy .agy-menu button:hover { background: var(--ag-hov); border-color: #99d1ff; }
+.agy-tb { display: flex; align-items: center; gap: 0.15em; padding: 0.25em 0.5em; border-bottom: 1px solid var(--ag-bd); }
+.agy-tb i { width: 1px; height: 1.5em; background: var(--ag-bd); margin: 0 0.3em; }
+.agy .agy-tb button { width: 2.1em; height: 2.1em; padding: 0; border: 1px solid transparent; background: none; color: var(--ag-fg); border-radius: 3px; justify-content: center; }
+.agy .agy-tb button:hover:not(:disabled) { background: var(--ag-hov); border-color: #99d1ff; }
+.agy .agy-tb button:disabled { opacity: 0.35; }
+.agy-upd { display: inline-flex; background: #2e9e4a; color: #fff; border-radius: 3px; padding: 1px; }
+.agy-upd .wi { font-size: 1em; stroke-width: 2.4; }
+.agy-tree { flex: 1; overflow: auto; padding: 0.4em 0.3em 1em; user-select: none; }
+.agy-root { display: flex; align-items: center; gap: 0.3em; padding: 0.15em 0.3em; font-weight: 400; }
+.agy-cat { margin-left: 1.3em; }
+.agy .agy-head { display: flex; align-items: center; gap: 0.3em; width: 100%; border: 1px solid transparent; background: none; color: inherit; text-align: left; padding: 0.15em 0.3em; border-radius: 3px; font: inherit; }
+.agy .agy-head:hover { background: var(--ag-hov); border-color: transparent; }
+.agy-ch { display: inline-flex; width: 1em; color: var(--ag-mut); flex: none; justify-content: center; }
+.agy-ch .wi { font-size: 0.9em; transition: transform 0.12s; }
+.agy-ch.o .wi { transform: rotate(90deg); }
+.agy-i { display: inline-flex; position: relative; flex: none; }
+.agy-i .wi { font-size: 1.25em; }
+.agy-it { margin-left: 2.7em; padding: 0.15em 0.4em; border-radius: 3px; cursor: default; outline: none; display: flex; align-items: center; gap: 0.4em; border: 1px solid transparent; }
+.agy-it:hover { background: var(--ag-hov); }
+.agy-it.sel { background: var(--ag-sel); }
+.agy-it:focus-visible { border-color: #3399ff; }
+.agy-it.off { color: var(--ag-mut); }
+.agy-it.off .agy-i .wi { filter: grayscale(1); opacity: 0.7; }
+.agy-dn { position: absolute; right: -0.25em; bottom: -0.2em; font-style: normal; display: inline-flex; background: #6d6d6d; color: #fff; border-radius: 50%; }
+.agy-dn .wi { font-size: 0.75em; stroke-width: 3; }
+.agy-prog { position: absolute; left: 1em; right: 1em; bottom: 1em; background: var(--ag-bg); border: 1px solid var(--ag-bd); border-radius: 8px; padding: 0.7em 1em; box-shadow: 0 6px 18px #0003; }
+.agy-pr { min-width: 18em; }
+.agy-prh { display: flex; align-items: center; gap: 0.7em; margin-bottom: 0.7em; font-size: 1.05em; }
+.agy-prh .wi { font-size: 2em; }
+.agy-pr dl { display: grid; grid-template-columns: 7em 1fr; gap: 0.2em 0.6em; margin: 0 0 0.7em; }
+.agy-pr dt { opacity: 0.7; } .agy-pr dd { margin: 0; }
+.agy-pr fieldset { border: 1px solid #8a93a0; border-radius: 4px; padding: 0.4em 0.7em 0.6em; margin: 0; }
+.agy-pr legend { padding: 0 0.3em; opacity: 0.8; }
+
 @container (max-width: 36em) { .dtm-cats { grid-template-columns: 1fr; } .dtm-left { width: 9.5em; } .dtm-search input { width: 7em; } .dtm-box dl { grid-template-columns: 8em 1fr; } }

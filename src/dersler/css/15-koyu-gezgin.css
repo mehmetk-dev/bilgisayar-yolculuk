@@ -11,12 +11,6 @@
  .dk-dark .st-dl dt, .dk-dark .st-none  { color: #bbb; }
 /* Denetim Masası */
 /* Aygıt Yöneticisi */
-.dk-dark .dm-bar { color: #ddd; border-color: #444; }
-.dk-dark .dm-head { color: #eee; }
-.dk-dark .dm-head:hover { background: #333; }
-.dk-dark .dm-item.warn { color: #ffc266; }
-.dk-dark .dm-item.sel { background: #2f4a6b; }
-.dk-dark .dm-prog { background: #2b2b2b; color: #eee; border-color: #555; }
 /* Görev Yöneticisi */
 .dk-dark .tm-t th small { color: #eee; }
 .dk-dark .tm-t th.tm-sort:hover { background: #333; }
