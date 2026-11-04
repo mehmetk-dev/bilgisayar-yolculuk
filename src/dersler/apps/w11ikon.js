@@ -1,0 +1,127 @@
+// Görev Yöneticisi, Fotoğraflar, Müzik, PDF, E-posta, Mağaza, Takvim, Hava Durumu ve oyunlar için
+// Fluent tarzı ince çizgili (currentColor) SVG simgeler ve renkli hava durumu simgeleri. Emoji yok.
+// Kullanım: ic('search') → <svg class="wi wi-m">; boyut çevreleyen yazı boyutuna (1em) bağlıdır.
+const L = (body, fill = false) => `<svg class="wi wi-m" viewBox="0 0 24 24" ${fill ? 'fill="currentColor" stroke="none"' : 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"'} aria-hidden="true" focusable="false">${body}</svg>`;
+
+const ICONS = {
+  // genel
+  search: L('<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>'),
+  plus: L('<path d="M12 5v14M5 12h14"/>'),
+  minus: L('<path d="M5 12h14"/>'),
+  close: L('<path d="M6 6l12 12M18 6L6 18"/>'),
+  check: L('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+  menu: L('<path d="M4 6.5h16M4 12h16M4 17.5h16"/>'),
+  more: L('<circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/>', true),
+  chevleft: L('<path d="M15 6l-6 6 6 6"/>'),
+  chevright: L('<path d="M9 6l6 6-6 6"/>'),
+  chevdown: L('<path d="M6 9l6 6 6-6"/>'),
+  chevup: L('<path d="M6 15l6-6 6 6"/>'),
+  back: L('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
+  refresh: L('<path d="M19.5 12a7.5 7.5 0 1 1-2.4-5.5"/><path d="M19 3.5v4h-4"/>'),
+  gear: L('<circle cx="12" cy="12" r="3"/><path d="M19.4 14.8a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3h0a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v0a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>'),
+  info: L('<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/>'),
+  warn: L('<path d="M12 4l9 15.5H3z"/><path d="M12 10v4.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>'),
+  user: L('<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>'),
+  users: L('<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5a6 6 0 0 1 12 0"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 5.8M17.5 14.2a6 6 0 0 1 3.5 5.3"/>'),
+  folder: L('<path d="M3.5 7a2 2 0 0 1 2-2h4l2 2.2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),
+  heart: L('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>'),
+  home: L('<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.8V19a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1V9.8"/>'),
+  star: L('<path d="M12 3.8l2.5 5.1 5.6.8-4 4 .9 5.6-5-2.6-5 2.6.9-5.6-4-4 5.600-.8z"/>'),
+  starf: L('<path d="M12 3.8l2.5 5.1 5.6.8-4 4 .9 5.6-5-2.6-5 2.6.9-5.6-4-4 5.600-.8z"/>', true),
+  download: L('<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/>'),
+  print: L('<path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/>'),
+  trash: L('<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l.8 12a1.5 1.5 0 0 0 1.5 1.4h6.400a1.500 1.500 0 0 0 1.500-1.400L17.500 7M10 11v6M14 11v6"/>'),
+  pencil: L('<path d="M4 20l4-1 10.500-10.500a2 2 0 0 0-3-3L5 16z"/><path d="M13.500 6.500l3 3"/>'),
+  rotate: L('<path d="M19.500 12a7.500 7.500 0 1 1-2.400-5.500"/><path d="M19 3.500v4h-4"/>'),
+  zoomin: L('<circle cx="10.500" cy="10.500" r="6"/><path d="M15 15l5.500 5.500M10.500 8v5M8 10.500h5"/>'),
+  zoomout: L('<circle cx="10.500" cy="10.500" r="6"/><path d="M15 15l5.500 5.500M8 10.500h5"/>'),
+  image: L('<rect x="3.500" y="4.500" width="17" height="15" rx="2.500"/><circle cx="9" cy="10" r="1.700"/><path d="M20.500 16l-4.500-4.500L7 19.500"/>'),
+  images: L('<rect x="3.500" y="6.500" width="14" height="13" rx="2"/><path d="M7 4h11.500a2 2 0 0 1 2 2v10"/><circle cx="8.500" cy="11" r="1.300"/><path d="M17.500 16l-3.500-3.500-7.500 7"/>'),
+  calendar: L('<rect x="4" y="5.500" width="16" height="14.500" rx="2.500"/><path d="M4 10h16M8.500 3.500v4M15.500 3.500v4"/>'),
+  slideshow: L('<rect x="3.500" y="5" width="17" height="11.500" rx="2"/><path d="M10 8.500v4.500l4-2.250zM8 20h8"/>'),
+  monitor: L('<rect x="3" y="4.500" width="18" height="12" rx="2"/><path d="M9 20h6M12 16.500V20"/>'),
+  copy: L('<rect x="8" y="8" width="11.500" height="11.500" rx="2"/><path d="M16 8V6.500A2 2 0 0 0 14 4.500H6.500a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2H8"/>'),
+  save: L('<path d="M5 4.500h11l3.500 3.500V18a1.500 1.500 0 0 1-1.500 1.500H6A1.500 1.500 0 0 1 4.500 18V5.500z"/><path d="M8 4.500v4h6v-4M8 19.500v-5.500h8v5.500"/>'),
+  undo: L('<path d="M9 6L4.500 10.500 9 15"/><path d="M5 10.500h9.500a5 5 0 0 1 0 10H11"/>'),
+  text: L('<path d="M5 6.500V5h14v1.500M12 5v14M9 19h6"/>'),
+  highlight: L('<path d="M14.500 4.500l5 5-8 8H7.500v-4z"/><path d="M4 21h8"/>'),
+  sign: L('<path d="M4 17c3-6 4.500-9 6-9 2 0-1.500 7.500 0 7.500 1.800 0 2.500-4 4-4 1 0 .6 2.500 2 2.500.8 0 1.500-.8 2-1.500"/><path d="M4 21h16"/>'),
+  rotateleft: L('<path d="M4.500 12a7.500 7.500 0 1 0 2.400-5.500"/><path d="M5 3.500v4h4"/>'),
+  fit: L('<path d="M4 9V5.500A1.500 1.500 0 0 1 5.500 4H9M15 4h3.500A1.500 1.500 0 0 1 20 5.500V9M20 15v3.500a1.500 1.500 0 0 1-1.500 1.500H15M9 20H5.500A1.500 1.500 0 0 1 4 18.500V15"/>'),
+  // Görev Yöneticisi
+  tmproc: L('<rect x="3.500" y="4" width="17" height="16" rx="2.500"/><path d="M3.500 9h17M8.500 9v11"/>'),
+  tmperf: L('<path d="M3 12h4l2.500-6.500 4 13L16 12h5"/>'),
+  tmhist: L('<path d="M3.500 12a8.500 8.500 0 1 0 2.600-6.100L3.500 8.500"/><path d="M3.500 4v4.500H8M12 7.500V12l3 2"/>'),
+  tmstart: L('<path d="M4 17a8.500 8.500 0 1 1 16 0"/><path d="M12 17l4.500-6"/><circle cx="12" cy="17" r="1" fill="currentColor"/>'),
+  tmdetails: L('<path d="M8.500 6.500H21M8.500 12H21M8.500 17.500H21"/><circle cx="4.200" cy="6.500" r="1" fill="currentColor"/><circle cx="4.200" cy="12" r="1" fill="currentColor"/><circle cx="4.200" cy="17.500" r="1" fill="currentColor"/>'),
+  tmserv: L('<rect x="4" y="3.500" width="16" height="7" rx="2"/><rect x="4" y="13.500" width="16" height="7" rx="2"/><path d="M7.500 7h.01M7.500 17h.01"/>'),
+  tmrun: L('<rect x="3.500" y="4.500" width="17" height="15" rx="2.500"/><path d="M10 9l5 3-5 3z"/>'),
+  tmend: L('<rect x="3.500" y="4.500" width="17" height="15" rx="2.500"/><path d="M9.500 9.500l5 5M14.500 9.500l-5 5"/>'),
+  tmeco: L('<path d="M11 20A7 7 0 0 1 9.800 6.100C15.500 5 17 4.500 19 2c1 2 2 4.200 2 8 0 5.500-4.800 10-10 10z"/><path d="M2 21c0-3 1.900-5.400 5.100-6 2.400-.5 4.900-2 5.900-3"/>'),
+  cpu: L('<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.500" y="9.500" width="5" height="5" rx=".8"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>'),
+  memory: L('<rect x="3" y="7.500" width="18" height="8" rx="1.500"/><path d="M7 15.500v3M11 15.500v3M15 15.500v3M7 11.500h.01M12 11.500h.01M17 11.500h.01"/>'),
+  disk: L('<rect x="3.500" y="6.500" width="17" height="11" rx="2.500"/><path d="M7 14.500h.01M10.500 14.500h6.500"/>'),
+  wifi: L('<path d="M3 9.200a13 13 0 0 1 18 0"/><path d="M6 12.400a8.700 8.700 0 0 1 12 0"/><path d="M9 15.600a4.400 4.400 0 0 1 6 0"/><circle cx="12" cy="18.800" r=".9" fill="currentColor"/>'),
+  wifioff: L('<path d="M3 9.200a13 13 0 0 1 18 0M6 12.400a8.700 8.700 0 0 1 12 0M9 15.600a4.400 4.400 0 0 1 6 0" opacity=".45"/><path d="M4 4l16 16"/>'),
+  // Müzik
+  music: L('<path d="M9 17.500V6l11-2v11.500"/><circle cx="6.500" cy="17.500" r="2.500"/><circle cx="17.500" cy="15.500" r="2.500"/>'),
+  play: L('<path d="M7 4.500v15l12-7.500z"/>', true),
+  pause: L('<rect x="6.500" y="4.500" width="3.800" height="15" rx="1"/><rect x="13.700" y="4.500" width="3.800" height="15" rx="1"/>', true),
+  prev: L('<path d="M18 5.500v13L9.500 12zM6 5.500v13"/>'),
+  next: L('<path d="M6 5.500v13L14.500 12zM18 5.500v13"/>'),
+  shuffle: L('<path d="M3.500 7h3.500c5 0 4 10 9 10h4M3.500 17h3.500c1.800 0 2.800-1.100 3.600-2.500M13.400 9.500C14.200 8 15.200 7 17 7h3.500"/><path d="M18 4.500l2.500 2.500-2.500 2.500M18 14.500l2.500 2.500-2.500 2.500"/>'),
+  repeat: L('<path d="M4 11V9.500A2.500 2.500 0 0 1 6.500 7H20M17 4l3 3-3 3M20 13v1.500a2.500 2.500 0 0 1-2.500 2.500H4M7 20l-3-3 3-3"/>'),
+  vol: L('<path d="M4 9.500h3.500L12 5.500v13l-4.500-4H4z"/><path d="M15.500 9a4.500 4.500 0 0 1 0 6"/><path d="M18.300 6.400a8.300 8.300 0 0 1 0 11.200"/>'),
+  volmute: L('<path d="M4 9.500h3.500L12 5.500v13l-4.500-4H4z"/><path d="M16 9.500l5 5M21 9.500l-5 5"/>'),
+  playlist: L('<path d="M4 6.500h12M4 11.500h12M4 16.500h7"/><path d="M15.500 20V13l5-1.200v6"/><circle cx="14" cy="20" r="1.500"/><circle cx="19" cy="18" r="1.500"/>'),
+  album: L('<circle cx="12" cy="12" r="8.500"/><circle cx="12" cy="12" r="2.500"/>'),
+  // PDF
+  pagefile: L('<path d="M7 3.500h7.500L19 8v11a1.500 1.500 0 0 1-1.500 1.500h-10A1.500 1.500 0 0 1 6 19V5A1.500 1.500 0 0 1 7 3.500z"/><path d="M14.500 3.500V8H19"/>'),
+  // E-posta
+  mail: L('<rect x="3" y="5.500" width="18" height="13" rx="2.500"/><path d="M3.500 7.500l8.500 6 8.500-6"/>'),
+  mailnew: L('<path d="M12 18.500H5.500A2.500 2.500 0 0 1 3 16V8a2.500 2.500 0 0 1 2.500-2.500h13A2.500 2.500 0 0 1 21 8v3"/><path d="M3.500 7.500l8.500 6 8.500-6M18 14.500v6M15 17.500h6"/>'),
+  inbox: L('<path d="M3.500 13.500h4.500l1.500 2.500h5l1.500-2.500h4.500"/><path d="M5.800 5.500h12.400a1.500 1.500 0 0 1 1.400 1l1.900 6.500V18a1.500 1.500 0 0 1-1.500 1.500H4A1.500 1.500 0 0 1 2.500 18v-5L4.400 6.500a1.500 1.500 0 0 1 1.400-1z"/>'),
+  drafts: L('<path d="M14.500 20.500H6A2.500 2.500 0 0 1 3.500 18V6.500A2.500 2.500 0 0 1 6 4h8l5 5v3"/><path d="M14 4v5h5"/><path d="M12 20.500l.5-2.500 6.500-6.500a1.400 1.400 0 0 1 2 2L14.500 20z"/>'),
+  send: L('<path d="M21 3L10.500 13.500M21 3l-6.500 18-4-7.500L3 9.500z"/>'),
+  sent: L('<path d="M20.500 3.500L3.500 10l6.500 3 3 6.500z"/><path d="M10 13l5-5"/>'),
+  junk: L('<circle cx="12" cy="12" r="8.500"/><path d="M6 6l12 12"/>'),
+  archive: L('<rect x="3.500" y="4.500" width="17" height="4.500" rx="1.200"/><path d="M5 9v8.500a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/>'),
+  reply: L('<path d="M9.500 6L4 11.500 9.500 17"/><path d="M4.500 11.500h9a6 6 0 0 1 6 6V19"/>'),
+  forward: L('<path d="M14.500 6L20 11.500 14.500 17"/><path d="M19.500 11.500h-9a6 6 0 0 0-6 6V19"/>'),
+  clip: L('<path d="M19.500 11.500l-7 7a4.500 4.500 0 0 1-6.400-6.400l7.500-7.500a3 3 0 0 1 4.200 4.200l-7.500 7.500a1.500 1.500 0 0 1-2.100-2.100l6.800-6.800"/>'),
+  people: L('<circle cx="9" cy="8.500" r="3.200"/><path d="M3 19.500a6 6 0 0 1 12 0"/><path d="M15.500 5.600a3.200 3.200 0 0 1 0 5.800M17.500 14.200a6 6 0 0 1 3.500 5.300"/>'),
+  newsletter: L('<rect x="4" y="4" width="16" height="16" rx="2.500"/><path d="M8 9h8M8 13h8M8 16.500h4.500"/>'),
+  // Mağaza
+  apps: L('<rect x="4" y="4" width="6.500" height="6.500" rx="1.400"/><rect x="13.500" y="4" width="6.500" height="6.500" rx="1.400"/><rect x="4" y="13.500" width="6.500" height="6.500" rx="1.400"/><rect x="13.500" y="13.500" width="6.500" height="6.500" rx="1.400"/>'),
+  gamepad: L('<path d="M7.500 7h9a4.500 4.500 0 0 1 4.400 3.600l.9 4.700a2.500 2.500 0 0 1-4.400 2.100l-1.500-1.800H8.100l-1.500 1.800a2.500 2.500 0 0 1-4.400-2.100l.9-4.700A4.500 4.500 0 0 1 7.500 7z"/><path d="M7.500 10v3M6 11.500h3M15.500 11h.01M17.500 12.500h.01"/>'),
+  library: L('<path d="M5 4.500v15M9.500 4.500v15M14 6l4.500 13.500M3.500 19.500h17"/>'),
+  palette: L('<path d="M12 3.500a8.500 8.500 0 1 0 0 17c1.400 0 2-.8 2-1.700 0-1.300-1.100-1.500-1.100-2.800 0-1 .8-1.700 1.800-1.700h2.200a3.600 3.600 0 0 0 3.600-3.600A8.500 8.500 0 0 0 12 3.500z"/><circle cx="7.800" cy="11.500" r=".9" fill="currentColor"/><circle cx="10.500" cy="7.500" r=".9" fill="currentColor"/><circle cx="15" cy="7.800" r=".9" fill="currentColor"/>'),
+  shield: L('<path d="M12 3.500l7 2.800v5.200c0 4.400-3 7.800-7 9-4-1.200-7-4.600-7-9V6.300z"/><path d="M8.800 12l2.200 2.200 4.200-4.400"/>'),
+  bag: L('<path d="M5.500 8h13l-1 11.500a1.500 1.500 0 0 1-1.500 1.400H8a1.500 1.500 0 0 1-1.500-1.400z"/><path d="M9 8V6.500a3 3 0 0 1 6 0V8"/>'),
+  // Takvim, hava
+  bell: L('<path d="M6 16.500V11a6 6 0 0 1 12 0v5.500l1.500 2h-15z"/><path d="M10 21h4"/>'),
+  pin: L('<path d="M12 21s-6.500-5.800-6.500-11a6.500 6.500 0 0 1 13 0c0 5.200-6.500 11-6.500 11z"/><circle cx="12" cy="10" r="2.300"/>'),
+  drop: L('<path d="M12 3.500s6 6 6 10.500a6 6 0 0 1-12 0c0-4.500 6-10.500 6-10.500z"/>'),
+  wind: L('<path d="M3.500 9.500h10a2.500 2.500 0 1 0-2.400-3.100M3.500 14.500h14a2.500 2.500 0 1 1-2.400 3.100M3.500 12h6"/>'),
+  // oyunlar
+  flag: L('<path d="M6 21V4M6 4.500h11l-2.500 4 2.500 4H6"/>'),
+  bomb: L('<circle cx="11" cy="14" r="6.500"/><path d="M15.500 9.500l2.200-2.200M17 4.500l2.500 2.500M18 5.800l1-1.800"/>'),
+  target: L('<circle cx="12" cy="12" r="8.500"/><circle cx="12" cy="12" r="4.500"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'),
+  lightning: L('<path d="M13 3L5 13.500h6l-1 7.500 8-10.500h-6z"/>'),
+};
+
+export const ic = (name) => ICONS[name] || '';
+
+// ---- Hava durumu: renkli, dolgulu küçük simgeler ----
+const W = (body, cls = '') => `<svg class="wi wx${cls ? ' ' + cls : ''}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${body}</svg>`;
+const SUN = '<circle cx="24" cy="24" r="9" fill="#ffc933"/><g stroke="#ffb300" stroke-width="3" stroke-linecap="round"><path d="M24 5v5M24 38v5M5 24h5M38 24h5M10.500 10.500l3.500 3.500M34 34l3.500 3.500M37.500 10.500L34 14M14 34l-3.500 3.500"/></g>';
+const CLOUD = (x = 0, y = 0, c = '#dbe6f2', s = '#a9bdd2') => `<path transform="translate(${x} ${y})" d="M14 36a7.500 7.500 0 0 1-.9-14.900A10.500 10.500 0 0 1 33.500 19 8.500 8.500 0 0 1 34 36z" fill="${c}" stroke="${s}" stroke-width="1.400" stroke-linejoin="round"/>`;
+export const WX = {
+  sun: W(SUN),
+  partly: W('<g transform="translate(-4 -6) scale(.78)"><circle cx="24" cy="24" r="9" fill="#ffc933"/><g stroke="#ffb300" stroke-width="3" stroke-linecap="round"><path d="M24 5v5M5 24h5M10.500 10.500l3.500 3.500M37.500 10.500L34 14M38 24h5"/></g></g>' + CLOUD(2, 2)),
+  few: W('<g transform="translate(-2 -8) scale(.85)"><circle cx="24" cy="24" r="9" fill="#ffc933"/><g stroke="#ffb300" stroke-width="3" stroke-linecap="round"><path d="M24 5v5M5 24h5M10.500 10.500l3.500 3.500M37.500 10.500L34 14M38 24h5"/></g></g><path transform="translate(8 8) scale(.8)" d="M14 36a7.500 7.500 0 0 1-.9-14.900A10.500 10.500 0 0 1 33.500 19 8.500 8.500 0 0 1 34 36z" fill="#eef3f9" stroke="#b7c8da" stroke-width="1.400"/>'),
+  cloud: W(CLOUD(0, -2, '#cfdbe8', '#8fa6bd')),
+  rain: W(CLOUD(0, -6, '#b7c6d6', '#7f93a9') + '<g stroke="#3d8ef0" stroke-width="3" stroke-linecap="round"><path d="M17 36l-2 5M25 36l-2 5M33 36l-2 5"/></g>'),
+  storm: W(CLOUD(0, -6, '#8c98a8', '#5f6b7a') + '<path d="M25 28l-5 8h4l-2 7 7-10h-4l3-5z" fill="#ffd23f" stroke="#e0a800" stroke-width="1"/>'),
+  off: W('<path d="M6 18a26 26 0 0 1 36 0M12 25a17 17 0 0 1 24 0M18 32a8 8 0 0 1 12 0" fill="none" stroke="#8a96a6" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="38" r="2" fill="#8a96a6"/><path d="M8 8l32 32" stroke="#d13438" stroke-width="3.500" stroke-linecap="round"/>'),
+};

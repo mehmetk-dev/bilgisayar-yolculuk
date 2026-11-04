@@ -14,7 +14,7 @@ export const gorev = {
     ['Ctrl + Shift + Esc', 'Görev Yöneticisi\'ni doğrudan açar'],
     ['Ctrl + Alt + Delete', 'Kilitle, oturumu kapat, Görev Yöneticisi ekranı'],
     ['İşlemler → Görevi sonlandır', 'Donan programı zorla kapatır (kaydedilmemiş iş kaybolur)'],
-    ['Performans', 'İşlemci, bellek (RAM), disk ve ağın ne kadar dolu olduğu'],
+    ['Performans', 'CPU (işlemci), bellek (RAM), disk ve ağın ne kadar dolu olduğu'],
     ['Başlangıç uygulamaları', 'Bilgisayar açılırken kendiliğinden çalışanlar; gereksizler devre dışı bırakılır'],
   ],
   steps: [
@@ -51,7 +51,7 @@ export const gorev = {
     },
     {
       title: 'Görev Yöneticisi\'ni açın',
-      html: `<p><b>Görev çubuğunun boş bir yerine sağ tıklayın</b> ve <b>📊 Görev Yöneticisi</b>\'ni seçin.</p>
+      html: `<p><b>Görev çubuğunun boş bir yerine sağ tıklayın</b> ve <b>Görev Yöneticisi</b>\'ni seçin.</p>
         <p class="mut">Kısayolu: ${K('Ctrl', 'Shift', 'Esc')}. Bilgisayar tamamen kilitlenmişse ${K('Ctrl', 'Alt', 'Delete')} da çalışır. (Bu tuşları gerçek Windows kendisi yakalayabilir; öyleyse sağ tıkı kullanın.)</p>`,
       mouse: '🖱 Görev çubuğuna sağ tık → Görev Yöneticisi',
       setup: (c) => { const w = c.d.find('word'); if (w && !w.hung) c.d.hang(w); },
@@ -61,7 +61,7 @@ export const gorev = {
     },
     {
       title: 'Donan programı seçin',
-      html: '<p>Listede durumu <b>⏳ Yanıt vermiyor</b> olan satıra (Kelime İşlemci) bir kez tıklayın.</p>',
+      html: '<p>Listede durumu <b>Yanıt vermiyor</b> olan satıra (Kelime İşlemci) bir kez tıklayın.</p>',
       mouse: '🖱 Yanıt vermiyor satırına tıklayın',
       setup: (c) => { c.d.ensure('taskmgr', { tab: 'proc' }); if (TM(c)?.tab !== 'proc') c.d.find('taskmgr').api.onArgs({ tab: 'proc' }); },
       on: (ev) => ev.type === 'task-select' && ev.id === 'app:word',
@@ -69,7 +69,7 @@ export const gorev = {
     },
     {
       title: 'Görevi sonlandırın',
-      html: '<p>Sağ üstteki <b>⊘ Görevi sonlandır</b>\'a tıklayın. (Satıra sağ tıklayıp da seçebilirsiniz.)</p>',
+      html: '<p>Sağ üstteki <b>Görevi sonlandır</b>\'a tıklayın. (Satıra sağ tıklayıp da seçebilirsiniz.)</p>',
       mouse: '🖱 Görevi sonlandır',
       hint: 'Önce satırı seçmezseniz düğme soluk kalır.',
       on: (ev) => ev.type === 'task-end' && ev.app === 'word',
@@ -85,7 +85,7 @@ export const gorev = {
     }),
     {
       title: 'Performans',
-      html: '<p>Soldaki <b>📈 Performans</b>\'a tıklayın, sonra listeden <b>Bellek (RAM)</b>\'i seçin.</p>',
+      html: '<p>Soldaki <b>Performans</b>\'a tıklayın, sonra soldaki kartlardan <b>Bellek</b>\'i seçin.</p>',
       mouse: '🖱 Performans → Bellek',
       setup: (c) => c.d.ensure('taskmgr'),
       on: (ev) => ev.type === 'task-perf' && ev.kind === 'mem',
@@ -93,17 +93,17 @@ export const gorev = {
     },
     rehberSoru({
       title: 'Bilgisayarınızı tanıyın',
-      html: '<p>Yandaki Performans sayfasında <b>İşlemci (CPU)</b>\'ya tıklayın. Bu bilgisayarda hangi işlemci var?</p>',
-      opts: ['Intel Core i5-12400', '8,0 GB DDR4', 'NVMe SSD 512 GB'],
+      html: '<p>Yandaki Performans sayfasında <b>CPU</b> kartına tıklayın. Bu bilgisayarda hangi işlemci var?</p>',
+      opts: ['Intel Core i7-8700', '8,0 GB DDR4', 'NVMe SSD 512 GB'],
       ok: 0,
       setup: (c) => c.d.ensure('taskmgr', { tab: 'perf' }),
-      wrong: 'O işlemci değil. İşlemci (CPU) satırına tıklayıp sağ üst köşedeki yazıya bakın.',
-      why: '“i5” işlemcinin sınıfı, “12” onun nesli (12. nesil). Bilgisayar alırken ilanlarda yazan bilgiler burada görülür.',
+      wrong: 'O işlemci değil. CPU kartına tıklayıp sağ üst köşedeki yazıya bakın.',
+      why: '“i7” işlemcinin sınıfı, “8700” modelidir (8. nesil). Bilgisayar alırken ilanlarda yazan bilgiler burada görülür.',
     }),
     {
       title: 'Bilgisayar geç açılıyor',
       html: `<p>Bazı programlar bilgisayar açılırken <b>kendiliğinden</b> çalışır ve açılışı yavaşlatır.</p>
-        <ol class="steps"><li>Soldaki <b>🚀 Başlangıç uygulamaları</b>\'na tıklayın.</li><li>Yayımcısı <b>Bilinmiyor</b>, etkisi <b>Yüksek</b> olan <b>Süper Arama Yardımcısı</b>\'nı seçin.</li><li><b>Devre dışı bırak</b>\'a tıklayın.</li></ol>`,
+        <ol class="steps"><li>Soldaki <b>Başlangıç uygulamaları</b>\'na tıklayın.</li><li>Yayımcısı <b>Bilinmiyor</b>, etkisi <b>Yüksek</b> olan <b>Süper Arama Yardımcısı</b>\'nı seçin.</li><li><b>Devre dışı bırak</b>\'a tıklayın.</li></ol>`,
       mouse: '🖱 Başlangıç uygulamaları → Süper Arama Yardımcısı → Devre dışı bırak',
       setup: (c) => { c.d.settings.toolbar = true; c.d.ensure('taskmgr'); },
       on: (ev) => ev.type === 'startup-toggle' && ev.id === 'toolbar' && !ev.on,
