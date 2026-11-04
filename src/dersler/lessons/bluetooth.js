@@ -62,13 +62,13 @@ export const bluetooth = {
     },
     {
       title: 'Müziği kulaklıkta dinleyin',
-      html: '<p>Müzik Çalar açıldı. <b>▶ Çal</b>\'a tıklayın. Ekranın köşesinde sesin nereden çaldığı yazacak.</p>',
-      mouse: '🖱 ▶ Çal',
+      html: '<p>Müzik Çalar açıldı. altta ortadaki <b>Çal</b> (▶) düğmesine tıklayın. Ekranın köşesinde sesin nereden çaldığı yazacak.</p>',
+      mouse: '🖱 Çal (▶)',
       hint: 'Ses duyulmuyorsa sağ alttaki 🔊 simgesinden sesi açın.',
       setup: (c) => c.d.ensure('music'),
       on: (ev, c) => {
         if (ev.type !== 'music-play') return false;
-        if (!ev.audible) { c.warn('Ses kapalı ya da sıfırda. 🔊 simgesinden sesi açıp tekrar ▶ Çal\'a basın.'); return false; }
+        if (!ev.audible) { c.warn('Ses kapalı ya da sıfırda. 🔊 simgesinden sesi açıp tekrar Çal düğmesine basın.'); return false; }
         return /Kulaklık/.test(ev.output);
       },
       done: 'Ses kulaklıktan geliyor. Bluetooth cihaz bağlıyken ses ona gider; bağlı değilse bilgisayarın hoparlöründen çalar.',

@@ -104,10 +104,10 @@ export const buyukParkur = {
     },
     {
       title: '6. Davetiyeyi gönderin', html: '<p>Ahmet\'e konusu <b>Doğum günü daveti</b> olan bir e-posta gönderin; <b>davetiye</b> dosyasını ekleyin.</p>',
-      hint: 'E-posta → ✏ Yeni posta → Kime: ahmet@ornek.com → 📎 Dosya ekle → Belgeler → Doğum Günü → davetiye → Aç → ➤ Gönder.',
+      hint: 'E-posta → Yeni posta → Kime: ahmet@ornek.com → Dosya ekle → Belgeler → Doğum Günü → davetiye → Aç → Gönder.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send' || !ev.toList.map(lower).includes('ahmet@ornek.com')) return false;
-        if (!ev.attachments.some((a) => /davet/i.test(a))) { c.warn('Posta gitti ama davetiye ekli değildi. Yeniden gönderin; 📎 Dosya ekle\'yi kullanın.'); return false; }
+        if (!ev.attachments.some((a) => /davet/i.test(a))) { c.warn('Posta gitti ama davetiye ekli değildi. Yeniden gönderin; Dosya ekle\'yi kullanın.'); return false; }
         return true;
       },
     },

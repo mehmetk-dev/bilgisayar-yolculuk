@@ -267,18 +267,6 @@
 .dk-dark .qk-row button { background: #3a3a3a; }
 .dk-dark .win { border-color: #555; }
 /* Windows'un kendi uygulamaları da koyulaşır: Ayarlar, Dosya Gezgini, Görev Yöneticisi, Mağaza, Takvim, Hava Durumu */
- .dk-dark .tm, .dk-dark .ms, .dk-dark .tk, .dk-dark .hv  { background: #202020; color: #eee; }
- .dk-dark .tm-nav button.on, .dk-dark .ms-nav button.on, .dk-dark .ms-card, .dk-dark .ms-page section, .dk-dark .ms-row, .dk-dark .tm-main, .dk-dark .tk-day  { background: #2b2b2b; border-color: #3a3a3a; color: #eee; }
- .dk-dark .tm-nav button:hover, .dk-dark .ms-nav button:hover  { background: #333; }
- .dk-dark .ms-btn, .dk-dark .tm-btn, .dk-dark .ms-q, .dk-dark .tk-head button, .dk-dark .tk-note, .dk-dark .hv-city  { background: #3a3a3a; color: #eee; border-color: #555 !important; }
- .dk-dark .ms-card small, .dk-dark .ms-mut, .dk-dark .tm-boot small  { color: #aaa; }
-.dk-dark .tm-t th { background: #2b2b2b; color: #ddd; border-color: #3a3a3a; }
-.dk-dark .tm-t td { border-color: #333; color: #eee; }
-.dk-dark .tm-t tr.sel td { background: #2f4a6b !important; }
-.dk-dark .tm-t tr[data-proc]:hover td, .dk-dark .tm-t tr[data-start]:hover td { background: #333; }
-.dk-dark .tm-grp td { color: #8cb8ff; }
-.dk-dark .tm-plist button.on { background: #2f4a6b; }
-.dk-dark .tk-grid button { background: #2b2b2b; color: #eee; }
 
 /* Ortak ilerleme çubuğu */
 .prg-l { font-size: 0.9em; margin-bottom: 0.3em; }

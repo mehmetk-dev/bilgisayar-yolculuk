@@ -30,7 +30,7 @@ export const takvimRandevu = {
       mouse: '🖱 Başlat → Takvim',
       check: (c) => !!c.d.find('takvim'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'takvim',
-      done: 'Bugünün tarihi renkli kutuda. ‹ › ile aylar arasında gezilir; kırmızı günler resmî tatildir.',
+      done: 'Bugünün tarihi renkli kutuda. Sağ üstteki yukarı ve aşağı oklarla aylar arasında gezilir; kırmızı günler resmî tatildir.',
     },
     {
       title: 'Randevu ekleyin',
@@ -309,10 +309,10 @@ export const gorevAyrinti = {
   desc: 'Sütunlara tıklayarak bilgisayarı en çok yoran programı bulmak, tanımadığınız programı fark etmek, Yeni görev çalıştır ile program açmak.',
   summary: [
     ['Sütun başlığına tıklayın', 'Büyükten küçüğe sıralar: en çok kullanan en üste çıkar. Bir daha tıklayınca sıralama kalkar'],
-    ['İşlemci', 'Programın çalışma yükü; sürekli yüksekse bilgisayar ağırlaşır'],
+    ['CPU', 'İşlemcinin (bilgisayarın beyni) çalışma yükü; sürekli yüksekse bilgisayar ağırlaşır'],
     ['Bellek', 'Programın tuttuğu hafıza (MB); tarayıcılar çok tutar'],
     ['Disk ve Ağ', 'Dosya okuma-yazma ve internet kullanımı; tanımadığınız bir programın ağ kullanması şüphelidir'],
-    ['▶ Yeni görev çalıştır', 'notepad, calc, mspaint yazarak program açar (menüler kaybolduğunda işe yarar)'],
+    ['Yeni görev çalıştır', 'notepad, calc, mspaint yazarak program açar (menüler kaybolduğunda işe yarar)'],
   ],
   steps: [
     {
@@ -347,8 +347,8 @@ export const gorevAyrinti = {
     }),
     {
       title: 'İşlemciye göre sıralayın',
-      html: '<p>Bu kez <b>İşlemci</b> başlığına tıklayın. <b>Arka plan işlemleri</b> bölümüne bakın: adını bilmediğiniz bir program en üste çıkacak.</p>',
-      mouse: '🖱 “İşlemci” başlığı',
+      html: '<p>Bu kez <b>CPU</b> başlığına tıklayın. <b>Arka plan işlemleri</b> bölümüne bakın: adını bilmediğiniz bir program en üste çıkacak.</p>',
+      mouse: '🖱 “CPU” başlığı',
       setup: (c) => { c.d.settings.toolbar = true; tmOpen(c); },
       on: (ev) => ev.type === 'task-sort' && ev.key === 'cpu',
       done: '<b>Süper Arama Yardımcısı</b> işlemcinin yaklaşık %34\'ünü kullanıyor. Siz böyle bir program kurmadınız; büyük olasılıkla bir program kurarken yanında gelmiş.',
@@ -371,7 +371,7 @@ export const gorevAyrinti = {
     }),
     {
       title: 'Yeni görev çalıştır',
-      html: '<p>Görev Yöneticisi\'nin üstündeki <b>▶ Yeni görev çalıştır</b>\'a basın, kutuya <b>notepad</b> yazın ve <b>Tamam</b>\'a basın.</p>',
+      html: '<p>Görev Yöneticisi\'nin sağ üstündeki <b>Yeni görev çalıştır</b>\'a basın, kutuya <b>notepad</b> yazın ve <b>Tamam</b>\'a basın.</p>',
       target: 'notepad',
       setup: tmOpen,
       hint: 'Başlat menüsü ya da görev çubuğu donduğunda programları böyle açabilirsiniz. Açılmazsa adı doğru yazdığınızdan emin olun.',

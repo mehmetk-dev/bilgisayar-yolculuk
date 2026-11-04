@@ -54,7 +54,7 @@ export const gunlukPc = {
       html: '<p>Dosya Gezgini\'ni açın, <b>Resimler</b> klasörüne gidin. <b>tatil.jpg</b>\'ye <b>sağ tıklayın</b> ve <b>Masaüstü arka planı olarak ayarla</b>\'yı seçin.</p>',
       mouse: '🖱 Resimler → tatil.jpg → sağ tık',
       setup: (c) => { c.d.closeAll(); c.d.open('explorer', { folder: 'pictures' }); },
-      hint: 'Fotoğrafı açıp Fotoğraflar uygulamasındaki “Arka plan yap” düğmesi de aynı işi yapar.',
+      hint: 'Fotoğrafı açıp Fotoğraflar uygulamasında ⋯ → Farklı ayarla → Arka plan da aynı işi yapar.',
       on: (ev) => ev.type === 'wallpaper' && ev.custom,
       done: 'Masaüstünün arka planı değişti. Ayarlar → Kişiselleştirme → Arka plan\'dan da yapılabilir.',
     },

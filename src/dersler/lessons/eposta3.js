@@ -11,8 +11,8 @@ export const epostaIletme = {
   id: 'eposta-iletme', icon: '↪', title: 'E-posta: yanıtla, ilet, Bilgi (Cc), Gizli (Bcc) ve taslak', minutes: 30, stage: 'desktop',
   desc: 'Yanıtlamak ile iletmenin farkı, Bilgi (Cc) ve Gizli (Bcc), Taslaklar.',
   summary: [
-    ['↩ Yanıtla', 'Yalnızca size yazana cevap verir'],
-    ['↪ İlet', 'Postayı başka birine gönderir; “Kime”yi siz yazarsınız'],
+    ['Yanıtla', 'Yalnızca size yazana cevap verir'],
+    ['İlet', 'Postayı başka birine gönderir; “Kime”yi siz yazarsınız'],
     ['Bilgi (Cc)', 'Bilgisi olsun istediğiniz kişiler; herkes birbirinin adresini görür'],
     ['Gizli (Bcc)', 'Alıcılar birbirini görmez; kalabalık duyuru için en güvenlisi'],
     ['Birden çok adres', 'Noktalı virgülle ayrılır: ali@ornek.com; ayse@ornek.com'],
@@ -22,7 +22,7 @@ export const epostaIletme = {
     {
       title: 'Yanıtla mı, ilet mi?',
       html: `<p>Gelen bir postayla iki şey yapabilirsiniz:</p>
-        <ul class="big-list"><li><b>↩ Yanıtla</b>: size yazana cevap verirsiniz.</li><li><b>↪ İlet</b>: postayı <b>başka birine</b> gönderirsiniz (örneğin faturayı kardeşiniz Ahmet'e).</li></ul>
+        <ul class="big-list"><li><b>Yanıtla</b>: size yazana cevap verirsiniz.</li><li><b>İlet</b>: postayı <b>başka birine</b> gönderirsiniz (örneğin faturayı kardeşiniz Ahmet'e).</li></ul>
         <p>Ayrıca bir postayı <b>çok kişiye</b> atarken <b>Bilgi (Cc)</b> ve <b>Gizli (Bcc)</b> kutuları vardır.</p>
         <p class="mut">Gerçek posta programlarında üçüncü bir düğme daha olur: <b>Tümünü yanıtla</b>. Yanıtla yalnızca gönderene gider; Tümünü yanıtla, gönderene ve Kime/Bilgi kutusundaki <b>herkese</b> gider. Özel bir şey yazacaksanız <b>Yanıtla</b>\'yı seçin ve Kime kutusuna bakın. Dernek duyurusuna yalnızca başkana teşekkür edecekseniz bile Tümünü yanıtla\'ya basarsanız bütün üyeler okur.</p>`,
       setup: (c) => {
@@ -32,13 +32,13 @@ export const epostaIletme = {
     },
     {
       title: 'Faturayı kardeşinize iletin',
-      html: `<p>Gelen Kutusu'ndaki <b>Ekim ayı faturanız</b> postasını açın. Üstteki <b>↪ İlet</b>'e tıklayın.</p>
+      html: `<p>Gelen Kutusu'ndaki <b>Ekim ayı faturanız</b> postasını açın. Üstteki <b>İlet</b>'e tıklayın.</p>
         <p><b>Kime</b>: <b>ahmet@ornek.com</b> (kardeşiniz Ahmet). Faturayı ödemesi için bir cümle yazıp <b>Gönder</b>.</p>`,
       hint: 'Konu kendiliğinden “İlt: …” olur ve fatura eki yanında gelir; siz yalnızca Kime ve kısa bir not ekleyin.',
       setup: mailOpen,
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
-        if (!ev.forwardOf) { c.warn('Posta gitti ama iletme değil. Faturayı açıp ↪ İlet\'e tıklamalıydınız.'); return false; }
+        if (!ev.forwardOf) { c.warn('Posta gitti ama iletme değil. Faturayı açıp İlet\'e tıklamalıydınız.'); return false; }
         if (!ev.toList.includes('ahmet@ornek.com')) { c.warn(`Posta <b>${ev.to}</b> adresine gitti. Kardeşiniz Ahmet'in adresi: ahmet@ornek.com`); return false; }
         return true;
       },
@@ -46,7 +46,7 @@ export const epostaIletme = {
     },
     {
       title: 'Bilgi (Cc) ekleyin',
-      html: `<p>Şimdi yeni bir posta: <b>✏ Yeni posta</b>. <b>Kime</b>: <b>elif@ornek.com</b>. <b>Kime</b> kutusunun yanındaki <b>Bilgi / Gizli</b> bağlantısına tıklayın; <b>Bilgi (Cc)</b>'ye <b>hoca@ornek.com</b> yazın. Konu: <b>Bahçe</b>. Gönderin.</p>
+      html: `<p>Şimdi yeni bir posta: <b>Yeni posta</b>. <b>Kime</b>: <b>elif@ornek.com</b>. <b>Kime</b> kutusunun yanındaki <b>Bilgi / Gizli</b> bağlantısına tıklayın; <b>Bilgi (Cc)</b>'ye <b>hoca@ornek.com</b> yazın. Konu: <b>Bahçe</b>. Gönderin.</p>
         <p class="mut"><b>Bilgi (Cc)</b>: asıl alıcı Elif; hocanın da haberi olsun. Herkes herkesi görür.</p>`,
       hint: 'Bilgi / Gizli bağlantısı Kime kutusunun sağında, mavi altı çizili.',
       on: (ev, c) => {
@@ -71,7 +71,7 @@ export const epostaIletme = {
     },
     {
       title: 'Yarım kalan posta',
-      html: `<p>Posta yazarken telefon çaldı ve yazmayı yarıda bıraktınız. Bunu şöyle canlandıralım: <b>✏ Yeni posta</b>'ya tıklayın, Kime'ye <b>hoca@ornek.com</b>, Konu'ya <b>Ödevim</b> yazın (mesajı yazmayın). Sonra soldaki <b>📥 Gelen Kutusu</b>'na tıklayın.</p>
+      html: `<p>Posta yazarken telefon çaldı ve yazmayı yarıda bıraktınız. Bunu şöyle canlandıralım: <b>Yeni posta</b>'ya tıklayın, Kime'ye <b>hoca@ornek.com</b>, Konu'ya <b>Ödevim</b> yazın (mesajı yazmayın). Sonra soldaki <b>Gelen Kutusu</b>'na tıklayın.</p>
         <p class="mut">Posta kaybolmaz: kendiliğinden <b>Taslak</b> olarak kaydedilir.</p>`,
       on: (ev) => ev.type === 'mail-draft-save',
       done: 'Sağ altta “Taslak kaydedildi” çıktı.',
@@ -81,7 +81,7 @@ export const epostaIletme = {
       html: '<p>Soldaki <b>📝 Taslaklar</b>\'a tıklayın, <b>Ödevim</b> taslağını açıp mesajı yazın ve gönderin.</p>',
       hint: 'Taslaklar klasörü Gelen Kutusu\'nun hemen altında.',
       on: (ev, c) => {
-        if (ev.type === 'mail-draft-open') c.note('Taslak açıldı. Mesaj kutusuna bir şeyler yazıp ➤ Gönder\'e basın.');
+        if (ev.type === 'mail-draft-open') c.note('Taslak açıldı. Mesaj kutusuna bir şeyler yazıp Gönder\'e basın.');
         return ev.type === 'mail-send' && ev.subject === 'Ödevim';
       },
       done: 'Taslak gönderildi ve Taslaklar klasöründen kalktı. Yarım işleriniz hep orada bekler.',
@@ -96,9 +96,9 @@ export const epostaIletme = {
     rehberSoru({
       title: 'Yanıtla / İlet',
       html: '<p>Hocadan bir davet postası geldi, bunu komşunuza da göstermek istiyorsunuz. Ne yaparsınız?</p>',
-      opts: ['↩ Yanıtla', '↪ İlet ve Kime\'ye komşunun adresini yazarım', 'Sil'], ok: 1,
+      opts: ['Yanıtla', 'İlet ve Kime\'ye komşunun adresini yazarım', 'Sil'], ok: 1,
       wrong: 'Yanıtla yalnızca gönderene cevap verir, başkasına göndermez.',
-      why: 'Doğru: ↪ İlet, postayı (ekleriyle) başkasına gönderir.',
+      why: 'Doğru: İlet, postayı (ekleriyle) başkasına gönderir.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>E-postada kalabalık ve yarım işler:</p>' },
   ],

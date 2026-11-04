@@ -12,15 +12,15 @@ const isDocx = (n) => /\.docx$/i.test(n || '');
 
 export const belgeGonder = {
   id: 'belge-gonder', icon: '📨', title: 'Belgeyi PDF yapıp e-postayla gönderin', minutes: 25, stage: 'desktop', parkur: true,
-  desc: 'Kısa bir dilekçe yazın, PDF yapın, e-postaya ekleyip gönderin; Gönderilenler\'den kontrol edin.',
+  desc: 'Kısa bir dilekçe yazın, PDF yapın, e-postaya ekleyip gönderin; Gönderilmiş Öğeler\'den kontrol edin.',
   summary: [
     ['Ctrl + S', 'Word belgesini kaydeder (Belgeler klasörü)'],
     ['Dosya → PDF olarak kaydet', 'PDF kopyası çıkarır. Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF'],
     ['PDF', 'Karşı taraf değiştiremez; her telefonda ve bilgisayarda aynı görünür'],
-    ['✏ Yeni posta', 'Boş bir posta açar: Kime, Konu, mesaj'],
-    ['📎 Dosya ekle', 'Belgeler klasöründen PDF\'i seçin (.pdf ile biten)'],
-    ['➤ Gönder', 'Postayı yollar; kopyası 📤 Gönderilenler\'de kalır'],
-    ['Gönderilenler', 'Postanın gittiğinden ve ekin yanında olduğundan emin olun'],
+    ['Yeni posta', 'Boş bir posta açar: Kime, Konu, mesaj'],
+    ['Dosya ekle', 'Belgeler klasöründen PDF\'i seçin (.pdf ile biten)'],
+    ['Gönder', 'Postayı yollar; kopyası Gönderilmiş Öğeler\'de kalır'],
+    ['Gönderilmiş Öğeler', 'Postanın gittiğinden ve ekin yanında olduğundan emin olun'],
   ],
   steps: [
     {
@@ -81,7 +81,7 @@ export const belgeGonder = {
     {
       title: '6. Yeni posta açın',
       html: '<p>Boş bir posta yazma ekranı açın.</p>',
-      hint: 'Soldaki ✏ Yeni posta düğmesine tıklayın.',
+      hint: 'Soldaki Yeni posta düğmesine tıklayın.',
       setup: mailOpen,
       on: (ev) => ev.type === 'mail-compose',
     },
@@ -94,12 +94,12 @@ export const belgeGonder = {
     },
     {
       title: '8. PDF dosyasını ekleyin',
-      html: `<p><b>📎 Dosya ekle</b>\'ye tıklayın. Açılan pencere <b>Resimler</b> klasöründen başlar; soldan <b>Belgeler</b>\'e geçin ve <b>.pdf</b> ile biten dosyayı seçin.</p>
+      html: `<p><b>Dosya ekle</b>\'ye tıklayın. Açılan pencere <b>Resimler</b> klasöründen başlar; soldan <b>Belgeler</b>\'e geçin ve <b>.pdf</b> ile biten dosyayı seçin.</p>
         <p class="mut">Aynı adlı iki dosya göreceksiniz: biri <b>.docx</b>, biri <b>.pdf</b>. Siz <b>.pdf</b> olanı ekleyin.</p>`,
       hint: 'Seçmek için dosyaya bir kez tıklayın, sonra Aç\'a basın (ya da çift tıklayın). Yanlışı eklediyseniz, eklenen dosyanın yanındaki ✕ ile çıkarıp yenisini ekleyin.',
       on: (ev, c) => {
         if (ev.type !== 'mail-attach') return false;
-        if (isDocx(ev.name)) { c.warn(`Word dosyasını (<b>${ev.name}</b>) eklediniz. PDF olanı ekleyin: eklenen dosyanın yanındaki ✕ ile bunu çıkarın, sonra 📎 Dosya ekle ile <b>.pdf</b> ile biten dosyayı seçin.`); return false; }
+        if (isDocx(ev.name)) { c.warn(`Word dosyasını (<b>${ev.name}</b>) eklediniz. PDF olanı ekleyin: eklenen dosyanın yanındaki ✕ ile bunu çıkarın, sonra Dosya ekle ile <b>.pdf</b> ile biten dosyayı seçin.`); return false; }
         if (!isPdf(ev.name)) { c.warn(`<b>${ev.name}</b> bir PDF değil. Belgeler klasöründeki <b>.pdf</b> ile biten dosyayı ekleyin.`); return false; }
         return true;
       },
@@ -107,27 +107,27 @@ export const belgeGonder = {
     },
     {
       title: '9. Gönderin',
-      html: '<p>Her şey tamamsa <b>➤ Gönder</b>\'e tıklayın.</p>',
+      html: '<p>Her şey tamamsa <b>Gönder</b>\'e tıklayın.</p>',
       hint: 'Göndermeden önce Kime ve Konu kutularına son bir kez bakın. Konu kutusu boşsa program “Konu yok” diye sorar; “Geri dön, konu yazayım”ı seçip konuyu yazın ve yeniden gönderin.',
       on: (ev, c) => {
         if (ev.type !== 'mail-send') return false;
-        if (!ev.attachments.some(isPdf)) { c.warn('Posta gitti ama içinde PDF yok. Yeni posta açın, 📎 Dosya ekle ile Belgeler\'deki <b>.pdf</b> dosyayı ekleyip tekrar gönderin.'); return false; }
+        if (!ev.attachments.some(isPdf)) { c.warn('Posta gitti ama içinde PDF yok. Yeni posta açın, Dosya ekle ile Belgeler\'deki <b>.pdf</b> dosyayı ekleyip tekrar gönderin.'); return false; }
         if (ev.body.trim().length < 3) { c.warn('Posta PDF ile gitti ama mesaj kısmı boş. Resmî postalara bir iki cümle yazmak nezaket gereğidir; bir dahaki sefere yazın. Şimdilik tekrar gönderin.'); return false; }
         return true;
       },
       done: 'Posta gitti. Şimdi gerçekten gittiğinden emin olalım.',
     },
     {
-      title: '10. Gönderilenler\'de kontrol edin',
-      html: `<p>Soldaki <b>📤 Gönderilenler</b> klasörüne tıklayın. Az önceki postayı bulup açın ve <b>📎 PDF'in</b> yanında durduğuna bakın.</p>
+      title: '10. Gönderilmiş Öğeler\'de kontrol edin',
+      html: `<p>Soldaki <b>Gönderilmiş Öğeler</b> klasörüne tıklayın. Az önceki postayı bulup açın ve <b>PDF'in</b> yanında durduğuna bakın.</p>
         <p class="mut">Önemli bir belgeyi gönderdiyseniz bu kontrolü her seferinde yapın.</p>`,
       hint: 'Postanın satırında Kime: muhtarlik@ornek.com yazar. Satıra tıklayınca açılır.',
       setup: mailOpen,
       on: (ev, c) => {
-        if (ev.type === 'mail-folder' && ev.folder === 'sent') { c.note('Gönderilenler açıldı. Şimdi en üstteki postaya tıklayıp açın.'); return false; }
+        if (ev.type === 'mail-folder' && ev.folder === 'sent') { c.note('Gönderilmiş Öğeler açıldı. Şimdi en üstteki postaya tıklayıp açın.'); return false; }
         return ev.type === 'mail-open' && ev.folder === 'sent';
       },
-      done: 'Postanız ve PDF eki Gönderilenler\'de duruyor; gönderme tamam. Gmail\'de adı “Gönderilmiş”, Outlook\'ta “Gönderilmiş Öğeler”.',
+      done: 'Postanız ve PDF eki Gönderilmiş Öğeler\'de duruyor; gönderme tamam. Gmail\'de adı “Gönderilmiş”, Outlook\'ta “Gönderilmiş Öğeler”.',
     },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Bir belgeyi yazıp PDF yaptınız ve e-postayla gönderdiniz:</p>' },
   ],
