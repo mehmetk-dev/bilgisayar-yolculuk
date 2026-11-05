@@ -31,11 +31,9 @@
 .calc .ca-keys sup, .calc .ca-keys sub { font-size: 0.6em; line-height: 0; }
 .calc .ca-keys .ca-deg { font-size: 0.8em; font-weight: 700; }
 .calc .ca-keys svg { width: 1.2em; height: 1.2em; }
-/* Geçmiş / Bellek paneli: dar pencerede alttan açılır, geniş pencerede sağda durur */
+/* Geçmiş / Bellek paneli: Geçmiş simgesine ya da M˅'ya basınca alttan açılır (pencere ne kadar geniş olursa olsun) */
 .calc .ca-side { display: none; flex-direction: column; background: var(--ca-panel); min-height: 0; }
 .calc .ca-pan .ca-side { display: flex; position: absolute; left: 0; right: 0; bottom: 0; height: 60%; z-index: 3; border-top: 1px solid var(--ca-bd); box-shadow: 0 -4px 14px #0002; }
-.calc .ca-wide .ca-side, .calc .ca-wide.ca-pan .ca-side { display: flex; position: static; width: 18em; height: auto; flex: none; border-top: 0; border-left: 1px solid var(--ca-bd); box-shadow: none; }
-.calc .ca-wide .ca-hbtn { visibility: hidden; }
 .calc .ca-tabs { display: flex; gap: 0.3em; padding: 0.4em 0.6em 0; }
 .calc .ca-tabs button { border: 0; background: none; color: var(--ca-mut); font-weight: 600; padding: 0.3em 0.5em; border-bottom: 3px solid transparent; border-radius: 0; }
 .calc .ca-tabs button.on { color: var(--ca-fg); border-bottom-color: var(--acc, #0067c0); }
