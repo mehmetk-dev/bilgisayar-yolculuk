@@ -61,6 +61,8 @@ button.link { background: none; border: 0; color: var(--acc); text-decoration: u
 
 /* ana sayfa */
 /* Ana sayfa stilleri: 03-anasayfa.css */
+/* svgicons.js: metinde emoji yerine konan SVG (yazı boyunda, yazıyla aynı hizada) */
+.svi { width: 1em; height: 1em; display: inline-block; vertical-align: -0.15em; flex: none; }
 .printcard .svi, #printCard .svi { width: 1em; height: 1em; vertical-align: -0.1em; }
 
 /* ders ekranı */
