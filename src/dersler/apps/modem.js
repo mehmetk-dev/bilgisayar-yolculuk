@@ -2,6 +2,7 @@
 // Modem: Power, DSL, Internet, WLAN, LAN ışıkları; arkadaki düğmeyle kapatıp açmak (10 saniye kuralı).
 // Telefon: erişim noktası açılınca Wi-Fi listesinde telefonun ağı görünür; bilgisayar telefonun internetini kullanır.
 import { esc } from './util.js';
+import { SYS_ICONS, MONO } from './appicons.js';
 
 export const HOTSPOT = { name: 'Ahmet\'in telefonu', lock: true, pass: 'telefon123', bars: 3, phone: true };
 
@@ -34,11 +35,11 @@ export function modemPanel(desk, { fault = 'reset' } = {}) {
   let timer = 0;
   let small = false; // küçültülünce yalnızca küçük bir düğme kalır (pencereleri kapatmasın)
   const draw = () => {
-    if (small) { el.innerHTML = '<button type="button" class="dk-chip" data-big="1">📟 Modem ▴</button>'; return; }
+    if (small) { el.innerHTML = `<button type="button" class="dk-chip" data-big="1">${MONO.wifi} Modem ${MONO.chevup}</button>`; return; }
     const off = !m.on && !m.booting;
     const secs = off ? Math.floor((Date.now() - m.offAt) / 1000) : 0;
-    el.innerHTML = `<div class="mo-box"><div class="mo-brand">MODEM <button type="button" class="dk-mini" data-small="1" title="Küçült">▾</button></div><div class="mo-leds">${LEDS.map(([id, l]) => `<button type="button" class="mo-led" data-led="${id}" title="${esc(l)}"><i class="${m.lit[id]}"></i><span>${l}</span></button>`).join('')}</div></div>
-      <div class="mo-back"><button type="button" class="mo-pwr" title="Modemin arkasındaki açma/kapama düğmesi">⏻</button><small>${m.booting ? 'Açılıyor…' : off ? `Kapalı · ${secs} sn` : 'Arkadaki düğme'}</small></div>
+    el.innerHTML = `<div class="mo-box"><div class="mo-brand">MODEM <button type="button" class="dk-mini" data-small="1" title="Küçült">${MONO.chevdown}</button></div><div class="mo-leds">${LEDS.map(([id, l]) => `<button type="button" class="mo-led" data-led="${id}" title="${esc(l)}"><i class="${m.lit[id]}"></i><span>${l}</span></button>`).join('')}</div></div>
+      <div class="mo-back"><button type="button" class="mo-pwr" title="Modemin arkasındaki açma/kapama düğmesi">${MONO.power}</button><small>${m.booting ? 'Açılıyor…' : off ? `Kapalı · ${secs} sn` : 'Arkadaki düğme'}</small></div>
       <div class="mo-say" hidden></div>`;
   };
   const tick = () => { if (!m.on && !m.booting) { const sm = el.querySelector('.mo-back small'); if (sm) sm.textContent = `Kapalı · ${Math.floor((Date.now() - m.offAt) / 1000)} sn`; } };
@@ -110,9 +111,9 @@ export function hotspotPhone(desk) {
   let small = false;
   const draw = () => {
     const on = !!desk.hotspot;
-    if (small) { el.innerHTML = `<button type="button" class="dk-chip" data-big="1">📱 Telefon${on ? ' · erişim noktası açık' : ''} ▴</button>`; return; }
-    el.innerHTML = `<button type="button" class="dk-mini" data-small="1" title="Telefonu küçült">▾ Küçült</button><div class="ph-body"><div class="ph-notch"></div><div class="ph-screen">
-      <div class="ph-time">📶 4.5G 🔋</div><div class="hs-card"><b>Kişisel Erişim Noktası</b><small>Telefonunuzun mobil internetini başka cihazlarla paylaşır</small>
+    if (small) { el.innerHTML = `<button type="button" class="dk-chip" data-big="1">${SYS_ICONS.phone} Telefon${on ? ' · erişim noktası açık' : ''} ${MONO.chevup}</button>`; return; }
+    el.innerHTML = `<button type="button" class="dk-mini" data-small="1" title="Telefonu küçült">${MONO.chevdown} Küçült</button><div class="ph-body"><div class="ph-notch"></div><div class="ph-screen">
+      <div class="ph-time">${MONO.wifi} 4.5G ${MONO.battery}</div><div class="hs-card"><b>Kişisel Erişim Noktası</b><small>Telefonunuzun mobil internetini başka cihazlarla paylaşır</small>
       <label class="hs-sw"><input type="checkbox" ${on ? 'checked' : ''}><span>${on ? 'Açık' : 'Kapalı'}</span></label>
       ${on ? `<div class="hs-info">Ağ adı: <b>${esc(HOTSPOT.name)}</b><br>Şifre: <b>${HOTSPOT.pass}</b></div><small class="hs-warn">Mobil veri (GB) paketinizden harcar.</small>` : ''}</div></div></div>`;
   };
