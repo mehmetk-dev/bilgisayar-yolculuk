@@ -1,6 +1,6 @@
 // Dersler sayfası: ders listesi, adım adım yönlendirme, ilerlemenin ve adım sürelerinin kaydı.
 // Üç tür sahne vardır: 'notepad' (tek Not Defteri + klavye), 'desktop' (benzetim Windows), 'scene' (etkinlik).
-import { emojiIcon } from './svgicons.js';
+import { emojiIcon, watchIcons } from './svgicons.js';
 import { LESSONS, WEEKS } from './lessons/index.js';
 import { Keyboard, keyLabel } from './keyboard.js';
 import { setupTouch } from './dokunmatik.js';
@@ -787,4 +787,6 @@ if (!asked) openPicker(true);
 // Testler ve eğitmen için: konsoldan erişim
 window.DERS = { get desk() { return desk; }, np, get lesson() { return lesson; }, get idx() { return idx; }, get done() { return done; }, showStep: (i) => showStep(i) };
 
+// Önce svgicons (Windows 11 simgeleri, görünmeyen emojiler), sonra ⏻ ⌫ gibi genel simgeler
+watchIcons();
 startIcons();
