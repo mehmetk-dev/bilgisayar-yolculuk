@@ -401,13 +401,8 @@ export function calc({ body, emit }) {
     act(...r);
     flash(...r);
   });
-  // Pencere genişleyince geçmiş/bellek paneli sağda sürekli görünür
-  const ro = new ResizeObserver(() => {
-    const wide = body.clientWidth >= 36 * parseFloat(getComputedStyle(body).fontSize);
-    if (wide !== wrap.classList.contains('ca-wide')) { wrap.classList.toggle('ca-wide', wide); if (wide) panel = false; }
-    show();
-  });
-  ro.observe(body);
+  // Pencere boyu değişince büyük sayının yazı boyu yeniden ayarlanır
+  new ResizeObserver(() => show()).observe(body);
 
   buildKeys();
   show();
