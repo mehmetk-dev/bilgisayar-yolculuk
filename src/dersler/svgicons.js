@@ -240,7 +240,8 @@ const HAS = new RegExp(`(?:${ALL_KEYS.join('|')})|👩\\u200d⚕`);
 
 // Ders anlatımı: Windows 11 simgeleri yalnızca burada yazıdaki simgelerin yerine geçer (uygulamaların içine dokunulmaz)
 const GUIDE = '#guide,#home,#ozet,#printCard,#scene,#top,#pick,[data-w11text]';
-const NO_ICON = 'script,style,textarea,input,select,option,svg,canvas,[data-noicon]';
+// Masaüstü benzetimine (.dk) ve içindeki pencerelere hiç dokunulmaz: uygulama kodu metinleri okuyup karşılaştırabilir
+const NO_ICON = 'script,style,textarea,input,select,option,svg,canvas,.dk,[data-noicon]';
 const holder = typeof document !== 'undefined' ? document.createElement('template') : null;
 
 // Düğümün yanındaki (kardeş ve üst öğenin kardeşi) yazıdan en çok 60 karakter: "Başlat → <b>⚙ Ayarlar</b>" gibi yerlerde bağlam için
@@ -259,7 +260,8 @@ function fixText(node) {
   const el = node.parentElement;
   if (!el || el.closest(NO_ICON) || el.isContentEditable) return;
   const src = text.replace(SEQ, '🩺');
-  const guide = !!el.closest(GUIDE);
+  if (!el.closest(GUIDE)) return;
+  const guide = true;
   const prev = around(node, 'previousSibling');
   const next = around(node, 'nextSibling');
   let html = '', last = 0, n = 0, m;
@@ -291,10 +293,10 @@ function fixTree(root) {
 /**
  * Sayfadaki (ve sonradan eklenen) metinlerde, her bilgisayarda görünmeyebilecek emojiler
  * ile Windows 11 arayüz simgelerinin yerine SVG koyar. Kaynak metin olduğu gibi kalır.
- * Düzenlenebilir alanlara (Word, Not Defteri), giriş kutularına ve data-noicon'lu öğelere dokunmaz.
+ * Yalnızca ders anlatım alanlarına (GUIDE) bakar; masaüstü benzetimine (.dk), giriş kutularına ve data-noicon'lu öğelere dokunmaz.
  */
-export function watchIcons(root = document.body) {
-  fixTree(root);
+export function watchIcons() {
+  const roots = [...document.querySelectorAll(GUIDE)];
   const mo = new MutationObserver((records) => {
     for (const r of records) {
       if (r.type === 'characterData') fixText(r.target);
@@ -302,7 +304,10 @@ export function watchIcons(root = document.body) {
     }
     mo.takeRecords();
   });
-  mo.observe(root, { childList: true, subtree: true, characterData: true });
+  for (const root of roots) {
+    fixTree(root);
+    mo.observe(root, { childList: true, subtree: true, characterData: true });
+  }
   return mo;
 }
 
