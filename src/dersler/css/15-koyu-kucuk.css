@@ -1,9 +1,8 @@
 /* Koyu mod: küçük uygulamalar (Yapışkan Notlar, Takvim, Saat, Ses Kaydedici, Güvenlik, PDF, Ekran Alıntısı ...) */
-.dk-dark .win .mut, .dk-dark .win .rc-hint, .dk-dark .win .sn-prev, .dk-dark .win .sk-empty, .dk-dark .win .pdf-small { color: #aaa; }
+.dk-dark .win .mut, .dk-dark .win .rc-hint, .dk-dark .win .sk-empty, .dk-dark .win .pdf-small { color: #aaa; }
 /* Windows Güvenliği */
 /* PDF okuyucu: çevre koyu, sayfa beyaz kâğıt kalır */
 
 .dk-dark .pdf-page { color: #222; }
 .dk-dark .pdf-page .pdf-small { color: #555; }
 /* Ekran Alıntısı */
-.dk-dark .sn-bar { background: #2b2b2b; color: #eee; }

@@ -12,11 +12,11 @@ let tabSeq = 1;
 
 // Uzantılar: tarayıcıya eklenen küçük programlar. fake: doğrulanmamış, fazla izin isteyen, zararlı uzantı.
 export const EXTS = {
-  adblock: { icon: '🛡', name: 'Reklam Kalkanı', pub: 'Kalkan Yazılım', verified: true, users: '10.000.000+', stars: 4.7, desc: 'Sayfalardaki reklamları ve açılır pencereleri gizler.', perms: ['Ziyaret ettiğiniz sitelerdeki reklamları görme ve gizleme'] },
-  dark: { icon: '🌙', name: 'Gece Okuma', pub: 'Okuma Araçları', verified: true, users: '2.000.000+', stars: 4.5, desc: 'Beyaz sayfaları koyu renkte gösterir; akşamları gözü yormaz.', perms: ['Sitelerin görünüşünü değiştirme'] },
-  note: { icon: '🗒', name: 'Yapışkan Not', pub: 'Verimlilik Araçları', verified: true, users: '500.000+', stars: 4.2, desc: 'Bir sayfaya kendinize küçük bir not yapıştırın; sayfayı yeniden açınca not orada olsun. Simgesine tıklayın.', perms: ['Notlarınızı bu bilgisayarda saklama'] },
-  reader: { icon: '🔊', name: 'Sesli Okuyucu', pub: 'Erişilebilirlik Derneği', verified: true, users: '800.000+', stars: 4.6, desc: 'Seçtiğiniz yazıyı (seçim yoksa sayfayı) sesli okur. Simgesine tıklayın.', perms: ['Seçtiğiniz yazıyı okuma'] },
-  fake: { icon: '⚡', name: 'Süper İndirici PRO', pub: 'free-dl-pro-2026', verified: false, users: '312', stars: 1.9, desc: 'İNDİRMELERİNİZİ 10 KAT HIZLANDIRIR!!! Tamamen BEDAVA!!!', perms: ['Ziyaret ettiğiniz BÜTÜN sitelerdeki verilerinizi okuma ve değiştirme', 'Kayıtlı şifrelerinizi görme', 'İndirmelerinizi yönetme', 'Ana sayfanızı ve arama motorunuzu değiştirme'] },
+  adblock: { name: 'Reklam Kalkanı', pub: 'Kalkan Yazılım', verified: true, users: '10.000.000+', stars: 4.7, desc: 'Sayfalardaki reklamları ve açılır pencereleri gizler.', perms: ['Ziyaret ettiğiniz sitelerdeki reklamları görme ve gizleme'] },
+  dark: { name: 'Gece Okuma', pub: 'Okuma Araçları', verified: true, users: '2.000.000+', stars: 4.5, desc: 'Beyaz sayfaları koyu renkte gösterir; akşamları gözü yormaz.', perms: ['Sitelerin görünüşünü değiştirme'] },
+  note: { name: 'Yapışkan Not', pub: 'Verimlilik Araçları', verified: true, users: '500.000+', stars: 4.2, desc: 'Bir sayfaya kendinize küçük bir not yapıştırın; sayfayı yeniden açınca not orada olsun. Simgesine tıklayın.', perms: ['Notlarınızı bu bilgisayarda saklama'] },
+  reader: { name: 'Sesli Okuyucu', pub: 'Erişilebilirlik Derneği', verified: true, users: '800.000+', stars: 4.6, desc: 'Seçtiğiniz yazıyı (seçim yoksa sayfayı) sesli okur. Simgesine tıklayın.', perms: ['Seçtiğiniz yazıyı okuma'] },
+  fake: { name: 'Süper İndirici PRO', pub: 'free-dl-pro-2026', verified: false, users: '312', stars: 1.9, desc: 'İNDİRMELERİNİZİ 10 KAT HIZLANDIRIR!!! Tamamen BEDAVA!!!', perms: ['Ziyaret ettiğiniz BÜTÜN sitelerdeki verilerinizi okuma ve değiştirme', 'Kayıtlı şifrelerinizi görme', 'İndirmelerinizi yönetme', 'Ana sayfanızı ve arama motorunuzu değiştirme'] },
 };
 // Uzantı simgeleri (emoji yerine çizim)
 const EXT_SVG = { adblock: 'shield', dark: 'moon', note: 'note', reader: 'volume', fake: 'bolt' };
@@ -199,12 +199,12 @@ export function browser({ desk, body, args, emit, setTitle }) {
 
   function popup() {
     const p = $('.br-pop');
-    p.innerHTML = `<div class="pop-box"><div class="pop-bar">⚠ Windows Güvenlik Uyarısı <button type="button" class="pop-fakex" title="Kapat">✕</button></div>
+    p.innerHTML = `<div class="pop-box"><div class="pop-bar">${ic('warn', 16)} Windows Güvenlik Uyarısı <button type="button" class="pop-fakex" title="Kapat">${ic('close', 14)}</button></div>
       <h2>Bilgisayarınızda 5 VİRÜS bulundu!</h2><p>Verileriniz silinmek üzere. HEMEN destek hattını arayın: <b>0850 000 00 00</b></p>
       <button type="button" class="pop-fakeok">Tamam, şimdi temizle</button><p class="scam-note">(Alıştırma: bu bir dolandırıcılık penceresidir. Gerçek Windows uyarıları tarayıcının içinde çıkmaz.)</p></div>`;
     p.hidden = false;
     emit('web-popup');
-    p.querySelector('.pop-fakex').onclick = () => { emit('web-popup-click', { what: 'x' }); p.querySelector('h2').textContent = '⚠ Bu pencerenin ✕ işareti de sahte olabilir! En güvenlisi sekmeyi kapatmaktır.'; };
+    p.querySelector('.pop-fakex').onclick = () => { emit('web-popup-click', { what: 'x' }); p.querySelector('h2').textContent = 'Bu pencerenin kapatma (X) düğmesi de sahte olabilir! En güvenlisi sekmeyi kapatmaktır.'; };
     p.querySelector('.pop-fakeok').onclick = () => emit('web-popup-click', { what: 'ok' });
   }
 
@@ -337,7 +337,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     $('.br-perm').hidden = true;
     if (v === 'close') { emit('web-perm', { host: cur.hist[cur.idx]?.host, perm: 'notify', value: '', via: 'close' }); return; }
     setPerm(cur.hist[cur.idx].host, 'notify', v, 'prompt');
-    if (v === 'allow') desk.toast(`${siteName(cur.hist[cur.idx].host)}`, '🔔 ŞOK İNDİRİM!!! Sepetinizde ürün kaldı! (İzin verdiğiniz için site artık size istediği zaman bildirim gönderebilir.)', '🛒', 7000);
+    if (v === 'allow') desk.toast(`${siteName(cur.hist[cur.idx].host)}`, 'ŞOK İNDİRİM!!! Sepetinizde ürün kaldı! (İzin verdiğiniz için site artık size istediği zaman bildirim gönderebilir.)', ic('bell', 22), 7000);
   });
 
   // ---- Adres çubuğu önerileri: yazarken geçmiş, sık kullanılanlar ve bilinen siteler ----
@@ -858,7 +858,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (k === 'newtab') { newTab(null); pageEl.innerHTML = `<div class="wp uf-one"><img src="${pictureURL(photoContent(id))}" alt=""></div>`; cur.title = p.name; renderTabs(); return; }
     if (k === 'copyimg') {
       const im = new Image();
-      im.onload = () => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').drawImage(im, 0, 0); desk.imageClip = c; desk.toast('Resim kopyalandı', 'Paint\'te ya da e-postada Ctrl + V ile yapıştırabilirsiniz.', '⧉', 4000); emit('web-img-copy', { name: p.name }); };
+      im.onload = () => { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').drawImage(im, 0, 0); desk.imageClip = c; desk.toast('Resim kopyalandı', 'Paint\'te ya da e-postada Ctrl + V ile yapıştırabilirsiniz.', ic('copy', 22), 4000); emit('web-img-copy', { name: p.name }); };
       im.src = pictureURL(photoContent(id));
       return;
     }

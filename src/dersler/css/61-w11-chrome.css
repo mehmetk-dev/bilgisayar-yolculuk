@@ -108,22 +108,60 @@
 .br-ctx button:hover { background: #f1f3f4; }
 .br-ctx small { margin-left: auto; color: #5f6368; padding-left: 2em; }
 
-/* ---- gizli pencere (Chrome koyu görünüm) */
-.br-private { background: #35363a; }
-.br-private .br-tabs { background: #202124; }
-.br-private .br-tab { color: #bdc1c6; }
-.br-private .br-tab:not(.on):hover { background: #ffffff1a; }
-.br-private .br-tab.on { background: #35363a; color: #e8eaed; }
-.br-private .br-tab.on::before { background: radial-gradient(circle at 0 0, transparent 0.75em, #35363a 0.76em); }
-.br-private .br-tab.on::after { background: radial-gradient(circle at 100% 0, transparent 0.75em, #35363a 0.76em); }
-.br-private .br-tabx, .br-private .br-newtab, .br-private .br-fav { color: #bdc1c6; }
-.br-private .br-bar, .br-private .br-bm { background: #35363a; border-color: #5f6368; }
-.br-private .br-bar > button, .br-private .br-lock, .br-private .br-addr .br-star { color: #bdc1c6; }
-.br-private .br-addr { background: #202124; }
-.br-private .br-addr:hover { background: #292a2d; }
-.br-private .br-addr:focus-within { background: #202124; border-color: #8ab4f8; }
-.br-private .br-url { color: #e8eaed; }
-.br-private .br-bm button { color: #e8eaed; }
+/* ---- koyu görünüm: gizli pencere ve Windows koyu modu (Chrome varsayılan temada sistemi izler). Çerçeve koyulur, web sayfası açık kalır. */
+:is(.br-private, .dk-dark .br) { background: #35363a; }
+:is(.br-private, .dk-dark .br) .br-tabs { background: #202124; }
+:is(.br-private, .dk-dark .br) .br-tab { color: #bdc1c6; }
+:is(.br-private, .dk-dark .br) .br-tab:not(.on):hover { background: #ffffff1a; }
+:is(.br-private, .dk-dark .br) .br-tab.on { background: #35363a; color: #e8eaed; }
+:is(.br-private, .dk-dark .br) .br-tab.on::before { background: radial-gradient(circle at 0 0, transparent 0.75em, #35363a 0.76em); }
+:is(.br-private, .dk-dark .br) .br-tab.on::after { background: radial-gradient(circle at 100% 0, transparent 0.75em, #35363a 0.76em); }
+:is(.br-private, .dk-dark .br) .br-tabx, :is(.br-private, .dk-dark .br) .br-newtab, :is(.br-private, .dk-dark .br) .br-fav { color: #bdc1c6; }
+:is(.br-private, .dk-dark .br) .br-bar, :is(.br-private, .dk-dark .br) .br-bm { background: #35363a; border-color: #5f6368; }
+:is(.br-private, .dk-dark .br) .br-bar > button, :is(.br-private, .dk-dark .br) .br-lock, :is(.br-private, .dk-dark .br) .br-addr .br-star { color: #bdc1c6; }
+:is(.br-private, .dk-dark .br) .br-addr { background: #202124; }
+:is(.br-private, .dk-dark .br) .br-addr:hover { background: #292a2d; }
+:is(.br-private, .dk-dark .br) .br-addr:focus-within { background: #202124; border-color: #8ab4f8; }
+:is(.br-private, .dk-dark .br) .br-url { color: #e8eaed; }
+:is(.br-private, .dk-dark .br) .br-bm button { color: #e8eaed; }
+:is(.br-private, .dk-dark .br) .br-bar > button:hover:not(:disabled), :is(.br-private, .dk-dark .br) .br-exts button:hover, :is(.br-private, .dk-dark .br) .br-addr .br-star:hover, :is(.br-private, .dk-dark .br) .br-tabx:hover, :is(.br-private, .dk-dark .br) .br-newtab:hover { background: #ffffff1f; }
+:is(.br-private, .dk-dark .br) .br-bm button:hover { background: #ffffff1f; }
+:is(.br-private, .dk-dark .br) .br-lock:hover { background: #ffffff26; }
+:is(.br-private, .dk-dark .br) .br-lock { background: #ffffff14; }
+:is(.br-private, .dk-dark .br) .br-addr .br-zoomlbl { background: #35363a; color: #e8eaed; }
+:is(.br-private, .dk-dark .br) .br-url::placeholder { color: #9aa0a6; }
+:is(.br-private, .dk-dark .br) .br-bar { border-bottom-color: #5f6368; }
+:is(.br-private, .dk-dark .br) .br-bar:has(+ .br-bm:not([hidden])) { border-bottom-color: transparent; }
+:is(.br-private, .dk-dark .br) .ext-bad { color: #f28b82; }
+/* Windows koyu modunda yalnızca çerçeve koyudur: sayfanın kendisi (Google, siteler) açık kalır */
+.dk-dark .br:not(.br-private) .br-page { background: #fff; color: #202124; }
+/* menüler ve açılır pencereler */
+:is(.br-private, .dk-dark .br) :is(.br-menu, .br-find, .br-sug, .br-ctx, .br-info, .br-perm, .br-dlpanel) { background: #292a2d; color: #e8eaed; border-color: #5f6368; box-shadow: 0 4px 16px #0009; }
+:is(.br-private, .dk-dark .br) .br-sug { border-top: 0; }
+:is(.br-private, .dk-dark .br) .br-mi, :is(.br-private, .dk-dark .br) .br-ctx button, :is(.br-private, .dk-dark .br) .bs-row b, :is(.br-private, .dk-dark .br) .br-mh { color: #e8eaed; }
+:is(.br-private, .dk-dark .br) .br-mi:hover, :is(.br-private, .dk-dark .br) .br-mi:focus-visible, :is(.br-private, .dk-dark .br) .br-ctx button:hover, :is(.br-private, .dk-dark .br) .bs-row:hover, :is(.br-private, .dk-dark .br) .bs-row.on, :is(.br-private, .dk-dark .br) .br-mz button:hover { background: #ffffff1a; }
+:is(.br-private, .dk-dark .br) :is(.br-mic, .br-mi kbd, .br-mnone, .br-ctx small, .bs-row > span, .br-fn, .br-find button, .br-mz button, .br-mzf, .bi-x) { color: #bdc1c6; }
+:is(.br-private, .dk-dark .br) .bs-row small { color: #8ab4f8; }
+:is(.br-private, .dk-dark .br) .br-menu hr { border-top-color: #5f6368; }
+:is(.br-private, .dk-dark .br) .br-mz, :is(.br-private, .dk-dark .br) .br-mz b { border-color: #5f6368; }
+:is(.br-private, .dk-dark .br) .br-find input { background: none; color: #e8eaed; border-right-color: #5f6368; }
+:is(.br-private, .dk-dark .br) .br-find button:hover { background: #ffffff1a; }
+:is(.br-private, .dk-dark .br) .bi-note, :is(.br-private, .dk-dark .br) .bi-url { color: #e8eaed; }
+:is(.br-private, .dk-dark .br) .bi-sec { border-top-color: #5f6368; }
+:is(.br-private, .dk-dark .br) :is(.bi-url, .bi-legend) span { color: #202124; }
+:is(.br-private, .dk-dark .br) .bi-head.ok { color: #81c995; }
+:is(.br-private, .dk-dark .br) .bi-head.bad { color: #f28b82; }
+:is(.br-private, .dk-dark .br) .dl-item { background: #35363a; }
+:is(.br-private, .dk-dark .br) .dl-item small { color: #81c995; }
+/* yeni sekme sayfası (Chrome'un kendi sayfası) koyu temada koyudur */
+.dk-dark .br:not(.br-private) .br-page:has(> .wp.br-nt) { background: #202124; }
+.dk-dark .wp.br-nt { background: #202124; color: #e8eaed; }
+.dk-dark .wp.br-nt .br-nt-tiles a { color: #e8eaed; }
+.dk-dark .wp.br-nt .br-nt-tiles a:hover, .dk-dark .br-nt-tiles a > span, .dk-dark .wp.br-nt .br-nt-cust { background: #35363a; }
+.dk-dark .br-nt-add, .dk-dark .wp.br-nt .br-nt-cust { color: #bdc1c6; }
+.dk-dark .wp.br-nt .gg-box { background: #202124; border-color: #5f6368; }
+.dk-dark .wp.br-nt .gg-box input { color: #e8eaed; }
+.dk-dark .wp.br-nt .gg-logo { background: none; }
 .wp.br-priv { max-width: none; margin: 0; min-height: 100%; background: #292a2d; color: #e8eaed; text-align: center; padding: 3em 1.4em; box-sizing: border-box; }
 .br-priv h1 { font-size: 1.6em; margin: 0.3em 0; font-weight: 400; }
 .br-priv p { max-width: 36em; margin: 0.6em auto; line-height: 1.5; color: #bdc1c6; text-align: left; }
