@@ -23,9 +23,11 @@ const EXT_SVG = { adblock: 'shield', dark: 'moon', note: 'note', reader: 'volume
 const extIc = (k, size = 20) => ic(EXT_SVG[k] || 'puzzle', size, k === 'fake' ? 'ext-bad' : '');
 const mi = (name, size = 20) => (name === 'incog' ? icIncognito(size) : name ? ic(name, size) : '');
 const stars = (n) => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
+const listSearch = (label) => `<input type="search" class="ti-search" data-ti-filter placeholder="${label}" aria-label="${label}" spellcheck="false">
+  <p class="ti-note" data-ti-empty role="status" hidden>Aramanıza uyan sonuç yok.</p>`;
 
 export function browser({ desk, body, args, emit, setTitle }) {
-  const priv0 = !!args.private;
+  const priv = !!args.private;
   body.classList.add('br');
   const who = (desk.settings.user || 'K').charAt(0).toLocaleUpperCase('tr');
   body.innerHTML = `
@@ -34,7 +36,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
       <button type="button" class="br-back" title="Geri" aria-label="Geri">${ic('back', 20)}</button><button type="button" class="br-fwd" title="İleri" aria-label="İleri">${ic('fwd', 20)}</button><button type="button" class="br-reload" title="Bu sayfayı yeniden yükle" aria-label="Yenile">${ic('reload', 20)}</button><button type="button" class="br-home" title="Ana sayfa" aria-label="Ana sayfa">${ic('home', 20)}</button>
       <div class="br-addr"><button type="button" class="br-lock" title="Site bilgilerini görüntüle"></button><input class="br-url" spellcheck="false" autocomplete="off" aria-label="Adres çubuğu" placeholder="Google'da arayın ya da bir URL yazın"><button type="button" class="br-zoomlbl" hidden title="Yakınlaştırmayı sıfırla (Ctrl + 0)"></button><button type="button" class="br-star" title="Bu sayfayı yer işaretlerine ekle (Ctrl + D)" aria-label="Yer işareti ekle"></button></div>
       <button type="button" class="br-cap" title="Web yakalama: sayfanın resmini al (Ctrl + Shift + S)" aria-label="Web yakalama">${ic('cut', 20)}</button><button type="button" class="br-dl" title="İndirilenler (Ctrl + J)" aria-label="İndirilenler">${ic('download', 20)}</button>
-      <span class="br-exts"></span><button type="button" class="br-ext" title="Uzantılar" aria-label="Uzantılar">${ic('puzzle', 20)}</button><button type="button" class="br-prof" title="Siz" aria-label="Profil"><span>${priv0 ? icIncognito(16) : esc(who)}</span></button><button type="button" class="br-more" title="Google Chrome'u özelleştir ve yönet" aria-label="Google Chrome'u özelleştir ve yönet">${ic('more', 20)}</button>
+      <span class="br-exts"></span><button type="button" class="br-ext" title="Uzantılar" aria-label="Uzantılar">${ic('puzzle', 20)}</button><button type="button" class="br-prof" title="Siz" aria-label="Profil"><span>${priv ? icIncognito(16) : esc(who)}</span></button><button type="button" class="br-more" title="Google Chrome'u özelleştir ve yönet" aria-label="Google Chrome'u özelleştir ve yönet">${ic('more', 20)}</button>
     </div>
     <div class="br-bm" hidden></div>
     <div class="br-find" hidden><input class="br-fq" placeholder="Sayfada bul" aria-label="Sayfada bul"><span class="br-fn"></span><button type="button" data-find="-1" title="Önceki" aria-label="Önceki">${ic('up', 20)}</button><button type="button" data-find="1" title="Sonraki" aria-label="Sonraki">${ic('down', 20)}</button><button type="button" data-find="0" title="Kapat (Esc)" aria-label="Kapat">${ic('close', 18)}</button></div>
@@ -52,15 +54,16 @@ export function browser({ desk, body, args, emit, setTitle }) {
   pageEl.tabIndex = -1; // sayfaya tıklanınca odak tarayıcıya gelsin; kısayollar (Ctrl + D, Ctrl + +) çalışsın
   const tabs = [];
   let cur = null;
-  const downloads = (desk.dlList ||= []);
-  const priv = !!args.private; // gizli pencere: geçmiş tutulmaz
+  // Gizli pencerenin oturumları, izinleri ve listeleri pencere kapanınca kaybolur.
+  const webData = priv ? { settings: desk.settings } : desk;
+  const downloads = (webData.dlList ||= []);
   const asked = {};
   if (priv) body.classList.add('br-private');
   const s = desk.settings;
   const extOn = (id) => s.ext[id] === true;
-  const notes = (desk.webNotes ||= {}); // Yapışkan Not: sayfa adresine göre notlar
+  const notes = (webData.webNotes ||= {}); // Yapışkan Not: sayfa adresine göre notlar
   const curUrl = () => (cur?.hist[cur.idx] ? fmtUrl(cur.hist[cur.idx]) : '');
-  const history = () => (desk.history ||= []);
+  const history = () => (webData.history ||= []);
 
   const fmtUrl = (loc) => (loc.host === 'tarayici' ? 'chrome://' + chromeName(loc.path) : loc.host === 'dosya' ? 'dosya://' + loc.path : loc.host === 'kaynak' ? 'view-source:dosya://' + loc.path : loc.host + (loc.path === '/' ? '' : loc.path) + (loc.q ? '?q=' + encQ(loc.q) : ''));
   const internal = (loc) => loc && (loc.host === 'tarayici' || loc.host === EXT_HOST || loc.host === 'dosya' || loc.host === 'kaynak');
@@ -87,6 +90,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
   }
 
   function navigate(loc, via) {
+    if (document.activeElement === url) url.blur();
+    if (loc.host === 'tarayici' && loc.path === '/indirilenler') $('.br-dlpanel').hidden = true;
     const t = cur;
     t.hist = t.hist.slice(0, t.idx + 1);
     t.hist.push(loc);
@@ -211,19 +216,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
   // Sitelerin işlem yapabilmesi için (form, sepet, giriş): sitenin kendi durumu, sayfa değiştirme, indirme
   function webCtx(loc) {
     const ctx = {
-      desk, loc, priv,
-      state: ((desk.webState ||= {})[siteName(loc.host)] ||= {}),
+      desk, loc, priv, webData,
+      state: ((webData.webState ||= {})[siteName(loc.host)] ||= {}),
       emit: (type, data = {}) => emit(type, { host: loc.host, ...data }),
       go: (path, q = '') => navigate({ host: loc.host, path, q }, 'form'),
       visit: (host, path = '/', q = '') => navigate({ host, path, q }, 'form'),
       refresh: () => { const y = pageEl.scrollTop; show(); pageEl.scrollTop = y; },
-      download: (name, content) => {
-        const node = desk.fs.write('downloads', name, content);
-        downloads.unshift({ name, id: node.id });
-        renderDl(true);
-        emit('download', { name, id: node.id });
-        return node;
-      },
+      download: (name, content) => recordDownload(desk.fs.write('downloads', name, content)),
       perm: (k) => perms(loc.host)[k] || '',
       askPerm: (list, then) => askPerms(loc.host, list, then),
     };
@@ -248,15 +247,31 @@ export function browser({ desk, body, args, emit, setTitle }) {
 
   function download(name, photo) {
     const content = photo ? photoContent(photo) : /resim/i.test(name) ? { setup: 'viewer' } : /surucu/i.test(name) ? { setup: 'driver' } : '';
-    const node = desk.fs.write('downloads', name, content);
-    downloads.unshift({ name, id: node.id });
+    recordDownload(desk.fs.write('downloads', name, content));
+  }
+
+  function recordDownload(node) {
+    const { name, id } = node;
+    downloads.unshift({ name, id, when: desk.now().toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' }) });
     renderDl(true);
-    emit('download', { name, id: node.id });
+    emit('download', { name, id });
+    return node;
+  }
+
+  const downloadNode = (id) => desk.fs.inRecycle(id) ? null : desk.fs.get(id);
+
+  function downloadItem(d) {
+    const found = downloadNode(d.id);
+    return `<div class="dl-item" data-ti-entry="${esc(d.name)}"><span>${fileIcon(d.name)}</span>
+      <div><b>${esc(d.name)}</b><small>${d.when ? esc(d.when) + ' · ' : ''}${found ? 'Tamamlandı' : 'Dosya yerinde yok'}</small>
+      <div><button type="button" data-open="${d.id}" ${found ? '' : 'disabled'}>Dosyayı aç</button><button type="button" data-folder="${d.id}" ${found ? '' : 'disabled'}>Klasörde göster</button></div></div></div>`;
   }
 
   function renderDl(open) {
     const p = $('.br-dlpanel');
-    p.innerHTML = `<div class="dl-head">İndirilenler <button type="button" class="dl-x" aria-label="Kapat">${ic('close', 16)}</button></div>${downloads.length ? downloads.map((d) => `<div class="dl-item"><span>${fileIcon(d.name)}</span><div><b>${esc(d.name)}</b><small>${d.when ? esc(d.when) + ' · ' : ''}${desk.fs.get(d.id) && !desk.fs.inRecycle(d.id) ? 'Tamamlandı' : 'Silindi'}</small><div><button type="button" data-open="${d.id}">Dosyayı aç</button><button type="button" data-folder="${d.id}">Klasörde göster</button></div></div></div>`).join('') : '<p>Henüz indirme yok.</p>'}`;
+    p.innerHTML = `<div class="dl-head">Son indirmeler <button type="button" class="dl-x" aria-label="Kapat">${ic('close', 16)}</button></div>
+      ${downloads.length ? downloads.slice(0, 5).map(downloadItem).join('') : '<p>Henüz indirme yok.</p>'}
+      <button type="button" class="xs-btn" data-m="downloads">Tüm indirmeleri göster</button>`;
     if (open) p.hidden = false;
   }
 
@@ -264,7 +279,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   const placeUnder = (el, wide) => { const r = $('.br-addr').getBoundingClientRect(), b = body.getBoundingClientRect(); el.style.left = (r.left - b.left) + 'px'; el.style.top = (r.bottom - b.top - 2) + 'px'; if (wide) { el.style.right = 'auto'; el.style.width = r.width + 'px'; } };
   // ---- Site bilgileri: kilide tıklayınca adresin parçaları, bağlantı, sertifika ve site izinleri ----
   const PERMS = [['location', 'Konum', 'pin'], ['camera', 'Kamera', 'cam'], ['mic', 'Mikrofon', 'micp'], ['notify', 'Bildirimler', 'bell']];
-  const perms = (host) => ((desk.sitePerms ||= {})[siteName(host)] ||= {});
+  const perms = (host) => ((webData.sitePerms ||= {})[siteName(host)] ||= {});
   // Adresi parçalarına ayırır: https:// · www. · alt alan · alan adı · /yol · ?q=arama
   function urlParts(loc, secure) {
     const host = loc.host, name = siteName(host);
@@ -386,11 +401,11 @@ export function browser({ desk, body, args, emit, setTitle }) {
   // Tarayıcının sakladığı çerezler: girişler ve sepetler sitelerin durumundan, reklam çerezleri desk.cookies'ten gelir; her birinin silinmesi gerçek etkiyi yaratır
   function getCookies() {
     const out = [];
-    for (const [site, st] of Object.entries(desk.webState || {})) {
+    for (const [site, st] of Object.entries(webData.webState || {})) {
       if (st.user) out.push({ site, name: 'oturum', party: 'first', purpose: 'Giriş yaptığınızı hatırlar: her sayfada yeniden şifre sormaz', del: () => { st.user = false; } });
       if (st.cart?.length) out.push({ site, name: 'sepet', party: 'first', purpose: 'Sepetinizdeki ürünleri hatırlar', del: () => { st.cart = []; } });
     }
-    for (const c of desk.cookies || []) out.push({ ...c, del: () => { desk.cookies.splice(desk.cookies.indexOf(c), 1); } });
+    for (const c of webData.cookies || []) out.push({ ...c, del: () => { webData.cookies.splice(webData.cookies.indexOf(c), 1); } });
     return out;
   }
   function internalPage(loc) {
@@ -416,18 +431,24 @@ export function browser({ desk, body, args, emit, setTitle }) {
         <div class="xs-grid">${Object.entries(EXTS).map(([k, e]) => `<a class="xs-card" data-href="${EXT_HOST}/${k}"><span class="xs-ic">${extIc(k, 40)}</span><b>${e.name}</b><small>${esc(e.pub)} ${e.verified ? ic('check', 13) : ''}</small><small class="xs-stars">${stars(e.stars)} · ${e.users}</small></a>`).join('')}</div></div>` };
     }
     const page = loc.path.slice(1);
-    const nav = `<nav class="ti-nav"><div class="ti-brand">${icChrome(22)} Chrome</div>${[['gecmis', 'history', 'Geçmiş'], ['uzantilar', 'puzzle', 'Uzantılar'], ['cerezler', 'cookie', 'Çerezler'], ['ayarlar', 'gear', 'Ayarlar']].map(([k, i, l]) => `<a data-go="chrome://${chromeName('/' + k)}" class="${k === page ? 'on' : ''}">${ic(i, 18)} ${l}</a>`).join('')}</nav>`;
+    const nav = `<nav class="ti-nav" aria-label="Chrome sayfaları"><div class="ti-brand">${icChrome(22)} Chrome</div>
+      ${[['gecmis', 'history', 'Geçmiş'], ['indirilenler', 'download', 'İndirilenler'], ['uzantilar', 'puzzle', 'Uzantılar'], ['cerezler', 'cookie', 'Çerezler'], ['ayarlar', 'gear', 'Ayarlar']].map(([k, i, l]) => `<a href="#" data-go="chrome://${chromeName('/' + k)}" ${k === page ? 'class="on" aria-current="page"' : ''}>${ic(i, 18)} ${l}</a>`).join('')}</nav>`;
     if (page === 'gecmis') {
       const h = history();
       return { title: 'Geçmiş', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Geçmiş</h1>${priv ? `<p class="ti-note">${icIncognito(16)} Gizli pencerede gezdikleriniz buraya yazılmaz.</p>` : ''}
         <button type="button" class="xs-btn" data-clear="1">Tarama verilerini temizle...</button>
-        ${h.length ? `<h3>Bugün</h3><div class="ti-hist">${h.map((x, i) => `<div class="ti-row"><span>${x.time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</span><a data-go="${esc(x.url)}">${esc(x.title)}</a><small>${esc(x.url.split('/')[0])}</small><button type="button" data-hdel="${i}" title="Geçmişten kaldır" aria-label="Geçmişten kaldır">${ic('close', 14)}</button></div>`).join('')}</div>` : '<p class="ti-note">Geçmiş boş.</p>'}</div></div>` };
+        ${h.length ? `${listSearch('Geçmişte ara')}<div class="ti-hist">${h.map((x, i) => `<div class="ti-row ti-visit" data-ti-entry="${esc(x.title + ' ' + x.url)}"><time datetime="${x.time.toISOString()}">${x.time.toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })}</time><a href="#" data-go="${esc(x.url)}" data-visit>${esc(x.title)}</a><small>${esc(x.url.split('/')[0])}</small><button type="button" data-hdel="${i}" title="Geçmişten kaldır" aria-label="Geçmişten kaldır">${ic('close', 14)}</button></div>`).join('')}</div>` : '<p class="ti-note">Geçmiş boş.</p>'}</div></div>` };
+    }
+    if (page === 'indirilenler') {
+      return { title: 'İndirilenler', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>İndirilenler</h1>
+        <p class="ti-note">Dosyayı açabilir veya Dosya Gezgini'nde yerini görebilirsiniz.</p>
+        ${downloads.length ? `${listSearch('İndirilenlerde ara')}<div class="ti-downloads">${downloads.map(downloadItem).join('')}</div>` : '<p class="ti-note">Henüz indirme yok.</p>'}</div></div>` };
     }
     if (page === 'uzantilar') {
       const mine = Object.keys(s.ext);
       return { title: 'Uzantılar', html: `<div class="wp ti">${nav}<div class="ti-main"><h1>Uzantılar</h1>
         ${mine.length ? mine.map((k) => `<div class="ti-ext ${EXTS[k].verified ? '' : 'bad'}"><span class="xs-ic">${extIc(k, 32)}</span><div><b>${EXTS[k].name}</b><small>${esc(EXTS[k].desc)}</small>${EXTS[k].verified ? '' : `<small class="xs-no">${ic('warn', 14)} Doğrulanmamış yayımcı. Bu uzantıyı siz eklemediyseniz hemen kaldırın.</small>`}</div>
-          <label class="ti-tog"><input type="checkbox" data-exttog="${k}" ${extOn(k) ? 'checked' : ''}><i></i></label><button type="button" class="xs-btn" data-extdel="${k}">Kaldır</button></div>`).join('') : '<p class="ti-note">Henüz uzantı eklenmedi.</p>'}
+          <label class="ti-tog"><input type="checkbox" data-exttog="${k}" aria-label="${esc(EXTS[k].name)} etkin" ${extOn(k) ? 'checked' : ''}><i></i></label><button type="button" class="xs-btn" data-extdel="${k}">Kaldır</button></div>`).join('') : '<p class="ti-note">Henüz uzantı eklenmedi.</p>'}
         <p><a class="xs-link" data-href="${EXT_HOST}">Chrome Web Mağazası'nı ziyaret et</a></p></div></div>` };
     }
     if (page === 'cerezler') {
@@ -482,8 +503,8 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const a = await desk.dialogs.ask({ title: 'Tarama verilerini temizle', icon: ic('sweep', 28), text: '<b>Şunlar silinecek:</b><ul><li>Tarama geçmişi</li><li>Çerezler ve site verileri (sitelerdeki oturumlarınız kapanır)</li><li>Önbellekteki resimler ve dosyalar</li></ul>İndirdiğiniz dosyalar ve sık kullanılanlar silinmez.', buttons: [['yes', 'Şimdi temizle', true], ['no', 'İptal']] });
     if (a !== 'yes') return;
     history().length = 0;
-    desk.cookies = [];
-    desk.webState = {}; // giriş yapılmış oturumlar ve sepetler de çerezlerle birlikte silinir
+    webData.cookies = [];
+    webData.webState = {}; // giriş yapılmış oturumlar ve sepetler de çerezlerle birlikte silinir
     desk.toast('Temizlendi', 'Tarama verileri silindi.', ic('sweep', 22), 3000);
     emit('web-clear');
     show();
@@ -527,7 +548,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (m === 'newtab') { newTab(null); emit('web-tab-new', { count: tabs.length }); }
     else if (m === 'private') { desk.open('browser', { private: true }); emit('web-private'); }
     else if (m === 'history') newTab({ host: 'tarayici', path: '/gecmis', q: '' });
-    else if (m === 'downloads') renderDl(true);
+    else if (m === 'downloads') newTab({ host: 'tarayici', path: '/indirilenler', q: '' });
     else if (m === 'bookmark') bookmark();
     else if (m === 'newwin') { desk.open('browser'); emit('web-newwin'); }
     else if (m === 'exit') desk.close(desk.wins.find((w) => w.api === api));
@@ -621,13 +642,24 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (hits.length) { hitIdx = (hitIdx + +d + hits.length) % hits.length; focusHit(); }
   });
 
+  pageEl.addEventListener('input', (e) => {
+    if (!e.target.hasAttribute('data-ti-filter')) return;
+    const q = e.target.value.trim().toLocaleLowerCase('tr');
+    let matches = 0;
+    for (const row of pageEl.querySelectorAll('[data-ti-entry]')) {
+      row.hidden = !row.dataset.tiEntry.toLocaleLowerCase('tr').includes(q);
+      if (!row.hidden) matches++;
+    }
+    pageEl.querySelector('[data-ti-empty]').hidden = matches !== 0;
+  });
+
   body.addEventListener('change', (e) => {
     const k = e.target.dataset.exttog;
     if (k) { setExt(k, e.target.checked); return; }
     if (e.target.dataset.popblock) { s.popupBlock = e.target.checked; emit('web-popup-setting', { on: s.popupBlock }); }
     if (e.target.dataset.blockthird) {
       s.blockThird = e.target.checked;
-      if (s.blockThird) desk.cookies = (desk.cookies || []).filter((c) => c.party !== 'third');
+      if (s.blockThird) webData.cookies = (webData.cookies || []).filter((c) => c.party !== 'third');
       emit('cookie-block-third', { on: s.blockThird });
       show();
     }
@@ -636,7 +668,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
   body.addEventListener('click', (e) => {
     if (!e.target.closest('.br-menu, .br-more, .br-ext')) menu.hidden = true;
     const g = e.target.closest('[data-go]');
-    if (g) { e.preventDefault(); go(g.dataset.go, 'link'); return; }
+    if (g) { e.preventDefault(); go(g.dataset.go, g.hasAttribute('data-visit') ? 'history' : 'link'); return; }
     if (e.target.closest('[data-notesave]')) {
       const u = curUrl(), v = menu.querySelector('.br-ntext').value.trim();
       if (v) notes[u] = v; else delete notes[u];
@@ -667,7 +699,7 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (e.target.closest('[data-clear]')) { clearData(); return; }
     const cd = e.target.closest('[data-ckdel]');
     if (cd) { const c = getCookies()[+cd.dataset.ckdel]; if (c) { c.del(); emit('cookie-delete', { site: c.site, name: c.name, party: c.party }); show(); } return; }
-    if (e.target.closest('[data-ckall]')) { const n = getCookies().length; desk.cookies = []; desk.webState = {}; emit('cookie-clear-all', { count: n }); show(); return; }
+    if (e.target.closest('[data-ckall]')) { const n = getCookies().length; webData.cookies = []; webData.webState = {}; emit('cookie-clear-all', { count: n }); show(); return; }
     const hd = e.target.closest('[data-hdel]');
     if (hd) { history().splice(+hd.dataset.hdel, 1); show(); emit('web-history-del'); return; }
     if (e.target.closest('[data-reset]')) {
@@ -712,14 +744,21 @@ export function browser({ desk, body, args, emit, setTitle }) {
     if (x) { closeTab(+x.dataset.close); return; }
     if (tab) { cur = tabs.find((t) => t.id === +tab.dataset.tab); show(); emit('web-tab-switch'); return; }
     const op = e.target.closest('[data-open]');
-    if (op) { $('.br-dlpanel').hidden = true; const n = desk.fs.get(op.dataset.open); if (n) { emit('download-open', { name: n.name }); desk.openNode(n); } return; }
+    if (op) {
+      const n = downloadNode(op.dataset.open);
+      if (!n) { renderDl(); show(); return; }
+      $('.br-dlpanel').hidden = true;
+      emit('download-open', { name: n.name });
+      desk.openNode(n);
+      return;
+    }
     const fd = e.target.closest('[data-folder]');
     if (fd) {
+      const n = downloadNode(fd.dataset.folder);
+      if (!n) { renderDl(); show(); return; }
       $('.br-dlpanel').hidden = true;
-      const n = desk.fs.get(fd.dataset.folder);
-      const folder = n && !desk.fs.inRecycle(n.id) ? n.parent : 'downloads';
-      desk.open('explorer', { folder, select: n?.id });
-      emit('download-folder', { name: n?.name, folder });
+      desk.open('explorer', { folder: n.parent, select: n.id });
+      emit('download-folder', { name: n.name, folder: n.parent });
       return;
     }
     if (e.target.closest('.dl-x')) { $('.br-dlpanel').hidden = true; }
@@ -732,7 +771,13 @@ export function browser({ desk, body, args, emit, setTitle }) {
     const q = f.querySelector('input').value.trim();
     if (q) navigate({ host: SEARCH_HOST, path: '/search', q, search: true }, 'search');
   });
-  url.addEventListener('focus', () => setTimeout(() => url.select(), 0));
+  url.addEventListener('focus', () => url.select());
+  url.addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || document.activeElement === url) return;
+    // İlk tıklamada adres seçili kalsın. Sonraki tıklamalar imleci normal biçimde yerleştirir.
+    e.preventDefault();
+    url.focus();
+  });
   url.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); const v = url.value; url.blur(); go(v, 'address'); }
     if (e.key === 'Escape') { url.blur(); show(); }

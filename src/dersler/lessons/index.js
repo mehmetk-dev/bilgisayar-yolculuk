@@ -1,4 +1,5 @@
 // Derslerin haftalara göre listesi (eğitmenin 8 haftalık programıyla aynı sırada)
+import { bilgisayaraGiris } from './bilgisayara-giris.js';
 import { ackapa, fare1, fare2, surukle, pencereler, parkur } from './hafta1.js';
 import { dizustu } from './dizustu.js';
 import { yaziSorun } from './yazisorun.js';
@@ -32,6 +33,7 @@ import { sorunAra } from './sorunara.js';
 import { epostaHesap } from './epostahesap.js';
 import { telefonTarama } from './telefontarama.js';
 import { edevletIlk } from './edevletilk.js';
+import { bankaHesap } from './banka-hesap.js';
 import { faturaOde } from './faturaode.js';
 import { torunGuvenlik } from './torunguvenlik.js';
 import { kisiselVeri, dolandirildim } from './bilgiguvenligi2.js';
@@ -112,7 +114,7 @@ const yolculuk = {
 
 // Her hafta 8 ders: konu anlatımları, ek dersler, orta seviye alıştırmalar (yönlendirmesiz) ve tekrar testi
 export const WEEKS = [
-  { no: 1, title: 'Açma-kapama ve fare', lessons: [ackapa, fare1, fare2, surukle, pencereler, dizustu, parkur, odev1, test1] },
+  { no: 1, title: 'Açma-kapama ve fare', lessons: [bilgisayaraGiris, ackapa, fare1, fare2, surukle, pencereler, dizustu, parkur, odev1, test1] },
   { no: 2, title: 'Klavye', lessons: [klavye, fqKlavye, harfbul, onparmak, rakamlar, isaretler, yaziSorun, klavyeDili, tusavi, kart, odev2, test2] },
   { no: 3, title: 'Metin seçme ve kısayollar', lessons: [notdefteri, secme, kaydetPratik, liste, kisayolYarisi, odev3, test3] },
   { no: 4, title: 'Donanım ve yazılım', lessons: [yolculuk, donanimDersi, donanim, parcalar, portlar, ilanOku, bakim, sorunGiderme, odev4, test4, testDonanim] },
@@ -125,7 +127,7 @@ export const WEEKS = [
   { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, excelBicim, hucreInce, doldurDondur, hesap3, hesap4, excelYuzde, duseyara, excelHata, excelYazi, excelTarih, altToplam, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
   { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, sunuBaglanti, animasyon, animasyonBolmesi, sunuAni, sunuProva, anıAlbumu, sunuParkur, sunuSinav, odev12, test12] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukWeb, telefon, telefonTarama, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, fotoBoyut, harita, whatsappWeb, gunlukParkur, odev13, test13] },
-  { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevletIlk, edevlet, randevu, alisveris, sanalKart, faturaOde, gorusme, eNabiz, kamuHizmet, ilanTuzak, eHizmetParkur, odev14, test14] },
+  { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevletIlk, edevlet, randevu, alisveris, bankaHesap, sanalKart, faturaOde, gorusme, eNabiz, kamuHizmet, ilanTuzak, eHizmetParkur, odev14, test14] },
   { no: 15, title: 'Bilgi güvenliği: yedek, iki adımlı doğrulama, sosyal medya, kişisel veriler', lessons: [yedekleme, ikiAdim, telefonKayip, sosyalMedya, kisiselVeri, torunGuvenlik, dolandirildim, guvenlikParkur, odev15, test15] },
   { no: 0, title: 'İnternette güvenlik, yapay zekâ, yazma hızı ve kurs bitirme', lessons: [guvenlik, yapayZeka, hiz, buyukParkur, kursSinavi] },
 ];

@@ -1,4 +1,5 @@
 // 7. hafta ek dersleri: Paint ile ev çizimi, tebrik kartı, ekran alıntısıyla yardım istemek, Ayarlar parkuru
+import { houseGuide, cardGuide } from './paint-guide.js';
 import { K, desktopReady, maxed } from './common.js';
 
 const paintReady = (c) => { desktopReady(c); c.d.closeAll(); maxed(c, 'paint'); };
@@ -27,7 +28,7 @@ export const evCiz = {
     },
     {
       title: 'Evin gövdesi',
-      html: '<p><b>Şekiller</b> bölümünden <b>Dikdörtgen</b>\'i seçin. Tuvalin ortasında, sol üstten sağ alta doğru sürükleyerek <b>büyük</b> bir dikdörtgen çizin.</p>',
+      html: '<p><b>Şekiller</b> bölümünden <b>Dikdörtgen</b>\'i seçin. Tuvalin ortasında, sol üstten sağ alta doğru sürükleyerek <b>büyük</b> bir dikdörtgen çizin.</p>' + houseGuide(0),
       setup: paintOpen,
       on: (ev, c) => {
         if (shape('rect')(ev) && (ev.w < 120 || ev.h < 80)) c.note('Biraz daha büyük çizin; içine kapı ve pencere sığacak.');
@@ -37,7 +38,7 @@ export const evCiz = {
     },
     {
       title: 'Çatı',
-      html: '<p><b>Şekiller</b> bölümünden <b>Çizgi</b>\'yi seçin. Gövdenin sol üst köşesinden yukarı-ortaya, oradan sağ üst köşeye <b>iki çizgi</b> çekerek üçgen bir çatı yapın.</p>',
+      html: '<p><b>Şekiller</b> bölümünden <b>Çizgi</b>\'yi seçin. Gövdenin sol üst köşesinden yukarı-ortaya, oradan sağ üst köşeye <b>iki çizgi</b> çekerek üçgen bir çatı yapın.</p>' + houseGuide(1),
       setup: paintOpen,
       on: (ev, c) => {
         if (!shape('line')(ev)) return false;
@@ -49,14 +50,14 @@ export const evCiz = {
     },
     {
       title: 'Kapı',
-      html: '<p>Rengi <b>kahverengi</b> yapın ve gövdenin altına, ortaya <b>uzun ince</b> bir dikdörtgen çizin: kapı.</p>',
+      html: '<p>Rengi <b>kahverengi</b> yapın ve gövdenin altına, ortaya <b>uzun ince</b> bir dikdörtgen çizin: kapı.</p>' + houseGuide(2),
       setup: paintOpen,
       on: shape('rect', (e) => e.h > e.w),
       done: 'Kapı yerinde.',
     },
     {
       title: 'Pencereler',
-      html: '<p>Rengi <b>mavi</b> yapın ve kapının iki yanına iki küçük kare çizin.</p>',
+      html: '<p>Rengi <b>mavi</b> yapın ve kapının iki yanına iki küçük kare çizin.</p>' + houseGuide(3),
       setup: paintOpen,
       on: (ev, c) => {
         if (!shape('rect')(ev)) return false;
@@ -66,7 +67,7 @@ export const evCiz = {
     },
     {
       title: 'Güneş',
-      html: '<p>Rengi <b>sarı</b> yapın, <b>Şekiller</b>\'den <b>Oval</b>\'i seçip sağ üst köşeye bir güneş çizin. Sonra <b>Dolgu</b> (boya kovası) ile içine tıklayıp sarıya boyayın.</p>',
+      html: '<p>Rengi <b>sarı</b> yapın, <b>Şekiller</b>\'den <b>Oval</b>\'i seçip sağ üst köşeye bir güneş çizin. Sonra <b>Dolgu</b> (boya kovası) ile içine tıklayıp sarıya boyayın.</p>' + houseGuide(4),
       setup: paintOpen,
       on: (ev, c) => {
         if (shape('ellipse')(ev)) { c.s.e = true; c.note('Güneş çizildi. Şimdi Dolgu aracıyla içine tıklayın.'); }
@@ -83,7 +84,7 @@ export const evCiz = {
     },
     {
       title: 'Çimen',
-      html: '<p><b>Fırçalar</b>\'dan fırçayı ve <b>yeşil</b> rengi seçin. Evin altına sola-sağa sürükleyerek çimen çizin.</p>',
+      html: '<p><b>Fırçalar</b>\'dan fırçayı ve <b>yeşil</b> rengi seçin. Evin altına sola-sağa sürükleyerek çimen çizin.</p>' + houseGuide(5),
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-draw' && ev.tool === 'brush' && ev.len > 100,
       done: 'Resminiz tamam!',
@@ -127,7 +128,7 @@ export const tebrikKarti = {
     },
     {
       title: 'Bir balon',
-      html: '<p>Kartın <b>sol üst</b> tarafına büyükçe bir <b>balon</b> çizin: boyu eninden biraz uzun bir elips. Sonra içini kırmızı ya da mavi boyayın.</p>',
+      html: '<p>Kartın <b>sol üst</b> tarafına büyükçe bir <b>balon</b> çizin: boyu eninden biraz uzun bir elips. Sonra içini kırmızı ya da mavi boyayın.</p>' + cardGuide(0),
       hint: 'Şekiller\'den Oval ile sürükleyin, sonra renk seçip Dolgu ile içine tıklayın.',
       setup: paintOpen,
       on: (ev, c) => {
@@ -137,14 +138,14 @@ export const tebrikKarti = {
     },
     {
       title: 'Balonun ipi',
-      html: '<p>Balonun altından aşağı doğru bir ip çizin. <b>Boyut</b>\'tan <b>İnce</b>\'yi seçmeyi unutmayın.</p>',
+      html: '<p>Balonun altından aşağı doğru bir ip çizin. <b>Boyut</b>\'tan <b>İnce</b>\'yi seçmeyi unutmayın.</p>' + cardGuide(1),
       hint: 'Kalem ya da Çizgi aracı. Boyut düğmesi şeridin ortasındadır.',
       setup: paintOpen,
       on: (ev) => shape('line')(ev) || (ev.type === 'paint-draw' && ev.len > 40),
     },
     {
       title: 'Pasta',
-      html: '<p>Kartın <b>alt kısmına</b> bir doğum günü pastası çizin: <b>kahverengi</b> bir dikdörtgen (pasta) ve üstüne dik <b>3 mum</b> (kısa çizgiler). İsterseniz pastanın içini Dolgu ile boyayın.</p>',
+      html: '<p>Kartın <b>alt kısmına</b> bir doğum günü pastası çizin: <b>kahverengi</b> bir dikdörtgen (pasta) ve üstüne dik <b>3 mum</b> (kısa çizgiler). İsterseniz pastanın içini Dolgu ile boyayın.</p>' + cardGuide(2),
       hint: 'Şekiller\'den Dikdörtgen ile pastayı çizin. Sonra Çizgi aracıyla pastanın üst kenarından yukarı doğru üç kısa çizgi çekin.',
       setup: paintOpen,
       on: (ev, c) => {

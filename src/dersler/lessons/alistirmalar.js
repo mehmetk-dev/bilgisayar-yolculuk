@@ -506,7 +506,8 @@ export const masaustuParkur = {
     },
     {
       title: '6. Masaüstünü gösterin', html: '<p>Pencereleri kapatmadan <b>hepsini birden</b> küçültüp masaüstünü gösterin.</p>',
-      hint: 'Görev çubuğunun en sağ köşesine, saatin sağındaki ince çizgiye tıklayın.',
+      hint: 'Saatin hemen sağındaki dikey çizgili <b>Masaüstünü göster</b> düğmesine tıklayın.',
+      setup: (c) => { c.d.ensure('paint'); c.d.ensure('calc'); },
       on: (ev) => ev.type === 'show-desktop' && ev.hidden,
     },
     {
@@ -516,10 +517,10 @@ export const masaustuParkur = {
     },
     {
       title: '8. Sesi kapatın', html: '<p>Bir telefon görüşmesi yapacaksınız. Bilgisayarın sesini <b>tamamen kapatın</b> (🔇).</p>',
-      hint: 'Sağ alttaki 🔊 simgesine tıklayın; açılan kutuda 🔊 düğmesine basınca 🔇 olur.',
+      hint: 'Sağ alttaki ses simgesine tıklayın. Açılan kutuda hoparlör düğmesine basın ya da ses çubuğunu <b>0</b>’a çekin.',
       setup: (c) => c.d.closeMenus(),
-      check: (c) => c.d.settings.muted,
-      on: (ev) => ev.type === 'setting' && ev.key === 'muted' && ev.value,
+      check: (c) => c.d.settings.muted || c.d.settings.volume === 0,
+      on: (ev) => ev.type === 'setting' && ((ev.key === 'muted' && ev.value) || (ev.key === 'volume' && ev.value === 0)),
     },
     {
       title: '9. Sesi açıp kısın', html: '<p>Görüşme bitti. Sesi yeniden açın ve düzeyini <b>30 civarına</b> getirin.</p>',

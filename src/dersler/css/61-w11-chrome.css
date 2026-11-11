@@ -190,7 +190,27 @@
 .wp.ti .ti-nav a { display: flex; align-items: center; gap: 0.7em; border-radius: 0 999px 999px 0; }
 .ti-nav a.on { background: #e8f0fe; color: #1967d2; }
 .ti-nav { background: #fff; border-right: 1px solid #e8eaed; }
+.br-page { container-type: inline-size; }
+.ti-main { min-width: 0; }
+.ti-search { width: min(100%, 26em); padding: 0.55em 0.75em; border: 1px solid #bdc1c6; border-radius: 8px; font: inherit; }
+.ti-visit { flex-wrap: wrap; gap: 0.35em 0.85em; }
+.ti-visit time, .ti-visit small { color: #5f6368; font-size: 0.85em; }
+.ti-visit a { min-width: 10em; overflow-wrap: anywhere; }
 .ti-row button { display: flex; align-items: center; }
+.ti-downloads { width: 100%; }
+.ti-downloads .dl-item { border: 1px solid #dadce0; padding: 0.65em; background: #fff; color: #202124; }
+.ti-downloads .dl-item small { color: #5f6368; }
+.dl-item > div { min-width: 0; overflow-wrap: anywhere; }
+.br-dlpanel { max-width: calc(100% - 1.2em); max-height: calc(100% - 5.8em); overflow-y: auto; }
+.ti-tog input:focus-visible + i { outline: 2px solid #1a73e8; outline-offset: 3px; }
+@container (max-width: 32em) {
+  .wp.ti { flex-direction: column; }
+  .ti-nav { flex-direction: row; flex-wrap: wrap; width: auto; padding: 0.45em; border-right: 0; border-bottom: 1px solid #e8eaed; }
+  .ti-brand { flex-basis: 100%; padding: 0.25em 0.45em; }
+  .wp.ti .ti-nav a { border-radius: 999px; }
+  .ti-main { padding: 0.75em; }
+  .ti-ext { flex-wrap: wrap; gap: 0.5em; }
+}
 .xs-head { background: #fff; color: #202124; border-bottom: 1px solid #dadce0; font-weight: 400; }
 .xs-brand { display: flex; align-items: center; gap: 0.6em; font-size: 1.05em; }
 .xs-head a { color: #1a73e8; }

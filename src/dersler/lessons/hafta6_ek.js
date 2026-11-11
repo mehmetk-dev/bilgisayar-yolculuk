@@ -1,75 +1,123 @@
 // 6. hafta ek dersleri: dosya türleri, fotoğraflar, klasör içinde klasör, Geri Dönüşüm Kutusu, dosya senaryoları
 import { K, desktopReady, put, PIC } from './common.js';
-import { info, ayir, sec } from './kalip.js';
+import { info, rehberSoru, sec } from './kalip.js';
 import { RECYCLE } from '../vfs.js';
 
 const explorerAt = (folder) => (c) => { const w = c.d.ensure('explorer'); if (folder && w.api.folder !== folder) w.api.go(folder); };
 
+const typeFolder = 'Dosya türleri alıştırması';
+const noteName = 'liste.txt';
+const renamedNote = 'alışveriş.txt';
+const photoName = 'tatil.jpg';
+const pdfName = 'fatura.pdf';
+const archiveName = 'fotoğraflar.zip';
+
+const typeFiles = (c) => {
+  const folder = put(c, 'docs', typeFolder, 'folder').id;
+  if (!c.d.fs.find(folder, renamedNote)) put(c, folder, noteName, 'file', 'Ekmek, süt ve yumurta');
+  put(c, folder, pdfName, 'file', { pages: ['<h3>Örnek fatura</h3><p>Bu belge dosya türleri alıştırması için hazırlanmıştır.</p>'] });
+  const photo = put(c, folder, photoName, 'file', PIC('🏖', '#bfdbfe', '#fef3c7'));
+  put(c, folder, 'fatura.pdf.exe');
+  if (!c.d.fs.find(folder, archiveName)) c.d.fs.compress([photo.id], folder, archiveName);
+  return folder;
+};
+
+const openTypeFiles = (c) => {
+  desktopReady(c);
+  explorerAt(typeFiles(c))(c);
+};
+
 export const dosyaTurleri = {
-  id: 'dosya-turleri', icon: '🏷', title: 'Dosya türleri ve uzantılar', minutes: 20, stage: 'scene',
-  desc: '.txt, .pdf, .docx, .jpg, .zip ne demek? Uzantıları görünür yapmak, tehlikeli uzantılar.',
+  id: 'dosya-turleri', icon: '🏷', title: 'Dosya türleri ve uzantılar', minutes: 25, stage: 'desktop',
+  desktop: { settings: { exExtensions: false } },
+  desc: 'Örnek dosyalarla uzantıları gösterin, dosya türünü bulun, farklı uygulamayla açın ve ZIP paketi ayıklayın.',
   summary: [
-    ['.txt', 'Düz yazı (Not Defteri)'],
-    ['.docx', 'Word belgesi'],
-    ['.pdf', 'Değiştirilmeyen belge: fatura, dilekçe, e-Devlet çıktısı'],
-    ['.jpg / .png', 'Fotoğraf, resim'],
-    ['.mp3 / .mp4', 'Müzik / video'],
-    ['.zip', 'Sıkıştırılmış paket: içinde birçok dosya'],
-    ['.exe', 'Program! Tanımadığınız yerden geldiyse açmayın'],
-    ['Uzantıları göstermek', 'Dosya Gezgini → Görünüm → Göster → Dosya adı uzantıları'],
+    ['.txt / .docx', 'Düz metin / Word belgesi'],
+    ['.pdf', 'Sayfa düzenini koruyan belge'],
+    ['.jpg / .png', 'Fotoğraf ve resim'],
+    ['.mp3 / .mp4', 'Ses / video'],
+    ['.zip', 'İçinde dosya ve klasör bulunan sıkıştırılmış paket'],
+    ['.exe', 'Çalıştırılabilir uygulama; tanımadığınız kaynaktan geldiyse açmayın'],
+    ['Uzantıları göstermek', 'Dosya Gezgini → Görüntüle → Göster → Dosya adı uzantıları'],
   ],
   steps: [
     {
-      title: 'Dosyanın soyadı: uzantı',
-      html: `<p>Her dosyanın adının sonunda, noktadan sonra gelen kısa bir ek vardır: <b>uzantı</b>. Dosyanın türünü söyler.</p>
-        <p><b>tatil.jpg</b> → adı <i>tatil</i>, türü <i>jpg</i> (fotoğraf).</p>
-        <table class="tbl"><tr><th>.txt .docx .pdf</th><td>Yazı ve belge</td></tr><tr><th>.jpg .png</th><td>Fotoğraf ve resim</td></tr><tr><th>.mp3 .mp4</th><td>Müzik ve video</td></tr><tr><th>.zip</th><td>Sıkıştırılmış paket</td></tr><tr><th>.exe</th><td>Program: çalışır, bilgisayarda değişiklik yapabilir</td></tr></table>`,
-      scene: info('<div class="sc-big">📄 🖼 🎵 🎬 📦 ⚙</div><p>ad<b>.uzantı</b></p>'),
+      title: 'Dosya adını okuyun',
+      html: `<p>Dosyanın türünü anlamak için <b>adına</b>, <b>simgesine</b> ve <b>Tür</b> sütununa bakabilirsiniz. Örneğin <b>tatil.jpg</b> dosyasının adı <b>tatil</b>, uzantısı <b>.jpg</b>.</p>
+        <table class="tbl"><tr><th>.txt · .docx · .pdf</th><td>Metin ve belge</td></tr><tr><th>.jpg · .png</th><td>Fotoğraf ve resim</td></tr><tr><th>.mp3 · .mp4</th><td>Ses ve video</td></tr><tr><th>.zip</th><td>Sıkıştırılmış paket</td></tr><tr><th>.exe</th><td>Çalıştırılabilir uygulama</td></tr></table>
+        <p>Yandaki <b>Dosya türleri alıştırması</b> klasöründe uzantılar şimdilik gizli. Örneğin <b>tatil.jpg</b> yalnızca <b>tatil</b> diye görünüyor.</p>`,
+      setup: openTypeFiles,
     },
     {
-      title: 'Uzantılar görünmüyorsa',
-      html: `<p>Windows uzantıları çoğu zaman <b>gizler</b>: <b>tatil.jpg</b> yalnızca <b>tatil</b> diye görünür. Bu tehlikelidir; <b>fatura.pdf.exe</b> gibi kılık değiştirmiş bir program <b>fatura.pdf</b> gibi görünür.</p>
-        <p>Gerçek bilgisayarda uzantıları bir kez görünür yapın, hep öyle kalır:</p>
-        <ol class="steps"><li>Dosya Gezgini'ni açın.</li><li>Üstteki <b>Görünüm</b> menüsüne tıklayın.</li><li><b>Göster</b> → <b>Dosya adı uzantıları</b>'nı işaretleyin.</li></ol>
-        <p class="mut">Windows 10'da: üstteki <b>Görünüm</b> sekmesinde <b>Dosya adı uzantıları</b> kutusunu işaretleyin.</p>`,
-      scene: info('<div class="sc-big">tatil ➜ tatil<b>.jpg</b></div><p>Görünüm → Göster → Dosya adı uzantıları</p>'),
+      title: 'Uzantıları görünür yapın',
+      html: `<p>Dosya Gezgini'nde <b>Görüntüle → Göster → Dosya adı uzantıları</b> seçeneğini işaretleyin. Dosya adlarına yeniden bakın.</p>
+        <p class="mut">Düğme görünmüyorsa <b>⋯</b> menüsünden <b>Görüntüle</b>’yi açın. Windows 10’da seçenek <b>Görünüm</b> sekmesindedir.</p>`,
+      setup: openTypeFiles,
+      check: (c) => c.d.settings.exExtensions === true,
+      on: (ev) => ev.type === 'setting' && ev.key === 'exExtensions' && ev.value === true,
+      done: 'Artık <b>tatil.jpg</b> ve <b>fatura.pdf</b> adlarını uzantılarıyla görüyorsunuz.',
     },
-    sec({ title: 'Uzantıyı görmek', text: '<div class="qz-pic">📄 fatura</div>', q: 'Dosya Gezgini\'nde dosyalar uzantısız görünüyor: “fatura”, “tatil”. Türlerini görmek için ne yaparsınız?', opts: ['Görünüm → Göster → Dosya adı uzantıları\'nı işaretlerim', 'Dosyaları tek tek açıp bakarım', 'Adlarının sonuna kendim .pdf yazarım'], ok: 0, why: 'Bu ayar açıkken her dosyanın gerçek türü görünür. Adın sonuna elle uzantı yazmak türü değiştirmez, dosyayı bozabilir.' }),
-    ayir({
-      title: 'Türlerine ayırın',
-      html: '<p>Dosyaları türlerine göre doğru kutuya sürükleyin.</p>',
-      bins: [{ id: 'yazi', label: 'Yazı ve belge', icon: '📄' }, { id: 'resim', label: 'Resim', icon: '🖼' }, { id: 'ses', label: 'Müzik ve video', icon: '🎵' }, { id: 'prog', label: 'Program ve paket', icon: '⚙' }],
-      items: [
-        { label: 'mektup.txt', icon: '', bin: 'yazi', why: '.txt düz yazıdır.' },
-        { label: 'dilekçe.docx', icon: '', bin: 'yazi', why: '.docx Word belgesidir.' },
-        { label: 'fatura.pdf', icon: '', bin: 'yazi', why: '.pdf değiştirilmeyen belgedir.' },
-        { label: 'tatil.jpg', icon: '', bin: 'resim', why: '.jpg fotoğraftır.' },
-        { label: 'ekran.png', icon: '', bin: 'resim', why: '.png resimdir (ekran alıntıları genellikle png olur).' },
-        { label: 'türkü.mp3', icon: '', bin: 'ses', why: '.mp3 müziktir.' },
-        { label: 'düğün.mp4', icon: '', bin: 'ses', why: '.mp4 videodur.' },
-        { label: 'kurulum.exe', icon: '', bin: 'prog', why: '.exe programdır.' },
-        { label: 'fotoğraflar.zip', icon: '', bin: 'prog', why: '.zip birçok dosyanın sıkıştırılıp paketlendiği dosyadır.' },
-      ],
-      done: 'Uzantıya bakarak dosyanın ne olduğunu anlayabilirsiniz.',
+    rehberSoru({
+      title: 'Ad ile türü karşılaştırın',
+      html: '<p>Dosya Gezgini’nde <b>tatil.jpg</b> satırını bulun. <b>Tür</b> sütununa bakın. Bu dosya ne içerir?</p>',
+      opts: ['Bir fotoğraf', 'Bir yazı belgesi', 'Bir ses kaydı'], ok: 0,
+      setup: openTypeFiles, why: '<b>.jpg</b> fotoğraflar için sık kullanılan bir resim biçimidir.',
     }),
-    sec({ title: 'Şüpheli ek', kind: 'mail', from: 'Kargo Bilgi <bilgi@kargo-takip-tr.co>', subject: 'Kargonuz yolda', text: 'Sayın müşterimiz, kargo bilgileriniz ektedir.<br><br>📎 <b>kargo_bilgisi.pdf.exe</b>', q: 'Bu e-postanın ekini açar mısınız?', opts: ['Açarım, PDF yazıyor', 'Açmam: sonu .exe, yani program; PDF gibi görünmeye çalışıyor', 'Önce arkadaşlarıma gönderirim'], ok: 1, why: 'Dosyanın gerçek türü <b>en sondaki</b> uzantıdır: .exe. Virüsler böyle kılık değiştirir. Beklemediğiniz eklerdeki .exe dosyalarını asla açmayın.' }),
-    sec({ title: 'Hangi programla?', text: '<div class="qz-pic">📄 fatura.pdf</div>', q: 'fatura.pdf dosyası hangi programla açılır?', opts: ['Hesap Makinesi', 'PDF okuyucu ya da internet tarayıcısı', 'Paint'], ok: 1, why: 'Bilgisayar dosyayı uzantısına bakarak uygun programla kendisi açar; çift tıklamanız yeterlidir.' }),
     {
-      title: 'Yanlış programda açılırsa',
-      html: `<p>Bir dosya beklemediğiniz programda açılırsa ya da <b>“Bu dosyayı nasıl açmak istiyorsunuz?”</b> sorusu çıkarsa: dosyaya <b>sağ tıklayın → Birlikte aç</b> → istediğiniz programı seçin. Hep aynı programda açılsın isterseniz <b>Her zaman</b> kutusunu işaretleyin.</p>
-        <p>Listede uygun program yoksa dosya türüne bakın: örneğin <b>.docx</b> için Word ya da LibreOffice gerekir.</p>`,
-      scene: info('<div class="sc-big">📄 ➜ 🤔</div><p>Sağ tık → Birlikte aç</p>'),
+      title: 'Dosyanın özelliklerine bakın',
+      html: '<p><b>fatura.pdf</b> dosyasına sağ tıklayın ve <b>Özellikler</b>’i seçin. Pencerede dosyanın <b>türü</b>, <b>boyutu</b> ve <b>konumu</b> görünür.</p>',
+      setup: openTypeFiles,
+      on: (ev) => ev.type === 'ex-properties' && ev.name === pdfName,
+      done: 'Burada <b>PDF Belgesi</b> yazıyor. Bilgileri inceledikten sonra <b>Tamam</b>’a basın.',
+    },
+    rehberSoru({
+      title: 'Şüpheli eki ayırt edin',
+      html: '<p>Bir kargo e-postasında <b>fatura.pdf.exe</b> eki var. Klasördeki <b>fatura.pdf</b> ile karşılaştırın. Eki açar mısınız?</p>',
+      opts: ['Açarım, adında PDF var', 'Açmam, sonu .exe ve bir uygulama çalıştırabilir', 'Bir arkadaşıma gönderirim'], ok: 1,
+      setup: openTypeFiles, why: 'Dosya türü için <b>en sondaki</b> uzantıya bakın. Bu ek PDF gibi adlandırılmış bir uygulama. Beklemediğiniz ekleri açmadan önce göndereni doğrulayın.',
+    }),
+    {
+      title: 'PDF belgesini açın',
+      html: '<p><b>fatura.pdf</b> dosyasına çift tıklayın. Açılan pencerenin üstündeki uygulama adına bakın.</p>',
+      setup: openTypeFiles,
+      on: (ev) => ev.type === 'ex-open' && ev.name === pdfName,
+      done: 'Dosya PDF okuyucuda açıldı. Bir PDF belgesi tarayıcıda da görüntülenebilir.',
     },
     {
-      title: 'Sarı şeritli belge',
-      html: `<p>İnternetten ya da e-postadan gelen bir Word ya da Excel belgesi üstte <b>sarı bir şeritle</b> açılabilir: <b>Korumalı Görünüm</b>. Dosya sizi korumak için salt okunur açılmıştır.</p>
-        <p>Dosyayı tanıyorsanız (torununuzun gönderdiği tarif, bankanın faturası) <b>Düzenlemeyi Etkinleştir</b>\'e basın. Şerit <b>“İçeriği Etkinleştir”</b> ya da <b>“Makroları etkinleştir”</b> diyorsa basmayın. Tanımadığınız kişiden geldiyse dosyayı hiç açmayın.</p>`,
-      scene: info('<div class="sc-big">🟨 📄</div><p>Korumalı Görünüm → Düzenlemeyi Etkinleştir</p>'),
+      title: 'Fotoğrafı Paint ile açın',
+      html: '<p>Fotoğrafa çift tıklarsanız varsayılan uygulamada açılır. Başka bir uygulama seçmek için <b>tatil.jpg</b> dosyasına sağ tıklayın ve <b>Birlikte aç → Paint</b> yolunu izleyin.</p>',
+      setup: openTypeFiles,
+      on: (ev) => ev.type === 'ex-openwith' && ev.name === photoName && ev.app === 'paint',
+      done: 'Aynı fotoğrafı bu kez Paint açtı. Dosyanın türü ve uzantısı aynı kaldı.',
     },
-    sec({ title: 'En büyük dosya', text: '<div class="qz-pic">📄 🖼 🎬</div>', q: 'Bunlardan hangisi genellikle en çok yer kaplar?', opts: ['mektup.txt', 'tatil.jpg', 'düğün videosu.mp4'], ok: 2, why: 'Yazı birkaç KB, fotoğraf birkaç MB, video ise GB\'larca olabilir. Disk dolduğunda önce videolara bakın.' }),
-    sec({ title: 'Zip dosyası', text: '<div class="qz-pic">📦 fotoğraflar.zip</div>', q: 'Torununuz “fotoğraflar.zip” gönderdi. Ne yaparsınız?', opts: ['Sağ tık → Tümünü ayıkla ile paketi açıp içindeki fotoğraflara bakarım', 'Silerim, açılmaz', 'Adını .jpg yaparım'], ok: 0, why: 'Zip, birçok dosyayı tek pakette gönderir. Ayıklayınca aynı adlı bir klasör oluşur, fotoğraflar içindedir.' }),
-    sec({ title: 'Uzantıyı değiştirmek', text: '<div class="qz-pic">mektup.txt ➜ mektup.jpg</div>', q: 'Bir dosyanın adını değiştirirken uzantısını da değiştirirseniz ne olur?', opts: ['Dosya fotoğrafa dönüşür', 'Dosya açılmayabilir; uzantıya dokunmayın', 'Dosya küçülür'], ok: 1, why: 'Uzantı türü değiştirmez, yalnızca bilgisayarı şaşırtır. F2 ile ad değiştirirken yalnızca noktadan önceki kısmı değiştirin.' }),
-    { final: true, title: 'Tebrikler! 🎉', html: '<p>Dosya türlerini tanıyorsunuz:</p>', scene: info('<div class="sc-big">🏷✔</div>') },
+    {
+      title: 'Korumalı Görünüm',
+      html: `<p>İnternetten ya da e-postadan gelen bir Word veya Excel belgesi <b>Korumalı Görünüm</b>’de, üstte sarı bir şeritle açılabilir. Belge başlangıçta salt okunurdur.</p>
+        <p>Dosyayı bekliyorsanız, kaynağını doğruladıysanız ve belgeyi değiştirmeniz gerekiyorsa <b>Düzenlemeyi Etkinleştir</b>’i kullanın. Beklenmedik belgelerde <b>İçeriği Etkinleştir</b> veya <b>Makroları Etkinleştir</b> uyarısına basmayın.</p>`,
+    },
+    rehberSoru({
+      title: 'Dosya boyutunu okuyun',
+      html: '<p>Dosya Gezgini’ndeki <b>Boyut</b> sütunu dosyanın ne kadar yer kapladığını gösterir. Genellikle hangisi daha büyük olur?</p>',
+      opts: ['Kısa bir alışveriş listesi', 'Bir fotoğraf', 'Uzun bir düğün videosu'], ok: 2,
+      setup: openTypeFiles, why: 'Kısa metinler birkaç KB, fotoğraflar birkaç MB, uzun videolar ise GB düzeyinde olabilir.',
+    }),
+    {
+      title: 'ZIP paketini açın',
+      html: '<p><b>fotoğraflar.zip</b> dosyasına sağ tıklayın ve <b>Tümünü ayıkla</b>’yı seçin. Açılan pencerede <b>Ayıkla</b>’ya basın.</p>',
+      setup: openTypeFiles,
+      on: (ev) => ev.type === 'zip-extract' && ev.name === archiveName,
+      done: 'Bir klasör oluştu ve paketteki fotoğraf içine çıkarıldı. ZIP dosyası da yerinde duruyor.',
+    },
+    {
+      title: 'Adı değiştirin, türü koruyun',
+      html: `<p><b>liste.txt</b> dosyasına bir kez tıklayın. ${K('F2')} ile seçili olan <b>liste</b> kısmını <b>alışveriş</b> yapıp ${K('Enter')} tuşuna basın. <b>.txt</b> uzantısını olduğu gibi bırakın.</p>`,
+      setup: openTypeFiles,
+      combo: ['F2'],
+      check: (c) => !!c.d.fs.find(typeFiles(c), renamedNote),
+      on: (ev) => ev.type === 'rename' && ev.old === noteName && ev.name === renamedNote,
+      done: 'Dosyanın adı <b>alışveriş.txt</b> oldu. Uzantı aynı kaldığı için dosya hâlâ düz metin.',
+    },
+    { final: true, title: 'Tebrikler! 🎉', html: '<p>Dosya türünü uzantısından ve özelliklerinden tanıyabiliyor, uygun uygulamayla açabiliyor ve ZIP paketinden dosya çıkarabiliyorsunuz.</p>' },
   ],
 };
 

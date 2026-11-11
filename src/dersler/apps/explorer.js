@@ -114,6 +114,13 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
   let sel = null, anchor = null; // sel: son tıklanan öğe; anchor: Shift + tık aralığının başı
   const picked = new Set(); // seçili öğelerin hepsi (Ctrl + tık, Shift + tık, çerçeve)
   let boxes = !!desk.settings.exBoxes; // öğe onay kutuları
+  let showExtensions = desk.settings.exExtensions !== false;
+  const hiddenExtension = (n) => showExtensions || n.type !== 'file' || !TYPES.some(([pattern]) => pattern.test(n.name))
+    ? '' : n.name.match(/(?<=.)\.[^.]+$/)?.[0] || '';
+  const displayName = (n) => n.name.slice(0, n.name.length - hiddenExtension(n).length);
+  const itemName = (n) => renaming === n.id
+    ? `<input class="ei-rename" value="${esc(displayName(n))}" spellcheck="false">`
+    : `<span class="ei-name">${esc(displayName(n))}</span>`;
   let renaming = null;
   let query = '';
   let userMode = args.view || null, sortBy = 'name', sortDesc = false; // görünüm: seçilmediyse klasöre göre (aşağıda); sıralama
@@ -255,7 +262,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       const quick = ['desktop', 'downloads', 'docs', 'pictures', 'music', 'videos'];
       box.innerHTML = `<h3 class="ex-h">${I.chevD} Hızlı erişim</h3><div class="ex-quick">${quick.map((id) => `<button type="button" class="gx-tile" data-go="${id}" ${id === 'videos' ? '' : `data-drop="folder:${id}"`}>${big(id)}<span><b>${esc(label(id))}</b><small>${I.pin} Bu Bilgisayar</small></span></button>`).join('')}</div>
         <h3 class="ex-h">${I.chevD} Son kullanılanlar</h3>${list.length ? `<table class="ex-det ex-recent"><thead><tr><th>Ad</th><th>Değiştirme tarihi</th><th>Konum</th></tr></thead><tbody>
-        ${list.map((n) => `<tr class="ex-item${picked.has(n.id) ? ' sel' : ''}" data-id="${n.id}"><td><span class="ei-ic">${nodeIcon(n)}</span><span class="ei-name">${esc(n.name)}</span></td><td>${fmtDate(n.mtime)}</td><td class="ex-loc">${esc(fs.path(n.parent).map((x) => x.name).join(' › '))}</td></tr>`).join('')}</tbody></table>`
+        ${list.map((n) => `<tr class="ex-item${picked.has(n.id) ? ' sel' : ''}" data-id="${n.id}"><td><span class="ei-ic">${nodeIcon(n)}</span>${itemName(n)}</td><td>${fmtDate(n.mtime)}</td><td class="ex-loc">${esc(fs.path(n.parent).map((x) => x.name).join(' › '))}</td></tr>`).join('')}</tbody></table>`
           : '<p class="ex-empty">Açtığınız ve kaydettiğiniz dosyalar burada görünür.</p>'}`;
     } else if (cur === 'pc' && !query) {
       const tile = (id) => `<button type="button" class="gx-tile" data-go="${id}" ${id === 'videos' ? '' : `data-drop="folder:${id}"`}>${big(id)}<span><b>${esc(label(id))}</b></span></button>`;
@@ -276,13 +283,13 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
     } else if (m === 'details') {
       const col = (k, l) => `<th data-sort="${k}" class="${sortBy === k ? 'on' : ''}">${l}${sortBy === k ? (sortDesc ? I.chevD : I.chevU) : ''}</th>`;
       box.innerHTML = `<table class="ex-det"><thead><tr>${col('name', 'Ad')}${col('date', 'Değiştirme tarihi')}${col('type', 'Tür')}${col('size', 'Boyut')}</tr></thead><tbody>
-        ${list.map((n, i) => `${groupHead(list, i, (g) => `<tr class="ex-grp"><td colspan="4">${g}</td></tr>`)}<tr class="ex-item${picked.has(n.id) ? ' sel' : ''}" data-id="${n.id}" ${n.type === 'folder' && !inRecycle ? `data-drop="folder:${n.id}"` : ''}><td>${boxes ? '<span class="ei-chk" title="Seç"></span>' : ''}<span class="ei-ic">${nodeIcon(n)}</span>${renaming === n.id ? `<input class="ei-rename" value="${esc(n.name)}" spellcheck="false">` : `<span class="ei-name">${esc(n.name)}</span>`}</td>
+        ${list.map((n, i) => `${groupHead(list, i, (g) => `<tr class="ex-grp"><td colspan="4">${g}</td></tr>`)}<tr class="ex-item${picked.has(n.id) ? ' sel' : ''}" data-id="${n.id}" ${n.type === 'folder' && !inRecycle ? `data-drop="folder:${n.id}"` : ''}><td>${boxes ? '<span class="ei-chk" title="Seç"></span>' : ''}<span class="ei-ic">${nodeIcon(n)}</span>${itemName(n)}</td>
           <td>${fmtDate(n.mtime)}</td><td>${esc(typeName(n))}</td><td class="num">${n.type === 'folder' ? '' : fmtSize(fs.sizeOf(n))}</td></tr>`).join('')}</tbody></table>`;
     } else {
       const big3 = m === 'xl' || m === 'lg' || m === 'icons';
       box.innerHTML = list.map((n, i) => `${groupHead(list, i, (g) => `<div class="ex-grp">${g}</div>`)}<div class="ex-item${picked.has(n.id) ? ' sel' : ''}" data-id="${n.id}" ${n.type === 'folder' && !inRecycle ? `data-drop="folder:${n.id}"` : ''}>
           ${boxes ? '<span class="ei-chk" title="Seç"></span>' : ''}<span class="ei-img">${big3 && thumb(n) ? `<img class="ei-thumb" src="${thumb(n)}" alt="" draggable="false">` : nodeIcon(n)}</span>
-          <span class="ei-txt">${renaming === n.id ? `<input class="ei-rename" value="${esc(n.name)}" spellcheck="false">` : `<span class="ei-name">${esc(n.name)}</span>`}
+          <span class="ei-txt">${itemName(n)}
           ${m === 'tiles' ? `<small class="ei-loc">${esc(typeName(n))}</small>${n.type === 'folder' ? '' : `<small class="ei-loc">${fmtSize(fs.sizeOf(n))}</small>`}` : ''}
           ${query ? `<small class="ei-loc">${esc(fs.label(n.parent))}</small>` : ''}
           ${inRecycle && n.deletedFrom ? `<small class="ei-loc">Eski yeri: ${esc(fs.label(n.deletedFrom))}</small>` : ''}</span></div>`).join('');
@@ -372,6 +379,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
     const inp = $('.ei-rename');
     if (!inp) return;
     const node = fs.get(renaming);
+    const extension = hiddenExtension(node);
     inp.focus();
     const dot = node.type === 'file' ? node.name.lastIndexOf('.') : -1;
     inp.setSelectionRange(0, dot > 0 ? dot : node.name.length);
@@ -381,9 +389,10 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       done = true;
       const id = renaming;
       renaming = null;
-      const v = inp.value.trim();
+      const base = inp.value.trim();
+      const v = base + extension;
       const old = node.name;
-      if (save && v && v !== old) {
+      if (save && base && v !== old) {
         const err = fs.rename(id, v);
         if (err) { desk.toast('Ad değiştirilemedi', esc(err), iconFor('warn')); render(); }
         else emit('rename', { id, name: v, old });
@@ -530,8 +539,9 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
     if (k === 'sort') return [...SORTS.map(([c, l]) => ({ cmd: 'sort:' + c, ...mi(sortBy === c ? I.dot : '', l) })), '-', { cmd: 'dir:asc', ...mi(!sortDesc ? I.dot : '', 'Artan') }, { cmd: 'dir:desc', ...mi(sortDesc ? I.dot : '', 'Azalan') }];
     if (k === 'view') {
       const m = viewMode();
+      const show = [{ cmd: 'boxes', ...mi(ck(boxes), 'Öğe onay kutuları') }, { cmd: 'extensions', ...mi(ck(showExtensions), 'Dosya adı uzantıları') }];
       return [...VIEWS.map(([c, l]) => ({ cmd: 'view:' + c, ...mi(m === c ? I.dot : '', l) })), '-',
-        ...(flat ? [{ cmd: 'boxes', ...mi(ck(boxes), 'Öğe onay kutuları') }] : [{ cmd: 'show', ...mi('', 'Göster'), sub: [{ cmd: 'boxes', ...mi(ck(boxes), 'Öğe onay kutuları') }] }])];
+        ...(flat ? show : [{ cmd: 'show', ...mi('', 'Göster'), sub: show }])];
     }
     if (k === 'filter') return [...FILTERS.map(([c, l]) => ({ cmd: 'filter:' + c, ...mi(filt === c ? I.dot : '', l) })), '-', { cmd: 'filter:', ...mi('', 'Filtreyi temizle'), disabled: !filt }];
     return [];
@@ -654,6 +664,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
         return;
       }
       case 'boxes': boxes = desk.settings.exBoxes = !boxes; emit('ex-checkboxes', { on: boxes }); return render();
+      case 'extensions': return desk.setSetting('exExtensions', !showExtensions);
       case 'empty': desk.emptyRecycle(); return;
       case 'eject': desk.ejectUsb(); return;
       case 'import': desk.importPhotos(); return;
@@ -691,6 +702,7 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
       case 'props': {
         const t = n || (!isSpecial(cur) && fs.get(cur));
         if (!t) return;
+        emit('ex-properties', { id: t.id, name: t.name });
         return desk.dialogs.ask({ title: `${t.name} Özellikleri`, icon: nodeIcon(t), text: `<b>${esc(t.name)}</b><br>Tür: ${esc(typeName(t))}<br>Konum: ${esc(fs.path(t.parent).map((x) => x.name).join(' › '))}<br>Boyut: ${fmtSize(fs.sizeOf(t))}<br>Değiştirme tarihi: ${fmtDate(t.mtime)}`, buttons: [['ok', 'Tamam', true]] });
       }
     }
@@ -832,6 +844,12 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
   if (args.select && fs.get(args.select)) select(args.select);
   return {
     onFs: () => { if (!isSpecial(cur) && !fs.get(cur)) cur = 'pc'; if (sel && !fs.get(sel)) sel = null; if (picked.size) { const here = new Set(items().map((n) => n.id)); [...picked].forEach((x) => { if (!here.has(x)) picked.delete(x); }); } if (!renaming && !editAddr) render(); },
+    onSettings: () => {
+      const next = desk.settings.exExtensions !== false;
+      if (next === showExtensions) return;
+      showExtensions = next;
+      if (!renaming && !editAddr) render();
+    },
     onArgs: (a) => { if (a.folder) go(a.folder); if (a.select && fs.get(a.select)) select(a.select); },
     leaveUsb: () => { if (hasInUsb()) go('pc'); },
     leavePhone: () => { if (!isSpecial(cur) && (cur === PHONE || !fs.get(cur) || fs.isInside(cur, PHONE))) go('pc'); },

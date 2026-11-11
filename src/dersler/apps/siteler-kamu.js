@@ -104,7 +104,7 @@ const CIMER = {
     const st = ctx.state;
     st.err = '';
     if (a === 'login') {
-      const ed = ctx.desk.webState?.['turkiye.gov.tr'];
+      const ed = ctx.webData.webState['turkiye.gov.tr'];
       if (!ed?.user) { st.err = 'Önce e-Devlet\'e giriş yapın (turkiye.gov.tr), sonra bu sayfaya dönüp yeniden deneyin.'; ctx.emit('cimer-login', { ok: false }); ctx.refresh(); return; }
       st.user = true;
       ctx.desk.toast('e-Devlet ile giriş', 'Açık olan e-Devlet oturumunuzla CİMER\'e girdiniz.', '🇹🇷', 4000);
@@ -119,7 +119,7 @@ const CIMER = {
       else if ((v.metin || '').length < 30) st.err = 'Başvuru metni çok kısa. Ne olduğunu, nerede ve ne zamandan beri olduğunu yazın.';
       ctx.emit('cimer-form', { ok: !st.err });
       if (st.err) { ctx.refresh(); return; }
-      const prev = ctx.desk.webState?.['cinar.bel.tr']?.done?.no; // belediyeye yapılan başvurunun numarası
+      const prev = ctx.webData.webState['cinar.bel.tr']?.done?.no; // belediyeye yapılan başvurunun numarası
       st.done = { no: 'CMR-' + code(9), kurum: v.kurum };
       ctx.emit('cimer-basvuru', { tur: v.tur, kurum: v.kurum, prior: !!v.onceki, priorOk: !!prev && v.onceki.toLocaleUpperCase('tr').replace(/\s/g, '') === prev.toLocaleUpperCase('tr') });
       ctx.refresh();

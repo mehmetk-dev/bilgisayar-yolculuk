@@ -35,7 +35,7 @@ const kayitSayfa = (path, st) => {
   if (sira > (st.ks || 0)) return page('Önce önceki adımlar', `${head}<div class="ed"><h1>Önce bir önceki adımı bitirin</h1><p><a data-href="www.e-hesabim.com.tr/kayit">Hesap oluşturmaya baştan başlayın</a></p></div>`);
   if (path === '/kayit') {
     const gun = val(st, 'gun'), yil = val(st, 'yil');
-    return page('Hesap oluştur', `${head}<form class="ed-login" data-act="k-ad">${adim(1)}<h1>Hesap oluşturun</h1><p>Önce adınızı ve doğum tarihinizi yazın. <b>Gerçek bilgilerinizi</b> yazın; hesabınızı kurtarmanız gerekirse bunlar sorulur.</p>
+    return page('Hesap oluştur', `${head}<form class="ed-login" data-act="k-ad">${adim(1)}<h1>Hesap oluşturun</h1><div class="ed-note"><b>Alıştırma:</b> Ders kartındaki örnek bilgileri kullanın. Gerçek adınızı, doğum tarihinizi veya telefon numaranızı girmeyin.</div>
       <label>Ad<input name="ad" autocomplete="off" value="${val(st, 'ad')}"></label>${err(st, 'ad')}<label>Soyad<input name="soyad" autocomplete="off" value="${val(st, 'soyad')}"></label>${err(st, 'soyad')}
       <div style="display:flex;gap:0.6em;align-items:flex-end"><label>Gün<input name="gun" maxlength="2" inputmode="numeric" autocomplete="off" style="width:4em" value="${gun}"></label>
       <label>Ay<select name="ay"><option value="">Seçin</option>${AYLAR.map((m, i) => `<option value="${i + 1}"${String(st.f?.ay) === String(i + 1) ? ' selected' : ''}>${m}</option>`).join('')}</select></label>
@@ -51,12 +51,12 @@ const kayitSayfa = (path, st) => {
   if (path === '/kayit/sifre') {
     const p1 = st.f?.p1 || '', s = p1 ? strength(p1) : -1, tip = st.show ? 'text' : 'password';
     const metre = p1 && st.sifreDenendi ? `<div class="pw-meter"><i data-s="${Math.max(s, 0)}" style="width:${(Math.max(s, 0) + 1) * 20}%"></i></div><small>${['Çok zayıf', 'Zayıf', 'Orta', 'İyi', 'Çok güçlü'][Math.max(s, 0)]}</small>` : '';
-    return page('Şifre', `${head}<form class="ed-login" data-act="k-sifre">${adim(3)}<h1>Bir şifre belirleyin</h1><p>Site en az <b>8 karakter</b> ister; siz <b>12 ve üzerini</b> tercih edin. Üç dört kelimelik uzun bir cümle hem hatırlanır hem güçlüdür. Adınız ve doğum yılınız olmasın.</p>
+    return page('Şifre', `${head}<form class="ed-login" data-act="k-sifre">${adim(3)}<h1>Bir şifre belirleyin</h1><p>Bu alıştırmada <b>en az 12 karakter</b> gerekiyor. Üç dört kelimelik uzun bir cümle uydurun. Başka bir yerde kullandığınız şifreyi yazmayın.</p>
       <label>Şifre<input name="p1" type="${tip}" autocomplete="off" value="${esc(p1)}"></label>${err(st, 'p1')}${metre}<label>Şifre (tekrar)<input name="p2" type="${tip}" autocomplete="off" value="${val(st, 'p2')}"></label>${err(st, 'p2')}
       <p><button type="button" class="ed-btn ghost small" style="margin-left:0" data-act="k-goster">👁 ${st.show ? 'Şifreyi gizle' : 'Şifreyi göster'}</button></p><button class="ed-btn">Sonraki</button></form>`);
   }
   if (path === '/kayit/telefon') {
-    return page('Telefon', `${head}<form class="ed-login" data-act="k-telefon">${adim(4)}<h1>Telefon numaranız</h1><p>Şifrenizi unutursanız ya da biri hesabınıza girmeye çalışırsa <b>telefonunuza SMS kodu</b> göndeririz. Bu yüzden telefon numarası ister.</p>
+    return page('Telefon', `${head}<form class="ed-login" data-act="k-telefon">${adim(4)}<h1>Kurtarma telefonu</h1><p>Karttaki örnek numarayı kullanın. Alıştırma kodu, ekranın köşesinde görünür.</p>
       <label>Cep telefonu<input name="tel" inputmode="tel" autocomplete="off" placeholder="05xx xxx xx xx" value="${val(st, 'tel')}"></label>${err(st, 'tel')}
       <label>Kurtarma e-postası <small>(isteğe bağlı)</small><input name="kurt" autocomplete="off" spellcheck="false" value="${val(st, 'kurt')}"></label>${err(st, 'kurt')}
       <p class="ed-small">Kurtarma e-postası, başka bir adresiniz varsa yardımcı olur. Yoksa boş bırakabilirsiniz.</p><button class="ed-btn">Kod gönder</button>
@@ -124,17 +124,12 @@ const kayitAct = (a, v, ctx, el, sms) => {
     const duz = sade(p1);
     let neden = '';
     if (!p1) { neden = 'bos'; st.err.p1 = 'Bir şifre yazın.'; }
-    else if (p1.length < 8) { neden = 'kisa'; st.err.p1 = 'En az 8 karakter olmalı. Siz 12 ve üzerini tercih edin.'; }
+    else if (p1.length < 12) { neden = 'kisa'; st.err.p1 = 'En az 12 karakter olmalı. Cümlenize birkaç kelime daha ekleyin.'; }
     else if ((ad.length >= 3 && duz.includes(ad)) || (soyad.length >= 3 && duz.includes(soyad)) || (kok.length >= 6 && duz.includes(kok))) { neden = 'kisisel'; st.err.p1 = 'Şifrede adınızı, soyadınızı ya da kullanıcı adınızı kullanmayın.'; }
     else if (strength(p1) < 2) { neden = 'zayif'; st.err.p1 = 'Bu şifre kolay tahmin edilir. Büyük ve küçük harf, rakam ekleyin ya da daha uzun bir cümle yazın; 123 gibi dizilerden ve doğum yılından kaçının.'; }
     else if (p1 !== v.p2) { neden = 'uyusmuyor'; st.err.p2 = 'İki şifre aynı değil. İkincisine aynısını yazın.'; }
     st.sifreDenendi = true;
     if (neden) return yenile('acct-pass', { reason: neden, len: p1.length });
-    if (p1.length < 12 && st.soft !== p1) {
-      st.soft = p1;
-      st.err.p1 = 'Kabul edilir ama kısa. 12 ve üzeri karakterli, uzun bir cümle çok daha güvenlidir. Yine de bu şifreyle devam etmek isterseniz Sonraki\'ye tekrar basın.';
-      return yenile('acct-pass', { reason: 'kisa12', soft: true, len: p1.length });
-    }
     st.sifre = p1;
     ctx.emit('acct-pass', { ok: true, len: p1.length, strength: strength(p1) });
     return ilerle(3, '/kayit/telefon');
@@ -161,7 +156,7 @@ const kayitAct = (a, v, ctx, el, sms) => {
     ctx.emit('acct-created', { mail: st.acct.mail, user: st.f.user, kurtarma: !!st.f.kurt });
     st.f = {};
     st.ks = 0;
-    st.soft = st.sifre = null;
+    st.sifre = null;
     st.sifreDenendi = false;
     st.show = false;
     return ctx.go('/kayit/tamam');
@@ -203,9 +198,10 @@ const HESAP = {
     if (path === '/hesap') {
       return page('Hesabım', `${head}<div class="ed"><h1>👋 Hoş geldiniz</h1>${st.who ? `<p><b>${esc(st.who)}</b></p>` : ''}<p>E-Hesabım'a giriş yaptınız. <button type="button" class="ed-btn small" data-act="logout">⏻ Çıkış</button></p></div>`);
     }
-    return page('E-Hesabım: Giriş', `${head}<form class="ed-login" data-act="login"><h1>Hesabınıza giriş yapın</h1><p class="mut">Alıştırma hesabı: <b>${HESAP_MAIL}</b> · şifre <b>${st.pass === HESAP_ESKI ? 'unuttuğunuzu varsayın' : 'yeni şifreniz'}</b></p>
+    return page('E-Hesabım: Giriş', `${head}<form class="ed-login" data-act="login"><h1>Hesabınıza giriş yapın</h1><div class="ed-note">Yeni bir e-posta adresi mi istiyorsunuz? <button type="button" class="ed-btn small" data-href="www.e-hesabim.com.tr/kayit">Hesap oluştur</button></div>
+      <p class="mut">Alıştırma hesabı: <b>${HESAP_MAIL}</b> · şifre <b>${st.pass === HESAP_ESKI ? 'unuttuğunuzu varsayın' : 'yeni şifreniz'}</b></p>
       ${st.err?.top ? `<div class="wf-errtop">⚠ ${st.err.top}</div>` : ''}<label>E-posta<input name="mail" autocomplete="off" spellcheck="false" value="${esc(st.form?.mail ?? '')}"></label><label>Şifre<input name="pw" type="password" autocomplete="off"></label>
-      <button class="ed-btn">Giriş yap</button><p class="ed-small"><a data-href="www.e-hesabim.com.tr/sifirla">Şifremi unuttum</a></p><p class="ed-small">Hesabınız yok mu? <a data-href="www.e-hesabim.com.tr/kayit">Hesap oluştur</a></p></form>`);
+      <button class="ed-btn">Giriş yap</button><p class="ed-small"><a data-href="www.e-hesabim.com.tr/sifirla">Şifremi unuttum</a></p></form>`);
   },
   act(a, v, ctx, el) {
     const st = ctx.state;

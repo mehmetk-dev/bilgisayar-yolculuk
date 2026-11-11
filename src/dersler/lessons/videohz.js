@@ -1,4 +1,4 @@
-// 8. hafta ek dersi: video kalitesi (144p … 4K) ve Hz (ekranın yenileme hızı).
+// 8. hafta ek dersi: video biçimi, video çözünürlüğü ve ekranın yenileme hızı.
 // İki küçük deney sahnesi: piksel netliği ve saniyedeki kare sayısı; ekran ayarı taslağı.
 import { info, sec } from './kalip.js';
 
@@ -34,7 +34,7 @@ function kaliteSahnesi(el, c) {
   el.className = 'sc sc-vh';
   el.innerHTML = `<div class="vh-screen"><canvas class="vh-cv"></canvas><span class="vh-badge"></span></div>
     <div class="vh-btns">${KALITE.map((q) => `<button type="button" data-q="${q.id}">${q.label}</button>`).join('')}</div>
-    <dl class="tb-facts vh-info"><dt>Videonun boyutu</dt><dd class="a"></dd><dt>Nokta (piksel) sayısı</dt><dd class="b"></dd><dt>Bir saat izlerseniz</dt><dd class="d"></dd><dt>Görünüş</dt><dd class="e"></dd></dl>
+    <dl class="tb-facts vh-info"><dt>Kare çözünürlüğü</dt><dd class="a"></dd><dt>Nokta (piksel) sayısı</dt><dd class="b"></dd><dt>Bir saat izlerseniz</dt><dd class="d"></dd><dt>Görünüş</dt><dd class="e"></dd></dl>
     <p class="mut vh-hint">Bir kaliteye tıklayın. Resim “temsilidir”; gerçek bir videoda da fark böyledir.</p>`;
   const cv = el.querySelector('.vh-cv'), tried = new Set();
   const draw = (q) => {
@@ -126,11 +126,13 @@ function ekranAyari(el, c) {
 }
 
 export const videoHz = {
-  id: 'video-hz', icon: '🎞', title: 'Video kalitesi (360p, 1080p, 4K) ve Hz nedir?', minutes: 30, stage: 'scene',
-  desc: 'Video kalitesi (720p, 4K) ve ekran yenileme hızı (Hz) ne demek?',
+  id: 'video-hz', icon: '🎞', title: 'Video biçimi, çözünürlük ve Hz', minutes: 30, stage: 'scene',
+  desc: 'MP4 video dışarı aktarmayı, 360p, 1080p ve 4K çözünürlükleri ve ekranın yenileme hızını öğrenin.',
   summary: [
-    ['144p, 360p, 720p, 1080p, 4K', 'Videonun netliği; sayı büyüdükçe daha net, daha çok internet harcar'],
-    ['Çözünürlük', 'Ekranda yan yana kaç nokta (piksel) olduğu: 1920 × 1080 = Full HD'],
+    ['MP4', 'Video dosyasının biçimi. Bir MP4 dosyası farklı çözünürlüklerde hazırlanabilir.'],
+    ['1080p (Full HD)', 'Video çözünürlüğü. Full HD örneğinde her kare 1920 × 1080 pikseldir.'],
+    ['Uzantı ve dışarı aktarma', 'Uzantıyı değiştirmek dosyanın adını değiştirir. Video Oluştur, sunudan yeni bir MP4 dosyası üretir.'],
+    ['144p, 360p, 720p, 1080p, 4K', 'Daha yüksek çözünürlük daha fazla ayrıntı gösterebilir ve genellikle daha çok veri kullanır.'],
     ['Kotalı internet', 'Telefonda kotanızı korumak için 360p ya da 480p seçin; 4K bir saatte yaklaşık 7 GB harcar'],
     ['Otomatik kalite', 'Kalite ayarı “Otomatik” ise internet yavaşlayınca video kaliteyi kendiliğinden düşürür'],
     ['Hz (hertz)', 'Ekranın saniyede kaç kez yenilendiği: 60 Hz = saniyede 60 resim'],
@@ -140,29 +142,30 @@ export const videoHz = {
   ],
   steps: [
     {
-      title: 'İki farklı sayı',
-      html: `<p>Videoda ve ekranda iki ayrı sayıyla karşılaşırsınız:</p>
-        <ul class="big-list"><li><b>360p, 720p, 1080p, 4K</b>: videonun <b>netliği</b></li><li><b>60 Hz, 144 Hz</b>: ekranın <b>akıcılığı</b></li></ul>
-        <p>İkisini de kendiniz deneyerek göreceğiz. Hiçbir ayar gerçekten değişmez; yalnızca denersiniz.</p>`,
-      scene: info('<div class="sc-big">🎞 1080p<br>🖥 60 Hz</div><p>Netlik ve akıcılık</p>'),
+      title: 'MP4, 1080p ve Hz',
+      html: `<p>Bilgisayarınızda <b>albüm.mp4</b> adlı bir video açtınız. Video bilgilerinde <b>1080p</b>, ekran ayarında <b>60 Hz</b> yazıyor.</p>
+        <ul class="big-list"><li><b>MP4</b> dosyanın biçimidir. <b>.mp4</b> dosya adının sonundaki uzantıdır.</li>
+        <li><b>1080p</b> videonun çözünürlüğünü belirtir. Full HD örneğinde her kare 1920 × 1080 pikselden oluşur.</li>
+        <li><b>60 Hz</b> ekranın saniyede 60 kez yenilendiğini belirtir.</li></ul>`,
+      scene: info('<div class="sc-big">🎞 1080p<br>🖥 60 Hz</div><p>Aynı MP4 biçiminde 360p ve 1080p videolar hazırlanabilir.</p>'),
     },
     {
       title: 'Netliği deneyin',
       html: `<p>Sağdaki manzara bir videonun bir karesidir. <b>144p</b>'ye tıklayın; yazıya ve evin penceresine bakın. Sonra <b>1080p</b> ve <b>4K</b>'yı deneyin. Her seferinde sağdaki bilgilere de bakın.</p>
-        <p class="mut">1080, ekranın yukarıdan aşağı 1080 nokta (piksel) olduğunu söyler. Sondaki p ise görüntünün tek seferde, satır atlamadan çizildiğini gösterir (İngilizce “progressive”). Siz yalnızca sayıya bakın.</p>`,
+        <p class="mut">1080p’de 1080, video karesinin yüksekliğindeki piksel sayısıdır. <b>p</b>, karenin satırlarının sırayla çizildiğini belirtir. Full HD ekranda 4K video ekranın çözünürlüğüne sığdırılır ve izlerken daha fazla veri harcayabilir.</p>`,
       scene: kaliteSahnesi,
       on: (ev, c) => ev.type === 'vh-q' && ev.tried.includes('144') && (ev.tried.includes('1080') || ev.tried.includes('2160')),
       done: '144p’de resim kocaman karelerden oluşuyor, yazı okunmuyor; 1080p ve 4K’da yazı bile keskin. Ama dikkat: kalite arttıkça video çok daha fazla internet harcıyor. Video sitelerinde kaliteyi, videonun üstündeki ⚙ (dişli) simgesinden seçersiniz; “Otomatik” seçiliyse internet yavaşlayınca kalite kendiliğinden düşer.',
     },
     sec({
-      title: 'Kotanız dar', text: '<p>Telefonunuzda <b>mobil internet kotanız</b> kısıtlı: ayda 10 GB. Bir yemek tarifi videosunu telefonda izleyeceksiniz.</p>',
-      q: 'Hangi kaliteyi seçersiniz?', opts: ['4K: en güzel görünür', '360p ya da 480p: küçük ekranda yeterli, kotanız az harcanır', '144p: bir şey görünmese de olur'], ok: 1,
-      why: 'Telefonun küçük ekranında 360p–480p bile yeterince nettir; 4K gereksiz yere kotanızı bitirir. Evde kablosuz internetle (Wi-Fi) izlerken kota sorun olmaz.',
+      title: 'Aynı biçim, iki çözünürlük', text: '<p>Bir yemek tarifi videosunun iki sürümü var. İkisinin de uzantısı <b>.mp4</b>. Biri <b>360p</b>, diğeri <b>1080p</b>.</p>',
+      q: 'Bu bilgiler neyi anlatıyor?', opts: ['İki video da MP4 biçiminde. 1080p olanın çözünürlüğü daha yüksek.', 'İki video aynı çözünürlükte. MP4 olanın ekranı daha hızlı yenilenir.', '360p ve 1080p iki farklı dosya biçimidir.'], ok: 0,
+      why: 'MP4 dosya biçimini, 360p ve 1080p çözünürlüğü gösterir. Mobil internet kotanız sınırlıysa ve yazılar okunuyorsa 360p sürüm daha az veri harcayabilir.',
     }),
     sec({
-      title: 'Ekran ve video', text: '<p>Bilgisayarınızın ekranı <b>1920 × 1080 (Full HD)</b>. İnternette bir videonun <b>4K</b> sürümü var.</p>',
-      q: '4K izlerseniz ne olur?', opts: ['Görüntü iki kat netleşir', 'Ekran Full HD olduğu için 1080p’den çok farklı görünmez; ama daha çok internet harcar', 'Bilgisayar bozulur'], ok: 1,
-      why: 'Ekran en fazla kendi nokta sayısı kadar netlik gösterebilir. Full HD ekranda 1080p yeterlidir; 4K video fazladan veri harcar. 4K’nın faydası yalnızca 4K bir ekran ya da televizyonda görülür.',
+      title: 'Sunudan video oluşturun', text: '<p>PowerPoint’te hazırladığınız <b>albüm.pptx</b> sunusunu video olarak göndermek istiyorsunuz. Dosyanın adını <b>albüm.mp4</b> yapmayı düşündünüz.</p>',
+      q: 'Sunudan bir MP4 video dosyasını nasıl üretirsiniz?', opts: ['Dosya Gezgini’nde adın sonundaki .pptx yerine .mp4 yazın.', 'PowerPoint’te Dosya → Dışarı Aktar → Video Oluştur ile kaydedin.', 'Ekran ayarından 1920 × 1080 çözünürlüğünü seçin.'], ok: 1,
+      why: 'Uzantıyı değiştirmek yalnızca dosyanın adını değiştirir. Video Oluştur, slaytları video olarak kaydeder ve düzenlenebilir sunu dosyanızı korur.',
     }),
     {
       title: 'Akıcılığı deneyin',
@@ -197,6 +200,12 @@ export const videoHz = {
       q: 'Ne dersiniz?', opts: ['Güzel fikir', 'Önerilen çözünürlük kalsın; yazıyı büyütmek için Ölçek ya da Metin boyutu ayarını kullansın', 'Ekranı yenilesin'], ok: 1,
       why: 'Çözünürlüğü önerilenin altına çekmek görüntüyü bulanıklaştırır. Yazıyı büyütmenin doğru yolu Ayarlar → Ekran → Ölçek ya da Erişilebilirlik → Metin boyutudur.',
     }),
-    { final: true, title: 'Tebrikler! 🎉', html: '<p>Video kalitesi ve Hz:</p>', scene: info('<div class="sc-big">🎞 ✔ 🖥</div>') },
+    {
+      final: true, title: 'Video biçimi, çözünürlük ve Hz',
+      html: `<p>Dosya biçimini değiştirmenin iki örneğini uygulayın.</p>
+        <ul><li><a href="#ders/resim-web-dosyalari">Resim ve web dosyaları</a> dersinde Paint’te <b>Farklı Kaydet</b> ile JPEG biçimini seçin.</li>
+        <li><a href="#ders/ani-albumu">Aile ve anı albümü sunusu</a> dersinde <b>Video yapın</b> adımında <b>Dosya → Dışarı Aktar → Video Oluştur</b> yoluyla MP4 dosyası üretin.</li></ul>`,
+      scene: info('<div class="sc-big">🎞 ✔ 🖥</div>'),
+    },
   ],
 };

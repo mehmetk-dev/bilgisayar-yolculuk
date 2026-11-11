@@ -260,17 +260,81 @@ function yolMap(W, D) {
 const yolDevam = (D) => (D.bitti ? `<div class="yh-dv"><b>🏁 Yolculuk bitti, tebrikler! Bütün ${D.total} dersi bitirdiniz.</b></div>`
   : `<a class="yh-dv" href="${D.href}"><span class="yh-dv-ic">${D.icon}</span><span><small>${D.label}</small><b>${D.title}</b><span class="yh-dv-alt">Bütün kurs: ${D.nDone} / ${D.total} ders bitti</span></span><span class="yh-go">${D.go} ›</span></a>`);
 
-function homeHarita(W, D) {
-  return `<div class="harita"><div class="yh-ust"><div><h1>${hello()}</h1><p>${safeNote} Yol 1. haftadan başlar; bir durağa tıklayın.</p></div>
-    ${yolDevam(D)}</div>${yolMap(W, D)}</div>`;
+const searchAliases = new Map([
+  ['takvim-randevu', 'ajanda'],
+  ['donatilar', 'Sticky Notes'],
+  ['banka-hesap', 'e-banka ebanka internet bankacılığı'],
+  ['fatura-ode', 'e-banka ebanka internet bankacılığı'],
+  ['fare2', 'sağ tıklama sağ tuş'],
+]);
+const searchText = (text) => text.normalize('NFC').toLocaleLowerCase('tr-TR').normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/ı/g, 'i').replace(/[^a-z0-9]+/g, ' ').trim();
+const searchableWeeks = WEEKS.map((week, i) => ({
+  title: week.title, label: weekName(week), href: `#hafta/${i}`, titleText: searchText(week.title),
+}));
+const searchableLessons = WEEKS.flatMap((week) => realLessons(week).map((l) => ({
+  title: l.title, desc: l.desc, label: weekName(week), href: `#ders/${l.id}`,
+  titleText: searchText(l.title), descText: searchText(l.desc || ''), aliasText: searchText(searchAliases.get(l.id) || ''),
+})));
+
+function homeHarita() {
+  return `<div class="harita"><div class="yh-ust"><div><h1>${hello()}</h1><p>${safeNote} Yol 1. haftadan başlar; bir durağa tıklayın.</p>
+    <form id="yh-search" role="search" aria-label="Ders arama">
+      <label for="yh-query">Ders ara</label>
+      <div><input id="yh-query" type="text" inputmode="search" autocomplete="off" placeholder="Örn. PDF, ajanda">
+        <button type="button" id="yh-clear" hidden>Temizle</button></div>
+    </form></div><div id="yh-devam"></div></div>
+    <p id="yh-search-status" role="status"></p>
+    <ul id="yh-results" hidden></ul>
+    <div id="yh-map"></div></div>`;
 }
 
+function searchHome() {
+  const value = $('#yh-query').value;
+  const active = !!value.trim();
+  $('#yh-clear').hidden = !value;
+  $('#yh-map').hidden = active;
+  $('#yh-devam').hidden = active;
+  const results = $('#yh-results');
+  const query = searchText(value);
+  const matches = [], descriptions = [];
+  if (query) {
+    for (const entry of searchableLessons) {
+      if (entry.titleText.includes(query) || entry.aliasText.includes(query)) matches.push(entry);
+      else if (entry.descText.includes(query)) descriptions.push(entry);
+    }
+    matches.push(...descriptions, ...searchableWeeks.filter((entry) => entry.titleText.includes(query)));
+  }
+  results.hidden = !matches.length;
+  results.innerHTML = matches.map(({ href, title, label, desc }) => `<li><a href="${esc(href)}">
+    <small>${esc(label)}</small><strong>${esc(title)}</strong>${desc ? `<span>${esc(desc)}</span>` : ''}</a></li>`).join('');
+  $('#yh-search-status').textContent = active
+    ? (matches.length ? `${matches.length} sonuç` : 'Sonuç bulunamadı. Başka bir kelime deneyin.')
+    : '';
+}
 
 function renderHome() {
   const home = $('#home');
   home.dataset.hafta = homeWeek != null ? '1' : '';
-  home.innerHTML = homeWeek != null ? weekPage(homeWeek) : homeHarita(weekInfo(), devamInfo());
-  if (homeWeek != null) home.scrollTop = 0;
+  if (homeWeek != null) {
+    home.innerHTML = weekPage(homeWeek);
+    home.scrollTop = 0;
+    return;
+  }
+  if (!$('#yh-search')) {
+    home.innerHTML = homeHarita();
+    const query = $('#yh-query');
+    $('#yh-search').onsubmit = (e) => e.preventDefault();
+    query.oninput = searchHome;
+    $('#yh-clear').onclick = () => {
+      query.value = '';
+      searchHome();
+      query.focus();
+    };
+  }
+  const devam = devamInfo();
+  $('#yh-devam').innerHTML = yolDevam(devam);
+  $('#yh-map').innerHTML = yolMap(weekInfo(), devam);
 }
 
 

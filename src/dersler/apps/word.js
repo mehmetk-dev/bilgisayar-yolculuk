@@ -34,6 +34,14 @@ const WMARKS = ['ÖRNEKTİR', 'ACİL', 'TASLAK'];
 const PAGECOLORS = [['Açık sarı', '#fff8dc'], ['Açık mavi', '#e8f0fb'], ['Açık yeşil', '#eaf5e4'], ['Açık gri', '#f0f0f0'], ['Renk Yok', '']];
 // Tablo Tasarımı → Tablo Stilleri (ilki Word'ün varsayılanı “Tablo Kılavuzu”; ötekiler örnek görünüşler)
 const TSTYLES = [['kilavuz', 'Tablo Kılavuzu (düz çizgili)'], ['mavi', 'Mavi başlık satırı'], ['serit', 'Şeritli satırlar'], ['yesil', 'Yeşil başlık, şeritli satırlar']];
+function rowSpans(row) {
+  let column = 0;
+  return [...row.cells].map((cell) => {
+    const start = column;
+    column += cell.colSpan;
+    return { cell, start, end: column };
+  });
+}
 // Ekle → Sayfa Numarası → Sayfanın Altı
 const PNPOS = [['sol', 'Düz Numara 1 (solda)'], ['orta', 'Düz Numara 2 (ortada)'], ['sag', 'Düz Numara 3 (sağda)']];
 // Gözden Geçir → Görüntülenecek İşaretleme (Word'ün varsayılanı Basit İşaretleme)
@@ -179,7 +187,7 @@ export function word({ desk, body, args, emit, setTitle }) {
       <div class="wd-grp">Satır: <button type="button" data-tb="rowAbove">↑ Üste ekle</button><button type="button" data-tb="rowBelow">↓ Alta ekle</button><button type="button" data-tb="rowDel">✕ Satırı sil</button></div>
       <div class="wd-grp">Sütun: <button type="button" data-tb="colLeft">← Sola ekle</button><button type="button" data-tb="colRight">→ Sağa ekle</button><button type="button" data-tb="colDel">✕ Sütunu sil</button></div>
       <div class="wd-grp"><button type="button" data-tb="merge" title="Önce birleştirmek istediğiniz yan yana hücreleri fareyle sürükleyerek seçin">⊞ Hücreleri birleştir</button></div>
-      <div class="wd-grp">Hücre içi: <button type="button" data-tb="vTop">⬆ Üst</button><button type="button" data-tb="vMid">↕ Orta</button><button type="button" data-tb="vBot">⬇ Alt</button></div>
+      <div class="wd-grp">Hücre içi: <button type="button" data-tb="vTop">⬆ Üst</button><button type="button" data-tb="vMid" title="Yatay ve dikey ortala">⊙ Orta</button><button type="button" data-tb="vBot">⬇ Alt</button></div>
       <div class="wd-grp">Çizgiler: <button type="button" data-tb="bThin">İnce</button><button type="button" data-tb="bThick">Kalın</button><button type="button" data-tb="tblDel">🗑 Tabloyu sil</button></div>
     </div>
     <div class="wd-rib" data-tab="pic" hidden>
@@ -200,6 +208,7 @@ export function word({ desk, body, args, emit, setTitle }) {
   const $ = (s) => body.querySelector(s);
   const page = $('.wd-page');
   let fileName = null, folder = 'docs', dirty = false, range = null;
+  let pickedCells = [], dragCell = null, replacingTable = false;
   // margin: 'normal' | 'dar' | 'genis' | 'ozel' (mg: { top, bottom, left, right } cm); pcolor: Tasarım → Sayfa Rengi
   const DEF_LAYOUT = { margin: 'normal', orient: 'dikey', cols: 1, border: 'yok', wm: '', pcolor: '', mg: null };
   const layout = { ...DEF_LAYOUT };
@@ -264,6 +273,8 @@ export function word({ desk, body, args, emit, setTitle }) {
 
   const pics = pictureTools({ page, body, emit, changed: () => changed() });
   function load(html, name = null, fld = folder, layout = {}, hf = {}) {
+    setPickedCells();
+    range = null;
     page.innerHTML = html || '<p><br></p>';
     pics.refresh();
     setLayout(layout, true);
@@ -288,61 +299,153 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (s.rangeCount && page.contains(s.anchorNode)) { range = s.getRangeAt(0).cloneRange(); syncTools(); syncTableTab(); }
   };
   document.addEventListener('selectionchange', onSel);
-  // Tablo Düzeni sekmesi yalnızca imleç bir tablonun içindeyken görünür
-  const cellOf = (node) => { const el = node && (node.nodeType === 1 ? node : node.parentElement); const td = el?.closest('td'); return td && page.contains(td) ? td : null; };
+  function cellOf(node) {
+    const el = node?.nodeType === 1 ? node : node?.parentElement;
+    const cell = el?.closest('td, th');
+    return cell && page.contains(cell) ? cell : null;
+  }
+  function cellRectangle(a, b) {
+    const table = a.closest('table');
+    if (!b || a === b || b.closest('table') !== table) return [];
+    const ra = a.parentElement.rowIndex, rb = b.parentElement.rowIndex;
+    const sa = rowSpans(a.parentElement)[a.cellIndex], sb = rowSpans(b.parentElement)[b.cellIndex];
+    const left = Math.min(sa.start, sb.start), right = Math.max(sa.end, sb.end);
+    return [...table.rows].slice(Math.min(ra, rb), Math.max(ra, rb) + 1).flatMap((row) =>
+      rowSpans(row).filter(({ start, end }) => end > left && start < right).map(({ cell }) => cell));
+  }
+  function setPickedCells(cells = []) {
+    pickedCells.forEach((cell) => {
+      cell.classList.remove('wd-cell-picked');
+      if (!cell.className) cell.removeAttribute('class');
+    });
+    pickedCells = cells;
+    pickedCells.forEach((cell) => cell.classList.add('wd-cell-picked'));
+    page.classList.toggle('wd-cell-selection', cells.length > 0);
+  }
+  page.addEventListener('pointerdown', (e) => {
+    setPickedCells();
+    dragCell = e.button === 0 && e.pointerType === 'mouse' ? cellOf(e.target) : null;
+    if (dragCell) {
+      document.addEventListener('pointerup', () => {
+        if (pickedCells.length) placeInCell(dragCell);
+        dragCell = null;
+      }, { once: true });
+    }
+  });
+  page.addEventListener('pointermove', (e) => {
+    if (!dragCell || !(e.buttons & 1)) return;
+    const end = cellOf(e.target);
+    if (end?.closest('table') === dragCell.closest('table')) setPickedCells(cellRectangle(dragCell, end));
+  });
+  function placeInCell(cell, caret) {
+    range = document.createRange();
+    range.selectNodeContents(cell);
+    range.collapse(false);
+    if (caret) {
+      const node = caret.path.reduce((parent, index) => parent?.childNodes[index], cell);
+      if (node) {
+        const size = node.nodeType === Node.TEXT_NODE ? node.length : node.childNodes.length;
+        range.setStart(node, Math.min(caret.offset, size));
+        range.collapse(true);
+      }
+    }
+    restore();
+    onSel();
+  }
   // Tablo Tasarımı ve Tablo Düzeni sekmeleri yalnızca imleç bir tablonun içindeyken görünür
   function syncTableTab() {
-    const inTable = !!cellOf(range?.startContainer);
+    const inTable = !!(pickedCells.length || cellOf(range?.startContainer));
     const tabs = [...body.querySelectorAll('.wd-tabtbl')];
     if (tabs[0].hidden === !inTable) return;
     tabs.forEach((t) => { t.hidden = !inTable; });
     if (!inTable && tabs.some((t) => t.classList.contains('on'))) $('.wd-tabs [data-tab="home"]').click();
   }
-  // Tablo Tasarımı: tablo stili (bütün tablo) ve gölgelendirme (seçili hücreler; seçim yoksa imlecin olduğu hücre)
-  function tableLook(kind, v) {
-    const td = cellOf(range?.startContainer);
-    if (!td) return;
-    const table = td.closest('table');
-    let count = 1;
-    if (kind === 'style') { if (v === 'kilavuz') delete table.dataset.tstyle; else table.dataset.tstyle = v; }
-    else {
-      const cells = [...table.querySelectorAll('td')].filter((c) => range.intersectsNode(c));
-      const list = range.collapsed || !cells.length ? [td] : cells;
-      list.forEach((c) => { c.style.backgroundColor = v === 'transparent' ? '' : v; });
-      count = list.length;
-    }
+  // Tablonun yeni halini tek düzenleme olarak ekle. Böylece Ctrl+Z/Y yazı ile tablo işlemlerini aynı sırada işler.
+  function replaceTable(table, copy) {
+    const oldTables = new Set(page.querySelectorAll('table'));
+    const next = table.nextElementSibling;
+    // Chromium bitişikteki boş paragrafı yeni tablonun içine çekebilir; ekleme sırasında paragrafı dolu tut.
+    const marker = copy && /^(P|DIV)$/.test(next?.tagName) && next.innerHTML === '<br>' ? document.createTextNode('\u00a0') : null;
+    if (marker) next.prepend(marker);
+    range = document.createRange();
+    range.selectNode(table);
     restore();
-    changed();
-    emit('doc-table', { op: kind, value: v, count, ok: true, rows: table.rows.length, cols: table.rows[0]?.cells.length || 0 });
+    replacingTable = true;
+    try {
+      document.execCommand(copy ? 'insertHTML' : 'delete', false, copy?.outerHTML);
+    } finally {
+      marker?.remove();
+      replacingTable = false;
+    }
+    return [...page.querySelectorAll('table')].find((t) => !oldTables.has(t));
   }
-  function tableOp(op) {
-    const td = cellOf(range?.startContainer);
-    if (!td) return;
-    const tr = td.parentElement, table = td.closest('table');
-    const idx = td.cellIndex;
-    let keep = null; // işlemden sonra imlecin gideceği hücre (tablo duruyorsa Tablo Düzeni sekmesi açık kalır)
-    const newRow = () => { const r = document.createElement('tr'); const n = [...table.rows[0].cells].reduce((a, c) => a + c.colSpan, 0); r.innerHTML = '<td><br></td>'.repeat(n); return r; };
+  function tableOp(op, value) {
+    const focused = cellOf(range?.startContainer);
+    const active = pickedCells[0] || focused;
+    if (!active) return;
+    const table = active.closest('table');
+    const selected = pickedCells.length ? pickedCells : cellRectangle(active, cellOf(range?.endContainer));
+    if (op === 'merge') {
+      if (selected.length < 2) { desk.toast('Hücreleri önce seçin', 'Yan yana hücrelerin üzerinden fareyle sürükleyin, sonra “Hücreleri birleştir”e tıklayın.', '▦', 5000); return; }
+      if (selected.some((cell) => cell.parentElement !== active.parentElement)) { desk.toast('Aynı satır', 'Yalnızca aynı satırdaki hücreler birleştirilebilir.', '▦'); return; }
+    }
+    setPickedCells();
+    const copy = table.cloneNode(true);
+    const corresponding = (target, cell) => target.rows[cell.parentElement.rowIndex]?.cells[cell.cellIndex];
+    const td = corresponding(copy, active), tr = td.parentElement;
+    const cells = selected.length ? selected.map((cell) => corresponding(copy, cell)) : [td];
+    const span = rowSpans(tr)[td.cellIndex];
+    const formatting = ['style', 'shade', 'vTop', 'vMid', 'vBot', 'bThin', 'bThick'].includes(op);
+    let keep = formatting && focused?.closest('table') === table ? corresponding(copy, focused) : td;
+    const newRow = () => {
+      const row = document.createElement('tr');
+      row.innerHTML = '<td><br></td>'.repeat(rowSpans(copy.rows[0]).at(-1).end);
+      return row;
+    };
     switch (op) {
       case 'rowAbove': tr.before(newRow()); break;
       case 'rowBelow': tr.after(newRow()); break;
-      case 'rowDel': { const nr = tr.nextElementSibling || tr.previousElementSibling; if (table.rows.length === 1) table.remove(); else { keep = nr.cells[Math.min(idx, nr.cells.length - 1)]; tr.remove(); } break; }
-      case 'colLeft': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.insertAdjacentHTML('beforebegin', '<td><br></td>'); break;
-      case 'colRight': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.insertAdjacentHTML('afterend', '<td><br></td>'); break;
-      case 'colDel': for (const r of table.rows) r.cells[Math.min(idx, r.cells.length - 1)]?.remove(); if (![...table.rows].some((r) => r.cells.length)) table.remove(); else keep = tr.cells[Math.min(idx, tr.cells.length - 1)]; break;
-      case 'tblDel': table.remove(); break;
-      case 'bThick': table.classList.add('thick'); break;
-      case 'bThin': table.classList.remove('thick'); break;
+      case 'rowDel': {
+        const next = copy.rows[tr.rowIndex + 1] || copy.rows[tr.rowIndex - 1];
+        keep = next && (rowSpans(next).find(({ end }) => end > span.start)?.cell || next.cells[next.cells.length - 1]);
+        tr.remove();
+        break;
+      }
+      case 'colLeft': case 'colRight': {
+        const at = op === 'colLeft' ? span.start : span.end;
+        for (const row of copy.rows) {
+          const target = rowSpans(row).find(({ end }) => end > at);
+          if (target && target.start < at) target.cell.colSpan++;
+          else if (target) target.cell.insertAdjacentHTML('beforebegin', '<td><br></td>');
+          else row.insertAdjacentHTML('beforeend', '<td><br></td>');
+        }
+        break;
+      }
+      case 'colDel': {
+        for (const row of copy.rows) {
+          const target = rowSpans(row).find(({ end }) => end > span.start)?.cell;
+          if (!target) continue;
+          if (target.colSpan > 1) target.colSpan--;
+          else target.remove();
+        }
+        keep = copy.contains(td) ? td : rowSpans(tr).find(({ end }) => end > span.start)?.cell || tr.cells[tr.cells.length - 1];
+        break;
+      }
+      case 'bThick': case 'bThin': copy.classList.toggle('thick', op === 'bThick'); break;
+      case 'style': if (value === 'kilavuz') delete copy.dataset.tstyle; else copy.dataset.tstyle = value; break;
+      case 'shade': cells.forEach((cell) => { cell.style.backgroundColor = value === 'transparent' ? '' : value; }); break;
       case 'vTop': case 'vMid': case 'vBot': {
         const v = { vTop: 'top', vMid: 'middle', vBot: 'bottom' }[op];
-        const cells = [...table.querySelectorAll('td')].filter((c) => range.intersectsNode(c));
-        (cells.length ? cells : [td]).forEach((c) => { c.style.verticalAlign = v; });
+        for (const cell of cells) {
+          cell.style.verticalAlign = v;
+          if (op === 'vMid') {
+            cell.style.textAlign = 'center';
+            cell.querySelectorAll(':scope > [style]').forEach((el) => { if (el.style.textAlign) el.style.textAlign = 'center'; });
+          }
+        }
         break;
       }
       case 'merge': {
-        const a = cellOf(range.startContainer), b = cellOf(range.endContainer);
-        const cells = [...table.querySelectorAll('td')].filter((c) => range.intersectsNode(c) && c.parentElement === a.parentElement);
-        if (!b || a === b || cells.length < 2) { desk.toast('Hücreleri önce seçin', 'Birleştirmek istediğiniz yan yana hücreleri fareyle sürükleyerek seçin, sonra “Hücreleri birleştir”e tıklayın.', '▦', 5000); emit('doc-table', { op: 'merge', ok: false }); return; }
-        if (cells.some((c) => c.parentElement !== a.parentElement)) { desk.toast('Aynı satır', 'Yalnızca aynı satırdaki hücreler birleştirilebilir.', '▦'); return; }
         const first = cells[0];
         first.colSpan = cells.reduce((n, c) => n + c.colSpan, 0);
         first.innerHTML = cells.map((c) => c.innerHTML.replace(/^<br>$/, '')).filter(Boolean).join(' ') || '<br>';
@@ -351,14 +454,19 @@ export function word({ desk, body, args, emit, setTitle }) {
         break;
       }
     }
-    // Hücre silindiyse ya da birleştiyse kayıtlı seçim artık geçersizdir
-    if (['rowDel', 'colDel', 'tblDel', 'merge'].includes(op)) {
-      range = null;
-      if (keep?.isConnected) { const r = document.createRange(); r.selectNodeContents(keep); r.collapse(true); range = r; restore(); }
+    const remove = op === 'tblDel' || ![...copy.rows].some((row) => row.cells.length);
+    const caret = formatting && range?.collapsed && focused && keep === corresponding(copy, focused) ? { path: [], offset: range.startOffset } : null;
+    if (caret) {
+      for (let node = range.startContainer; node !== focused; node = node.parentNode) caret.path.unshift([...node.parentNode.childNodes].indexOf(node));
     }
-    syncTableTab();
-    changed();
-    emit('doc-table', { op, ok: true, rows: page.querySelector('table')?.rows.length || 0, cols: page.querySelector('table')?.rows[0]?.cells.length || 0 });
+    const modified = remove || copy.outerHTML !== table.outerHTML;
+    const edited = modified ? replaceTable(table, remove ? null : copy) : table;
+    if (edited && keep) {
+      placeInCell(corresponding(edited, keep), caret);
+      if (formatting && selected.length > 1) setPickedCells(cells.map((cell) => corresponding(edited, cell)));
+    } else { range = null; onSel(); syncTableTab(); }
+    if (modified) changed();
+    emit('doc-table', { op, value, count: cells.length, ok: true, rows: edited?.rows.length || 0, cols: edited?.rows[0]?.cells.length || 0 });
   }
   function restore() {
     page.focus({ preventScroll: true });

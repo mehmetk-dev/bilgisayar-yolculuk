@@ -164,7 +164,7 @@ const EDEVLET = {
     }
     if (a === 'consent' || a === 'consentNo') {
       const ok = a === 'consent';
-      if (ok) { const nb = ((ctx.desk.webState ||= {})['enabiz.gov.tr'] ||= {}); nb.user = true; nb.name = st.userName; }
+      if (ok) { const nb = (ctx.webData.webState['enabiz.gov.tr'] ||= {}); nb.user = true; nb.name = st.userName; }
       st.back = null;
       ctx.emit(ok ? 'nabiz-login' : 'nabiz-login-cancel', { ok });
       ctx.visit('enabiz.gov.tr', '/');
@@ -363,7 +363,7 @@ const SHOP = {
       ctx.desk.toast('Sepete eklendi', `${esc(URUNLER.find((u) => u.id === el.dataset.id).name)} · Sepette ${count(st)} ürün`, '🛒', 2500);
       const ur = URUNLER.find((u) => u.id === el.dataset.id);
       // Üçüncü taraf: alışveriş sitesine gömülü reklam şirketi, baktığınız ürünü başka sitelerde reklam göstermek için kaydeder
-      setCookie(ctx.desk, { site: 'reklam-takip.net', name: 'ilgi-alani', party: 'third', purpose: 'Baktığınız ürünü hatırlar; başka sitelerde size o ürünün reklamını gösterir', interest: ur.name });
+      setCookie(ctx.webData, { site: 'reklam-takip.net', name: 'ilgi-alani', party: 'third', purpose: 'Baktığınız ürünü hatırlar; başka sitelerde size o ürünün reklamını gösterir', interest: ur.name });
       ctx.emit('shop-add', { id: el.dataset.id, count: count(st) });
       ctx.refresh();
       return;

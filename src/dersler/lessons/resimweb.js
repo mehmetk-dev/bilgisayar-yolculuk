@@ -1,5 +1,6 @@
 // 6. hafta ek dersi: resim dosyası türleri (PNG, JPG, GIF) ve web sayfası dosyası (HTML). Paint'ten iki türde kaydetmek,
 // hazır bir HTML sayfasını tarayıcıda açmak, kaynağını görmek, Not Defteri'nde bir kelimesini değiştirmek.
+import { flowerGuide } from './paint-guide.js';
 import { K, desktopReady, maxed } from './common.js';
 import { rehberSoru } from './kalip.js';
 
@@ -29,7 +30,7 @@ export const resimWeb = {
     },
     {
       title: 'Paint\'i açın ve çizin',
-      html: '<p>⊞ Başlat → <b>🎨 Paint</b>. Kalemle basit bir <b>çiçek</b> çizin: önce <b>yeşil</b> renkle aşağı doğru bir sap, sonra <b>kırmızı</b> ya da <b>mor</b> renkle sapın tepesine yuvarlak yapraklar.</p>',
+      html: '<p>⊞ Başlat → <b>🎨 Paint</b>. Kalemle basit bir <b>çiçek</b> çizin: önce <b>yeşil</b> renkle aşağı doğru bir sap, sonra <b>kırmızı</b> ya da <b>mor</b> renkle sapın tepesine yuvarlak yapraklar.</p>' + flowerGuide(1),
       hint: 'Rengi sağdaki renk yuvarlaklarından seçin, sonra beyaz alanda sol tuşu basılı tutarak çizin.',
       setup: (c) => maxed(c, 'paint'),
       on: (ev, c) => {
@@ -85,7 +86,7 @@ export const resimWeb = {
     },
     {
       title: 'Sayfayı açın',
-      html: '<p><b>Belgeler</b> klasörüne sizin için hazır bir sayfa koyduk: <b>sayfam.html</b>. Simgesi 🌐: bilgisayar onu web sayfası olarak tanıyor.</p><p>Dosyaya <b>çift tıklayın</b>. Tarayıcı açılır ve sayfayı gösterir.</p>',
+      html: '<p><b>Belgeler</b> klasöründe <code>sayfam.html</code> adlı hazır bir web sayfası var. Dosyayı 🌐 simgesinden tanıyabilirsiniz.</p><p>Dosyaya <b>çift tıklayın</b>. Tarayıcı açılır ve sayfayı gösterir.</p>',
       mouse: '🖱 sayfam.html: çift tık',
       setup: (c) => { if (!pageFile(c)) c.d.fs.write('docs', 'sayfam.html', PAGE); const e = c.d.find('explorer'); if (e) c.d.close(e); c.d.open('explorer', { folder: 'docs' }); },
       on: (ev) => ev.type === 'web-nav' && ev.host === 'dosya',

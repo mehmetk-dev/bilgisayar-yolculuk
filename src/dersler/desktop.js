@@ -74,6 +74,7 @@ const DEFAULT_SETTINGS = () => ({
 });
 
 const pad = (n) => String(n).padStart(2, '0');
+const volumeIcon = ({ muted, volume }) => muted || !volume ? MONO.vol0 : volume < 40 ? MONO.vol1 : MONO.vol2;
 
 export class Desktop {
   constructor(root, onEvent) {
@@ -111,7 +112,7 @@ export class Desktop {
             <button type="button" class="tb-lang" title="Giriş dili ve klavye düzeni"></button>
             <button type="button" class="tb-net" title="Ağ ve ses"><span class="tb-wifi"></span><span class="tb-vol"></span><span class="tb-bat">${MONO.battery}</span></button>
             <button type="button" class="tb-clock"><span class="tb-time"></span><span class="tb-date"></span></button>
-            <button type="button" class="tb-showdesk" title="Masaüstünü göster"></button>
+            <button type="button" class="tb-showdesk" title="Masaüstünü göster" aria-label="Masaüstünü göster"></button>
           </div>
         </div>
         <div class="dk-dim"></div>
@@ -166,7 +167,7 @@ export class Desktop {
   reset({ power = 'desktop', settings = {} } = {}) {
     this.closeMenus();
     this.root.querySelector('.dk-toasts').innerHTML = '';
-    this.screen.querySelectorAll('.dk-uac, .dk-snip, .dk-switch, .dk-secure, .dk-phone, .dk-modem').forEach((x) => x.remove());
+    this.screen.querySelectorAll('.dk-uac, .dk-snip, .dk-switch, .dk-secure, .dk-phone, .dk-modem, .corner-targets').forEach((x) => x.remove());
     this.modem?.remove?.(); this.modem = null; this.hotspot = false;
     this.phoneEl = null;
     this.snipping = false;
@@ -301,7 +302,12 @@ export class Desktop {
     this.root.querySelector('.tb-wifi').innerHTML = s.airplane ? MONO.airplane : s.wifi && s.network ? (noNet ? MONO.nonet : MONO.wifi) : MONO.wifioff;
     this.root.querySelector('.tb-net').title = noNet ? `${s.network}: İnternet erişimi yok` : 'Ağ ve ses';
     this.root.querySelector('.tb-net').classList.toggle('nonet', !!noNet);
-    this.root.querySelector('.tb-vol').innerHTML = s.muted || !s.volume ? MONO.vol0 : s.volume < 40 ? MONO.vol1 : MONO.vol2;
+    this.root.querySelector('.tb-vol').innerHTML = volumeIcon(s);
+    const mute = this.root.querySelector('.dk-quick:not([hidden]) .qk-mute');
+    if (mute) {
+      mute.innerHTML = volumeIcon(s);
+      mute.setAttribute('aria-pressed', String(s.muted));
+    }
     this.root.classList.toggle('dk-dark', !!s.dark);
     this.root.style.setProperty('--dk-acc', s.accent || '#0a5dc2');
     this.root.classList.toggle('tb-left', !!s.taskbarLeft);
@@ -780,7 +786,7 @@ export class Desktop {
       this.emit('shortcut-open', { name: n.name, target: t.name });
       return this.openNode(t);
     }
-    if (n.type === 'link') return this.open(n.app, n.args);
+    if (n.type === 'link') return n.args ? this.open(n.app, n.args) : this.launchApp(n.app);
     if (n.type === 'folder') return this.open('explorer', { folder: n.id });
     const name = n.name.toLowerCase();
     if (name.endsWith('.txt')) return this.open('notepad', { node: n.id });
@@ -962,12 +968,7 @@ export class Desktop {
     $('.tb-start').oncontextmenu = (e) => { e.preventDefault(); this.winxMenu(); };
     $('.tb-search').onclick = () => this.toggleStart(true, true);
     $('.tb-tv').onclick = () => this.taskView();
-    $('.tb-showdesk').onclick = () => {
-      const vis = this.wins.filter((w) => !w.min && w.vd === this.vd);
-      if (vis.length) { this.hiddenByShow = vis; vis.forEach((w) => this.minimize(w, true)); }
-      else (this.hiddenByShow || []).forEach((w) => this.wins.includes(w) && this.restore(w, true));
-      this.emit('show-desktop', { hidden: vis.length });
-    };
+    $('.tb-showdesk').onclick = () => this.toggleDesktop();
     $('.tb-net').onclick = () => this.toggleQuick();
     // ^ (gizli simgeler): Windows 11'deki gibi küçük bir tepsi açılır
     $('.tb-hid').onclick = () => {
@@ -981,7 +982,7 @@ export class Desktop {
       const r = $('.tb-hid').getBoundingClientRect(), scr = this.screen.getBoundingClientRect();
       wrap.style.left = Math.max(2, Math.min(r.left - scr.left + r.width / 2 - wrap.offsetWidth / 2, scr.width - wrap.offsetWidth - 4)) + 'px';
       wrap.style.top = (r.top - scr.top - wrap.offsetHeight - 6) + 'px';
-      wrap.addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) { this.closeMenus(); this.open(b.dataset.app); } });
+      wrap.addEventListener('click', (e) => { const b = e.target.closest('[data-app]'); if (b) { this.closeMenus(); this.launchApp(b.dataset.app); } });
       this.emit('tray-more', { open: true });
     };
     $('.tb-usb').onclick = () => {
@@ -1004,7 +1005,7 @@ export class Desktop {
       const b = e.target.closest('.tb-apps [data-app]');
       if (b) {
         const app = b.dataset.app, list = this.wins.filter((w) => w.app === app);
-        this.menu(e.clientX, e.clientY - (list.length ? 110 : 75), [{ cmd: 'open', label: APPS[app].name, ic: APPS[app].icon }, '-',
+        this.menu(e.clientX, e.clientY - (list.length ? 110 : 75), [{ cmd: 'open', label: list.length && !APPS[app].single ? 'Yeni pencere aç' : APPS[app].name, ic: APPS[app].icon }, '-',
           ...(list.length ? [{ cmd: 'close', label: list.length > 1 ? 'Tüm pencereleri kapat' : 'Pencereyi kapat' }] : []), { cmd: 'taskmgr', label: 'Görev Yöneticisi', ic: MONO.taskmgr }],
         (c) => (c === 'open' ? this.open(app) : c === 'taskmgr' ? this.open('taskmgr') : list.forEach((w) => this.close(w))), 'taskbar-app', { app });
         return;
@@ -1089,7 +1090,7 @@ export class Desktop {
         : '<div class="st-none">Sonuç bulunamadı.</div>';
     });
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { const a = match(input.value)[0]; if (input.value.trim() && a) { this.closeMenus(); this.emit('start-open', { app: a, via: 'search' }); this.open(a); } }
+      if (e.key === 'Enter') { const a = match(input.value)[0]; if (input.value.trim() && a) { this.closeMenus(); this.emit('start-open', { app: a, via: 'search' }); this.launchApp(a); } }
       if (e.key === 'Escape') this.closeMenus();
     });
     // Dokunmatikte odak menünün kendisindedir: Esc yine kapatsın, yazılan harf aramaya gitsin
@@ -1110,7 +1111,7 @@ export class Desktop {
       const rc = e.target.closest('[data-rec]');
       if (rc) { const n = this.fs.get(rc.dataset.rec); this.closeMenus(); this.emit('start-open', { file: n?.name, via: 'recommended' }); this.openNode(n); return; }
       const b = e.target.closest('[data-app]');
-      if (b) { this.closeMenus(); this.emit('start-open', { app: b.dataset.app, via: 'click' }); this.open(b.dataset.app); return; }
+      if (b) { this.closeMenus(); this.emit('start-open', { app: b.dataset.app, via: 'click' }); this.launchApp(b.dataset.app); return; }
       if (e.target.closest('.st-power')) this.powerMenu(e.target.closest('.st-power'));
       const um = e.target.closest('.st-user');
       if (um) {
@@ -1172,10 +1173,10 @@ export class Desktop {
     const b = this.root.querySelector('.tb-start').getBoundingClientRect();
     this.menu(b.left, b.top - 345, items, (cmd) => {
       if (cmd === 'apps') this.open('settings', { page: 'apps' });
-      else if (cmd === 'devmgr') this.open('devmgr');
+      else if (cmd === 'devmgr') this.launchApp('devmgr');
       else if (cmd === 'taskmgr') this.open('taskmgr');
       else if (cmd === 'settings') this.open('settings');
-      else if (cmd === 'explorer') this.open('explorer');
+      else if (cmd === 'explorer') this.launchApp('explorer');
       else if (cmd === 'search') this.toggleStart(true, true);
       else if (cmd === 'desktop') this.root.querySelector('.tb-showdesk').click();
       else this.powerAction(cmd);
@@ -1236,7 +1237,7 @@ export class Desktop {
         <button type="button" class="qk-bt ${s.bluetooth ? 'on' : ''}">${MONO.bluetooth}<span>${s.bluetooth ? 'Bluetooth açık' : 'Bluetooth kapalı'}</span></button>
         <button type="button" class="qk-air ${s.airplane ? 'on' : ''}">${MONO.airplane}<span>Uçak modu</span></button></div>
       <label class="qk-sl">${MONO.brightness} <input type="range" class="qk-bri" min="20" max="100" value="${s.brightness}"></label>
-      <label class="qk-sl"><button type="button" class="qk-mute" title="Sesi kapat/aç">${s.muted ? MONO.vol0 : MONO.vol2}</button><input type="range" class="qk-vol" min="0" max="100" value="${s.volume}"><b class="qk-vv">${s.volume}</b></label>
+      <label class="qk-sl"><button type="button" class="qk-mute" title="Sesi kapat/aç" aria-label="Sessize al" aria-pressed="${s.muted}">${volumeIcon(s)}</button><input type="range" class="qk-vol" aria-label="Ses düzeyi" min="0" max="100" value="${s.volume}"><b class="qk-vv">${s.volume}</b></label>
       <button type="button" class="qk-all">${MONO.gear} Tüm ayarlar</button>`;
     q.hidden = false;
     this.emit('quick', { open: true });
@@ -1245,11 +1246,22 @@ export class Desktop {
     q.querySelector('.qk-air').onclick = () => { this.setAirplane(!s.airplane); q.hidden = true; this.toggleQuick(); };
     q.querySelector('.qk-bri').oninput = (e) => this.setSetting('brightness', +e.target.value);
     q.querySelector('.qk-vol').oninput = (e) => { this.setSetting('volume', +e.target.value); q.querySelector('.qk-vv').textContent = e.target.value; if (s.muted) this.setSetting('muted', false); };
-    q.querySelector('.qk-mute').onclick = (e) => { this.setSetting('muted', !s.muted); e.currentTarget.innerHTML = s.muted ? MONO.vol0 : MONO.vol2; };
+    q.querySelector('.qk-mute').onclick = () => this.setSetting('muted', !s.muted);
     q.querySelector('.qk-all').onclick = () => { q.hidden = true; this.open('settings'); };
   }
 
   // ------------------------------------------------------------------ Pencereler
+  // Başlat ve program kısayolları açık pencereyi getirir. Dosya ve Yeni pencere işlemleri open() kullanır.
+  launchApp(app) {
+    if (APPS[app]?.single) return this.open(app);
+    const win = this.wins.filter((w) => w.app === app && w.vd === this.vd && !w.args?.private)
+      .sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
+    if (!win) return this.open(app);
+    if (win.min) this.restore(win); else this.focus(win);
+    this.emit('app-open', { app, win: win.id, args: {}, again: true });
+    return win;
+  }
+
   open(app, args = {}) {
     const def = APPS[app];
     if (!def) return null;
@@ -1407,9 +1419,24 @@ export class Desktop {
 
   restore(win, quiet) {
     win.min = false;
+    win.hiddenByShow = false;
     win.el.classList.remove('min');
     this.focus(win, true);
     if (!quiet) this.emit('win-restore', { app: win.app, win: win.id, via: 'taskbar' });
+  }
+
+  toggleDesktop() {
+    this.closeMenus();
+    const here = this.wins.filter((w) => w.vd === this.vd);
+    here.sort((a, b) => a.el.style.zIndex - b.el.style.zIndex);
+    const visible = here.filter((w) => !w.min);
+    const toRestore = visible.length ? [] : here.filter((w) => w.hiddenByShow);
+    if (visible.length) {
+      for (const w of here) w.hiddenByShow = !w.min;
+      for (const w of visible) this.minimize(w, true);
+    }
+    for (const w of toRestore) this.restore(w, true);
+    this.emit('show-desktop', { hidden: visible.length, restored: toRestore.length });
   }
 
   maximize(win) {
@@ -1599,6 +1626,11 @@ export class Desktop {
       // ⊞ + H: sesle yazma (dikte). Benzetimde mikrofon yok; şeritteki düğme hazır cümleleri yazar
       if (e.metaKey && !e.ctrlKey && e.code === 'KeyH' && this.power === 'desktop') { e.preventDefault(); if (!e.repeat) this.dictation(); return; }
       if (e.metaKey && e.ctrlKey && e.code === 'KeyD') { e.preventDefault(); this.newDesk(); return; }
+      if (e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.code === 'KeyD' && this.power === 'desktop') {
+        e.preventDefault();
+        if (!e.repeat) this.toggleDesktop();
+        return;
+      }
       if (e.metaKey && e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); this.switchDesk(this.vd + (e.key === 'ArrowLeft' ? -1 : 1)); return; }
       // ⊞ + ← / →: etkin pencereyi ekranın yarısına yaslar; ⊞ + ↑ ekranı kaplar, ⊞ + ↓ eski boyutuna getirir / küçültür
       if (e.metaKey && !e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && this.active) {

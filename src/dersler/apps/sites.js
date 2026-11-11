@@ -94,6 +94,19 @@ const BOREK_STEPS = [
   'Fırından çıkınca üzerini bir bezle örtüp 10 dakika dinlendirin, sonra servis yapın.',
 ];
 
+export const MEB_KURS = {
+  host: 'www.meb.gov.tr',
+  path: '/duyurular/bilgisayar-isletmenligi',
+  file: 'bilgisayar kursu başlangıç notu.pdf',
+  content: {
+    html: `<p class="pdf-org">Bilgisayar İşletmenliği · Örnek ders materyali</p>
+      <h3>Bilgisayar kursu başlangıç notu</h3>
+      <p>İlk derste fareyi kullanmayı ve bir dosyayı açmayı deneyeceksiniz.</p>
+      <ol><li>Fareyi hareket ettirip ekrandaki işaretçiyi izleyin.</li><li>Dosya Gezgini'nden İndirilenler klasörünü açın.</li><li>Açmak istediğiniz dosyanın adını okuyun ve çift tıklayın.</li></ol>
+      <p class="pdf-small">Bu belge bilgisayar kursu alıştırması için hazırlanmıştır.</p>`,
+  },
+};
+
 export const SITES = {
   [SEARCH_HOST]: googleSite({ SEARCH_HOST, RESULTS, AD, AD_DEVLET, PHOTOS, sorunSonuc, getSites: () => SITES, HARITA_HOST, GUN_HOST: 'www.gunun-haberleri.com.tr' }),
   'www.lezzetli-tarifler.com.tr': {
@@ -102,8 +115,8 @@ export const SITES = {
       if (a !== 'ck') return;
       const all = el.dataset.v === 'all';
       ctx.state.cookie = all ? 'all' : 'need';
-      setCookie(ctx.desk, { site: 'lezzetli-tarifler.com.tr', name: 'tercihler', party: 'first', purpose: 'Çerez seçiminizi hatırlar; pencere bir daha çıkmaz' });
-      if (all) setCookie(ctx.desk, { site: 'reklam-takip.net', name: 'izleme', party: 'third', purpose: 'Gezdiğiniz sayfaları reklam göstermek için izler' });
+      setCookie(ctx.webData, { site: 'lezzetli-tarifler.com.tr', name: 'tercihler', party: 'first', purpose: 'Çerez seçiminizi hatırlar; pencere bir daha çıkmaz' });
+      if (all) setCookie(ctx.webData, { site: 'reklam-takip.net', name: 'izleme', party: 'third', purpose: 'Gezdiğiniz sayfaları reklam göstermek için izler' });
       ctx.emit('cookie-choice', { choice: ctx.state.cookie });
       ctx.refresh();
     },
@@ -149,7 +162,7 @@ export const SITES = {
     name: 'Günün Haberleri', secure: true,
     render(path, q, ctx) {
       // Üçüncü taraf çerezi varsa reklam, başka bir sitede baktığınız ürüne göre kişiselleştirilir
-      const ilgi = (ctx?.desk.cookies || []).find((c) => c.party === 'third' && c.interest);
+      const ilgi = (ctx?.webData.cookies || []).find((c) => c.party === 'third' && c.interest);
       const reklam = ilgi ? `<div class="ad gh-ad">🎯 <b>Size özel:</b> ${esc(ilgi.interest)} bugün %20 indirimli!<small>Reklam · “az önce baktığınız ürün”</small></div>` : '<div class="ad gh-ad">📣 <b>Yeni sezon ürünleri</b> mağazalarda!<small>Reklam · herkese aynı</small></div>';
       const news = [['Kış lastiği uygulaması yarın başlıyor', 'Sürücülerin kış lastiği takması için son gün yaklaşıyor. Uzmanlar, lastik diş derinliğinin en az 4 mm olmasını öneriyor.'], ['Belediyeden yaşlılara ücretsiz bilgisayar kursu', 'Kurslar her hafta salı ve perşembe günleri yapılacak. Katılımcılara sertifika verilecek.'], ['Dolandırıcılara karşı uyarı: kodunuzu kimseyle paylaşmayın', 'Bankalar, telefonla aranıp şifre ya da doğrulama kodu istenmesinin dolandırıcılık olduğunu hatırlattı.']];
       const m = path.match(/^\/haber\/(\d)/);
@@ -229,11 +242,23 @@ export const SITES = {
         <p class="scam-note">Bu site <b>şifreli bağlantı (https)</b> kullanmıyor: adres çubuğunda “⚠ Güvenli değil” yazar. Okumak sorun değil, ama buraya şifre ya da kart bilgisi girmeyin.</p></div>`);
     },
   },
-  'www.meb.gov.tr': {
+  [MEB_KURS.host]: {
     name: 'Millî Eğitim Bakanlığı', secure: true,
-    render() {
-      return page('T.C. Millî Eğitim Bakanlığı', `<header class="ed-head" style="background:#0d47a1">🎓 T.C. Millî Eğitim Bakanlığı</header><div class="ed"><h1>Duyurular</h1>
-        <p>📢 Halk eğitim merkezlerinde yeni dönem kurs kayıtları başladı: bilgisayar işletmenliği, el sanatları, yabancı dil.</p><p>📢 Hayat boyu öğrenme kurslarına e-Devlet üzerinden başvurulabilir.</p></div>`);
+    render(path) {
+      const head = '<header class="ed-head" style="background:#0d47a1">🎓 T.C. Millî Eğitim Bakanlığı</header>';
+      if (path === MEB_KURS.path) {
+        return page('Bilgisayar İşletmenliği kurs duyurusu', `${head}<div class="ed"><h1>Bilgisayar İşletmenliği kurs duyurusu</h1>
+          <p>Bilgisayarı yeni kullanmaya başlayanlar için örnek kurs. İlk derste fareyle tıklama ve dosya açma çalışılır.</p>
+          <h2>İlk dersin materyali</h2><p>Başlangıç notunu indirip kendi hızınızda okuyabilirsiniz.</p>
+          <button type="button" class="ed-btn" data-act="kurs-materyali">Başlangıç notunu indir (PDF)</button>
+          <p class="mut">Bu duyuru ve dosya alıştırma için hazırlanmıştır.</p></div>`);
+      }
+      return page('T.C. Millî Eğitim Bakanlığı', `${head}<div class="ed"><h1>Duyurular</h1>
+        <div class="ed-grid"><a class="ed-card" href="#" data-href="${MEB_KURS.host}${MEB_KURS.path}">Bilgisayar İşletmenliği kurs duyurusu<small>Örnek kurs bilgileri ve başlangıç notu</small></a></div>
+        <p>Halk eğitim merkezlerinde bilgisayar işletmenliği, el sanatları ve yabancı dil kursları düzenlenir.</p><p>Hayat boyu öğrenme kurslarına e-Devlet üzerinden başvurulabilir.</p></div>`);
+    },
+    act(action, values, ctx) {
+      if (action === 'kurs-materyali' && ctx.loc.path === MEB_KURS.path) ctx.download(MEB_KURS.file, MEB_KURS.content);
     },
   },
   'www.bankam-guvenlik-giris.xyz': {
@@ -252,7 +277,7 @@ export const encQ = (q) => String(q).replace(/%/g, '%25').replace(/\+/g, '%2B').
 export const decQ = (q) => { const t = String(q).replace(/\+/g, ' '); try { return decodeURIComponent(t); } catch { return t; } };
 
 // Tarayıcının kendi sayfaları: Chrome'daki gibi chrome://history, chrome://extensions, chrome://settings
-const CHROME_PAGES = { history: 'gecmis', extensions: 'uzantilar', settings: 'ayarlar', 'settings/cookies': 'cerezler' };
+const CHROME_PAGES = { history: 'gecmis', downloads: 'indirilenler', extensions: 'uzantilar', settings: 'ayarlar', 'settings/cookies': 'cerezler' };
 export const chromeName = (path) => Object.entries(CHROME_PAGES).find(([, v]) => '/' + v === path)?.[0] || path.slice(1);
 
 // Adres çubuğuna yazılanı çözümler: site adresi mi, arama mı?

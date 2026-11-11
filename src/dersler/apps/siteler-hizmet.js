@@ -53,7 +53,7 @@ const ENABIZ = {
     const st = ctx.state;
     if (a === 'edevlet') {
       // Gerçekte olduğu gibi: kimlik e-Devlet'te doğrulanır, e-Nabız şifreyi görmez
-      const ed = ((ctx.desk.webState ||= {})['turkiye.gov.tr'] ||= {});
+      const ed = (ctx.webData.webState['turkiye.gov.tr'] ||= {});
       ed.back = 'enabiz';
       ctx.emit('nabiz-edevlet');
       ctx.visit('www.turkiye.gov.tr', ed.user ? '/onay' : '/giris');
@@ -62,7 +62,7 @@ const ENABIZ = {
     if (a === 'logout') {
       st.user = false;
       // e-Nabız e-Devlet kimliğiyle açıldığı için, çıkışta e-Devlet oturumu da kapatılır (ortak bilgisayarda açık kalmasın)
-      const ed = (ctx.desk.webState ||= {})['turkiye.gov.tr'];
+      const ed = ctx.webData.webState['turkiye.gov.tr'];
       let closed = false;
       if (ed?.user) { ed.user = false; ed.back = null; ctx.desk.toast('Güvenli çıkış', 'e-Nabız ile birlikte e-Devlet oturumunuz da kapatıldı.', '🔒', 5000); closed = true; }
       ctx.emit('nabiz-logout');

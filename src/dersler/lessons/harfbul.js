@@ -1,6 +1,6 @@
 // 2. hafta: tuşların yerini hiç bilmeyenler için harf bulma alıştırması.
 // Ekranda büyük bir harf çıkar; öğrenci klavyede bulup basar. Takılınca ekrandaki klavyede tuş yanar.
-// Yanlış basılan ya da geç bulunan tuşlar sıranın sonuna yeniden eklenir.
+// Zorlanılan tuşlar araya başka tuşlar girebildiğinde bir kez daha sorulur.
 import { keyLabel } from '../keyboard.js';
 import { info } from './kalip.js';
 
@@ -19,9 +19,15 @@ const label = (code) => keyLabel(code);
 function drill(codes, times = 1) {
   return (el, c) => {
     el.className = 'sc sc-drill';
-    const queue = shuffle(Array.from({ length: times }, () => codes).flat());
+    const queue = [];
+    for (let i = 0; i < times; i++) {
+      const round = shuffle(codes);
+      if (round[0] === queue[queue.length - 1] && round.length > 1) round.push(round.shift());
+      queue.push(...round);
+    }
     const total = queue.length;
-    let cur = null, t0 = 0, helpTimer = 0, wrong = 0, doneN = 0;
+    const retried = new Set();
+    let cur = null, t0 = 0, helpTimer = 0, nextTimer = 0, wrong = 0, doneN = 0;
     el.innerHTML = `<div class="dr-card"><div class="dr-key"></div><div class="dr-msg">Klavyede bu harfi bulup basın</div></div>
       <div class="dr-bar"><i></i></div><div class="dr-count"></div>`;
     const $ = (s) => el.querySelector(s);
@@ -29,6 +35,8 @@ function drill(codes, times = 1) {
     function nextKey() {
       clearTimeout(helpTimer);
       c.kb.want([]);
+      $('.dr-bar i').style.width = (doneN / total * 100) + '%';
+      $('.dr-count').textContent = `${doneN} / ${total}`;
       if (!queue.length) {
         cur = null;
         $('.dr-key').textContent = '🎉';
@@ -43,8 +51,6 @@ function drill(codes, times = 1) {
       k.textContent = label(cur);
       k.classList.remove('ok', 'bad');
       $('.dr-msg').textContent = 'Klavyede bu harfi bulup basın';
-      $('.dr-bar i').style.width = (doneN / total * 100) + '%';
-      $('.dr-count').textContent = `${doneN} / ${total}`;
       helpTimer = setTimeout(help, HELP_AFTER);
     }
     const onKey = (e) => {
@@ -56,13 +62,15 @@ function drill(codes, times = 1) {
         const sn = (performance.now() - t0) / 1000;
         const L = (c.L.times ||= {});
         L[cur] = Math.max(L[cur] || 0, sn);
-        // Zorlanılan tuş bir kez daha, birkaç tuş sonra sorulur
-        if ((wrong || sn > SLOW) && !queue.slice(0, 3).includes(cur)) { queue.splice(Math.min(3, queue.length), 0, cur); }
-        else doneN++;
+        const after = Math.min(3, queue.length);
+        if ((wrong || sn > SLOW) && after && !retried.has(cur) && !queue.slice(0, after + 1).includes(cur)) {
+          queue.splice(after, 0, cur);
+          retried.add(cur);
+        } else doneN++;
         k.classList.add('ok');
         $('.dr-msg').textContent = sn < 2 ? 'Çok hızlı! 👏' : 'Doğru!';
         cur = null;
-        setTimeout(nextKey, 450);
+        nextTimer = setTimeout(nextKey, 450);
       } else {
         wrong++;
         (c.L.wrong ||= {})[cur] = (c.L.wrong[cur] || 0) + 1;
@@ -72,7 +80,7 @@ function drill(codes, times = 1) {
       }
     };
     addEventListener('keydown', onKey, true);
-    c.s.off = () => { removeEventListener('keydown', onKey, true); clearTimeout(helpTimer); c.kb.want([]); };
+    c.s.off = () => { removeEventListener('keydown', onKey, true); clearTimeout(helpTimer); clearTimeout(nextTimer); c.kb.want([]); };
     nextKey();
   };
 }

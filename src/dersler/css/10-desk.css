@@ -76,7 +76,9 @@
 .tb-tray button { border: 0 !important; background: none; height: 100%; padding: 0 0.5em !important; border-radius: 4px !important; font-size: 0.9em; }
 .tb-net { display: flex; gap: 0.35em; align-items: center; }
 .tb-clock { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; line-height: 1.15; font-size: 0.82em !important; }
-.tb-showdesk { width: 0.7em; padding: 0 !important; border-left: 1px solid #b5bfcc !important; border-radius: 0 !important; }
+.tb-tray .tb-showdesk { position: relative; flex: none; width: 24px; padding: 0 !important; }
+.tb-showdesk::before { content: ""; position: absolute; inset: 22% 50%; border-left: 2px solid currentColor; opacity: 0.65; }
+.tb-showdesk:focus-visible { outline-offset: -3px; }
 .logo4 { display: inline-grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 0.95em; height: 0.95em; }
 .logo4 i { background: linear-gradient(135deg, color-mix(in srgb, var(--dk-acc, #0a5dc2) 55%, #fff), var(--dk-acc, #0a5dc2)); border-radius: 1px; }
 

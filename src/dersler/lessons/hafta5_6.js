@@ -62,11 +62,12 @@ export const masaustu = {
     },
     {
       title: 'Masaüstünü gösterin',
-      html: '<p>Görev çubuğunun <b>en sağ köşesindeki ince çizgiye</b> (saatin sağı) tıklayın: bütün pencereler küçülür. Bir daha tıklayınca geri gelirler.</p>',
+      html: '<p>Saatin hemen sağındaki dikey çizgili <b>Masaüstünü göster</b> düğmesine tıklayın. Açık pencereler küçülür. Aynı düğmeye bir daha tıklayınca geri gelirler.</p>',
       mouse: '🖱 Sağ alt köşe',
+      setup: (c) => { c.d.ensure('paint'); c.d.ensure('calc'); },
       on: (ev, c) => {
         if (ev.type === 'show-desktop' && ev.hidden) { c.s.h = true; c.note('Masaüstü göründü. Şimdi aynı yere bir daha tıklayın.'); }
-        return !!c.s.h && ev.type === 'show-desktop' && !ev.hidden;
+        return !!c.s.h && ev.type === 'show-desktop' && ev.restored > 0;
       },
       done: 'Masaüstündeki bir dosyaya hızlıca ulaşmak için kullanışlıdır.',
     },

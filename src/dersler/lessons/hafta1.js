@@ -13,25 +13,32 @@ const MOUSE_SVG = `<svg class="mouse-svg" viewBox="0 0 160 220" role="img" aria-
 // Ekranın dört köşesine fare götürme alıştırması için köşe işaretleri
 function cornerGame(c) {
   const scr = c.d.screen;
-  const marks = ['tl', 'tr', 'br', 'bl'].map((k) => {
+  const board = document.createElement('div');
+  board.className = 'corner-targets';
+  board.setAttribute('aria-hidden', 'true');
+  const marks = Object.entries({ tl: '↖', tr: '↗', br: '↘', bl: '↙' }).map(([k, arrow]) => {
     const m = document.createElement('div');
     m.className = 'corner-mark cm-' + k;
-    m.textContent = { tl: '↖', tr: '↗', br: '↘', bl: '↙' }[k];
-    scr.append(m);
+    m.textContent = arrow;
+    board.append(m);
     return m;
   });
-  const hit = new Set();
-  const move = (e) => {
-    const r = scr.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-    const k = x < 0.15 && y < 0.18 ? 'tl' : x > 0.85 && y < 0.18 ? 'tr' : x > 0.85 && y > 0.75 ? 'br' : x < 0.15 && y > 0.75 ? 'bl' : null;
-    if (!k || hit.has(k)) return;
-    hit.add(k);
-    marks.find((m) => m.classList.contains('cm-' + k)).classList.add('ok');
-    c.emit('corner', { n: hit.size });
+  scr.insertBefore(board, c.d.iconsEl);
+  let hits = 0;
+  const aim = (e) => {
+    const mark = marks.find((m) => {
+      if (m.classList.contains('ok')) return false;
+      const r = m.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    });
+    if (!mark) return;
+    mark.classList.add('ok');
+    mark.textContent = '✔';
+    c.emit('corner', { n: ++hits });
   };
-  scr.addEventListener('pointermove', move);
-  c.s.cleanup = () => { scr.removeEventListener('pointermove', move); marks.forEach((m) => m.remove()); };
+  board.addEventListener('pointermove', aim);
+  board.addEventListener('pointerdown', aim);
+  c.s.cleanup = () => board.remove();
 }
 
 export const ackapa = {

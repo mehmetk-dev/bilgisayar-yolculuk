@@ -1,4 +1,5 @@
 // 7. hafta: Paint, Ekran Alıntısı, Ayarlar
+import { flowerGuide } from './paint-guide.js';
 import { K, desktopReady, maxed } from './common.js';
 
 const paintOpen = (c) => maxed(c, 'paint');
@@ -29,7 +30,7 @@ export const paint = {
     },
     {
       title: 'Kalemle sap çizin',
-      html: '<p>Kalem seçili. Sağdaki <b>Renkler</b> bölümünden <b>yeşile</b> tıklayın. Sonra tuvalin <b>ortasında</b>, sol tuşu <b>basılı tutarak</b> yukarıdan aşağıya uzun bir çizgi çizin: bu, çiçeğin <b>sapı</b>.</p>',
+      html: '<p>Kalem seçili. Sağdaki <b>Renkler</b> bölümünden <b>yeşile</b> tıklayın. Sonra tuvalin <b>ortasında</b>, sol tuşu <b>basılı tutarak</b> yukarıdan aşağıya uzun bir çizgi çizin: bu, çiçeğin <b>sapı</b>.</p>' + flowerGuide(0),
       hint: 'Tuvalin üst yarısının ortasından başlayın, aşağıya doğru çekin; altta saksıya yer kalsın.',
       mouse: '🖱 Bas, tut, çiz',
       setup: paintOpen,
@@ -44,7 +45,7 @@ export const paint = {
     },
     {
       title: 'Çiçeği çizin',
-      html: '<p>Şimdi <b>kırmızıya</b> tıklayın. Sapın <b>tepesine</b>, küçük yuvarlaklar çizerek çiçeğin yapraklarını yapın (papatya gibi, ortanın çevresinde 5-6 yuvarlak).</p>',
+      html: '<p>Şimdi <b>kırmızıya</b> tıklayın. Sapın <b>tepesine</b>, küçük yuvarlaklar çizerek çiçeğin taç yapraklarını yapın (papatya gibi, ortanın çevresinde 5-6 yuvarlak).</p>' + flowerGuide(1),
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-color') c.note(`Seçili renk: <b>${ev.colorName}</b>`);
@@ -54,7 +55,7 @@ export const paint = {
     },
     {
       title: 'Fırça ile yapraklar',
-      html: '<p><b>Fırçalar</b> bölümündeki fırça simgesine tıklayın, sonra <b>Boyut</b>\'a tıklayıp <b>Kalın</b>\'ı seçin, rengi yeniden <b>yeşil</b> yapın. Sapın iki yanına birer <b>yaprak</b> çizin.</p>',
+      html: '<p><b>Fırçalar</b> bölümündeki fırça simgesine tıklayın, sonra <b>Boyut</b>\'a tıklayıp <b>Kalın</b>\'ı seçin, rengi yeniden <b>yeşil</b> yapın. Sapın iki yanına birer <b>yaprak</b> çizin.</p>' + flowerGuide(2),
       hint: 'Yaprak için sapın ortasından yana doğru kısa, kalın bir çizgi yeter.',
       setup: paintOpen,
       on: (ev, c) => {
@@ -64,14 +65,14 @@ export const paint = {
     },
     {
       title: 'Dikdörtgenle saksı',
-      html: '<p>Rengi <b>kahverengi</b> yapın ve <b>Şekiller</b> bölümünden <b>Dikdörtgen</b>\'i (boş kare) seçin. Sapın <b>alt ucuna</b> bir saksı çizin: saksının sol üst köşesinden başlayıp sol tuşu basılı tutarak sağ alta doğru <b>çapraz</b> sürükleyin, bırakın.</p>',
+      html: '<p>Rengi <b>kahverengi</b> yapın ve <b>Şekiller</b> bölümünden <b>Dikdörtgen</b>\'i (boş kare) seçin. Sapın <b>alt ucuna</b> bir saksı çizin: saksının sol üst köşesinden başlayıp sol tuşu basılı tutarak sağ alta doğru <b>çapraz</b> sürükleyin, bırakın.</p>' + flowerGuide(3),
       setup: paintOpen,
       on: (ev) => ev.type === 'paint-shape' && ev.shape === 'rect',
       done: 'Saksı yerinde. Oval ve Çizgi de aynı şekilde, çapraz sürükleyerek çizilir.',
     },
     {
       title: 'Saksıyı boyayın',
-      html: '<p><b>Araçlar</b> bölümünden <b>Dolgu</b>\'yu (boya kovası) seçin, <b>turuncu</b> renge tıklayın, sonra saksının <b>içine</b> tıklayın.</p>',
+      html: '<p><b>Araçlar</b> bölümünden <b>Dolgu</b>\'yu (boya kovası) seçin, <b>turuncu</b> renge tıklayın, sonra saksının <b>içine</b> tıklayın.</p>' + flowerGuide(4),
       setup: paintOpen,
       on: (ev, c) => {
         if (ev.type === 'paint-fill' && ev.pixels > 200000) c.note('Bütün sayfa boyandı: dikdörtgenin <b>dışına</b> tıkladınız. Ctrl + Z ile geri alıp içine tıklayın.');

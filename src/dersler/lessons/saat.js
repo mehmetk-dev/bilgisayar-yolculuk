@@ -115,7 +115,7 @@ export const saatTarih = {
       html: '<p>Bir tanıdığınız: “Bilgisayarı uzun süre kapalı kalmıştı. Açtım; bankanın sitesi de, e-Devlet de, haber siteleri de açılmıyor. <b>Hepsinde</b> <b>Bağlantınız gizli değil</b> yazıyor.” Önce neye bakarsınız?</p>',
       opts: ['Bilgisayarın tarih ve saatinin doğru olup olmadığına', 'Bankayı aramaya', 'Bilgisayarı kapatıp açmaya'], ok: 0,
       wrong: 'Hata sertifikayla ilgili. Sertifikanın tarihini bilgisayar neyle karşılaştırır?',
-      why: 'Doğru: tarih ve saat. Saat yanlışsa <b>bütün</b> güvenli siteler birden açılmaz; birçok sitede aynı hatayı görmek bunun işaretidir. Hata <b>yalnızca tek bir sitede</b> çıkıyorsa sorun büyük ihtimalle saatte değildir: adres yanlış yazılmış ya da site sahte olabilir. O sitede şifre yazmayın; adresi kontrol edin, gerekirse bankayı arayın.',
+      why: 'Doğru. Bilgisayarın tarihi çok yanlışsa tarayıcı birden fazla sitenin güvenlik sertifikasını süresi geçmiş ya da henüz geçerli değil sanabilir. Önce tarih ve saati düzeltin, sonra tekrar deneyin. Uyarı bir sitede sürüyorsa adresi ve siteyi kontrol edin. Banka sitesinde uyarı varken şifre girmeyin.',
     }),
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Saati ve tarihi ayarlamayı öğrendiniz:</p>' },
   ],
