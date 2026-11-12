@@ -93,7 +93,8 @@ export function bulut({ desk, body, args, emit, dialogs }) {
     if (b.dataset.copy) {
       const u = $('.bd-url');
       u.select();
-      try { await navigator.clipboard.writeText(linkOf(f)); } catch { document.execCommand('copy'); }
+      desk.sheetClip = null;
+      try { await navigator.clipboard.writeText(linkOf(f)); } catch { if (!desk.sheetClip && u.isConnected) document.execCommand('copy'); }
       desk.textClip = linkOf(f);
       desk.toast('Bağlantı kopyalandı', `${esc(linkOf(f))}<br>E-postaya ya da mesaja <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, ico('copy'), 5000);
       emit('cloud-copy', { link: linkOf(f) });

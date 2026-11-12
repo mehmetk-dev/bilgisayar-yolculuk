@@ -290,7 +290,7 @@ export function word({ desk, body, args, emit, setTitle }) {
   if (n?.content?.pass) openLocked(n); // parolalı belge: önce parola sorulur
   else if (n) load(n.content?.html, n.name, n.parent, n.content?.layout, n.content);
   else if (args.merged) { load(args.merged.html, null, folder, args.merged.layout, args.merged); dirty = true; setTitle('*Mektuplar1 - Kelime İşlemci'); } // adres mektup birleştirmenin sonucu
-  else load();
+  else load(args.html);
 
   // Seçim, araç çubuğuna tıklanınca kaybolmasın: son seçim saklanır ve komuttan önce geri yüklenir
   const onSel = () => {
@@ -944,16 +944,37 @@ export function word({ desk, body, args, emit, setTitle }) {
   let clip = '';
   page.addEventListener('copy', () => { clip = getSelection().toString(); });
   page.addEventListener('cut', () => { clip = getSelection().toString(); });
+  function pasteSheet() {
+    const rows = desk.sheetClip;
+    if (!rows || locked || desk.dialogs.busy) return false;
+    const start = range?.startContainer;
+    const editable = (start?.nodeType === Node.ELEMENT_NODE ? start : start?.parentElement)?.closest('[contenteditable]');
+    if ((editable && editable !== page) || (document.activeElement.isContentEditable && document.activeElement !== page)) return false;
+    if (track) {
+      restore();
+      trackInsert(rows.map((row) => row.join('\t')).join('\n'));
+      emit('doc-clip', { op: 'paste' });
+      return true;
+    }
+    const html = rows.map((row) => `<tr>${row.map((value) => `<td>${esc(value).replace(/\r\n?|\n/g, '<br>') || '<br>'}</td>`).join('')}</tr>`).join('');
+    insertHtml(`<table class="wd-t">${html}</table><p><br></p>`, 'table');
+    emit('doc-clip', { op: 'paste', source: 'sheet' });
+    return true;
+  }
   function clipCmd(k) {
-    restore();
     if (k === 'paste') {
+      if (locked || desk.dialogs.busy) return;
+      if (pasteSheet()) return;
+      restore();
       // Tarayıcı panoya doğrudan erişime izin vermeyebilir: önce gerçek panoyu dener, olmazsa bu programda kopyalananı yapıştırır
       const put = (txt) => { restore(); document.execCommand('insertText', false, txt); changed(); emit('doc-clip', { op: 'paste' }); };
       if (navigator.clipboard?.readText) navigator.clipboard.readText().then((x) => put(x || clip), () => put(clip));
       else put(clip);
       return;
     }
+    restore();
     if (getSelection().isCollapsed) { desk.toast('Önce seçin', 'Kesmek ya da kopyalamak için önce yazıyı seçin (sürükleyerek ya da çift tıklayarak).', '✋', 3500); return; }
+    desk.sheetClip = null;
     clip = getSelection().toString();
     document.execCommand(k);
     if (k === 'cut') changed();
@@ -1673,8 +1694,8 @@ export function word({ desk, body, args, emit, setTitle }) {
     if (t.classList.contains('wd-parno')) { parPop.hidden = true; restore(); return; }
     if (t.classList.contains('wd-partabs')) { parPop.hidden = true; $('.wd-tabpop').hidden = false; return; }
     if (t.dataset.pn !== undefined) { closePals(); return setPageNum(t.dataset.pn); }
-    if (t.dataset.tstyle) return tableLook('style', t.dataset.tstyle);
-    if (t.dataset.tshade) { closePals(); if (t.dataset.tshade !== 'transparent') $('.wd-tshbtn i').style.background = t.dataset.tshade; return tableLook('shade', t.dataset.tshade); }
+    if (t.dataset.tstyle) return tableOp('style', t.dataset.tstyle);
+    if (t.dataset.tshade) { closePals(); if (t.dataset.tshade !== 'transparent') $('.wd-tshbtn i').style.background = t.dataset.tshade; return tableOp('shade', t.dataset.tshade); }
     if (t.classList.contains('wd-hilite')) return pal('.wd-hpal');
     if (t.dataset.hilite) { $('.wd-hpal').hidden = true; if (t.dataset.hilite !== 'transparent') $('.wd-hilite i').style.background = t.dataset.hilite; return exec('hiliteColor', t.dataset.hilite); }
     if (t.classList.contains('wd-sym')) return pal('.wd-spal');
@@ -1814,6 +1835,7 @@ export function word({ desk, body, args, emit, setTitle }) {
   function shortcut(e) {
     if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyF') { e.preventDefault(); addFootnote(); return; }
     if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+    if (e.code === 'KeyV' && !e.shiftKey && pasteSheet()) { e.preventDefault(); return; }
     if (e.shiftKey && e.code === 'KeyE') { e.preventDefault(); setTrack(!track); emit('doc-shortcut', { cmd: 'track' }); return; }
     const map = { KeyB: 'bold', KeyI: 'italic', KeyU: 'underline', KeyL: 'justifyLeft', KeyE: 'justifyCenter', KeyR: 'justifyRight', KeyJ: 'justifyFull' };
     if (map[e.code]) { e.preventDefault(); exec(map[e.code]); emit('doc-shortcut', { cmd: map[e.code] }); return; }

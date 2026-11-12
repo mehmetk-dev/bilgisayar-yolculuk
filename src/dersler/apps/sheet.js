@@ -675,9 +675,19 @@ export function sheet({ desk, body, args, emit, setTitle }) {
   // ---- Kopyala, kes, yapıştır; Ctrl + D ve doldurma tutamacı ----
   function copy(cut = false) {
     const t = sel();
-    const data = [];
-    for (let r = t.r1; r <= t.r2; r++) { const row = []; for (let c = t.c1; c <= t.c2; c++) row.push([cells[addr(r, c)], fmt[addr(r, c)]]); data.push(row); }
+    const data = [], values = [];
+    for (let r = t.r1; r <= t.r2; r++) {
+      const row = [], shown = [];
+      for (let c = t.c1; c <= t.c2; c++) {
+        const a = addr(r, c);
+        row.push([cells[a], fmt[a]]);
+        if (!cut) shown.push(show(a).text);
+      }
+      data.push(row);
+      values.push(shown);
+    }
     clip = { ...t, data, cut };
+    desk.sheetClip = cut ? null : values;
     paintSel();
     emit('xl-copy', { range: selAddr(), cut });
   }

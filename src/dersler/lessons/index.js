@@ -47,6 +47,7 @@ import { excelHata } from './excel4.js';
 import { excelYazi } from './excel5.js';
 import { excelTarih } from './excel6.js';
 import { altToplam } from './excel7.js';
+import { excelWordTablo } from './excel-word-tablo.js';
 import { isletimSistemleri } from './isletim.js';
 import { tarayicilarBilgi } from './tarayicilar.js';
 import { virusAntivirus } from './virus.js';
@@ -60,6 +61,7 @@ import { pdfDuzenle } from './pdfduzenle.js';
 import { resimWeb } from './resimweb.js';
 import { cerezler } from './cerezler.js';
 import { aramaMotorlari } from './aramamotoru.js';
+import { dijitalEgitim } from './dijital-egitim.js';
 import { sunuKurallar, sunuAni } from './sunu3.js';
 import { asilSlayt, sunuParkur } from './sunu4.js';
 import { sunuProva, sunuBaglanti } from './sunu5.js';
@@ -121,10 +123,10 @@ export const WEEKS = [
   { no: 5, title: 'Masaüstü, Başlat menüsü ve pencereler', lessons: [masaustu, masaustuDuzen, hesapMakinesi, donatilar, takvimRandevu, fareAyar, okumaKolay, ekranKlavyesi, sesleYazma, gorev, gorevAyrinti, yanYana, sanalMasaustu, masaustuParkur, odev5, test5] },
   { no: 6, title: 'Dosyalar ve klasörler', lessons: [dosyalar, dosyaTurleri, resimWeb, klasorAgaci, fotograflar, cokluSecim, kayipDosya, zip, copKutusu, dosyaParkur, dosyaSenaryo, odev6, test6] },
   { no: 7, title: 'Paint, Ekran Alıntısı ve Ayarlar', lessons: [paint, tebrikKarti, alinti, ayarlar, saatTarih, denetimMasasi, windowsAraclar, temalar, bluetooth, hesapPin, ayarlarParkur, odev7, test7] },
-  { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, tarayicilarBilgi, adres, aramaMotorlari, sorunAra, medya, videoHz, ingilizce, tuzaklar, kurulum, yazici, bakimGuvenlik, virusAntivirus, internetKesildi, modemSifre, isletimSistemleri, oskurulum, internetParkur, odev8, test8] },
+  { no: 8, title: 'İnternet, program kurma, yazıcı ve işletim sistemi', lessons: [internet, tarayicilarBilgi, adres, aramaMotorlari, dijitalEgitim, sorunAra, medya, videoHz, ingilizce, tuzaklar, kurulum, yazici, bakimGuvenlik, virusAntivirus, internetKesildi, modemSifre, isletimSistemleri, oskurulum, internetParkur, odev8, test8] },
   { no: 9, title: 'E-posta', lessons: [eposta, gmailHotmail, epostaHesap, epostaIletme, eposta2, bulutPaylas, sifreSifirla, epostaTemizlik, epostaParkur, odev9, test9] },
   { no: 10, title: 'Kelime işlemci (Word)', lessons: [dilekce, apartmanDuyuru, belgeEkle, wordResim, tabloInce, belgeDuzen, bicimBoyacisi, sayfaDuzeni, simgeSekil, mektup, kelimeHarf, ozgecmis, kelimeDipnot, kelimeIcindekiler, kelimeBulten, kelimeIzle, kelimeParola, kelimeIlan, dilekceParkur, mebProva, belgeGonder, officeYoksa, odev10, test10] },
-  { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, excelBicim, hucreInce, doldurDondur, hesap3, hesap4, excelYuzde, duseyara, excelHata, excelYazi, excelTarih, altToplam, aidatTakip, calismaSayfalari, excelYazdir, butce, tabloParkur, odev11, test11] },
+  { no: 11, title: 'Hesap tablosu (Excel)', lessons: [hesap1, hesap2, excelBicim, hucreInce, doldurDondur, hesap3, hesap4, excelYuzde, duseyara, excelHata, excelYazi, excelTarih, altToplam, aidatTakip, calismaSayfalari, excelYazdir, butce, excelWordTablo, tabloParkur, odev11, test11] },
   { no: 12, title: 'Sunu (PowerPoint)', lessons: [sunu, sunuKurallar, slaytDuzen, smartArt, asilSlayt, sunuBaglanti, animasyon, animasyonBolmesi, sunuAni, sunuProva, anıAlbumu, sunuParkur, sunuSinav, odev12, test12] },
   { no: 13, title: 'Günlük işler: bilgisayarda ve tarayıcıda', lessons: [gunlukWeb, telefon, telefonTarama, tarayici, tarayiciNot, cerezler, pdfCalis, pdfDuzenle, fotoBoyut, harita, whatsappWeb, gunlukParkur, odev13, test13] },
   { no: 14, title: 'İnternette işlemler: e-Devlet, randevu, e-Nabız, alışveriş, görüntülü görüşme, ilan siteleri', lessons: [edevletIlk, edevlet, randevu, alisveris, bankaHesap, sanalKart, faturaOde, gorusme, eNabiz, kamuHizmet, ilanTuzak, eHizmetParkur, odev14, test14] },

@@ -675,7 +675,15 @@ export function explorer({ desk, body, args, emit, setTitle, close: closeWin }) 
         return desk.dialogs.ask({ title: 'Paylaş', icon: I.share, text: `${picked.size > 1 ? `<b>${picked.size} öğe</b>yi` : `<b>${esc(n.name)}</b> ${n.type === 'folder' ? 'klasörünü' : 'dosyasını'}`} nasıl paylaşmak istersiniz?<br><br>Gerçek bilgisayarda burada E-posta, Yakındaki Paylaşım ve Bluetooth gibi seçenekler görünür. Bu benzetimde e-posta ile paylaşabilirsiniz.`, buttons: [['mail', 'E-posta', true], ['no', 'Vazgeç']] })
           .then((a) => { emit('ex-share', { name: n.name, answer: a }); if (a === 'mail') desk.open('mail'); });
       }
-      case 'copypath': if (n) { const p = `Bu Bilgisayar\\${[...fs.path(n.id)].map((x) => x.name).join('\\')}`; navigator.clipboard?.writeText?.(p).catch(() => {}); desk.toast('Yol kopyalandı', esc(p), iconFor('clipboard'), 3500); emit('ex-copypath', { name: n.name }); } return;
+      case 'copypath': {
+        if (!n) return;
+        const p = `Bu Bilgisayar\\${[...fs.path(n.id)].map((x) => x.name).join('\\')}`;
+        desk.sheetClip = null;
+        navigator.clipboard?.writeText?.(p).catch(() => {});
+        desk.toast('Yol kopyalandı', esc(p), iconFor('clipboard'), 3500);
+        emit('ex-copypath', { name: n.name });
+        return;
+      }
       case 'options': return desk.dialogs.ask({ title: 'Klasör Seçenekleri', icon: iconFor('info'), text: 'Gerçek bilgisayarda burada Dosya Gezgini\'nin davranışını ayarlarsınız: dosyaları tek tıkla açmak, gizli dosyaları göstermek, dosya uzantılarını göstermek gibi.', buttons: [['ok', 'Tamam', true]] });
       case 'compress': {
         if (!n || isSpecial(cur)) return;

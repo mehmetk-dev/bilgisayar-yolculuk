@@ -88,6 +88,11 @@ export class Desktop {
     this.selected = null;
     this.fileClip = null; // { op: 'copy'|'cut', id }
     this.imageClip = null; // ekran alıntısından gelen canvas
+    this.sheetClip = null; // Excel'den kopyalanan hücrelerin görünen değerleri
+    const clearSheetClip = () => { this.sheetClip = null; };
+    document.addEventListener('copy', clearSheetClip, true);
+    document.addEventListener('cut', clearSheetClip, true);
+    window.addEventListener('blur', clearSheetClip);
     this.settings = DEFAULT_SETTINGS();
     root.classList.add('dk');
     root.innerHTML = `
@@ -188,6 +193,7 @@ export class Desktop {
     this.webState = {}; // sitelerin durumu (giriş yapılmış mı, sepet, görüşme); önceki dersten kalmasın
     this.sitePerms = {}; // sitelere verilen kamera, mikrofon, bildirim izinleri
     this.textClip = null;
+    this.sheetClip = null;
     this.cookies = []; // sitelerin bıraktığı çerezler (üçüncü taraf takip çerezleri dahil)
     this.stopped = null; // Görev Yöneticisinden sonlandırılan arka plan işlemleri
     this.sec = null; // Windows Güvenliği: disk doluluğu, güvenlik duvarı, tarama bilgisi

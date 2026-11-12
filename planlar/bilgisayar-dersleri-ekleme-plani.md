@@ -1,6 +1,6 @@
 # Bilgisayar dersleri için ekleme planı
 
-10 Kasım 2026 · İlk paket doğrulanıyor
+12 Kasım 2026 · İki paket de tamamlandı ve doğrulandı
 
 Karşılaştırma, yetişkin kursunda gerçekten listelenen dersler ve çalışma ağacındaki benzetim kaynakları üzerinden yapıldı. “Mevcut” işareti, dersin müfredatta veya belirtilen adımda bulunduğunu gösterir. Bu tarama sırasında dersler tarayıcıda oynatılmadı. Çalışma ağacında önceden başlamış Windows, tarayıcı, Word ve ders düzenlemeleri bulunuyor. Özellikle Paint'in yeni çizim kılavuzları yerelde ve doğrulamaya alınmalı.
 
@@ -61,15 +61,15 @@ Karşılaştırma, yetişkin kursunda gerçekten listelenen dersler ve çalışm
 
 ### A4 — İnternetten öğrenin
 
-**Durum** · Bekliyor. **Bağımlılık** · Yok.
+**Durum** · Uygulandı. **Bağımlılık** · Yok.
 
 - **Amaç.** 8. haftada öğrenci aramayı gerçek bir öğrenme görevi için kullansın.
 - **Dosyalar.** Yeni `src/dersler/lessons/dijital-egitim.js`. Aramada “kurs/eğitim” ile bulunan MEB benzetimindeki bilgisayar işletmenliği duyurusunu kullan. Örnek materyal bağlantısını `src/dersler/apps/sites.js` içindeki bu sayfaya ekle. `lessons/aramamotoru.js` ve `lessons/pdfduzenle.js` akışlarını örnek al.
-- **Bitiş ölçütü.** Öğrenci bir kurs duyurusu buluyor, örnek materyali açıyor, indirdiği dosyayı bulup ders sayfasına dönüyor. Akış örnek sayfa ve dosyayla çevrimdışı çalışıyor.
+- **Bitiş ölçütü.** Öğrenci kurs duyurusunu buluyor, örnek PDF’yi indiriyor, dosyayı İndirilenler’den açıyor ve duyuruya dönüyor. Akış örnek sayfa ve dosyayla çevrimdışı çalışıyor.
 
 ### A5 — Video biçimi ve çözünürlük
 
-**Durum** · Bekliyor. **Bağımlılık** · Yok.
+**Durum** · Uygulandı. **Bağımlılık** · Yok.
 
 - **Amaç.** 8. haftadaki video dersine, biçim seçme ve dışarı aktarma konusunda kısa bir örnek ekle.
 - **Dosya.** `src/dersler/lessons/videohz.js`. Karşılaştırma için `resimweb.js` içindeki farklı kaydetmeye ve `sunu2.js` içindeki MP4 dışarı aktarma adımına yönlendir.
@@ -77,17 +77,23 @@ Karşılaştırma, yetişkin kursunda gerçekten listelenen dersler ve çalışm
 
 ### A6 — Excel'den Word'e tablo
 
-**Durum** · Bekliyor. **Bağımlılık** · Yok.
+**Durum** · Uygulandı. **Bağımlılık** · Yok.
 
-- **Amaç.** 11. haftadan sonra küçük bir Excel aralığını düzenlenebilir Word tablosu olarak kullanma alıştırması.
+- **Amaç.** 11. haftanın sonunda küçük bir Excel aralığını düzenlenebilir Word tablosu olarak kullanma alıştırması.
 - **Dosyalar.** `src/dersler/apps/sheet.js`, `apps/word.js`, uygulamalar arasında tablo verisini taşıyacak pano için `src/dersler/desktop.js` ve yeni `lessons/excel-word-tablo.js`. Word'ün mevcut tablo oluşturma ve düzenleme kodunu kullan.
 - **Bitiş ölçütü.** Örnek 2×3 aralık tek işlemde Word'de 2×3 tablo olarak görünür. Ctrl + V ve şeritteki Yapıştır düğmesi aynı sonucu verir. Öğrenci bir hücreyi düzenleyip başlık satırına gölgelendirme verir. Kaydedip açınca tablo korunur. Düz metin ve Excel içi kopyala/yapıştır çevrimdışı çalışmaya devam eder.
 
 ### A7 — Müfredata bağlayın ve doğrulayın
 
-**Durum** · İlk paket doğrulaması sürüyor. **Bağımlılık** · Seçilen paketin adımları.
+**Durum** · 12 Kasım 2026'da tamamlandı. İki paket de müfredata bağlandı ve doğrulandı. **Bağımlılık** · Seçilen paketin adımları.
 
 - **Dosyalar.** `src/dersler/lessons/index.js`, kullanıcıya görünen ders özeti değişirse `README.md`, derleme sonunda `dist/`. Yalnızca seçilen dersleri ilgili haftaya ekle, mevcut ders kimliklerini koru.
 - **Bitiş ölçütü.** `node build.mjs` geçer. Yeni ve doğrudan etkilenen dersler için `node tools/ders-tara.mjs --only=...` çalıştırılır. Çıktıda beklenen ders kimlikleri ve sıfırdan büyük adım sayısı görülür. Öğrenci eylemini algılayan adımları ayrıca tarayıcıda tamamla. Ders aramasını masaüstü ve dar ekranda, yeni ve mevcut öğrenci profiliyle dene. Çiçek ve kart rehberlerini açıp kontrol et. Ev dersi eklenirse aynı kontrolü ona da uygula.
+
+**Gerçekleşen doğrulama**
+
+- Son `node build.mjs` derlemesi başarılı oldu. Üretilen iki ders HTML kopyası birebir aynı. Chromium'da 1366×768 boyutunda `ders-tara` 12 dersi ve 123 adımı sorunsuz taradı.
+- Son `dist` çıktısında 375×812 boyutunda ders araması ve ders haritası çalıştı. 1366×768 boyutunda dijital eğitim dersinde aramadan PDF'ye geçiş ve geri dönüş tamamlandı. Excel–Word dersinde yapıştırma, hücre düzenleme, gölgelendirme, kaydetme ve yeniden açma tamamlandı.
+- Önceki A6 testinde 375×812 dokunmatik görünümde sekiz adım tamamlandı. Cmd+V, şeritteki Yapıştır düğmesi, pano ve yeniden açma kontrolleri geçti.
 
 Mağaza'dan oyun yükleme ve uygulama güncelleme, ilk iki paketten sonra küçük bir ek olarak düşünülebilir. İki belirsiz el yazısı ifadesi, Word'de serbest çizim ve sanatsal gölgelendirme bu taslakta geliştirme adımına çevrilmedi.
