@@ -1871,13 +1871,15 @@ export function word({ desk, body, args, emit, setTitle }) {
         while (walk.nextNode()) if (walk.currentNode.textContent.trim()) texts.push(walk.currentNode.parentElement);
         const cs = (el) => getComputedStyle(el);
         const al = cs(b.tagName === 'UL' || b.tagName === 'OL' ? b.querySelector('li') || b : b).textAlign;
+        const sizes = [...new Set(texts.map((el) => parseFloat(cs(el).fontSize) * 0.75))];
         return {
           tag: b.tagName, text: b.innerText.trim(),
           align: al === 'start' ? 'left' : al,
           bold: texts.length > 0 && texts.every((el) => +cs(el).fontWeight >= 600),
           italic: texts.length > 0 && texts.every((el) => cs(el).fontStyle === 'italic'),
           underline: texts.length > 0 && texts.every((el) => { for (let x = el; x && x !== page; x = x.parentElement) if (cs(x).textDecorationLine.includes('underline')) return true; return false; }),
-          size: texts.length ? Math.max(...texts.map((el) => Math.round(parseFloat(cs(el).fontSize) * 0.75))) : 0,
+          size: sizes.length ? Math.round(Math.max(...sizes)) : 0,
+          sizes,
           colors: [...new Set(texts.map((el) => cs(el).color))],
           items: b.tagName === 'UL' || b.tagName === 'OL' ? [...b.querySelectorAll('li')].map((li) => li.innerText.trim()) : null,
           cols: b.parentElement?.classList.contains('wd-cols') ? +b.parentElement.style.columnCount : 0,
@@ -1891,8 +1893,10 @@ export function word({ desk, body, args, emit, setTitle }) {
       return {
         pages: pageCount(), shapes: page.querySelectorAll('.wd-shape').length,
         table: (() => { const t = page.querySelector('table'); return t && { rows: t.rows.length, cols: Math.max(...[...t.rows].map((r) => r.cells.length)), merged: [...t.querySelectorAll('td')].some((c) => c.colSpan > 1), thick: t.classList.contains('thick'), valign: [...t.querySelectorAll('td')].some((c) => c.style.verticalAlign === 'middle'),
-          style: t.dataset.tstyle || 'kilavuz', headShade: [...(t.rows[0]?.cells || [])].every((c) => !!c.style.backgroundColor), shaded: [...t.querySelectorAll('td')].filter((c) => !!c.style.backgroundColor).length }; })(),
-        blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, pics: pics.info(), fileName, dirty,
+          style: t.dataset.tstyle || 'kilavuz', headShade: [...(t.rows[0]?.cells || [])].every((c) => !!c.style.backgroundColor),
+          headCells: [...(t.rows[0]?.cells || [])].map((c) => ({ text: c.innerText.trim(), color: c.style.backgroundColor })),
+          shaded: [...t.querySelectorAll('td')].filter((c) => !!c.style.backgroundColor).length }; })(),
+        blocks, text: page.innerText, tables: page.querySelectorAll('table').length, images: page.querySelectorAll('img').length, pics: pics.info(), fileName, folder, dirty,
         fields: [...page.querySelectorAll('.wd-field')].map((x) => x.dataset.field), merge: mm && { list: mm.name, count: mm.rows.length, preview: mm.preview },
         ruler: !$('.wd-ruler').hidden, links: page.querySelectorAll('a[href]').length, pageBreaks: page.querySelectorAll('hr.wd-pb').length, spellErrors: page.querySelectorAll('.wd-sp').length,
         styles: tops.map((b) => (b.classList?.contains('wd-title') ? 'title' : b.tagName.toLowerCase())), layout: { ...layout }, zoom,

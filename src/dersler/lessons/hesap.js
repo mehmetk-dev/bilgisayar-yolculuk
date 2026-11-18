@@ -18,6 +18,24 @@ const butceData = () => {
   return { cells };
 };
 
+// Ders yeniden açıldığında mevcut adımın ihtiyaç duyduğu tabloyu kur.
+const resumeBudget = ({ rows = BUTCE.length, total = false, updated = false, average = false, yearly = false } = {}) => (c) => {
+  if (!c.resumed || X(c)) return;
+  desktopReady(c);
+  const { cells } = butceData();
+  const checkpoint = {};
+  for (let row = 1; row <= rows; row++) {
+    checkpoint['A' + row] = cells['A' + row];
+    checkpoint['B' + row] = cells['B' + row];
+  }
+  if (total) Object.assign(checkpoint, { A6: cells.A6, B6: cells.B6 });
+  if (updated) checkpoint.B3 = '900';
+  if (average) Object.assign(checkpoint, { A7: 'Ortalama', B7: '=ORTALAMA(B2:B5)' });
+  if (yearly) Object.assign(checkpoint, { C1: 'Yıllık', C2: '=B2*12' });
+  sheetOpen(c, { cells: checkpoint });
+};
+const resumeUpdatedBudget = resumeBudget({ total: true, updated: true });
+
 export const hesap1 = {
   id: 'hesap1', icon: '📗', title: 'Hesap tablosu: hücreler ve formüller', minutes: 40, stage: 'desktop',
   desc: 'Satır, sütun, hücre; formül yazmak, TOPLA ve ORTALAMA.',
@@ -50,6 +68,7 @@ export const hesap1 = {
     },
     {
       title: 'Gerçek Excel\'in sekmeleri',
+      setup: resumeBudget({ rows: 0 }),
       html: `<p>Bu alıştırma ekranında düğmelerin hepsi tek şeritte durur. Gerçek Excel'de ise düğmeler <b>sekmelere</b> dağılmıştır. Üstteki sekme adına tıklayınca o sekmenin düğmeleri görünür:</p>
         <table class="sum"><tr><th>Dosya</th><td>Kaydet, Farklı Kaydet, Aç, Yazdır</td></tr><tr><th>Giriş</th><td>Yazı tipi, kalın, kenarlık, dolgu rengi, hizalama, para ve yüzde biçimi, ∑ Otomatik Toplam, Koşullu Biçimlendirme, Sırala ve Filtre Uygula</td></tr>
         <tr><th>Ekle</th><td>Grafikler, Özet Tablo, resim</td></tr><tr><th>Sayfa Düzeni</th><td>Kâğıt yönü, kenar boşlukları, sığdırma</td></tr><tr><th>Formüller</th><td>İşlev listesi (TOPLA, EĞER…)</td></tr>
@@ -60,7 +79,7 @@ export const hesap1 = {
       title: 'Hücre adresi',
       html: '<p><b>C4</b> hücresine tıklayın: C sütunu ile 4. satırın kesiştiği kutu.</p>',
       mouse: '🖱 C4',
-      setup: (c) => sheetOpen(c),
+      setup: (c) => { desktopReady(c); sheetOpen(c); },
       hint: 'Önce üstteki harflerden C\'yi bulun, sonra aşağı inip soldaki 4 numarayla aynı hizadaki kutuya tıklayın.',
       on: (ev, c) => {
         if (ev.type !== 'xl-select') return false;
@@ -71,6 +90,7 @@ export const hesap1 = {
     },
     {
       title: 'Başlıkları yazın',
+      setup: resumeBudget({ rows: 0 }),
       html: `<p><b>A1</b> hücresine tıklayın, <b>Gider</b> yazın ve ${K('Tab')}\'a basın (sağa geçer). <b>B1</b>\'e <b>Tutar</b> yazıp ${K('Enter')}.</p>`,
       combo: ['Tab'],
       hint: 'Hücreye tıklayıp doğrudan yazmaya başlayın; yazdığınız hem hücrede hem üstteki formül çubuğunda görünür.',
@@ -79,6 +99,7 @@ export const hesap1 = {
     },
     {
       title: 'Giderleri yazın',
+      setup: resumeBudget({ rows: 1 }),
       html: `<p>A sütununa giderleri, B sütununa tutarlarını yazın. Her hücreden sonra ${K('Enter')} ile aşağı inin:</p>
         <table class="sum">${BUTCE.slice(1).map(([a, b], i) => `<tr><th>A${i + 2}: ${a}</th><td>B${i + 2}: ${b}</td></tr>`).join('')}</table>`,
       hint: 'Önce A2\'ye tıklayıp dört gideri alt alta yazın. Sonra B2\'ye tıklayıp tutarları yazın. Sayılara TL yazmayın; sadece rakam.',
@@ -87,11 +108,14 @@ export const hesap1 = {
     },
     {
       title: 'Sayı mı, yazı mı?',
-      html: `<p>Sayılar hücrede <b>sağa</b>, yazılar <b>sola</b> yaslanır. Hesaba yalnızca sayılar girer.</p>
+      setup: resumeBudget(),
+      html: `<p>Sayılar hücrede <b>sağa</b>, yazılar <b>sola</b> yaslanır. Hücreye sayı yerine metin girilirse kullanılan formül önemlidir.</p>
+        <p>Örneğin A1 = 100, A2 = iki yüz (metin), A3 = 300 olsun. <b>=TOPLA(A1:A3)</b> metni atlayıp <b>400</b> verir. <b>=A1+A2+A3</b>, A2 metin olduğu için <b>#DEĞER!</b> verir. A2’ye 200 yazarsanız iki formül de 600 verir.</p>
         <ul class="big-list"><li>Ondalık için <b>virgül</b> yazın: <b>45,50</b>. Nokta ile <b>45.50</b> yazarsanız Excel bunu sayı saymaz; hücre sola yaslanır, toplam yanlış çıkar. <b>12.5</b> yazarsanız Excel bunu <b>12 Mayıs</b> tarihi sanar.</li><li>Bir sayı <b>sola</b> yaslıysa ve toplama girmiyorsa yazı sanılmıştır. Hücreyi silip virgülle yeniden yazın.</li><li>Telefon numarasının başındaki <b>0</b> silinir (0532 → 532). Önce hücreyi seçip <b>Giriş</b> sekmesindeki sayı biçimi listesinden <b>Metin</b>\'i seçin, sonra numarayı yazın. Kısa yol: numaranın başına kesme işareti koyun: <b>'0532…</b></li></ul>`,
     },
     {
       title: 'Otomatik toplam',
+      setup: resumeBudget(),
       html: `<ol class="steps"><li><b>A6</b>\'ya <b>Toplam</b> yazın.</li><li><b>B6</b> hücresine tıklayın (sayıların hemen altı).</li><li>Üstteki <b>∑ Otomatik Toplam</b> düğmesine tıklayın.</li><li>Formül hücrede yazılı bekler: <b>=TOPLA(B2:B5)</b>. Toplanacak sayılar kesik çizgiyle çerçevelenir. Doğruysa ${K('Enter')}\'a basın.</li></ol>
         <p class="mut">Enter\'a basmadan başka bir hücreye tıklarsanız formüldeki aralık o hücreyle değişir. Öyle olursa ${K('Esc')} ile vazgeçip yeniden ∑\'ye basın.</p>`,
       mouse: '🖱 B6 → ∑ → Enter',
@@ -107,28 +131,32 @@ export const hesap1 = {
     },
     {
       title: 'Değer değişince',
+      setup: resumeBudget({ total: true }),
       html: '<p>Elektrik faturası arttı! <b>B3</b>\'e tıklayın, <b>900</b> yazıp Enter\'a basın. Toplama ne oluyor?</p>',
       on: when((c) => near(cell(c, 'B3').value, 900) && near(cell(c, 'B6').value, 10200)),
       done: 'Toplam kendiliğinden <b>10.200</b> oldu. Hesap tablosunun gücü budur: formül bir kez yazılır, sayılar değişince sonuç güncellenir.',
     },
     {
       title: 'Yanlışlıkla sildim!',
+      setup: resumeUpdatedBudget,
       html: `<p>Korkmayın, bozulan her şey geri gelir. Deneyelim: <b>B2</b>\'ye (kira) tıklayıp ${K('Delete')} tuşuna basın. Kira silinir, toplam da değişir.</p><p>Şimdi ${K('Ctrl')} + ${K('Z')} tuşlarına basın: silinen sayı geri gelir.</p>`,
       hint: 'Ctrl + Z yerine şeridin en solundaki ↶ (Geri al) düğmesine de basabilirsiniz. Fazla geri aldıysanız Ctrl + Y (↷ Yinele) ileri alır.',
       on: (ev, c) => {
         if (ev.type === 'xl-edit' && cell(c, 'B2').raw === '') c.s.cleared = true;
         if (ev.type !== 'xl-undo') return false;
         if (!c.s.cleared) { c.warn('Önce B2\'yi silin, sonra geri alın. Elektrik 750\'ye döndüyse Ctrl + Y ile yineleyin.'); return false; }
-        return near(cell(c, 'B2').value, 5000) && near(cell(c, 'B3').value, 900);
+        return near(cell(c, 'B2').value, 5000) && near(cell(c, 'B3').value, 900) && near(cell(c, 'B6').value, 10200);
       },
       done: 'Kira geri geldi, toplam yine <b>10.200</b>. <b>Ctrl + Z</b> Word\'de, Not Defteri\'nde, hemen her programda çalışır; birkaç kez basarsanız daha geriye gider.',
     },
     {
       title: 'Hücreyi düzeltmek',
+      setup: resumeUpdatedBudget,
       html: `<p>Hücrenin içindekini baştan yazmak yerine <b>çift tıklayın</b> ya da hücreyi seçip ${K('F2')} tuşuna basın. İmleç hücrenin içine girer; tek bir harfi ya da sayıyı düzeltebilirsiniz. ${K('Enter')} onaylar. Yazarken vazgeçerseniz ${K('Esc')} tuşuna basın.</p><p class="mut">Listenin sonuna yeni satır eklerseniz toplam formülünün onu kapsayıp kapsamadığına bakın: toplam hücresine çift tıklayınca formülün seçtiği alan renkli çerçeveyle görünür.</p>`,
     },
     {
       title: 'Formülü kendiniz yazın',
+      setup: resumeUpdatedBudget,
       html: `<p><b>A7</b>\'ye <b>Ortalama</b> yazın. <b>B7</b>\'ye şu formülü yazıp ${K('Enter')}:</p><div class="target">=ORTALAMA(B2:B5)</div>`,
       hint: '= işareti Shift + 0. Parantez Shift + 8 ve Shift + 9. İki nokta (:) Shift + nokta.',
       on: (ev, c) => {
@@ -139,6 +167,7 @@ export const hesap1 = {
     },
     {
       title: 'Dört işlem',
+      setup: resumeBudget({ total: true, updated: true, average: true }),
       html: `<p>Kiranın bir yıllık tutarını bulalım. <b>C1</b>\'e <b>Yıllık</b> yazın. <b>C2</b>\'ye şunu yazın:</p><div class="target">=B2*12</div><p class="mut">Hesap tablosunda çarpı <b>*</b>, bölü <b>/</b> işaretiyle yazılır.</p>`,
       hint: '* işareti 0\'ın sağındaki tuştur. Bölü (/) Shift + 7, artı (+) Shift + 4 ile yazılır.',
       on: when((c) => near(cell(c, 'C2').value, 60000) && cell(c, 'C2').raw.startsWith('=')),
@@ -146,6 +175,7 @@ export const hesap1 = {
     },
     {
       title: 'Kaydedin',
+      setup: resumeBudget({ total: true, updated: true, average: true, yearly: true }),
       html: `<p>${K('Ctrl', 'S')} ile <b>Belgeler</b> klasörüne <b>ev bütçesi</b> adıyla kaydedin.</p>`,
       combo: ['Ctrl', 'KeyS'],
       on: (ev) => ev.type === 'xl-save',
@@ -207,14 +237,14 @@ export const hesap2 = {
     },
     {
       title: 'Sıralayın',
-      html: '<p>En büyük gider en üstte olsun. Tutar sütunundan başlayarak <b>B2</b>\'den <b>A5</b>\'e doğru sürükleyin (başlık satırı ve Toplam satırı seçilmesin). Sonra <b>↓ Z→A</b> (büyükten küçüğe) düğmesine basın.</p><p class="mut">Toplam satırı seçilmez, yoksa sıralamaya karışır. Excel, sürüklemeye başladığınız sütuna göre sıralar.</p>',
+      html: '<p>En büyük gider en üstte olsun. Tutar sütunundan başlayarak <b>B2</b>\'den <b>A5</b>\'e doğru sürükleyin (başlık satırı ve Toplam satırı seçilmesin). Sonra <b>↓ Z→A</b> (büyükten küçüğe) düğmesine basın.</p><p class="mut">Toplam satırı seçilirse sıralamaya karışır. Benzetimde sıralama ölçütü, sürüklemeye başladığınız hücrenin sütunudur.</p><p>Gerçek Excel’de A1:B5’i seçin ve <b>Veri → Sırala</b> yolunu izleyin. <b>Verilerimde üst bilgi var</b> seçeneğini işaretleyin. Sütun olarak <b>Tutar</b>, düzen olarak <b>Büyükten Küçüğe</b> seçin. Böylece gider adı ve tutar birlikte taşınır.</p>',
       mouse: '🖱 B2 → A5 sürükle → ↓ Z→A',
-      hint: 'Başlık satırını ve Toplam satırını seçmeyin. Fareyi B2\'ye basılı tutup A5\'e kadar sürükleyin: seçim A2:B5 olur ve sıralama B (Tutar) sütununa göre yapılır. Gerçek Excel\'de daha güvenli bir yol da var: A2:B5\'i seçip <b>Veri → Sırala</b>; açılan pencerede Sıralama ölçütü: <b>Tutar</b>, Düzen: <b>Büyükten Küçüğe</b>.',
+      hint: 'Başlık satırını ve Toplam satırını seçmeyin. Fareyi B2\'ye basılı tutup A5\'e kadar sürükleyin: seçim A2:B5 olur ve sıralama B (Tutar) sütununa göre yapılır.',
       on: (ev, c) => {
         if (ev.type !== 'xl-sort') return false;
-        if (ev.single) { c.note('Tek hücreye tıkladınız. Bu benzetim Toplam satırını atladı ama <b>gerçek Excel atlamaz</b>: bitişik bütün alanı, Toplam satırını da sıralar. Ctrl + Z ile geri alın; B2\'den A5\'e doğru sürükleyerek seçip yeniden deneyin.'); return false; }
+        if (ev.single) { c.note('Tek hücreye tıkladınız. Sıralamadan önce başlık ve Toplam satırı dışarıda kalacak şekilde veri aralığını seçin. Ctrl + Z ile geri alın; B2\'den A5\'e doğru sürükleyerek seçip yeniden deneyin.'); return false; }
         if (ev.from !== 'A2' || ev.to !== 'B5') { c.note('Seçim A2:B5 olmalı (başlık ve Toplam hariç). Ctrl + Z ile geri alıp B2\'den A5\'e doğru sürükleyerek yeniden seçin.'); return false; }
-        if (ev.col !== 'B' || !ev.desc) { c.note('Sıralandı ama tutara göre büyükten küçüğe değil. Excel, sürüklemeye başladığınız hücrenin sütununa göre sıralar. Ctrl + Z ile geri alıp Tutar sütunundan (B2) başlayarak A5\'e doğru sürükleyin, ↓ Z→A\'ya basın.'); return false; }
+        if (ev.col !== 'B' || !ev.desc) { c.note('Sıralandı ama tutara göre büyükten küçüğe değil. Benzetimde sürüklemeye başladığınız hücrenin sütunu sıralama ölçütüdür. Ctrl + Z ile geri alıp Tutar sütunundan (B2) başlayarak A5\'e doğru sürükleyin, ↓ Z→A\'ya basın.'); return false; }
         return norm(cell(c, 'A2').raw) === 'kira';
       },
       done: 'Kira en üstte. Gider adları da tutarlarıyla birlikte yer değiştirdi; satırlar bozulmadı.',

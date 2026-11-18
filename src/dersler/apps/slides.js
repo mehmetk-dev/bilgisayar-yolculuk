@@ -588,6 +588,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
 
   // ---- Slayt gösterisi ----
   let showAt = -1, timers = [], musicTimer = 0, revealed = 0, revealTotal = 0, jumpBuf = '';
+  let showFrom = 0, showSeen = new Set();
   // tool: null (ok işaretçi) | 'pen' (kalem) | 'hl' (vurgulayıcı); ink: gösteri boyunca her slaydın mürekkebi
   // rehearse: Zamanlamaları Prova Et sırasında her slaytta geçen süre (ms)
   let tool = null, ink = [], inkDirty = false, stroke = null, rehearse = null, rhTimer = 0;
@@ -666,6 +667,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
       return;
     }
     showAt = Math.max(0, i);
+    showSeen.add(showAt);
     syncMusic();
     const s = deck.slides[showAt];
     seq = null;
@@ -703,6 +705,8 @@ export function slides({ desk, body, args, emit, setTitle }) {
     $('.pp-rhbar').hidden = !rehearse;
     if (rehearse) { rhTick(); rhTimer = setInterval(rhTick, 250); }
     clearInterval(musicTimer); musicTimer = 0;
+    showFrom = from;
+    showSeen = new Set();
     showAt = nextShown(from);
     const audible = syncMusic();
     emit('ppt-show-start', { from, music: deck.music || null, audible, rehearse: !!rehearse });
@@ -719,7 +723,10 @@ export function slides({ desk, body, args, emit, setTitle }) {
     setTool(null);
     clearTimers();
     clearInterval(musicTimer); musicTimer = 0;
-    emit('ppt-show-exit', { at: showAt, finished: showAt >= deck.slides.length });
+    emit('ppt-show-exit', {
+      at: showAt, finished: showAt >= deck.slides.length, from: showFrom, rehearse: !!rh,
+      allSeen: showSeen.size === deck.slides.length,
+    });
     showAt = -1; seq = null;
     $('.pp-thumbs').focus();
     afterShow(rh);
@@ -1116,7 +1123,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
   function writePdf(r, via) {
     const html = deck.slides.map((s) => `<div class="pdf-slide" style="container-type:inline-size;aspect-ratio:16/9;margin:0 0 .8em;box-shadow:0 1px 5px #0003">${slideHtml(s, false)}</div>`).join('');
     desk.fs.write(r.folder, r.name, { html, slides: deck.slides.length });
-    desk.toast('PDF olarak kaydedildi', `${esc(r.name)}: bilgisayarı olmayanlar da açabilir.`, '📕');
+    desk.toast('Sanal PDF kaydedildi', esc(r.name), '📕');
     emit('ppt-pdf', { name: r.name, folder: r.folder, slides: deck.slides.length, via });
   }
   // Dosya → Dışarı Aktar → Video Oluştur
@@ -1127,12 +1134,12 @@ export function slides({ desk, body, args, emit, setTitle }) {
     if (!r) return;
     const timed = deck.slides.every((s) => s.auto > 0);
     const secs = deck.slides.reduce((n, s) => n + (s.auto || 5), 0);
-    desk.toast('Video hazırlanıyor…', `${deck.slides.length} slayt, yaklaşık ${secs} saniye.`, '🎬', 2500);
+    desk.toast('Sanal video hazırlanıyor…', `${deck.slides.length} slayt, yaklaşık ${secs} saniye.`, '🎬', 2500);
     await wait(2200);
     const [, , bg] = theme();
     desk.fs.write(r.folder, r.name, { emoji: '🎬', bg: ['#263238', '#546e7a'], video: true, slides: deck.slides.length, secs });
     if (!timed) desk.toast('Süreler verilmemiş', 'Slaytlara süre vermediğiniz için her slayt 5 saniye gösterilecek. Geçişler sekmesinde “Sonra:” kutusuna süre verip Tümüne Uygula\'ya basabilirsiniz.', 'ℹ', 6000);
-    else desk.toast('Video kaydedildi', esc(r.name), '🎬');
+    else desk.toast('Sanal video kaydedildi', esc(r.name), '🎬');
     emit('ppt-video', { name: r.name, folder: r.folder, slides: deck.slides.length, secs, timed });
   }
 
@@ -1394,6 +1401,7 @@ export function slides({ desk, body, args, emit, setTitle }) {
       if (view === 'master') { deck.master.logo = desk.fs.find(r.folder, r.name)?.content || { emoji: '🖼', bg: ['#ccc', '#999'] }; changed(); render(); emit('ppt-master', { what: 'logo', value: r.name }); return; }
       pull();
       deck.slides[cur].img = desk.fs.find(r.folder, r.name)?.content || { emoji: '🖼', bg: ['#ccc', '#999'] };
+      deck.slides[cur].imgSource = { folder: r.folder, name: r.name };
       changed(); render();
       emit('ppt-insert', { what: 'picture', name: r.name, index: cur });
       return;
@@ -1719,9 +1727,9 @@ export function slides({ desk, body, args, emit, setTitle }) {
     info() {
       pull();
       return {
-        theme: deck.theme, showing: !$('.pp-show').hidden, fileName, slideNum: !!deck.slideNum, notes: deck.slides.map((x) => x.notes || ''),
+        theme: deck.theme, showing: !$('.pp-show').hidden, fileName, folder, dirty, slideNum: !!deck.slideNum, notes: deck.slides.map((x) => x.notes || ''),
         music: deck.music || null, musicAt: deck.musicAt || 0, musicBg: !!deck.musicBg, view, bgPane: bgOpen, picSel: selImg, crop: cropOn, animPane: paneOpen, animSel: { t: selObj, at: selAnim }, master: { ...deck.master, logo: !!deck.master.logo }, hf: { ...deck.hf },
-        slides: deck.slides.map((s) => ({ layout: s.layout, title: plain(s.title), sub: plain(s.sub), items: [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean), img: !!s.img, trans: s.trans, art: s.art, anim: s.anim?.effect || 'none', animStart: s.anim?.start,
+        slides: deck.slides.map((s) => ({ layout: s.layout, title: plain(s.title), sub: plain(s.sub), items: [...new DOMParser().parseFromString(`<ul>${s.body}</ul>`, 'text/html').querySelectorAll('li')].map((li) => li.textContent.trim()).filter(Boolean), img: !!s.img, imgSource: s.img && s.imgSource ? { ...s.imgSource } : null, trans: s.trans, art: s.art, anim: s.anim?.effect || 'none', animStart: s.anim?.start,
           anims: (s.anims || []).map((a) => ({ t: a.t, name: objName(s, a.t), kind: fxOf(a.effect)?.[2], effect: a.effect, start: a.start, dur: a.dur, delay: a.delay })), auto: s.auto || 0, click: s.click !== false, hidden: !!s.hidden, fs: { ...(s.fs || {}) }, fc: { ...(s.fc || {}) }, al: { ...(s.al || {}) }, bg: s.bg ? (s.bg.color ? { color: s.bg.color } : { pic: true }) : null, imgW: s.imgW || 0, imgCrop: s.crop ? { ...s.crop } : null, imgSize: s.imgSize, table: s.table ? s.table.map((r) => [...r]) : null, chart: s.chart ? structuredClone(s.chart) : null,
           shapes: (s.shapes || []).map((o) => ({ kind: o.kind, text: o.text || '', fill: o.fill || null, style: o.style || null, link: o.link || null, name: o.name || null })),
           links: [...new DOMParser().parseFromString(`${s.title}${s.sub}<ul>${s.body}</ul><ul>${s.body2}</ul>`, 'text/html').querySelectorAll('a[href]')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),

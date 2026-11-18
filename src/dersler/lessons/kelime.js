@@ -12,6 +12,36 @@ const formatEvents = ['doc-format', 'doc-input', 'doc-shortcut', 'doc-insert', '
 const when = (test) => (ev, c) => formatEvents.includes(ev.type) && !!test(c);
 
 const today = () => new Date().toLocaleDateString('tr-TR');
+const GOVDE = 'Mahallemizdeki parkın aydınlatma lambaları bir aydır yanmamaktadır. Akşamları park karanlık olduğu için kimse parkı kullanamamaktadır.';
+const KAPANIS = 'Gereğinin yapılmasını saygılarımla arz ederim.';
+const dilekceParagraflari = (doc) => {
+  const blocks = doc.blocks.filter((b) => b.text);
+  return blocks.length >= 3 && blocks[0].text.toLocaleLowerCase('tr').includes('muhtarlığına') &&
+    norm(blocks[1].text) === norm(GOVDE) && norm(blocks[2].text) === norm(KAPANIS);
+};
+
+export function wordOutput(type, name, source) {
+  return (ev, c) => {
+    if (ev.type !== type) return false;
+    const win = c.d.find('word');
+    const doc = win?.api.info();
+    if (ev.app !== 'word' || ev.win !== win?.id || !doc) {
+      c.note('Bu işlemi alıştırmayı yaptığınız Kelime İşlemci penceresinde yapın.');
+      return false;
+    }
+    if (ev.folder !== 'docs') {
+      c.note('Kaydetme penceresinde <b>Belgeler</b> klasörünü seçip yeniden kaydedin.');
+      return false;
+    }
+    if (ev.name?.toLocaleLowerCase('tr') !== name) {
+      c.note(`Dosyayı <b>${name}</b> adıyla kaydedin. Dosya menüsünden kaydetme penceresini yeniden açın.`);
+      return false;
+    }
+    const correction = source(doc);
+    if (correction) { c.note(correction); return false; }
+    return true;
+  };
+}
 
 export const dilekce = {
   id: 'dilekce', icon: '📘', title: 'Kelime işlemci: dilekçe yazalım', minutes: 40, stage: 'desktop',
@@ -55,9 +85,9 @@ export const dilekce = {
     },
     {
       title: 'Kalın yapın',
-      html: `<ol class="steps"><li>Başlığın üzerine <b>hızlıca üç kez</b> tıklayın: bütün paragraf seçilir (başlıkta bu, bütün satırdır; mavi olur).</li><li>Şeritteki <b>K</b> düğmesine tıklayın ya da ${K('Ctrl', 'B')}.</li></ol>`,
+      html: `<ol class="steps"><li>Başlığın başından son harfine kadar fareyle sürükleyin. Klavyeyle de seçebilirsiniz: başlığa tıklayın, ${K('Home')} ile başa gidin ve ${K('Shift', 'End')} ile satırı seçin.</li><li>Şeritteki <b>K</b> düğmesine tıklayın ya da ${K('Ctrl', 'B')}. Yanlış yeri değiştirdiyseniz ${K('Ctrl', 'Z')} ile geri alın.</li></ol>`,
       combo: ['Ctrl', 'KeyB'],
-      hint: 'Seçmek için fareyle satırın başından sonuna sürükleyebilirsiniz de. Seçili yazı mavi görünür.',
+      hint: 'Seçili yazı mavi görünür. İsterseniz paragrafı üzerine art arda üç kez tıklayarak da seçebilirsiniz.',
       check: (c) => block(c, 'muhtarlığına')?.bold,
       on: when((c) => block(c, 'muhtarlığına')?.bold),
       done: 'Kalın yazı, başlıkların ve önemli kelimelerin göze çarpmasını sağlar. Word\'de bu düğme <b>B</b> harfiyle de görünebilir.',
@@ -75,17 +105,27 @@ export const dilekce = {
       title: 'Yazıyı büyütün',
       html: '<p>Başlık seçiliyken şeritteki <b>yazı boyutu</b> kutusuna (içinde <b>11</b> yazar; Word\'ün yeni sürümlerinde <b>12</b>) tıklayın ve <b>14</b>\'ü seçin.</p>',
       mouse: '🖱 Boyut kutusu → 14',
-      hint: 'Seçim kaybolduysa başlığa yeniden üç kez tıklayın.',
+      hint: 'Seçim kaybolduysa başlığın başından sonuna yeniden sürükleyin.',
       check: (c) => block(c, 'muhtarlığına')?.size >= 14,
       on: when((c) => block(c, 'muhtarlığına')?.size >= 14),
       done: 'Yazı boyutu “punto” ile ölçülür. Normal yazı 11–12 punto, başlıklar 14–16 punto olur.',
     },
     {
       title: 'Dilekçenin metni',
-      html: `<p>Başlığın altındaki boş satıra tıklayın ve metni yazın. İki cümle aynı paragrafta, sonra ${K('Enter')} ile yeni satıra son cümle:</p>
-        <div class="target">Mahallemizdeki parkın aydınlatma lambaları bir aydır yanmamaktadır. Akşamları park karanlık olduğu için kimse parkı kullanamamaktadır.</div><div class="target">Gereğinin yapılmasını saygılarımla arz ederim.</div>`,
+      html: `<p>Başlığın altında ilk iki cümleyi tek paragrafta yazın:</p><div class="target">${GOVDE}</div>
+        <p>${K('Enter')} ile ayrı bir paragraf açın ve kapanış cümlesini yazın:</p><div class="target">${KAPANIS}</div>`,
       hint: 'Satır sonuna gelince Enter\'a basmayın: kelime işlemci yazıyı kendisi alt satıra geçirir. Enter yalnızca yeni paragraf için.',
-      on: when((c) => block(c, 'aydınlatma') && block(c, 'arz ederim')),
+      check: (c) => dilekceParagraflari(info(c)),
+      on: when((c) => {
+        const doc = info(c);
+        if (dilekceParagraflari(doc)) return true;
+        if (doc.blocks.some((b) => norm(b.text).includes('aydınlatma') && norm(b.text).includes('arz ederim'))) {
+          c.note('“Gereğinin yapılmasını” cümlesinin başına tıklayıp Enter’a basın. Kapanış cümlesi ayrı bir paragrafta olmalı.');
+        } else if (doc.blocks.some((b) => norm(b.text) === norm(KAPANIS))) {
+          c.note('Başlıktan sonra parkı anlatan iki cümleyi aynı paragrafta yazın. Ardından Enter’a basıp kapanışı yazın.');
+        }
+        return false;
+      }),
       done: 'Kelime işlemcide satır sonunda Enter\'a basmak gerekmez; yazı kendiliğinden alt satıra akar.',
     },
     {
@@ -130,11 +170,8 @@ export const dilekce = {
       title: 'Kaydedin',
       html: `<p>${K('Ctrl', 'S')}\'ye basın (ya da <b>Dosya → Kaydet</b>). Açılan pencerede <b>Belgeler</b> klasörüne <b>dilekçe</b> adıyla kaydedin.</p>`,
       combo: ['Ctrl', 'KeyS'],
-      on: (ev, c) => {
-        if (ev.type !== 'doc-save') return false;
-        if (!/dilek/i.test(ev.name)) { c.note(`“${ev.name}” adıyla kaydedildi. Ders için adı <b>dilekçe</b> olsun: Dosya → Farklı kaydet.`); return false; }
-        return true;
-      },
+      on: wordOutput('doc-save', 'dilekçe.docx', (doc) => !dilekceParagraflari(doc) &&
+        'Başlığı, gövdeyi ve kapanış cümlesini yazdığınız dilekçeyi açıp Dosya → Farklı kaydet ile kaydedin.'),
       done: 'Word belgelerinin uzantısı <b>.docx</b>\'tir. Dosya Gezgini\'nde mavi 📘 simgesiyle görünür. Gerçek Word\'de ilk kayıtta Kaydet penceresinde dosyanın nereye gideceğine (<b>Bu bilgisayar</b> ya da <b>OneDrive</b>) bakın.',
     },
     {
@@ -228,7 +265,8 @@ export const belgeEkle = {
       title: 'PDF olarak kaydedin',
       html: '<p><b>Dosya</b> menüsünden <b>📕 PDF olarak kaydet</b>\'i seçin ve <b>Belgeler</b>\'e <b>ilaç çizelgesi</b> adıyla kaydedin.</p><p class="mut">Gerçek Word\'de bu düğme bu adla yok. Yol şöyledir: <b>Dosya → Farklı Kaydet</b>, sonra <b>Kayıt türü</b> listesinden <b>PDF</b>\'i seçin. Bir yol daha: <b>Dosya → Dışarı Aktar → PDF/XPS Oluştur</b>.</p>',
       mouse: '🖱 Dosya → PDF olarak kaydet',
-      on: (ev) => ev.type === 'doc-pdf',
+      on: wordOutput('doc-pdf', 'ilaç çizelgesi.pdf', (doc) => !doc.blocks.some((b) => norm(b.text) === 'ilaç çizelgem') || !doc.tables || !doc.images
+        ? 'Başlığı, tabloyu ve resmi eklediğiniz ilaç çizelgesine dönüp PDF’yi o belgeden oluşturun.' : ''),
       done: 'PDF dosyası her bilgisayarda ve telefonda aynı görünür, kolayca değiştirilemez. E-postayla göndermek için en uygun biçimdir. PDF yaptıktan sonra yazıyı değiştiremezsiniz; bu yüzden <b>Word dosyanızı da saklayın</b>: düzeltme gerekirse onu değiştirir, yeniden PDF yaparsınız. Resmî kuruma gidecek belgeyi (dilekçe, özgeçmiş) PDF olarak gönderin; birlikte düzenleyeceğiniz belgeyi Word dosyası olarak gönderin. Aynı adla iki dosya (.docx ve .pdf) olacağını unutmayın; birini silip ötekini kaybetmeyin.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>Kelime işlemcinin Ekle sekmesini öğrendiniz:</p>' },

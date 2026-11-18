@@ -1303,14 +1303,15 @@ write('hafta9', '9. Hafta', 'Bilgisayar İşletmenliği – 9. Hafta Alıştırm
 # ================================================================ HAFTA 10
 S = []
 S.append(cover('10. Hafta: Kelime işlemci (Word)', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On sekiz ders', plan([
+S.append(slide('Bu hafta', '24 kalem · ödev ve test dahil', plan([
     ('Dilekçe yazalım', 40), ('Apartman duyurusu', 40), ('Liste, tablo, resim', 40), ('Resim neden kaçıyor?', 25),
     ('Tablo incelikleri', 35), ('Başlıklar, bul-değiştir, yazım', 40), ('Biçim Boyacısı, satır aralığı', 25),
     ('Sayfa düzeni ve yazdırma', 35), ('Simgeler ve şekiller: ₺ °C ½ ©', 25), ('Adres mektup birleştirme', 30),
     ('Büyük/küçük harf, stiller, cetvel', 30), ('Şablondan özgeçmiş', 40), ('Üst/alt bilgi, dipnot, köprü', 35),
     ('Numaralandırma ve içindekiler', 35), ('Bülten: sütun, kenarlık, sekme', 30),
-    ('Tutanak: izle, açıklama, parola', 40), ('İlan: Metin Kutusu, WordArt', 30), ('Dilekçe parkuru', 25)],
-    'on küçük görev', 19)))
+    ('Tutanak: izle ve açıklama', 30), ('Belgeyi parolayla korumak', 15), ('İlan: Metin Kutusu, WordArt', 30),
+    ('Dilekçe parkuru', 25), ('MEB provası: resmî yazı', 30), ('PDF ve e-posta', 25), ('Office yoksa ücretsiz seçenekler', 20)],
+    'on küçük görev', '24 soruluk test')))
 S.append(slide('Ders 1 · Dilekçe', 'Kelime işlemci nedir?', split(
     ul(['Not Defteri düz yazı yazar; <b>kelime işlemci</b> (en bilineni Microsoft Word) yazıyı <b>biçimlendirir</b>.',
         'Kalın, büyük, ortalı başlıklar; renkler, listeler, tablolar, resimler.',
@@ -1328,9 +1329,9 @@ S.append(slide('Ders 1 · Dilekçe', 'Adım adım dilekçe', split(
 S.append(slide('Ders 2 · Apartman duyurusu', 'Göze çarpan, tek sayfalık duyuru', table([
     ['Başlık', 'Ortalı, büyük (24–28 punto), kalın'],
     ['Önemli satır', 'Renk ya da kalın: gözün hemen gördüğü yer'],
-    ['Düzen → Sayfa kenarlığı', 'Sayfanın çevresine çerçeve çizer'],
+    ['Tasarım → Sayfa Kenarlıkları', 'Sayfanın çevresine çerçeve çizer'],
     [K('Ctrl', 'P'), 'Yazdırma önizlemesi: kâğıtta nasıl çıkacağını gösterir'],
-    ['Tek kâğıt', 'Önizlemede “tek kâğıda sığıyor” yazmalı; taşıyorsa yazıyı küçültün'],
+    ['Önizlemede 1/1', 'Birinci sayfadasınız, belge toplam bir sayfa. 1/2 ise ikinci sayfayı da inceleyin'],
     [K('Ctrl', 'S'), 'Kaydedin; adı anlaşılır olsun']], 'kv')))
 S.append(slide('Ders 3–4 · Liste, tablo, resim', 'Belgeye eklemek', split(
     table([['Ekle → Tablo', 'Satır ve sütun sayısını seçip ekler'],
@@ -1353,19 +1354,19 @@ S.append(slide('Ders 5 · Tablo incelikleri', 'Aidat ve nöbet çizelgesi', tabl
 S.append(slide('Ders 6–7 · Düzenlemek', 'Başlıklar, bul-değiştir, Biçim Boyacısı', split(
     table([['Giriş → Stiller', 'Normal, Başlık 1, Başlık 2, Konu Başlığı'],
            [K('Ctrl', 'F') + ' · ' + K('Ctrl', 'H'), 'Bul · Değiştir (Tümünü değiştir)'],
-           [K('F7'), 'Yazım denetimi: kırmızı dalgalı çizgili kelimeler; sağ tık doğrusunu önerir'],
+           [K('F7'), 'Yazım önerisini cümleye göre uygulayın ya da geçin. Denetim dili: Gözden Geçir → Dil'],
            ['🖍 Vurgu rengi', 'Fosforlu kalem gibi'],
            ['Gözden Geçir → Sözcük sayısı', 'Sayfa, sözcük, karakter']], 'kv tight'),
     table([['🖌 bir kez tıklayın', 'Seçili yazının biçimini alır, sonraki seçtiğinize sürer'],
            ['🖌 çift tıklayın', 'Birçok yere sürersiniz; bitince ' + K('Esc')],
            ['Satır aralığı 1,15 / 1,5', 'Sıkışık yazıyı ferahlatır; resmî yazılarda 1,5'],
-           [K('Tab') + ' paragraf başında', 'İlk satır girintisi'],
+           ['Giriş → Paragraf ↘', 'Özel: İlk satır, Ölçü: 1,25 cm. Satır aralığını aynı pencereden ayarlayın'],
            ['⇥ / ⇤', 'Paragrafı içeri alır / geri çeker']], 'kv tight'), 1, 1)))
 S.append(slide('Ders 8–9 · Sayfa ve simgeler', 'Sayfa düzeni, yazdırma, simgeler', split(
     table([['Düzen → Kenar boşlukları', 'Dar: sayfaya daha çok yazı sığar'],
            ['Düzen → Yönlendirme', 'Dikey (mektup), Yatay (geniş tablo)'],
-           ['Yazı taştı', 'Önizlemede “2 sayfa” yazıyorsa boşluğu daraltın ya da yazıyı küçültün'],
-           ['Filigran', 'ÖRNEKTİR, ACİL gibi silik arka plan yazısı'],
+           ['Önizleme: 1/2', 'Toplam iki sayfa. Taşmayı görünce kenar boşluklarını veya metin düzenini kontrol edin'],
+           ['Tasarım → Filigran', 'ÖRNEKTİR, ACİL gibi silik arka plan yazısı'],
            [K('Ctrl', 'Enter'), 'Yeni sayfa; Enter’a defalarca basmayın']], 'kv tight'),
     table([['Ekle → Simge', 'Klavyede olmayanlar: ₺ ° ½ © € ✓ ☎'],
            ['₺', 'Klavyede ' + K('AltGr', 'T') + ' de olabilir; Simge menüsü her yerde çalışır'],
@@ -1411,12 +1412,13 @@ S.append(slide('Ders 15 · Bülten', 'Sütunlar, kenarlık, gölgelendirme, sekm
            ['Giriş → ▢ <b>Kenarlık</b>', 'Dış Kenarlıklar: çerçeve · Üst Kenarlık: kesme çizgisi'],
            ['Yazıyı seçin → Düzen → <b>Sütunlar → İki</b>', 'Yalnızca seçilen haberler iki sütun olur'],
            ['Seçmeden İki', 'Bütün belge iki sütun olur (başlık da)']], 'kv tight'),
-    table([['Paragraf bölümünün oku → <b>Sekmeler…</b>', 'Sekme durağı konumu: <b>15 cm</b>, öncü: <b>2 .......</b>, Ayarla, Tamam'],
+    table([['Giriş → Paragraf ↘ → <b>Sekmeler…</b>', 'Sekme durağı konumu: <b>15 cm</b>, öncü: <b>2 .......</b>, Ayarla, Tamam'],
            [K('Tab'), 'İmleci durağa götürür, arayı noktalarla doldurur'],
            ['Adı Soyadı: ............', 'Bütün satırlar aynı yerde biter'],
            ['Nokta ya da boşluk tuşu', 'Hizalamak için kullanmayın: satır sonları kayar']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 16 · Tutanak', 'Değişiklikleri izle, açıklama, parola', split(
+S.append(slide('Ders 16–17 · Tutanak ve parola', 'Değişiklikleri izle, açıklama, parola', split(
     table([['Gözden Geçir → 📝 <b>Değişiklikleri İzle</b>', 'Açıkken eklenen yazı <u>altı çizili</u> renkli, silinen <s>üstü çizili</s> kalır (' + K('Ctrl', 'Shift', 'E') + ')'],
+           ['Basit İşaretleme → Tüm İşaretlemeler', 'Kenar çizgisi yerine ekleme ve silme ayrıntılarını gösterir'],
            ['💬 <b>Yeni Açıklama</b>', 'Seçili yazıya sağ kenarda not balonu; yazı değişmez'],
            ['Sonraki ▶ · ◀ Önceki', 'Değişiklikleri sırayla seçer'],
            ['✔ <b>Kabul Et</b> · ✖ <b>Reddet</b>', 'Öneriyi işler · geri alır; ▾ Tüm Değişiklikleri Kabul Et'],
@@ -1426,7 +1428,7 @@ S.append(slide('Ders 16 · Tutanak', 'Değişiklikleri izle, açıklama, parola'
           'Kaydedin ve kapatın.',
           'Açarken parola sorulur; yanlışsa belge <b>açılmaz</b>.'], 'small') +
     note('Parolayı unutursanız belge kurtarılamaz: güvenli bir yere yazın.'), 1.1, .9)))
-S.append(slide('Ders 17 · İlan', 'Metin Kutusu ve WordArt', split(
+S.append(slide('Ders 18 · İlan', 'Metin Kutusu ve WordArt', split(
     table([['Ekle → <b>WordArt ▾</b>', 'Süslü, gölgeli başlık; bir biçim seçin'],
            ['“Metninizi buraya yazın”', 'Seçili gelir; yazmaya başlayınca yerine geçer'],
            [K('Ctrl', 'E'), 'WordArt da satır gibi ortalanır'],
@@ -1435,33 +1437,45 @@ S.append(slide('Ders 17 · İlan', 'Metin Kutusu ve WordArt', split(
            ['Sağa yaslı kutu', 'Paragrafın yanında durur, yazı çevresinden akar'],
            ['Ne yazılır?', 'Telefon, “Giriş ücretsizdir”, önemli not: göze çarpması gereken kısa yazı'],
            [K('Ctrl', 'P'), 'Kâğıtta nasıl duracağına bakın']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 18 · Tekrar', 'Dilekçe parkuru', ul([
+S.append(slide('Ders 19 · Tekrar', 'Dilekçe parkuru', ul([
     'Kelime İşlemci’yi açın', 'Makam: <b>ÇINAR MAHALLESİ MUHTARLIĞINA</b>', 'Başlık ortalı, kalın, 14 punto',
     '<b>Konu: Sokak lambası hakkında</b> (sola hizalı)', 'En az iki cümlelik paragraf; son cümle: <b>Gereğini saygılarımla arz ederim.</b>',
     'Paragrafı iki yana yaslayın', 'Tarih (Ekle → Tarih) ve ad sağa hizalı', '<b>dilekçe</b> adıyla kaydedin, sonra PDF yapın'], 'task2') +
     note('Nasıl yapılacağı yazmaz; takılınca 💡 İpucu. Süreler tutulur.')))
+S.append(slide('Ders 20 · MEB sınav provası', 'Resmî yazı için verilen ölçüler', split(
+    table([['Belge', 'Belgeler’deki sınav provası.docx'],
+           ['Yazı', 'Times New Roman, 12 punto; başlık ortalı, kalın, 14 punto'],
+           ['Üç paragraf', 'İki yana yaslı; ilk satır 1,25 cm, satır aralığı 1,5'],
+           ['Sayfa düzeni', 'Dört kenar 2,5 cm']], 'kv tight'),
+    table([['Tablo', 'Gün, Saat ve Yer hücrelerinin üçünü açık gri ile gölgelendirin'],
+           ['Sayfa numarası', 'Alt bilgiye, ortaya'],
+           ['Çıktı', 'Belgeler → sınav provası.pdf'],
+           ['Kontrol', 'Gerçek Word’de belgeyi ve ayrı okuyucuda PDF’yi yeniden açın']], 'kv tight'), 1, 1)))
 S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Ctrl + B · I · U', 'Kalın · italik · altı çizili'], ['Ctrl + E · J · R · L', 'Ortala · iki yana · sağa · sola'],
     ['Üç tık', 'Bütün paragrafı seçer'], ['Ctrl + P', 'Yazdırma önizlemesi'],
     ['Ekle → Tablo · Resim · Simge', 'Tablo, fotoğraf, ₺ ° ½ ©'], ['Kare / Sıkı', 'Resmi yazının yanına yerleştirir'],
     ['Tablo Düzeni', 'Satır, sütun ekle; hücreleri birleştir'], ['Ctrl + F · Ctrl + H · F7', 'Bul · değiştir · yazım denetimi'],
-    ['🖌 Biçim Boyacısı', 'Biçimi kopyalar'], ['Düzen', 'Kenar boşlukları, yönlendirme, sayfa kenarlığı'],
+    ['🖌 Biçim Boyacısı', 'Biçimi kopyalar'], ['Düzen · Tasarım', 'Kenar boşluğu ve yönlendirme · sayfa kenarlığı'],
     ['Ctrl + Enter', 'Yeni sayfa'], ['Postalar', 'Adres mektup birleştirme'],
     ['Aa▾ · PDF', 'BÜYÜK / küçük harf · gönderme'],
     ['Başlık 1 → İçindekiler Tablosu', 'Tabloyu Güncelleştir’i unutmayın'], ['Sütunlar · Sekmeler', 'Seçili yazı iki sütun · noktalı satırlar'],
     ['Değişiklikleri İzle', 'Kabul Et / Reddet · parola']],
-    'on küçük görev', 19)))
+    'on küçük görev', 24)))
 write('hafta10', '10. Hafta', 'Bilgisayar İşletmenliği – 10. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 11
 S = []
 S.append(cover('11. Hafta: Hesap tablosu (Excel)', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On altı ders', plan([
-    ('Hücreler ve formüller', 40), ('Biçim, sıralama, grafik', 35), ('Birleştir ve Ortala, #####, satır ekleme', 30),
-    ('Otomatik doldurma, dondurma', 30), ('EĞER ve formül kopyalama', 40), ('Sabit başvuru, ETOPLA, filtre', 35), ('DÜŞEYARA', 35),
-    ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35), ('Tarihler, yaş, sayma işlevleri', 35), ('Alt Toplam', 35), ('Açılır liste ve aidat takibi', 35),
-    ('Çalışma sayfaları', 30), ('Excel’de yazdırma', 30), ('Ev bütçesi ve pasta grafiği', 35), ('Tablo parkuru', 25)],
-    'on küçük görev', 17)))
+S.append(slide('Bu hafta', '21 kalem · ödev ve test dahil', plan([
+    ('Hücreler ve formüller', 40), ('Biçim, sıralama, grafik', 35), ('Kenarlık, dolgu ve hizalama', 30),
+    ('Birleştir ve Ortala, Metni Kaydır, #####', 30), ('Otomatik doldurma, dondurma', 30),
+    ('EĞER ve formül kopyalama', 40), ('Sabit başvuru, ETOPLA, filtre', 35), ('Yüzde hesabı ve mutlak başvuru', 35),
+    ('DÜŞEYARA', 35), ('Excel hataları ve Özet Tablo', 35), ('Yazı işlevleri, YUVARLA, koruma', 35),
+    ('Tarihler, yaş, sayma işlevleri', 35), ('Alt Toplam', 35), ('Açılır liste ve aidat takibi', 35),
+    ('Çalışma sayfaları', 30), ('Excel’de yazdırma', 30), ('Ev bütçesi ve pasta grafiği', 35),
+    ('Excel’den Word’e tablo aktarın', 15), ('Tablo parkuru', 25)],
+    'on küçük görev', 22)))
 S.append(slide('Ders 1 · Hesap tablosu', 'Satır, sütun, hücre', split(
     table([['Sütun', 'Yukarıdan aşağı: <b>A, B, C</b>…'], ['Satır', 'Soldan sağa uzanır; numarası <b>1, 2, 3</b>…'],
            ['Hücre adresi', 'Sütun harfi + satır numarası: <b>C4</b>'],
@@ -1471,16 +1485,17 @@ S.append(slide('Ders 1 · Hesap tablosu', 'Satır, sütun, hücre', split(
     '<h2>Ev bütçesi</h2>' + table([['Kira', '5000'], ['Elektrik', '750 → 900'], ['Su', '300'], ['Market', '4000'],
                                     ['Toplam (∑)', '10.050 → <b>10.200</b>'], ['=ORTALAMA(B2:B5)', '2.550'], ['=B2*12', 'Kira, bir yıl: 60.000']], 'tight') +
     note('Bir sayı değişince toplam <b>kendiliğinden</b> güncellenir. Çarpı *, bölü /.'), 1, 1)))
-S.append(slide('Ders 2–3 · Biçim ve hücreler', 'Biçimlendirmek, sıralamak, grafik', split(
+S.append(slide('Ders 2–4 · Biçim ve hücreler', 'Biçimlendirmek, sıralamak, grafik', split(
     table([['Sürükleyerek seçmek', 'Aralık seçer: <b>B2:B6</b>'], [K('Ctrl', 'B'), 'Kalın'],
            ['₺', 'Para birimi biçimi: 5.000,00 ₺'], ['Durum çubuğu', 'Seçili sayıların toplamı ve ortalaması en altta'],
-           ['↓ Z→A', 'Büyükten küçüğe sıralar'], ['📊 Grafik', 'Seçili adlar ve sayılardan sütun grafiği']], 'kv tight'),
-    table([['Birleştir ve Ortala', 'Yan yana hücreleri tek hücre yapar, başlığı ortalar'],
+           ['Sıralama', 'Ad ve tutarı birlikte seçin; tutara göre büyükten küçüğe sıralayın'], ['📊 Grafik', 'Seçili adlar ve sayılardan sütun grafiği']], 'kv tight'),
+    table([['Giriş → Kenarlık ve Dolgu Rengi', 'Tabloya çizgi; başlığa dolgu, kalın yazı ve ortalama'],
+           ['Birleştir ve Ortala', 'Yan yana hücreleri tek hücre yapar, başlığı ortalar'],
            ['Metni Kaydır', 'Uzun yazı hücre içinde alt satıra iner'],
            ['#####', '<b>Hata değil</b>: sütun dar. Sütun başlığındaki çizgiye çift tıklayın'],
            ['Sütun çizgisini sürükleyin', 'Sütunu elle genişletir'],
            ['Satır numarasına sağ tık', '<b>Ekle</b>: üstüne boş satır · <b>Sil</b>: satırı kaldırır']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 5 · EĞER ve kopyalama', 'Not çizelgesi: Geçti mi, kaldı mı?', table([
+S.append(slide('Ders 6 · EĞER ve kopyalama', 'Not çizelgesi: Geçti mi, kaldı mı?', table([
     ['Doldurma tutamacı', 'Seçili hücrenin sağ altındaki küçük kare: aşağı sürükleyince formülü kopyalar'],
     ['Göreli başvuru', 'Bir alt satıra kopyalanınca B2 → B3 olur'],
     ['=EĞER(D2>=50;"Geçti";"Kaldı")', 'Koşul doğruysa ilki, değilse ikincisi'],
@@ -1488,24 +1503,25 @@ S.append(slide('Ders 5 · EĞER ve kopyalama', 'Not çizelgesi: Geçti mi, kald�
     ['=EĞERSAY(E2:E7;"Geçti")', 'Koşula uyan hücreleri sayar'],
     ['=MAK(…) / =MİN(…)', 'En büyük / en küçük değer'],
     ['🎨 Koşullu Biçim', 'Belli değerdeki hücreleri kendiliğinden renklendirir']], 'kv tight')))
-S.append(slide('Ders 6–7 · Sabit başvuru ve DÜŞEYARA', 'Fatura listesi ve fiyat listesi', split(
-    table([['%20', 'Hücreye %20 yazılır, hesapta 0,2'],
+S.append(slide('Ders 7–9 · Sabit başvuru ve DÜŞEYARA', 'Fatura listesi ve fiyat listesi', split(
+    table([['%20', 'Yüzdeyi %20 olarak girin; hesapta 0,2. 20 yazıp yüzde biçimi vermek %2000 gösterir'],
+           ['=B4*$B$1', 'Tutarı sabit yüzdeyle çarpar; aşağı kopyalanınca B4 değişir, $B$1 sabit kalır'],
            ['$B$1', 'Sabit başvuru: kopyalanınca B1 değişmez (gerçek Excel’de ' + K('F4') + ')'],
            ['=ETOPLA(B4:B9;"Market";D4:D9)', 'Kategorisi Market olanların toplamı'],
-           ['🔽 Filtre', 'Başlıklara ▾ ekler; bir daha basınca kalkar']], 'kv tight'),
+           ['Veri → Filtre', 'Başlık okuyla bir kategori seçin. Filtreyi temizleyince diğer satırlar geri görünür']], 'kv tight'),
     '<h2>=DÜŞEYARA(A2;$F$2:$G$7;2;YANLIŞ)</h2>' + table([
         ['A2', 'Aranan ürün'], ['$F$2:$G$7', 'Fiyat listesi; aranan değer <b>ilk sütunda</b>'],
         ['2', 'Getirilecek değer 2. sütunda (fiyat)'], ['YANLIŞ', 'Tam eşleşme'],
         ['#YOK', 'Ürün listede yok ya da yanlış yazılmış']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 8 · Hatalar ve Özet Tablo', 'Hücrede hata kodu çıkınca', split(
-    table([['#DEĞER!', 'Sayı yerine yazı var (“iki yüz”): rakamla yazın'],
+S.append(slide('Ders 10 · Hatalar ve Özet Tablo', 'Hücrede hata kodu çıkınca', split(
+    table([['#DEĞER!', 'A2+B2 gibi işlemlerde metin hata verebilir. TOPLA(A2:B2) aralıktaki metni atlar; sayıları kontrol edin'],
            ['#AD?', 'İşlevin adı yanlış: TOPLAM değil <b>TOPLA</b>'],
            ['#SAYI/0!', 'Sıfıra ya da boş hücreye bölünüyor: bölen hücreyi doldurun'],
            ['#####', 'Hata değil: sütun dar']], 'kv'),
     table([['Ekle → 🧮 Özet Tablo', 'Uzun listeyi formülsüz özetler'],
            ['Satırlar', 'Neye göre gruplanacak'], ['Değerler', 'Neyin toplamı'],
            ['Ana liste değişirse', 'Özet tabloyu yeniden oluşturun']], 'kv'), 1, 1)))
-S.append(slide('Ders 9 · Yazı işlevleri ve koruma', 'Dağınık listeyi düzeltmek, sayfayı korumak', split(
+S.append(slide('Ders 11 · Yazı işlevleri ve koruma', 'Dağınık listeyi düzeltmek, sayfayı korumak', split(
     table([['=YAZIM.DÜZENİ(A2)', '“fatma nur” → “Fatma Nur”'], ['=BÜYÜKHARF(B2)', '“yılmaz” → “YILMAZ”'],
            ['=KÜÇÜKHARF(C2)', 'Hepsi küçük: e-posta adresleri için'],
            ['=BİRLEŞTİR(D2;" ";E2)', 'Ad ve soyadı yan yana; " " araya boşluk'],
@@ -1514,7 +1530,7 @@ S.append(slide('Ders 9 · Yazı işlevleri ve koruma', 'Dağınık listeyi düze
            ['🔓 Hücre Kilidini Aç', 'Koruma açıkken de yazılabilecek hücreler (Ödendi mi?)'],
            ['🔒 Sayfayı Koru', 'Öteki hücreler değiştirilemez; parolayı bir yere yazın'],
            ['Koruma ne değildir?', 'Dosyayı şifrelemez: açan herkes içini görür']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 10 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son ödeme, kaç kişi?', split(
+S.append(slide('Ders 12 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son ödeme, kaç kişi?', split(
     table([['12.04.1958', 'Tarih gün.ay.yıl, <b>noktayla</b> yazılır; Excel tanırsa sağa yaslar'],
            ['📅 · 123', 'Tarih aslında sayıdır: 1900’den bu yana geçen gün (21287)'],
            ['=BUGÜN()', 'Bugünün tarihi; her gün kendiliğinden yenilenir'],
@@ -1525,7 +1541,7 @@ S.append(slide('Ders 10 · Tarihler ve sayma', 'Kurs kayıt listesi: yaş, son �
            ['=BOŞLUKSAY(G2:G7)', 'Boş hücreleri sayar: kimin telefonu eksik?'],
            ['=YIL(MİN(B2:B7))', 'En eski tarihin yılı; AY() ayı, GÜN() günü verir'],
            ['_ (alt çizgi)', K('Shift', '-') + ': BAĞ_DEĞ_SAY yazarken']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 11 · Alt Toplam', 'Dernek harcamaları: her kalemin altına toplam', split(
+S.append(slide('Ders 13 · Alt Toplam', 'Dernek harcamaları: her kalemin altına toplam', split(
     table([['1. ↑ A→Z', 'Önce <b>Kategori</b> sütununa göre sıralayın: aynı kalemler alt alta'],
            ['2. 🔢 Alt Toplam', 'Excel’de: Veri sekmesi → Anahat → Alt Toplam'],
            ['Her değişiklikte', '<b>Kategori</b>: kalem değişince yeni grup başlar'],
@@ -1536,7 +1552,7 @@ S.append(slide('Ders 11 · Alt Toplam', 'Dernek harcamaları: her kalemin altın
                              ['Temizlik Toplam', '695 ₺'], ['Genel Toplam', '<b>5.785 ₺</b>']], 'tight') +
     note('Sol üstteki <b>1 2 3</b>: 1 yalnız genel toplam, 2 alt toplamlar, 3 bütün satırlar. '
          '<b>=ALTTOPLAM(9;D2:D4)</b>: 9 = topla. Başka alt toplamları saymaz; TOPLA ise iki kez toplar.'), 1, 1)))
-S.append(slide('Ders 4, 12–13 · Pratik araçlar', 'Doldurma, açılır liste, sayfalar', split(
+S.append(slide('Ders 5, 14–15 · Pratik araçlar', 'Doldurma, açılır liste, sayfalar', split(
     table([['Doldurma tutamacı', 'Ocak → Şubat → Mart; 1, 2 seçip çekince 3, 4, 5…'],
            ['❄ Üst Satırı Dondur', 'Aşağı inerken başlık satırı yerinde kalır'],
            ['✔ Açılır Liste', 'Yalnızca belirlenen seçenekler: <b>Ödendi, Ödenmedi, Kısmen</b> (virgülle)'],
@@ -1545,7 +1561,7 @@ S.append(slide('Ders 4, 12–13 · Pratik araçlar', 'Doldurma, açılır liste,
     table([['＋ (alttaki sekmeler)', 'Yeni çalışma sayfası'], ['Sekmeye çift tık', 'Adını değiştirir'],
            ['Sekmeye sağ tık', 'Yeniden adlandır, Sekme rengi, Taşı veya Kopyala, Sil'],
            ['Taşı veya Kopyala → Kopya oluştur', 'Ocak tablosunu Şubat’a çoğaltır; asıl sayfa bozulmaz']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 14–15 · Yazdırma ve bütçe', 'Tek kâğıda sığdırmak, pasta grafiği', split(
+S.append(slide('Ders 16–17 · Yazdırma ve bütçe', 'Tek kâğıda sığdırmak, pasta grafiği', split(
     table([[K('Ctrl', 'P'), 'Önizleme: kaç sayfa olacak?'],
            ['Tüm sütunları bir sayfaya sığdır', 'Tabloyu küçültüp tek kâğıda alır'],
            ['Yatay', 'Geniş tablolar için'],
@@ -1554,32 +1570,39 @@ S.append(slide('Ders 14–15 · Yazdırma ve bütçe', 'Tek kâğıda sığdırm
            ['Rakamı değiştirmek', 'Toplam ve kalan kendiliğinden hesaplanır'],
            ['🥧 Pasta grafiği', 'Her kalem bütünün yüzde kaçı?'],
            ['📊 Sütun grafiği', 'Kalemleri karşılaştırır']], 'kv tight'), 1, 1)))
-S.append(slide('Ders 16 · Tekrar', 'Tablo parkuru: pazar alışverişi', split(
+S.append(slide('Ders 18 · Excel’den Word’e', 'Düzenlenebilir tablo aktarımı', adim([
+    'Excel’de başlıklarıyla birlikte hücre aralığını seçin ve ' + K('Ctrl', 'C') + ' ile kopyalayın.',
+    'Word’de imleci yerleştirin ve ' + K('Ctrl', 'V') + ' ile yapıştırın. Yapıştırma seçeneklerinde kaynak biçimlendirmesini koruyabilir veya hedef stilleri kullanabilirsiniz.',
+    'Tabloda bir hücreye tıklayıp metni düzenleyin. Sonra belgeyi kaydedin.']) +
+    note('Word’deki tabloyu değiştirmek Excel dosyasındaki hücreleri değiştirmez.')))
+S.append(slide('Ders 19 · Tekrar', 'Tablo parkuru: pazar alışverişi', split(
     table([['Domates', '45'], ['Peynir', '120,50'], ['Zeytin', '85'], ['Ekmek', '15'], ['Süt', '38,75'], ['Toplam (B6)', '<b>304,25</b>']], 'tight'),
-    ul(['Ürünleri A1–A5’e, fiyatları B1–B5’e yazın.', 'B6’da toplamı hesaplatın, kalın yapın.',
-        'B1:B6’yı ₺ biçiminde gösterin.', 'A1:B5’i fiyata göre büyükten küçüğe sıralayın; toplam yerinde kalsın.',
+    ul(['Ürünleri A1–A5’e, fiyatları B1–B5’e yazın.', 'B6’ya <b>=TOPLA(B1:B5)</b> yazın ve kalın yapın.',
+        'B1:B6’yı ₺ biçiminde gösterin.', 'A1:B5’i birlikte fiyat sütununa göre büyükten küçüğe sıralayın; B6 sıralama dışında kalsın.',
         '<b>pazar</b> adıyla Belgeler’e kaydedin.'], 'small'), .7, 1.3)))
 S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Hücre adresi', 'Sütun harfi + satır: B3'], ['=', 'Formül = ile başlar'],
-    ['=TOPLA · =ORTALAMA', 'Toplam · ortalama; ∑ Otomatik Toplam'], ['₺ · K', 'Para biçimi · kalın'],
-    ['Z→A · 📊', 'Sıralama · grafik'], ['#####', 'Sütun dar: çizgiye çift tık'],
+    ['=TOPLA · =ORTALAMA', 'Toplam · ortalama; ∑ Otomatik Toplam'], ['₺ · % · Kenarlık', 'Para ve yüzde biçimi · tablo çizgisi'],
+    ['Sıralama · 📊', 'Satır bütünlüğünü koru · grafik oluştur'], ['#####', 'Sütun dar: çizgiye çift tık'],
     ['Doldurma tutamacı', 'Formülü ve listeyi çoğaltır'], ['=EĞER · =EĞERSAY', 'Koşul · koşula uyanları say'],
     ['$B$1', 'Kopyalanınca değişmeyen adres'], ['=ETOPLA · 🔽 Filtre', 'Koşullu toplam · satırları süz'],
     ['=DÜŞEYARA', 'Listeden fiyat getir'], ['#DEĞER! · #AD? · #SAYI/0!', 'Yazı · yanlış ad · sıfıra bölme'],
     ['=BUGÜN · =ETARİHLİ', 'Bugünün tarihi · yaş hesabı'], ['=BAĞ_DEĞ_SAY · =BOŞLUKSAY', 'Sayıları say · boşları say'],
     ['🔢 Alt Toplam · 1 2 3', 'Sırala, grupla, özeti göster'],
-    ['❄ Dondur · ✔ Açılır Liste', 'Başlık sabit · seçenekli hücre'], ['Ctrl + P', 'Tek sayfaya sığdır, kılavuz çizgileri']],
-    'on küçük görev', 17)))
+    ['❄ Dondur · ✔ Açılır Liste', 'Başlık sabit · seçenekli hücre'], ['Ctrl + P', 'Önizle, ölçeği ve kılavuz çizgilerini ayarla'], ['Excel → Word', 'Kopyala, düzenlenebilir tablo olarak yapıştır']],
+    'on küçük görev', 22)))
 write('hafta11', '11. Hafta', 'Bilgisayar İşletmenliği – 11. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 12
 S = []
 S.append(cover('12. Hafta: Sunu (PowerPoint)', 'Alıştırmalar', 'Alıştırma bilgisayarında uygulamalı ders'))
-S.append(slide('Bu hafta', 'On iki ders', plan([
-    ('Sunu hazırlayalım', 40), ('İyi bir sunu nasıl olur?', 25), ('Slayt düzenleri ve Slayt Sıralayıcı', 30),
-    ('SmartArt: şema ve soy ağacı', 25), ('Asıl Slayt; tablo ve grafik', 30), ('Şekil, WordArt, video, köprü', 40), ('Animasyon ve süre ayarı', 30),
-    ('Vurgu, çıkış, Animasyon Bölmesi', 40),     ('Sunum anı: notlar, kısayollar', 30), ('Sunuya hazırlık: prova, kalem', 40), ('Aile ve anı albümü', 40), ('Sunu parkuru', 25)],
-    'on küçük görev', 17)))
+S.append(slide('Bu hafta', '15 kalem · ödev ve test dahil', plan([
+    ('Sunu hazırlayalım', 45), ('İyi bir sunu nasıl olur?', 25), ('Slayt düzenleri ve Slayt Sıralayıcı', 30),
+    ('SmartArt: şema ve soy ağacı', 25), ('Asıl Slayt; tablo ve grafik', 40), ('Şekil, WordArt, video, köprü', 40),
+    ('Animasyon ve süre ayarı', 30), ('Vurgu, çıkış, Animasyon Bölmesi', 40), ('Sunum anı: notlar, kısayollar', 30),
+    ('Sunuya hazırlık: prova, kalem', 40), ('Aile ve anı albümü', 45), ('Sunu parkuru', 25),
+    ('MEB provası: 5 slaytlık sunu', 40)],
+    'on küçük görev', 21)))
 S.append(slide('Ders 1 · Sunu hazırlayalım', 'Slaytlar ve slayt gösterisi', split(
     table([['Slayt', 'Sununun her bir sayfası'],
            ['Giriş → Yeni Slayt', 'Düzen seçerek slayt ekler: Başlık ve içerik…'],
@@ -1589,7 +1612,7 @@ S.append(slide('Ders 1 · Sunu hazırlayalım', 'Slaytlar ve slayt gösterisi', 
            ['▲ / ▼', 'Seçili slaydın sırasını değiştirir']], 'kv'),
     table([[K('F5'), 'Gösteriyi baştan başlatır'], [K('→') + ' · ' + K('Boşluk') + ' · tık', 'Sonraki slayt'],
            [K('Esc'), 'Gösteriden çıkar']], 'kv') +
-    note('Sunuyu ' + K('Ctrl', 'S') + ' ile kaydedin.'), 1.2, .8)))
+    note('Tüm slaytları gösterin ve son slaytta Esc ile çıkın. ' + K('Ctrl', 'S') + ' ile Belgeler’e bahçemiz.pptx olarak kaydedin.'), 1.2, .8)))
 S.append(slide('Ders 2 · İyi bir sunu', 'Az yazı, büyük yazı, zıt renk', table([
     ['Az yazı', 'Slayt başına en çok 3–5 kısa madde; konuşurken siz anlatın'],
     ['Büyük yazı', 'Metin en az 24 punto, başlık 32–44 punto: arka sıradan okunmalı. Giriş → <b>Yazı boyutu</b>'],
@@ -1604,7 +1627,8 @@ S.append(slide('Ders 3–4 · Düzen ve SmartArt', 'Slayt düzenleri, şemalar',
            ['⧉ Slaytı Çoğalt', 'Kopyası hemen altına eklenir; yalnızca yazıyı değiştirin'],
            ['Görünüm → Slayt Sıralayıcı', 'Bütün slaytlar küçük resim; sürükleyerek sıra değişir'],
            ['Çift tık (sıralayıcıda)', 'O slaydı düzenlemek için açar']], 'kv tight'),
-    table([['Ekle → SmartArt', 'Maddeleri şemaya çevirir'],
+    table([['Giriş → SmartArt’a Dönüştür', 'Önce slayttaki maddeleri seçin; sonra düzeni seçin'],
+           ['Ekle → SmartArt', 'Yeni bir şema ekler'],
            ['Liste', 'Birbirinden bağımsız başlıklar: renkli kutular'],
            ['Süreç', 'Sıralı işler: 1 ➜ 2 ➜ 3'],
            ['Soy ağacı / şema', 'İlk madde üstte, diğerleri altında dallanır'],
@@ -1663,15 +1687,26 @@ S.append(slide('Ders 11 · Anı albümü', 'Fotoğraflardan sunu, PDF ve video',
     ['Altına yazı', 'Tarih ve kısa not: “Bayram 2026: dedenin bahçesinde”'],
     ['Resim boyutu', 'Küçük / Orta / Büyük (Ekle sekmesi)'],
     ['🎵 Ses', 'Fon müziği; gösteri başlayınca çalar'],
-    ['Dosya → PDF olarak kaydet', 'Bilgisayarı olmayanlar da açar; WhatsApp’tan gönderilir'],
-    ['Dosya → Video olarak kaydet (.mp4)', 'Her slayt kendi süresi kadar gösterilir'],
+    ['Dosya → Dışarı Aktar → PDF/XPS', 'Benzetimde sanal kopya; gerçek PDF’yi ayrı okuyucuda açıp sayfa sırasına bakın'],
+    ['Dosya → Dışarı Aktar → Video Oluştur', 'Benzetimde sanal kayıt; gerçek .mp4 dosyasını video oynatıcıda açıp ses ve süreyi kontrol edin'],
     ['Bir kâğıda 4 slayt', 'Yazdırırken düzen seçilir; kâğıt tasarrufu']], 'kv')))
 S.append(slide('Ders 12 · Tekrar', 'Sunu parkuru: Kapadokya gezisi', ul([
     'Belgeler’deki <b>Kapadokya gezisi</b> sunusunu açın', 'Başlık: <b>Kapadokya Gezisi</b>, alt başlık: <b>Çınar Emekliler Derneği</b>',
     '2. slayda en az üç madde (Gezi programı)', '3. slayda <b>peri bacaları.jpg</b>',
     'Renkli bir tasarım teması', 'Bütün slaytlara geçiş efekti',
-    'Sona “Yalnızca başlık” düzeninde <b>Teşekkürler</b>', 'Kaydedin, sonra PDF olarak Belgeler’e'], 'task2') +
+    'Sona “Yalnızca başlık” düzeninde <b>Teşekkürler</b> ekleyip ona da geçiş verin', 'Belgeler’de aynı PPTX’e kaydedin, sonra sanal PDF oluşturun'], 'task2') +
     note('Nasıl yapılacağı yazmaz; takılınca 💡 İpucu. Süreler tutulur.')))
+S.append(slide('Ders 13 · MEB sınav provası', 'Mahalle Kütüphanesi · beş slayt', split(
+    adim(['<b>Mahalle Kütüphanesi</b> · Başlık slaytı; alt başlık ad ve soyad.',
+          '<b>Çalışma saatleri</b> · Başlık ve içerik; en az üç madde.',
+          '<b>Neler var?</b> · Başlık ve içerik; en az üç madde.',
+          '<b>Kütüphaneden bir köşe</b> · Yalnızca başlık; Resimler’deki kütüphane.jpg.',
+          '<b>Teşekkürler</b> · Yalnızca başlık.'], 'small'),
+    ul(['Renkli tema, 2. slaydın başlığı ortalı ve renkli.',
+        'Tümüne aynı geçiş; fotoğrafa giriş animasyonu.',
+        'Slayt numarası ekleyin; kapakta göstermeyin.',
+        'F5 ile başlayın, beşini de gösterin, sonda Esc.',
+        'Belgeler’e kütüphane.pptx ve beş sayfalık PDF kaydedin.'], 'small'), 1.05, .95)))
 S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Yeni Slayt ▾', 'Düzen seçerek slayt ekler'], ['Tasarım · Geçişler', 'Renk ve arka plan · slayt geçişi'],
     ['F5 · Esc', 'Gösteriyi başlat · çık'], ['3–5 madde, 24+ punto', 'Az ve büyük yazı'],
@@ -1679,9 +1714,9 @@ S.append(slide('Özet', 'Bu hafta öğrendiklerimiz', ozet([
     ['Asıl Slayt', 'Logo, alt bilgi, yazı tipi: bütün slaytlara'], ['Ekle → Tablo · Grafik', 'Tablo, sütun ve pasta grafiği'],
     ['Animasyonlar', 'Maddeler tek tek gelir'], ['Animasyon Bölmesi', 'Vurgu, çıkış; sıra, Öncekiyle / Öncekinden Sonra'],
     ['Konuşmacı notları', 'Yalnızca siz görürsünüz'],
-    ['B · W · 3 + Enter', 'Karart · beyaz · 3. slayda git'], ['PDF · Video olarak kaydet', 'Göndermek için'],
+    ['B · W · 3 + Enter', 'Karart · beyaz · 3. slayda git'], ['PDF · Video', 'Paylaşılabilir dosyaları gerçek PowerPoint’te oluşturup açın'],
     ['Ctrl + K · Eylem düğmesi', 'Köprü: siteye ya da slayda git'], ['Prova · Ctrl + P (gösteride)', 'Süreyi ölç · kalemle göster']],
-    'on küçük görev', 17)))
+    'on küçük görev', 21)))
 write('hafta12', '12. Hafta', 'Bilgisayar İşletmenliği – 12. Hafta Alıştırmaları', S)
 
 # ================================================================ HAFTA 13

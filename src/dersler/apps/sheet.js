@@ -1159,7 +1159,7 @@ export function sheet({ desk, body, args, emit, setTitle }) {
     emit('xl-autosum', { addr: a, formula: f, pending: true });
   }
   function sort(desc) {
-    // Sürüklemenin başladığı (etkin) hücrenin sütununa göre, başlık satırının altındaki veri satırlarını sıralar; gerçek Excel gibi. Tek hücrede Toplam satırında durur.
+    // Sıralama ölçütü sürüklemenin başladığı hücrenin sütunudur. Tek hücre seçildiyse benzetim Toplam satırında durur.
     const s = sel();
     const lastCol = (r) => { let c = COLS.length - 1; while (c >= 0 && !cells[addr(r, c)]) c--; return c; };
     let r1 = s.r1 === s.r2 ? 1 : s.r1, r2 = s.r1 === s.r2 ? r1 : s.r2;

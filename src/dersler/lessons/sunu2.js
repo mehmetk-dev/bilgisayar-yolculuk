@@ -347,20 +347,25 @@ export const anıAlbumu = {
     },
     {
       title: 'PDF olarak kaydedin',
-      html: '<p>Albümü bilgisayarı olmayan komşuya göndermek için <b>Dosya</b>\'ya tıklayın, <b>📤 Dışarı Aktar</b>\'ı seçin, sonra <b>📕 PDF/XPS Belgesi Oluştur</b>\'a basın ve <b>Belgeler</b>\'e kaydedin.</p><p class="mut">Gerçek PowerPoint\'te sağda bir kez daha <b>PDF/XPS Oluştur</b> düğmesine basılır; açılan pencerede <b>Yayımla</b> denir. Başka yol: Dosya → Farklı Kaydet → Kayıt türü: PDF.</p>',
+      html: '<p>Albümün <b>sanal PDF</b> kopyasını oluşturmak için <b>Dosya</b>\'ya tıklayın, <b>📤 Dışarı Aktar</b>\'ı seçin, sonra <b>📕 PDF/XPS Belgesi Oluştur</b>\'a basın ve <b>Belgeler</b>\'e kaydedin.</p><p class="mut">Gerçek PowerPoint\'te sağda bir kez daha <b>PDF/XPS Oluştur</b> düğmesine basılır; açılan pencerede <b>Yayımla</b> denir. Başka yol: Dosya → Farklı Kaydet → Kayıt türü: PDF.</p>',
       hint: 'Dosya menüsü sol üstte. Dışarı Aktar\'a tıklayınca altında iki seçenek açılır.',
-      on: (ev) => ev.type === 'ppt-pdf',
-      done: 'PDF hazır: yalnızca okunur, herkesin telefonunda açılır.',
+      on: (ev, c) => {
+        if (ev.type !== 'ppt-pdf') return false;
+        if (ev.folder === 'docs' && /\.pdf$/i.test(ev.name)) return true;
+        c.note('PDF kopyası için Belgeler klasörünü seçip yeniden kaydedin.');
+        return false;
+      },
+      done: 'Sanal PDF hazır. Dosya Gezgini → Belgeler’den PDF’ye çift tıklayarak ayrı görüntüleyicide sayfa sırasına bakabilirsiniz. Gerçek bilgisayarda önce .pptx’i yeniden açıp kontrol edin. Ardından PowerPoint’te PDF oluşturun ve PDF’yi ayrı bir okuyucuda açın.',
     },
     {
       title: 'Video yapın',
-      html: '<p><b>Dosya → 📤 Dışarı Aktar → 🎬 Video Oluştur</b>\'u seçip kaydedin. Slaytlar süreleriyle birlikte video (.mp4) olur.</p><p class="mut">Gerçek PowerPoint\'te ayarların altındaki <b>Video Oluştur</b> düğmesine bir kez daha basılır; video hazırlanırken alttaki çubukta ilerleme görünür.</p>',
+      html: '<p><b>Dosya → 📤 Dışarı Aktar → 🎬 Video Oluştur</b>\'u seçip kaydedin. Benzetim, slayt sürelerine göre bir <b>sanal video kaydı</b> oluşturur.</p><p class="mut">Gerçek PowerPoint\'te ayarların altındaki <b>Video Oluştur</b> düğmesine bir kez daha basılır; video hazırlanırken alttaki çubukta ilerleme görünür.</p>',
       on: (ev, c) => {
         if (ev.type !== 'ppt-video') return false;
         if (!ev.timed) c.warn('Videoda süreler verilmemiş. Geçişler → Sonra: kutusuna süre verip Tümüne Uygula\'ya basın, sonra yeniden deneyin.');
         return ev.timed;
       },
-      done: 'Video hazır. WhatsApp\'tan göndermek için uygundur.',
+      done: 'Sanal video kaydı hazır. Paylaşılabilir .mp4 dosyasını gerçek PowerPoint’te oluşturun, ardından bir video oynatıcıda açıp sesini ve slayt sürelerini kontrol edin.',
     },
     {
       title: 'Bir kâğıda 4 slayt',

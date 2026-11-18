@@ -2,7 +2,9 @@
 
 Bu tablo, sitedeki haftaların MEB Bilgisayar İşletmenliği kurs programının hangi modülüne karşılık geldiğini gösterir. Plan yazarken, denetimde ya da "bu konu nerede?" sorusunda kullanılır.
 
-- **MEB saatleri:** Avcılar Halk Eğitimi Merkezi'nin yayımladığı Bilgisayar İşletmenliği kurs programı modül tablosu (toplam 163 ders saati). Programın aslı: MEB Bilgisayar İşletmeni Yetiştirme Kurs Programı (TTK, 02.09.2019, sayı 25).
+- **Modül saatlerinin kaynağı** Merzifon Şehit Abdulmuttalip Kesikbaş Halk Eğitimi Merkezi’nin 15.12.2025 tarihli *Bilgisayar İşletmenliği (Operatörlüğü) Kursumuz* duyurusunda altı modül toplam 163 ders saati, Elektronik Tablolama modülü 35 ders saati olarak belirtiliyor. Aşağıdaki MEB saatleri bu duyurudan alınmıştır. [Merzifon HEM duyurusu](https://merzifonhem.meb.k12.tr/icerikler/bilgisayarisletmenligioperatorlugukursumuz_16954823.html)
+- **Kurs kapsamı** Avcılar Halk Eğitimi Merkezi’nin *Bilgisayar İşletmenliği Kursu* duyurusu kursun amaçlarını ve işlenen konu alanlarını açıklar. [Avcılar HEM duyurusu](https://avcilarhem.meb.k12.tr/icerikler/bilgisayarisletmenligikursu_16814249.html)
+- **Özel öğretim kurs programı** MEB Özel Öğretim Kurumları Genel Müdürlüğünün *Bilgisayar İşletmeni Yetiştirme Kurs Programı* TTK’nin 02.09.2019 tarihli ve 25 sayılı kararıyla kabul edilmiştir. Program, özel öğretim kursları için 42 saat teorik ve 118 saat uygulamalı eğitim olmak üzere toplam 160 ders saati öngörür. [2019 programı, PDF’nin 2. ve 4. sayfaları](https://ookgm.meb.gov.tr/meb_iys_dosyalar/2019_09/03164428_Bilgisayar_YYletmeni_YetiYtirme_Kurs_ProgramY_2019_25.pdf)
 - **Sitedeki süre:** derslerin `minutes` alanlarının toplamıdır (alıştırma, parkur, ödev ve test dahil). 1 ders saati = 40 dakika alınmıştır. Sınıftaki anlatım, tekrar ve gerçek bilgisayardaki ödevler bu süreye dahil değildir. Bu yüzden sitedeki süre MEB saatinden az olabilir.
 
 | MEB modülü | MEB (ders saati) | Sitedeki haftalar ve dersler | Sitedeki süre |

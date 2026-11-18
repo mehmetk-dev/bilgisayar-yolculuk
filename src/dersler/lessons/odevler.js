@@ -6,14 +6,15 @@ const KURAL = '<p class="mut">Gerçek bilgisayarda çalışırken <b>şifrelerin
 
 // görev: [başlık, anlatım, ipucu (isteğe bağlı), simge]
 const SAYI = ['', 'Bir', 'İki', 'Üç', 'Dört', 'Beş', 'Altı', 'Yedi', 'Sekiz', 'Dokuz', 'On'];
-function odev(n, konu, icon, gorevler) {
+function odev(n, konu, icon, gorevler, ortam) {
   const kac = SAYI[gorevler.length] || gorevler.length;
+  const baslik = ortam?.baslik || 'Gerçek bilgisayarda deneyin';
   const steps = [
     {
-      title: 'Gerçek bilgisayarda deneyin',
-      html: `<p>Bu ödev <b>alıştırma bilgisayarında değil</b>, <b>kendi bilgisayarınızda</b> (ya da kurstaki gerçek bilgisayarda) yapılır. ${n}. haftada öğrendiğiniz <b>${konu}</b> konusunu gerçekte denersiniz.</p>
-        <p>${kac} küçük görev var. Her birini yapınca <b>Yaptım ✔</b>'ya basın. Hepsi bitince son ekranda yazdırılabilir <b>ödev kâğıdı</b> çıkar.</p>${KURAL}`,
-      scene: info(`<div class="sc-big">${icon}<br>💻</div><p>${n}. hafta ödevi: kendi bilgisayarınızda</p>`),
+      title: baslik,
+      html: `<p>${ortam?.giris || `Bu ödev <b>alıştırma bilgisayarında değil</b>, <b>kendi bilgisayarınızda</b> (ya da kurstaki gerçek bilgisayarda) yapılır. ${n}. haftada öğrendiğiniz <b>${konu}</b> konusunu gerçekte denersiniz.`}</p>
+        <p>${kac} küçük görev var. Her birini yapınca <b>Yaptım ✔</b>'ya basın. Hepsi bitince son ekranda yazdırılabilir <b>ödev kâğıdı</b> çıkar.</p>${ortam ? '' : KURAL}`,
+      scene: info(`<div class="sc-big">${icon}<br>💻</div><p>${n}. hafta ödevi: ${ortam?.kisa || 'kendi bilgisayarınızda'}</p>`),
     },
     ...gorevler.map(([t, h, ip, ic], i) => ({
       title: `Görev ${i + 1}: ${t}`,
@@ -26,8 +27,9 @@ function odev(n, konu, icon, gorevler) {
     { final: true, title: 'Ödev kâğıdı 🎉', html: `<p>${n}. hafta ödevini bitirdiniz. Aşağıdaki kâğıdı yazdırıp çalışmanızı işaretleyebilir, takıldığınız yerleri not alıp derse getirebilirsiniz.</p>`, scene: info('<div class="sc-big">🏠✔</div>') },
   ];
   return {
-    id: `odev${n}`, icon: '🏠', title: `${n}. hafta ödevi: gerçek bilgisayarda deneyin`, minutes: 25, stage: 'scene',
-    desc: `${konu}: ${kac.toLocaleLowerCase('tr')} küçük görev. Kendi bilgisayarınızda yapılır; ödev kâğıdı yazdırılabilir.`,
+    id: `odev${n}`, icon: '🏠', title: `${n}. hafta ödevi: ${baslik.toLocaleLowerCase('tr')}`, minutes: 25, stage: 'scene',
+    ...(ortam?.progressVersion && { progressVersion: ortam.progressVersion }),
+    desc: `${konu}: ${kac.toLocaleLowerCase('tr')} küçük görev. ${ortam?.aciklama || 'Kendi bilgisayarınızda yapılır; ödev kâğıdı yazdırılabilir.'}`,
     summary: [...gorevler.map(([t], i) => [`☐ ${i + 1}. ${t}`, 'Not: ______________']), ['Takıldığım yerler', '__________________________________']],
     steps,
   };
@@ -134,15 +136,15 @@ export const odev10 = odev(10, 'kelime işlemci (Word)', '📘', [
 ]);
 
 export const odev11 = odev(11, 'hesap tablosu (Excel)', '📗', [
-  ['Harcama tablosu', 'Excel ya da benzeri programda 1. satıra başlıkları yazın: <b>A1</b>\'e <b>Kalem</b>, <b>B1</b>\'e <b>Tutar</b>. Sonra 2. satırdan başlayarak <b>A sütununa</b> bir haftanın 7 harcama kalemini (market, ulaşım, ilaç…), <b>B sütununa</b> tutarlarını yazın.', 'Ondalık için virgül kullanın: 45,50.', '📋'],
+  ['Harcama tablosu', 'Excel ya da benzeri programda 1. satıra başlıkları yazın: <b>A1</b>\'e <b>Kalem</b>, <b>B1</b>\'e <b>Tutar</b>. Sonra 2. satırdan başlayarak <b>A sütununa</b> 7 örnek harcama kalemini (defter, kalem, silgi, dosya, kitap, çanta, cetvel), <b>B sütununa</b> bu kalemler için uydurduğunuz tutarları yazın.', 'Ondalık için virgül kullanın: 45,50.', '📋'],
   ['Toplamı bulun', 'Tutarların altındaki hücreye (<b>B9</b>) <b>=TOPLA(B2:B8)</b> yazın ya da <b>∑ Otomatik Toplam</b> düğmesine basıp <b>Enter</b>\'a basın.', '∑ formülü önerir; Enter\'a basmadan sonuç çıkmaz. Tutar değişince toplam kendiliğinden güncellenir.', '∑'],
   ['Para biçimi', 'Tutarları seçip <b>₺ (Para birimi)</b> biçimine çevirin.', 'Sütun dar kalırsa ##### çıkar; çizgisine çift tıklayın.', '₺'],
-  ['Sıralayın', 'Tutarlara göre <b>büyükten küçüğe</b> sıralayın: en pahalı kalem en üstte görünsün.', 'Başlıkları ve toplam satırını seçmeyin: yalnızca 2–8. satırları, <b>B2</b>\'den başlayıp <b>A8</b>\'e doğru sürükleyin. Excel, sürüklemeye başladığınız hücrenin sütununa göre sıralar. Daha güvenli yol: A2:B8\'i seçip <b>Veri → Sırala</b>, ölçüt Tutar, Büyükten Küçüğe.', '↓'],
+  ['Sıralayın', 'Excel\'de <b>A1:B8</b> aralığını seçin, ardından <b>Veri → Sırala</b>\'yı açın. <b>Verilerimde üst bilgi var</b> seçeneğini işaretleyip sütun olarak <b>Tutar</b>, düzen olarak <b>Büyükten Küçüğe</b> seçin. <b>Tamam</b>\'a basıp en pahalı kalemin en üstte olduğunu görün.', 'İki sütunu birlikte seçince kalem ve tutar aynı satırda kalır. B9 toplam hücresini seçime katmayın.', '↓'],
   ['Başlığı donatın', 'Tablonun üstüne yeni bir satır ekleyin (1. satır numarasına sağ tık → Ekle). <b>A1</b>\'e <b>HAFTALIK HARCAMA</b> yazıp A1 ile B1\'i seçin ve <b>Birleştir ve Ortala</b> ile tek başlık yapın.', 'Başlığı kalın yapmak okunurluğu artırır.', '🏷'],
-  ['Hatayı düzeltin', 'Bir sayının yerine yazıyla “<b>iki yüz</b>” yazın ve toplamın <b>#DEĞER!</b> verdiğini görün. Rakamla <b>200</b> yazarak düzeltin.', 'Hata kodları: #DEĞER! yazı var, #AD? işlev adı yanlış, #SAYI/0! sıfıra bölme.', '⚠'],
+  ['Metni sayıya çevirin', 'Tablonun dışındaki <b>F1</b>, <b>F2</b> ve <b>F3</b> hücrelerine sırasıyla <b>100</b>, <b>iki yüz</b> ve <b>300</b> yazın. <b>F4</b>\'e <b>=TOPLA(F1:F3)</b>, <b>F5</b>\'e <b>=F1+F2+F3</b> yazın. <b>TOPLA</b> metin hücresini atlar ve eksik toplam <b>400</b> çıkar. <b>+</b> ile toplama ise <b>#DEĞER!</b> hatası verir. F2\'ye rakamla <b>200</b> yazın. İki sonucun da <b>600</b> olduğunu görün.', '400 de bir sorun işaretidir: toplamda 200 eksiktir.', '⚠'],
   ['Özet Tablo', 'Kategoriyi <b>C</b> sütununa yazın: <b>C2</b>\'ye <b>Kategori</b>, altına her harcamanın kategorisini (Market, Fatura…). Başlık satırından son harcamaya kadar (<b>A2:C9</b>) fareyle seçin; üstteki büyük başlığı ve toplam satırını seçmeyin. Sonra <b>Ekle → Özet Tablo → Tamam</b>.', 'Sağdaki listeden <b>Kategori</b> ve <b>Tutar</b> kutularını işaretleyin: her kategorinin toplamı çıkar.', '🧮'],
-  ['Yaş hesabı', 'Alttaki <b>＋</b> ile yeni bir sayfa açın. 1. satıra <b>Ad</b>, <b>Doğum tarihi</b>, <b>Yaş</b> yazın; 2. satırdan başlayarak aile üyelerinizin adlarını ve doğum tarihlerini (ör. <b>12.04.1958</b>) girin. <b>E1</b>\'e <b>=BUGÜN()</b>, <b>C2</b>\'ye <b>=ETARİHLİ(B2;$E$1;"Y")</b> yazıp aşağı doldurun.', 'Tarih sağa yaslanmalı; sola yaslandıysa Excel onu yazı sanmıştır. Excel ETARİHLİ\'yi yazarken önermez, harf harf yazın.', '🎂'],
-  ['Sayın ve gün ekleyin', 'Aynı sayfada <b>D1</b>\'e <b>Telefon</b> yazıp altına telefonları girin, birini boş bırakın. Altına <b>=BAĞ_DEĞ_DOLU_SAY(A2:A6)</b> ile kaç kişi olduğunu, <b>=BOŞLUKSAY(D2:D6)</b> ile kaç telefonun eksik olduğunu bulun. Boş bir hücreye <b>=E1+30</b> yazıp 30 gün sonrasının tarihini görün.', 'Kaç kişi yazdıysanız aralığı ona göre değiştirin (ör. 8 kişi için A2:A9).', '🔢'],
+  ['Yaş hesabı', 'Alttaki <b>＋</b> ile yeni bir sayfa açın. 1. satıra <b>Ad</b>, <b>Doğum tarihi</b>, <b>Yaş</b> yazın; 2. satırdan başlayarak beş hayalî kişinin adını ve doğum tarihini girin (ör. <b>Kişi 1</b>, <b>12.04.1958</b>). <b>E1</b>\'e <b>=BUGÜN()</b>, <b>C2</b>\'ye <b>=ETARİHLİ(B2;$E$1;"Y")</b> yazıp aşağı doldurun.', 'Tarih sağa yaslanmalı; sola yaslandıysa Excel onu yazı sanmıştır. Excel ETARİHLİ\'yi yazarken önermez, harf harf yazın.', '🎂'],
+  ['Sayın ve gün ekleyin', 'Aynı sayfada <b>D1</b>\'e <b>Telefon</b> yazıp altına <b>Örnek 1</b>, <b>Örnek 2</b> gibi yer tutucular yazın ve bir hücreyi boş bırakın. Altına <b>=BAĞ_DEĞ_DOLU_SAY(A2:A6)</b> ile kaç kişi olduğunu, <b>=BOŞLUKSAY(D2:D6)</b> ile kaç telefonun eksik olduğunu bulun. Boş bir hücreye <b>=E1+30</b> yazıp 30 gün sonrasının tarihini görün.', 'Kaç kişi yazdıysanız aralığı ona göre değiştirin (ör. 8 kişi için A2:A9).', '🔢'],
   ['Kaydedin', '<b>Ctrl + S</b> ile <b>harcamalar</b> adıyla <b>Belgeler</b> klasörüne kaydedin. Kapatıp yeniden açarak toplamın durduğunu görün.', 'Haftaya yeni bir sayfa sekmesiyle devam edin.', '💾'],
 ]);
 
@@ -171,15 +173,22 @@ export const odev13 = odev(13, 'günlük işler: bilgisayarda ve tarayıcıda', 
 ]);
 
 export const odev14 = odev(14, 'e-Devlet, randevu ve internette işlemler', '🏛', [
-  ['e-Devlet\'e girin', '<b>turkiye.gov.tr</b> adresini <b>kendiniz yazarak</b> girin; <b>T.C. kimlik numaranızı ve e-Devlet şifrenizi yalnızca bu adreste</b> yazın. Giriş yapın.', 'Arama sonucunda çıkan reklamlardan girmeyin.', '🏛'],
-  ['Belge alın', '“Yerleşim yeri belgesi” (ikametgâh) hizmetini bulup belgeyi oluşturun ve <b>PDF olarak indirin</b>. İndirilenler\'de bulun. Belgede kişisel bilgileriniz var: ortak bilgisayarda işiniz bitince dosyayı silin (Geri Dönüşüm Kutusu\'nu da boşaltın).', 'Belgenin altındaki barkodu not edin.', '📄'],
-  ['Barkodu doğrulayın', 'e-Devlet\'te <b>Barkodlu Belge Doğrulama</b> sayfasına gidip az önceki belgenin barkodunu yazarak doğrulayın.', 'Size verilen bir belgeyi bu yolla sorgulatırsınız.', '🔎'],
-  ['Randevuları görün', '<b>MHRS</b> sitesine (mhrs.gov.tr) <b>e-Devlet ya da T.C. kimlik numaranızla giriş yaparak</b> girin ve <b>Randevularım</b> bölümüne bakın. (İstemiyorsanız yeni randevu almayın.)', 'Gidemeyecekseniz randevuyu iptal edin.', '🏥'],
-  ['e-Nabız\'a bakın', '<b>e-Devlet ile giriş</b> yoluyla e-Nabız\'a girin ve reçete ya da tahlil listenize bakın. <b>Şifreyi e-Nabız sayfasında değil, e-Devlet sayfasında</b> yazdığınızı kontrol edin.', 'Sağlık bilgileriniz özeldir; işiniz bitince çıkış yapın.', '🩺'],
-  ['Kayıtlı hatlar', 'e-Devlet\'te “<b>Mobil Hat Sorgulama</b>”yı açıp adınıza kayıtlı hatlara bakın. Tanımadığınız bir hat var mı?', 'Bilmediğiniz bir hat varsa operatörüne başvurup kapattırın.', '📱'],
-  ['Kart ayarları', 'Bankanızın mobil uygulamasında ya da internet şubesinde kartınızın <b>internet alışverişi</b> ayarını ve <b>sanal kart</b> seçeneğini bulun. Değiştirmeniz gerekmez; yerini öğrenin.', 'Şifrenizi yalnızca bankanın kendi uygulamasına yazın; SMS kodunu kimseye söylemeyin.', '💳'],
-  ['Çıkış yapın', 'Bütün sitelerden <b>Çıkış</b> yapın. Sonra tarayıcıda <b>Ctrl + Shift + Del</b> ile tarama verilerini temizlemeyi düşünün (ortak bilgisayardaysanız).', 'Oturum açık kalırsa sonraki kişi girebilir.', '🚪'],
-]);
+  ['Adresi kontrol edin', '<b>e-Devlet’ten belge almak</b> dersindeki alıştırma tarayıcısına <b>turkiye.gov.tr</b> yazın. Adres çubuğunu okuyup <b>Giriş Yap</b>’ı seçin ve derste gösterilen örnek hesap kartını kullanın.', 'Ortak bilgisayarda tarayıcı şifreyi kaydetmeyi sorarsa Hayır’ı seçin ve “Beni hatırla” kutusunu boş bırakın.', '🏛'],
+  ['Örnek belgeyi indirin', 'Aynı derste <b>ikametgâh</b> hizmetini bulun. Örnek belgeyi oluşturun, <b>Belgeyi indir (PDF)</b>’ye basın ve dosya adını <b>İndirilenler</b>’de bulun. Sınıf uygulamasında öğretmenin hazırladığı <b>egitim-belgesi.pdf</b> dosyasını indirin.', 'Temizleme adımında doğru dosyayı seçebilmek için adını aklınızda tutun.', '📄'],
+  ['Örnek barkodu doğrulayın', 'Alıştırma e-Devlet ana sayfasındaki <b>Barkodlu Belge Doğrulama</b> bölümünü açın. Örnek PDF’in altındaki barkodu yazıp <b>Doğrula</b>’ya basın.', 'Sınıfta öğretmenin gösterdiği örnek barkodu eğitim sayfasında deneyin.', '🔎'],
+  ['Örnek randevuyu görün', '<b>Hastane randevusu: form doldurmak</b> dersinde formu örnek bilgilerle doldurun ve <b>Randevularım</b>’da oluşturduğunuz alıştırma randevusunu bulun.', 'Sınıf uygulamasında örnek randevu ekranında tarih, saat ve bölümün yerini gösterin.', '🏥'],
+  ['Örnek sağlık ekranını inceleyin', '<b>e-Nabız: reçete ve tahlil sonuçlarınıza bakmak</b> dersindeki <b>e-Devlet ile giriş yap</b> düğmesini kullanın. Girişten önce alıştırma tarayıcısının adres çubuğunu kontrol edin, sonra <b>Tahlil sonuçlarım</b>’dan bir örnek açın.', 'Sınıf uygulamasında örnek yönlendirme ekranının adresini okuyup sağlık ekranında sonuç listesini gösterin.', '🩺'],
+  ['Örnek hat listesini okuyun', '<b>e-Devlet: SGK, emekli aylığı, kayıtlı hatlar; belediye ve CİMER</b> dersinde <b>Mobil Hat Sorgulama</b> hizmetini açın. Örnek listede tanınmayan bir hat gördüğünüzde kime başvuracağınızı söyleyin.', 'Sınıf uygulamasında öğretmenin verdiği örnek listeyi kullanın.', '📱'],
+  ['Örnek kart ayarını bulun', '<b>Sanal kart, IBAN kopyalama ve dekont</b> dersinde Bankam’ın örnek şubesinde <b>Kartlarım</b>’ı açıp <b>İnternet alışverişine açık</b> kutusunu ve <b>Sanal kart oluştur</b> bölümünü bulun. Sınıfta öğretmenin hazırladığı örnek kart ayarları ekranında <b>İnternet alışverişi</b> ve <b>Sanal kart</b> seçeneklerini gösterin.', 'Örnek kartta limitin ne işe yaradığını söyleyin.', '💳'],
+  ['Oturumu kapatın', 'Her uygulamayı bitirdiğinizde açtığınız eğitim hesabının <b>Çıkış</b> düğmesine basın. e-Nabız’dan çıktıktan sonra örnek e-Devlet oturumunu da kontrol edin. Sınıftaki eğitim hesabında çıkış yaptıktan sonra <b>Giriş Yap</b> ekranının yeniden geldiğini görün.', 'Sekmeyi kapatmadan önce çıkış yapın.', '🚪'],
+  ['Eğitim indirmesini temizleyin', 'PDF’yi kapatın. Belgeyi indirdiğiniz bilgisayarda <b>Dosya Gezgini → İndirilenler</b>’i açın. <b>Yalnızca indirdiğiniz örnek PDF’yi</b> seçip <b>Sil</b>’e basın ve klasörden kalktığını kontrol edin.', 'Dosya Geri Dönüşüm Kutusu’na taşındıysa yalnızca aynı örnek PDF’yi kutuda seçip silin.', '🗑'],
+], {
+  baslik: 'Örnek bilgilerle deneyin',
+  progressVersion: 2,
+  giris: 'Benzetim için 14. haftadaki ilgili dersleri kullanın. Her dersten ayrılmadan önce son iki görevdeki çıkış ve indirme temizliği adımlarını uygulayın. Sınıfta çalışıyorsanız öğretmenin hazırladığı eğitim hesabını, örnek ekranları ve <b>egitim-belgesi.pdf</b> dosyasını kullanın. Sınıf malzemeleri yoksa benzetimi seçin. <b>Yalnızca örnek bilgiler kullanın.</b> Gerçek hesap açmayın veya kimlik, şifre, sağlık ve banka bilgisi girmeyin.',
+  kisa: 'eğitim hesabıyla alıştırma',
+  aciklama: 'Benzetimde veya sınıftaki eğitim ortamında yapılır. Ödev kâğıdı yazdırılabilir.',
+});
 
 export const odev15 = odev(15, 'bilgi güvenliği', '🛡', [
   ['Fotoğrafları yedekleyin', 'Bir USB bellek ya da harici disk takın; içinde <b>Yedek</b> klasörü açıp <b>Resimler</b> klasörünüzdeki fotoğrafları oraya <b>kopyalayın</b>. Yedekteki bir fotoğrafı açıp bakın, sonra belleği <b>güvenle çıkarın</b>.', 'Kopyala (Ctrl + C) kullanın, Kes değil: asıllar bilgisayarda kalsın.', '💾'],

@@ -1,6 +1,7 @@
 // 10. hafta ek dersleri: apartman duyurusu, sayfa düzeni ve yazdırma, tablo incelikleri, simgeler ve şekiller, dilekçe parkuru
 import { K, desktopReady, maxed, norm } from './common.js';
 import { rehberSoru } from './kalip.js';
+import { wordOutput } from './kelime.js';
 
 const W = (c) => c.d.find('word')?.api;
 const info = (c) => W(c)?.info() || { blocks: [], text: '', tables: 0, images: 0, layout: {}, pages: 1, table: null };
@@ -119,11 +120,8 @@ export const apartmanDuyuru = {
       title: 'Kaydedin',
       html: `<p>${K('Ctrl', 'S')} ile <b>Belgeler</b> klasörüne <b>apartman duyurusu</b> adıyla kaydedin.</p>`,
       combo: ['Ctrl', 'KeyS'],
-      on: (ev, c) => {
-        if (ev.type !== 'doc-save') return false;
-        if (!/duyuru/i.test(ev.name)) { c.note(`“${ev.name}” olarak kaydedildi. Adı <b>apartman duyurusu</b> yapın: Dosya → Farklı kaydet.`); return false; }
-        return true;
-      },
+      on: wordOutput('doc-save', 'apartman duyurusu.docx', (doc) => !doc.blocks.some((b) => norm(b.text) === 'duyuru') ||
+        !norm(doc.text).includes('bahçede toplantı yapılacaktır') ? 'Yazdığınız apartman duyurusuna dönüp belgeyi yeniden kaydedin.' : ''),
     },
     rehberSoru({
       title: 'Hangisi iyi duyuru?',
@@ -454,8 +452,13 @@ export const simgeSekil = {
   ],
 };
 
+const parkurDilekcesi = (doc) => doc.blocks.some((b) => norm(b.text).includes('muhtarlığına')) &&
+  doc.blocks.some((b) => norm(b.text).includes('konu sokak lambası')) &&
+  doc.blocks.some((b) => norm(b.text).includes('saygılarımla arz ederim'));
+
 export const dilekceParkur = {
   id: 'dilekce-parkur', icon: '🏁', title: 'Dilekçe parkuru', minutes: 25, stage: 'desktop', parkur: true,
+  restartOnResume: true,
   desc: 'Orta seviye: dilekçe yazıp biçimlendirmek, kaydetmek, PDF yapmak. Süreler tutulur.',
   steps: [
     {
@@ -470,8 +473,11 @@ export const dilekceParkur = {
     { title: '5. Metin', html: '<p>Bir paragraf yazın (en az iki cümle): sokağınızdaki lambanın yanmadığını ve değiştirilmesini rica edin. Paragrafı şu cümleyle bitirin: <b>Gereğini saygılarımla arz ederim.</b></p>', hint: 'Satır sonlarında Enter\'a basmayın. Her cümlenin sonuna nokta koyun.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && norm(b.text).includes('lamba') && (b.text.match(/[.!?]/g) || []).length >= 2 && norm(b.text).includes('saygılarımla arz ederim'))) },
     { title: '6. İki yana yaslayın', html: '<p>Yazdığınız metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: 'Paragrafa üç tıkla; Ctrl + J.', on: when((c) => info(c).blocks.some((b) => b.text.length > 60 && b.align === 'justify')) },
     { title: '7. Tarih ve ad', html: '<p>Altına <b>bugünün tarihini</b> (Ekle → Tarih ve Saat) ve <b>adınızı soyadınızı</b> yazıp ikisini <b>sağa hizalayın</b>.</p>', hint: 'Ekle → Tarih ve Saat. İkisini birlikte seçip Ctrl + R.', on: when((c) => { const b = info(c).blocks.filter((x) => x.text); const i = b.findIndex((x) => x.text.includes(today())); return i >= 0 && b[i].align === 'right' && b.slice(i + 1).some((x) => x.align === 'right' && /\p{L}{2,}/u.test(x.text)); }) },
-    { title: '8. Kaydedin', html: '<p>Belgeyi <b>dilekçe</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S.', on: (ev) => ev.type === 'doc-save' && ev.name.toLocaleLowerCase('tr').includes('dilek') },
-    { title: '9. PDF yapın', html: '<p>Aynı belgeyi <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF. Resmî kuruma göndereceğiniz belgeyi PDF yollayın, Word dosyanızı da saklayın.)', on: (ev) => ev.type === 'doc-pdf' },
+    { title: '8. Kaydedin', html: '<p>Belgeyi <b>dilekçe</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S.',
+      on: wordOutput('doc-save', 'dilekçe.docx', (doc) => !parkurDilekcesi(doc) && 'Bu parkurda yazdığınız dilekçeyi açıp yeniden kaydedin.') },
+    { title: '9. PDF yapın', html: '<p>Aynı belgeyi <b>Belgeler</b> klasörüne <b>dilekçe.pdf</b> adıyla kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF. Resmî kuruma göndereceğiniz belgeyi PDF yollayın, Word dosyanızı da saklayın.)',
+      on: wordOutput('doc-pdf', 'dilekçe.pdf', (doc) => (!parkurDilekcesi(doc) || !belgelerdekiKaynak(doc, 'dilekçe.docx')) &&
+        'Belgeler’de kaydettiğiniz dilekçe.docx dosyasını açıp PDF’yi o belgeden oluşturun.') },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Bir dilekçeyi baştan sona hazırladınız.</p>' },
   ],
 };
@@ -485,15 +491,38 @@ const PROVA_HTML = `<p>Kurs bitirme sınavı hakkında</p>
 <table class="wd-t"><tr><td>Gün</td><td>Saat</td><td>Yer</td></tr><tr><td>Pazartesi</td><td>10.00</td><td>Bilgisayar salonu</td></tr><tr><td>Salı</td><td>14.00</td><td>Bilgisayar salonu</td></tr><tr><td>Çarşamba</td><td>10.00</td><td>Toplantı salonu</td></tr></table>
 <p>Halk Eğitim Merkezi Müdürlüğü</p>`;
 const GOVDE = ['bitirme sınavı kurs salonunda', 'kimlik kartınızı', 'başarılı olan kursiyerlere'];
-const govdeler = (c) => GOVDE.map((w) => block(c, w)).filter(Boolean);
-const metinler = (c) => info(c).blocks.filter((x) => x.text);
-const yaziTipi = (c) => metinler(c).length >= 5 && metinler(c).every((x) => x.fonts?.length && x.fonts.every((n) => n === 'Times New Roman'));
+const belgelerdekiKaynak = (doc, name) => doc.folder === 'docs' && doc.fileName?.toLocaleLowerCase('tr') === name;
+const govdeler = (doc) => GOVDE.map((w) => doc.blocks.find((b) => norm(b.text).includes(w))).filter(Boolean);
+const metinler = (doc) => doc.blocks.filter((b) => b.text);
+const yaziTipi = (doc) => metinler(doc).length >= 5 && metinler(doc).every((b) => b.fonts?.length && b.fonts.every((name) => name === 'Times New Roman'));
 const near = (a, b) => Math.abs(a - b) < 0.06;
+const punto = (b, size) => b.sizes?.length && b.sizes.every((value) => near(value, size));
+const provaBasligi = (doc) => doc.blocks.find((b) => norm(b.text) === 'kurs bitirme sınavı hakkında');
+const baslikDogru = (b) => b?.align === 'center' && b.bold && punto(b, 14);
+const govdeHizasi = (doc) => govdeler(doc).length === 3 && govdeler(doc).every((b) => b.align === 'justify');
+const govdeAraligi = (doc) => govdeler(doc).length === 3 && govdeler(doc).every((b) => near(b.first, 1.25) && near(b.lh, 1.5));
+const bosluklar = (l) => l.margin === 'normal' || (l.margin === 'ozel' && ['top', 'bottom', 'left', 'right'].every((k) => l.mg?.[k] === 2.5));
+const TABLO_BASLIKLARI = ['gün', 'saat', 'yer'];
+const acikGri = (doc) => doc.table?.headCells?.length === TABLO_BASLIKLARI.length &&
+  doc.table.headCells.every((cell, i) => norm(cell.text) === TABLO_BASLIKLARI[i] && cell.color === 'rgb(231, 230, 230)');
+function provaPdfKontrolu(doc) {
+  const baslik = provaBasligi(doc);
+  if (!belgelerdekiKaynak(doc, PROVA) || !baslik) return 'Belgeler’deki sınav provası.docx belgesini açıp PDF’yi ondan oluşturun.';
+  if (!yaziTipi(doc)) return 'Belgenin tamamını Times New Roman yapıp PDF’yi yeniden kaydedin.';
+  if (!baslikDogru(baslik)) return 'Başlığın tamamını ortalı, kalın ve 14 punto yapın.';
+  if (!metinler(doc).filter((b) => b !== baslik).every((b) => punto(b, 12))) return 'Başlık dışındaki bütün metni 12 punto yapın.';
+  if (!govdeHizasi(doc) || !govdeAraligi(doc)) return 'Üç paragrafı iki yana yaslayın. İlk satır girintisini 1,25 cm, satır aralığını 1,5 yapın.';
+  if (!bosluklar(doc.layout)) return 'Dört kenar boşluğunu da 2,5 cm yapın.';
+  if (!acikGri(doc)) return 'Tablonun Gün, Saat ve Yer hücrelerinin üçüne de Açık gri uygulayın.';
+  if (doc.pageNum !== 'orta') return 'Sayfanın altına, ortaya sayfa numarası ekleyin.';
+  return '';
+}
 // Parkurda her belge olayından sonra koşula bakılır (biçim, paragraf, tablo, düzen…)
 const anyDoc = (test) => (ev, c) => ev.type.startsWith('doc-') && !!test(c);
 
 export const mebProva = {
   id: 'meb-prova', icon: '🎓', title: 'MEB sınav provası: resmî yazı', minutes: 30, stage: 'desktop', parkur: true,
+  restartOnResume: true,
   desc: 'MEB uygulama sınavındaki gibi ölçüleri verilen bir belge: Times New Roman 12, 1,5 satır aralığı, ilk satır girintisi 1,25 cm, kenar boşlukları 2,5 cm, gölgeli tablo başlığı, sayfa numarası, PDF. Süreler tutulur.',
   setup: (c) => { if (!c.d.fs.find('docs', PROVA)) c.d.fs.create('docs', { type: 'file', name: PROVA, content: { html: PROVA_HTML, layout: { margin: 'dar' } } }); },
   steps: [
@@ -501,27 +530,27 @@ export const mebProva = {
       title: 'Sınav provası',
       html: `<p>MEB uygulama sınavında size hazır bir yazı ve bir <b>ölçü listesi</b> verilir. Bu parkurda aynısını yapacaksınız. <b>Nasıl yapılacağı yazmıyor</b>; takılırsanız 💡 İpucu.</p>
         <table class="sum"><tr><td>Yazı tipi</td><td>Times New Roman, 12 punto</td></tr><tr><td>Başlık</td><td>Ortalı, kalın, 14 punto</td></tr><tr><td>Paragraflar</td><td>İki yana yaslı, ilk satır girintisi 1,25 cm, satır aralığı 1,5</td></tr>
-        <tr><td>Kenar boşlukları</td><td>Dört kenar 2,5 cm</td></tr><tr><td>Tablo</td><td>Başlık satırı gölgeli</td></tr><tr><td>Sayfa numarası</td><td>Sayfanın altında, ortada</td></tr><tr><td>Kayıt</td><td>PDF olarak</td></tr></table>`,  // Eğitmen notu: son ekranda her görevin süresi görünür.
+        <tr><td>Kenar boşlukları</td><td>Dört kenar 2,5 cm</td></tr><tr><td>Tablo</td><td>Başlık satırının üç hücresi açık gri</td></tr><tr><td>Sayfa numarası</td><td>Sayfanın altında, ortada</td></tr><tr><td>Kayıt</td><td>Belgeler → sınav provası.pdf</td></tr></table>`,  // Eğitmen notu: son ekranda her görevin süresi görünür.
       setup: (c) => { desktopReady(c); c.d.closeAll(); },
     },
     { title: '1. Belgeyi açın', html: `<p><b>Belgeler</b> klasöründeki <b>${PROVA}</b> belgesini açın.</p>`, hint: 'Dosya Gezgini → Belgeler → dosyaya çift tık. Ya da Kelime İşlemci\'de Dosya → Aç.',
-      check: (c) => /sınav provası/i.test(info(c).fileName || ''), on: (ev, c) => !!W(c) && /sınav provası/i.test(info(c).fileName || '') },
+      check: (c) => belgelerdekiKaynak(info(c), PROVA), on: (ev, c) => belgelerdekiKaynak(info(c), PROVA) },
     { title: '2. Yazı tipi ve boyutu', html: '<p>Bütün belgeyi <b>Times New Roman</b>, <b>12 punto</b> yapın.</p>', hint: 'Ctrl + A ile hepsini seçin; Giriş sekmesinde yazı tipi kutusu ve yanındaki boyut kutusu.',
-      on: anyDoc((c) => yaziTipi(c) && metinler(c).every((x) => x.size === 12)) },
+      on: anyDoc((c) => { const doc = info(c); return yaziTipi(doc) && metinler(doc).every((b) => punto(b, 12)); }) },
     { title: '3. Başlık', html: '<p>İlk satırdaki başlığı <b>ortalı, kalın ve 14 punto</b> yapın.</p>', hint: 'Başlığa üç kez tıklayıp seçin; Ctrl + E, Ctrl + B ve boyut kutusundan 14.',
-      on: anyDoc((c) => { const b = block(c, 'sınavı hakkında'); return b && b.align === 'center' && b.bold && b.size >= 14; }) },
+      on: anyDoc((c) => baslikDogru(provaBasligi(info(c)))) },
     { title: '4. İki yana yaslayın', html: '<p>Üç metin paragrafını <b>iki yana yaslayın</b>.</p>', hint: '“Bilgisayar İşletmenliği…” paragrafının başından “…gösterilmiştir.” sözcüğünün sonuna kadar sürükleyip seçin, Ctrl + J.',
-      on: anyDoc((c) => govdeler(c).length === 3 && govdeler(c).every((b) => b.align === 'justify')) },
+      on: anyDoc((c) => govdeHizasi(info(c))) },
     { title: '5. İlk satır ve satır aralığı', html: '<p>Aynı üç paragrafa <b>ilk satır girintisi 1,25 cm</b> ve <b>1,5 satır aralığı</b> verin.</p>', hint: 'Üç paragraf seçiliyken Giriş → Paragraf bölümünün sağ altındaki küçük ok (↘). Özel: İlk satır, Ölçü: 1,25 cm; Satır aralığı: 1,5 satır; Tamam.',
-      on: anyDoc((c) => govdeler(c).length === 3 && govdeler(c).every((b) => near(b.first, 1.25) && near(b.lh, 1.5))) },
+      on: anyDoc((c) => govdeAraligi(info(c))) },
     { title: '6. Kenar boşlukları', html: '<p>Belgenin kenar boşlukları dar. <b>Dört kenarı da 2,5 cm</b> yapın.</p>', hint: 'Düzen → Kenar Boşlukları ▾ → Özel Kenar Boşlukları…: Üst, Alt, Sol, Sağ kutularına 2,5 yazıp Tamam. (Hazır Normal de 2,5 cm\'dir.)',
-      on: (ev, c) => { if (ev.type !== 'doc-layout') return false; const l = info(c).layout; return l.margin === 'normal' || (l.margin === 'ozel' && ['top', 'bottom', 'left', 'right'].every((k) => l.mg?.[k] === 2.5)); } },
+      on: (ev, c) => ev.type === 'doc-layout' && bosluklar(info(c).layout) },
     { title: '7. Tablo başlığı', html: '<p>Tablonun <b>ilk satırını</b> (Gün, Saat, Yer) <b>açık gri</b> ile gölgelendirin.</p>', hint: 'İlk satırın üç hücresini soldan sağa sürükleyerek seçin; Tablo Tasarımı → Gölgelendirme ▾ → Açık gri.',
-      on: anyDoc((c) => !!info(c).table?.headShade) },
+      on: anyDoc((c) => acikGri(info(c))) },
     { title: '8. Sayfa numarası', html: '<p>Sayfanın <b>altına, ortaya</b> sayfa numarası ekleyin.</p>', hint: 'Ekle → Sayfa Numarası ▾ → Sayfanın Altı → Düz Numara 2.',
       on: (ev, c) => ev.type === 'doc-pagenum' && info(c).pageNum === 'orta' },
-    { title: '9. PDF', html: '<p>Belgeyi <b>Belgeler</b> klasörüne <b>PDF olarak</b> kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF.)',
-      on: (ev) => ev.type === 'doc-pdf' },
+    { title: '9. PDF', html: '<p>Prova belgesini <b>Belgeler</b> klasörüne <b>sınav provası.pdf</b> adıyla kaydedin.</p>', hint: 'Dosya → PDF olarak kaydet. (Gerçek Word\'de: Dosya → Farklı Kaydet → Kayıt türü: PDF.)',
+      on: wordOutput('doc-pdf', 'sınav provası.pdf', provaPdfKontrolu) },
     { final: true, title: 'Prova bitti! 🎉', html: '<p>Sınavda istenen ölçülerin hepsini uyguladınız. Gerçek sınavdan önce aynı işleri gerçek Word\'de de bir kez deneyin.</p>' },
   ],
 };

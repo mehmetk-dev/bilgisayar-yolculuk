@@ -180,13 +180,35 @@ const GEZI = {
     sl('content', { title: 'Ücret ve kayıt', body: li('Kişi başı 2.500 ₺', 'Son kayıt: 25 Ekim', 'Dernek sekreterine bildirin') }),
   ],
 };
-const sunuAcik = (c) => info(c).fileName === 'Kapadokya gezisi.pptx';
+const GEZI_DOSYA = 'Kapadokya gezisi.pptx';
+const geziKayitli = (d) => d.folder === 'docs' && d.fileName?.toLocaleLowerCase('tr') === GEZI_DOSYA.toLocaleLowerCase('tr');
+const sunuAcik = (c) => geziKayitli(info(c));
+const geziBaslik = (s) => s?.layout === 'title' && norm(s.title) === 'kapadokya gezisi'
+  && norm(s.sub) === 'çınar emekliler derneği';
+const geziFoto = (s) => s?.imgSource?.folder === 'pictures' && s.imgSource.name.toLocaleLowerCase('tr') === 'peri bacaları.jpg';
+const geziSon = (s) => s?.layout === 'only' && norm(s.title) === 'teşekkürler';
+const gecisVar = (s) => !!s.trans && s.trans !== 'none';
+function geziTamam(d, c) {
+  const { slides } = d;
+  if (slides.length !== 5 || !geziBaslik(slides[0]) || norm(slides[1].title) !== 'gezi programı'
+    || slides[1].items.length < 3 || norm(slides[2].title) !== 'peri bacaları' || !geziFoto(slides[2])
+    || norm(slides[3].title) !== 'ücret ve kayıt' || !geziSon(slides[4]) || !d.theme || d.theme === 'beyaz') {
+    c.note('Beş slaydın sırasını, başlıklarını, 2. slaydın maddelerini, 3. slaydın fotoğrafını ve renkli temayı kontrol edin.');
+    return false;
+  }
+  if (!slides.every(gecisVar)) {
+    c.note('Bir slaytta geçiş eksik. Geçişler sekmesinde bir efekt seçip Tümüne Uygula’ya basın ve yeniden kaydedin.');
+    return false;
+  }
+  return true;
+}
 
 export const sunuParkur = {
-  id: 'sunu-parkur', icon: '🏁', title: 'Sunu parkuru', minutes: 25, stage: 'desktop', parkur: true,
+  id: 'sunu-parkur', icon: '🏁', title: 'Sunu parkuru', minutes: 25, stage: 'desktop', parkur: true, progressVersion: 2,
+  restartOnResume: true,
   desc: 'Orta seviye: yarım kalmış bir sunuyu başlık, madde, fotoğraf, tema ve geçişle tamamlayıp PDF olarak kaydetmek. Süreler tutulur.',
   setup: (c) => {
-    put(c, 'docs', 'Kapadokya gezisi.pptx', 'file', GEZI);
+    put(c, 'docs', GEZI_DOSYA, 'file', GEZI);
     put(c, 'pictures', 'peri bacaları.jpg', 'file', { emoji: '🏜', bg: ['#ffcc80', '#90caf9'] });
   },
   steps: [
@@ -203,7 +225,7 @@ export const sunuParkur = {
     {
       title: '2. Başlık slaydı', html: '<p>İlk slaydın başlığına <b>Kapadokya Gezisi</b>, alt başlığına <b>Çınar Emekliler Derneği</b> yazın.</p>',
       hint: 'Soldan 1. slayda tıklayın; “Başlık eklemek için tıklayın” yazan kutuya tıklayıp yazın.',
-      ...durum((c) => { const s = info(c).slides[0]; return s && norm(s.title).includes('kapadokya') && norm(s.sub).includes('emekliler'); }),
+      ...durum((c) => geziBaslik(info(c).slides[0])),
     },
     {
       title: '3. Maddeler', html: '<p>2. slayda (Gezi programı) <b>en az üç madde</b> yazın. Örneğin: Cuma sabah hareket, Cumartesi Göreme, Pazar dönüş.</p>',
@@ -213,7 +235,7 @@ export const sunuParkur = {
     {
       title: '4. Fotoğraf', html: '<p>3. slayda (Peri bacaları) <b>Resimler</b>\'deki <b>peri bacaları.jpg</b> fotoğrafını ekleyin.</p>',
       hint: '3. slaydı seçin → Ekle → 🖼 Resim → peri bacaları.jpg → Aç.',
-      ...durum((c) => info(c).slides[2]?.img),
+      ...durum((c) => geziFoto(info(c).slides[2])),
     },
     {
       title: '5. Tema', html: '<p>Sunuya beyaz yerine renkli bir <b>tasarım teması</b> verin.</p>',
@@ -223,26 +245,40 @@ export const sunuParkur = {
     {
       title: '6. Geçişler', html: '<p><b>Bütün slaytlara</b> bir geçiş efekti verin.</p>',
       hint: 'Geçişler sekmesinde bir geçiş (ör. Solma) seçin, sonra sağdaki Tümüne Uygula\'ya basın. Geçişi olan slaytın numarasının yanında ★ görünür.',
-      ...durum((c) => { const s = info(c).slides; return s.length >= 4 && s.every((x) => x.trans !== 'none'); }),
+      ...durum((c) => { const s = info(c).slides; return s.length >= 4 && s.every(gecisVar); }),
     },
     {
       title: '7. Son slayt', html: '<p>Sununun <b>en sonuna</b> “Yalnızca başlık” düzeninde bir slayt ekleyin; başlığı <b>Teşekkürler</b> olsun.</p>',
       hint: 'Soldan son slayda tıklayın → Giriş → Yeni Slayt ▾ → Yalnızca başlık. Yeni slayt seçili slaydın altına gelir. Yeni slayda da geçiş vermeyi unutmayın.',
-      ...durum((c) => { const s = info(c).slides, z = s[s.length - 1]; return s.length >= 5 && z.layout === 'only' && norm(z.title).includes('teşekkür'); }),
+      ...durum((c) => { const { slides } = info(c); return slides.length === 5 && geziSon(slides[4]); }),
     },
     {
-      title: '8. Kaydedin', html: '<p>Sunuyu <b>kaydedin</b> (aynı adla, aynı yere).</p>',
+      title: '8. Kaydedin', html: '<p>Yeni slayda da <b>geçiş</b> verin. Sonra sunuyu <b>kaydedin</b> (aynı adla, aynı yere).</p>',
       hint: `${K('Ctrl', 'S')} ya da Dosya → Kaydet.`,
       on: (ev, c) => {
-        if (ev.type !== 'ppt-save') return false;
-        if (!info(c).slides.every((x) => x.trans !== 'none')) c.note('Kaydedildi. Bir slaytta geçiş eksik görünüyor; son slayda da geçiş verin, sonra yeniden kaydedin.');
-        return true;
+        if (ev.type !== 'ppt-save' && ev.type !== 'ppt-pdf') return false;
+        if (ev.type !== 'ppt-save' || ev.folder !== 'docs' || ev.name.toLocaleLowerCase('tr') !== GEZI_DOSYA.toLocaleLowerCase('tr')) {
+          c.note('Dosya → Farklı Kaydet ile sunuyu Belgeler klasörüne Kapadokya gezisi.pptx olarak kaydedin.');
+          return false;
+        }
+        return geziTamam(info(c), c);
       },
     },
     {
-      title: '9. PDF', html: '<p>Bilgisayarı olmayan üyelere göndermek için sunuyu <b>PDF olarak</b> Belgeler\'e kaydedin.</p>',
+      title: '9. PDF', html: '<p>Sunuyu <b>sanal PDF olarak</b> Belgeler\'e kaydedin.</p>',
       hint: 'Dosya → 📤 Dışarı Aktar → 📕 PDF/XPS Belgesi Oluştur → Kaydet. (Ya da Dosya → Farklı Kaydet → Kayıt türü: PDF.)',
-      on: (ev) => ev.type === 'ppt-pdf' && ev.slides >= 5,
+      on: (ev, c) => {
+        if (ev.type !== 'ppt-pdf') return false;
+        const d = info(c);
+        if (!geziTamam(d, c)) return false;
+        if (!geziKayitli(d) || d.dirty) {
+          c.note('Önce güncel sunuyu Belgeler klasörüne Kapadokya gezisi.pptx olarak kaydedin.');
+          return false;
+        }
+        if (ev.folder === 'docs' && /\.pdf$/i.test(ev.name) && ev.slides === 5) return true;
+        c.note('Beş sayfalık PDF’yi Belgeler klasörüne dışarı aktarın.');
+        return false;
+      },
     },
     { final: true, title: 'Parkur bitti! 🏁', html: '<p>Bir sunuyu baştan sona kendiniz tamamladınız.</p>' },
   ],

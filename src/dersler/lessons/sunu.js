@@ -127,14 +127,24 @@ export const sunu = {
         <p>Sonraki slayt için fareyle tıklayın ya da ${K('→')}. Sonuna kadar gidin ve ${K('Esc')} ile çıkın.</p>`,
       combo: ['F5'],
       hint: 'Dizüstü bilgisayarlarda F5 için Fn tuşu gerekebilir. Slayt Gösterisi sekmesindeki düğme de aynı işi yapar.',
-      on: (e) => e.type === 'ppt-show-exit' && e.finished,
+      on: (e, c) => {
+        if (e.type !== 'ppt-show-exit') return false;
+        if (e.from === 0 && !e.rehearse && e.allSeen && (e.finished || e.at === info(c).slides.length - 1)) return true;
+        c.note('F5 ile baştan başlayın. Bütün slaytları gösterin ve son slaytta Esc ile çıkın.');
+        return false;
+      },
       done: 'Sunum yaparken F5 ile başlar, ok tuşlarıyla ilerlersiniz. Perdeye yansıtırken de böyledir.',
     },
     {
       title: 'Kaydedin',
       html: `<p>${K('Ctrl', 'S')} ile <b>Belgeler</b> klasörüne <b>bahçemiz</b> adıyla kaydedin.</p>`,
       combo: ['Ctrl', 'KeyS'],
-      on: (e) => e.type === 'ppt-save',
+      on: (e, c) => {
+        if (e.type !== 'ppt-save' && e.type !== 'ppt-pdf') return false;
+        if (e.type === 'ppt-save' && e.folder === 'docs' && e.name.toLocaleLowerCase('tr') === 'bahçemiz.pptx') return true;
+        c.note('Dosya → Farklı Kaydet ile Belgeler klasörünü ve PowerPoint Sunusu (*.pptx) türünü seçin. Dosya adını bahçemiz yazın.');
+        return false;
+      },
       done: 'PowerPoint dosyalarının uzantısı <b>.pptx</b>\'tir; turuncu 📙 simgesiyle görünür. Gerçek PowerPoint\'te ilk kayıtta Kaydet penceresinde dosyanın nereye gideceğine (<b>Bu bilgisayar</b> ya da <b>OneDrive</b>) bakın.',
     },
     { final: true, title: 'Tebrikler! 🎉', html: '<p>İlk sununuzu hazırlayıp gösterdiniz:</p>' },

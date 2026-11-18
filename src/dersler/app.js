@@ -12,6 +12,8 @@ import { startIcons } from '../icons.js';
 const $ = (s) => document.querySelector(s);
 const K = (...names) => names.map((n) => `<kbd>${n}</kbd>`).join(' + ');
 const HINT_DELAY = 40000;
+const isRequiredStep = (s) => !s.final && !!(s.on || s.manual);
+const missingSteps = (l, progress) => l.steps.flatMap((s, i) => isRequiredStep(s) && !progress?.stats?.[i] ? [i] : []);
 
 // ---- Öğrenci profilleri: aynı bilgisayarı kullananların ilerlemesi ayrı saklanır ----
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } };
@@ -122,7 +124,7 @@ function showOzet() {
   clearTimeout(hintTimer);
   const t = ozetTable();
   $('#ozet').innerHTML = `<div class="oz"><h1>📊 Eğitmen özeti</h1>
-    <p class="mut">Bu bilgisayarda kayıtlı öğrencilerin her haftada bitirdiği ders sayısı ve test puanı (ilk denemede doğru bilinen sorular). Yeşil: hafta tamam, sarı: yarım. Kayıtlar yalnızca bu bilgisayarın tarayıcısındadır; her bilgisayarın özeti ayrıdır.</p>
+    <p class="mut">Bu özet, öğrencilerin uygulamada bitirdiği dersleri ve ilk denemede doğru bildiği test sorularını gösterir. Gerçek bilgisayar yeterliliğini değerlendirmek için öğrencinin görevi ipucusuz yapmasını ve ortaya çıkan dosya veya sonucu ayrıca kontrol edin. Yeşil, haftanın tamamlandığını; sarı, kısmen tamamlandığını gösterir. Kayıtlar bu bilgisayarın tarayıcısında saklanır.</p>
     ${t ? `<div class="oz-wrap">${t}</div><div class="oz-btns"><button type="button" class="btn" id="ozPrint">Yazdır</button><a class="btn" href="#">Ders listesi</a></div>` : '<p>Henüz kayıtlı öğrenci yok. Öğrenciler üstteki 👤 düğmesinden adlarını ekleyince burada görünür.</p><a class="btn" href="#">Ders listesi</a>'}</div>`;
   const pr = $('#ozPrint');
   if (pr) pr.onclick = () => {
@@ -351,6 +353,10 @@ $('#home').addEventListener('click', (e) => {
 
 function openLesson(l) {
   if (lesson === l) return;
+  if (lesson) saveProgress();
+  if (step && ctx) { try { step.leave?.(ctx); } catch (err) { console.error(err); } }
+  step = null;
+  ctx = null;
   lesson = l;
   late = [];
   const stage = l.stage || 'notepad';
@@ -366,6 +372,19 @@ function openLesson(l) {
   $('#crumb').textContent = l.title;
   $('#dots').innerHTML = l.steps.map((s, i) => `<button type="button" data-i="${i}" title="${esc(s.title)}"></button>`).join('');
   const p = store.lessons[l.id] || {};
+  const restarting = l.restartOnResume && !p.done &&
+    (p.step > 0 || p.max > 0 || Object.keys(p.stats || {}).length > 0);
+  if (restarting || l.progressVersion) {
+    // Eski sürümdeki yarım ders kaydı yeni adım sırasına taşınamaz.
+    if (restarting || (p.version !== l.progressVersion && !p.done)) {
+      p.step = 0;
+      p.max = 0;
+      p.stats = {};
+    }
+    if (l.progressVersion) p.version = l.progressVersion;
+    store.lessons[l.id] = p;
+    persist();
+  }
   np.active = stage === 'notepad';
   if (stage === 'notepad') {
     np.setState(p.np);
@@ -377,8 +396,10 @@ function openLesson(l) {
     requestAnimationFrame(() => {
       if (lesson !== l) return;
       getDesk().reset(l.desktop || {});
+      if (l.restartOnResume) base = null;
       l.setup?.(ctxBase());
       startAt(p);
+      if (restarting) msg('note', 'Benzetimdeki dosyalar yeniden açılışta sıfırlandığı için parkur baştan başladı.');
     });
   } else {
     l.setup?.(ctxBase());
@@ -422,12 +443,12 @@ function showStep(i, resumed = false) {
   done = false;
   stepStart = now;
   stepWarns = 0;
-  ctx = Object.assign(Object.create(ctxBase()), {
+  const stepCtx = ctx = Object.assign(Object.create(ctxBase()), {
     s: {},
     resumed,
     warn: (h) => { stepWarns++; msg('warn', h); },
     note: (h) => msg('note', h),
-    complete: () => { if (!done) complete(); },
+    complete: () => { if (ctx === stepCtx && lesson === stepCtx.lesson && !done) complete(); },
     emit: (type, data = {}) => onEvent({ type, ...data }),
   });
   const total = lesson.steps.length;
@@ -440,10 +461,11 @@ function showStep(i, resumed = false) {
     bt.classList.toggle('seen', j <= p.max);
   });
 
-  $('#stepTitle').textContent = step.title;
-  let body = typeof step.html === 'function' ? step.html(ctx) : step.html || '';
+  const missing = step.final ? missingSteps(lesson, p) : [];
+  $('#stepTitle').textContent = missing.length ? 'Ders özeti' : step.title;
+  let body = missing.length ? '' : typeof step.html === 'function' ? step.html(ctx) : step.html || '';
   if (step.target) body += `<div class="target">${esc(step.target)}</div>`;
-  if (step.final) body += finalHtml();
+  if (step.final) body += finalHtml(missing);
   $('#stepBody').innerHTML = body;
   const parts = [];
   if (step.mouse) parts.push(`<span class="mouse">${step.mouse}</span>`);
@@ -458,7 +480,7 @@ function showStep(i, resumed = false) {
   touch.want(step.combo || [], step.keys || []);
   $('#combo .keys')?.addEventListener('click', () => touch.press(step.combo));
 
-  const info = !step.on && !step.manual;
+  const info = !isRequiredStep(step);
   $('#next').hidden = !info || !!step.final;
   $('#next').textContent = i === 0 ? 'Başlayalım' : 'Devam';
   $('#manual').hidden = !step.manual;
@@ -481,7 +503,7 @@ function showStep(i, resumed = false) {
     try { ok = step.on(e.ev, ctx); } catch (err) { console.error(err); }
     if (ok) complete();
   }
-  if (step.final) finish();
+  if (step.final && !missing.length) finish();
   if (step.hint) hintTimer = setTimeout(() => { if (!done) $('#hint').hidden = false; }, HINT_DELAY);
   $('#guide').scrollTop = 0;
   saveProgress();
@@ -525,7 +547,7 @@ function msg(kind, html) {
 
 const fmtTime = (t) => (t >= 60 ? `${Math.floor(t / 60)} dk ${t % 60} sn` : `${t} sn`);
 
-function finalHtml() {
+function finalHtml(missing) {
   const stats = store.lessons[lesson.id]?.stats || {};
   const timed = Object.entries(stats).map(([i, s]) => ({ i: +i, ...s })).filter((s) => lesson.steps[s.i]?.on || lesson.steps[s.i]?.manual);
   const slow = [...timed].sort((a, b) => b.t - a.t);
@@ -537,7 +559,7 @@ function finalHtml() {
   } else if (lesson.test) {
     const sc = testScore(lesson);
     report = `<div class="score"><b>${sc.right} / ${sc.total}</b><span>soruyu ilk denemede doğru bildiniz</span></div>
-      ${lesson.sertifika ? (sc.right / sc.total >= 0.7 ? '<div class="cert-ok">🎓 Kursu başarıyla tamamladınız! Belgenizi yazdırabilirsiniz.</div><p><button type="button" class="btn primary" data-act="cert">🎓 Kurs bitirme belgesini yazdır</button></p>' : '<p class="mut">Belge için soruların en az %70\'ini ilk denemede bilmek gerekir. Aşağıdaki konulara bakıp sınavı yeniden çözebilirsiniz.</p>') : ''}
+      ${lesson.sertifika && !missing.length ? (sc.right / sc.total >= 0.7 ? '<div class="cert-ok">🎓 Kursu başarıyla tamamladınız! Belgenizi yazdırabilirsiniz.</div><p><button type="button" class="btn primary" data-act="cert">🎓 Kurs bitirme belgesini yazdır</button></p>' : '<p class="mut">Belge için soruların en az %70\'ini ilk denemede bilmek gerekir. Aşağıdaki konulara bakıp sınavı yeniden çözebilirsiniz.</p>') : ''}
       ${sc.missed.length ? `<details class="rep-d" open><summary>Tekrar bakılacak konular</summary><ul>${sc.missed.map((s) => `<li>${esc(s.title)}</li>`).join('')}</ul></details>` : '<p>Hepsini ilk denemede bildiniz! 🌟</p>'}`;
   } else if (slow.length >= 3) {
     report = `<details class="rep-d"><summary>En çok zaman aldığınız adımlar</summary><table class="sum rep">${slow.slice(0, 3).map((s) => `<tr><th>${esc(lesson.steps[s.i].title)}</th><td>${fmtTime(s.t)}${s.w ? ` · ${s.w} uyarı` : ''}</td></tr>`).join('')}</table></details>`;
@@ -548,7 +570,12 @@ function finalHtml() {
   const sumRow = ([k, v]) => { const p = keyParts(k); return `<tr><th${p ? '' : ' class="txt"'}>${p ? p.map((x, i) => (i % 2 ? x : `<kbd>${x}</kbd>`)).join('') : k}</th><td>${v}</td></tr>`; };
   const sum = lesson.summary ? `<table class="sum">${lesson.summary.map(sumRow).join('')}</table>` : '';
   const nx = nextLesson();
-  return `${sum}${report}
+  const previouslyDone = missing.length && store.lessons[lesson.id]?.done;
+  const pending = previouslyDone ? '<p><b>Ders daha önce tamamlandı.</b> Eski kayıtta bazı adımların ayrıntıları eksik. Yeni bir sonuç almak için dersi baştan yapabilirsiniz.</p>' :
+    missing.length ? `<p><b>${missing.length} zorunlu adım henüz tamamlanmadı.</b> Dersi bitirmek için eksik adımlara dönün.</p>
+    <details class="rep-d"><summary>Eksik adımlar</summary><ol>${missing.map((i) => `<li value="${i + 1}">${esc(lesson.steps[i].title)}</li>`).join('')}</ol></details>
+    <p><button type="button" class="btn primary" data-act="missing">İlk eksik adıma dön</button></p>` : '';
+  return `${pending}${sum}${previouslyDone ? '' : report}
     <div class="fbtns">
       ${nx ? `<a class="btn primary" href="#ders/${nx.id}">Sonraki ders: ${esc(nx.title)}</a>` : ''}
       ${lesson.summary ? '<button type="button" class="btn" data-act="print">Özet kartını yazdır</button>' : ''}
@@ -582,6 +609,10 @@ $('#stepBody').addEventListener('click', (e) => {
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'print') printCard();
   if (act === 'cert') printCert();
+  if (act === 'missing') {
+    const [first] = missingSteps(lesson, store.lessons[lesson.id]);
+    if (first !== undefined) showStep(first, true);
+  }
   if (act === 'download') download();
   if (act === 'restart') restart();
 });
@@ -609,7 +640,9 @@ function printCard() {
 
 // Kurs bitirme sınavında %70 ve üstü: adı, tarihi ve puanı yazan basit bir belge
 function printCert() {
+  if (!lesson?.sertifika || !step?.final || missingSteps(lesson, store.lessons[lesson.id]).length) return;
   const sc = testScore(lesson);
+  if (!sc.total || sc.right / sc.total < 0.7) return;
   const d = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   $('#printCard').innerHTML = `<div class="cert"><div class="cert-ic">🎓</div><h1>Kurs Bitirme Belgesi</h1><p class="cert-name">${esc(who || 'Kursiyer')}</p>
     <p>15 haftalık <b>Temel Bilgisayar Kullanımı</b> kursunu tamamlamış ve kurs bitirme sınavında <b>${sc.right} / ${sc.total}</b> soruyu ilk denemede doğru cevaplamıştır.</p>
@@ -691,7 +724,7 @@ function updatePano(ev) {
 }
 
 function saveProgress() {
-  if (!lesson) return;
+  if (!lesson || !step) return;
   const p = (store.lessons[lesson.id] ||= {});
   p.step = idx;
   if (lesson.stage === 'notepad') p.np = np.getState();

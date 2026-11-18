@@ -335,8 +335,20 @@ export const excelYazdir = {
   ],
 };
 
+const PAZAR = [['Domates', 45], ['Peynir', 120.5], ['Zeytin', 85], ['Ekmek', 15], ['Süt', 38.75]];
+const PAZAR_SIRALI = [...PAZAR].sort((a, b) => b[1] - a[1]);
+const pazarRows = (c, products) => products.every(([name, price], i) => (
+  norm(cell(c, 'A' + (i + 1)).raw) === norm(name) && near(cell(c, 'B' + (i + 1)).value, price)
+));
+const pazarTotal = (c) => {
+  const total = cell(c, 'B6');
+  return /^=\s*TOPLA\s*\(\s*\$?B\$?1\s*:\s*\$?B\$?5\s*\)$/i.test(total.raw.trim()) && near(total.value, 304.25);
+};
+const pazarCurrency = (c) => ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'].every((a) => cell(c, a).f === 'tl');
+
 export const tabloParkur = {
   id: 'tablo-parkur', icon: '🏁', title: 'Tablo parkuru', minutes: 25, stage: 'desktop', parkur: true,
+  restartOnResume: true,
   desc: 'Orta seviye: pazar harcamasını yazıp toplatmak, sıralamak. Süreler tutulur.',
   steps: [
     {
@@ -350,13 +362,35 @@ export const tabloParkur = {
       html: '<p>A1\'den A5\'e ürün adlarını, B1\'den B5\'e fiyatlarını yazın:<br><b>Domates 45 · Peynir 120,50 · Zeytin 85 · Ekmek 15 · Süt 38,75</b></p>',
       hint: 'Her satırda ürün adını yazıp Tab\'a basın (yan hücreye geçer), fiyatı yazıp Enter\'a basın (alt satırın başına iner). Virgülü kuruş için kullanın: 120,50.',
       setup: (c) => { if (!X(c)) sheetOpen(c); },
-      on: when((c) => norm(cell(c, 'A1').raw) === 'domates' && near(cell(c, 'B1').value, 45) && near(cell(c, 'B2').value, 120.5) && near(cell(c, 'B3').value, 85) && near(cell(c, 'B4').value, 15) && near(cell(c, 'B5').value, 38.75)),
+      on: when((c) => pazarRows(c, PAZAR)),
     },
-    { title: '3. Toplamı bulun', html: '<p><b>B6</b> hücresine pazarın <b>toplamını</b> hesaplatın.</p>', hint: 'B6\'ya tıklayıp ∑ Otomatik Toplam\'a basın, sonra Enter. Ya da =TOPLA(B1:B5) yazın.', on: when((c) => near(cell(c, 'B6').value, 304.25)) },
-    { title: '4. Toplamı kalın yapın', html: '<p>Toplam hücresini (B6) <b>kalın</b> yapın.</p>', hint: 'B6\'yı seçip K düğmesi ya da Ctrl + B.', on: when((c) => cell(c, 'B6').bold) },
-    { title: '5. Para biçimi', html: '<p>B1\'den B6\'ya kadar fiyatları <b>₺ (para birimi)</b> biçiminde gösterin.</p>', hint: 'B1:B6\'yı fareyle sürükleyerek seçin, ₺ düğmesine tıklayın.', on: when((c) => ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'].every((a) => cell(c, a).f === 'tl')) },
-    { title: '6. En pahalıdan sıralayın', html: '<p>A1:B5 aralığını fiyata göre <b>büyükten küçüğe</b> sıralayın. Toplam satırı yerinde kalmalı. Sürüklemeye fiyat sütunundan (B1) başlayın.</p>', hint: 'Fiyat sütunundan başlayın: B1\'e basılı tutup A5\'e doğru sürükleyin (B6, yani Toplam seçime girmesin), sonra ↓ Z→A. Excel, sürüklemeye başladığınız hücrenin sütununa göre sıralar. İlk satır Peynir olmalı.', on: when((c) => norm(cell(c, 'A1').raw) === 'peynir' && near(cell(c, 'B6').value, 304.25)) },
-    { title: '7. Kaydedin', html: '<p>Dosyayı <b>pazar</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>', hint: 'Ctrl + S, adı pazar yazın.', on: (ev) => ev.type === 'xl-save' && /pazar/i.test(ev.name) },
+    { title: '3. Toplamı bulun', html: '<p><b>B6</b> hücresinde pazarın <b>toplamını bir formülle</b> hesaplayın.</p>', hint: "B6’ya tıklayıp ∑ Otomatik Toplam’a basın, sonra Enter. Ya da =TOPLA(B1:B5) yazın.", on: when((c) => pazarRows(c, PAZAR) && pazarTotal(c)) },
+    { title: '4. Toplamı kalın yapın', html: '<p>Toplam hücresini (B6) <b>kalın</b> yapın.</p>', hint: 'B6’yı seçip K düğmesine veya Ctrl + B’ye basın.', on: when((c) => cell(c, 'B6').bold) },
+    { title: '5. Para biçimi', html: '<p>B1’den B6’ya kadar fiyatları <b>₺ (para birimi)</b> biçiminde gösterin.</p>', hint: 'B1:B6’yı fareyle sürükleyerek seçin, ₺ düğmesine tıklayın.', on: when(pazarCurrency) },
+    {
+      title: '6. En pahalıdan sıralayın',
+      html: '<p>A1:B5 aralığını fiyata göre <b>büyükten küçüğe</b> sıralayın. Her ürünün fiyatı kendi satırında, toplam ise B6’da kalsın.</p><p class="mut">Gerçek Excel’de A1:B5’in iki sütununu birlikte seçin. <b>Veri → Sırala</b> penceresinde <b>Verilerimde üst bilgi var</b> kutusunu boş bırakın, <b>B sütunu</b> ve <b>Büyükten Küçüğe</b> seçeneklerini seçin.</p>',
+      hint: 'Benzetimde sıralama sütununu seçmek için B1’den başlayıp A5’e sürükleyin. Sonra ↓ Z→A’ya basın.',
+      on: (ev, c) => ev.type === 'xl-sort' && ev.desc && ev.col === 'B' && ev.from === 'A1' && ev.to === 'B5'
+        && pazarRows(c, PAZAR_SIRALI) && pazarTotal(c),
+    },
+    {
+      title: '7. Kaydedin',
+      html: '<p>Dosyayı <b>pazar</b> adıyla <b>Belgeler</b> klasörüne kaydedin.</p>',
+      hint: 'Ctrl + S’ye basın, Belgeler klasörünü seçip dosya adını pazar yazın. Yanlış klasöre veya adla kaydettiyseniz Dosya → Farklı kaydet’i kullanın.',
+      on: (ev, c) => {
+        if (ev.type !== 'xl-save') return false;
+        if (ev.folder !== 'docs' || ev.name.toLowerCase() !== 'pazar.xlsx') {
+          c.warn('Belgeler klasörüne pazar.xlsx adıyla kaydedin.');
+          return false;
+        }
+        if (!pazarRows(c, PAZAR_SIRALI) || !pazarTotal(c) || !cell(c, 'B6').bold || !pazarCurrency(c)) {
+          c.warn('Sıralı ürün ve fiyatları, B6’daki toplam formülünü, kalın yazıyı ve para biçimini kontrol edip yeniden kaydedin.');
+          return false;
+        }
+        return true;
+      },
+    },
     { final: true, title: 'Parkur bitti! 🎉', html: '<p>Pazar listesini yazıp topladınız, biçimlendirdiniz ve sıraladınız.</p>' },
   ],
 };
