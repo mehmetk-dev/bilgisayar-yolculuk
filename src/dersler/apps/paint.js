@@ -194,6 +194,7 @@ export function paint({ desk, win, body, args, emit, setTitle, dialogs }) {
   let tool = 'pencil', prevTool = 'pencil', color = '#000000', color2 = '#ffffff', slot = 1, size = 6, brushKind = 'brush';
   let outlineMode = 'solid', fillMode = 'none', zi = 4, sbar = true;
   let fileName = null, folder = 'pictures', dirty = false, pend = null;
+  let pastedSource = null;
   const undo = [], redo = [];
   // Gerçek piksel boyutu: virt açıkken resim ekranda küçültülmüş çizilir (ör. 4000 × 3000 fotoğraf)
   let virt = false, lw = W, lh = H, sel = null;
@@ -240,9 +241,10 @@ export function paint({ desk, win, body, args, emit, setTitle, dialogs }) {
     ov.style.cursor = tool === 'text' ? 'text' : tool === 'fill' ? 'cell' : tool === 'magnifier' ? 'zoom-in' : tool === 'picker' ? 'copy' : 'crosshair';
     applyZoom();
   };
-  const grab = () => { const im = g.getImageData(0, 0, cv.width, cv.height); im.v = [virt, lw, lh]; return im; };
+  const grab = () => { const im = g.getImageData(0, 0, cv.width, cv.height); im.v = [virt, lw, lh]; im.pastedSource = pastedSource; return im; };
   const snap = () => { undo.push(grab()); if (undo.length > 30) undo.shift(); redo.length = 0; ui(); };
   const restoreImg = (img) => {
+    pastedSource = img.pastedSource;
     if (img.width !== cv.width || img.height !== cv.height) resize(img.width, img.height, false);
     g.putImageData(img, 0, 0);
     if (img.v) [virt, lw, lh] = img.v;
@@ -683,6 +685,7 @@ export function paint({ desk, win, body, args, emit, setTitle, dialogs }) {
     snap();
     if (img.width > cv.width || img.height > cv.height) resize(Math.max(cv.width, img.width), Math.max(cv.height, img.height));
     g.drawImage(img, 0, 0);
+    pastedSource = pastedSource === null || pastedSource === img ? img : false;
     changed();
     emit('paint-paste', { w: img.width, h: img.height });
   }
@@ -708,7 +711,7 @@ export function paint({ desk, win, body, args, emit, setTitle, dialogs }) {
     dirty = false;
     title(); ui();
     const [dw, dh] = dims();
-    emit('save', { name: fileName, folder, label: desk.fs.label(folder), format: jpeg ? 'jpg' : 'png', w: dw, h: dh, size: desk.fs.sizeOf(node) });
+    emit('save', { name: fileName, folder, label: desk.fs.label(folder), format: jpeg ? 'jpg' : 'png', w: dw, h: dh, size: desk.fs.sizeOf(node), pastedSource });
     return true;
   }
 
@@ -728,11 +731,13 @@ export function paint({ desk, win, body, args, emit, setTitle, dialogs }) {
     resize(W, H, false);
     undo.length = redo.length = 0;
     fileName = null; dirty = false; zi = 4;
+    pastedSource = null;
     title(); ui();
     emit('paint-new');
   }
 
   function load(content, name, fold) {
+    pastedSource = false;
     const im = new Image();
     const big = content && typeof content === 'object' && content.w && content.h;
     im.onload = () => {
@@ -749,6 +754,7 @@ export function paint({ desk, win, body, args, emit, setTitle, dialogs }) {
       }
       undo.length = redo.length = 0;
       ui();
+      emit('paint-image-loaded', { name, folder: fold, content });
     };
     im.src = pictureURL(content);
     fileName = name; folder = fold; dirty = false;

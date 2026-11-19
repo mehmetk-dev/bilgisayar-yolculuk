@@ -1,6 +1,6 @@
 // Ekran Alıntısı Aracı (Windows 11): "+ Yeni" ile ekranın bir bölümünü alır (dikdörtgen, pencere, tam ekran ya da serbest biçim),
 // istenirse beş saniye gecikmeyle; alıntıyı kalem, vurgulayıcı ve silgiyle işaretler, panoya kopyalar ya da kaydeder.
-// Olaylar: 'snip-new', 'snip-start', 'snip' { w, h, mode }, 'snip-cancel' { small }, 'snip-copy', 'save' { name, folder, label }
+// Olaylar: 'snip-new', 'snip-start', 'snip' { w, h, mode, rect? }, 'snip-cancel' { small }, 'snip-copy', 'save' { name, folder, label }
 import { ico } from '../w11ikon.js';
 
 const MODES = [['rect', 'Dikdörtgen', 'rect', 'Alınacak alanı fareyle sürükleyerek çerçeveleyin'], ['free', 'Serbest biçim', 'free', 'Fareyle istediğiniz şekli çizin; bırakınca alınır'], ['window', 'Pencere', 'window', 'Almak istediğiniz pencerenin üzerine gelip tıklayın'], ['full', 'Tam ekran', 'screen', 'Tüm ekran alınıyor']];
@@ -11,12 +11,12 @@ const COLORS = [['#d13438', 'Kırmızı'], ['#0067c0', 'Mavi'], ['#111111', 'Siy
 
 export function captureScreen(desk, emit, startMode) {
   startMode ||= 'rect';
-  const finish = (canvas, mode, small) => {
+  const finish = (canvas, mode, small, rect) => {
     if (canvas) {
       desk.imageClip = canvas;
       const t = desk.toast('Ekran alıntısı panoya kopyalandı', `<img class="to-img" src="${canvas.toDataURL()}" alt="">Paint'i açıp <b>Ctrl + V</b> ile yapıştırabilirsiniz.`, ico('copy'), 9000);
       t.classList.add('wide');
-      emit('snip', { w: canvas.width, h: canvas.height, mode });
+      emit('snip', { w: canvas.width, h: canvas.height, mode, ...(rect && { rect }) });
     } else {
       if (small) { desk.toast('Ekran Alıntısı Aracı', 'Alan çok küçüktü. Tekrar deneyin ve biraz daha büyük sürükleyin.', ico('rect')); }
       emit('snip-cancel', small ? { small: true } : {});
@@ -106,7 +106,7 @@ export function captureScreen(desk, emit, startMode) {
       const r = { x: Math.min(x, sx), y: Math.min(y, sy), w: Math.abs(x - sx), h: Math.abs(y - sy) };
       end();
       if (r.w < 20 || r.h < 20) return finish(null, 'rect', true);
-      finish(desk.renderScreen(r), 'rect');
+      finish(desk.renderScreen(r), 'rect', false, r);
     } else if (mode === 'free') {
       const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
       const r = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };

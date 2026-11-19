@@ -3,8 +3,72 @@ import { K, norm, lines } from './common.js';
 
 const hasCI = (c, word) => norm(c.np.value).split(/\s+/).includes(norm(word));
 
+const kursFormu = {
+  title: 'Kurs kayıt formunda alıştırma',
+  html: `<p>Ad Soyad alanına tıklayıp <b>Deniz Yılmaz</b> yazın. ${K('Tab')} ile önce Telefon, sonra E-posta alanına geçin. E-posta alanına <b>deniz@example.com</b> yazın.</p>
+    <p>Telefonun son rakamı yanlış. E-posta alanından ${K('Shift', 'Tab')} ile telefona dönüp numarayı <b>000 000 00 00</b> olarak düzeltin. Sonra <b>Kontrol et</b> düğmesine basın.</p>
+    <p class="mut kurs-formu-dokunmatik">Dokunmatik tuş şeridinde Tab’a veya sırasıyla Shift ve Tab’a dokunun.</p>
+    <p class="mut" id="kurs-formu-not">Örnek bilgileri kullanın. Formdaki bilgiler gönderilmez.</p>
+    <form class="kurs-formu" aria-label="Örnek kurs kayıt formu" aria-describedby="kurs-formu-not" autocomplete="off" novalidate>
+      <label>Ad Soyad <input type="text" required></label>
+      <label>Telefon <input type="tel" value="000 000 00 01" required></label>
+      <label>E-posta <input type="email" required></label>
+      <button type="submit" class="btn">Kontrol et</button>
+      <div role="status"></div>
+    </form>`,
+  setup: (c) => {
+    const form = document.querySelector('.kurs-formu');
+    const alanlar = [...form.querySelectorAll('input, button')];
+    const [ad, telefon, eposta] = alanlar;
+    const sonuc = form.querySelector('[role="status"]');
+    let fromTab = null;
+    let ters = false;
+    let adim = 0;
+
+    form.addEventListener('keydown', (e) => {
+      fromTab = e.key === 'Tab' && !e.ctrlKey && !e.altKey && !e.metaKey ? e.target : null;
+      ters = e.shiftKey;
+      // Dokunmatik tuş şeridinden gelen olay tarayıcının normal Tab hareketini başlatmaz.
+      if (fromTab && !e.isTrusted) {
+        const hedef = alanlar[alanlar.indexOf(fromTab) + (ters ? -1 : 1)];
+        if (hedef) {
+          e.preventDefault();
+          hedef.focus();
+        }
+      }
+    });
+    form.addEventListener('focusin', (e) => {
+      if (fromTab === e.relatedTarget) {
+        if (!ters && fromTab === ad && e.target === telefon && adim === 0) adim = 1;
+        if (!ters && fromTab === telefon && e.target === eposta && adim === 1) adim = 2;
+        if (ters && fromTab === eposta && e.target === telefon && adim === 2) adim = 3;
+      }
+      fromTab = null;
+    });
+    form.addEventListener('focusout', (e) => {
+      if (!form.contains(e.relatedTarget)) fromTab = null;
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (adim < 2) sonuc.textContent = 'Tab ile Ad Soyad alanından Telefon, ardından E-posta alanına geçin.';
+      else if (adim < 3) sonuc.textContent = 'E-posta alanına tıklayın ve Shift + Tab ile Telefon alanına dönün.';
+      else if (norm(ad.value) !== norm('Deniz Yılmaz')) sonuc.textContent = 'Ad Soyad alanına Deniz Yılmaz yazın.';
+      else if (telefon.value.replace(/\s/g, '') !== '0000000000') sonuc.textContent = 'Telefonu 000 000 00 00 olarak düzeltin.';
+      else if (eposta.value.trim().toLowerCase() !== 'deniz@example.com') sonuc.textContent = 'E-posta alanına deniz@example.com yazın.';
+      else {
+        sonuc.textContent = 'Üç alan da doğru.';
+        c.emit('kurs-formu-dogru');
+      }
+    });
+  },
+  keys: ['Tab', 'Shift'],
+  on: (ev) => ev.type === 'kurs-formu-dogru',
+  done: 'Tab ile ileri gittiniz, Shift + Tab ile önceki alana dönüp telefonu düzelttiniz.',
+};
+
 export const klavye = {
   id: 'klavye', icon: '⌨', title: 'Klavyeyi tanıyalım', minutes: 25, stage: 'notepad',
+  progressVersion: 1,
   desc: 'Boşluk, Enter, Backspace, Delete, Shift, Caps Lock, Türkçe harfler, ok tuşları, Tab ve Esc.',
   summary: [
     ['Boşluk', 'Kelimeler arasına boşluk'],
@@ -19,6 +83,7 @@ export const klavye = {
     ['↑ ↓ ← →', 'İmleci hareket ettirir'],
     ['Home / End', 'Satırın başına / sonuna'],
     ['Tab', 'Formda sonraki kutuya geçer'],
+    ['Shift + Tab', 'Formda önceki kutuya döner'],
     ['Esc', 'Vazgeç, menüyü kapat'],
     ['⊞ Windows', 'Başlat menüsünü açar'],
   ],
@@ -158,16 +223,17 @@ export const klavye = {
       title: 'Tab ve Esc',
       html: `<p>İki tuş daha: ${K('Tab')} (Q'nun solunda) ve ${K('Esc')} (sol üst köşede).</p>
         <ul class="big-list"><li>${K('Tab')}: formlarda <b>bir sonraki kutuya</b> geçirir. Yazıda biraz ileri boşluk bırakır.</li><li>${K('Esc')}: <b>vazgeç</b> demektir. Açılan menüyü ya da pencereyi kapatır.</li></ul>
-        <p>İkisine de bir kez basın.</p>`,
-      keys: ['Tab'],
+        <p>Not Defteri açıkken önce ${K('Esc')}, sonra ${K('Tab')} tuşuna basın.</p>`,
+      keys: ['Escape', 'Tab'],
       on: (ev, c) => {
         if (ev.type !== 'key') return false;
-        if (ev.e.key === 'Tab') { ev.e.preventDefault(); document.execCommand('insertText', false, '\t'); c.s.t = true; }
+        if (ev.e.key === 'Tab') c.s.t = true;
         if (ev.e.key === 'Escape') c.s.esc = true;
         return !!(c.s.t && c.s.esc);
       },
       done: 'Bir de ⊞ <b>Windows</b> tuşu var (Ctrl ile Alt arasında, pencere resimli). Başlat menüsünü açar; 5. haftada kullanacağız.',
     },
+    kursFormu,
     {
       title: 'Alt sıradaki tuşlar',
       html: `<p>Klavyenin en alt sırasında, boşluk çubuğunun solunda sırayla şunlar var: ${K('Ctrl')}, <b>⊞ Windows</b> (pencere işareti), ${K('Alt')}. Dizüstünde Ctrl'nin yanında bir de ${K('Fn')} olur. Boşluğun sağında ${K('AltGr')} vardır.</p>

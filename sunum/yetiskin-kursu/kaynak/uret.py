@@ -429,8 +429,15 @@ S.append(slide('Ders 1 · Alıştırma 6', 'Ok tuşları, Home ve End', table([
     [K('↑') + ' ' + K('↓') + ' ' + K('←') + ' ' + K('→'), 'İmleci harf harf, satır satır hareket ettirir. Dördüne de basın.'],
     [K('Home'), 'İmleci satırın <b>başına</b> götürür.'],
     [K('End'), 'İmleci satırın <b>sonuna</b> götürür.'],
-    [K('Tab') + ' · ' + K('Esc'), 'Formda sonraki kutuya geç · vazgeç, menüyü kapat. ' + K('⊞') + ' Windows tuşu Başlat’ı açar.']], 'kv') +
+    [K('Tab') + ' / ' + K('Shift', 'Tab'), 'Formda sonraki / önceki kutuya geç.'],
+    [K('Esc') + ' · ' + K('⊞'), 'Vazgeç, menüyü kapat · Başlat’ı aç.']], 'kv') +
     note('Fareye gerek kalmadan imleci istediğiniz yere götürebilirsiniz. Uzun satırlarda Home ve End çok zaman kazandırır.')))
+S.append(slide('Ders 1 · Form alıştırması', 'Kurs kayıt formunu doldurun', adim([
+    '<b>Ad Soyad</b> alanına <b>Deniz Yılmaz</b> yazın.',
+    K('Tab') + ' ile <b>Telefon</b> alanına, bir kez daha basarak <b>E-posta</b> alanına geçin. <b>deniz@example.com</b> yazın.',
+    K('Shift', 'Tab') + ' ile telefona dönün. Son rakamı düzeltin: <b>000 000 00 00</b>.',
+    '<b>Kontrol et</b> düğmesine basın.']) +
+    note('Örnek bilgileri kullanın. Formdaki bilgiler gönderilmez.')))
 S.append(slide('Ders 2 · F klavye ve Q klavye', 'Hangi klavyeyi kullanıyorsunuz?', table([
     ['Q klavye', 'Üst sıra <b>Q W E R T Y</b>… Bilgisayarların çoğunda böyledir.'],
     ['F klavye', 'Üst sıra <b>F G Ğ I O D</b>… 1955’te Türkçenin harf sıklığına göre tasarlandı; sesli harfler sol elin altında.'],
@@ -553,6 +560,11 @@ S.append(slide('Ders 3 · Kaydetme', 'Kaydet mi, farklı kaydet mi?', split(
           'Bir satır ekleyin, yine ' + K('Ctrl', 'S') + ': bu sefer bir şey sorulmaz.',
           'Farklı kaydet ile <b>Masaüstü</b>’ne <b>randevu kopyası</b>.',
           K('Ctrl', 'O') + ' ile Belgeler’deki asıl dosyayı açın.'], 'small'), 1.1, .9)))
+S.append(slide('Gerçek bilgisayarda ödev', 'Randevu notunu ve kopyasını kaydedin', adim([
+    'Not Defteri’nde <b>Randevu saati 10.00</b> yazın. ' + K('Ctrl', 'S') + ' ile Belgeler’e <b>Randevu notu</b> adıyla kaydedin.',
+    '<b>Dosya → Farklı kaydet</b> ile Belgeler’e <b>Randevu notu - kopya</b> adıyla kaydedin.',
+    'Kopyadaki saati <b>11.00</b> yapıp ' + K('Ctrl', 'S') + ' ile kaydedin.',
+    'Dosyaları kapatın. <b>Dosya Gezgini → Belgeler</b> üzerinden ikisini açın. Asıl notta <b>10.00</b>, kopyada <b>11.00</b> olmalı.'])))
 S.append(slide('Ders 4–5 · Tekrar', 'Alıştırmalar', table([
     ['Alışveriş listesi', 'Satırı taşıyın (' + K('Ctrl', 'X') + ' → ' + K('Ctrl', 'V') + '), ekleyin, silin, ' + K('Ctrl', 'Z') + ' ile geri getirin, listeyi çoğaltın. Başlığı <b>seçip üzerine yazın</b>.'],
     ['Kısayol yarışı', '9 görev, yalnızca kısayollarla; süre tutulur. Son görev: ' + K('Ctrl') + ' + fare tekerleği ile yazıyı büyütmek.']], 'kv') +
@@ -958,14 +970,12 @@ S.append(slide('Ders 3 · Ekran Alıntısı', 'Alıntıyı kullanmak', table([
     ['Gerçek bilgisayarda', f'{K("⊞", "Shift", "S")}, ekran kararınca yeri çerçeveleyin. Sonra WhatsApp’ta, e-postada ya da Paint’te {K("Ctrl", "V")}.'],
     ['Print Screen (PrtSc)', 'Bütün ekranı panoya alır.']], 'kv') +
     note('Bir hata mesajını, tarifi ya da adresi resim olarak saklayıp birine gönderebilirsiniz.')))
-S.append(slide('Ders 3 · Ekran alıntısıyla yardım istemek', 'Anlatmak yerine resmini gönderin', split(
-    adim(['Başlat’tan arayarak <b>Ekran Alıntısı</b>’nı açın, <b>＋ Yeni</b>.',
-          'Göstermek istediğiniz bölgeyi (ör. bir hata yazısını) çapraz sürükleyerek seçin.',
-          'Paint’i açıp ' + K('Ctrl', 'V') + '; kırmızı ◯ Elips ile önemli yeri işaretleyin.',
-          'Kaydedin; e-postaya ya da mesaja ekleyin.']),
-    ul(['Gerçekte: ' + K('⊞', 'Shift', 'S') + ' ile alanı seçin; WhatsApp Web’de ya da e-postada ' + K('Ctrl', 'V') + '.',
-        'Altına kısaca ne yapmaya çalıştığınızı yazın.'], 'small') +
-    note('Ekranda şifre, kart numarası ya da kimlik bilgisi görünüyorsa o resmi <b>kimseyle paylaşmayın</b>.'), 1.1, .9)))
+S.append(slide('Ders 3 · Ekran alıntısıyla yardım istemek', 'Yükleme hatasını gösterin', split(
+    adim(['<b>Ekran Alıntısı → ＋ Yeni</b>. Örnek ekranda yalnızca kırmızı <b>Belge yüklenemedi</b> kutusunun iki satırını seçin. Alttaki örnek e-posta dışarıda kalsın.',
+          'Paint’i açıp ' + K('Ctrl', 'V') + ' ile yapıştırın. İsterseniz kırmızı <b>Oval</b> ile yazıyı kapatmadan işaretleyin.',
+          'Resimler’e <b>hata-mesaji.png</b> olarak kaydedin. Paint’te ' + K('Ctrl', 'O') + ' ile yeniden açın.'], 'small'),
+    ul(['Hata mesajı okunuyor mu? E-posta adresi kesitin dışında mı? Kontrol edin.',
+        'Yardım mesajında ne yaparken hata aldığınızı bir cümleyle yazın. Örnek <b>Belge yüklerken hata aldım.</b>'], 'small'), 1.2, .8)))
 S.append(slide('Ders 4 · Ayarlar (30 dk)', 'Arka plan, ses, parlaklık, güncelleme', split(
     table([['Kişiselleştirme', 'Arka plan: Orman’ı seçin; kendi fotoğrafınızı da seçebilirsiniz'],
            ['Sistem', 'Ses düzeyini 30’a çekin; “Sesi kapat (sessiz)”i açıp kapatın; parlaklığı 60–80 yapın'],
@@ -1228,9 +1238,15 @@ S.append(slide('Ders 1 · E-posta', 'Okumak, yanıtlamak, göndermek', table([
     ['⬇ İndir', 'Eki bilgisayara kaydeder (İndirilenler klasörü)'],
     ['Kendi klasörüne taşı', 'İndirilenler’de bayram.jpg → ' + K('Ctrl', 'X') + ' → Resimler → ' + K('Ctrl', 'V')],
     ['↩ Yanıtla', 'Gönderene cevap; Kime ve Konu kendiliğinden dolar. Yazıp <b>➤ Gönder</b>'],
-    ['✏ Yeni posta', 'Kime: <b>elif@ornek.com</b>, Konu: <b>Bahçemiz</b>, 📎 Dosya ekle → Resimler’den çiçekler.jpg → Aç → Gönder'],
+    ['📎 Ekli cevap', 'Elif’in takip iletisini açın. Fotoğrafı doğrulayıp aynı iletiye ekli yanıt verin.'],
     ['⚠ İstenmeyen', '“ACİL: Hesabınız askıya alındı!” gibi sahte postayı buraya. Bağlantısına tıklamayın']], 'kv') +
     note('Bankalar e-postayla şifre ya da kart numarası <b>istemez</b>.')))
+S.append(slide('Ders 1 · Ekli yanıt', 'Doğru fotoğrafı seçin ve gönderin', adim([
+    'Elif’in bahçe fotoğrafını istediği <b>Ynt: Bayram fotoğrafı</b> iletisini açın.',
+    'Resimler’de benzer adlı fotoğrafları açın. <b>çiçekler.jpg</b> ayçiçeklerini, <b>çiçekler-2.jpg</b> laleleri gösterir.',
+    'Elif’in iletisinde <b>Yanıtla</b>’ya basın. Kısa bir cevap yazıp <b>çiçekler.jpg</b> dosyasını ekleyin.',
+    'Yanlış veya fazladan eki göndermeden önce <b>× (Eki çıkar)</b> ile çıkarın.',
+    'Gönderince <b>Gönderilmiş Öğeler</b>’de yanıtı açın. Alıcıyı ve yalnızca <b>çiçekler.jpg</b> dosyasının eklendiğini kontrol edin.'], 'small')))
 S.append(slide('Ders 2 · Gmail ve Hotmail', 'İki yaygın e-posta hizmeti', split(
     table([['Gmail', 'Google; adres <b>@gmail.com</b>. Google hesabı: Android, YouTube, Drive'],
            ['Hotmail / Outlook', 'Microsoft; <b>@hotmail.com</b>, <b>@outlook.com</b>, @live.com. Microsoft hesabı: Windows, Office, OneDrive'],

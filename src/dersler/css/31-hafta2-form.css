@@ -1,0 +1,24 @@
+.kurs-formu-dokunmatik { display: none; }
+body.touch .kurs-formu-dokunmatik { display: block; }
+.kurs-formu {
+  display: grid;
+  gap: 0.55em;
+  padding: 0.7em;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.kurs-formu label {
+  display: grid;
+  gap: 0.18em;
+}
+.kurs-formu input {
+  min-width: 0;
+  padding: 0.35em 0.5em;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font: inherit;
+  color: inherit;
+  background: var(--card);
+}
+.kurs-formu button { justify-self: start; }
+.kurs-formu [role="status"]:empty { display: none; }

@@ -213,8 +213,8 @@ export function mail({ desk, body, emit, setTitle }) {
     emit('mail-compose', { reply: !!o.replyTo, forward: !!o.forwardOf });
     setTimeout(() => { (view.to ? $('.w11ml-body') : $('.w11ml-to'))?.focus(); if (view.to) caretTop(); }, 0);
   }
-  // İmza önceden kutuya konduğu için imleç imzanın altına gitmesin: kutu henüz değişmediyse imleç en başa (imzanın ÜSTÜNE) konur
-  const untouched = (b) => view?.kind === 'compose' && mb.signature && b.value === view.initText;
+  // Yeni yanıtın imleci, varsa imzanın ve alıntının üstüne konur.
+  const untouched = (b) => view?.kind === 'compose' && (mb.signature || view.replyTo) && b.value === view.initText;
   function caretTop() { const b = $('.w11ml-body'); if (b && untouched(b)) b.setSelectionRange(0, 0); }
   body.addEventListener('mousedown', (e) => {
     const b = e.target.closest('.w11ml-body');
@@ -285,7 +285,7 @@ export function mail({ desk, body, emit, setTitle }) {
       view.attachments.push(a);
       render();
       if (a.size > MAX_ATTACH) $('.w11ml-err').textContent = `Bu dosya ${fmtSize(a.size)}; e-postayla en fazla 25 MB gönderilebilir.`;
-      emit('mail-attach', { name: r.name, size: a.size, tooBig: a.size > MAX_ATTACH });
+      emit('mail-attach', { name: r.name, size: a.size, tooBig: a.size > MAX_ATTACH, attachments: view.attachments.map((x) => x.name) });
     });
   }
 
@@ -383,7 +383,13 @@ export function mail({ desk, body, emit, setTitle }) {
     if (view?.kind === 'compose') {
       if (t.classList.contains('w11ml-send')) return send();
       if (t.classList.contains('w11ml-attach')) return attach();
-      if (t.dataset.unatt) { keep(); view.attachments.splice(+t.dataset.unatt, 1); render(); return; }
+      if (t.dataset.unatt) {
+        keep();
+        view.attachments.splice(+t.dataset.unatt, 1);
+        render();
+        emit('mail-detach', { attachments: view.attachments.map((a) => a.name) });
+        return;
+      }
       if (t.classList.contains('w11ml-discard')) { if (view.draftId) mb.mails = mb.mails.filter((x) => x.id !== view.draftId); view = null; render(); emit('mail-discard'); }
     }
   });

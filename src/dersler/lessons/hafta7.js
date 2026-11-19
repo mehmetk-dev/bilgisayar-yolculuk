@@ -119,67 +119,175 @@ export const paint = {
   ],
 };
 
+const alintiFile = 'hata-mesaji.png';
+
+function openAlintiExample(c) {
+  desktopReady(c);
+  let win = c.L.example;
+  if (!win?.el.isConnected) c.L.example = win = c.d.open('browser');
+  const page = win.el.querySelector('.br-page');
+  if (!page.querySelector('.alinti-error')) {
+    page.innerHTML = `<div style="padding:16px;max-width:480px;margin:auto;font:15px/1.45 system-ui">
+      <p style="margin:0 0 12px"><b>Belge yükleme</b></p>
+      <div class="alinti-error" style="width:fit-content;padding:8px 12px;background:#ffebe9;color:#771d17;border:1px solid #d87973;border-radius:6px">
+        <b>Belge yüklenemedi</b><br><span>Dosya 5 MB sınırını aşıyor.</span>
+      </div>
+      <p style="margin:16px 0 0">E-posta<br>ornek@hesap.invalid</p>
+      <small>Eğitim örneği · E-posta adresi kurgusaldır.</small>
+    </div>`;
+  }
+  if (win.min) c.d.restore(win, true);
+  c.d.focus(win, true);
+}
+
+function alintiFitsError(ev, c) {
+  const error = c.L.example?.el.querySelector('.alinti-error');
+  if (!error || ev.mode !== 'rect' || !ev.rect) return false;
+  const screen = c.d.screen.getBoundingClientRect();
+  const bounds = error.getBoundingClientRect();
+  if (!bounds.width || !bounds.height) return false;
+  const { x, y, w, h } = ev.rect;
+  const left = screen.left + x, top = screen.top + y;
+  const right = left + w, bottom = top + h;
+  // Metnin tamamı gerekir. Kutunun etrafında boşluk bırakılabilir.
+  const textRects = Array.from(error.querySelectorAll('b, span'), (el) => el.getBoundingClientRect());
+  return textRects.every((r) => left <= r.left && top <= r.top && right >= r.right && bottom >= r.bottom)
+    && left >= bounds.left - 30 && right <= bounds.right + 30
+    && top >= bounds.top - 10 && bottom <= bounds.bottom + 12;
+}
+
 export const alinti = {
   id: 'alinti', icon: '✂', title: 'Ekran Alıntısı', minutes: 20, stage: 'desktop',
-  desc: 'Ekranın bir bölümünü resim olarak almak, Paint\'e yapıştırıp işaretlemek, kaydetmek ve yardım isterken göndermek.',
+  progressVersion: 2, restartOnResume: true,
+  desc: 'Yardım isterken yalnızca hata mesajını alın, kaydettiğiniz resmi kontrol edin ve hatayı bir cümleyle açıklayın.',
   summary: [
     ['⊞ + Shift + S', 'Gerçek bilgisayarda Ekran Alıntısı kısayolu'],
-    ['Print Screen (PrtSc)', 'Bütün ekranı panoya alır'],
-    ['Ctrl + V', 'Alınan resmi Paint\'e, WhatsApp\'a, e-postaya yapıştırır'],
-    ['Kırmızı daire', 'Paint\'te sorunlu yeri gösterir'],
-    ['Dikkat', 'Şifre, kart numarası görünen ekranların resmini paylaşmayın'],
+    ['Dikdörtgen alıntı', 'Hata kutusunu seçin, kişisel bilgileri dışarıda bırakın'],
+    ['Ctrl + V', 'Alıntıyı Paint’e yapıştırır'],
+    ['Ctrl + S / Ctrl + O', 'Resmi kaydedin ve yeniden açıp kontrol edin'],
+    ['Yardım mesajı', 'Hatayı almadan hemen önce ne yaptığınızı bir cümleyle yazın'],
   ],
   steps: [
     {
-      title: 'Ekran alıntısı nedir?',
-      html: `<p>Ekranda gördüğünüz bir şeyin <b>fotoğrafını çekmek</b> gibidir: bir hata mesajını, bir tarifi, bir adresi resim olarak saklayabilir ya da birine gönderebilirsiniz.</p>
-        <p>Gerçek bilgisayarda kısayolu: ${K('⊞', 'Shift', 'S')}. Burada aynı işi <b>Ekran Alıntısı</b> programıyla yapacağız.</p>`,
-      setup: (c) => { desktopReady(c); c.d.closeAll(); c.d.open('browser', { url: 'www.hava-durumu.com.tr' }); },
+      title: 'Yardım istemeden önce',
+      html: `<p>Belge yüklerken bir hata aldığınızı düşünün. Yardım isteyeceğiniz kişi hem <b>hata mesajını</b> hem de o sırada ne yaptığınızı bilirse sorunu daha kolay anlayabilir.</p>
+        <p>Örnek ekranda hata kutusunun altında kurgusal bir e-posta adresi var. Yalnızca hata kutusunu resim olarak alacağız.</p>`,
+      setup: openAlintiExample,
     },
     {
-      title: 'Ekran Alıntısı\'nı açın',
-      html: '<p>⊞ Başlat\'ı açın, <b>ekran</b> yazın ve <b>Ekran Alıntısı</b>\'nı açın.</p>',
+      title: 'Ekran Alıntısı’nı açın',
+      html: '<p>⊞ <b>Başlat</b>’ı açın, <b>ekran</b> yazın ve <b>Ekran Alıntısı</b>’nı açın.</p>',
+      setup: openAlintiExample,
       check: (c) => !!c.d.find('snip'),
       on: (ev) => ev.type === 'app-open' && ev.app === 'snip',
     },
     {
-      title: 'Alıntı alın',
-      html: '<p><b>＋ Yeni</b>\'ye tıklayın. Ekran kararır. Hava durumunun olduğu yeri fareyle <b>çerçeveleyin</b>: sol tuşu basılı tutup çapraz sürükleyin, bırakın.</p>',
+      title: 'Yalnızca hata kutusunu alın',
+      html: '<p><b>＋ Yeni</b>’ye tıklayın. Ekran kararınca kırmızı hata kutusunun bir köşesinden karşı köşesine sürükleyin. Kutunun iki satırı da görünsün. E-posta adresini dışarıda bırakın.</p><p>Örnek sayfa kapanırsa <button type="button" class="btn" id="alinti-example">Örneği yeniden aç</button>.</p>',
       mouse: '🖱 Çapraz sürükleyin',
-      setup: (c) => c.d.ensure('snip'),
-      on: (ev) => ev.type === 'snip',
-      done: 'Resim <b>panoya</b> kopyalandı. Sağ altta küçük bir önizleme çıktı.',
-    },
-    {
-      title: 'Paint\'e yapıştırın',
-      html: `<p>Paint\'i açın ve ${K('Ctrl', 'V')}'ye basın (ya da <b>Düzenle</b> → <b>Yapıştır</b>).</p>`,
-      combo: ['Ctrl', 'KeyV'],
-      on: (ev) => ev.type === 'paint-paste',
-      done: 'Alıntı Paint\'te!',
-    },
-    {
-      title: 'Önemli yeri işaretleyin',
-      html: '<p>Resmi birine gösterirken önemli yeri işaretlemek işi kolaylaştırır. <b>Kırmızı</b> rengi ve <b>Şekiller</b>\'den <b>Oval</b>\'i seçip bugünkü sıcaklığın çevresine bir daire çizin.</p>',
+      setup: (c) => {
+        delete c.L.clip;
+        delete c.L.paintWin;
+        delete c.L.saved;
+        const prepare = () => { openAlintiExample(c); c.d.ensure('snip'); };
+        prepare();
+        document.querySelector('#alinti-example').onclick = prepare;
+      },
       on: (ev, c) => {
-        if (ev.type !== 'paint-shape' || ev.shape !== 'ellipse') return false;
-        if (ev.colorName !== 'Kırmızı') { c.note(`Daire ${ev.colorName.toLowerCase()} oldu. Kırmızı daha dikkat çeker: Ctrl + Z, kırmızıyı seçip yeniden çizin.`); return false; }
+        if (ev.type !== 'snip') return false;
+        if (!alintiFitsError(ev, c)) {
+          c.note('Tekrar <b>Yeni</b>’ye tıklayın ve <b>Dikdörtgen</b> kipinde kırmızı kutunun kenarlarından sürükleyin. Tüm hata yazısı içeride, e-posta adresi dışarıda kalsın.');
+          return false;
+        }
+        c.L.clip = c.d.imageClip;
         return true;
       },
-      done: 'Bakan kişi neyi göstermek istediğinizi hemen görür. Bir hata mesajının resmini torununuza gönderirken de böyle yapabilirsiniz.',
+      done: 'Hata kutusu panoya kopyalandı.',
     },
     {
-      title: 'Kaydedin',
-      html: `<p>${K('Ctrl', 'S')} ile <b>Resimler</b> klasörüne <b>hava durumu</b> adıyla kaydedin.</p>`,
+      title: 'Paint’e yapıştırın',
+      html: `<p><b>Başlat</b>’tan <b>Paint</b>’i açın ve ${K('Ctrl', 'V')} ile alıntıyı yapıştırın. <b>Düzenle → Yapıştır</b> yolunu da kullanabilirsiniz.</p>`,
+      combo: ['Ctrl', 'KeyV'],
+      on: (ev, c) => {
+        if (ev.type !== 'paint-paste') return false;
+        if (!c.L.clip || c.d.imageClip !== c.L.clip) {
+          c.note('<b>Geri</b> ile önceki adıma dönüp hata kutusunun alıntısını tekrar alın.');
+          return false;
+        }
+        c.L.paintWin = ev.win;
+        return true;
+      },
+    },
+    {
+      title: 'Resmi kaydedin',
+      html: `<p>İsterseniz Paint’in <b>Şekiller</b> bölümünden <b>Oval</b> ve <b>kırmızı</b> rengi seçip önemli yerin etrafını, yazı okunacak biçimde işaretleyin.</p>
+        <p>${K('Ctrl', 'S')} ile <b>Resimler</b> klasörüne <b>hata-mesaji</b> adıyla kaydedin. PNG uzantısı otomatik eklenir.</p>`,
       combo: ['Ctrl', 'KeyS'],
-      on: (ev) => ev.type === 'save' && ev.app === 'paint',
+      on: (ev, c) => {
+        if (ev.type !== 'save' || ev.app !== 'paint') return false;
+        if (ev.pastedSource !== c.L.clip) {
+          c.note('Bu Paint belgesi yalnızca doğru alıntıyı içermelidir. <b>Geri</b> ile yapıştırma adımına dönün. Paint’te <b>Dosya → Yeni</b> deyin ve doğru alıntıyı boş belgeye tekrar yapıştırın.');
+          return false;
+        }
+        if (ev.win !== c.L.paintWin || ev.folder !== 'pictures' || ev.name.toLowerCase() !== alintiFile) {
+          c.note('Alıntıyı yapıştırdığınız Paint penceresinde <b>Dosya → Farklı kaydet</b> ile resmi <b>Resimler</b> klasörüne <b>hata-mesaji.png</b> olarak kaydedin.');
+          return false;
+        }
+        c.L.saved = c.d.fs.dialogApi().read(ev.folder, ev.name);
+        return true;
+      },
     },
     {
-      title: 'Gerçek bilgisayarda',
-      html: `<ol class="steps"><li>${K('⊞', 'Shift', 'S')}'ye birlikte basın.</li><li>Ekran kararınca istediğiniz yeri çerçeveleyin.</li><li>Sonra WhatsApp\'ta, e-postada ya da Paint\'te ${K('Ctrl', 'V')} yapın.</li><li>Yardım istiyorsanız altına kısaca ne yapmaya çalıştığınızı yazın.</li></ol>
-        <div class="box">⚠ Ekranda şifre, kart numarası ya da kimlik bilgisi görünüyorsa o resmi kimseyle paylaşmayın.</div>`,
-      manual: '✔ Anladım',
+      title: 'Kaydedilen resmi yeniden açın',
+      html: `<p>Paint’te ${K('Ctrl', 'O')} ile <b>Resimler</b> klasöründeki <b>hata-mesaji.png</b> dosyasını açın. <b>Dosya → Aç</b> menüsünü de kullanabilirsiniz.</p>`,
+      combo: ['Ctrl', 'KeyO'],
+      on: (ev, c) => {
+        if (ev.type !== 'paint-image-loaded') return false;
+        if (c.L.saved && ev.content === c.L.saved && ev.folder === 'pictures' && ev.name.toLowerCase() === alintiFile) return true;
+        c.note('<b>Resimler</b> klasöründe bu derste kaydettiğiniz <b>hata-mesaji.png</b> dosyasını seçin.');
+        return false;
+      },
     },
-    { final: true, title: 'Tebrikler! 🎉', html: '<p>Ekran alıntısı almayı öğrendiniz.</p>' },
+    {
+      title: 'Açılan resmi kontrol edin',
+      html: '<p>Resimde hata mesajının tamamı okunuyor mu? E-posta adresi dışarıda kaldı mı? İkisini de kontrol edin. Gerekirse <b>Geri</b> düğmesiyle alıntı adımına dönüp resmi yeniden alın.</p>',
+      manual: '✔ Kontrol ettim',
+    },
+    {
+      title: 'Hatayı bir cümleyle açıklayın',
+      html: `<p>Yardım isteyeceğiniz kişiye hatanın <b>hangi işlemi yaparken</b> çıktığını bir cümleyle yazın.</p>
+        <form id="alinti-message"><label for="alinti-text">Yardım mesajınız</label>
+          <textarea id="alinti-text" rows="2" maxlength="180" style="display:block;width:100%;margin:6px 0" placeholder="… yaparken hata aldım."></textarea>
+          <button type="submit" class="btn">Cümleyi kontrol et</button>
+        </form>`,
+      setup: (c) => {
+        const form = document.querySelector('#alinti-message');
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          c.emit('alinti-message', { value: form.querySelector('textarea').value });
+        });
+      },
+      on: (ev, c) => {
+        if (ev.type !== 'alinti-message') return false;
+        const value = ev.value.trim().toLocaleLowerCase('tr');
+        if (/[\w.+-]+@[\w.-]+/.test(value)) {
+          c.note('E-posta adresini mesajdan çıkarın ve yeniden deneyin.');
+        } else if (!/(belge|dosya|pdf)/.test(value) || !/(yükle|ekle|gönder)/.test(value)) {
+          c.note('Bir cümleyle hangi belge veya dosya işlemini yapmaya çalışırken hata aldığınızı yazın.');
+        } else if (!/^[^.!?\n]+[.!?]?$/.test(value)) {
+          c.note('Yaptığınız işlemi tek bir cümleyle anlatın.');
+        } else {
+          return true;
+        }
+        return false;
+      },
+      done: 'Yardım mesajınız, hatayı hangi işlem sırasında aldığınızı açıklıyor.',
+    },
+    {
+      final: true, title: 'Tebrikler! 🎉',
+      html: `<p>Hata mesajını içeren resmi ve bir cümlelik açıklamanızı birlikte paylaşabilirsiniz. Gerçek bilgisayarda ekran alıntısını ${K('⊞', 'Shift', 'S')} ile başlatabilirsiniz.</p>
+        <div class="box">⚠ Göndermeden önce kaydettiğiniz resmi açın. Şifre, kart numarası, kimlik bilgisi veya e-posta adresi görünüyorsa alıntıyı yeniden alın.</div>`,
+    },
   ],
 };
 

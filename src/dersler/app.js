@@ -399,7 +399,7 @@ function openLesson(l) {
       if (l.restartOnResume) base = null;
       l.setup?.(ctxBase());
       startAt(p);
-      if (restarting) msg('note', 'Benzetimdeki dosyalar yeniden açılışta sıfırlandığı için parkur baştan başladı.');
+      if (restarting) msg('note', `Benzetimdeki dosyalar yeniden açılışta sıfırlandığı için ${l.parkur ? 'parkur' : 'ders'} baştan başladı.`);
     });
   } else {
     l.setup?.(ctxBase());
